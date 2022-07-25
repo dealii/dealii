@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2021 by the deal.II authors
+// Copyright (C) 2007 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,12 +27,13 @@ namespace
 {
   template <int dim>
   void
-  print_value_at_point(const Function<dim> &function, const Point<dim> &point)
+  print_value_and_gradient_at_point(const Function<dim> &function,
+                                    const Point<dim> &   point)
   {
     deallog << "point = " << point << std::endl;
     deallog << "value = " << function.value(point) << std::endl;
+    deallog << "gradient = " << function.gradient(point) << std::endl;
   }
-
 
 
   void
@@ -50,16 +51,16 @@ namespace
     const Functions::SignedDistance::Ellipsoid<dim> ellipsoid(center, radii);
 
     deallog << "center" << std::endl;
-    print_value_at_point(ellipsoid, center);
+    print_value_and_gradient_at_point(ellipsoid, center);
     deallog << "inside" << std::endl;
-    print_value_at_point(ellipsoid, Point<dim>(0.));
-    print_value_at_point(ellipsoid, Point<dim>(1.5));
+    print_value_and_gradient_at_point(ellipsoid, Point<dim>(0.));
+    print_value_and_gradient_at_point(ellipsoid, Point<dim>(1.5));
     deallog << "on ellipse" << std::endl;
-    print_value_at_point(ellipsoid, Point<dim>(-1.));
-    print_value_at_point(ellipsoid, Point<dim>(3.));
+    print_value_and_gradient_at_point(ellipsoid, Point<dim>(-1.));
+    print_value_and_gradient_at_point(ellipsoid, Point<dim>(3.));
     deallog << "outside" << std::endl;
-    print_value_at_point(ellipsoid, Point<dim>(-2.));
-    print_value_at_point(ellipsoid, Point<dim>(6.));
+    print_value_and_gradient_at_point(ellipsoid, Point<dim>(-2.));
+    print_value_and_gradient_at_point(ellipsoid, Point<dim>(6.));
 
     deallog << std::endl;
   }
@@ -81,20 +82,20 @@ namespace
     const Functions::SignedDistance::Ellipsoid<dim> ellipsoid(center, radii);
 
     deallog << "center" << std::endl;
-    print_value_at_point(ellipsoid, center);
+    print_value_and_gradient_at_point(ellipsoid, center);
     deallog << "inside" << std::endl;
-    print_value_at_point(ellipsoid, {3., 1.});
-    print_value_at_point(ellipsoid, {3.5, 2.});
-    print_value_at_point(ellipsoid, {3.1, 1.9});
+    print_value_and_gradient_at_point(ellipsoid, {3., 1.});
+    print_value_and_gradient_at_point(ellipsoid, {3.5, 2.});
+    print_value_and_gradient_at_point(ellipsoid, {3.1, 1.9});
     deallog << "on ellipse" << std::endl;
-    print_value_at_point(ellipsoid, {2., 2.});
-    print_value_at_point(ellipsoid, {3., 4.});
-    print_value_at_point(ellipsoid, {2.5, 2. + std::sqrt(3.)});
+    print_value_and_gradient_at_point(ellipsoid, {2., 2.});
+    print_value_and_gradient_at_point(ellipsoid, {3., 4.});
+    print_value_and_gradient_at_point(ellipsoid, {2.5, 2. + std::sqrt(3.)});
     deallog << "outside" << std::endl;
-    print_value_at_point(ellipsoid, {3., -1.});
-    print_value_at_point(ellipsoid, {-1., 2.});
-    print_value_at_point(ellipsoid, {0., 0.});
-    print_value_at_point(ellipsoid, {4., 5.});
+    print_value_and_gradient_at_point(ellipsoid, {3., -1.});
+    print_value_and_gradient_at_point(ellipsoid, {-1., 2.});
+    print_value_and_gradient_at_point(ellipsoid, {0., 0.});
+    print_value_and_gradient_at_point(ellipsoid, {4., 5.});
 
     deallog << std::endl;
   }

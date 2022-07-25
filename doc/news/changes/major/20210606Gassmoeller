@@ -1,5 +1,0 @@
-Improved: The internal particle handler storage structure has been reworked to
-allow for significantly faster particle sorting and iteration as well as for
-future improvements and extensions.
-<br>
-(Rene Gassmoeller, Bruno Blais, Martin Kronbichler, Peter Munch, 2021/06/06)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2223,17 +2223,6 @@ CellAccessor<dim, spacedim>::set_subdomain_id(
          ExcMessage("set_subdomain_id() can only be called on active cells!"));
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index] =
     new_subdomain_id;
-}
-
-
-
-template <int dim, int spacedim>
-types::subdomain_id
-CellAccessor<dim, spacedim>::level_subdomain_id() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]
-    ->level_subdomain_ids[this->present_index];
 }
 
 

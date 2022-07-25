@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,6 +26,9 @@
 #   OPENCASCADE_INCLUDE_DIRS
 #   OPENCASCADE_LIBRARIES
 #   OPENCASCADE_VERSION
+#   OPENCASCADE_VERSION_MAJOR
+#   OPENCASCADE_VERSION_MINOR
+#   OPENCASCADE_VERSION_SUBMINOR
 #
 
 
@@ -48,6 +51,18 @@ IF(EXISTS ${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx)
   STRING(REGEX REPLACE
     "#define OCC_VERSION_COMPLETE.*\"(.*)\"" "\\1"
     OPENCASCADE_VERSION "${OPENCASCADE_VERSION}"
+    )
+  STRING(REGEX REPLACE
+    "^([0-9]+).*$" "\\1"
+    OPENCASCADE_VERSION_MAJOR "${OPENCASCADE_VERSION}"
+    )
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.([0-9]+).*$" "\\1"
+    OPENCASCADE_VERSION_MINOR "${OPENCASCADE_VERSION}"
+    )
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    OPENCASCADE_VERSION_SUBMINOR "${OPENCASCADE_VERSION}"
     )
 ENDIF()
 

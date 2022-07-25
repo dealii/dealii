@@ -170,7 +170,8 @@ namespace hp
   /**
    * This class implements a collection of objects.
    *
-   * It implements the concepts stated in the @ref hpcollection
+   * It implements the concepts stated in the
+   * @ref hpcollection
    * module described in the doxygen documentation.
    *
    * @ingroup hp hpcollection

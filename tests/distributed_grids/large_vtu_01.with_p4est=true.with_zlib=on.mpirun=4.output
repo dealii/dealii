@@ -1,0 +1,14 @@
+
+DEAL:0::n_global_active_cells: 8 n_global_levels: 2
+DEAL:0::<?xml version="1.0" ?> 
+<!-- 
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="216" NumberOfCells="64" >
+OK
+
+
+
+
+
+

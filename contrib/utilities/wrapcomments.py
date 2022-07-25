@@ -18,11 +18,23 @@
 #
 # Written by timo.heister@gmail.com
 
-# run this script on all headers of deal.II to fix comment line wrapping for
-# doxygen comments.
-# Example:
-# cd include
-# find . -name "*h" -print | while read file;do ../contrib/utilities/wrapcomments.py $file >temp;mv temp $file;done
+# This Python script detects problems in the formatting of doxygen-style
+# comments in our header files. The tool used to also rewrap the text to 78 columns,
+# but this has since been disabled. Instead, it can be used to find:
+#
+# - invalid @ref statements (to be safe, this tools likes to have them
+#   on a separate line even though this is not strictly necessary)
+# - unbalanced or incorrect formulas
+# - wrong indentation of the starting of the lines ("   * ")
+# - unbalanced doxygen groups @{ @}
+#
+# To run this script on all headers of deal.II:
+#
+# find include/ -name "*.h" -print | while read file;do ./contrib/utilities/wrapcomments.py $file >temp;mv temp $file;done
+#
+# Note: the script changes formatting on a lot of lines that we do
+# want to preserve (for example @note indentation), so currently the
+# only way is to read through all changes separately. Sorry.
 
 from __future__ import print_function
 import textwrap
@@ -34,15 +46,12 @@ import sys, re
 # (inadvertently) split across two lines.
 wrapper = textwrap.TextWrapper(break_on_hyphens=False)
 
-# take an array of lines and wrap them to 78 columns and let each line start
-# with @p startwith
+# Take an array of lines and return them with @p startwith prepended
 def wrap_block(lines, startwith):
-    longline = " ".join(lines)
-    wrapper.initial_indent = startwith
-    wrapper.subsequent_indent = startwith
-    wrapper.break_long_words = False
-    wrapper.width = 78
-    return wrapper.wrap(longline)
+    # We used to rewrap the text to 78 columns in this function (hence
+    # the name), but we no longer do this. Check the history for the
+    # implementation.
+    return [startwith+line for line in lines]
 
 # strips whitespace and leading "*" from each lines
 def remove_junk(lines):
@@ -265,18 +274,20 @@ def format_block(lines, infostr=""):
 
 
 # test the routines:
-lineI = ["   * blub", \
-         "   * two three ", \
+lineI = ["   * blub",
+         "   * two three ",
          "   * four"]
-lineO = ["blub", \
-         "two three", \
+lineO = ["blub",
+         "two three",
          "four"]
 assert(remove_junk(lineI)==lineO)
 
-lineI = ["blub", \
-         "two three", \
+lineI = ["blub",
+         "two three",
          "four"]
-lineO = ["   * blub two three four"]
+lineO = ["   * blub",
+         "   * two three",
+         "   * four"]
 assert(wrap_block(lineI,"   * ")==lineO)
 
 lineI = [" * 1 2 3 4 5 6 7 9 0 1 2 3 4 5 6 7 9 0 1 2 3 4 5 6 7 9 0 1 2 3 4 5 6 7 9 0 1 2",\
@@ -288,252 +299,253 @@ lineI = [" * Structure which is passed to Triangulation::create_triangulation. I
          " * vertices and the material indicator."]
 assert(wrap_block(remove_junk(lineI)," * ")==lineI)
 
-lineI = ["  /**", \
-         "   * blub", \
-         "   * two three", \
-         "   * four", \
+lineI = ["  /**",
+         "   * blub",
+         "   * two three",
+         "   * four",
          "   */"]
-lineO = ["  /**", \
-         "   * blub two three four", \
-         "   */"]
-assert(format_block(lineI)==lineO)
-
-lineI = ["  /**", \
-         "   * blub", \
-         "   * two three", \
-         "   * ", \
-         "   * four", \
-         "   */"]
-lineO = ["  /**", \
-         "   * blub two three", \
-         "   *", \
-         "   * four", \
-         "   */"]
-assert(format_block(lineI)==lineO)
-
-lineI = ["  /**", \
-         "   * blub", \
-         "   * @code", \
-         "   *   two three", \
-         "   * @endcode", \
-         "   * four", \
+lineO = ["  /**",
+         "   * blub two three four",
          "   */"]
 assert(format_block(lineI)==lineI)
 
-lineI = ["  /**", \
-         "   * blub", \
-         "   * @code ", \
-         "   *   two three", \
-         "   *   two three  ", \
-         "   * ", \
-         "   *   two three", \
-         "   * @endcode ", \
-         "   * four", \
+lineI = ["  /**",
+         "   * blub",
+         "   * two three",
+         "   * ",
+         "   * four",
          "   */"]
-lineO = ["  /**", \
-         "   * blub", \
-         "   * @code", \
-         "   *   two three", \
-         "   *   two three", \
-         "   *", \
-         "   *   two three", \
-         "   * @endcode", \
-         "   * four", \
+lineO = ["  /**",
+         "   * blub",
+         "   * two three",
+         "   *",
+         "   * four",
+         "   */"]
+assert(format_block(lineI)==lineO)
+
+lineI = ["  /**",
+         "   * blub",
+         "   * @code",
+         "   *   two three",
+         "   * @endcode",
+         "   * four",
+         "   */"]
+assert(format_block(lineI)==lineI)
+
+lineI = ["  /**",
+         "   * blub",
+         "   * @code ",
+         "   *   two three",
+         "   *   two three  ",
+         "   * ",
+         "   *   two three",
+         "   * @endcode ",
+         "   * four",
+         "   */"]
+lineO = ["  /**",
+         "   * blub",
+         "   * @code",
+         "   *   two three",
+         "   *   two three",
+         "   *",
+         "   *   two three",
+         "   * @endcode",
+         "   * four",
          "   */"]
 assert(format_block(lineI)==lineO)
  
-lineI = ["  /**", \
-         "   * blub", \
-         "       @code ", \
-         "       two three", \
-         "      @endcode ", \
-         "   * four", \
+lineI = ["  /**",
+         "   * blub",
+         "       @code ",
+         "       two three",
+         "      @endcode ",
+         "   * four",
          "   */"]
-lineO = ["  /**", \
-         "   * blub", \
-         "   * @code", \
-         "   *   two three", \
-         "   * @endcode", \
-         "   * four", \
-         "   */"]
-assert(format_block(lineI)==lineO)
-
-
-lineI = ["  /**", \
-         "   * blub", \
-         "   * @code ", \
-         "    *   two three", \
-         "   *   two three  ", \
-         " * ", \
-         "       two three", \
-         "    ", \
-         "   * @endcode ", \
-         "   * four", \
-         "   */"]
-lineO = ["  /**", \
-         "   * blub", \
-         "   * @code", \
-         "   *   two three", \
-         "   *   two three", \
-         "   *", \
-         "   *   two three", \
-         "   *", \
-         "   * @endcode", \
-         "   * four", \
+lineO = ["  /**",
+         "   * blub",
+         "   * @code",
+         "   *   two three",
+         "   * @endcode",
+         "   * four",
          "   */"]
 assert(format_block(lineI)==lineO)
 
 
+lineI = ["  /**",
+         "   * blub",
+         "   * @code ",
+         "    *   two three",
+         "   *   two three  ",
+         " * ",
+         "       two three",
+         "    ",
+         "   * @endcode ",
+         "   * four",
+         "   */"]
+lineO = ["  /**",
+         "   * blub",
+         "   * @code",
+         "   *   two three",
+         "   *   two three",
+         "   *",
+         "   *   two three",
+         "   *",
+         "   * @endcode",
+         "   * four",
+         "   */"]
+assert(format_block(lineI)==lineO)
 
-lineI = ["  /**", \
-         "   * blub", \
-         "   * <ul>", \
-         "   * <li> bla", \
-         "   * <li> blub", \
-         "   * </ul>", \
+
+
+lineI = ["  /**",
+         "   * blub",
+         "   * <ul>",
+         "   * <li> bla",
+         "   * <li> blub",
+         "   * </ul>",
          "   */"]
 assert(format_block(lineI)==lineI)
  
-lineI = ["    /** @addtogroup Exceptions", \
+lineI = ["    /** @addtogroup Exceptions",
          "     * @{ */"]
-lineO = ["    /**", \
-         "     * @addtogroup Exceptions", \
-         "     * @{", \
+lineO = ["    /**",
+         "     * @addtogroup Exceptions",
+         "     * @{",
          "     */"]
 assert(format_block(lineI)==lineO)
 
-lineI = [" /** ", \
-         "  *   bla", \
-         "  * @image testing.png", \
-         "  *  blub", \
+lineI = [" /** ",
+         "  *   bla",
+         "  * @image testing.png",
+         "  *  blub",
          "  */"]
-lineO = [" /**", \
-         "  * bla", \
-         "  * @image testing.png", \
-         "  * blub", \
+lineO = [" /**",
+         "  * bla",
+         "  * @image testing.png",
+         "  * blub",
          "  */"]
 assert(format_block(lineI)==lineO)
 
-lineI = [" /** ", \
-         "  * @ref a b c d e", \
-         "  * @ref a \"b c\" d dd", \
+lineI = [" /** ",
+         "  * @ref a b c d e",
+         "  * @ref a \"b c\" d dd",
          "  */"]
-lineO = [" /**", \
-         "  * @ref a", \
-         "  * b c d e", \
-         "  * @ref a \"b c\"", \
-         "  * d dd", \
+lineO = [" /**",
+         "  * @ref a",
+         "  * b c d e",
+         "  * @ref a \"b c\"",
+         "  * d dd",
          "  */"]
 assert(format_block(lineI)==lineO)
 
 long = "long "*20
-lineI = [" /** ", \
-         "  * @ref a \""+long+"\" d", \
+lineI = [" /** ",
+         "  * @ref a \""+long+"\" d",
          "  */"]
-lineO = [" /**", \
-         "  * @ref a \""+long+"\"", \
-         "  * d", \
+lineO = [" /**",
+         "  * @ref a \""+long+"\"",
+         "  * d",
          "  */"]
 assert(format_block(lineI)==lineO)
 
-lineI = [" /** ", \
-         "  * @ref a. c", \
-         "  * @ref a \"b c\". c2", \
+lineI = [" /** ",
+         "  * @ref a. c",
+         "  * @ref a \"b c\". c2",
          "  */"]
-lineO = [" /**", \
-         "  * @ref a.", \
-         "  * c", \
-         "  * @ref a \"b c\".", \
-         "  * c2", \
+lineO = [" /**",
+         "  * @ref a.",
+         "  * c",
+         "  * @ref a \"b c\".",
+         "  * c2",
          "  */"]
 assert(format_block(lineI)==lineO)
 
 # do not break @page:
 longtext = "bla bla"*20
-lineI = [" /**", \
-         "  * @page " + longtext, \
-         "  * hello", \
+lineI = [" /**",
+         "  * @page " + longtext,
+         "  * hello",
          "  */"]
 assert(format_block(lineI)==lineI)
 
 # do not break $very_long_formula_without_spacing$:
 longtext = "blabla"*20
-lineI = [" /**", \
-         "  * a $" + longtext + "$", \
+lineI = [" /**",
+         "  * a $" + longtext + "$",
          "  */"]
-lineO = [" /**", \
-         "  * a", \
-         "  * $" + longtext + "$", \
+lineO = [" /**",
+         "  * a",
+         "  * $" + longtext + "$",
          "  */"]
-assert(format_block(lineI)==lineO)
+assert(format_block(lineI)==lineI)
 
 # nested lists
-lineI = [" /**", \
-         "  * Hello:", \
-         "  * - A", \
-         "  * - B", \
-         "  *   - C", \
-         "  *   - D", \
-         "  * - E", \
-         "  *         - very indented", \
+lineI = [" /**",
+         "  * Hello:",
+         "  * - A",
+         "  * - B",
+         "  *   - C",
+         "  *   - D",
+         "  * - E",
+         "  *         - very indented",
          "  */"]
 lineO = lineI
 assert(format_block(lineI)==lineO)
 
 # @f{}
-lineI = [" /**", \
-         "  * Hello:", \
-         "  * @f{aligned*}{", \
-         "  *   A\\\\", \
-         "  *   B", \
-         "  * @f}", \
-         "  * bla", \
+lineI = [" /**",
+         "  * Hello:",
+         "  * @f{aligned*}{",
+         "  *   A\\\\",
+         "  *   B",
+         "  * @f}",
+         "  * bla",
          "  */"]
 lineO = lineI
 assert(format_block(lineI)==lineO)
 
 # @until 
-lineI = [" /**", \
-         "  * Hello:", \
-         "  * @include a", \
-         "  * bla", \
-         "  * @dontinclude a", \
-         "  * bla", \
-         "  * @line a", \
-         "  * bla", \
-         "  * @skip a", \
-         "  * bla", \
-         "  * @until a", \
-         "  * bla", \
+lineI = [" /**",
+         "  * Hello:",
+         "  * @include a",
+         "  * bla",
+         "  * @dontinclude a",
+         "  * bla",
+         "  * @line a",
+         "  * bla",
+         "  * @skip a",
+         "  * bla",
+         "  * @until a",
+         "  * bla",
          "  */"]
 lineO = lineI
 assert(format_block(lineI)==lineO)
 
 # lists
-lineI = [" /**", \
-         "  * Hello:", \
-         "  *  - a", \
-         "  *  - b", \
-         "  * the end.", \
+lineI = [" /**",
+         "  * Hello:",
+         "  *  - a",
+         "  *  - b",
+         "  * the end.",
          "  */"]
 lineO = lineI
 assert(format_block(lineI)==lineO)
 
 # numbered lists
-lineI = [" /**", \
-         "  * Hello:", \
-         "  * 1. a", \
-         "  * 2. b", \
-         "  * the end.", \
+lineI = [" /**",
+         "  * Hello:",
+         "  * 1. a",
+         "  * 2. b",
+         "  * the end.",
          "  */"]
 lineO = lineI
 assert(format_block(lineI)==lineO)
 
 # do not break @name:
 longtext = "bla bla"*20
-lineI = [" /**", \
-         "  * @name " + longtext, \
-         "  * hello", \
+lineI = [" /**",
+         "  * @name " + longtext,
+         "  * hello",
          "  */"]
 assert(format_block(lineI)==lineI)
 

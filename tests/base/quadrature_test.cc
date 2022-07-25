@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,8 +127,10 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
     {
       Quadrature<dim> quadrature(
         sub == false ?
-          QProjector<dim>::project_to_all_faces(*quadratures[n]) :
-          QProjector<dim>::project_to_all_subfaces(*quadratures[n]));
+          QProjector<dim>::project_to_all_faces(
+            ReferenceCells::get_hypercube<dim>(), *quadratures[n]) :
+          QProjector<dim>::project_to_all_subfaces(
+            ReferenceCells::get_hypercube<dim>(), *quadratures[n]));
       const std::vector<Point<dim>> &points  = quadrature.get_points();
       const std::vector<double> &    weights = quadrature.get_weights();
 

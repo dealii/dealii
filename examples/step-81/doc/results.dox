@@ -1,0 +1,298 @@
+<h1>Results</h1>
+
+The solution is written to a .vtk file with four components. These are the
+real and imaginary parts of the $E_x$ and $E_y$ solution waves. With the
+current setup, the output should read
+
+@code
+Number of active cells: 4096
+Number of degrees of freedom: 16640
+Program ended with exit code: 0
+@endcode
+
+<h3> Absorbing boundary conditions and the PML </h3>
+
+The following images are the outputs for the imaginary $E_x$ without the
+interface and with the dipole centered at $(0,0)$. In order to remove the
+interface, the surface conductivity is set to 0. First, we turn off the
+absorbing boundary conditions and the PML. Second, we want to see the
+effect of the PML when absorbing boundary conditions apply. So we set
+absorbing boundary conditions to true and leave the PML strength to 0.
+Lastly, we increase the strength of the PML to 4. Change the following in
+the .prm file:
+
+@code
+# use absorbing boundary conditions?
+  set absorbing boundary condition = false
+
+# position of the dipole
+  set dipole position    = 0, 0
+
+# strength of the PML
+  set strength     = 0
+
+# surface conductivity between material 1 and material 2
+  set sigma              = 0, 0; 0, 0| 0, 0; 0, 0
+@endcode
+
+Following are the output images:
+
+<table width="80%" align="center">
+  <tr>
+      <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_abs_PML0.png" alt="Visualization of the solution of step-81 with no interface, Dirichlet boundary conditions and PML strength 0" height="210"/>
+      <p> Solution with no interface, Dirichlet boundary conditions and PML strength 0.</p>
+      </td>
+      <td></td>
+        <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_noabs_PML0.png" alt="Visualization of the solution of step-81 with no interface, no absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with no interface, absorbing boundary conditions and PML strength 0.</p>
+            </td>
+        <td></td>
+            <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_abs_PML4.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 4" height="210">
+      <p> Solution with no interface, absorbing boundary conditions and PML strength 4.</p>
+    </td>
+  </tr>
+</table>
+
+We observe that with absorbing boundary conditions and in absence of the
+PML, there is a lot of distortion and resonance (the real parts will not be
+generated without a PML). This is, as we stipulated, due to reflection from
+infinity. As we see, a much more coherent image is generated with an
+appropriate PML.
+
+<h3> Surface Plasmon Polariton </h3>
+Now, let's generate a standing wave by adding an interface at the center.
+In order to observe this effect, we offset the center of the dipole to $(0,
+0.8)$ and set the surface conductivity back to $(0.001, 0.2)$:
+
+@code
+# position of the dipole
+  set dipole position    = 0, 0.8
+
+# surface conductivity between material 1 and material 2
+  set sigma              = 0.001, 0.2; 0, 0| 0, 0; 0.001, 0.2
+@endcode
+
+Once again, we will visualize the output with absorbing boundary conditions
+and PML strength 0 and with absorbing boundary conditions and PML strength
+4. The following tables are the imaginary part of $E_x$ and the real part
+of $E_x$.
+
+<table width="80%" align="center">
+  <tr>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
+            </td>
+            <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML4.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        </td>
+  </tr>
+</table>
+
+
+<table width="80%" align="center">
+  <tr>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
+            </td>
+            <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML4.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+    </td>
+  </tr>
+</table>
+
+The SPP is confined near the interface that we created, however without
+absorbing boundary conditions, we don't observe a dissipation effect. On
+adding the absorbing boundary conditions, we observe distortion and
+resonance and we still don't notice any dissipation. As expected, the PML
+removes the distortion and resonance. The standing wave is also dissipating
+and getting absorbed within the PML, and as we increase the PML strength,
+the standing wave will dissipate more within the PML ring.
+
+Here are some animations to demonstrate the effect of the PML
+<table width="80%" align="center">
+  <tr>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-dirichlet_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
+            </td>
+            <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-absorbing_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-perfectly_matched_layer_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        </td>
+  </tr>
+</table>
+
+
+<table width="80%" align="center">
+  <tr>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-dirichlet_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
+            </td>
+            <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-absorbing_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-perfectly_matched_layer_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        </td>
+  </tr>
+</table>
+
+<h3> Notes </h3>
+
+<h4> Real and Complex Matrices </h4>
+As is evident from the results, we are splitting our solution matrices into
+the real and the imaginary components. We started off using the $H^{curl}$
+conforming Nédélec Elements, and we made two copies of the Finite Elements
+in order to represent the real and the imaginary components of our input
+(FE_NedelecSZ was used instead of FE_Nedelec to avoid the sign conflicts
+issues present in traditional Nédélec elements). In the assembly, we create
+two vectors of dimension $dim$ that assist us in extracting the real and
+the imaginary components of our finite elements.
+
+
+<h4> Rotations and Scaling </h4>
+As we see in our assembly, our finite element is rotated and scaled as
+follows:
+
+@code
+const auto phi_i = real_part.value(i, q_point) - 1.0i * imag_part.value(i, q_point);
+@endcode
+
+This $\phi_i$ variable doesn't need to be scaled in this way, we may choose
+any arbitrary scaling constants $a$ and $b$. If we choose this scaling, the
+$\phi_j$ must also be modified with the same scaling, as follows:
+
+@code
+const auto phi_i = a*real_part.value(i, q_point) -
+                                   bi * imag_part.value(i, q_point);
+
+const auto phi_j = a*real_part.value(i, q_point) +
+                                   bi * imag_part.value(i, q_point);
+@endcode
+
+Moreover, the cell_rhs need not be the real part of the rhs_value. Say if
+we modify to take the imaginary part of the computed rhs_value, we must
+also modify the cell_matrix accordingly to take the imaginary part of temp.
+However, making these changes to both sides of the equation will not affect
+our solution, and we will still be able to generate the surface plasmon
+polariton.
+
+@code
+cell_rhs(i) += rhs_value.imag();
+
+cell_matrix(i) += temp.imag();
+@endcode
+
+<h4> Postprocessing </h4>
+We will create a video demonstrating the wave in motion, which is
+essentially an implementation of $e^{-i\omega t}(Re(E) + i*Im(E))$ as we
+increment time. This is done by slightly changing the output function to
+generate a series of .vtk files, which will represent out solution wave as
+we increment time. Introduce an input variable $t$ in the output_results()
+class as output_results(unsigned int t). Then change the class itself to
+the following:
+
+@code
+template <int dim>
+void Maxwell<dim>::output_results(unsigned int t)
+{
+  std::cout << "Running step:" << t << std::endl;
+  DataOut<2> data_out;
+  data_out.attach_dof_handler(dof_handler);
+  Vector<double> postprocessed;
+  postprocessed.reinit(solution);
+  for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+    {
+      if (i % 4 == 0)
+        {
+          postprocessed[i] = std::cos(2 * M_PI * 0.04 * t) * solution[i] -
+                             std::sin(2 * M_PI * 0.04 * t) * solution[i + 1];
+        }
+      else if (i % 4 == 2)
+        {
+          postprocessed[i] = std::cos(2 * M_PI * 0.04 * t) * solution[i] -
+                             std::sin(2 * M_PI * 0.04 * t) * solution[i + 1];
+        }
+    }
+  data_out.add_data_vector(postprocessed, {"E_x", "E_y", "null0", "null1"});
+  data_out.build_patches();
+  const std::string filename =
+    "solution-" + Utilities::int_to_string(t) + ".vtk";
+  std::ofstream output(filename);
+  data_out.write_vtk(output);
+  std::cout << "Done running step:" << t << std::endl;
+}
+@endcode
+
+Finally, in the run() function, replace output_results() with
+@code
+for (int t = 0; t <= 100; t++)
+  {
+    output_results(t);
+  }
+@endcode
+
+This would generate 100 solution .vtk files, which can be opened in a group
+on Paraview and then can be saved as an animation. We used FFMPEG to
+generate gifs.
+
+<h3> Possibilities for Extension </h3>
+
+The example step could be extended in a number of different directions.
+<ul>
+  <li>
+    The current program uses a direct solver to solve the linear system.
+    This is efficient for two spatial dimensions where scattering problems
+    up to a few millions degrees of freedom can be solved. In 3D, however,
+    the increased stencil size of the Nedelec element pose a severe
+    limiting factor on the problem size that can be computed. As an
+    alternative, the idea to use iterative solvers can be entertained.
+    This, however requires specialized preconditioners. For example, just
+    using an iterative Krylov space solver (such as SolverGMRES) on above
+    problem will requires many thousands of iterations to converge.
+    Unfortunately, time-harmonic Maxwell's equations lack the usual notion
+    of local smoothing properties, which renders the usual suspects, such
+    as a geometric multigrid (see the Multigrid class), largely useless. A
+    possible extension would be to implement an additive Schwarz preconditioner
+    (based on domain decomposition, see for example
+    @cite Gopalakrishnan2003), or a sweeping preconditioner (see for
+    example @cite Ying2012).
+  </li>
+  <li>
+    Another possible extension of the current program is to introduce local
+    mesh refinement (either based on a residual estimator, or based on the
+    dual weighted residual method, see step-14). This is in particular of
+    interest to counter the increased computational cost caused by the
+    scale separation between the SPP and the dipole.
+  </li>
+</ul>

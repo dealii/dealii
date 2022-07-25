@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2020 by the deal.II authors
+// Copyright (C) 2011 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,18 +21,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/partitioner.h>
 #include <deal.II/base/vectorization.h>
 
-#include <deal.II/dofs/dof_handler.h>
-
-#include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-
 #include <deal.II/matrix_free/face_info.h>
-#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/task_info.h>
 #include <deal.II/matrix_free/vector_data_exchange.h>
 
 #include <array>
@@ -42,6 +34,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
+
+// forward declarations
+
 namespace internal
 {
   namespace MatrixFreeFunctions
@@ -51,14 +46,42 @@ namespace internal
 
     template <typename, typename>
     struct FPArrayComparator;
+
+    struct TaskInfo;
   } // namespace MatrixFreeFunctions
 } // namespace internal
+
+template <typename>
+class AffineConstraints;
+
+class DynamicSparsityPattern;
+
+template <typename>
+class TriaIterator;
+
+template <int, int, bool>
+class DoFCellAccessor;
+
+namespace Utilities
+{
+  namespace MPI
+  {
+    class Partitioner;
+  }
+} // namespace Utilities
+
 #endif
 
 namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    /**
+     * Type of the 8-bit representation of the refinement configuration that
+     * is in hanging_nodes_internal.h.
+     */
+    using compressed_constraint_kind = std::uint8_t;
+
     /**
      * A struct that takes entries describing a constraint and puts them into
      * a sorted list where duplicates are filtered out

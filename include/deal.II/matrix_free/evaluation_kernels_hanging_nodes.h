@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@ namespace internal
 
 
   /**
-   * Helper enum to spefify the type of vectorization for
+   * Helper enum to specify the type of vectorization for
    * FEEvaluationImplHangingNodesRunnerTypes::scalar.
    */
   enum class VectorizationTypes

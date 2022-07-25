@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,8 +94,8 @@ namespace NonMatching
    * can not be computed without knowing the surface normal in
    * $\mathbb{R}^{\text{spacedim}}$. The conormal is the unit vector parallel to
    * the projection of the face normal into the surface plane. This is
-   * essentially the same thing as the normalized @ref GlossBoundaryForm
-   * "boundary form".
+   * essentially the same thing as the normalized
+   * @ref GlossBoundaryForm "boundary form".
    */
   template <int dim, int spacedim = dim>
   class ImmersedSurfaceQuadrature : public Quadrature<dim>

@@ -174,7 +174,4 @@
  * module that are only used in the internal data structures of mesh
  * handling. They are generally in the internal namespace, and not meant for
  * use in application code.
- *
- *
- * @author Wolfgang Bangerth, 1998-2006
  */

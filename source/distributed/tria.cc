@@ -623,7 +623,7 @@ namespace
 
   private:
     /**
-     * Simple struct to keep relavant data. Can be accessed though p4est's user
+     * Simple struct to keep relevant data. Can be accessed though p4est's user
      * pointer.
      */
     class QuadrantData
@@ -2738,19 +2738,17 @@ namespace parallel
     bool
     Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
     {
-      std::vector<bool> flags_before[2];
-      this->save_coarsen_flags(flags_before[0]);
-      this->save_refine_flags(flags_before[1]);
-
       bool         mesh_changed = false;
       unsigned int loop_counter = 0;
+      unsigned int n_changes    = 0;
       do
         {
-          this->dealii::Triangulation<dim, spacedim>::
-            prepare_coarsening_and_refinement();
+          n_changes += this->dealii::Triangulation<dim, spacedim>::
+                         prepare_coarsening_and_refinement();
           this->update_periodic_face_map();
           // enforce 2:1 mesh balance over periodic boundaries
           mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this);
+          n_changes += mesh_changed;
 
           // We can't be sure that we won't run into a situation where we can
           // not reconcile mesh smoothing and balancing of periodic faces. As
@@ -2766,13 +2764,8 @@ namespace parallel
         }
       while (mesh_changed);
 
-      // check if any of the refinement flags were changed during this
-      // function and return that value
-      std::vector<bool> flags_after[2];
-      this->save_coarsen_flags(flags_after[0]);
-      this->save_refine_flags(flags_after[1]);
-      return ((flags_before[0] != flags_after[0]) ||
-              (flags_before[1] != flags_after[1]));
+      // report if we observed changes in any of the sub-functions
+      return n_changes > 0;
     }
 
 

@@ -15,7 +15,7 @@
 
 
 
-// compares the computation of the diagonal using a face integration
+// compares the computation of the diagonal using the face integration
 // facilities with the alternative reinit(cell_index, face_number) approach
 
 #include <deal.II/base/function.h>
@@ -82,8 +82,8 @@ public:
   compute_diagonal_by_face(
     LinearAlgebra::distributed::Vector<number> &result) const
   {
-    int dummy;
-    result = 0;
+    int dummy = 0;
+    result    = 0;
     data.loop(&LaplaceOperator::local_diagonal_dummy,
               &LaplaceOperator::local_diagonal_face,
               &LaplaceOperator::local_diagonal_boundary,
@@ -96,7 +96,7 @@ public:
   compute_diagonal_by_cell(
     LinearAlgebra::distributed::Vector<number> &result) const
   {
-    int dummy;
+    int dummy = 0;
     result.zero_out_ghost_values();
     data.cell_loop(&LaplaceOperator::local_diagonal_by_cell,
                    this,

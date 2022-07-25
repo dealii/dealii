@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -669,27 +669,6 @@ namespace Particles
      *
      * @return An IndexSet of size get_next_free_particle_index(), containing
      * n_locally_owned_particle() indices.
-     *
-     * @deprecated Use locally_owned_particle_ids() instead.
-     */
-    DEAL_II_DEPRECATED IndexSet
-    locally_relevant_ids() const;
-
-    /**
-     * Extract an IndexSet with global dimensions equal to
-     * get_next_free_particle_index(), containing the locally owned
-     * particle indices.
-     *
-     * This function can be used to construct distributed vectors and matrices
-     * to manipulate particles using linear algebra operations.
-     *
-     * Notice that it is the user's responsibility to guarantee that particle
-     * indices are unique, and no check is performed to verify that this is the
-     * case, nor that the union of all IndexSet objects on each mpi process is
-     * complete.
-     *
-     * @return An IndexSet of size get_next_free_particle_index(), containing
-     * n_locally_owned_particle() indices.
      */
     IndexSet
     locally_owned_particle_ids() const;
@@ -826,7 +805,7 @@ namespace Particles
      * prepare_for_serialization() instead. See there for further information
      * about the purpose of this function.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     register_store_callback_function();
 
@@ -840,7 +819,7 @@ namespace Particles
      * deserialize() instead. See there for further information about the
      * purpose of this function.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     register_load_callback_function(const bool serialization);
 
@@ -1401,15 +1380,6 @@ namespace Particles
       output_vector.compress(VectorOperation::add);
     else
       output_vector.compress(VectorOperation::insert);
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline IndexSet
-  ParticleHandler<dim, spacedim>::locally_relevant_ids() const
-  {
-    return this->locally_owned_particle_ids();
   }
 
 } // namespace Particles

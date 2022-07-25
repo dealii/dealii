@@ -1,0 +1,19 @@
+
+DEAL:0::new case with locally owned dofs = {[0,9]}
+DEAL:0::
+DEAL:0::difference norm = 0.00000
+DEAL:0::new case with locally owned dofs = {[0,249]}
+DEAL:0::
+DEAL:0::difference norm = 0.00000
+DEAL:0::new case with locally owned dofs = {[0,7941]}
+DEAL:0::
+DEAL:0::difference norm = 1.62791e-15
+DEAL:0::new case with locally owned dofs = {[0,4]}
+DEAL:0::
+DEAL:0::new case with locally owned dofs = {[0,440]}
+DEAL:0::
+DEAL:0::new case with locally owned dofs = {[0,3361]}
+DEAL:0::
+DEAL:0::difference norm = 0.00000
+DEAL:0::FE_NedelecSZ nodal renumbering failed successfully.
+DEAL:0::FE_NedelecSZ nodal renumbering failed successfully.

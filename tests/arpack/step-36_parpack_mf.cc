@@ -103,7 +103,7 @@ test()
       MatrixFree<dim, double>::AdditionalData::partition_color;
     data.mapping_update_flags =
       update_values | update_gradients | update_JxW_values;
-    mf_data->reinit(dof_handler, constraints, quad, data);
+    mf_data->reinit(MappingQ1<dim>{}, dof_handler, constraints, quad, data);
   }
 
 

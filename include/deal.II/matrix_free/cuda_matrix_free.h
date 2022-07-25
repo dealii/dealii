@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// Copyright (C) 2016 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -164,8 +164,8 @@ namespace CUDAWrappers
       bool use_coloring;
 
       /**
-       *  Overlap MPI communications with computation. This requires CUDA-aware
-       *  MPI and use_coloring must be false.
+       * Overlap MPI communications with computation. This requires CUDA-aware
+       * MPI and use_coloring must be false.
        */
       bool overlap_communication_computation;
     };

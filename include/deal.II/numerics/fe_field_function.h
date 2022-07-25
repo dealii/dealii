@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2020 by the deal.II authors
+// Copyright (C) 2007 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -487,22 +487,6 @@ namespace Functions
       const Point<dim> &point) const;
   };
 } // namespace Functions
-
-namespace Legacy
-{
-  namespace Functions
-  {
-    /**
-     * @deprecated Use dealii::Functions::FEFieldFunction without the
-     * DoFHandlerType template instead.
-     */
-    template <int dim,
-              typename DoFHandlerType = DoFHandler<dim>,
-              typename VectorType     = Vector<double>>
-    using FEFieldFunction DEAL_II_DEPRECATED = dealii::Functions::
-      FEFieldFunction<dim, VectorType, DoFHandlerType::space_dimension>;
-  } // namespace Functions
-} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

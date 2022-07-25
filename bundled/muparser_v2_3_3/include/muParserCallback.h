@@ -36,6 +36,8 @@
 	\brief Definition of the parser callback class.
 */
 
+namespace dealii
+{
 namespace mu
 {
 
@@ -156,6 +158,7 @@ namespace mu
 	typedef std::map<string_type, ParserCallback> funmap_type;
 
 } // namespace mu
+}
 
 #endif
 

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -38,12 +38,6 @@ ENDIF()
 # Set the pic flag.
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
-
-#
-# Check whether the -as-needed flag is available. If so set it to link
-# the deal.II library with it.
-#
-ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 
 #
 # Enable verbose warnings:

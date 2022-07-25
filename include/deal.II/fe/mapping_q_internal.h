@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -901,13 +901,17 @@ namespace internal
         AssertDimension(real_support_points.size(), unit_support_points.size());
 
         // For the bi-/trilinear approximation, we cannot build a quadratic
-        // polynomial due to a lack of points (interpolation matrix would get
-        // singular), so pick the affine approximation. Similarly, it is not
-        // entirely clear how to gather enough information for the case dim <
-        // spacedim
-        if (real_support_points.size() ==
-              GeometryInfo<dim>::vertices_per_cell ||
-            dim < spacedim)
+        // polynomial due to a lack of points (interpolation matrix would
+        // get singular). Similarly, it is not entirely clear how to gather
+        // enough information for the case dim < spacedim.
+        //
+        // In both cases we require the vector real_support_points to
+        // contain the vertex positions and fall back to an affine
+        // approximation:
+        Assert(dim == spacedim || real_support_points.size() ==
+                                    GeometryInfo<dim>::vertices_per_cell,
+               ExcInternalError());
+        if (real_support_points.size() == GeometryInfo<dim>::vertices_per_cell)
           {
             const auto affine = GridTools::affine_cell_approximation<dim>(
               make_array_view(real_support_points));

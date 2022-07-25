@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,10 +75,15 @@ namespace MeshWorker
       const std::array<unsigned int, n_dof_indices> &dof_indices_sizes);
 
     /**
-     * Deep copy constructor.
+     * Copy constructor.
      */
-    CopyData(const CopyData<n_matrices, n_vectors, n_dof_indices, ScalarType>
-               &other) = default;
+    CopyData(const CopyData &other) = default;
+
+    /**
+     * Copy operator.
+     */
+    CopyData &
+    operator=(const CopyData &other) = default;
 
     /**
      * Reinitialize everything the same @p size. This is usually the number of

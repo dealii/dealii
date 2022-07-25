@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,15 +73,15 @@ print_cell_and_face_locations(
   const NonMatching::MeshClassifier<dim> &                 classifier,
   const typename Triangulation<dim>::active_cell_iterator &cell)
 {
-  const NonMatching::LocationToLevelSet cell_position =
+  const NonMatching::LocationToLevelSet cell_location =
     classifier.location_to_level_set(cell);
-  deallog << "cell " << location_to_string(cell_position) << std::endl;
+  deallog << "cell " << location_to_string(cell_location) << std::endl;
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (unsigned int f : cell->face_indices())
     {
-      const NonMatching::LocationToLevelSet cell_position =
-        classifier.location_to_level_set(cell, i);
-      deallog << "face " << i << ' ' << location_to_string(cell_position)
+      const NonMatching::LocationToLevelSet face_location =
+        classifier.location_to_level_set(cell, f);
+      deallog << "face " << f << ' ' << location_to_string(face_location)
               << std::endl;
     }
 }

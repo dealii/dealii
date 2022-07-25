@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,8 +83,8 @@ namespace NonMatching
      *
      * $|\frac{\partial \psi}{\partial x_i}| > 0$.
      *
-     * In practice, it might happend the bound we have for the expression in
-     * the left-hand side is only floating-point close to zero.
+     * In practice, the bound we have for the expression in the left-hand side
+     * may be near but not equal to zero due to roundoff errors.
      *
      * This constant is a safety margin, $C$, that states that the implicit
      * function theorem can be used when
@@ -906,7 +906,7 @@ namespace NonMatching
          * The roots of the functions in point_restrictions.
          * This will be the values of the height functions, $\{H_i(x_I)\}$ at
          * some lower dimensional quadrature point,
-         * $x_I \in \mathbb{R}^{dim-1}}$.
+         * $x_I \in \mathbb{R}^{dim-1}$.
          */
         std::vector<double> roots;
       };
@@ -1348,7 +1348,7 @@ namespace NonMatching
        *
        * $|\partial_k \psi_j| > L_{jk}$.
        *
-       * and then returns a coordindate direction, $i$, and a lower bound $L$,
+       * and then returns a coordinate direction, $i$, and a lower bound $L$,
        * such that
        *
        * @f[

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,8 +26,6 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/component_mask.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 
@@ -1061,7 +1059,6 @@ namespace DoFTools
     const number periodicity_factor = 1.);
 
 
-
   /**
    * Insert the (algebraic) constraints due to periodic boundary conditions
    * into an AffineConstraints object @p constraints.
@@ -1087,24 +1084,6 @@ namespace DoFTools
     const std::vector<GridTools::PeriodicFacePair<
       typename DoFHandler<dim, spacedim>::cell_iterator>> &periodic_faces,
     AffineConstraints<number> &                            constraints,
-    const ComponentMask &            component_mask = ComponentMask(),
-    const std::vector<unsigned int> &first_vector_components =
-      std::vector<unsigned int>(),
-    const number periodicity_factor = 1.);
-
-  /**
-   * The same as above.
-   *
-   * @deprecated Use the function that takes dim and spacedim as template
-   *   argument.
-   */
-  template <typename DoFHandlerType, typename number>
-  DEAL_II_DEPRECATED void
-  make_periodicity_constraints(
-    const std::vector<
-      GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
-      &                              periodic_faces,
-    AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask = ComponentMask(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),
@@ -1626,8 +1605,7 @@ namespace DoFTools
    * DoFHandler objects built on parallel::distributed::Triangulation this set
    * is the union of DoFHandler::locally_owned_dofs() and the DoF indices on
    * all ghost cells. In essence, it is the DoF indices on all cells that are
-   * not artificial (see
-   * @ref GlossArtificialCell "the glossary").
+   * not artificial (see @ref GlossArtificialCell "the glossary").
    *
    * @deprecated Use the previous function instead.
    */
@@ -1638,12 +1616,12 @@ namespace DoFTools
 
   /**
    * Extract the set of locally owned DoF indices for each component within the
-   * mask that are owned by the current  processor. For components disabled by
+   * mask that are owned by the current processor. For components disabled by
    * the mask, an empty IndexSet is returned. For a scalar DoFHandler built on a
    * sequential triangulation, the return vector contains a single complete
    * IndexSet with all DoF indices. If the mask contains all components (which
    * also corresponds to the default value), then the union of the returned
-   * index sets equlas what DoFHandler::locally_owned_dofs() returns.
+   * index sets equals what DoFHandler::locally_owned_dofs() returns.
    */
   template <int dim, int spacedim>
   std::vector<IndexSet>
@@ -1890,17 +1868,6 @@ namespace DoFTools
   get_dofs_on_patch(
     const std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
       &patch);
-
-  /**
-   * The same as above.
-   *
-   * @deprecated Use the function that takes dim and spacedim as template
-   *   argument.
-   */
-  template <typename DoFHandlerType>
-  DEAL_II_DEPRECATED std::vector<types::global_dof_index>
-                     get_dofs_on_patch(
-                       const std::vector<typename DoFHandlerType::active_cell_iterator> &patch);
 
   /**
    * Creates a sparsity pattern, which lists
@@ -2205,17 +2172,6 @@ namespace DoFTools
   count_dofs_on_patch(
     const std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
       &patch);
-
-  /**
-   * The same as above.
-   *
-   * @deprecated Use the function that takes dim and spacedim as template
-   *   argument.
-   */
-  template <typename DoFHandlerType>
-  DEAL_II_DEPRECATED unsigned int
-  count_dofs_on_patch(
-    const std::vector<typename DoFHandlerType::active_cell_iterator> &patch);
 
   /**
    * @}
@@ -2683,50 +2639,6 @@ namespace DoFTools
     point_to_index_map.clear();
     for (types::global_dof_index i = 0; i < dof_handler.n_dofs(); ++i)
       point_to_index_map[support_points[i]] = i;
-  }
-
-
-
-  template <typename DoFHandlerType, typename number>
-  inline void
-  make_periodicity_constraints(
-    const std::vector<
-      GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
-      &                              periodic_faces,
-    AffineConstraints<number> &      constraints,
-    const ComponentMask &            component_mask,
-    const std::vector<unsigned int> &first_vector_components,
-    const number                     periodicity_factor)
-  {
-    make_periodicity_constraints<DoFHandlerType::dimension,
-                                 DoFHandlerType::space_dimension>(
-      periodic_faces,
-      constraints,
-      component_mask,
-      first_vector_components,
-      periodicity_factor);
-  }
-
-
-
-  template <typename DoFHandlerType>
-  inline std::vector<types::global_dof_index>
-  get_dofs_on_patch(
-    const std::vector<typename DoFHandlerType::active_cell_iterator> &patch)
-  {
-    return get_dofs_on_patch<DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension>(patch);
-  }
-
-
-
-  template <typename DoFHandlerType>
-  inline unsigned int
-  count_dofs_on_patch(
-    const std::vector<typename DoFHandlerType::active_cell_iterator> &patch)
-  {
-    return count_dofs_on_patch<DoFHandlerType::dimension,
-                               DoFHandlerType::space_dimension>(patch);
   }
 } // namespace DoFTools
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2020 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -502,7 +502,7 @@ namespace PETScWrappers
       reinit(const SparseMatrix &other);
 
       /**
-       * Create a matrix where the size() of the IndexSets determine the
+       * Create a matrix where the size of the IndexSets determine the
        * global number of rows and columns and the entries of the IndexSet
        * give the rows and columns for the calling processor. Note that only
        * ascending, 1:1 IndexSets are supported. The additional call to the
@@ -635,7 +635,8 @@ namespace PETScWrappers
                 const SparsityPatternType &sparsity_pattern);
 
       /**
-       * Same as previous functions, but here we consider active dofs for MATIS.
+       * Same as previous functions, but here we consider active dofs for
+       * matrices of IS type.
        */
       template <typename SparsityPatternType>
       void

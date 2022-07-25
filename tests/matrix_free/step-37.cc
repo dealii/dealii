@@ -219,7 +219,8 @@ namespace Step37
     additional_data.mg_level = level;
     additional_data.mapping_update_flags =
       (update_gradients | update_JxW_values | update_quadrature_points);
-    data.reinit(dof_handler,
+    data.reinit(MappingQ1<dim>{},
+                dof_handler,
                 constraints,
                 QGauss<1>(fe_degree + 1),
                 additional_data);

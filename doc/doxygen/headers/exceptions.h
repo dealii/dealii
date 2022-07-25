@@ -422,7 +422,4 @@
  *  it only checks the condition in debug mode -- but it is immune to the
  *  effect of deal_II_exceptions::disable_abort_on_exception(): It will
  *  only ever abort the program, and never throw an exception.
- *
- *
- * @author Wolfgang Bangerth, 1998-2017
  */

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// Copyright (C) 2000 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -242,17 +242,6 @@ private:
     internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
     DataOutBase::Patch<patch_dim, patch_spacedim> &                    patch);
 };
-
-namespace Legacy
-{
-  /**
-   * @deprecated Use dealii::DataOutFaces without the DoFHandlerType template
-   * instead.
-   */
-  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOutFaces DEAL_II_DEPRECATED =
-    dealii::DataOutFaces<dim, DoFHandlerType::space_dimension>;
-} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

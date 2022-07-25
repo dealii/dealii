@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2021 by the deal.II authors
+//    Copyright (C) 2017 - 2022 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/sundials/arkode.h>
+
+#include <arkode/arkode_arkstep.h>
 
 #include "../tests.h"
 
@@ -47,12 +49,9 @@
  * eps in right hand side of the third equation).
  */
 int
-main(int argc, char **argv)
+main()
 {
   initlog();
-
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
 
   using VectorType = LinearAlgebra::distributed::Vector<double>;
 
@@ -79,7 +78,7 @@ main(int argc, char **argv)
     [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = 0;
     ydot[1] = 0;
-    ydot[2] = (b - y[2]) / eps;
+    ydot[2] = -y[2] / eps;
     return 0;
   };
 
@@ -88,7 +87,7 @@ main(int argc, char **argv)
     [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
     ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
-    ydot[2] = -y[2] * y[0];
+    ydot[2] = b / eps - y[2] * y[0];
     return 0;
   };
 
@@ -100,6 +99,19 @@ main(int argc, char **argv)
     if (step_number % 10 == 0)
       deallog << t << ' ' << std::setprecision(10) << sol[0] << ' ' << sol[1]
               << ' ' << sol[2] << std::endl;
+    return 0;
+  };
+
+  // This test, for reasons I don't fully understand, generates some output
+  // which varies between environments much more than the other ARKODE
+  // tests. Work around it by setting a fairly stringent maximum time step.
+  ode.custom_setup = [&](void *arkode_mem) -> int {
+    int ierr = ARKStepSetMinStep(arkode_mem, 1e-8);
+    AssertThrow(ierr == 0, ExcInternalError());
+    ierr = ARKStepSetMaxStep(arkode_mem, 1e-4);
+    AssertThrow(ierr == 0, ExcInternalError());
+    ierr = ARKStepSetMaxNumSteps(arkode_mem, 5000);
+    AssertThrow(ierr == 0, ExcInternalError());
     return 0;
   };
 

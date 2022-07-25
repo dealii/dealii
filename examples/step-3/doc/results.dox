@@ -74,8 +74,8 @@ suggestions:
   Change the boundary condition: The code uses the Functions::ZeroFunction
   function to generate zero boundary conditions. However, you may want to try
   non-zero constant boundary values using
-  <code>ConstantFunction&lt;2&gt;(1)</code> instead of
-  <code>ZeroFunction&lt;2&gt;()</code> to have unit Dirichlet boundary
+  <code>Functions::ConstantFunction&lt;2&gt;(1)</code> instead of
+  <code>Functions::ZeroFunction&lt;2&gt;()</code> to have unit Dirichlet boundary
   values. More exotic functions are described in the documentation of the
   Functions namespace, and you may pick one to describe your particular boundary
   values.
@@ -139,7 +139,7 @@ suggestions:
   @code
   VectorTools::interpolate_boundary_values(dof_handler,
 					   1,
-					   ConstantFunction<2>(1.),
+					   Functions::ConstantFunction<2>(1.),
 					   boundary_values);
   @endcode
   If you have this call immediately after the first one to this function, then

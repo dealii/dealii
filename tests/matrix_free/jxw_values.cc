@@ -71,7 +71,7 @@ test()
     typename MatrixFree<dim>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
     data.mapping_update_flags  = update_JxW_values;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   double error = 0, error2 = 0, abs = 0;
@@ -82,7 +82,9 @@ test()
   for (unsigned int cell = 0; cell < mf_data.n_cell_batches(); ++cell)
     {
       fe_eval.reinit(cell);
-      for (unsigned int v = 0; v < mf_data.n_components_filled(cell); ++v)
+      for (unsigned int v = 0;
+           v < mf_data.n_active_entries_per_cell_batch(cell);
+           ++v)
         {
           fe_values.reinit(mf_data.get_cell_iterator(cell, v));
           for (unsigned int q = 0; q < quad.size(); ++q)

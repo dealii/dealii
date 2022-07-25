@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,7 @@
 
 #include <deal.II/fe/block_mask.h>
 #include <deal.II/fe/component_mask.h>
-#include <deal.II/fe/fe_base.h>
+#include <deal.II/fe/fe_data.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
@@ -825,33 +825,6 @@ public:
    */
   virtual std::string
   get_name() const = 0;
-
-  /**
-   * This operator returns a reference to the present object if the argument
-   * given equals to zero. While this does not seem particularly useful, it is
-   * helpful in writing code that works with both ::DoFHandler and the hp-
-   * version hp::DoFHandler, since one can then write code like this:
-   * @code
-   * dofs_per_cell =
-   *   dof_handler->get_fe()[cell->active_fe_index()].n_dofs_per_cell();
-   * @endcode
-   *
-   * This code doesn't work in both situations without the present operator
-   * because DoFHandler::get_fe() returns a finite element, whereas
-   * hp::DoFHandler::get_fe() returns a collection of finite elements that
-   * doesn't offer a <code>dofs_per_cell</code> member variable: one first has
-   * to select which finite element to work on, which is done using the
-   * operator[]. Fortunately, <code>cell-@>active_fe_index()</code> also works
-   * for non-hp-classes and simply returns zero in that case. The present
-   * operator[] accepts this zero argument, by returning the finite element
-   * with index zero within its collection (that, of course, consists only of
-   * the present finite element anyway).
-   *
-   * @deprecated With DoFHandler::get_fe(int) and the deprecation of the
-   * hp::DoFHandler class, there is no more use of this operator.
-   */
-  DEAL_II_DEPRECATED const FiniteElement<dim, spacedim> &
-                           operator[](const unsigned int fe_index) const;
 
   /**
    * @name Shape function access
@@ -3091,18 +3064,6 @@ protected:
 
 
 //----------------------------------------------------------------------//
-
-
-template <int dim, int spacedim>
-inline const FiniteElement<dim, spacedim> &
-FiniteElement<dim, spacedim>::operator[](const unsigned int fe_index) const
-{
-  (void)fe_index;
-  Assert(fe_index == 0,
-         ExcMessage("A fe_index of zero is the only index allowed here"));
-  return *this;
-}
-
 
 
 template <int dim, int spacedim>

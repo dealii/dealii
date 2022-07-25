@@ -77,14 +77,15 @@ test()
   const QGauss<1>                                  quad(2);
   typename MatrixFree<dim, number>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
-  mf_data_0->reinit(dof, constraints_0, quad, data);
-  mf_data_1->reinit(dof, constraints_1, quad, data);
+  mf_data_0->reinit(MappingQ1<dim>{}, dof, constraints_0, quad, data);
+  mf_data_1->reinit(MappingQ1<dim>{}, dof, constraints_1, quad, data);
   {
     std::vector<const DoFHandler<dim> *>           dof_handlers(2, &dof);
     std::vector<const AffineConstraints<double> *> constraint(2);
     constraint[0] = &constraints_0;
     constraint[1] = &constraints_1;
-    mf_data_combined->reinit(dof_handlers, constraint, quad, data);
+    mf_data_combined->reinit(
+      MappingQ1<dim>{}, dof_handlers, constraint, quad, data);
   }
 
   MatrixFreeOperators::

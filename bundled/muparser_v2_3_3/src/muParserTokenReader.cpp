@@ -45,6 +45,8 @@
 */
 
 
+namespace dealii
+{
 namespace mu
 {
 
@@ -991,6 +993,7 @@ namespace mu
 		return m_cArgSep;
 	}
 } // namespace mu
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)

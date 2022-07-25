@@ -165,19 +165,21 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                 dealii::Tensor<2, dim>::unrolled_to_component_indices(k);
               if (ind_k == nonzero_ind)
                 {
-                  AssertThrow(val_q[ind_k] == scalar_values[i_node][q],
+                  AssertThrow(std::abs(val_q[ind_k] -
+                                       scalar_values[i_node][q]) < 1e-12,
                               ExcInternalError());
-                  AssertThrow((grad_q[ind_k[0]][ind_k[1]] ==
-                               scalar_gradients[i_node][q]),
+                  AssertThrow((grad_q[ind_k[0]][ind_k[1]] -
+                               scalar_gradients[i_node][q])
+                                  .norm() < 1e-11,
                               ExcInternalError());
                 }
               else
                 {
-                  AssertThrow(val_q[ind_k] == 0.,
+                  AssertThrow(std::abs(val_q[ind_k]) < 1e-12,
                               ExcMessage(std::to_string(k) + " " +
                                          std::to_string(ind_k[0]) + " " +
                                          std::to_string(ind_k[1])));
-                  AssertThrow((grad_q[ind_k[0]][ind_k[1]] == Tensor<1, dim>()),
+                  AssertThrow(grad_q[ind_k[0]][ind_k[1]].norm() < 1e-11,
                               ExcInternalError());
                 }
             }
@@ -190,7 +192,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
               for (unsigned int j = 0; j < dim; ++j)
                 div_tmp += grad_q[i][j][j];
 
-              AssertThrow(div_tmp == div_q[i], ExcInternalError());
+              AssertThrow(std::abs(div_tmp - div_q[i]) < 1e-11,
+                          ExcInternalError());
             }
         }
     }
@@ -198,9 +201,12 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   // compare function values/gradients/divergences:
   for (unsigned int q = 0; q < quadrature.size(); ++q)
     {
-      AssertThrow(values_manual[q] == values[q], ExcInternalError());
-      AssertThrow(gradients_manual[q] == gradients[q], ExcInternalError());
-      AssertThrow(divergences_manual[q] == divergences[q], ExcInternalError());
+      AssertThrow((values_manual[q] - values[q]).norm() < 1e-12,
+                  ExcInternalError());
+      AssertThrow((gradients_manual[q] - gradients[q]).norm() < 1e-11,
+                  ExcInternalError());
+      AssertThrow((divergences_manual[q] - divergences[q]).norm() < 1e-11,
+                  ExcInternalError());
     }
 }
 

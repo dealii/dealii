@@ -145,7 +145,7 @@ namespace internal
 
       static void (&quadrant_set_morton)(types<2>::quadrant *quadrant,
                                          int                 level,
-                                         uint64_t            id);
+                                         std::uint64_t       id);
 
       static int (&quadrant_is_equal)(const types<2>::quadrant *q1,
                                       const types<2>::quadrant *q2);
@@ -348,7 +348,7 @@ namespace internal
 
       static void (&quadrant_set_morton)(types<3>::quadrant *quadrant,
                                          int                 level,
-                                         uint64_t            id);
+                                         std::uint64_t       id);
 
       static int (&quadrant_is_equal)(const types<3>::quadrant *q1,
                                       const types<3>::quadrant *q2);

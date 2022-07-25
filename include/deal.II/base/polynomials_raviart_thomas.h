@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2020 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,16 @@ class PolynomialsRaviartThomas : public TensorPolynomialsBase<dim>
 public:
   /**
    * Constructor. Creates all basis functions for Raviart-Thomas polynomials
-   * of given degree.
+   * of given degree in normal and tangential directions. The usual
+   * FE_RaviartThomas and FE_RaviartThomasNodal classes will use `degree + 1`
+   * and `degree` in the two directions, respectively.
+   */
+  PolynomialsRaviartThomas(const unsigned int degree_normal,
+                           const unsigned int degree_tangential);
+
+  /**
+   * Constructor, using the common Raviart-Thomas space of degree `k + 1` in
+   * normal direction and `k` in the tangential directions.
    *
    * @arg k: the degree of the Raviart-Thomas-space, which is the degree of
    * the largest tensor product polynomial space <i>Q<sub>k</sub></i>
@@ -63,13 +72,13 @@ public:
   /**
    * Copy constructor.
    */
-  PolynomialsRaviartThomas(const PolynomialsRaviartThomas &other);
+  PolynomialsRaviartThomas(const PolynomialsRaviartThomas &other) = default;
 
   /**
-   * Compute the value and the first and second derivatives of each Raviart-
-   * Thomas polynomial at @p unit_point.
+   * Compute the value and derivatives of each Raviart-Thomas polynomial at
+   * @p unit_point.
    *
-   * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
+   * The size of the vectors must either be zero or equal <tt>n()</tt>. In
    * the first case, the function will not compute these values.
    *
    * If you need values or derivatives of all tensor product polynomials then
@@ -86,18 +95,35 @@ public:
            std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
-   * Return the name of the space, which is <tt>RaviartThomas</tt>.
+   * Return the name of the space, which is <tt>PolynomialsRaviartThomas</tt>.
    */
   std::string
   name() const override;
 
   /**
-   * Return the number of polynomials in the space <tt>RT(degree)</tt> without
-   * requiring to build an object of PolynomialsRaviartThomas. This is
-   * required by the FiniteElement classes.
+   * Return the number of polynomials in the space without requiring to
+   * build an object of PolynomialsRaviartThomas. This is required by the
+   * FiniteElement classes.
+   */
+  static unsigned int
+  n_polynomials(const unsigned int normal_degree,
+                const unsigned int tangential_degree);
+
+  /**
+   * Variant of the n_polynomials() function taking only a single argument
+   * `degree`, assuming `degree + 1` in the normal direction and `degree` in
+   * the tangential directions.
    */
   static unsigned int
   n_polynomials(const unsigned int degree);
+
+  /**
+   * Compute the lexicographic to hierarchic numbering underlying this class,
+   * computed as a free function.
+   */
+  static std::vector<unsigned int>
+  get_lexicographic_numbering(const unsigned int normal_degree,
+                              const unsigned int tangential_degree);
 
   /**
    * @copydoc TensorPolynomialsBase::clone()
@@ -105,7 +131,27 @@ public:
   virtual std::unique_ptr<TensorPolynomialsBase<dim>>
   clone() const override;
 
+  /**
+   * Compute the generalized support points in the ordering used by the
+   * polynomial shape functions. Note that these points are not support points
+   * in the classical sense as the Lagrange polynomials of the different
+   * components have different points, which need to be combined in terms of
+   * Piola transforms.
+   */
+  std::vector<Point<dim>>
+  get_polynomial_support_points() const;
+
 private:
+  /**
+   * The given degree in the normal direction.
+   */
+  const unsigned int normal_degree;
+
+  /**
+   * The given degree in the tangential direction.
+   */
+  const unsigned int tangential_degree;
+
   /**
    * An object representing the polynomial space for a single component. We
    * can re-use it by rotating the coordinates of the evaluation point.
@@ -113,39 +159,21 @@ private:
   const AnisotropicPolynomials<dim> polynomial_space;
 
   /**
-   * A static member function that creates the polynomial space we use to
-   * initialize the #polynomial_space member variable.
+   * Renumbering from lexicographic to hierarchic order.
    */
-  static std::vector<std::vector<Polynomials::Polynomial<double>>>
-  create_polynomials(const unsigned int k);
+  std::vector<unsigned int> lexicographic_to_hierarchic;
 
   /**
-   * A mutex with which to guard access to the following `mutable`
-   * variables.
+   * Renumbering from hierarchic to lexicographic order. Inverse of
+   * lexicographic_to_hierarchic.
    */
-  mutable std::mutex scratch_arrays_mutex;
+  std::vector<unsigned int> hierarchic_to_lexicographic;
 
   /**
-   * The following arrays are used as scratch data in the evaluate() function.
-   * Since that function is `const`, they have to be marked as `mutable`, and
-   * since we want that function to be thread-safe, access to these scratch
-   * arrays is guarded by the mutex above.
+   * Renumbering from shifted polynomial spaces to lexicographic one.
    */
-  mutable std::vector<double>         scratch_values;
-  mutable std::vector<Tensor<1, dim>> scratch_grads;
-  mutable std::vector<Tensor<2, dim>> scratch_grad_grads;
-  mutable std::vector<Tensor<3, dim>> scratch_third_derivatives;
-  mutable std::vector<Tensor<4, dim>> scratch_fourth_derivatives;
+  std::array<std::vector<unsigned int>, dim> renumber_aniso;
 };
-
-
-
-template <int dim>
-inline std::string
-PolynomialsRaviartThomas<dim>::name() const
-{
-  return "RaviartThomas";
-}
 
 
 DEAL_II_NAMESPACE_CLOSE

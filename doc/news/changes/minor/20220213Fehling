@@ -1,4 +1,0 @@
-Fixed: BlockDynamicSparsityPattern in step-55 will be initialized with
-the correct IndexSet for locally relevant dofs.
-<br>
-(Marc Fehling, 2022/02/10)

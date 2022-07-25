@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2021 by the deal.II authors
+// Copyright (C) 2002 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,13 +66,15 @@ DEAL_II_NAMESPACE_OPEN
  * field must be continuous across the line (or surface) even though
  * the normal component may not be. As a consequence, the
  * N&eacute;d&eacute;lec element is constructed in such a way that (i) it is
- * @ref vector_valued "vector-valued", (ii) the shape functions are
+ * @ref vector_valued "vector-valued",
+ * (ii) the shape functions are
  * discontinuous, but (iii) the tangential component(s) of the vector field
  * represented by each shape function are continuous across the faces
  * of cells.
  *
  * Other properties of the N&eacute;d&eacute;lec element are that (i) it is
- * @ref GlossPrimitive "not a primitive element"; (ii) the shape functions
+ * @ref GlossPrimitive "not a primitive element"
+ * ; (ii) the shape functions
  * are defined so that certain integrals over the faces are either zero
  * or one, rather than the common case of certain point values being
  * either zero or one.
@@ -406,7 +408,9 @@ public:
    * the 3D version of FE_Nedelec has 12 degrees of freedom for `order = 0`
    * and 54 for `degree = 1`. It is important to have enough quadrature points
    * in order to perform the quadrature with sufficient accuracy.
-   * For example [QGauss<dim>(order + 2)](@ref QGauss) can be used for the
+   * For example
+   * [QGauss<dim>(order + 2)](@ref QGauss)
+   * can be used for the
    * quadrature formula, where `order` is the order of FE_Nedelec.
    */
   FE_Nedelec(const unsigned int order);
@@ -576,6 +580,18 @@ public:
 
   virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
+
+  /**
+   * For a finite element of degree larger than @p sub_degree, we return a
+   * vector which maps the numbering on an FE of degree @p sub_degree into the
+   * numbering on this element.
+   *
+   * Note that for the Nedelec element, by @p sub_degree,
+   * we refer to the maximal polynomial degree (in any coordinate direction) as
+   * opposed to the Nedelec degree.
+   */
+  std::vector<unsigned int>
+  get_embedding_dofs(const unsigned int sub_degree) const;
 
 private:
   /**

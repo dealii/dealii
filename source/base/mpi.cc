@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2021 by the deal.II authors
+// Copyright (C) 2005 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/mpi_large_count.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
@@ -26,6 +27,8 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
+
+#include <boost/serialization/utility.hpp>
 
 #include <iostream>
 #include <numeric>
@@ -68,10 +71,15 @@ DEAL_II_NAMESPACE_OPEN
 namespace Utilities
 {
   IndexSet
-  create_evenly_distributed_partitioning(const unsigned int my_partition_id,
-                                         const unsigned int n_partitions,
-                                         const IndexSet::size_type total_size)
+  create_evenly_distributed_partitioning(
+    const unsigned int            my_partition_id,
+    const unsigned int            n_partitions,
+    const types::global_dof_index total_size)
   {
+    static_assert(
+      std::is_same<types::global_dof_index, IndexSet::size_type>::value,
+      "IndexSet::size_type must match types::global_dof_index for "
+      "using this function");
     const unsigned int remain = total_size % n_partitions;
 
     const IndexSet::size_type min_size = total_size / n_partitions;
@@ -211,9 +219,14 @@ namespace Utilities
 
 
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &          comm,
-                                  const IndexSet::size_type locally_owned_size)
+    create_ascending_partitioning(
+      const MPI_Comm &              comm,
+      const types::global_dof_index locally_owned_size)
     {
+      static_assert(
+        std::is_same<types::global_dof_index, IndexSet::size_type>::value,
+        "IndexSet::size_type must match types::global_dof_index for "
+        "using this function");
       const unsigned int                     n_proc = n_mpi_processes(comm);
       const std::vector<IndexSet::size_type> sizes =
         all_gather(comm, locally_owned_size);
@@ -235,8 +248,9 @@ namespace Utilities
 
 
     IndexSet
-    create_evenly_distributed_partitioning(const MPI_Comm &          comm,
-                                           const IndexSet::size_type total_size)
+    create_evenly_distributed_partitioning(
+      const MPI_Comm &              comm,
+      const types::global_dof_index total_size)
     {
       const unsigned int this_proc = this_mpi_process(comm);
       const unsigned int n_proc    = n_mpi_processes(comm);
@@ -251,58 +265,10 @@ namespace Utilities
     std::unique_ptr<MPI_Datatype, void (*)(MPI_Datatype *)>
     create_mpi_data_type_n_bytes(const std::size_t n_bytes)
     {
-      // Simplified version from BigMPI repository, see
-      // https://github.com/jeffhammond/BigMPI/blob/5300b18cc8ec1b2431bf269ee494054ee7bd9f72/src/type_contiguous_x.c#L74
-      // (code is MIT licensed)
-
-      // We create an MPI datatype that has the layout A*n+B where A is
-      // max_signed_int bytes repeated n times and B is the remainder.
-
-      const MPI_Count max_signed_int = std::numeric_limits<int>::max();
-
-      const MPI_Count n_chunks          = n_bytes / max_signed_int;
-      const MPI_Count n_bytes_remainder = n_bytes % max_signed_int;
-
-      Assert(static_cast<std::size_t>(max_signed_int * n_chunks +
-                                      n_bytes_remainder) == n_bytes,
-             ExcInternalError());
-
-      MPI_Datatype chunks;
-
-      int ierr = MPI_Type_vector(
-        n_chunks, max_signed_int, max_signed_int, MPI_BYTE, &chunks);
-      AssertThrowMPI(ierr);
-
-      MPI_Datatype remainder;
-      ierr = MPI_Type_contiguous(n_bytes_remainder, MPI_BYTE, &remainder);
-      AssertThrowMPI(ierr);
-
-      const int      blocklengths[2]  = {1, 1};
-      const MPI_Aint displacements[2] = {0,
-                                         static_cast<MPI_Aint>(n_chunks) *
-                                           max_signed_int};
-
-      // This fails if Aint happens to be 32 bits (maybe on some 32bit
-      // systems as it has type "long" which is usually 64bits) or the
-      // message is very, very big.
-      AssertThrow(
-        displacements[1] == n_chunks * max_signed_int,
-        ExcMessage(
-          "Error in create_mpi_data_type_n_bytes(): the size is too big to support."));
-
       MPI_Datatype result;
-
-      const MPI_Datatype types[2] = {chunks, remainder};
-      ierr =
-        MPI_Type_create_struct(2, blocklengths, displacements, types, &result);
+      int ierr = LargeCount::Type_contiguous_c(n_bytes, MPI_BYTE, &result);
       AssertThrowMPI(ierr);
-
       ierr = MPI_Type_commit(&result);
-      AssertThrowMPI(ierr);
-
-      ierr = MPI_Type_free(&chunks);
-      AssertThrowMPI(ierr);
-      ierr = MPI_Type_free(&remainder);
       AssertThrowMPI(ierr);
 
 #  ifdef DEBUG
@@ -381,7 +347,7 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::NBX<char, char>().run(
+          return ConsensusAlgorithms::nbx<char, char>(
             destinations, {}, {}, {}, mpi_comm);
         }
 
@@ -477,8 +443,8 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::NBX<char, char>()
-            .run(destinations, {}, {}, {}, mpi_comm)
+          return ConsensusAlgorithms::nbx<char, char>(
+                   destinations, {}, {}, {}, mpi_comm)
             .size();
         }
       else
@@ -708,15 +674,17 @@ namespace Utilities
 
 
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm & /*comm*/,
-                                  const IndexSet::size_type locally_owned_size)
+    create_ascending_partitioning(
+      const MPI_Comm & /*comm*/,
+      const types::global_dof_index locally_owned_size)
     {
       return std::vector<IndexSet>(1, complete_index_set(locally_owned_size));
     }
 
     IndexSet
-    create_evenly_distributed_partitioning(const MPI_Comm & /*comm*/,
-                                           const IndexSet::size_type total_size)
+    create_evenly_distributed_partitioning(
+      const MPI_Comm & /*comm*/,
+      const types::global_dof_index total_size)
     {
       return complete_index_set(total_size);
     }
@@ -1098,8 +1066,9 @@ namespace Utilities
       // partition (i.e. in the dictionary). This process returns the actual
       // owner of the index.
       ConsensusAlgorithms::Selector<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_dof_index, types::global_dof_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, comm);
       consensus_algorithm.run();
 
@@ -1193,6 +1162,42 @@ namespace Utilities
 
 #ifndef DOXYGEN
     // explicit instantiations
+
+    // booleans aren't in MPI_SCALARS
+    template bool
+    reduce(const bool &,
+           const MPI_Comm &,
+           const std::function<bool(const bool &, const bool &)> &,
+           const unsigned int);
+
+    template std::vector<bool>
+    reduce(const std::vector<bool> &,
+           const MPI_Comm &,
+           const std::function<std::vector<bool>(const std::vector<bool> &,
+                                                 const std::vector<bool> &)> &,
+           const unsigned int);
+
+    template bool
+    all_reduce(const bool &,
+               const MPI_Comm &,
+               const std::function<bool(const bool &, const bool &)> &);
+
+    template std::vector<bool>
+    all_reduce(
+      const std::vector<bool> &,
+      const MPI_Comm &,
+      const std::function<std::vector<bool>(const std::vector<bool> &,
+                                            const std::vector<bool> &)> &);
+
+    // We need an explicit instantiation of this for the same reason as the
+    // other types described in mpi.inst.in
+    template void
+    internal::all_reduce<bool>(const MPI_Op &,
+                               const ArrayView<const bool> &,
+                               const MPI_Comm &,
+                               const ArrayView<bool> &);
+
+
     template bool
     logical_or<bool>(const bool &, const MPI_Comm &);
 

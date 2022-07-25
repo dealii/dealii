@@ -86,12 +86,12 @@ main(int argc, char **argv)
     u = 0.;
     check_solver_within_range(bicgstab_solver.solve(A, u, f),
                               control.last_step(),
-                              53,
+                              26,
                               65);
     u = 0.;
     check_solver_within_range(cgs_solver.solve(A, u, f),
                               control.last_step(),
-                              72,
+                              36,
                               79);
     u = 0.;
     check_solver_within_range(fcg_solver.solve(A, u, f),

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2021 by the deal.II authors
+ * Copyright (C) 2003 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -207,10 +207,9 @@ namespace Step50
     constraints.reinit(locally_relevant_set);
     DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
-    std::set<types::boundary_id>                        dirichlet_boundary_ids;
+    const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
     std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
     Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(1.0);
-    dirichlet_boundary_ids.insert(0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values(mg_dof_handler,
                                              dirichlet_boundary,

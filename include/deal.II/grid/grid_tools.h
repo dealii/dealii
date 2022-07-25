@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// Copyright (C) 2001 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -495,7 +493,8 @@ namespace GridTools
    * vertices so that all lines are consistently oriented.
    *
    * The expectations on orientation and a discussion of this function are
-   * available in the @ref reordering "reordering module".
+   * available in the
+   * @ref reordering "reordering module".
    *
    * @param cells The array of CellData objects that describe the mesh's topology.
    */
@@ -636,7 +635,7 @@ namespace GridTools
    * @deprecated Use the alternative with the unit vector instead.
    */
   template <int dim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   rotate(const double           angle,
          const unsigned int     axis,
          Triangulation<dim, 3> &triangulation);
@@ -3297,9 +3296,12 @@ namespace GridTools
    *
    * Type @p T is assumed to be serializable by <code>boost::serialization</code> (for
    * example <code>unsigned int</code> or <code>std::vector@<double@></code>).
+   *
+   * @deprecated The implementation in deal.II has been rewritten, making this class
+   * obsolete for use within deal.II. Use your own data structures instead.
    */
   template <int dim, typename T>
-  struct CellDataTransferBuffer
+  struct DEAL_II_DEPRECATED CellDataTransferBuffer
   {
     /**
      * A vector to store IDs of cells to be transferred.
@@ -3321,7 +3323,23 @@ namespace GridTools
      */
     template <class Archive>
     void
-    save(Archive &ar, const unsigned int version) const;
+    save(Archive &ar, const unsigned int) const
+    {
+      // Implement the code inline as some compilers do otherwise complain
+      // about the use of a deprecated interface.
+      Assert(cell_ids.size() == data.size(),
+             ExcDimensionMismatch(cell_ids.size(), data.size()));
+      // archive the cellids in an efficient binary format
+      const std::size_t n_cells = cell_ids.size();
+      ar &              n_cells;
+      for (const auto &id : cell_ids)
+        {
+          CellId::binary_type binary_cell_id = id.template to_binary<dim>();
+          ar &                binary_cell_id;
+        }
+
+      ar &data;
+    }
 
     /**
      * Read the data of this object from a stream for the purpose of
@@ -3331,7 +3349,23 @@ namespace GridTools
      */
     template <class Archive>
     void
-    load(Archive &ar, const unsigned int version);
+    load(Archive &ar, const unsigned int)
+    {
+      // Implement the code inline as some compilers do otherwise complain
+      // about the use of a deprecated interface.
+      std::size_t n_cells;
+      ar &        n_cells;
+      cell_ids.clear();
+      cell_ids.reserve(n_cells);
+      for (unsigned int c = 0; c < n_cells; ++c)
+        {
+          CellId::binary_type value;
+          ar &                value;
+          cell_ids.emplace_back(value);
+        }
+      ar &data;
+    }
+
 
 #ifdef DOXYGEN
     /**
@@ -4276,48 +4310,6 @@ namespace GridTools
 
 
 
-  template <int dim, typename T>
-  template <class Archive>
-  void
-  CellDataTransferBuffer<dim, T>::save(Archive &ar,
-                                       const unsigned int /*version*/) const
-  {
-    Assert(cell_ids.size() == data.size(),
-           ExcDimensionMismatch(cell_ids.size(), data.size()));
-    // archive the cellids in an efficient binary format
-    const std::size_t n_cells = cell_ids.size();
-    ar &              n_cells;
-    for (const auto &id : cell_ids)
-      {
-        CellId::binary_type binary_cell_id = id.template to_binary<dim>();
-        ar &                binary_cell_id;
-      }
-
-    ar &data;
-  }
-
-
-
-  template <int dim, typename T>
-  template <class Archive>
-  void
-  CellDataTransferBuffer<dim, T>::load(Archive &ar,
-                                       const unsigned int /*version*/)
-  {
-    std::size_t n_cells;
-    ar &        n_cells;
-    cell_ids.clear();
-    cell_ids.reserve(n_cells);
-    for (unsigned int c = 0; c < n_cells; ++c)
-      {
-        CellId::binary_type value;
-        ar &                value;
-        cell_ids.emplace_back(value);
-      }
-    ar &data;
-  }
-
-
   namespace internal
   {
     template <typename DataType,
@@ -4367,7 +4359,7 @@ namespace GridTools
             ExcMessage(
               "The functions GridTools::exchange_cell_data_to_ghosts() and "
               "GridTools::exchange_cell_data_to_level_ghosts() can only "
-              "operate on a single layer ghost cells. However, you have "
+              "operate on a single layer of ghost cells. However, you have "
               "given a Triangulation object of type "
               "parallel::shared::Triangulation without artificial cells "
               "resulting in arbitrary numbers of ghost layers."));
@@ -4407,7 +4399,7 @@ namespace GridTools
       const int mpi_tag_reply =
         Utilities::MPI::internal::Tags::exchange_cell_data_reply;
 
-      // send our requests:
+      // send our requests
       std::vector<MPI_Request> requests(ghost_owners.size());
       {
         unsigned int idx = 0;
@@ -4426,16 +4418,7 @@ namespace GridTools
           }
       }
 
-      using DestinationToBufferMap =
-        std::map<dealii::types::subdomain_id,
-                 GridTools::CellDataTransferBuffer<dim, DataType>>;
-      DestinationToBufferMap destination_to_data_buffer_map;
-
-      // receive requests and reply with the ghost indices
-      std::vector<std::vector<typename CellId::binary_type>> cell_data_to_send(
-        ghost_owners.size());
-      std::vector<std::vector<types::global_dof_index>>
-        send_dof_numbers_and_indices(ghost_owners.size());
+      // receive requests and reply with the results
       std::vector<MPI_Request>       reply_requests(ghost_owners.size());
       std::vector<std::vector<char>> sendbuffers(ghost_owners.size());
 
@@ -4451,14 +4434,18 @@ namespace GridTools
           int len;
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
           AssertThrowMPI(ierr);
-          Assert(len % sizeof(cell_data_to_send[idx][0]) == 0,
+          Assert(len % sizeof(typename CellId::binary_type) == 0,
                  ExcInternalError());
 
           const unsigned int n_cells =
             len / sizeof(typename CellId::binary_type);
-          cell_data_to_send[idx].resize(n_cells);
+          std::vector<typename CellId::binary_type> cells_with_requests(
+            n_cells);
+          std::vector<DataType> data_to_send;
+          data_to_send.reserve(n_cells);
+          std::vector<bool> cell_carries_data(n_cells, false);
 
-          ierr = MPI_Recv(cell_data_to_send[idx].data(),
+          ierr = MPI_Recv(cells_with_requests.data(),
                           len,
                           MPI_BYTE,
                           status.MPI_SOURCE,
@@ -4471,34 +4458,46 @@ namespace GridTools
           for (unsigned int c = 0; c < static_cast<unsigned int>(n_cells); ++c)
             {
               const auto cell =
-                tria->create_cell_iterator(CellId(cell_data_to_send[idx][c]));
+                tria->create_cell_iterator(CellId(cells_with_requests[c]));
 
-              MeshCellIteratorType                mesh_it(tria,
+              MeshCellIteratorType mesh_it(tria,
                                            cell->level(),
                                            cell->index(),
                                            &mesh);
-              const std_cxx17::optional<DataType> data = pack(mesh_it);
 
+              const std_cxx17::optional<DataType> data = pack(mesh_it);
               if (data)
                 {
-                  typename DestinationToBufferMap::iterator p =
-                    destination_to_data_buffer_map
-                      .insert(std::make_pair(
-                        idx,
-                        GridTools::CellDataTransferBuffer<dim, DataType>()))
-                      .first;
-
-                  p->second.cell_ids.emplace_back(cell->id());
-                  p->second.data.emplace_back(*data);
+                  data_to_send.emplace_back(*data);
+                  cell_carries_data[c] = true;
                 }
             }
 
-          // send reply
-          GridTools::CellDataTransferBuffer<dim, DataType> &data =
-            destination_to_data_buffer_map[idx];
+          // collect data for sending the reply in a buffer
 
-          sendbuffers[idx] =
-            Utilities::pack(data, /*enable_compression*/ false);
+          // (a) make room for storing the local offsets in case we receive
+          // other data
+          sendbuffers[idx].resize(sizeof(std::size_t));
+
+          // (b) append the actual data and store how much memory it
+          // corresponds to, which we then insert into the leading position of
+          // the sendbuffer
+          std::size_t size_of_send =
+            Utilities::pack(data_to_send,
+                            sendbuffers[idx],
+                            /*enable_compression*/ false);
+          std::memcpy(sendbuffers[idx].data(),
+                      &size_of_send,
+                      sizeof(std::size_t));
+
+          // (c) append information of certain cells that got left out in case
+          // we need it
+          if (data_to_send.size() < n_cells)
+            Utilities::pack(cell_carries_data,
+                            sendbuffers[idx],
+                            /*enable_compression*/ false);
+
+          // send data
           ierr = MPI_Isend(sendbuffers[idx].data(),
                            sendbuffers[idx].size(),
                            MPI_BYTE,
@@ -4511,7 +4510,7 @@ namespace GridTools
 
       // finally receive the replies
       std::vector<char> receive;
-      for (unsigned int idx = 0; idx < ghost_owners.size(); ++idx)
+      for (unsigned int id = 0; id < neighbor_cell_list.size(); ++id)
         {
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
@@ -4526,8 +4525,7 @@ namespace GridTools
 
           receive.resize(len);
 
-          char *ptr = receive.data();
-          ierr      = MPI_Recv(ptr,
+          ierr = MPI_Recv(receive.data(),
                           len,
                           MPI_BYTE,
                           status.MPI_SOURCE,
@@ -4536,23 +4534,52 @@ namespace GridTools
                           &status);
           AssertThrowMPI(ierr);
 
-          auto cellinfo =
-            Utilities::unpack<CellDataTransferBuffer<dim, DataType>>(
-              receive, /*enable_compression*/ false);
+          // (a) first determine the length of the data section in the
+          // received buffer
+          auto        data_iterator = receive.begin();
+          std::size_t size_of_received_data =
+            Utilities::unpack<std::size_t>(data_iterator,
+                                           data_iterator + sizeof(std::size_t));
+          data_iterator += sizeof(std::size_t);
 
-          DataType *data = cellinfo.data.data();
-          for (unsigned int c = 0; c < cellinfo.cell_ids.size(); ++c, ++data)
+          // (b) unpack the data section in the indicated region
+          auto received_data = Utilities::unpack<std::vector<DataType>>(
+            data_iterator,
+            data_iterator + size_of_received_data,
+            /*enable_compression*/ false);
+          data_iterator += size_of_received_data;
+
+          // (c) check if the received data contained fewer entries than the
+          // number of cells we identified in the beginning, in which case we
+          // need to extract the boolean vector with the relevant information
+          const std::vector<typename CellId::binary_type> &this_cell_list =
+            neighbor_cell_list[status.MPI_SOURCE];
+          AssertIndexRange(received_data.size(), this_cell_list.size() + 1);
+          std::vector<bool> cells_with_data;
+          if (received_data.size() < this_cell_list.size())
             {
-              const typename Triangulation<dim, spacedim>::cell_iterator
-                tria_cell = tria->create_cell_iterator(cellinfo.cell_ids[c]);
-
-              MeshCellIteratorType cell(tria,
-                                        tria_cell->level(),
-                                        tria_cell->index(),
-                                        &mesh);
-
-              unpack(cell, *data);
+              cells_with_data = Utilities::unpack<std::vector<bool>>(
+                data_iterator, receive.end(), /*enable_compression*/ false);
+              AssertDimension(cells_with_data.size(), this_cell_list.size());
             }
+
+          // (d) go through the received data and call the user-provided
+          // unpack function
+          auto received_data_iterator = received_data.begin();
+          for (unsigned int c = 0; c < this_cell_list.size(); ++c)
+            if (cells_with_data.empty() || cells_with_data[c])
+              {
+                const typename Triangulation<dim, spacedim>::cell_iterator
+                  tria_cell = tria->create_cell_iterator(this_cell_list[c]);
+
+                MeshCellIteratorType cell(tria,
+                                          tria_cell->level(),
+                                          tria_cell->index(),
+                                          &mesh);
+
+                unpack(cell, *received_data_iterator);
+                ++received_data_iterator;
+              }
         }
 
       // make sure that all communication is finished
@@ -4640,9 +4667,7 @@ namespace GridTools
       cell_filter,
       [&](const auto &process) {
         for (const auto &cell : mesh.cell_iterators())
-          if (cell->level_subdomain_id() !=
-                dealii::numbers::artificial_subdomain_id &&
-              !cell->is_locally_owned_on_level())
+          if (cell->is_ghost_on_level())
             process(cell, cell->level_subdomain_id());
       },
       [](const auto &tria) { return tria.level_ghost_owners(); });

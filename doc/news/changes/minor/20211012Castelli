@@ -1,3 +1,0 @@
-Fixed: The KellyErrorEstimator for 1D can now handle the hp case.
-<br>
-(Fabian Castelli, 2021/10/12)

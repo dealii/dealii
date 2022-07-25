@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -154,6 +155,8 @@ namespace MGTransferGlobalCoarseningTools
 
 /**
  * Class for transfer between two multigrid levels for p- or global coarsening.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransfer
@@ -202,6 +205,8 @@ public:
 /**
  * Class for transfer between two multigrid levels for p- or global coarsening.
  * Specialization for LinearAlgebra::distributed::Vector.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
  */
 template <int dim, typename Number>
 class MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
@@ -469,6 +474,8 @@ private:
  * FE_Q and FE_DGQ and simplex elements FE_SimplexP and FE_SimplexDGP as well as
  * for systems involving multiple components of one of these elements. Other
  * elements are currently not implemented.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
  */
 template <int dim, typename VectorType>
 class MGTransferGlobalCoarsening : public dealii::MGTransferBase<VectorType>
@@ -494,9 +501,10 @@ public:
   /**
    * Similar function to MGTransferMatrixFree::build() with the difference that
    * the information for the prolongation for each level has already been built.
-   * So this function only tries to optimize the data structues of the two-level
-   * transfer operators, e.g., by enabling inplace vector operations, by
-   * checking if @p external_partitioners and the internal ones are compatible.
+   * So this function only tries to optimize the data structures of the
+   * two-level transfer operators, e.g., by enabling inplace vector operations,
+   * by checking if @p external_partitioners and the internal ones are
+   * compatible.
    */
   void
   build(const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
@@ -595,6 +603,18 @@ public:
   std::size_t
   memory_consumption() const;
 
+  /**
+   * Minimum level.
+   */
+  unsigned int
+  min_level() const;
+
+  /**
+   * Maximum level.
+   */
+  unsigned int
+  max_level() const;
+
 private:
   /**
    * Function to initialize internal level vectors.
@@ -612,6 +632,38 @@ private:
    */
   std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     external_partitioners;
+};
+
+
+
+/**
+ * This class works with LinearAlgebra::distributed::BlockVector and
+ * performs exactly the same transfer operations for each block as
+ * MGTransferGlobalCoarsening.
+ */
+template <int dim, typename VectorType>
+class MGTransferBlockGlobalCoarsening
+  : public MGTransferBlockMatrixFreeBase<
+      dim,
+      typename VectorType::value_type,
+      MGTransferGlobalCoarsening<dim, VectorType>>
+{
+public:
+  /**
+   * Constructor.
+   */
+  MGTransferBlockGlobalCoarsening(
+    const MGTransferGlobalCoarsening<dim, VectorType> &transfer_operator);
+
+protected:
+  const MGTransferGlobalCoarsening<dim, VectorType> &
+  get_matrix_free_transfer(const unsigned int b) const override;
+
+private:
+  /**
+   * Non-block version of transfer operation.
+   */
+  const MGTransferGlobalCoarsening<dim, VectorType> &transfer_operator;
 };
 
 
@@ -836,6 +888,24 @@ MGTransferGlobalCoarsening<dim, VectorType>::memory_consumption() const
     size += this->transfer[l].memory_consumption();
 
   return size;
+}
+
+
+
+template <int dim, typename VectorType>
+inline unsigned int
+MGTransferGlobalCoarsening<dim, VectorType>::min_level() const
+{
+  return transfer.min_level();
+}
+
+
+
+template <int dim, typename VectorType>
+inline unsigned int
+MGTransferGlobalCoarsening<dim, VectorType>::max_level() const
+{
+  return transfer.max_level();
 }
 
 #endif

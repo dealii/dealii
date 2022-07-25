@@ -1,4 +1,0 @@
-New: There is now a function ReferenceCell::vertex() that returns the
-coordinates of a vertex of a reference cell.
-<br>
-(Wolfgang Bangerth, 2021/10/13)

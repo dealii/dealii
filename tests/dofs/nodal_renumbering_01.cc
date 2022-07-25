@@ -304,14 +304,8 @@ main(int argc, char **argv)
       }
     catch (const ExceptionBase &exc)
       {
-        // The third line contains line numbers so skip it
-        const std::vector<std::string> lines =
-          Utilities::split_string_list(exc.what(), "\n");
-        deallog
-          << "FE_NedelecSZ nodal renumbering failed successfully with message:"
-          << std::endl;
-        for (std::size_t i = 3; i < 6; ++i)
-          deallog << lines[i] << std::endl;
+        deallog << "FE_NedelecSZ nodal renumbering failed successfully."
+                << std::endl;
       }
   }
 
@@ -333,14 +327,8 @@ main(int argc, char **argv)
       }
     catch (const ExceptionBase &exc)
       {
-        // The third line contains line numbers so skip it
-        const std::vector<std::string> lines =
-          Utilities::split_string_list(exc.what(), "\n");
-        deallog
-          << "FE_NedelecSZ nodal renumbering failed successfully with message:"
-          << std::endl;
-        for (std::size_t i = 3; i < 6; ++i)
-          deallog << lines[i] << std::endl;
+        deallog << "FE_NedelecSZ nodal renumbering failed successfully."
+                << std::endl;
       }
   }
 }

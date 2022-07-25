@@ -1,5 +1,0 @@
-New: One can now output simplex, pyramid, and wedge cells in GNUPLOT
-format via DataOut and other classes that are based on DataOutBase and
-call DataOutBase::write_gnuplot().
-<br>
-(Wolfgang Bangerth, 2021/11/03)

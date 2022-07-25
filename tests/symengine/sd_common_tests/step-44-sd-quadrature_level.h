@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1056,7 +1056,7 @@ namespace Step44
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
     dofs_per_block =
-      DoFTools::count_dofs_per_block(dof_handler_ref, block_component);
+      DoFTools::count_dofs_per_fe_block(dof_handler_ref, block_component);
     std::cout << "Triangulation:"
               << "\n\t Number of active cells: "
               << triangulation.n_active_cells()

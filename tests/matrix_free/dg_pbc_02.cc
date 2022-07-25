@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,7 +96,7 @@ test()
     {
       MatrixFree<dim> mf_data;
       data.mg_level = level;
-      mf_data.reinit(dof, constraints, quad, data);
+      mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
       std::vector<unsigned int> n_inner_faces(2 * dim),
         n_inner_other_faces(2 * dim), n_boundary_faces(2 * dim);
       for (unsigned int f = 0; f < mf_data.n_inner_face_batches(); ++f)

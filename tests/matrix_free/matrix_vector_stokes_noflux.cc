@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2021 by the deal.II authors
+// Copyright (C) 2013 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -166,9 +166,7 @@ test()
   stokes_sub_blocks[dim] = 1;
   DoFRenumbering::component_wise(dof_handler, stokes_sub_blocks);
 
-  std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert(0);
-  no_normal_flux_boundaries.insert(1);
+  const std::set<types::boundary_id> no_normal_flux_boundaries = {0, 1};
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::compute_no_normal_flux_constraints(
     dof_handler, 0, no_normal_flux_boundaries, constraints, mapping);

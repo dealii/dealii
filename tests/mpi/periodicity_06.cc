@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2020 by the deal.II authors
+ * Copyright (C) 2018 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -183,8 +183,8 @@ test(const unsigned numRefinementLevels = 2)
                                       /*direction*/ d,
                                       periodicity_vectorDof);
 
-  DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vectorDof,
-                                                          constraints);
+  DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vectorDof,
+                                                   constraints);
   constraints.close();
 
   const std::vector<IndexSet> &locally_owned_dofs =

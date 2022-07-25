@@ -1,7 +1,0 @@
-Deprecated: Many of the member functions of the FEInterfaceValues class, as well
-as the FEInterfaceViews::Scalar and FEInterfaceViews::Vector classes, that are
-used to compute jumps and averages of shape function-related quantities have
-been renamed in such a way that they are more expressive about what they
-compute.
-<br>
-(Jean-Paul Pelteret, 2021/07/31)

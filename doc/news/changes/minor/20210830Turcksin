@@ -1,6 +1,0 @@
-Fixed: There was a bug in the default constructor of
-TimeStepping::EmbeddedExplicitRungeKutta(). Some parameters were left
-uninitialized which triggered a segmentation fault when calling
-`evolve_one_time_step()`.
-<br>
-(Praveen Chandrashekar, Bruno Turcksin, 2021/08/30)

@@ -1,5 +1,4 @@
 
-DEAL:BFGS::Starting value 63.201
 ------------------------------------------------
 Line search 0
 
@@ -156,9 +155,8 @@ function value: 9.39817  stepsize: 1.00000
          -0.10382         -2.78767          0.00745
          -0.04649         -1.29372          0.00407
           0.00033          0.06337         -0.00053
-DEAL:BFGS::Convergence step 127 value 8.1397e-06
+DEAL::Solver stopped within 130 - 140 iterations
 DEAL::Limited memory BFGS solution:
 -4.483e-09 5.000e-02 1.000e-01 1.500e-01 2.000e-01 2.500e-01 3.000e-01 3.500e-01 4.000e-01 4.500e-01 5.000e-01 5.500e-01 6.000e-01 6.500e-01 7.000e-01 7.500e-01 8.000e-01 8.500e-01 9.000e-01 9.500e-01 1.000e+00 
 DEAL::Function value: 1.3096e-13
 DEAL::Linf error in solution: 1.6564e-07
-DEAL::function calls: 133

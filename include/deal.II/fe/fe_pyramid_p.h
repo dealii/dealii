@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note Only implemented for 3D.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_PyramidPoly : public dealii::FE_Poly<dim, spacedim>
@@ -59,7 +59,7 @@ public:
  * @note Currently, only linear polynomials (degree=1) are implemented. See
  * also the documentation of ScalarLagrangePolynomialPyramid.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_PyramidP : public FE_PyramidPoly<dim, spacedim>
@@ -121,7 +121,7 @@ public:
  * @note Currently, only linear polynomials (degree=1) are implemented. See
  * also the documentation of ScalarLagrangePolynomialPyramid.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_PyramidDGP : public FE_PyramidPoly<dim, spacedim>

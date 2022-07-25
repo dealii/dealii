@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2021 by the deal.II authors
+// Copyright (C) 2005 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -252,8 +252,8 @@ protected:
    * The constructor of this class fills this table with 'false' values, i.e.,
    * no sign change at all. Derived finite element classes have to
    * fill this Table with the correct values, see the documentation in
-   * GeometryInfo<dim> and
-   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   * GeometryInfo<dim> and this
+   * @ref GlossFaceOrientation "glossary entry on face orientation".
    *
    * The table must be filled in finite element classes derived
    * from FE_PolyTensor in a meaningful way since the permutation
@@ -519,7 +519,7 @@ protected:
   const std::unique_ptr<const TensorPolynomialsBase<dim>> poly_space;
 
   /**
-   * The inverse of the matrix <i>a<sub>ij</sub></i> of node values
+   * The inverse of the matrix <i>a<sub>ij</sub></i> of node functionals
    * <i>N<sub>i</sub></i> applied to polynomial <i>p<sub>j</sub></i>. This
    * matrix is used to convert polynomials in the "raw" basis provided in
    * #poly_space to the basis dual to the node functionals on the reference
@@ -527,7 +527,9 @@ protected:
    *
    * This object is not filled by FE_PolyTensor, but is a chance for a derived
    * class to allow for reorganization of the basis functions. If it is left
-   * empty, the basis in #poly_space is used.
+   * empty, the basis in #poly_space is used, i.e., it is assumed that
+   * #poly_space already satisfies the Kronecker delta property with
+   * regard to the node functionals.
    */
   FullMatrix<double> inverse_node_matrix;
 

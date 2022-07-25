@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -401,7 +401,7 @@ private:
   double start_time;
 
   /**
-   *The end of the time interval.
+   * The end of the time interval.
    */
   double end_time;
 

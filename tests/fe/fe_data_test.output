@@ -2169,7 +2169,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=6
+DEAL::generalized_support_points=8
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
 DEAL::face_to_cell_index: 2 3
@@ -3816,7 +3816,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=12
+DEAL::generalized_support_points=20
 DEAL::face_to_equivalent_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 4 5 6 7

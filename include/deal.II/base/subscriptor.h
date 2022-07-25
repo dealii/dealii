@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
  * This class, as a base class, allows to keep track of other objects using a
  * specific object. It is used to avoid that pointers that point to an object of
  * a class derived from Subscriptor are referenced after that object has been
- * invalidated. Here, invalidation is assumend to happen when the object is
+ * invalidated. Here, invalidation is assumed to happen when the object is
  * moved from or destroyed.
  * The mechanism works as follows: The member function subscribe() accepts a
  * pointer to a boolean that is modified on invalidation. The object that owns

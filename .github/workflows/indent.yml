@@ -6,6 +6,9 @@ concurrency:
   group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{github.event_name == 'pull_request'}}
 
+permissions:
+  contents: read
+
 jobs:
   indent:
     # run the indent checks
@@ -14,7 +17,7 @@ jobs:
     runs-on: [ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 100
     - name: setup
@@ -35,7 +38,7 @@ jobs:
         ! [ -s doxygen.log ] || exit 1
         tar -czf doxygen_documentation.tar.gz doc/doxygen
     - name: archive documentation
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: doxygen_documentation.tar.gz
         path: build/doxygen_documentation.tar.gz

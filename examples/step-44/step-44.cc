@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2020 by the deal.II authors and
+ * Copyright (C) 2010 - 2022 by the deal.II authors and
  *                              & Jean-Paul Pelteret and Andrew McBride
  *
  * This file is part of the deal.II library.

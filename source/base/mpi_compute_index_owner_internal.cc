@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
+
+#include <boost/serialization/utility.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,19 +44,19 @@ namespace Utilities
 
         void
         FlexibleIndexStorage::reinit(const bool        use_vector,
+                                     const bool        index_range_contiguous,
                                      const std::size_t size)
         {
           this->use_vector = use_vector;
           this->size       = size;
 
-          data.clear();
+          data = {};
           data_map.clear();
 
-          if (use_vector)
-            {
-              data = {};
-              data.resize(size, invalid_index_value);
-            }
+          // in case we have contiguous indices, only fill the vector upon
+          // first request in `fill`
+          if (!index_range_contiguous)
+            data.resize(size, invalid_index_value);
         }
 
 
@@ -70,8 +72,27 @@ namespace Utilities
 
           if (use_vector)
             {
-              AssertDimension(data.size(), size);
-              std::fill(data.begin() + start, data.begin() + end, value);
+              if (data.empty() && end > start)
+                {
+                  // in debug mode, we want to track whether we set all
+                  // indices, so we first fill an invalid index and only later
+                  // the actual ones, whereas we simply assign the given rank
+                  // to the complete vector the first time we pass around in
+                  // this function in release mode to avoid touching data
+                  // unnecessarily (and overwrite the smaller pieces), as the
+                  // locally owned part comes first
+#ifdef DEBUG
+                  data.resize(size, invalid_index_value);
+                  std::fill(data.begin() + start, data.begin() + end, value);
+#else
+                  data.resize(size, value);
+#endif
+                }
+              else
+                {
+                  AssertDimension(data.size(), size);
+                  std::fill(data.begin() + start, data.begin() + end, value);
+                }
             }
           else
             {
@@ -131,6 +152,9 @@ namespace Utilities
 
           if (use_vector)
             {
+              if (data.empty())
+                return false;
+
               AssertDimension(data.size(), size);
               return data[index] != invalid_index_value;
             }
@@ -242,6 +266,8 @@ namespace Utilities
 
           actually_owning_ranks.reinit((owned_indices_size_actual *
                                         sparsity_factor) > owned_indices.size(),
+                                       owned_indices_size_actual ==
+                                         owned_indices.size(),
                                        locally_owned_size);
 
           // 2) collect relevant processes and process local dict entries
@@ -408,8 +434,9 @@ namespace Utilities
                                      actually_owning_rank_list);
 
               ConsensusAlgorithms::Selector<
-                std::pair<types::global_dof_index, types::global_dof_index>,
-                unsigned int>
+                std::vector<
+                  std::pair<types::global_dof_index, types::global_dof_index>>,
+                std::vector<unsigned int>>
                 consensus_algo(temp, comm);
               consensus_algo.run();
             }

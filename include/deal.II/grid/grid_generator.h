@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,8 @@
 
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/cgal/additional_data.h>
 
 #include <array>
 #include <map>
@@ -129,7 +131,7 @@ namespace GridGenerator
   simplex(Triangulation<dim, dim> &      tria,
           const std::vector<Point<dim>> &vertices);
 
-  /*
+  /**
    * Create a (coarse) grid with a single cell of the shape of the provided
    * reference cell. This is a generalization of the hyper_cube() and simplex()
    * functions above.
@@ -375,7 +377,7 @@ namespace GridGenerator
    *
    * In 3D, triangulation will be extruded in the z-direction by the total
    * height of @p L using @p n_slices slices (minimum is 2).
-
+   *
    * If the @p colorize flag is <code>true</code>, the boundary_ids of the
    * boundary faces are assigned such that the lower one in the x-direction is
    * 0, and the upper one is 1 (see
@@ -385,7 +387,7 @@ namespace GridGenerator
    *
    * @p tria is the triangulation to be created. It needs to be empty upon
    * calling this function.
-*/
+   */
   template <int dim>
   void
   plate_with_a_hole(Triangulation<dim> &     tria,
@@ -1050,7 +1052,8 @@ namespace GridGenerator
    * opening to match their index. All other boundary faces will be assigned
    * boundary ID 3.
    *
-   * @ref GlossManifoldIndicator "Manifold IDs" will be set on the mantles of each truncated cone in
+   * @ref GlossManifoldIndicator "Manifold IDs"
+   * will be set on the mantles of each truncated cone in
    * the same way. Each cone will have a special manifold object assigned, which
    * is based on the CylindricalManifold class. Further, all cells adjacent to
    * the mantle are given the manifold ID 3. If desired, you can assign an
@@ -1202,8 +1205,8 @@ namespace GridGenerator
    * If the @p colorize flag is <code>true</code>, the @p boundary_ids of the
    * surfaces are assigned such that the left boundary is 0 and the others are
    * assigned counterclockwise in ascending order (see
-   * @ref GlossColorization "the glossary entry on colorization"). The @p
-   * colorize option only works in two dimensions.
+   * @ref GlossColorization "the glossary entry on colorization").
+   * The @p colorize option only works in two dimensions.
    *
    * This function will create the classical L-shape in 2d
    * and it will look like the following in 3d:
@@ -1746,6 +1749,84 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &tria,
     const std::string &           grid_generator_function_name,
     const std::string &           grid_generator_function_arguments);
+
+  /**
+   * Generate a Triangulation from the zero level set of an implicit function,
+   * using the CGAL library.
+   *
+   * This function is only implemented for `dim` equal to two or three, and
+   * requires that deal.II is configured using `DEAL_II_WITH_CGAL`. When `dim`
+   * is equal to three, the @p implicit_function is supposed to be negative in
+   * the interior of the domain, positive outside, and to be entirely enclosed
+   * in a ball of radius @p outer_ball_radius centered at the point
+   * @p interior_point. The triangulation that is generated covers the volume
+   * bounded by the zero level set of the implicit function  where the
+   * @p implicit_function is negative.
+   *
+   * When `dim` is equal to two, the generated surface triangulation is the zero
+   * level set of the @p implicit_function, oriented such that the surface
+   * triangulation has normals pointing towards the region where
+   * @p implicit_function is positive.
+   *
+   * The struct @p data can be used to pass additional
+   * arguments to the CGAL::Mesh_criteria_3 class (see
+   * https://doc.cgal.org/latest/Mesh_3/index.html for more information.)
+   *
+   * An example usage of this function is given by
+   *
+   * @code
+   * Triangulation<dim, 3>  tria;
+   * FunctionParser<3> my_function("(1-sqrt(x^2+y^2))^2+z^2-.25");
+   * GridGenerator::implicit_function( tria, my_function,
+   *      Point<3>(.5, 0, 0), 1.0, cell_size = 0.2);
+   * @endcode
+   *
+   * The above snippet of code generates the following grid for `dim` equal to
+   * two and three respectively
+   *
+   * @image html grid_generator_implicit_function_2d.png
+   *
+   * @image html grid_generator_implicit_function_3d.png
+   *
+   * @ingroup simplex
+   *
+   * @param[out] tria The output triangulation
+   * @param[in] implicit_function The implicit function
+   * @param[in] data Additional parameters to pass to the CGAL::make_mesh_3
+   * function and to the CGAL::make_surface_mesh functions
+   * @param[in] interior_point A point in the interior of the domain, for which
+   * @p implicit_function is negative
+   * @param[in] outer_ball_radius The radius of the ball that will contain the
+   * generated Triangulation object
+   */
+  template <int dim>
+  void
+  implicit_function(Triangulation<dim, 3> &                  tria,
+                    const Function<3> &                      implicit_function,
+                    const CGALWrappers::AdditionalData<dim> &data =
+                      CGALWrappers::AdditionalData<dim>{},
+                    const Point<3> &interior_point    = Point<3>(),
+                    const double &  outer_ball_radius = 1.0);
+
+  /**
+   * Create a deal.II Triangulation<3> out of a deal.II Triangulation<2,3>
+   * by filling it with tetrahedra.
+   *
+   * The last optional argument @p data can be used to pass additional
+   * arguments to the CGAL::Mesh_criteria_3 class (see
+   * https://doc.cgal.org/latest/Mesh_3/index.html for more information).
+   *
+   *
+   * @param [in] surface_tria The input deal.II Triangulation<2,3>.
+   * @param [out] vol_tria The output deal.II Triangulation<3>.
+   * @param[in] data Additional parameters to pass to the CGAL::make_mesh_3
+   * function.
+   */
+  void
+  surface_mesh_to_volumetric_mesh(const Triangulation<2, 3> &surface_tria,
+                                  Triangulation<3> &         vol_tria,
+                                  const CGALWrappers::AdditionalData<3> &data =
+                                    CGALWrappers::AdditionalData<3>{});
   ///@}
 
   /**
@@ -1762,7 +1843,8 @@ namespace GridGenerator
    * This function is most often used to compose meshes for more complicated
    * geometries if the geometry can be composed of simpler parts for which
    * functions exist to generate
-   * @ref GlossCoarseMesh "coarse meshes". For example, the channel mesh
+   * @ref GlossCoarseMesh "coarse meshes".
+   * For example, the channel mesh
    * used in step-35 could in principle be created using a mesh created by the
    * GridGenerator::hyper_cube_with_cylindrical_hole function and several
    * rectangles, and merging them using the current function. The rectangles
@@ -1796,7 +1878,8 @@ namespace GridGenerator
    * the input meshes.
    *
    * @note The two input triangulations must be
-   * @ref GlossCoarseMesh "coarse meshes", i.e., they can not have any
+   * @ref GlossCoarseMesh "coarse meshes",
+   * i.e., they can not have any
    * refined cells.
    *
    * @note The function copies the material ids of the cells of the two input
@@ -1906,7 +1989,8 @@ namespace GridGenerator
    * @note This function is intended to create an adaptively refined
    * triangulation that contains the <i>most refined cells</i> from two input
    * triangulations that were derived from the <i>same</i>
-   * @ref GlossCoarseMesh "coarse mesh" by
+   * @ref GlossCoarseMesh "coarse mesh"
+   * by
    * adaptive refinement. This is an operation sometimes needed when one
    * solves for two variables of a coupled problem on separately refined
    * meshes on the same domain (for example because these variables have
@@ -2122,8 +2206,10 @@ namespace GridGenerator
    * triangulation later on.
    *
    * All information about cell
-   * @ref GlossManifoldIndicator "manifold indicators" and
-   * @ref GlossMaterialId "material indicators" are copied from
+   * @ref GlossManifoldIndicator "manifold indicators"
+   * and
+   * @ref GlossMaterialId "material indicators"
+   * are copied from
    * one triangulation to the other. The same is true for the manifold
    * indicators and, if an object is at the boundary, the boundary
    * indicators of faces and edges of the triangulation.
@@ -2177,7 +2263,7 @@ namespace GridGenerator
    *     out_tria.set_manifold(i, in_tria.get_manifold(i));
    * @endcode
    *
-   * @ingroup simplex
+   * @relates simplex
    */
   template <int dim, int spacedim>
   void
@@ -2393,7 +2479,7 @@ namespace GridGenerator
    *
    * @note Currently, this function only works for `dim==spacedim`.
    *
-   * @ingroup simplex
+   * @relates simplex
    */
   template <int dim, int spacedim>
   void
@@ -2416,7 +2502,7 @@ namespace GridGenerator
    * quadrilateral/hexahedral cells and subdivides these into 2/5
    * triangular/tetrahedral cells.
    *
-   * @ingroup simplex
+   * @relates simplex
    */
   template <int dim, int spacedim>
   void
@@ -2649,6 +2735,9 @@ namespace GridGenerator
                         const unsigned int,
                         const double,
                         const bool);
+
+
+
 #endif
 } // namespace GridGenerator
 

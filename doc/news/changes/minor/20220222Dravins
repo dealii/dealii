@@ -1,7 +1,0 @@
-Fixed: The function parallel::distributed::copy_triangulation() used to
-copy the reference to the attached SolutionTransfer instance, which resulted
-in calling the same SolutionTransfer instance multiple times if the 
-triangulation and the new triangulation are refined/coarsened independently.
-This has been fixed. 
-<br>
-(Ivo Dravins, Peter Munch, 2022/02/22)

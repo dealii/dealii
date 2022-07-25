@@ -1,8 +1,0 @@
-Fixed: Callback functions attached to any weighted load balancing signal
-of parallel::distributed::Triangulation objects now need to handle cells
-with CELL_INVALID status explicitely.
-<br>
-If a cell gets refined, only the first child has the CELL_REFINE status,
-while all other children are CELL_INVALID.
-<br>
-(Marc Fehling, 2022/02/25)

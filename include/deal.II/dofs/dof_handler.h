@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -572,63 +572,6 @@ public:
    */
   DoFHandler &
   operator=(const DoFHandler &) = delete;
-
-  /**
-   * Assign a Triangulation and a FiniteElement to the DoFHandler and compute
-   * the distribution of degrees of freedom over the mesh.
-   *
-   * @deprecated Use reinit() and distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  initialize(const Triangulation<dim, spacedim> &tria,
-             const FiniteElement<dim, spacedim> &fe);
-
-  /**
-   * Same as above but taking an hp::FECollection object.
-   *
-   * @deprecated Use reinit() and distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  initialize(const Triangulation<dim, spacedim> &   tria,
-             const hp::FECollection<dim, spacedim> &fe);
-
-  /**
-   * Assign a FiniteElement @p fe to this object.
-   *
-   * @note This function makes a copy of the finite element given as
-   * argument, and stores it as a member variable. Consequently, it is
-   * possible to write code such as
-   * @code
-   *   dof_handler.set_fe(FE_Q<dim>(2));
-   * @endcode
-   * You can then access the finite element later on by calling
-   * DoFHandler::get_fe(). However, it is often more convenient to
-   * keep a named finite element object as a member variable in your
-   * main class and refer to it directly whenever you need to access
-   * properties of the finite element (such as
-   * FiniteElementData::dofs_per_cell). This is what all tutorial programs do.
-   *
-   * @warning This function only sets a FiniteElement. Degrees of freedom have
-   * either not been distributed yet, or are distributed using a previously set
-   * element. In both cases, accessing degrees of freedom will lead to invalid
-   * results. To restore consistency, call distribute_dofs().
-   *
-   * @deprecated Use distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_fe(const FiniteElement<dim, spacedim> &fe);
-
-  /**
-   * Same as above but taking an hp::FECollection object.
-   *
-   * @deprecated Use distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_fe(const hp::FECollection<dim, spacedim> &fe);
 
   /**
    * Go through the triangulation and set the active FE indices of all
@@ -1391,20 +1334,10 @@ private:
      * Return the index of the <code>dof_number</code>th degree of freedom for
      * the given level stored for the current vertex.
      */
-    types::global_dof_index
-    get_index(const unsigned int level,
-              const unsigned int dof_number,
-              const unsigned int dofs_per_vertex) const;
-
-    /**
-     * Set the index of the <code>dof_number</code>th degree of freedom for
-     * the given level stored for the current vertex to <code>index</code>.
-     */
-    void
-    set_index(const unsigned int            level,
-              const unsigned int            dof_number,
-              const unsigned int            dofs_per_vertex,
-              const types::global_dof_index index);
+    types::global_dof_index &
+    access_index(const unsigned int level,
+                 const unsigned int dof_number,
+                 const unsigned int dofs_per_vertex);
 
   private:
     /**
@@ -1629,27 +1562,6 @@ private:
    */
   void
   clear_mg_space();
-
-  /**
-   * Return dof index of specified object.
-   */
-  template <int structdim>
-  types::global_dof_index
-  get_dof_index(const unsigned int obj_level,
-                const unsigned int obj_index,
-                const unsigned int fe_index,
-                const unsigned int local_index) const;
-
-  /**
-   * Return dof index of specified object.
-   */
-  template <int structdim>
-  void
-  set_dof_index(const unsigned int            obj_level,
-                const unsigned int            obj_index,
-                const unsigned int            fe_index,
-                const unsigned int            local_index,
-                const types::global_dof_index global_index) const;
 
   /**
    * Set up DoFHandler policy.
@@ -2156,30 +2068,15 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
 
 template <int dim, int spacedim>
-inline types::global_dof_index
-DoFHandler<dim, spacedim>::MGVertexDoFs::get_index(
+inline types::global_dof_index &
+DoFHandler<dim, spacedim>::MGVertexDoFs::access_index(
   const unsigned int level,
   const unsigned int dof_number,
-  const unsigned int dofs_per_vertex) const
+  const unsigned int dofs_per_vertex)
 {
   Assert((level >= coarsest_level) && (level <= finest_level),
          ExcInvalidLevel(level));
   return indices[dofs_per_vertex * (level - coarsest_level) + dof_number];
-}
-
-
-
-template <int dim, int spacedim>
-inline void
-DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(
-  const unsigned int            level,
-  const unsigned int            dof_number,
-  const unsigned int            dofs_per_vertex,
-  const types::global_dof_index index)
-{
-  Assert((level >= coarsest_level) && (level <= finest_level),
-         ExcInvalidLevel(level));
-  indices[dofs_per_vertex * (level - coarsest_level) + dof_number] = index;
 }
 
 

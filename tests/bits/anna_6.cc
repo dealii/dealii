@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2020 by the deal.II authors
+// Copyright (C) 2002 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -180,9 +180,8 @@ ImposeBC<dim>::test_extract_boundary_DoFs()
   bc_component_select[1] = true;
   bc_component_select[2] = false;
 
-  std::vector<bool>            ned_boundary_dofs(dof_handler.n_dofs());
-  std::set<types::boundary_id> boundary_ids;
-  boundary_ids.insert(0);
+  std::vector<bool>                  ned_boundary_dofs(dof_handler.n_dofs());
+  const std::set<types::boundary_id> boundary_ids = {0};
   DoFTools::extract_boundary_dofs(dof_handler,
                                   bc_component_select,
                                   ned_boundary_dofs,
@@ -219,9 +218,8 @@ ImposeBC<dim>::test_interpolate_BC()
   // check
   // (the pressure is assumed to be set to 1
   // on the boundary)
-  std::vector<bool>            p_boundary_dofs(dof_handler.n_dofs());
-  std::set<types::boundary_id> boundary_ids;
-  boundary_ids.insert(0);
+  std::vector<bool>                  p_boundary_dofs(dof_handler.n_dofs());
+  const std::set<types::boundary_id> boundary_ids = {0};
   DoFTools::extract_boundary_dofs(dof_handler,
                                   bc_component_select,
                                   p_boundary_dofs,

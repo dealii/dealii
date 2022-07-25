@@ -675,3 +675,28 @@ object. Doing this would require making substantial modifications to the
 LaplaceOperator class, but the MatrixFreeOperators::LaplaceOperator class that
 comes with the library can do this. See the discussion on blocks in
 MatrixFreeOperators::Base for more information on how to set up blocks.
+
+<h4> Further performance improvements </h4>
+
+While the performance achieved in this tutorial program is already very good,
+there is functionality in deal.II to further improve the performance. On the
+one hand, increasing the polynomial degree to three or four will further
+improve the time per unknown. (Even higher degrees typically get slower again,
+because the multigrid iteration counts increase slightly with the chosen
+simple smoother. One could then use hybrid multigrid algorithms to use
+polynomial coarsening through MGTransferGlobalCoarsening, to reduce the impact
+of the coarser level on the communication latency.) A more significant
+improvement can be obtained by data-locality optimizations. The class
+PreconditionChebyshev, when combined with a `DiagonalMatrix` inner
+preconditioner as in the present class, can overlap the vector operations with
+the matrix-vector product. As the former are typically constrained by memory
+bandwidth, reducing the number of loads helps to achieve this goal. The two
+ingredients to achieve this are
+<ol>
+<li> to provide LaplaceOperator class of this tutorial program with a `vmult`
+function that takes two `std::function` objects, which can be passed on to
+MatrixFree::cell_loop with the respective signature (PreconditionChebyshev
+will then pick up this interface and schedule its vector operations), and </li>
+<li> to compute a numbering that optimizes for data locality, as provided by
+DoFRenumbering::matrix_free_data_locality(). </li>
+</ol>

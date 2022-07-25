@@ -284,7 +284,7 @@ SolverQMRS<VectorType>::solve(const MatrixType &        A,
   LogStream::Prefix prefix("SQMR");
 
 
-  // temporary vectors, allocated trough the @p VectorMemory object at the
+  // temporary vectors, allocated through the @p VectorMemory object at the
   // start of the actual solution process and deallocated at the end.
   typename VectorMemory<VectorType>::Pointer Vr(this->memory);
   typename VectorMemory<VectorType>::Pointer Vu(this->memory);

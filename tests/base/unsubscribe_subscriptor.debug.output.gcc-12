@@ -1,0 +1,25 @@
+
+DEAL::Exception: ExcNoSubscriber(object_info->name(), name)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void dealii::Subscriptor::unsubscribe(std::atomic<bool>*, const std::string&) const
+The violated condition was: 
+    it != counter_map.end()
+Additional information: 
+    No subscriber with identifier <b> subscribes to this object of class
+    N6dealii11SubscriptorE. Consequently, it cannot be unsubscribed.
+--------------------------------------------------------
+
+DEAL::Exception: ExcMessage( "This Subscriptor object does not know anything about the supplied pointer!")
+DEAL::
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void dealii::Subscriptor::unsubscribe(std::atomic<bool>*, const std::string&) const
+The violated condition was: 
+    validity_ptr_it != validity_pointers.end()
+Additional information: 
+    This Subscriptor object does not know anything about the supplied
+    pointer!
+--------------------------------------------------------
+

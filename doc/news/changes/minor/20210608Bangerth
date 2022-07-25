@@ -1,7 +1,0 @@
-Fixed: The step-21 program called a function that was disabled on
-Microsoft Windows to work around a bug in the Microsoft Visual Studio
-compiler. This is now fixed and the program should run successfully
-again on Windows.
-<br>
-(Wolfgang Bangerth, 2021/06/08)
-

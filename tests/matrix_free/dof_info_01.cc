@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2020 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,7 @@ test(const bool adaptive_ref = true)
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.tasks_block_size      = 7;
-    mf_data->reinit(dof, constraints, quad, data);
+    mf_data->reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   const unsigned int     n_cells         = mf_data->n_cell_batches();
@@ -170,7 +170,9 @@ test(const bool adaptive_ref = true)
 
       // output cell blocks:
       for (unsigned int cell = 0; cell < n_cells; ++cell)
-        for (unsigned int c = 0; c < mf_data->n_components_filled(cell); ++c)
+        for (unsigned int c = 0;
+             c < mf_data->n_active_entries_per_cell_batch(cell);
+             ++c)
           {
             const auto dof_cell = mf_data->get_cell_iterator(cell, c);
             f << dof_cell->center() << " \"" << cell << "\"\n";

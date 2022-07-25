@@ -246,7 +246,7 @@ FE_SimplexP_Bubbles<dim, spacedim>::FE_SimplexP_Bubbles(
       FE_P_BubblesImplementation::get_fe_data<dim>(degree),
       FE_P_BubblesImplementation::unit_support_points<dim>(degree),
       {FE_P_BubblesImplementation::unit_support_points<dim - 1>(degree)},
-      // Interface contraints are not yet implemented
+      // Interface constraints are not yet implemented
       FullMatrix<double>())
   , approximation_degree(degree)
 {}

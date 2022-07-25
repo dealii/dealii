@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,15 +127,15 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    BlockVector<Number>::reinit(const std::vector<size_type> &n,
+    BlockVector<Number>::reinit(const std::vector<size_type> &block_sizes,
                                 const bool omit_zeroing_entries)
     {
-      this->block_indices.reinit(n);
+      this->block_indices.reinit(block_sizes);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
 
       for (size_type i = 0; i < this->n_blocks(); ++i)
-        this->components[i].reinit(n[i], omit_zeroing_entries);
+        this->components[i].reinit(block_sizes[i], omit_zeroing_entries);
     }
 
 
@@ -417,6 +417,16 @@ namespace LinearAlgebra
         if (this->block(block).has_ghost_elements() == true)
           has_ghost_elements = true;
       return has_ghost_elements;
+    }
+
+
+
+    template <typename Number>
+    void
+    BlockVector<Number>::set_ghost_state(const bool ghosted) const
+    {
+      for (unsigned int block = 0; block < this->n_blocks(); ++block)
+        this->block(block).set_ghost_state(ghosted);
     }
 
 

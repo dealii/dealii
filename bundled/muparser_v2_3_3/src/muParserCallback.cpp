@@ -38,6 +38,8 @@
 */
 
 
+namespace dealii
+{
 namespace mu
 {
 	static constexpr int CALLBACK_INTERNAL_VAR_ARGS         = 1 << 14;
@@ -888,6 +890,7 @@ namespace mu
 		return (m_iArgc & CALLBACK_INTERNAL_VAR_ARGS) ? -1 : (m_iArgc & CALLBACK_INTERNAL_FIXED_ARGS_MASK);
 	}
 } // namespace mu
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)

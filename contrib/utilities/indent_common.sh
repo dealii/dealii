@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2021 by the deal.II authors
+## Copyright (C) 2018 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -83,7 +83,7 @@ checks() {
   # first user names:
   git log --since "2019-01-01" --format="%aN" --no-merges | sort -u | while read name ; do
       words=($name)
-      if [ "${#words[@]}" -lt "2" ]; then
+      if [ "${#words[@]}" -lt "2" -a "$name" != "dependabot[bot]" ]; then
 	  echo "invalid author '$name' without firstname and lastname"
 	  echo ""
 	  echo "hint: for possible solutions, consult the webpage:"
@@ -144,7 +144,7 @@ fix_or_report()
 export -f fix_or_report
 
 #
-# In order to format .cc and .h files we have to make sure that we override
+# In order to format .cc and .h files we have to make sure that we overwrite
 # the source/header file only if the actual contents changed.
 # Unfortunately, clang-format isn't exactly helpful there. Thus, use a
 # temporary file and diff as a workaround.

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2020 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,7 +101,8 @@ public:
 
         // compare values with the ones the FEValues
         // gives us. Those are seen as reference
-        for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
+        for (unsigned int j = 0; j < data.n_active_entries_per_cell_batch(cell);
+             ++j)
           {
             fe_val.reinit(data.get_cell_iterator(cell, j));
             fe_val.get_function_values(src, reference_values);
@@ -264,7 +265,7 @@ do_test(const DoFHandler<dim> &          dof,
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.mapping_update_flags  = update_gradients | update_hessians;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);

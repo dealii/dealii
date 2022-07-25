@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -314,7 +314,7 @@ namespace GridGenerator
     };
 
     // Cartesian base represented by unit vectors.
-    constexpr std::array<vector3d, spacedim> directions = {
+    const std::array<vector3d, spacedim> directions = {
       {vector3d({1., 0., 0.}), vector3d({0., 1., 0.}), vector3d({0., 0., 1.})}};
 
     // The skeleton corresponds to the axis of symmetry in the center of each

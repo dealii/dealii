@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,9 +70,7 @@ main()
   static SphericalManifold<3 - 1, 3> surface_description;
   triangulation.set_manifold(0, surface_description);
 
-  std::set<types::boundary_id> boundary_ids;
-  boundary_ids.insert(0);
-
+  const std::set<types::boundary_id> boundary_ids = {0};
   GridGenerator::extract_boundary_mesh(volume_mesh,
                                        triangulation,
                                        boundary_ids);

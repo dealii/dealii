@@ -1,0 +1,4 @@
+Removed: The deprecated member functions DoFHandler::initialize() and
+DoFHandler::set_fe() have been removed.
+<br>
+(Daniel Arndt, 2022/06/24)

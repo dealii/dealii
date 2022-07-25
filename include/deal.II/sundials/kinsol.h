@@ -1,17 +1,18 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
-//---------------------------------------------------------------
+// ---------------------------------------------------------------------
+
 
 #ifndef dealii_sundials_kinsol_h
 #define dealii_sundials_kinsol_h
@@ -33,9 +34,6 @@
 #  include <boost/signals2.hpp>
 
 #  include <kinsol/kinsol.h>
-#  if DEAL_II_SUNDIALS_VERSION_LT(4, 1, 0)
-#    include <kinsol/kinsol_impl.h>
-#  endif
 #  include <nvector/nvector_serial.h>
 #  include <sundials/sundials_math.h>
 #  include <sundials/sundials_types.h>
@@ -376,15 +374,24 @@ namespace SUNDIALS
     };
 
     /**
-     * Constructor. It is possible to fine tune the SUNDIALS KINSOL solver by
-     * passing an AdditionalData() object that sets all of the solver
-     * parameters.
+     * Constructor, with class parameters set by the AdditionalData object.
      *
      * @param data KINSOL configuration data
-     * @param mpi_comm MPI communicator
+     *
+     * @note With SUNDIALS 6 and later this constructor sets up logging
+     * objects to only work on the present processor (i.e., results are only
+     * communicated over MPI_COMM_SELF).
      */
-    KINSOL(const AdditionalData &data     = AdditionalData(),
-           const MPI_Comm &      mpi_comm = MPI_COMM_WORLD);
+    KINSOL(const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param data KINSOL configuration data
+     * @param mpi_comm MPI Communicator over which logging operations are
+     * computed. Only used in SUNDIALS 6 and newer.
+     */
+    KINSOL(const AdditionalData &data, const MPI_Comm &mpi_comm);
 
     /**
      * Destructor.
@@ -694,12 +701,27 @@ namespace SUNDIALS
      */
     void *kinsol_mem;
 
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**
      * A context object associated with the KINSOL solver.
      */
     SUNContext kinsol_ctx;
 #  endif
+
+    /**
+     * KINSOL solution vector.
+     */
+    N_Vector solution;
+
+    /**
+     * KINSOL solution scale.
+     */
+    N_Vector u_scale;
+
+    /**
+     * KINSOL f scale.
+     */
+    N_Vector f_scale;
 
     /**
      * Memory pool of vectors.

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,8 +40,9 @@ check_line(Quadrature<1> &quadrature)
       p1(2) = 0;
       p2(2) = 10.;
     }
-  Quadrature<dim> q = QProjector<dim>::project_to_line(quadrature, p1, p2);
-  double          s = 0.;
+  Quadrature<dim> q = QProjector<dim>::project_to_line(
+    ReferenceCells::get_hypercube<dim>(), quadrature, p1, p2);
+  double s = 0.;
 
   for (unsigned int k = 0; k < q.size(); ++k)
     {
@@ -63,7 +64,9 @@ check_face(Quadrature<1> &q1)
       deallog << "Face " << f << std::endl;
 
       Quadrature<dim> quadrature =
-        QProjector<dim>::project_to_face(subquadrature, f);
+        QProjector<dim>::project_to_face(ReferenceCells::get_hypercube<dim>(),
+                                         subquadrature,
+                                         f);
       for (unsigned int k = 0; k < quadrature.size(); ++k)
         deallog << quadrature.point(k) << std::endl;
     }
@@ -74,7 +77,9 @@ check_face(Quadrature<1> &q1)
         deallog << "Face " << f << " subface " << s << std::endl;
 
         Quadrature<dim> quadrature =
-          QProjector<dim>::project_to_face(subquadrature, f);
+          QProjector<dim>::project_to_face(ReferenceCells::get_hypercube<dim>(),
+                                           subquadrature,
+                                           f);
         for (unsigned int k = 0; k < quadrature.size(); ++k)
           deallog << quadrature.point(k) << std::endl;
       }
@@ -92,22 +97,24 @@ check_faces(Quadrature<1> &q1)
   Quadrature<dim - 1> subquadrature(q1);
   const unsigned int  nqs = subquadrature.size();
 
-  Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(subquadrature);
+  Quadrature<dim> faces =
+    QProjector<dim>::project_to_all_faces(ReferenceCells::get_hypercube<dim>(),
+                                          subquadrature);
 
   for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {
       deallog << "Face " << f << " orientation false" << std::endl;
 
-      unsigned int offset =
-        QProjector<dim>::DataSetDescriptor::face(f, false, false, false, nqs);
+      unsigned int offset = QProjector<dim>::DataSetDescriptor::face(
+        ReferenceCells::get_hypercube<dim>(), f, false, false, false, nqs);
 
       for (unsigned int k = 0; k < nqs; ++k)
         deallog << faces.point(offset + k) << std::endl;
 
       deallog << "Face " << f << " orientation true" << std::endl;
 
-      offset =
-        QProjector<dim>::DataSetDescriptor::face(f, true, false, false, nqs);
+      offset = QProjector<dim>::DataSetDescriptor::face(
+        ReferenceCells::get_hypercube<dim>(), f, true, false, false, nqs);
 
       for (unsigned int k = 0; k < nqs; ++k)
         deallog << faces.point(offset + k) << std::endl;

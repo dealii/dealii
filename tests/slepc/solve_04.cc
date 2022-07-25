@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2020 by the deal.II authors
+// Copyright (C) 2004 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,7 @@ check_solve(SolverType &              solver,
       case 5:
         check_solver_within_range((void)true,
                                   solver_control.last_step(),
-                                  127,
+                                  125,
                                   138);
         break;
       case 6:

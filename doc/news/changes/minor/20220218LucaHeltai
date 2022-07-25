@@ -1,4 +1,0 @@
-New: AffineConstraints::add_entries_local_to_global() now supports also the case
-where columns don't use the same constraints as rows. 
-<br> 
-(Luca Heltai, 2022/02/18)

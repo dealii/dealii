@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -329,6 +329,39 @@ namespace
             subsection_path.emplace_back(subsection);
 
             recursively_sort_parameters(separator, subsection_path, tree);
+          }
+      }
+  }
+
+  /**
+   * Demangle all parameters recursively and attach them to @p tree_out.
+   * @p is_parameter_or_alias_node indicates, whether a given node
+   * @p tree_in is a parameter node or an alias node (as opposed to being
+   * a subsection).
+   */
+  void
+  recursively_demangle(const boost::property_tree::ptree &tree_in,
+                       boost::property_tree::ptree &      tree_out,
+                       const bool is_parameter_or_alias_node = false)
+  {
+    for (const auto &p : tree_in)
+      {
+        if (is_parameter_or_alias_node)
+          {
+            tree_out.put_child(p.first, p.second);
+          }
+        else
+          {
+            boost::property_tree::ptree temp;
+
+            if (const auto val = p.second.get_value_optional<std::string>())
+              temp.put_value<std::string>(*val);
+
+            recursively_demangle(p.second,
+                                 temp,
+                                 is_parameter_node(p.second) ||
+                                   is_alias_node(p.second));
+            tree_out.put_child(demangle(p.first), temp);
           }
       }
   }
@@ -1308,7 +1341,9 @@ ParameterHandler::print_parameters(std::ostream &    out,
 
   if ((style & JSON) != 0)
     {
-      write_json(out, current_entries);
+      boost::property_tree::ptree current_entries_damangled;
+      recursively_demangle(current_entries, current_entries_damangled);
+      write_json(out, current_entries_damangled);
       return out;
     }
 

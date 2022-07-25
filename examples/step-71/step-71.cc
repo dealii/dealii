@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 by the deal.II authors
+ * Copyright (C) 2021 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1797,7 +1797,7 @@ namespace Step71
       // calculations. These essentially act as the input arguments to
       // all dependent functions that the @p optimizer must evaluate.
       // They are, collectively, the independent variables
-      // for the problem, the history variables, the time step sie and the
+      // for the problem, the history variables, the time step size and the
       // constitutive parameters (since we've not hard encoded them in the
       // energy density function).
       //

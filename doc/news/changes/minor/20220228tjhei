@@ -1,3 +1,0 @@
-Changed: We now require the MPI library to support at least the MPI 3.0 standard.
-<br>
-(Pengfei Jia, Matthias Maier, Timo Heister, 2022/02/28)

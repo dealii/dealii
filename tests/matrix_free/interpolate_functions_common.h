@@ -1,6 +1,6 @@
 //------------------  interpolate_functions_common.h  ------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,8 @@ public:
         fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
                          EvaluationFlags::hessians);
 
-        for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
+        for (unsigned int j = 0; j < data.n_active_entries_per_cell_batch(cell);
+             ++j)
           for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
             {
               ++cell_times;
@@ -341,7 +342,7 @@ do_test(const DoFHandler<dim> &          dof,
       update_gradients | update_hessians | update_quadrature_points;
     data.mapping_update_flags_inner_faces =
       update_gradients | update_hessians | update_quadrature_points;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);

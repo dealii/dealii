@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2020 by the deal.II authors
+// Copyright (C) 2003 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,8 +23,6 @@
 #include <deal.II/base/point.h>
 
 #include <deal.II/dofs/dof_handler.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <vector>
 
@@ -1257,7 +1255,7 @@ namespace DoFRenumbering
    * distributes DoFs: i.e., for a given support point, the global dof indices
    * for component i should be less than the global dof indices for component i
    * + 1. Due to various technical complications (like DoF unification in
-   * hp-mode) this assumption needs to be satified for this function to work in
+   * hp-mode) this assumption needs to be satisfied for this function to work in
    * all relevant cases.
    */
   template <int dim, int spacedim>

@@ -60,7 +60,8 @@ do_test(const unsigned int n_refine)
                                   update_JxW_values | update_quadrature_points;
   add_data.mapping_update_flags_boundary_faces =
     update_values | update_JxW_values | update_quadrature_points;
-  matrix_free.reinit(dof_handler,
+  matrix_free.reinit(MappingQ1<dim>{},
+                     dof_handler,
                      constraints,
                      QGauss<1>(fe.degree + 1),
                      add_data);

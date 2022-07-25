@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_large_count.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/repartitioning_policy_tools.h>
@@ -256,34 +257,29 @@ namespace parallel
       const dealii::Triangulation<dim, spacedim> *other_tria_ptr = &other_tria;
 
       // temporary serial triangulation (since the input triangulation is const
-      // and we might modify its subdomain_ids
-      // and level_subdomain_ids during partitioning); this pointer only points
-      // to anything if the source triangulation is serial, and ensures that our
-      // copy is eventually deleted
-      std::unique_ptr<dealii::Triangulation<dim, spacedim>> serial_tria;
+      // and we might modify its subdomain_ids and level_subdomain_ids during
+      // partitioning)
+      dealii::Triangulation<dim, spacedim> serial_tria;
 
       // check if other triangulation is not a parallel one, which needs to be
       // partitioned
       if (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
                          *>(&other_tria) == nullptr)
         {
-          serial_tria =
-            std::make_unique<dealii::Triangulation<dim, spacedim>>();
-
           // actually copy the serial triangulation
-          serial_tria->copy_triangulation(other_tria);
+          serial_tria.copy_triangulation(other_tria);
 
           // partition triangulation
-          this->partitioner(*serial_tria,
+          this->partitioner(serial_tria,
                             dealii::Utilities::MPI::n_mpi_processes(
                               this->mpi_communicator));
 
           // partition multigrid levels
           if (this->is_multilevel_hierarchy_constructed())
-            GridTools::partition_multigrid_levels(*serial_tria);
+            GridTools::partition_multigrid_levels(serial_tria);
 
           // use the new serial triangulation to create the construction data
-          other_tria_ptr = serial_tria.get();
+          other_tria_ptr = &serial_tria;
         }
 
       // create construction data
@@ -544,35 +540,41 @@ namespace parallel
         dealii::Utilities::pack(construction_data, buffer, false);
 
         // Write offsets to file.
-        unsigned int buffer_size = buffer.size();
+        const std::uint64_t buffer_size = buffer.size();
 
-        unsigned int offset = 0;
+        std::uint64_t offset = 0;
 
-        ierr = MPI_Exscan(&buffer_size,
-                          &offset,
-                          1,
-                          MPI_UNSIGNED,
-                          MPI_SUM,
-                          this->mpi_communicator);
+        ierr = MPI_Exscan(
+          &buffer_size,
+          &offset,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_SUM,
+          this->mpi_communicator);
         AssertThrowMPI(ierr);
 
         // Write offsets to file.
-        ierr = MPI_File_write_at(fh,
-                                 myrank * sizeof(unsigned int),
-                                 &buffer_size,
-                                 1,
-                                 MPI_UNSIGNED,
-                                 MPI_STATUS_IGNORE);
+        ierr = MPI_File_write_at(
+          fh,
+          myrank * sizeof(std::uint64_t),
+          &buffer_size,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
+        // global position in file
+        const std::uint64_t global_position =
+          mpisize * sizeof(std::uint64_t) + offset;
+
         // Write buffers to file.
-        ierr = MPI_File_write_at(fh,
-                                 mpisize * sizeof(unsigned int) +
-                                   offset, // global position in file
-                                 buffer.data(),
-                                 buffer.size(), // local buffer
-                                 MPI_CHAR,
-                                 MPI_STATUS_IGNORE);
+        ierr = dealii::Utilities::MPI::LargeCount::File_write_at_c(
+          fh,
+          global_position,
+          buffer.data(),
+          buffer.size(), // local buffer
+          MPI_CHAR,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
@@ -656,35 +658,41 @@ namespace parallel
         AssertThrowMPI(ierr);
 
         // Read offsets from file.
-        unsigned int buffer_size;
+        std::uint64_t buffer_size;
 
-        ierr = MPI_File_read_at(fh,
-                                myrank * sizeof(unsigned int),
-                                &buffer_size,
-                                1,
-                                MPI_UNSIGNED,
-                                MPI_STATUS_IGNORE);
+        ierr = MPI_File_read_at(
+          fh,
+          myrank * sizeof(std::uint64_t),
+          &buffer_size,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
-        unsigned int offset = 0;
+        std::uint64_t offset = 0;
 
-        ierr = MPI_Exscan(&buffer_size,
-                          &offset,
-                          1,
-                          MPI_UNSIGNED,
-                          MPI_SUM,
-                          this->mpi_communicator);
+        ierr = MPI_Exscan(
+          &buffer_size,
+          &offset,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_SUM,
+          this->mpi_communicator);
         AssertThrowMPI(ierr);
+
+        // global position in file
+        const std::uint64_t global_position =
+          mpisize * sizeof(std::uint64_t) + offset;
 
         // Read buffers from file.
         std::vector<char> buffer(buffer_size);
-        ierr = MPI_File_read_at(fh,
-                                mpisize * sizeof(unsigned int) +
-                                  offset, // global position in file
-                                buffer.data(),
-                                buffer.size(), // local buffer
-                                MPI_CHAR,
-                                MPI_STATUS_IGNORE);
+        ierr = dealii::Utilities::MPI::LargeCount::File_read_at_c(
+          fh,
+          global_position,
+          buffer.data(),
+          buffer.size(), // local buffer
+          MPI_CHAR,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);

@@ -339,83 +339,83 @@ DEAL:RT::p[2] value 0 -1  first 0 0 0 0
 DEAL:RT::p[3] value 0 3  first 0 0 0 1 
 DEAL:RT::Point 2. 3.
 DEAL:RT::p[0] value -5 0  first -9 -2 0 0 
-DEAL:RT::p[1] value 16 0  first 24 8 0 0 
+DEAL:RT::p[1] value 9 0  first 15 3 0 0 
 DEAL:RT::p[2] value -11 0  first -13 -5 0 0 
-DEAL:RT::p[3] value 9 0  first 15 3 0 0 
-DEAL:RT::p[4] value -23 0  first -35 -7 0 0 
-DEAL:RT::p[5] value 18 0  first 21 6 0 0 
-DEAL:RT::p[6] value 0 -9  first 0 0 -9 -8 
-DEAL:RT::p[7] value 0 24  first 0 0 24 20 
-DEAL:RT::p[8] value 0 -14  first 0 0 -14 -10 
-DEAL:RT::p[9] value 0 20  first 0 0 10 18 
-DEAL:RT::p[10] value 0 -47  first 0 0 -23 -39 
-DEAL:RT::p[11] value 0 30  first 0 0 15 22 
+DEAL:RT::p[3] value 18 0  first 21 6 0 0 
+DEAL:RT::p[4] value 0 -9  first 0 0 -9 -8 
+DEAL:RT::p[5] value 0 20  first 0 0 10 18 
+DEAL:RT::p[6] value 0 -14  first 0 0 -14 -10 
+DEAL:RT::p[7] value 0 30  first 0 0 15 22 
+DEAL:RT::p[8] value 16 0  first 24 8 0 0 
+DEAL:RT::p[9] value -23 0  first -35 -7 0 0 
+DEAL:RT::p[10] value 0 24  first 0 0 24 20 
+DEAL:RT::p[11] value 0 -47  first 0 0 -23 -39 
 DEAL:RT::Point 2. 3.
-DEAL:RT::p[0] value -99 0  first -234 -89 0 0 
-DEAL:RT::p[1] value 360 0  first 810 324 0 0 
-DEAL:RT::p[2] value -449 0  first -944 -404 0 0 
-DEAL:RT::p[3] value 200 0  first 370 180 0 0 
-DEAL:RT::p[4] value 240 0  first 564 200 0 0 
-DEAL:RT::p[5] value -863 0  first -1943 -719 0 0 
-DEAL:RT::p[6] value 1080 0  first 2268 900 0 0 
-DEAL:RT::p[7] value -479 0  first -887 -399 0 0 
-DEAL:RT::p[8] value -149 0  first -352 -109 0 0 
-DEAL:RT::p[9] value 540 0  first 1215 396 0 0 
-DEAL:RT::p[10] value -674 0  first -1417 -494 0 0 
-DEAL:RT::p[11] value 300 0  first 555 220 0 0 
-DEAL:RT::p[12] value 0 -167  first 0 0 -279 -218 
-DEAL:RT::p[13] value 0 567  first 0 0 945 716 
-DEAL:RT::p[14] value 0 -647  first 0 0 -1079 -782 
-DEAL:RT::p[15] value 0 252  first 0 0 420 287 
-DEAL:RT::p[16] value 0 448  first 0 0 672 584 
-DEAL:RT::p[17] value 0 -1511  first 0 0 -2267 -1907 
-DEAL:RT::p[18] value 0 1728  first 0 0 2592 2088 
-DEAL:RT::p[19] value 0 -671  first 0 0 -1007 -763 
-DEAL:RT::p[20] value 0 -335  first 0 0 -391 -437 
-DEAL:RT::p[21] value 0 1134  first 0 0 1323 1431 
-DEAL:RT::p[22] value 0 -1295  first 0 0 -1511 -1565 
-DEAL:RT::p[23] value 0 504  first 0 0 588 573 
+DEAL:RT::p[0] value -109 0  first -259 -98 0 0 
+DEAL:RT::p[1] value 264 0  first 624 220 0 0 
+DEAL:RT::p[2] value -164 0  first -389 -120 0 0 
+DEAL:RT::p[3] value 220 0  first 410 198 0 0 
+DEAL:RT::p[4] value -527 0  first -983 -439 0 0 
+DEAL:RT::p[5] value 330 0  first 615 242 0 0 
+DEAL:RT::p[6] value 0 -185  first 0 0 -309 -242 
+DEAL:RT::p[7] value 0 496  first 0 0 744 648 
+DEAL:RT::p[8] value 0 -371  first 0 0 -433 -485 
+DEAL:RT::p[9] value 0 279  first 0 0 465 318 
+DEAL:RT::p[10] value 0 -743  first 0 0 -1115 -847 
+DEAL:RT::p[11] value 0 558  first 0 0 651 636 
+DEAL:RT::p[12] value 285 0  first 652 257 0 0 
+DEAL:RT::p[13] value -384 0  first -801 -346 0 0 
+DEAL:RT::p[14] value -684 0  first -1563 -570 0 0 
+DEAL:RT::p[15] value 925 0  first 1924 771 0 0 
+DEAL:RT::p[16] value 428 0  first 978 314 0 0 
+DEAL:RT::p[17] value -577 0  first -1202 -423 0 0 
+DEAL:RT::p[18] value 0 458  first 0 0 764 583 
+DEAL:RT::p[19] value 0 -1221  first 0 0 -1831 -1554 
+DEAL:RT::p[20] value 0 916  first 0 0 1069 1166 
+DEAL:RT::p[21] value 0 -547  first 0 0 -913 -657 
+DEAL:RT::p[22] value 0 1462  first 0 0 2192 1755 
+DEAL:RT::p[23] value 0 -1095  first 0 0 -1278 -1315 
 DEAL:RT::Point 2. 3.
-DEAL:RT::p[0] value -1959 0  first -5954 -2554 0 0 
-DEAL:RT::p[1] value 8960 0  first 26581 11680 0 0 
-DEAL:RT::p[2] value -15679 0  first -45023 -20439 0 0 
-DEAL:RT::p[3] value 12544 0  first 34347 16352 0 0 
-DEAL:RT::p[4] value -3919 0  first -9948 -5109 0 0 
-DEAL:RT::p[5] value 6615 0  first 20097 8348 0 0 
-DEAL:RT::p[6] value -30239 0  first -89711 -38159 0 0 
-DEAL:RT::p[7] value 52920 0  first 151956 66780 0 0 
-DEAL:RT::p[8] value -42335 0  first -115919 -53423 0 0 
-DEAL:RT::p[9] value 13230 0  first 33579 16695 0 0 
-DEAL:RT::p[10] value -7559 0  first -22967 -9134 0 0 
-DEAL:RT::p[11] value 34560 0  first 102528 41760 0 0 
-DEAL:RT::p[12] value -60479 0  first -173663 -73079 0 0 
-DEAL:RT::p[13] value 48384 0  first 132480 58464 0 0 
-DEAL:RT::p[14] value -15119 0  first -38375 -18269 0 0 
-DEAL:RT::p[15] value 2940 0  first 8932 3343 0 0 
-DEAL:RT::p[16] value -13439 0  first -39871 -15279 0 0 
-DEAL:RT::p[17] value 23520 0  first 67536 26740 0 0 
-DEAL:RT::p[18] value -18815 0  first -51519 -21391 0 0 
-DEAL:RT::p[19] value 5880 0  first 14924 6685 0 0 
-DEAL:RT::p[20] value 0 -3299  first 0 0 -7754 -5636 
-DEAL:RT::p[21] value 0 14400  first 0 0 33840 24160 
-DEAL:RT::p[22] value 0 -23759  first 0 0 -55835 -38999 
-DEAL:RT::p[23] value 0 17600  first 0 0 41360 28107 
-DEAL:RT::p[24] value 0 -4949  first 0 0 -11632 -7629 
-DEAL:RT::p[25] value 0 11880  first 0 0 26730 20292 
-DEAL:RT::p[26] value 0 -51839  first 0 0 -116639 -86975 
-DEAL:RT::p[27] value 0 85536  first 0 0 192456 140400 
-DEAL:RT::p[28] value 0 -63359  first 0 0 -142559 -101183 
-DEAL:RT::p[29] value 0 17820  first 0 0 40095 27468 
-DEAL:RT::p[30] value 0 -14849  first 0 0 -31184 -25364 
-DEAL:RT::p[31] value 0 64800  first 0 0 136080 108720 
-DEAL:RT::p[32] value 0 -106919  first 0 0 -224531 -175499 
-DEAL:RT::p[33] value 0 79200  first 0 0 166320 126480 
-DEAL:RT::p[34] value 0 -22274  first 0 0 -46777 -34334 
-DEAL:RT::p[35] value 0 6600  first 0 0 12210 11273 
-DEAL:RT::p[36] value 0 -28799  first 0 0 -53279 -48319 
-DEAL:RT::p[37] value 0 47520  first 0 0 87912 78000 
-DEAL:RT::p[38] value 0 -35199  first 0 0 -65119 -56212 
-DEAL:RT::p[39] value 0 9900  first 0 0 18315 15260 
+DEAL:RT::p[0] value -2789 0  first -8555 -3644 0 0 
+DEAL:RT::p[1] value 6872 0  first 21073 8745 0 0 
+DEAL:RT::p[2] value -8221 0  first -25212 -9869 0 0 
+DEAL:RT::p[3] value 4185 0  first 12834 4770 0 0 
+DEAL:RT::p[4] value -5579 0  first -14321 -7289 0 0 
+DEAL:RT::p[5] value 13743 0  first 35275 17490 0 0 
+DEAL:RT::p[6] value -16442 0  first -42204 -19739 0 0 
+DEAL:RT::p[7] value 8370 0  first 21483 9540 0 0 
+DEAL:RT::p[8] value 0 -4729  first 0 0 -11179 -8106 
+DEAL:RT::p[9] value 0 12273  first 0 0 28024 21035 
+DEAL:RT::p[10] value 0 -16572  first 0 0 -34473 -28404 
+DEAL:RT::p[11] value 0 9460  first 0 0 17630 16214 
+DEAL:RT::p[12] value 0 -7094  first 0 0 -16769 -10977 
+DEAL:RT::p[13] value 0 18409  first 0 0 42036 28484 
+DEAL:RT::p[14] value 0 -24858  first 0 0 -51710 -38463 
+DEAL:RT::p[15] value 0 14190  first 0 0 26445 21956 
+DEAL:RT::p[16] value 7125 0  first 21514 9309 0 0 
+DEAL:RT::p[17] value -9919 0  first -28767 -12959 0 0 
+DEAL:RT::p[18] value 11103 0  first 30132 14505 0 0 
+DEAL:RT::p[19] value -17548 0  first -52987 -22333 0 0 
+DEAL:RT::p[20] value 24433 0  first 70855 31094 0 0 
+DEAL:RT::p[21] value -27345 0  first -74214 -34800 0 0 
+DEAL:RT::p[22] value 20997 0  first 63398 25207 0 0 
+DEAL:RT::p[23] value -29232 0  first -84774 -35093 0 0 
+DEAL:RT::p[24] value 32718 0  first 88795 39278 0 0 
+DEAL:RT::p[25] value -10687 0  first -32270 -12181 0 0 
+DEAL:RT::p[26] value 14880 0  first 43152 16960 0 0 
+DEAL:RT::p[27] value -16653 0  first -45197 -18981 0 0 
+DEAL:RT::p[28] value 0 11711  first 0 0 27680 19833 
+DEAL:RT::p[29] value 0 -30384  first 0 0 -69382 -51459 
+DEAL:RT::p[30] value 0 41031  first 0 0 85352 69490 
+DEAL:RT::p[31] value 0 -23420  first 0 0 -43648 -39665 
+DEAL:RT::p[32] value 0 -15135  first 0 0 -35775 -24932 
+DEAL:RT::p[33] value 0 39272  first 0 0 89677 64693 
+DEAL:RT::p[34] value 0 -53031  first 0 0 -110316 -87359 
+DEAL:RT::p[35] value 0 30272  first 0 0 56416 49867 
+DEAL:RT::p[36] value 0 15239  first 0 0 36020 24185 
+DEAL:RT::p[37] value 0 -39539  first 0 0 -90288 -62751 
+DEAL:RT::p[38] value 0 53394  first 0 0 111070 84738 
+DEAL:RT::p[39] value 0 -30478  first 0 0 -56800 -48369 
 DEAL:RT::Point 2. 3. 4.
 DEAL:RT::p[0] value 0 0 0  first 0 0 0 0 0 0 0 0 0 
 DEAL:RT::p[1] value 2 0 0  first 1 0 0 0 0 0 0 0 0 
@@ -425,388 +425,388 @@ DEAL:RT::p[4] value 0 0 -2  first 0 0 0 0 0 0 0 0 0
 DEAL:RT::p[5] value 0 0 4  first 0 0 0 0 0 0 0 0 1 
 DEAL:RT::Point 2. 3. 4.
 DEAL:RT::p[0] value 18 0 0  first 30 9 6 0 0 0 0 0 0 
-DEAL:RT::p[1] value -47 0 0  first -71 -23 -15 0 0 0 0 0 0 
-DEAL:RT::p[2] value 36 0 0  first 42 18 12 0 0 0 0 0 0 
-DEAL:RT::p[3] value -26 0 0  first -44 -8 -8 0 0 0 0 0 0 
-DEAL:RT::p[4] value 72 0 0  first 108 24 24 0 0 0 0 0 0 
+DEAL:RT::p[1] value -26 0 0  first -44 -8 -8 0 0 0 0 0 0 
+DEAL:RT::p[2] value -23 0 0  first -39 -11 -5 0 0 0 0 0 0 
+DEAL:RT::p[3] value 36 0 0  first 60 12 9 0 0 0 0 0 0 
+DEAL:RT::p[4] value 36 0 0  first 42 18 12 0 0 0 0 0 0 
 DEAL:RT::p[5] value -53 0 0  first -62 -17 -17 0 0 0 0 0 0 
-DEAL:RT::p[6] value -23 0 0  first -39 -11 -5 0 0 0 0 0 0 
-DEAL:RT::p[7] value 64 0 0  first 96 32 16 0 0 0 0 0 0 
-DEAL:RT::p[8] value -47 0 0  first -55 -23 -11 0 0 0 0 0 0 
-DEAL:RT::p[9] value 36 0 0  first 60 12 9 0 0 0 0 0 0 
-DEAL:RT::p[10] value -95 0 0  first -143 -31 -23 0 0 0 0 0 0 
-DEAL:RT::p[11] value 72 0 0  first 84 24 18 0 0 0 0 0 0 
-DEAL:RT::p[12] value 0 30 0  first 0 0 0 30 27 10 0 0 0 
-DEAL:RT::p[13] value 0 -71 0  first 0 0 0 -71 -59 -23 0 0 0 
-DEAL:RT::p[14] value 0 45 0  first 0 0 0 45 33 15 0 0 0 
-DEAL:RT::p[15] value 0 -39 0  first 0 0 0 -39 -35 -9 0 0 0 
-DEAL:RT::p[16] value 0 96 0  first 0 0 0 96 80 24 0 0 0 
-DEAL:RT::p[17] value 0 -59 0  first 0 0 0 -59 -43 -14 0 0 0 
-DEAL:RT::p[18] value 0 -59 0  first 0 0 0 -29 -53 -19 0 0 0 
-DEAL:RT::p[19] value 0 144 0  first 0 0 0 72 120 48 0 0 0 
-DEAL:RT::p[20] value 0 -89 0  first 0 0 0 -44 -65 -29 0 0 0 
-DEAL:RT::p[21] value 0 80 0  first 0 0 0 40 72 20 0 0 0 
-DEAL:RT::p[22] value 0 -191 0  first 0 0 0 -95 -159 -47 0 0 0 
-DEAL:RT::p[23] value 0 120 0  first 0 0 0 60 88 30 0 0 0 
-DEAL:RT::p[24] value 0 0 42  first 0 0 0 0 0 0 42 21 26 
-DEAL:RT::p[25] value 0 0 -95  first 0 0 0 0 0 0 -95 -47 -55 
-DEAL:RT::p[26] value 0 0 56  first 0 0 0 0 0 0 56 28 30 
-DEAL:RT::p[27] value 0 0 -83  first 0 0 0 0 0 0 -41 -41 -51 
-DEAL:RT::p[28] value 0 0 192  first 0 0 0 0 0 0 96 96 112 
-DEAL:RT::p[29] value 0 0 -111  first 0 0 0 0 0 0 -55 -55 -59 
-DEAL:RT::p[30] value 0 0 -62  first 0 0 0 0 0 0 -62 -20 -38 
-DEAL:RT::p[31] value 0 0 144  first 0 0 0 0 0 0 144 48 84 
-DEAL:RT::p[32] value 0 0 -83  first 0 0 0 0 0 0 -83 -27 -44 
-DEAL:RT::p[33] value 0 0 126  first 0 0 0 0 0 0 63 42 78 
-DEAL:RT::p[34] value 0 0 -287  first 0 0 0 0 0 0 -143 -95 -167 
-DEAL:RT::p[35] value 0 0 168  first 0 0 0 0 0 0 84 56 90 
+DEAL:RT::p[6] value -47 0 0  first -55 -23 -11 0 0 0 0 0 0 
+DEAL:RT::p[7] value 72 0 0  first 84 24 18 0 0 0 0 0 0 
+DEAL:RT::p[8] value 0 30 0  first 0 0 0 30 27 10 0 0 0 
+DEAL:RT::p[9] value 0 -59 0  first 0 0 0 -29 -53 -19 0 0 0 
+DEAL:RT::p[10] value 0 -39 0  first 0 0 0 -39 -35 -9 0 0 0 
+DEAL:RT::p[11] value 0 80 0  first 0 0 0 40 72 20 0 0 0 
+DEAL:RT::p[12] value 0 45 0  first 0 0 0 45 33 15 0 0 0 
+DEAL:RT::p[13] value 0 -89 0  first 0 0 0 -44 -65 -29 0 0 0 
+DEAL:RT::p[14] value 0 -59 0  first 0 0 0 -59 -43 -14 0 0 0 
+DEAL:RT::p[15] value 0 120 0  first 0 0 0 60 88 30 0 0 0 
+DEAL:RT::p[16] value 0 0 42  first 0 0 0 0 0 0 42 21 26 
+DEAL:RT::p[17] value 0 0 -83  first 0 0 0 0 0 0 -41 -41 -51 
+DEAL:RT::p[18] value 0 0 -62  first 0 0 0 0 0 0 -62 -20 -38 
+DEAL:RT::p[19] value 0 0 126  first 0 0 0 0 0 0 63 42 78 
+DEAL:RT::p[20] value 0 0 56  first 0 0 0 0 0 0 56 28 30 
+DEAL:RT::p[21] value 0 0 -111  first 0 0 0 0 0 0 -55 -55 -59 
+DEAL:RT::p[22] value 0 0 -83  first 0 0 0 0 0 0 -83 -27 -44 
+DEAL:RT::p[23] value 0 0 168  first 0 0 0 0 0 0 84 56 90 
+DEAL:RT::p[24] value -47 0 0  first -71 -23 -15 0 0 0 0 0 0 
+DEAL:RT::p[25] value 72 0 0  first 108 24 24 0 0 0 0 0 0 
+DEAL:RT::p[26] value 64 0 0  first 96 32 16 0 0 0 0 0 0 
+DEAL:RT::p[27] value -95 0 0  first -143 -31 -23 0 0 0 0 0 0 
+DEAL:RT::p[28] value 0 -71 0  first 0 0 0 -71 -59 -23 0 0 0 
+DEAL:RT::p[29] value 0 144 0  first 0 0 0 72 120 48 0 0 0 
+DEAL:RT::p[30] value 0 96 0  first 0 0 0 96 80 24 0 0 0 
+DEAL:RT::p[31] value 0 -191 0  first 0 0 0 -95 -159 -47 0 0 0 
+DEAL:RT::p[32] value 0 0 -95  first 0 0 0 0 0 0 -95 -47 -55 
+DEAL:RT::p[33] value 0 0 192  first 0 0 0 0 0 0 96 96 112 
+DEAL:RT::p[34] value 0 0 144  first 0 0 0 0 0 0 144 48 84 
+DEAL:RT::p[35] value 0 0 -287  first 0 0 0 0 0 0 -143 -95 -167 
 DEAL:RT::Point 2. 3. 4.
-DEAL:RT::p[0] value -2099 0 0  first -4934 -1889 -1299 0 0 0 0 0 0 
-DEAL:RT::p[1] value 7560 0 0  first 17010 6804 4680 0 0 0 0 0 0 
-DEAL:RT::p[2] value -9449 0 0  first -19844 -8504 -5849 0 0 0 0 0 0 
-DEAL:RT::p[3] value 4200 0 0  first 7770 3780 2600 0 0 0 0 0 0 
-DEAL:RT::p[4] value 5040 0 0  first 11844 4200 3120 0 0 0 0 0 0 
-DEAL:RT::p[5] value -18143 0 0  first -40823 -15119 -11231 0 0 0 0 0 0 
-DEAL:RT::p[6] value 22680 0 0  first 47628 18900 14040 0 0 0 0 0 0 
-DEAL:RT::p[7] value -10079 0 0  first -18647 -8399 -6239 0 0 0 0 0 0 
-DEAL:RT::p[8] value -3149 0 0  first -7402 -2309 -1949 0 0 0 0 0 0 
-DEAL:RT::p[9] value 11340 0 0  first 25515 8316 7020 0 0 0 0 0 0 
-DEAL:RT::p[10] value -14174 0 0  first -29767 -10394 -8774 0 0 0 0 0 0 
-DEAL:RT::p[11] value 6300 0 0  first 11655 4620 3900 0 0 0 0 0 0 
-DEAL:RT::p[12] value 4800 0 0  first 11280 4320 2800 0 0 0 0 0 0 
-DEAL:RT::p[13] value -17279 0 0  first -38879 -15551 -10079 0 0 0 0 0 0 
-DEAL:RT::p[14] value 21600 0 0  first 45360 19440 12600 0 0 0 0 0 0 
-DEAL:RT::p[15] value -9599 0 0  first -17759 -8639 -5599 0 0 0 0 0 0 
-DEAL:RT::p[16] value -11519 0 0  first -27071 -9599 -6719 0 0 0 0 0 0 
-DEAL:RT::p[17] value 41472 0 0  first 93312 34560 24192 0 0 0 0 0 0 
-DEAL:RT::p[18] value -51839 0 0  first -108863 -43199 -30239 0 0 0 0 0 0 
-DEAL:RT::p[19] value 23040 0 0  first 42624 19200 13440 0 0 0 0 0 0 
-DEAL:RT::p[20] value 7200 0 0  first 16920 5280 4200 0 0 0 0 0 0 
-DEAL:RT::p[21] value -25919 0 0  first -58319 -19007 -15119 0 0 0 0 0 0 
-DEAL:RT::p[22] value 32400 0 0  first 68040 23760 18900 0 0 0 0 0 0 
-DEAL:RT::p[23] value -14399 0 0  first -26639 -10559 -8399 0 0 0 0 0 0 
-DEAL:RT::p[24] value -2799 0 0  first -6579 -2519 -1499 0 0 0 0 0 0 
-DEAL:RT::p[25] value 10080 0 0  first 22680 9072 5400 0 0 0 0 0 0 
-DEAL:RT::p[26] value -12599 0 0  first -26459 -11339 -6749 0 0 0 0 0 0 
-DEAL:RT::p[27] value 5600 0 0  first 10360 5040 3000 0 0 0 0 0 0 
-DEAL:RT::p[28] value 6720 0 0  first 15792 5600 3600 0 0 0 0 0 0 
-DEAL:RT::p[29] value -24191 0 0  first -54431 -20159 -12959 0 0 0 0 0 0 
-DEAL:RT::p[30] value 30240 0 0  first 63504 25200 16200 0 0 0 0 0 0 
-DEAL:RT::p[31] value -13439 0 0  first -24863 -11199 -7199 0 0 0 0 0 0 
-DEAL:RT::p[32] value -4199 0 0  first -9869 -3079 -2249 0 0 0 0 0 0 
-DEAL:RT::p[33] value 15120 0 0  first 34020 11088 8100 0 0 0 0 0 0 
-DEAL:RT::p[34] value -18899 0 0  first -39689 -13859 -10124 0 0 0 0 0 0 
-DEAL:RT::p[35] value 8400 0 0  first 15540 6160 4500 0 0 0 0 0 0 
-DEAL:RT::p[36] value 0 -3527 0  first 0 0 0 -5879 -4598 -2183 0 0 0 
-DEAL:RT::p[37] value 0 11907 0  first 0 0 0 19845 15026 7371 0 0 0 
-DEAL:RT::p[38] value 0 -13607 0  first 0 0 0 -22679 -16442 -8423 0 0 0 
-DEAL:RT::p[39] value 0 5292 0  first 0 0 0 8820 6017 3276 0 0 0 
-DEAL:RT::p[40] value 0 8064 0  first 0 0 0 13440 10512 4704 0 0 0 
-DEAL:RT::p[41] value 0 -27215 0  first 0 0 0 -45359 -34343 -15875 0 0 0 
-DEAL:RT::p[42] value 0 31104 0  first 0 0 0 51840 37584 18144 0 0 0 
-DEAL:RT::p[43] value 0 -12095 0  first 0 0 0 -20159 -13751 -7055 0 0 0 
-DEAL:RT::p[44] value 0 -4703 0  first 0 0 0 -7839 -6131 -2519 0 0 0 
-DEAL:RT::p[45] value 0 15876 0  first 0 0 0 26460 20034 8505 0 0 0 
-DEAL:RT::p[46] value 0 -18143 0  first 0 0 0 -30239 -21923 -9719 0 0 0 
-DEAL:RT::p[47] value 0 7056 0  first 0 0 0 11760 8022 3780 0 0 0 
-DEAL:RT::p[48] value 0 9408 0  first 0 0 0 14112 12264 5824 0 0 0 
-DEAL:RT::p[49] value 0 -31751 0  first 0 0 0 -47627 -40067 -19655 0 0 0 
-DEAL:RT::p[50] value 0 36288 0  first 0 0 0 54432 43848 22464 0 0 0 
-DEAL:RT::p[51] value 0 -14111 0  first 0 0 0 -21167 -16043 -8735 0 0 0 
-DEAL:RT::p[52] value 0 -21503 0  first 0 0 0 -32255 -28031 -12543 0 0 0 
-DEAL:RT::p[53] value 0 72576 0  first 0 0 0 108864 91584 42336 0 0 0 
-DEAL:RT::p[54] value 0 -82943 0  first 0 0 0 -124415 -100223 -48383 0 0 0 
-DEAL:RT::p[55] value 0 32256 0  first 0 0 0 48384 36672 18816 0 0 0 
-DEAL:RT::p[56] value 0 12544 0  first 0 0 0 18816 16352 6720 0 0 0 
-DEAL:RT::p[57] value 0 -42335 0  first 0 0 0 -63503 -53423 -22679 0 0 0 
-DEAL:RT::p[58] value 0 48384 0  first 0 0 0 72576 58464 25920 0 0 0 
-DEAL:RT::p[59] value 0 -18815 0  first 0 0 0 -28223 -21391 -10079 0 0 0 
-DEAL:RT::p[60] value 0 -7055 0  first 0 0 0 -8231 -9197 -4367 0 0 0 
-DEAL:RT::p[61] value 0 23814 0  first 0 0 0 27783 30051 14742 0 0 0 
-DEAL:RT::p[62] value 0 -27215 0  first 0 0 0 -31751 -32885 -16847 0 0 0 
-DEAL:RT::p[63] value 0 10584 0  first 0 0 0 12348 12033 6552 0 0 0 
-DEAL:RT::p[64] value 0 16128 0  first 0 0 0 18816 21024 9408 0 0 0 
-DEAL:RT::p[65] value 0 -54431 0  first 0 0 0 -63503 -68687 -31751 0 0 0 
-DEAL:RT::p[66] value 0 62208 0  first 0 0 0 72576 75168 36288 0 0 0 
-DEAL:RT::p[67] value 0 -24191 0  first 0 0 0 -28223 -27503 -14111 0 0 0 
-DEAL:RT::p[68] value 0 -9407 0  first 0 0 0 -10975 -12263 -5039 0 0 0 
-DEAL:RT::p[69] value 0 31752 0  first 0 0 0 37044 40068 17010 0 0 0 
-DEAL:RT::p[70] value 0 -36287 0  first 0 0 0 -42335 -43847 -19439 0 0 0 
-DEAL:RT::p[71] value 0 14112 0  first 0 0 0 16464 16044 7560 0 0 0 
-DEAL:RT::p[72] value 0 0 -4949  first 0 0 0 0 0 0 -8249 -4454 -4484 
-DEAL:RT::p[73] value 0 0 16200  first 0 0 0 0 0 0 27000 14580 14310 
-DEAL:RT::p[74] value 0 0 -17819  first 0 0 0 0 0 0 -29699 -16037 -15254 
-DEAL:RT::p[75] value 0 0 6600  first 0 0 0 0 0 0 11000 5940 5430 
-DEAL:RT::p[76] value 0 0 13200  first 0 0 0 0 0 0 19800 11880 11960 
-DEAL:RT::p[77] value 0 0 -43199  first 0 0 0 0 0 0 -64799 -38879 -38159 
-DEAL:RT::p[78] value 0 0 47520  first 0 0 0 0 0 0 71280 42768 40680 
-DEAL:RT::p[79] value 0 0 -17599  first 0 0 0 0 0 0 -26399 -15839 -14479 
-DEAL:RT::p[80] value 0 0 -9899  first 0 0 0 0 0 0 -11549 -8909 -8969 
-DEAL:RT::p[81] value 0 0 32400  first 0 0 0 0 0 0 37800 29160 28620 
-DEAL:RT::p[82] value 0 0 -35639  first 0 0 0 0 0 0 -41579 -32075 -30509 
-DEAL:RT::p[83] value 0 0 13200  first 0 0 0 0 0 0 15400 11880 10860 
-DEAL:RT::p[84] value 0 0 11880  first 0 0 0 0 0 0 19800 9900 10764 
-DEAL:RT::p[85] value 0 0 -38879  first 0 0 0 0 0 0 -64799 -32399 -34343 
-DEAL:RT::p[86] value 0 0 42768  first 0 0 0 0 0 0 71280 35640 36612 
-DEAL:RT::p[87] value 0 0 -15839  first 0 0 0 0 0 0 -26399 -13199 -13031 
-DEAL:RT::p[88] value 0 0 -31679  first 0 0 0 0 0 0 -47519 -26399 -28703 
-DEAL:RT::p[89] value 0 0 103680  first 0 0 0 0 0 0 155520 86400 91584 
-DEAL:RT::p[90] value 0 0 -114047  first 0 0 0 0 0 0 -171071 -95039 -97631 
-DEAL:RT::p[91] value 0 0 42240  first 0 0 0 0 0 0 63360 35200 34752 
-DEAL:RT::p[92] value 0 0 23760  first 0 0 0 0 0 0 27720 19800 21528 
-DEAL:RT::p[93] value 0 0 -77759  first 0 0 0 0 0 0 -90719 -64799 -68687 
-DEAL:RT::p[94] value 0 0 85536  first 0 0 0 0 0 0 99792 71280 73224 
-DEAL:RT::p[95] value 0 0 -31679  first 0 0 0 0 0 0 -36959 -26399 -26063 
-DEAL:RT::p[96] value 0 0 -7424  first 0 0 0 0 0 0 -12374 -5444 -6727 
-DEAL:RT::p[97] value 0 0 24300  first 0 0 0 0 0 0 40500 17820 21465 
-DEAL:RT::p[98] value 0 0 -26729  first 0 0 0 0 0 0 -44549 -19601 -22882 
-DEAL:RT::p[99] value 0 0 9900  first 0 0 0 0 0 0 16500 7260 8145 
-DEAL:RT::p[100] value 0 0 19800  first 0 0 0 0 0 0 29700 14520 17940 
-DEAL:RT::p[101] value 0 0 -64799  first 0 0 0 0 0 0 -97199 -47519 -57239 
-DEAL:RT::p[102] value 0 0 71280  first 0 0 0 0 0 0 106920 52272 61020 
-DEAL:RT::p[103] value 0 0 -26399  first 0 0 0 0 0 0 -39599 -19359 -21719 
-DEAL:RT::p[104] value 0 0 -14849  first 0 0 0 0 0 0 -17324 -10889 -13454 
-DEAL:RT::p[105] value 0 0 48600  first 0 0 0 0 0 0 56700 35640 42930 
-DEAL:RT::p[106] value 0 0 -53459  first 0 0 0 0 0 0 -62369 -39203 -45764 
-DEAL:RT::p[107] value 0 0 19800  first 0 0 0 0 0 0 23100 14520 16290 
+DEAL:RT::p[0] value -2309 0 0  first -5459 -2078 -1429 0 0 0 0 0 0 
+DEAL:RT::p[1] value 5544 0 0  first 13104 4620 3432 0 0 0 0 0 0 
+DEAL:RT::p[2] value -3464 0 0  first -8189 -2540 -2144 0 0 0 0 0 0 
+DEAL:RT::p[3] value 5280 0 0  first 12480 4752 3080 0 0 0 0 0 0 
+DEAL:RT::p[4] value -12671 0 0  first -29951 -10559 -7391 0 0 0 0 0 0 
+DEAL:RT::p[5] value 7920 0 0  first 18720 5808 4620 0 0 0 0 0 0 
+DEAL:RT::p[6] value -3079 0 0  first -7279 -2771 -1649 0 0 0 0 0 0 
+DEAL:RT::p[7] value 7392 0 0  first 17472 6160 3960 0 0 0 0 0 0 
+DEAL:RT::p[8] value -4619 0 0  first -10919 -3387 -2474 0 0 0 0 0 0 
+DEAL:RT::p[9] value 4620 0 0  first 8610 4158 2860 0 0 0 0 0 0 
+DEAL:RT::p[10] value -11087 0 0  first -20663 -9239 -6863 0 0 0 0 0 0 
+DEAL:RT::p[11] value 6930 0 0  first 12915 5082 4290 0 0 0 0 0 0 
+DEAL:RT::p[12] value -10559 0 0  first -19679 -9503 -6159 0 0 0 0 0 0 
+DEAL:RT::p[13] value 25344 0 0  first 47232 21120 14784 0 0 0 0 0 0 
+DEAL:RT::p[14] value -15839 0 0  first -29519 -11615 -9239 0 0 0 0 0 0 
+DEAL:RT::p[15] value 6160 0 0  first 11480 5544 3300 0 0 0 0 0 0 
+DEAL:RT::p[16] value -14783 0 0  first -27551 -12319 -7919 0 0 0 0 0 0 
+DEAL:RT::p[17] value 9240 0 0  first 17220 6776 4950 0 0 0 0 0 0 
+DEAL:RT::p[18] value 0 -3905 0  first 0 0 0 -6509 -5102 -2417 0 0 0 
+DEAL:RT::p[19] value 0 10416 0  first 0 0 0 15624 13608 6448 0 0 0 
+DEAL:RT::p[20] value 0 -7811 0  first 0 0 0 -9113 -10205 -4835 0 0 0 
+DEAL:RT::p[21] value 0 8928 0  first 0 0 0 14880 11664 5208 0 0 0 
+DEAL:RT::p[22] value 0 -23807 0  first 0 0 0 -35711 -31103 -13887 0 0 0 
+DEAL:RT::p[23] value 0 17856 0  first 0 0 0 20832 23328 10416 0 0 0 
+DEAL:RT::p[24] value 0 -5207 0  first 0 0 0 -8679 -6803 -2789 0 0 0 
+DEAL:RT::p[25] value 0 13888 0  first 0 0 0 20832 18144 7440 0 0 0 
+DEAL:RT::p[26] value 0 -10415 0  first 0 0 0 -12151 -13607 -5579 0 0 0 
+DEAL:RT::p[27] value 0 5859 0  first 0 0 0 9765 6678 3627 0 0 0 
+DEAL:RT::p[28] value 0 -15623 0  first 0 0 0 -23435 -17807 -9671 0 0 0 
+DEAL:RT::p[29] value 0 11718 0  first 0 0 0 13671 13356 7254 0 0 0 
+DEAL:RT::p[30] value 0 -13391 0  first 0 0 0 -22319 -15263 -7811 0 0 0 
+DEAL:RT::p[31] value 0 35712 0  first 0 0 0 53568 40704 20832 0 0 0 
+DEAL:RT::p[32] value 0 -26783 0  first 0 0 0 -31247 -30527 -15623 0 0 0 
+DEAL:RT::p[33] value 0 7812 0  first 0 0 0 13020 8904 4185 0 0 0 
+DEAL:RT::p[34] value 0 -20831 0  first 0 0 0 -31247 -23743 -11159 0 0 0 
+DEAL:RT::p[35] value 0 15624 0  first 0 0 0 18228 17808 8370 0 0 0 
+DEAL:RT::p[36] value 0 0 -5489  first 0 0 0 0 0 0 -9149 -4940 -4979 
+DEAL:RT::p[37] value 0 0 14640  first 0 0 0 0 0 0 21960 13176 13280 
+DEAL:RT::p[38] value 0 0 -10979  first 0 0 0 0 0 0 -12809 -9881 -9959 
+DEAL:RT::p[39] value 0 0 13176  first 0 0 0 0 0 0 21960 10980 11952 
+DEAL:RT::p[40] value 0 0 -35135  first 0 0 0 0 0 0 -52703 -29279 -31871 
+DEAL:RT::p[41] value 0 0 26352  first 0 0 0 0 0 0 30744 21960 23904 
+DEAL:RT::p[42] value 0 0 -8234  first 0 0 0 0 0 0 -13724 -6038 -7469 
+DEAL:RT::p[43] value 0 0 21960  first 0 0 0 0 0 0 32940 16104 19920 
+DEAL:RT::p[44] value 0 0 -16469  first 0 0 0 0 0 0 -19214 -12077 -14939 
+DEAL:RT::p[45] value 0 0 7320  first 0 0 0 0 0 0 12200 6588 6030 
+DEAL:RT::p[46] value 0 0 -19519  first 0 0 0 0 0 0 -29279 -17567 -16079 
+DEAL:RT::p[47] value 0 0 14640  first 0 0 0 0 0 0 17080 13176 12060 
+DEAL:RT::p[48] value 0 0 -17567  first 0 0 0 0 0 0 -29279 -14639 -14471 
+DEAL:RT::p[49] value 0 0 46848  first 0 0 0 0 0 0 70272 39040 38592 
+DEAL:RT::p[50] value 0 0 -35135  first 0 0 0 0 0 0 -40991 -29279 -28943 
+DEAL:RT::p[51] value 0 0 10980  first 0 0 0 0 0 0 18300 8052 9045 
+DEAL:RT::p[52] value 0 0 -29279  first 0 0 0 0 0 0 -43919 -21471 -24119 
+DEAL:RT::p[53] value 0 0 21960  first 0 0 0 0 0 0 25620 16104 18090 
+DEAL:RT::p[54] value 5994 0 0  first 13686 5394 3710 0 0 0 0 0 0 
+DEAL:RT::p[55] value -8093 0 0  first -16835 -7283 -5009 0 0 0 0 0 0 
+DEAL:RT::p[56] value -14384 0 0  first -32846 -11986 -8904 0 0 0 0 0 0 
+DEAL:RT::p[57] value 19425 0 0  first 40407 16187 12025 0 0 0 0 0 0 
+DEAL:RT::p[58] value 8990 0 0  first 20529 6593 5565 0 0 0 0 0 0 
+DEAL:RT::p[59] value -12139 0 0  first -25253 -8902 -7514 0 0 0 0 0 0 
+DEAL:RT::p[60] value -13699 0 0  first -31282 -12329 -7990 0 0 0 0 0 0 
+DEAL:RT::p[61] value 18500 0 0  first 38483 16650 10791 0 0 0 0 0 0 
+DEAL:RT::p[62] value 32879 0 0  first 75078 27399 19180 0 0 0 0 0 0 
+DEAL:RT::p[63] value -44398 0 0  first -92357 -36998 -25899 0 0 0 0 0 0 
+DEAL:RT::p[64] value -20549 0 0  first -46923 -15069 -11986 0 0 0 0 0 0 
+DEAL:RT::p[65] value 27750 0 0  first 57724 20350 16187 0 0 0 0 0 0 
+DEAL:RT::p[66] value 7991 0 0  first 18248 7192 4281 0 0 0 0 0 0 
+DEAL:RT::p[67] value -10790 0 0  first -22447 -9711 -5780 0 0 0 0 0 0 
+DEAL:RT::p[68] value -19179 0 0  first -43795 -15982 -10274 0 0 0 0 0 0 
+DEAL:RT::p[69] value 25900 0 0  first 53876 21583 13875 0 0 0 0 0 0 
+DEAL:RT::p[70] value 11987 0 0  first 27372 8791 6422 0 0 0 0 0 0 
+DEAL:RT::p[71] value -16186 0 0  first -33671 -11870 -8671 0 0 0 0 0 0 
+DEAL:RT::p[72] value 0 9620 0  first 0 0 0 16034 12243 5955 0 0 0 
+DEAL:RT::p[73] value 0 -25653 0  first 0 0 0 -38481 -32647 -15880 0 0 0 
+DEAL:RT::p[74] value 0 19241 0  first 0 0 0 22448 24486 11911 0 0 0 
+DEAL:RT::p[75] value 0 -11509 0  first 0 0 0 -19183 -13817 -7124 0 0 0 
+DEAL:RT::p[76] value 0 30694 0  first 0 0 0 46042 36848 19001 0 0 0 
+DEAL:RT::p[77] value 0 -23020 0  first 0 0 0 -26857 -27635 -14250 0 0 0 
+DEAL:RT::p[78] value 0 -21989 0  first 0 0 0 -36648 -27983 -12826 0 0 0 
+DEAL:RT::p[79] value 0 58639 0  first 0 0 0 87958 74625 34206 0 0 0 
+DEAL:RT::p[80] value 0 -43978 0  first 0 0 0 -51308 -55968 -25653 0 0 0 
+DEAL:RT::p[81] value 0 26310 0  first 0 0 0 43849 31584 15347 0 0 0 
+DEAL:RT::p[82] value 0 -70158 0  first 0 0 0 -105237 -84224 -40925 0 0 0 
+DEAL:RT::p[83] value 0 52619 0  first 0 0 0 61389 63169 30694 0 0 0 
+DEAL:RT::p[84] value 0 12827 0  first 0 0 0 21379 16324 6872 0 0 0 
+DEAL:RT::p[85] value 0 -34205 0  first 0 0 0 -51308 -43530 -18324 0 0 0 
+DEAL:RT::p[86] value 0 25654 0  first 0 0 0 29930 32648 13743 0 0 0 
+DEAL:RT::p[87] value 0 -15346 0  first 0 0 0 -25578 -18423 -8221 0 0 0 
+DEAL:RT::p[88] value 0 40926 0  first 0 0 0 61389 49131 21925 0 0 0 
+DEAL:RT::p[89] value 0 -30693 0  first 0 0 0 -35809 -36847 -16442 0 0 0 
+DEAL:RT::p[90] value 0 0 13187  first 0 0 0 0 0 0 21979 11869 11717 
+DEAL:RT::p[91] value 0 0 -35165  first 0 0 0 0 0 0 -52748 -31648 -31246 
+DEAL:RT::p[92] value 0 0 26374  first 0 0 0 0 0 0 30770 23737 23435 
+DEAL:RT::p[93] value 0 0 -31648  first 0 0 0 0 0 0 -52748 -26373 -28121 
+DEAL:RT::p[94] value 0 0 84398  first 0 0 0 0 0 0 126597 70332 74992 
+DEAL:RT::p[95] value 0 0 -63298  first 0 0 0 0 0 0 -73847 -52748 -56243 
+DEAL:RT::p[96] value 0 0 19781  first 0 0 0 0 0 0 32968 14506 17576 
+DEAL:RT::p[97] value 0 0 -52748  first 0 0 0 0 0 0 -79122 -38682 -46869 
+DEAL:RT::p[98] value 0 0 39562  first 0 0 0 0 0 0 46155 29012 35152 
+DEAL:RT::p[99] value 0 0 -14986  first 0 0 0 0 0 0 -24978 -13488 -12766 
+DEAL:RT::p[100] value 0 0 39966  first 0 0 0 0 0 0 59949 35969 34047 
+DEAL:RT::p[101] value 0 0 -29973  first 0 0 0 0 0 0 -34969 -26976 -25534 
+DEAL:RT::p[102] value 0 0 35969  first 0 0 0 0 0 0 59949 29974 30642 
+DEAL:RT::p[103] value 0 0 -95917  first 0 0 0 0 0 0 -143876 -79931 -81711 
+DEAL:RT::p[104] value 0 0 71939  first 0 0 0 0 0 0 83928 59949 61284 
+DEAL:RT::p[105] value 0 0 -22480  first 0 0 0 0 0 0 -37467 -16485 -19150 
+DEAL:RT::p[106] value 0 0 59949  first 0 0 0 0 0 0 89923 43963 51070 
+DEAL:RT::p[107] value 0 0 -44961  first 0 0 0 0 0 0 -52454 -32971 -38301 
 DEAL:RT::Point 2. 3. 4.
-DEAL:RT::p[0] value 323400 0 0  first 982520 421575 293020 0 0 0 0 0 0 
-DEAL:RT::p[1] value -1478399 0 0  first -4385919 -1927199 -1339519 0 0 0 0 0 0 
-DEAL:RT::p[2] value 2587200 0 0  first 7428960 3372600 2344160 0 0 0 0 0 0 
-DEAL:RT::p[3] value -2069759 0 0  first -5667199 -2698079 -1875327 0 0 0 0 0 0 
-DEAL:RT::p[4] value 646800 0 0  first 1641640 843150 586040 0 0 0 0 0 0 
-DEAL:RT::p[5] value -1091474 0 0  first -3316004 -1377337 -988942 0 0 0 0 0 0 
-DEAL:RT::p[6] value 4989600 0 0  first 14802480 6296400 4520880 0 0 0 0 0 0 
-DEAL:RT::p[7] value -8731799 0 0  first -25072739 -11018699 -7911539 0 0 0 0 0 0 
-DEAL:RT::p[8] value 6985440 0 0  first 19126800 8814960 6329232 0 0 0 0 0 0 
-DEAL:RT::p[9] value -2182949 0 0  first -5540534 -2754674 -1977884 0 0 0 0 0 0 
-DEAL:RT::p[10] value 1247400 0 0  first 3789720 1507275 1130220 0 0 0 0 0 0 
-DEAL:RT::p[11] value -5702399 0 0  first -16917119 -6890399 -5166719 0 0 0 0 0 0 
-DEAL:RT::p[12] value 9979200 0 0  first 28654560 12058200 9041760 0 0 0 0 0 0 
-DEAL:RT::p[13] value -7983359 0 0  first -21859199 -9646559 -7233407 0 0 0 0 0 0 
-DEAL:RT::p[14] value 2494800 0 0  first 6332040 3014550 2260440 0 0 0 0 0 0 
-DEAL:RT::p[15] value -485099 0 0  first -1473779 -551512 -439529 0 0 0 0 0 0 
-DEAL:RT::p[16] value 2217600 0 0  first 6578880 2521200 2009280 0 0 0 0 0 0 
-DEAL:RT::p[17] value -3880799 0 0  first -11143439 -4412099 -3516239 0 0 0 0 0 0 
-DEAL:RT::p[18] value 3104640 0 0  first 8500800 3529680 2812992 0 0 0 0 0 0 
-DEAL:RT::p[19] value -970199 0 0  first -2462459 -1103024 -879059 0 0 0 0 0 0 
-DEAL:RT::p[20] value -1058399 0 0  first -3215519 -1379699 -934919 0 0 0 0 0 0 
-DEAL:RT::p[21] value 4838400 0 0  first 14353920 6307200 4273920 0 0 0 0 0 0 
-DEAL:RT::p[22] value -8467199 0 0  first -24312959 -11037599 -7479359 0 0 0 0 0 0 
-DEAL:RT::p[23] value 6773760 0 0  first 18547200 8830080 5983488 0 0 0 0 0 0 
-DEAL:RT::p[24] value -2116799 0 0  first -5372639 -2759399 -1869839 0 0 0 0 0 0 
-DEAL:RT::p[25] value 3572100 0 0  first 10852380 4507650 3155355 0 0 0 0 0 0 
-DEAL:RT::p[26] value -16329599 0 0  first -48444479 -20606399 -14424479 0 0 0 0 0 0 
-DEAL:RT::p[27] value 28576800 0 0  first 82056240 36061200 25242840 0 0 0 0 0 0 
-DEAL:RT::p[28] value -22861439 0 0  first -62596799 -28848959 -20194271 0 0 0 0 0 0 
-DEAL:RT::p[29] value 7144200 0 0  first 18132660 9015300 6310710 0 0 0 0 0 0 
-DEAL:RT::p[30] value -4082399 0 0  first -12402719 -4932899 -3606119 0 0 0 0 0 0 
-DEAL:RT::p[31] value 18662400 0 0  first 55365120 22550400 16485120 0 0 0 0 0 0 
-DEAL:RT::p[32] value -32659199 0 0  first -93778559 -39463199 -28848959 0 0 0 0 0 0 
-DEAL:RT::p[33] value 26127360 0 0  first 71539200 31570560 23079168 0 0 0 0 0 0 
-DEAL:RT::p[34] value -8164799 0 0  first -20723039 -9865799 -7212239 0 0 0 0 0 0 
-DEAL:RT::p[35] value 1587600 0 0  first 4823280 1804950 1402380 0 0 0 0 0 0 
-DEAL:RT::p[36] value -7257599 0 0  first -21530879 -8251199 -6410879 0 0 0 0 0 0 
-DEAL:RT::p[37] value 12700800 0 0  first 36469440 14439600 11219040 0 0 0 0 0 0 
-DEAL:RT::p[38] value -10160639 0 0  first -27820799 -11551679 -8975231 0 0 0 0 0 0 
-DEAL:RT::p[39] value 3175200 0 0  first 8058960 3609900 2804760 0 0 0 0 0 0 
-DEAL:RT::p[40] value 1164240 0 0  first 3537072 1517670 996660 0 0 0 0 0 0 
-DEAL:RT::p[41] value -5322239 0 0  first -15789311 -6937919 -4556159 0 0 0 0 0 0 
-DEAL:RT::p[42] value 9313920 0 0  first 26744256 12141360 7973280 0 0 0 0 0 0 
-DEAL:RT::p[43] value -7451135 0 0  first -20401919 -9713087 -6378623 0 0 0 0 0 0 
-DEAL:RT::p[44] value 2328480 0 0  first 5909904 3035340 1993320 0 0 0 0 0 0 
-DEAL:RT::p[45] value -3929309 0 0  first -11937617 -4958414 -3363727 0 0 0 0 0 0 
-DEAL:RT::p[46] value 17962560 0 0  first 53288928 22667040 15377040 0 0 0 0 0 0 
-DEAL:RT::p[47] value -31434479 0 0  first -90261863 -39667319 -26909819 0 0 0 0 0 0 
-DEAL:RT::p[48] value 25147584 0 0  first 68856480 31733856 21527856 0 0 0 0 0 0 
-DEAL:RT::p[49] value -7858619 0 0  first -19945925 -9916829 -6727454 0 0 0 0 0 0 
-DEAL:RT::p[50] value 4490640 0 0  first 13642992 5426190 3844260 0 0 0 0 0 0 
-DEAL:RT::p[51] value -20528639 0 0  first -60901631 -24805439 -17573759 0 0 0 0 0 0 
-DEAL:RT::p[52] value 35925120 0 0  first 103156416 43409520 30754080 0 0 0 0 0 0 
-DEAL:RT::p[53] value -28740095 0 0  first -78693119 -34727615 -24603263 0 0 0 0 0 0 
-DEAL:RT::p[54] value 8981280 0 0  first 22795344 10852380 7688520 0 0 0 0 0 0 
-DEAL:RT::p[55] value -1746359 0 0  first -5305607 -1985444 -1494989 0 0 0 0 0 0 
-DEAL:RT::p[56] value 7983360 0 0  first 23683968 9076320 6834240 0 0 0 0 0 0 
-DEAL:RT::p[57] value -13970879 0 0  first -40116383 -15883559 -11959919 0 0 0 0 0 0 
-DEAL:RT::p[58] value 11176704 0 0  first 30602880 12706848 9567936 0 0 0 0 0 0 
-DEAL:RT::p[59] value -3492719 0 0  first -8864855 -3970889 -2989979 0 0 0 0 0 0 
-DEAL:RT::p[60] value -431199 0 0  first -1310026 -562099 -354759 0 0 0 0 0 0 
-DEAL:RT::p[61] value 1971200 0 0  first 5847893 2569600 1621760 0 0 0 0 0 0 
-DEAL:RT::p[62] value -3449599 0 0  first -9905279 -4496799 -2838079 0 0 0 0 0 0 
-DEAL:RT::p[63] value 2759680 0 0  first 7556267 3597440 2270464 0 0 0 0 0 0 
-DEAL:RT::p[64] value -862399 0 0  first -2188852 -1124199 -709519 0 0 0 0 0 0 
-DEAL:RT::p[65] value 1455300 0 0  first 4421340 1836450 1197315 0 0 0 0 0 0 
-DEAL:RT::p[66] value -6652799 0 0  first -19736639 -8395199 -5473439 0 0 0 0 0 0 
-DEAL:RT::p[67] value 11642400 0 0  first 33430320 14691600 9578520 0 0 0 0 0 0 
-DEAL:RT::p[68] value -9313919 0 0  first -25502399 -11753279 -7662815 0 0 0 0 0 0 
-DEAL:RT::p[69] value 2910600 0 0  first 7387380 3672900 2394630 0 0 0 0 0 0 
-DEAL:RT::p[70] value -1663199 0 0  first -5052959 -2009699 -1368359 0 0 0 0 0 0 
-DEAL:RT::p[71] value 7603200 0 0  first 22556160 9187200 6255360 0 0 0 0 0 0 
-DEAL:RT::p[72] value -13305599 0 0  first -38206079 -16077599 -10946879 0 0 0 0 0 0 
-DEAL:RT::p[73] value 10644480 0 0  first 29145600 12862080 8757504 0 0 0 0 0 0 
-DEAL:RT::p[74] value -3326399 0 0  first -8442719 -4019399 -2736719 0 0 0 0 0 0 
-DEAL:RT::p[75] value 646800 0 0  first 1965040 735350 532140 0 0 0 0 0 0 
-DEAL:RT::p[76] value -2956799 0 0  first -8771839 -3361599 -2432639 0 0 0 0 0 0 
-DEAL:RT::p[77] value 5174400 0 0  first 14857920 5882800 4257120 0 0 0 0 0 0 
-DEAL:RT::p[78] value -4139519 0 0  first -11334399 -4706239 -3405695 0 0 0 0 0 0 
-DEAL:RT::p[79] value 1293600 0 0  first 3283280 1470700 1064280 0 0 0 0 0 0 
-DEAL:RT::p[80] value 0 544500 0  first 0 0 0 1279575 930050 493350 0 0 0 
-DEAL:RT::p[81] value 0 -2375999 0  first 0 0 0 -5583599 -3986399 -2152799 0 0 0 
-DEAL:RT::p[82] value 0 3920400 0  first 0 0 0 9212940 6435000 3552120 0 0 0 
-DEAL:RT::p[83] value 0 -2903999 0  first 0 0 0 -6824399 -4637599 -2631199 0 0 0 
-DEAL:RT::p[84] value 0 816750 0  first 0 0 0 1919363 1258950 740025 0 0 0 
-DEAL:RT::p[85] value 0 -1781999 0  first 0 0 0 -4187699 -3043799 -1574099 0 0 0 
-DEAL:RT::p[86] value 0 7776000 0  first 0 0 0 18273600 13046400 6868800 0 0 0 
-DEAL:RT::p[87] value 0 -12830399 0  first 0 0 0 -30151439 -21059999 -11333519 0 0 0 
-DEAL:RT::p[88] value 0 9504000 0  first 0 0 0 22334400 15177600 8395200 0 0 0 
-DEAL:RT::p[89] value 0 -2672999 0  first 0 0 0 -6281549 -4120199 -2361149 0 0 0 
-DEAL:RT::p[90] value 0 1960200 0  first 0 0 0 4606470 3348180 1678050 0 0 0 
-DEAL:RT::p[91] value 0 -8553599 0  first 0 0 0 -20100959 -14351039 -7322399 0 0 0 
-DEAL:RT::p[92] value 0 14113440 0  first 0 0 0 33166584 23166000 12081960 0 0 0 
-DEAL:RT::p[93] value 0 -10454399 0  first 0 0 0 -24567839 -16695359 -8949599 0 0 0 
-DEAL:RT::p[94] value 0 2940300 0  first 0 0 0 6909705 4532220 2517075 0 0 0 
-DEAL:RT::p[95] value 0 -725999 0  first 0 0 0 -1706099 -1240066 -597299 0 0 0 
-DEAL:RT::p[96] value 0 3168000 0  first 0 0 0 7444800 5315200 2606400 0 0 0 
-DEAL:RT::p[97] value 0 -5227199 0  first 0 0 0 -12283919 -8579999 -4300559 0 0 0 
-DEAL:RT::p[98] value 0 3872000 0  first 0 0 0 9099200 6183467 3185600 0 0 0 
-DEAL:RT::p[99] value 0 -1088999 0  first 0 0 0 -2559149 -1678599 -895949 0 0 0 
-DEAL:RT::p[100] value 0 -1960199 0  first 0 0 0 -4410449 -3348179 -1776059 0 0 0 
-DEAL:RT::p[101] value 0 8553600 0  first 0 0 0 19245600 14351040 7750080 0 0 0 
-DEAL:RT::p[102] value 0 -14113439 0  first 0 0 0 -31755239 -23165999 -12787631 0 0 0 
-DEAL:RT::p[103] value 0 10454400 0  first 0 0 0 23522400 16695360 9472320 0 0 0 
-DEAL:RT::p[104] value 0 -2940299 0  first 0 0 0 -6615674 -4532219 -2664089 0 0 0 
-DEAL:RT::p[105] value 0 6415200 0  first 0 0 0 14434200 10957680 5666760 0 0 0 
-DEAL:RT::p[106] value 0 -27993599 0  first 0 0 0 -62985599 -46967039 -24727679 0 0 0 
-DEAL:RT::p[107] value 0 46189440 0  first 0 0 0 103926240 75816000 40800672 0 0 0 
-DEAL:RT::p[108] value 0 -34214399 0  first 0 0 0 -76982399 -54639359 -30222719 0 0 0 
-DEAL:RT::p[109] value 0 9622800 0  first 0 0 0 21651300 14832720 8500140 0 0 0 
-DEAL:RT::p[110] value 0 -7056719 0  first 0 0 0 -15877619 -12053447 -6040979 0 0 0 
-DEAL:RT::p[111] value 0 30792960 0  first 0 0 0 69284160 51663744 26360640 0 0 0 
-DEAL:RT::p[112] value 0 -50808383 0  first 0 0 0 -114318863 -83397599 -43495055 0 0 0 
-DEAL:RT::p[113] value 0 37635840 0  first 0 0 0 84680640 60103296 32218560 0 0 0 
-DEAL:RT::p[114] value 0 -10585079 0  first 0 0 0 -23816429 -16315991 -9061469 0 0 0 
-DEAL:RT::p[115] value 0 2613600 0  first 0 0 0 5880600 4464240 2150280 0 0 0 
-DEAL:RT::p[116] value 0 -11404799 0  first 0 0 0 -25660799 -19134719 -9383039 0 0 0 
-DEAL:RT::p[117] value 0 18817920 0  first 0 0 0 42340320 30888000 15482016 0 0 0 
-DEAL:RT::p[118] value 0 -13939199 0  first 0 0 0 -31363199 -22260479 -11468159 0 0 0 
-DEAL:RT::p[119] value 0 3920400 0  first 0 0 0 8820900 6042960 3225420 0 0 0 
-DEAL:RT::p[120] value 0 2450250 0  first 0 0 0 5145525 4185225 2220075 0 0 0 
-DEAL:RT::p[121] value 0 -10691999 0  first 0 0 0 -22453199 -17938799 -9687599 0 0 0 
-DEAL:RT::p[122] value 0 17641800 0  first 0 0 0 37047780 28957500 15984540 0 0 0 
-DEAL:RT::p[123] value 0 -13067999 0  first 0 0 0 -27442799 -20869199 -11840399 0 0 0 
-DEAL:RT::p[124] value 0 3675375 0  first 0 0 0 7718288 5665275 3330113 0 0 0 
-DEAL:RT::p[125] value 0 -8018999 0  first 0 0 0 -16839899 -13697099 -7083449 0 0 0 
-DEAL:RT::p[126] value 0 34992000 0  first 0 0 0 73483200 58708800 30909600 0 0 0 
-DEAL:RT::p[127] value 0 -57736799 0  first 0 0 0 -121247279 -94769999 -51000839 0 0 0 
-DEAL:RT::p[128] value 0 42768000 0  first 0 0 0 89812800 68299200 37778400 0 0 0 
-DEAL:RT::p[129] value 0 -12028499 0  first 0 0 0 -25259849 -18540899 -10625174 0 0 0 
-DEAL:RT::p[130] value 0 8820900 0  first 0 0 0 18523890 15066810 7551225 0 0 0 
-DEAL:RT::p[131] value 0 -38491199 0  first 0 0 0 -80831519 -64579679 -32950799 0 0 0 
-DEAL:RT::p[132] value 0 63510480 0  first 0 0 0 133372008 104247000 54368820 0 0 0 
-DEAL:RT::p[133] value 0 -47044799 0  first 0 0 0 -98794079 -75129119 -40273199 0 0 0 
-DEAL:RT::p[134] value 0 13231350 0  first 0 0 0 27785835 20394990 11326838 0 0 0 
-DEAL:RT::p[135] value 0 -3266999 0  first 0 0 0 -6860699 -5580299 -2687849 0 0 0 
-DEAL:RT::p[136] value 0 14256000 0  first 0 0 0 29937600 23918400 11728800 0 0 0 
-DEAL:RT::p[137] value 0 -23522399 0  first 0 0 0 -49397039 -38609999 -19352519 0 0 0 
-DEAL:RT::p[138] value 0 17424000 0  first 0 0 0 36590400 27825600 14335200 0 0 0 
-DEAL:RT::p[139] value 0 -4900499 0  first 0 0 0 -10291049 -7553699 -4031774 0 0 0 
-DEAL:RT::p[140] value 0 -1088999 0  first 0 0 0 -2014649 -1860099 -986699 0 0 0 
-DEAL:RT::p[141] value 0 4752000 0  first 0 0 0 8791200 7972800 4305600 0 0 0 
-DEAL:RT::p[142] value 0 -7840799 0  first 0 0 0 -14505479 -12869999 -7104239 0 0 0 
-DEAL:RT::p[143] value 0 5808000 0  first 0 0 0 10744800 9275200 5262400 0 0 0 
-DEAL:RT::p[144] value 0 -1633499 0  first 0 0 0 -3021974 -2517899 -1480049 0 0 0 
-DEAL:RT::p[145] value 0 3564000 0  first 0 0 0 6593400 6087600 3148200 0 0 0 
-DEAL:RT::p[146] value 0 -15551999 0  first 0 0 0 -28771199 -26092799 -13737599 0 0 0 
-DEAL:RT::p[147] value 0 25660800 0  first 0 0 0 47472480 42120000 22667040 0 0 0 
-DEAL:RT::p[148] value 0 -19007999 0  first 0 0 0 -35164799 -30355199 -16790399 0 0 0 
-DEAL:RT::p[149] value 0 5346000 0  first 0 0 0 9890100 8240400 4722300 0 0 0 
-DEAL:RT::p[150] value 0 -3920399 0  first 0 0 0 -7252739 -6696359 -3356099 0 0 0 
-DEAL:RT::p[151] value 0 17107200 0  first 0 0 0 31648320 28702080 14644800 0 0 0 
-DEAL:RT::p[152] value 0 -28226879 0  first 0 0 0 -52219727 -46331999 -24163919 0 0 0 
-DEAL:RT::p[153] value 0 20908800 0  first 0 0 0 38681280 33390720 17899200 0 0 0 
-DEAL:RT::p[154] value 0 -5880599 0  first 0 0 0 -10879109 -9064439 -5034149 0 0 0 
-DEAL:RT::p[155] value 0 1452000 0  first 0 0 0 2686200 2480133 1194600 0 0 0 
-DEAL:RT::p[156] value 0 -6335999 0  first 0 0 0 -11721599 -10630399 -5212799 0 0 0 
-DEAL:RT::p[157] value 0 10454400 0  first 0 0 0 19340640 17160000 8601120 0 0 0 
-DEAL:RT::p[158] value 0 -7743999 0  first 0 0 0 -14326399 -12366932 -6371199 0 0 0 
-DEAL:RT::p[159] value 0 2178000 0  first 0 0 0 4029300 3357200 1791900 0 0 0 
-DEAL:RT::p[160] value 0 0 764400  first 0 0 0 0 0 0 1796340 996450 912240 
-DEAL:RT::p[161] value 0 0 -3261439  first 0 0 0 0 0 0 -7664383 -4251519 -3837866 
-DEAL:RT::p[162] value 0 0 5241600  first 0 0 0 0 0 0 12317760 6832800 6068160 
-DEAL:RT::p[163] value 0 0 -3763199  first 0 0 0 0 0 0 -8843519 -4905599 -4273919 
-DEAL:RT::p[164] value 0 0 1019200  first 0 0 0 0 0 0 2395120 1328600 1131387 
-DEAL:RT::p[165] value 0 0 -2751839  first 0 0 0 0 0 0 -6191639 -3587219 -3284063 
-DEAL:RT::p[166] value 0 0 11741184  first 0 0 0 0 0 0 26417664 15305472 13816320 
-DEAL:RT::p[167] value 0 0 -18869759  first 0 0 0 0 0 0 -42456959 -24598079 -21845375 
-DEAL:RT::p[168] value 0 0 13547520  first 0 0 0 0 0 0 30481920 17660160 15386112 
-DEAL:RT::p[169] value 0 0 -3669119  first 0 0 0 0 0 0 -8255519 -4782959 -4072991 
-DEAL:RT::p[170] value 0 0 3439800  first 0 0 0 0 0 0 7223580 4484025 4105080 
-DEAL:RT::p[171] value 0 0 -14676479  first 0 0 0 0 0 0 -30820607 -19131839 -17270399 
-DEAL:RT::p[172] value 0 0 23587200  first 0 0 0 0 0 0 49533120 30747600 27306720 
-DEAL:RT::p[173] value 0 0 -16934399  first 0 0 0 0 0 0 -35562239 -22075199 -19232639 
-DEAL:RT::p[174] value 0 0 4586400  first 0 0 0 0 0 0 9631440 5978700 5091240 
-DEAL:RT::p[175] value 0 0 -1528799  first 0 0 0 0 0 0 -2828279 -1992899 -1824479 
-DEAL:RT::p[176] value 0 0 6522880  first 0 0 0 0 0 0 12067328 8503040 7675733 
-DEAL:RT::p[177] value 0 0 -10483199  first 0 0 0 0 0 0 -19393919 -13665599 -12136319 
-DEAL:RT::p[178] value 0 0 7526400  first 0 0 0 0 0 0 13923840 9811200 8547840 
-DEAL:RT::p[179] value 0 0 -2038399  first 0 0 0 0 0 0 -3771039 -2657199 -2262772 
-DEAL:RT::p[180] value 0 0 -2579849  first 0 0 0 0 0 0 -6062647 -3255524 -3078809 
-DEAL:RT::p[181] value 0 0 11007360  first 0 0 0 0 0 0 25867296 13890240 12952800 
-DEAL:RT::p[182] value 0 0 -17690399  first 0 0 0 0 0 0 -41572439 -22323599 -20480039 
-DEAL:RT::p[183] value 0 0 12700800  first 0 0 0 0 0 0 29846880 16027200 14424480 
-DEAL:RT::p[184] value 0 0 -3439799  first 0 0 0 0 0 0 -8083529 -4340699 -3818429 
-DEAL:RT::p[185] value 0 0 9287460  first 0 0 0 0 0 0 20896785 11719890 11083716 
-DEAL:RT::p[186] value 0 0 -39626495  first 0 0 0 0 0 0 -89159615 -50004863 -46630079 
-DEAL:RT::p[187] value 0 0 63685440  first 0 0 0 0 0 0 143292240 80364960 73728144 
-DEAL:RT::p[188] value 0 0 -45722879  first 0 0 0 0 0 0 -102876479 -57697919 -51928127 
-DEAL:RT::p[189] value 0 0 12383280  first 0 0 0 0 0 0 27862380 15626520 13746348 
-DEAL:RT::p[190] value 0 0 -11609324  first 0 0 0 0 0 0 -24379582 -14649862 -13854644 
-DEAL:RT::p[191] value 0 0 49533120  first 0 0 0 0 0 0 104019552 62506080 58287600 
-DEAL:RT::p[192] value 0 0 -79606799  first 0 0 0 0 0 0 -167174279 -100456199 -92160179 
-DEAL:RT::p[193] value 0 0 57153600  first 0 0 0 0 0 0 120022560 72122400 64910160 
-DEAL:RT::p[194] value 0 0 -15479099  first 0 0 0 0 0 0 -32506109 -19533149 -17182934 
-DEAL:RT::p[195] value 0 0 5159700  first 0 0 0 0 0 0 9545445 6511050 6157620 
-DEAL:RT::p[196] value 0 0 -22014719  first 0 0 0 0 0 0 -40727231 -27780479 -25905599 
-DEAL:RT::p[197] value 0 0 35380800  first 0 0 0 0 0 0 65454480 44647200 40960080 
-DEAL:RT::p[198] value 0 0 -25401599  first 0 0 0 0 0 0 -46992959 -32054399 -28848959 
-DEAL:RT::p[199] value 0 0 6879600  first 0 0 0 0 0 0 12727260 8681400 7636860 
-DEAL:RT::p[200] value 0 0 2948400  first 0 0 0 0 0 0 6928740 3562650 3518640 
-DEAL:RT::p[201] value 0 0 -12579839  first 0 0 0 0 0 0 -29562623 -15200639 -14803199 
-DEAL:RT::p[202] value 0 0 20217600  first 0 0 0 0 0 0 47511360 24429600 23405760 
-DEAL:RT::p[203] value 0 0 -14515199  first 0 0 0 0 0 0 -34110719 -17539199 -16485119 
-DEAL:RT::p[204] value 0 0 3931200  first 0 0 0 0 0 0 9238320 4750200 4363920 
-DEAL:RT::p[205] value 0 0 -10614239  first 0 0 0 0 0 0 -23882039 -12825539 -12667103 
-DEAL:RT::p[206] value 0 0 45287424  first 0 0 0 0 0 0 101896704 54722304 53291520 
-DEAL:RT::p[207] value 0 0 -72783359  first 0 0 0 0 0 0 -163762559 -87946559 -84260735 
-DEAL:RT::p[208] value 0 0 52254720  first 0 0 0 0 0 0 117573120 63141120 59346432 
-DEAL:RT::p[209] value 0 0 -14152319  first 0 0 0 0 0 0 -31842719 -17100719 -15710111 
-DEAL:RT::p[210] value 0 0 13267800  first 0 0 0 0 0 0 27862380 16031925 15833880 
-DEAL:RT::p[211] value 0 0 -56609279  first 0 0 0 0 0 0 -118879487 -68402879 -66614399 
-DEAL:RT::p[212] value 0 0 90979200  first 0 0 0 0 0 0 191056320 109933200 105325920 
-DEAL:RT::p[213] value 0 0 -65318399  first 0 0 0 0 0 0 -137168639 -78926399 -74183039 
-DEAL:RT::p[214] value 0 0 17690400  first 0 0 0 0 0 0 37149840 21375900 19637640 
-DEAL:RT::p[215] value 0 0 -5896799  first 0 0 0 0 0 0 -10909079 -7125299 -7037279 
-DEAL:RT::p[216] value 0 0 25159680  first 0 0 0 0 0 0 46545408 30401280 29606400 
-DEAL:RT::p[217] value 0 0 -40435199  first 0 0 0 0 0 0 -74805119 -48859199 -46811519 
-DEAL:RT::p[218] value 0 0 29030400  first 0 0 0 0 0 0 53706240 35078400 32970240 
-DEAL:RT::p[219] value 0 0 -7862399  first 0 0 0 0 0 0 -14545439 -9500399 -8727839 
-DEAL:RT::p[220] value 0 0 -1146599  first 0 0 0 0 0 0 -2694509 -1303574 -1368359 
-DEAL:RT::p[221] value 0 0 4892160  first 0 0 0 0 0 0 11496576 5561920 5756800 
-DEAL:RT::p[222] value 0 0 -7862399  first 0 0 0 0 0 0 -18476639 -8938799 -9102239 
-DEAL:RT::p[223] value 0 0 5644800  first 0 0 0 0 0 0 13265280 6417600 6410880 
-DEAL:RT::p[224] value 0 0 -1528799  first 0 0 0 0 0 0 -3592679 -1738099 -1697079 
-DEAL:RT::p[225] value 0 0 4127760  first 0 0 0 0 0 0 9287460 4692870 4926096 
-DEAL:RT::p[226] value 0 0 -17611775  first 0 0 0 0 0 0 -39626495 -20022911 -20724479 
-DEAL:RT::p[227] value 0 0 28304640  first 0 0 0 0 0 0 63685440 32179680 32768064 
-DEAL:RT::p[228] value 0 0 -20321279  first 0 0 0 0 0 0 -45722879 -23103359 -23079167 
-DEAL:RT::p[229] value 0 0 5503680  first 0 0 0 0 0 0 12383280 6257160 6109488 
-DEAL:RT::p[230] value 0 0 -5159699  first 0 0 0 0 0 0 -10835369 -5866087 -6157619 
-DEAL:RT::p[231] value 0 0 22014720  first 0 0 0 0 0 0 46230912 25028640 25905600 
-DEAL:RT::p[232] value 0 0 -35380799  first 0 0 0 0 0 0 -74299679 -40224599 -40960079 
-DEAL:RT::p[233] value 0 0 25401600  first 0 0 0 0 0 0 53343360 28879200 28848960 
-DEAL:RT::p[234] value 0 0 -6879599  first 0 0 0 0 0 0 -14447159 -7821449 -7636859 
-DEAL:RT::p[235] value 0 0 2293200  first 0 0 0 0 0 0 4242420 2607150 2736720 
-DEAL:RT::p[236] value 0 0 -9784319  first 0 0 0 0 0 0 -18100991 -11123839 -11513599 
-DEAL:RT::p[237] value 0 0 15724800  first 0 0 0 0 0 0 29090880 17877600 18204480 
-DEAL:RT::p[238] value 0 0 -11289599  first 0 0 0 0 0 0 -20885759 -12835199 -12821759 
-DEAL:RT::p[239] value 0 0 3057600  first 0 0 0 0 0 0 5656560 3476200 3394160 
+DEAL:RT::p[0] value 510570 0 0  first 1565748 667035 463140 0 0 0 0 0 0 
+DEAL:RT::p[1] value -1257525 0 0  first -3856414 -1600358 -1140706 0 0 0 0 0 0 
+DEAL:RT::p[2] value 1504576 0 0  first 4614035 1806234 1364807 0 0 0 0 0 0 
+DEAL:RT::p[3] value -765854 0 0  first -2348621 -872909 -694709 0 0 0 0 0 0 
+DEAL:RT::p[4] value -1226411 0 0  first -3760996 -1602247 -1089724 0 0 0 0 0 0 
+DEAL:RT::p[5] value 3020635 0 0  first 9263282 3844135 2683977 0 0 0 0 0 0 
+DEAL:RT::p[6] value -3614060 0 0  first -11083119 -4338656 -3211262 0 0 0 0 0 0 
+DEAL:RT::p[7] value 1839618 0 0  first 5641496 2096769 1634587 0 0 0 0 0 0 
+DEAL:RT::p[8] value 1393812 0 0  first 4274357 1820948 1187375 0 0 0 0 0 0 
+DEAL:RT::p[9] value -3432938 0 0  first -10527679 -4368842 -2924486 0 0 0 0 0 0 
+DEAL:RT::p[10] value 4107365 0 0  first 12595918 4930865 3499023 0 0 0 0 0 0 
+DEAL:RT::p[11] value -2090717 0 0  first -6411535 -2382968 -1781061 0 0 0 0 0 0 
+DEAL:RT::p[12] value -680759 0 0  first -2087663 -889379 -560789 0 0 0 0 0 0 
+DEAL:RT::p[13] value 1676702 0 0  first 5141886 2133812 1381218 0 0 0 0 0 0 
+DEAL:RT::p[14] value -2006101 0 0  first -6152045 -2408311 -1652567 0 0 0 0 0 0 
+DEAL:RT::p[15] value 1021140 0 0  first 3131496 1163880 841185 0 0 0 0 0 0 
+DEAL:RT::p[16] value 1021140 0 0  first 2620926 1334070 926280 0 0 0 0 0 0 
+DEAL:RT::p[17] value -2515052 0 0  first -6455302 -3200718 -2281413 0 0 0 0 0 0 
+DEAL:RT::p[18] value 3009153 0 0  first 7723493 3612469 2729614 0 0 0 0 0 0 
+DEAL:RT::p[19] value -1531709 0 0  first -3931388 -1745819 -1389419 0 0 0 0 0 0 
+DEAL:RT::p[20] value -2452823 0 0  first -6295582 -3204495 -2179449 0 0 0 0 0 0 
+DEAL:RT::p[21] value 6041271 0 0  first 15505929 7688271 5367953 0 0 0 0 0 0 
+DEAL:RT::p[22] value -7228121 0 0  first -18552178 -8677312 -6422525 0 0 0 0 0 0 
+DEAL:RT::p[23] value 3679237 0 0  first 9443374 4193539 3269175 0 0 0 0 0 0 
+DEAL:RT::p[24] value 2787624 0 0  first 7154903 3641896 2374750 0 0 0 0 0 0 
+DEAL:RT::p[25] value -6865877 0 0  first -17622420 -8737686 -5848973 0 0 0 0 0 0 
+DEAL:RT::p[26] value 8214729 0 0  first 21084471 9861729 6998047 0 0 0 0 0 0 
+DEAL:RT::p[27] value -4181436 0 0  first -10732353 -4765938 -3562124 0 0 0 0 0 0 
+DEAL:RT::p[28] value -1361519 0 0  first -3494567 -1778759 -1121579 0 0 0 0 0 0 
+DEAL:RT::p[29] value 3353404 0 0  first 8607070 4267625 2762435 0 0 0 0 0 0 
+DEAL:RT::p[30] value -4012203 0 0  first -10297989 -4816624 -3305134 0 0 0 0 0 0 
+DEAL:RT::p[31] value 2042280 0 0  first 5241852 2327760 1682370 0 0 0 0 0 0 
+DEAL:RT::p[32] value 0 865590 0  first 0 0 0 2045940 1483581 785180 0 0 0 
+DEAL:RT::p[33] value 0 -2245892 0  first 0 0 0 -5128400 -3849355 -2037257 0 0 0 
+DEAL:RT::p[34] value 0 3032793 0  first 0 0 0 6308751 5198066 2751058 0 0 0 
+DEAL:RT::p[35] value 0 -1731179 0  first 0 0 0 -3226289 -2967161 -1570359 0 0 0 
+DEAL:RT::p[36] value 0 -2079185 0  first 0 0 0 -4914439 -3563628 -1847454 0 0 0 
+DEAL:RT::p[37] value 0 5394736 0  first 0 0 0 12318651 9246327 4793477 0 0 0 
+DEAL:RT::p[38] value 0 -7284905 0  first 0 0 0 -15153905 -12485988 -6472980 0 0 0 
+DEAL:RT::p[39] value 0 4158373 0  first 0 0 0 7749694 7127257 3694910 0 0 0 
+DEAL:RT::p[40] value 0 2362986 0  first 0 0 0 5585240 4050049 2013005 0 0 0 
+DEAL:RT::p[41] value 0 -6131093 0  first 0 0 0 -14000093 -10508410 -5223018 0 0 0 
+DEAL:RT::p[42] value 0 8279264 0  first 0 0 0 17222349 14190273 7053023 0 0 0 
+DEAL:RT::p[43] value 0 -4725972 0  first 0 0 0 -8807493 -8100096 -4026009 0 0 0 
+DEAL:RT::p[44] value 0 -1154119 0  first 0 0 0 -2727919 -1978107 -950729 0 0 0 
+DEAL:RT::p[45] value 0 2994524 0  first 0 0 0 6837868 5132474 2466800 0 0 0 
+DEAL:RT::p[46] value 0 -4043723 0  first 0 0 0 -8411667 -6930753 -3331099 0 0 0 
+DEAL:RT::p[47] value 0 2308240 0  first 0 0 0 4301720 3956216 1901460 0 0 0 
+DEAL:RT::p[48] value 0 1298385 0  first 0 0 0 3068910 2008974 1177770 0 0 0 
+DEAL:RT::p[49] value 0 -3368838 0  first 0 0 0 -7692601 -5212560 -3055886 0 0 0 
+DEAL:RT::p[50] value 0 4549189 0  first 0 0 0 9463127 7038901 4126587 0 0 0 
+DEAL:RT::p[51] value 0 -2596769 0  first 0 0 0 -4839434 -4017947 -2355539 0 0 0 
+DEAL:RT::p[52] value 0 -3118778 0  first 0 0 0 -7371660 -4825645 -2771181 0 0 0 
+DEAL:RT::p[53] value 0 8092104 0  first 0 0 0 18477977 12520806 7190215 0 0 0 
+DEAL:RT::p[54] value 0 -10927357 0  first 0 0 0 -22730857 -16907757 -9709470 0 0 0 
+DEAL:RT::p[55] value 0 6237559 0  first 0 0 0 11624542 9651293 5542364 0 0 0 
+DEAL:RT::p[56] value 0 3544479 0  first 0 0 0 8377861 5484326 3019507 0 0 0 
+DEAL:RT::p[57] value 0 -9196641 0  first 0 0 0 -21000141 -14229841 -7834528 0 0 0 
+DEAL:RT::p[58] value 0 12418896 0  first 0 0 0 25833523 19215594 10579535 0 0 0 
+DEAL:RT::p[59] value 0 -7088958 0  first 0 0 0 -13211241 -10968652 -6039013 0 0 0 
+DEAL:RT::p[60] value 0 -1731179 0  first 0 0 0 -4091879 -2678631 -1426094 0 0 0 
+DEAL:RT::p[61] value 0 4491786 0  first 0 0 0 10256802 6950081 3700200 0 0 0 
+DEAL:RT::p[62] value 0 -6065585 0  first 0 0 0 -12617501 -9385200 -4996649 0 0 0 
+DEAL:RT::p[63] value 0 3462360 0  first 0 0 0 6452580 5357264 2852190 0 0 0 
+DEAL:RT::p[64] value 0 0 1217370  first 0 0 0 0 0 0 2877420 1590435 1455388 
+DEAL:RT::p[65] value 0 0 -3158634  first 0 0 0 0 0 0 -7212607 -4126602 -3776204 
+DEAL:RT::p[66] value 0 0 4265335  first 0 0 0 0 0 0 8872658 5572453 5099285 
+DEAL:RT::p[67] value 0 0 -2434739  first 0 0 0 0 0 0 -4537469 -3180869 -2910775 
+DEAL:RT::p[68] value 0 0 -2998364  first 0 0 0 0 0 0 -7087043 -3815792 -3584598 
+DEAL:RT::p[69] value 0 0 7779671  first 0 0 0 0 0 0 17764550 9900602 9300739 
+DEAL:RT::p[70] value 0 0 -10505456  first 0 0 0 0 0 0 -21853228 -13369504 -12559464 
+DEAL:RT::p[71] value 0 0 5996729  first 0 0 0 0 0 0 11175723 7631586 7169199 
+DEAL:RT::p[72] value 0 0 3587415  first 0 0 0 0 0 0 8479344 4306668 4288819 
+DEAL:RT::p[73] value 0 0 -9308042  first 0 0 0 0 0 0 -21254520 -11174244 -11127934 
+DEAL:RT::p[74] value 0 0 12569329  first 0 0 0 0 0 0 26146450 15089398 15026861 
+DEAL:RT::p[75] value 0 0 -7174828  first 0 0 0 0 0 0 -13371272 -8613335 -8577638 
+DEAL:RT::p[76] value 0 0 -1826054  first 0 0 0 0 0 0 -4316129 -2081309 -2183081 
+DEAL:RT::p[77] value 0 0 4737952  first 0 0 0 0 0 0 10818913 5400246 5664308 
+DEAL:RT::p[78] value 0 0 -6398001  first 0 0 0 0 0 0 -13308987 -7292345 -7648927 
+DEAL:RT::p[79] value 0 0 3652110  first 0 0 0 0 0 0 6806205 4162620 4366164 
+DEAL:RT::p[80] value 0 0 1623160  first 0 0 0 0 0 0 3836560 2120580 1805254 
+DEAL:RT::p[81] value 0 0 -4211512  first 0 0 0 0 0 0 -9616810 -5502137 -4683980 
+DEAL:RT::p[82] value 0 0 5687113  first 0 0 0 0 0 0 11830211 7429938 6325121 
+DEAL:RT::p[83] value 0 0 -3246319  first 0 0 0 0 0 0 -6049959 -4241159 -3610507 
+DEAL:RT::p[84] value 0 0 -3997818  first 0 0 0 0 0 0 -9449390 -5087723 -4446313 
+DEAL:RT::p[85] value 0 0 10372895  first 0 0 0 0 0 0 23686066 13200803 11536577 
+DEAL:RT::p[86] value 0 0 -14007275  first 0 0 0 0 0 0 -29137637 -17826005 -15578680 
+DEAL:RT::p[87] value 0 0 7995639  first 0 0 0 0 0 0 14900963 10175448 8892629 
+DEAL:RT::p[88] value 0 0 4783219  first 0 0 0 0 0 0 11305791 5742224 5319824 
+DEAL:RT::p[89] value 0 0 -12410723  first 0 0 0 0 0 0 -28339361 -14898993 -13803018 
+DEAL:RT::p[90] value 0 0 16759105  first 0 0 0 0 0 0 34861934 20119197 18639223 
+DEAL:RT::p[91] value 0 0 -9566438  first 0 0 0 0 0 0 -17828362 -11484447 -10639648 
+DEAL:RT::p[92] value 0 0 -2434739  first 0 0 0 0 0 0 -5754839 -2775079 -2707880 
+DEAL:RT::p[93] value 0 0 6317269  first 0 0 0 0 0 0 14425217 7200328 7025971 
+DEAL:RT::p[94] value 0 0 -8530668  first 0 0 0 0 0 0 -17745316 -9723127 -9487680 
+DEAL:RT::p[95] value 0 0 4869480  first 0 0 0 0 0 0 9074940 5550160 5415762 
+DEAL:RT::p[96] value -1303904 0 0  first -3937034 -1703487 -1182776 0 0 0 0 0 0 
+DEAL:RT::p[97] value 1815360 0 0  first 5264544 2371680 1646720 0 0 0 0 0 0 
+DEAL:RT::p[98] value -2031818 0 0  first -5514182 -2654473 -1843070 0 0 0 0 0 0 
+DEAL:RT::p[99] value 3211498 0 0  first 9696859 4087032 2913162 0 0 0 0 0 0 
+DEAL:RT::p[100] value -4471204 0 0  first -12966494 -5690166 -4055846 0 0 0 0 0 0 
+DEAL:RT::p[101] value 5004341 0 0  first 13581353 6368649 4539457 0 0 0 0 0 0 
+DEAL:RT::p[102] value -3842419 0 0  first -11601875 -4612799 -3485473 0 0 0 0 0 0 
+DEAL:RT::p[103] value 5349605 0 0  first 15513855 6422167 4852647 0 0 0 0 0 0 
+DEAL:RT::p[104] value -5987479 0 0  first -16249505 -7187930 -5431265 0 0 0 0 0 0 
+DEAL:RT::p[105] value 1955857 0 0  first 5905552 2229256 1774165 0 0 0 0 0 0 
+DEAL:RT::p[106] value -2723039 0 0  first -7896815 -3103679 -2470079 0 0 0 0 0 0 
+DEAL:RT::p[107] value 3047729 0 0  first 8271275 3473756 2764607 0 0 0 0 0 0 
+DEAL:RT::p[108] value 3132038 0 0  first 9456936 4091856 2782963 0 0 0 0 0 0 
+DEAL:RT::p[109] value -4360576 0 0  first -12645672 -5696882 -3874576 0 0 0 0 0 0 
+DEAL:RT::p[110] value 4880522 0 0  first 13245317 6376166 4336573 0 0 0 0 0 0 
+DEAL:RT::p[111] value -7714163 0 0  first -23292294 -9817235 -6854396 0 0 0 0 0 0 
+DEAL:RT::p[112] value 10740037 0 0  first 31146108 13668037 9543028 0 0 0 0 0 0 
+DEAL:RT::p[113] value -12020653 0 0  first -32623023 -15297781 -10680916 0 0 0 0 0 0 
+DEAL:RT::p[114] value 9229666 0 0  first 27868231 11080155 8200992 0 0 0 0 0 0 
+DEAL:RT::p[115] value -12849993 0 0  first -37264981 -15426333 -11417822 0 0 0 0 0 0 
+DEAL:RT::p[116] value 14382197 0 0  first 39032049 17265735 12779258 0 0 0 0 0 0 
+DEAL:RT::p[117] value -4698056 0 0  first -14185402 -5354774 -4174443 0 0 0 0 0 0 
+DEAL:RT::p[118] value 6540865 0 0  first 18968509 7455180 5811866 0 0 0 0 0 0 
+DEAL:RT::p[119] value -7320782 0 0  first -19867975 -8344117 -6504859 0 0 0 0 0 0 
+DEAL:RT::p[120] value -3559547 0 0  first -10747766 -4650376 -3032343 0 0 0 0 0 0 
+DEAL:RT::p[121] value 4955777 0 0  first 14371753 6474483 4221777 0 0 0 0 0 0 
+DEAL:RT::p[122] value -5546691 0 0  first -15053245 -7246484 -4725171 0 0 0 0 0 0 
+DEAL:RT::p[123] value 8767114 0 0  first 26471593 11157247 7468618 0 0 0 0 0 0 
+DEAL:RT::p[124] value -12206005 0 0  first -35397417 -15533665 -10398176 0 0 0 0 0 0 
+DEAL:RT::p[125] value 13661422 0 0  first 37075927 17385864 11638031 0 0 0 0 0 0 
+DEAL:RT::p[126] value -10489475 0 0  first -31672124 -12592547 -8935880 0 0 0 0 0 0 
+DEAL:RT::p[127] value 14603963 0 0  first 42351492 17531963 12440972 0 0 0 0 0 0 
+DEAL:RT::p[128] value -16345304 0 0  first -44359755 -19622432 -13924404 0 0 0 0 0 0 
+DEAL:RT::p[129] value 5339322 0 0  first 16121650 6085678 4548515 0 0 0 0 0 0 
+DEAL:RT::p[130] value -7433664 0 0  first -21557628 -8472779 -6332665 0 0 0 0 0 0 
+DEAL:RT::p[131] value 8320038 0 0  first 22579870 9483054 7087759 0 0 0 0 0 0 
+DEAL:RT::p[132] value 1738540 0 0  first 5249380 2271318 1432158 0 0 0 0 0 0 
+DEAL:RT::p[133] value -2420479 0 0  first -7019391 -3162239 -1993919 0 0 0 0 0 0 
+DEAL:RT::p[134] value 2709092 0 0  first 7352244 3539298 2231670 0 0 0 0 0 0 
+DEAL:RT::p[135] value -4281997 0 0  first -12929145 -5449375 -3527382 0 0 0 0 0 0 
+DEAL:RT::p[136] value 5961607 0 0  first 17288660 7586889 4910996 0 0 0 0 0 0 
+DEAL:RT::p[137] value -6672454 0 0  first -18108470 -8491531 -5496571 0 0 0 0 0 0 
+DEAL:RT::p[138] value 5123226 0 0  first 15469168 6150400 4220363 0 0 0 0 0 0 
+DEAL:RT::p[139] value -7132806 0 0  first -20685139 -8562888 -5875795 0 0 0 0 0 0 
+DEAL:RT::p[140] value 7983306 0 0  first 21666008 9583908 6576412 0 0 0 0 0 0 
+DEAL:RT::p[141] value -2607808 0 0  first -7874069 -2972341 -2148235 0 0 0 0 0 0 
+DEAL:RT::p[142] value 3630720 0 0  first 10529088 4138240 2990880 0 0 0 0 0 0 
+DEAL:RT::p[143] value -4063638 0 0  first -11028365 -4631673 -3347505 0 0 0 0 0 0 
+DEAL:RT::p[144] value 0 -2143059 0  first 0 0 0 -5065413 -3629476 -1943977 0 0 0 
+DEAL:RT::p[145] value 0 5560464 0  first 0 0 0 12697085 9417179 5043918 0 0 0 
+DEAL:RT::p[146] value 0 -7508699 0  first 0 0 0 -15619438 -12716703 -6811170 0 0 0 
+DEAL:RT::p[147] value 0 4286119 0  first 0 0 0 7987768 7258954 3887955 0 0 0 
+DEAL:RT::p[148] value 0 2769888 0  first 0 0 0 6547008 4562800 2512576 0 0 0 
+DEAL:RT::p[149] value 0 -7186856 0  first 0 0 0 -16410883 -11838814 -6519225 0 0 0 
+DEAL:RT::p[150] value 0 9704937 0  first 0 0 0 20188004 15986815 8803386 0 0 0 
+DEAL:RT::p[151] value 0 -5539775 0  first 0 0 0 -10324127 -9125599 -5025151 0 0 0 
+DEAL:RT::p[152] value 0 -2788789 0  first 0 0 0 -6591685 -4425877 -2529721 0 0 0 
+DEAL:RT::p[153] value 0 7235902 0  first 0 0 0 16522875 11483552 6563714 0 0 0 
+DEAL:RT::p[154] value 0 -9771165 0  first 0 0 0 -20325770 -15507077 -8863461 0 0 0 
+DEAL:RT::p[155] value 0 5577581 0  first 0 0 0 10394582 8851756 5059445 0 0 0 
+DEAL:RT::p[156] value 0 5147726 0  first 0 0 0 12167353 8718168 4573997 0 0 0 
+DEAL:RT::p[157] value 0 -13356486 0  first 0 0 0 -30498970 -22620489 -11867865 0 0 0 
+DEAL:RT::p[158] value 0 18036238 0  first 0 0 0 37518598 30546097 16026045 0 0 0 
+DEAL:RT::p[159] value 0 -10295451 0  first 0 0 0 -19186978 -17436334 -9147992 0 0 0 
+DEAL:RT::p[160] value 0 -6653395 0  first 0 0 0 -15726208 -10960051 -5911854 0 0 0 
+DEAL:RT::p[161] value 0 17263156 0  first 0 0 0 39419685 28437369 15339125 0 0 0 
+DEAL:RT::p[162] value 0 -23311697 0  first 0 0 0 -48492497 -38401051 -20713538 0 0 0 
+DEAL:RT::p[163] value 0 13306792 0  first 0 0 0 24799022 21920104 11823711 0 0 0 
+DEAL:RT::p[164] value 0 6698801 0  first 0 0 0 15833529 10631159 5952199 0 0 0 
+DEAL:RT::p[165] value 0 -17380963 0  first 0 0 0 -39688693 -27584011 -15443802 0 0 0 
+DEAL:RT::p[166] value 0 23470782 0  first 0 0 0 48823422 37248702 20854893 0 0 0 
+DEAL:RT::p[167] value 0 -13397600 0  first 0 0 0 -24968256 -21262318 -11904397 0 0 0 
+DEAL:RT::p[168] value 0 -5850368 0  first 0 0 0 -13828143 -9908159 -4983870 0 0 0 
+DEAL:RT::p[169] value 0 15179590 0  first 0 0 0 34661950 25708090 12931343 0 0 0 
+DEAL:RT::p[170] value 0 -20498106 0  first 0 0 0 -42639724 -34715507 -17462134 0 0 0 
+DEAL:RT::p[171] value 0 11700737 0  first 0 0 0 21805919 19816320 9967743 0 0 0 
+DEAL:RT::p[172] value 0 7561556 0  first 0 0 0 17872769 12456052 6441615 0 0 0 
+DEAL:RT::p[173] value 0 -19619501 0  first 0 0 0 -44800301 -32318947 -16713660 0 0 0 
+DEAL:RT::p[174] value 0 26493644 0  first 0 0 0 55111515 43642631 22569675 0 0 0 
+DEAL:RT::p[175] value 0 -15123111 0  first 0 0 0 -28183981 -24912103 -12883230 0 0 0 
+DEAL:RT::p[176] value 0 -7613157 0  first 0 0 0 -17994736 -12082266 -6485573 0 0 0 
+DEAL:RT::p[177] value 0 19753390 0  first 0 0 0 45106030 31349111 16827719 0 0 0 
+DEAL:RT::p[178] value 0 -26674442 0  first 0 0 0 -55487608 -42332989 -22723695 0 0 0 
+DEAL:RT::p[179] value 0 15226316 0  first 0 0 0 28376316 24164534 12971149 0 0 0 
+DEAL:RT::p[180] value 0 2857413 0  first 0 0 0 6753885 4839303 2353852 0 0 0 
+DEAL:RT::p[181] value 0 -7413951 0  first 0 0 0 -16929445 -12556238 -6107394 0 0 0 
+DEAL:RT::p[182] value 0 10011600 0  first 0 0 0 20825918 16955605 8247261 0 0 0 
+DEAL:RT::p[183] value 0 -5714825 0  first 0 0 0 -10650356 -9678604 -4707704 0 0 0 
+DEAL:RT::p[184] value 0 -3693183 0  first 0 0 0 -8729343 -6083732 -3042335 0 0 0 
+DEAL:RT::p[185] value 0 9582476 0  first 0 0 0 21881178 15785087 7893761 0 0 0 
+DEAL:RT::p[186] value 0 -12939915 0  first 0 0 0 -26917337 -21315752 -10659520 0 0 0 
+DEAL:RT::p[187] value 0 7386368 0  first 0 0 0 13765504 12167467 6084672 0 0 0 
+DEAL:RT::p[188] value 0 3718387 0  first 0 0 0 8788915 5901171 3063098 0 0 0 
+DEAL:RT::p[189] value 0 -9647868 0  first 0 0 0 -22030500 -15311402 -7947629 0 0 0 
+DEAL:RT::p[190] value 0 13028221 0  first 0 0 0 27101029 20676104 10732264 0 0 0 
+DEAL:RT::p[191] value 0 -7436773 0  first 0 0 0 -13859442 -11802341 -6126194 0 0 0 
+DEAL:RT::p[192] value 0 0 -2968682  first 0 0 0 0 0 0 -7016886 -3878440 -3515630 
+DEAL:RT::p[193] value 0 0 7702658  first 0 0 0 0 0 0 17588693 10063150 9121790 
+DEAL:RT::p[194] value 0 0 -10401460  first 0 0 0 0 0 0 -21636896 -13589004 -12317817 
+DEAL:RT::p[195] value 0 0 5937366  first 0 0 0 0 0 0 11065091 7756881 7031262 
+DEAL:RT::p[196] value 0 0 7311823  first 0 0 0 0 0 0 17282491 9305207 8658948 
+DEAL:RT::p[197] value 0 0 -18971534  first 0 0 0 0 0 0 -43320695 -24143644 -22466835 
+DEAL:RT::p[198] value 0 0 25618647  first 0 0 0 0 0 0 53291364 32602924 30338607 
+DEAL:RT::p[199] value 0 0 -14623645  first 0 0 0 0 0 0 -27253157 -18610413 -17317894 
+DEAL:RT::p[200] value 0 0 -8748281  first 0 0 0 0 0 0 -20677758 -10502255 -10360058 
+DEAL:RT::p[201] value 0 0 22698627  first 0 0 0 0 0 0 51831354 27249555 26880605 
+DEAL:RT::p[202] value 0 0 -30651611  first 0 0 0 0 0 0 -63760829 -36797060 -36298840 
+DEAL:RT::p[203] value 0 0 17496565  first 0 0 0 0 0 0 32607235 21004513 20720119 
+DEAL:RT::p[204] value 0 0 4453024  first 0 0 0 0 0 0 10525331 5075490 5273446 
+DEAL:RT::p[205] value 0 0 -11553986  first 0 0 0 0 0 0 -26383039 -13169060 -13682684 
+DEAL:RT::p[206] value 0 0 15602191  first 0 0 0 0 0 0 32455346 17783143 18476727 
+DEAL:RT::p[207] value 0 0 -8906048  first 0 0 0 0 0 0 -16597636 -10150979 -10546892 
+DEAL:RT::p[208] value 0 0 3710080  first 0 0 0 0 0 0 8769280 4847040 4302965 
+DEAL:RT::p[209] value 0 0 -9626314  first 0 0 0 0 0 0 -21981282 -12576314 -11164637 
+DEAL:RT::p[210] value 0 0 12999115  first 0 0 0 0 0 0 27040483 16982715 15076425 
+DEAL:RT::p[211] value 0 0 -7420159  first 0 0 0 0 0 0 -13828479 -9694079 -8605930 
+DEAL:RT::p[212] value 0 0 -9137872  first 0 0 0 0 0 0 -21598608 -11629082 -10598140 
+DEAL:RT::p[213] value 0 0 23709474  first 0 0 0 0 0 0 54139580 30173264 27498341 
+DEAL:RT::p[214] value 0 0 -32016630  first 0 0 0 0 0 0 -66600315 -40745157 -37133014 
+DEAL:RT::p[215] value 0 0 18275746  first 0 0 0 0 0 0 34059345 23258167 21196282 
+DEAL:RT::p[216] value 0 0 10933073  first 0 0 0 0 0 0 25841809 13125083 12680221 
+DEAL:RT::p[217] value 0 0 -28367368  first 0 0 0 0 0 0 -64775683 -34054841 -32900584 
+DEAL:RT::p[218] value 0 0 38306526  first 0 0 0 0 0 0 79684420 45986736 44428059 
+DEAL:RT::p[219] value 0 0 -21866145  first 0 0 0 0 0 0 -40750544 -26250166 -25360441 
+DEAL:RT::p[220] value 0 0 -5565119  first 0 0 0 0 0 0 -13153919 -6343039 -6454447 
+DEAL:RT::p[221] value 0 0 14439473  first 0 0 0 0 0 0 32971924 16457894 16746957 
+DEAL:RT::p[222] value 0 0 -19498672  first 0 0 0 0 0 0 -40560723 -22224293 -22614636 
+DEAL:RT::p[223] value 0 0 11130240  first 0 0 0 0 0 0 20742720 12686080 12908896 
+DEAL:RT::p[224] value 0 0 -3581244  first 0 0 0 0 0 0 -8464760 -4678722 -4047975 
+DEAL:RT::p[225] value 0 0 9292035  first 0 0 0 0 0 0 21217968 12139594 10503034 
+DEAL:RT::p[226] value 0 0 -12547711  first 0 0 0 0 0 0 -26101483 -16392978 -14183012 
+DEAL:RT::p[227] value 0 0 7162490  first 0 0 0 0 0 0 13348277 9357447 8095953 
+DEAL:RT::p[228] value 0 0 8820554  first 0 0 0 0 0 0 20848583 11225256 9970107 
+DEAL:RT::p[229] value 0 0 -22886146  first 0 0 0 0 0 0 -52259546 -29125476 -25868819 
+DEAL:RT::p[230] value 0 0 30904833  first 0 0 0 0 0 0 64287576 39330255 34932554 
+DEAL:RT::p[231] value 0 0 -17641108  first 0 0 0 0 0 0 -32876611 -22450511 -19940213 
+DEAL:RT::p[232] value 0 0 -10553414  first 0 0 0 0 0 0 -24944434 -12669305 -11928804 
+DEAL:RT::p[233] value 0 0 27382293  first 0 0 0 0 0 0 62526306 32872265 30950934 
+DEAL:RT::p[234] value 0 0 -36976306  first 0 0 0 0 0 0 -76917325 -44389816 -41795301 
+DEAL:RT::p[235] value 0 0 21106830  first 0 0 0 0 0 0 39335456 25338613 23857611 
+DEAL:RT::p[236] value 0 0 5371868  first 0 0 0 0 0 0 12697141 6122774 6071965 
+DEAL:RT::p[237] value 0 0 -13938051  first 0 0 0 0 0 0 -31826951 -15886381 -15754550 
+DEAL:RT::p[238] value 0 0 18821568  first 0 0 0 0 0 0 39152226 21452540 21274519 
+DEAL:RT::p[239] value 0 0 -10743734  first 0 0 0 0 0 0 -20022414 -12245547 -12143928 

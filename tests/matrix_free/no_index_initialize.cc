@@ -144,7 +144,7 @@ do_test(const DoFHandler<dim> &          dof,
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.mapping_update_flags  = update_gradients | update_hessians;
     data.initialize_indices    = false;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   deallog << "Testing " << dof.get_fe().get_name() << " without read"

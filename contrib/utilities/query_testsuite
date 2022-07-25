@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 set -eu
 
-BASE_URL="https://cdash.43-1.org"
+BASE_URL="https://cdash.dealii.org"
 
 # Script to query CDash on the command line and create a formatted table
 

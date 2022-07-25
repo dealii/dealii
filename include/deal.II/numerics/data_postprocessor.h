@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2020 by the deal.II authors
+// Copyright (C) 2007 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -258,39 +258,12 @@ namespace DataPostprocessorInputs
       const unsigned int                                       face_number);
 
     /**
-     * Set the cell that is currently being used in evaluating the data
-     * for which the DataPostprocessor object is being called.
-     *
-     * This function is not usually called from user space, but is instead
-     * called by DataOut and similar classes when creating the object that
-     * is then passed to DataPostprocessor.
-     *
-     * @deprecated Use the equivalent function with the dim template parameter
-     * instead.
-     */
-    template <typename DoFHandlerType>
-    DEAL_II_DEPRECATED void
-    set_cell(const typename DoFHandlerType::cell_iterator &cell);
-
-    /**
      * Query the cell on which we currently produce graphical output.
      * See the documentation of the current class for an example on how
      * to use this function.
      */
     template <int dim>
     typename DoFHandler<dim, spacedim>::cell_iterator
-    get_cell() const;
-
-    /**
-     * Query the cell on which we currently produce graphical output.
-     * See the documentation of the current class for an example on how
-     * to use this function.
-     *
-     * @deprecated Use the equivalent function with the dim template parameter
-     * instead.
-     */
-    template <typename DoFHandlerType>
-    DEAL_II_DEPRECATED typename DoFHandlerType::cell_iterator
     get_cell() const;
 
     /**
@@ -1331,17 +1304,6 @@ namespace DataPostprocessors
 namespace DataPostprocessorInputs
 {
   template <int spacedim>
-  template <typename DoFHandlerType>
-  void
-  CommonInputs<spacedim>::set_cell(
-    const typename DoFHandlerType::cell_iterator &new_cell)
-  {
-    return set_cell<DoFHandlerType::dimension>(new_cell);
-  }
-
-
-
-  template <int spacedim>
   template <int dim>
   void
   CommonInputs<spacedim>::set_cell(
@@ -1375,16 +1337,6 @@ namespace DataPostprocessorInputs
   {
     set_cell<dim>(new_cell);
     face_number = new_face_number;
-  }
-
-
-
-  template <int spacedim>
-  template <typename DoFHandlerType>
-  typename DoFHandlerType::cell_iterator
-  CommonInputs<spacedim>::get_cell() const
-  {
-    return get_cell<DoFHandlerType::dimension>();
   }
 
 

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,6 +14,23 @@
 ## ---------------------------------------------------------------------
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+
+#
+# Work around an issue where gcc emits a note that the warning
+# -Wmisleading-indentation will be disabled due to a humongous line of over
+# 100k characters produced by one of the CGAL headers. Unfortunately,
+# guarding the include by DEAL_II_DISABLE_EXTRA_DIAGNOSTICS is not enough
+# due to a longstanding bug in gcc. Thus, simply wet
+# -Wno-misleading-indentation on the command line for the
+# grid_generator_cgal.cc compilation unit.
+#
+IF(DEAL_II_WITH_CGAL)
+  ENABLE_IF_SUPPORTED(_flag "-Wno-misleading-indentation")
+  SET_PROPERTY(SOURCE "grid_generator_cgal.cc"
+    APPEND_STRING PROPERTY COMPILE_FLAGS " ${_flag}"
+    )
+ENDIF()
+
 
 SET(_unity_include_src
   cell_id.cc
@@ -32,15 +49,16 @@ SET(_unity_include_src
   )
 
 SET(_separate_src
+  grid_generator.cc
+  grid_generator_cgal.cc
   grid_generator_from_name.cc
+  grid_generator_pipe_junction.cc
   grid_in.cc
   grid_out.cc
-  grid_generator.cc
-  grid_generator_pipe_junction.cc
-  grid_tools.cc
   grid_tools_cache.cc
-  grid_tools_nontemplates.cc
+  grid_tools.cc
   grid_tools_dof_handlers.cc
+  grid_tools_nontemplates.cc
   tria.cc
   )
 
@@ -55,8 +73,9 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
 
 SET(_inst
   cell_id.inst.in
-  grid_generator.inst.in
+  grid_generator_cgal.inst.in
   grid_generator_from_name.inst.in
+  grid_generator.inst.in
   grid_generator_pipe_junction.inst.in
   grid_in.inst.in
   grid_out.inst.in

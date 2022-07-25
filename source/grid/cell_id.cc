@@ -161,15 +161,6 @@ CellId::to_string() const
 }
 
 
-
-template <int dim, int spacedim>
-typename Triangulation<dim, spacedim>::cell_iterator
-CellId::to_cell(const Triangulation<dim, spacedim> &tria) const
-{
-  return tria.create_cell_iterator(*this);
-}
-
-
 // explicit instantiations
 #include "cell_id.inst"
 

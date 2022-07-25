@@ -1,0 +1,62 @@
+# Listing of Parameters
+# ---------------------
+subsection Maxwell
+  # use absorbing boundary conditions?
+  set absorbing boundary condition = true
+
+  # order of the finite element space
+  set fe order                     = 0
+
+  # order of the quadrature
+  set quadrature order             = 1
+
+  # number of refinements of the geometry
+  set refinements                  = 8
+
+  # scale of the hypercube geometry
+  set scaling                      = 20
+end
+
+
+subsection Parameters
+  # orientation of the dipole
+  set dipole orientation = 0, 1
+
+  # position of the dipole
+  set dipole position    = 0, 0.8
+
+  # radius of the dipole
+  set dipole radius      = 0.3
+
+  # strength of the dipole
+  set dipole strength    = 1, 0
+
+  # relative permittivity of material 1
+  set material 1 epsilon = 1, 0; 0, 0| 0, 0; 1, 0
+
+  # inverse of relative permeability of material 1
+  set material 1 mu_inv  = 1, 0
+
+  # relative permittivity of material 2
+  set material 2 epsilon = 1, 0; 0, 0| 0, 0; 1, 0
+
+  # inverse of relative permeability of material 2
+  set material 2 mu_inv  = 1, 0
+
+  # surface conductivity between material 1 and material 2
+  set sigma              = 0.001, 0.2; 0, 0| 0, 0; 0.001, 0.2
+end
+
+
+subsection PerfectlyMatchedLayer
+  # inner radius of the PML shell
+  set inner radius = 12
+
+  # outer radius of the PML shell
+  set outer radius = 20
+
+  # strength of the PML
+  set strength     = 8
+end
+
+

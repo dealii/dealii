@@ -106,7 +106,8 @@ MatrixFreeTest<dim, fe_degree, Number>::operator()(
       fe_eval.reinit(cell);
       // compare values with the ones the FEValues
       // gives us. Those are seen as reference
-      for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
+      for (unsigned int j = 0; j < data.n_active_entries_per_cell_batch(cell);
+           ++j)
         {
           // generate random numbers at quadrature
           // points and test them with basis functions
@@ -222,7 +223,7 @@ test()
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.mapping_update_flags |= update_hessians;
     const QGauss<1> quad(fe_degree + 1);
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, number> mf(mf_data);

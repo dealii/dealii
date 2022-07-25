@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -702,7 +702,7 @@ namespace DataOutBase
   {
     /**
      * Default constructor. Sets up the dimension labels with the default values
-     of <tt>"x"</tt>, <tt>"y"</tt>, and <tt>"z"</tt>.
+     * of <tt>"x"</tt>, <tt>"y"</tt>, and <tt>"z"</tt>.
      */
     GnuplotFlags();
 
@@ -1536,7 +1536,8 @@ namespace DataOutBase
     unsigned int node_dim;
 
     /**
-     * The number of cells stored in @ref filtered_cells.
+     * The number of cells stored in
+     * @ref filtered_cells.
      */
     unsigned int num_cells;
 
@@ -3367,17 +3368,6 @@ public:
     ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes
       &num_cells &dimension &space_dimension &attribute_dims;
   }
-
-  /**
-   * Get the XDMF content associated with this entry.
-   * If the entry is not valid, this returns an empty string.
-   *
-   * @deprecated Use the overload taking an `unsigned int` and a
-   * `const ReferenceCell &` instead.
-   */
-  DEAL_II_DEPRECATED
-  std::string
-  get_xdmf_content(const unsigned int indent_level) const;
 
   /**
    * Get the XDMF content associated with this entry.

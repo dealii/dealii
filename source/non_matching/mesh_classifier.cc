@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,6 +46,16 @@ namespace NonMatching
   {
     namespace MeshClassifierImplementation
     {
+      DeclExceptionMsg(
+        ExcReclassifyNotCalled,
+        "The Triangulation has not been classified. You need to call the "
+        "reclassify()-function before using this function.");
+
+      DeclExceptionMsg(
+        ExcTriangulationMismatch,
+        "The incoming cell does not belong to the triangulation passed to "
+        "the constructor.");
+
       /**
        * Return LocationToLevelSet::inside/outside if all values in incoming
        * vector are negative/positive, otherwise return
@@ -311,6 +321,7 @@ namespace NonMatching
           dof_handler,
           level_set))
   {
+#ifdef DEAL_II_WITH_LAPACK
     const hp::FECollection<dim> &fe_collection =
       dof_handler.get_fe_collection();
     for (unsigned int i = 0; i < fe_collection.size(); i++)
@@ -320,9 +331,12 @@ namespace NonMatching
 
         Assert(fe_collection[i].has_face_support_points(),
                ExcMessage(
-                 "The elements in the FECollection of the incoming DoFHandler"
+                 "The elements in the FECollection of the incoming DoFHandler "
                  "must have face support points."));
       }
+#else
+    AssertThrow(false, ExcNeedsLAPACK());
+#endif
   }
 
 
@@ -419,6 +433,11 @@ namespace NonMatching
   MeshClassifier<dim>::location_to_level_set(
     const typename Triangulation<dim>::cell_iterator &cell) const
   {
+    Assert(cell_locations.size() == triangulation->n_active_cells(),
+           internal::MeshClassifierImplementation::ExcReclassifyNotCalled());
+    Assert(&cell->get_triangulation() == triangulation,
+           internal::MeshClassifierImplementation::ExcTriangulationMismatch());
+
     return cell_locations.at(cell->active_cell_index());
   }
 
@@ -431,6 +450,10 @@ namespace NonMatching
     const unsigned int                                face_index) const
   {
     AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
+    Assert(face_locations.size() == triangulation->n_raw_faces(),
+           internal::MeshClassifierImplementation::ExcReclassifyNotCalled());
+    Assert(&cell->get_triangulation() == triangulation,
+           internal::MeshClassifierImplementation::ExcTriangulationMismatch());
 
     return face_locations.at(cell->face(face_index)->index());
   }

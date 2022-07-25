@@ -22,8 +22,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_iterator.templates.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -191,6 +189,83 @@ DoFCellAccessor<dim, spacedim, lda>::neighbor_or_periodic_neighbor(
                                                            this->dof_handler);
 }
 
+
+
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline void
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
+  std::vector<types::global_dof_index> &dof_indices,
+  const unsigned int                    fe_index_) const
+{
+  Assert(this->dof_handler != nullptr, ExcInvalidObject());
+
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
+
+  Assert(static_cast<unsigned int>(this->level()) <
+           this->dof_handler->object_dof_indices.size(),
+         ExcMessage(
+           "The DoFHandler to which this accessor points has not "
+           "been initialized, i.e., it doesn't appear that DoF indices "
+           "have been distributed on it."));
+
+  // this function really only makes sense if either a) there are degrees of
+  // freedom defined on the present object, or b) the object is non-active
+  // objects but all degrees of freedom are located on vertices, since
+  // otherwise there are degrees of freedom on sub-objects which are not
+  // allocated for this non-active thing
+  Assert(this->fe_index_is_active(fe_index) ||
+           (this->dof_handler->get_fe(fe_index).n_dofs_per_cell() ==
+            this->n_vertices() *
+              this->dof_handler->get_fe(fe_index).n_dofs_per_vertex()),
+         ExcInternalError());
+
+  // now do the actual work
+  dealii::internal::DoFAccessorImplementation::Implementation::get_dof_indices(
+    *this, dof_indices, fe_index);
+}
+
+
+
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline void
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
+  const int                             level,
+  std::vector<types::global_dof_index> &dof_indices,
+  const unsigned int                    fe_index_) const
+{
+  Assert(this->dof_handler != nullptr, ExcInvalidObject());
+  Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
+         ExcMessage("Multigrid DoF indices can only be accessed after "
+                    "DoFHandler::distribute_mg_dofs() has been called!"));
+
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
+
+  internal::DoFAccessorImplementation::Implementation::get_mg_dof_indices(
+    *this, level, dof_indices, fe_index);
+}
+
+
+
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+inline void
+DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
+  const int                                   level,
+  const std::vector<types::global_dof_index> &dof_indices,
+  const unsigned int                          fe_index_)
+{
+  Assert(this->dof_handler != nullptr, ExcInvalidObject());
+
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
+
+  internal::DoFAccessorImplementation::Implementation::set_mg_dof_indices(
+    *this, level, dof_indices, fe_index);
+}
 
 
 // --------------------------------------------------------------------------

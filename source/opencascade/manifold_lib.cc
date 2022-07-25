@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/opencascade/manifold_lib.h>
 
 #ifdef DEAL_II_WITH_OPENCASCADE
@@ -21,16 +23,17 @@
 
 #  include <BRepAdaptor_CompCurve.hxx>
 #  include <BRepAdaptor_Curve.hxx>
-#  include <BRepAdaptor_HCompCurve.hxx>
-#  include <BRepAdaptor_HCurve.hxx>
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+#    include <BRepAdaptor_HCompCurve.hxx>
+#    include <BRepAdaptor_HCurve.hxx>
+#  endif
 #  include <BRepTools.hxx>
 #  include <BRep_Tool.hxx>
 #  include <GCPnts_AbscissaPoint.hxx>
 #  include <ShapeAnalysis_Curve.hxx>
 #  include <ShapeAnalysis_Surface.hxx>
-#  include <Standard_Version.hxx>
 #  include <TopoDS.hxx>
-#  if (OCC_VERSION_MAJOR < 7)
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
 #    include <Handle_Adaptor3d_HCurve.hxx>
 #  endif
 
@@ -47,6 +50,24 @@ namespace OpenCASCADE
      * TopoDS_Shape. This function will fail when the given shape is
      * not of topological dimension one.
      */
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+    Handle_Adaptor3d_Curve
+    curve_adaptor(const TopoDS_Shape &shape)
+    {
+      Assert((shape.ShapeType() == TopAbs_WIRE) ||
+               (shape.ShapeType() == TopAbs_EDGE),
+             ExcUnsupportedShape());
+      if (shape.ShapeType() == TopAbs_WIRE)
+        return Handle(BRepAdaptor_CompCurve)(
+          new BRepAdaptor_CompCurve(TopoDS::Wire(shape)));
+      else if (shape.ShapeType() == TopAbs_EDGE)
+        return Handle(BRepAdaptor_Curve)(
+          new BRepAdaptor_Curve(TopoDS::Edge(shape)));
+
+      Assert(false, ExcInternalError());
+      return Handle(BRepAdaptor_Curve)(new BRepAdaptor_Curve());
+    }
+#  else
     Handle_Adaptor3d_HCurve
     curve_adaptor(const TopoDS_Shape &shape)
     {
@@ -63,6 +84,7 @@ namespace OpenCASCADE
       Assert(false, ExcInternalError());
       return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve());
     }
+#  endif
 
 
 
@@ -70,8 +92,13 @@ namespace OpenCASCADE
     double
     shape_length(const TopoDS_Shape &sh)
     {
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+      Handle_Adaptor3d_Curve adapt = curve_adaptor(sh);
+      return GCPnts_AbscissaPoint::Length(*adapt);
+#  else
       Handle_Adaptor3d_HCurve adapt = curve_adaptor(sh);
       return GCPnts_AbscissaPoint::Length(adapt->GetCurve());
+#  endif
     }
   } // namespace
 
@@ -413,13 +440,24 @@ namespace OpenCASCADE
     double              t(0.0);
     ShapeAnalysis_Curve curve_analysis;
     gp_Pnt              proj;
-    const double        dist = curve_analysis.Project(
+
+    const double dist = curve_analysis.Project(
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+      *curve, point(space_point), tolerance, proj, t, true);
+#  else
       curve->GetCurve(), point(space_point), tolerance, proj, t, true);
+#  endif
+
+    (void)dist;
     Assert(dist < tolerance * length,
            ExcPointNotOnManifold<spacedim>(space_point));
-    (void)dist; // Silence compiler warning in Release mode.
+
     return Point<1>(GCPnts_AbscissaPoint::Length(
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+      *curve, curve->FirstParameter(), t));
+#  else
       curve->GetCurve(), curve->GetCurve().FirstParameter(), t));
+#  endif
   }
 
 
@@ -429,10 +467,16 @@ namespace OpenCASCADE
   ArclengthProjectionLineManifold<dim, spacedim>::push_forward(
     const Point<1> &chart_point) const
   {
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+    GCPnts_AbscissaPoint AP(*curve, chart_point[0], curve->FirstParameter());
+    gp_Pnt               P = curve->Value(AP.Parameter());
+#  else
     GCPnts_AbscissaPoint AP(curve->GetCurve(),
                             chart_point[0],
                             curve->GetCurve().FirstParameter());
     gp_Pnt               P = curve->GetCurve().Value(AP.Parameter());
+#  endif
+
     return point<spacedim>(P);
   }
 

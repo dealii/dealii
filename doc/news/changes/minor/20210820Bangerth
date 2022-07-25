@@ -1,6 +1,0 @@
-New: The hp::FECollection::hp_vertex_dof_identities() function (and
-related functions for lines and quads) allows for the computation of
-multiway computations of DoF indentities in the hp-context.
-<br>
-(Wolfgang Bangerth, 2021/08/20)
-

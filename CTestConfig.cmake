@@ -20,7 +20,7 @@
 SET(CTEST_PROJECT_NAME "deal.II")
 
 SET(CTEST_DROP_METHOD "https")
-SET(CTEST_DROP_SITE "cdash.43-1.org")
+SET(CTEST_DROP_SITE "cdash.dealii.org")
 SET(CTEST_DROP_LOCATION "/submit.php?project=deal.II")
 SET(CTEST_DROP_SITE_CDASH TRUE)
 

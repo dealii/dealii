@@ -1,6 +1,0 @@
-Improved: To be consistent with the FEValues classes, one can now 
-loop over all DoF and quadrature-point indices in a 
-range-based loop with the help of the new functions dof_indices() and
-quadrature_point_indices().
-<br>
-(Peter Munch, 2022/02/06)

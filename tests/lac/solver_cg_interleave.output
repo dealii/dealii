@@ -1,0 +1,53 @@
+
+DEAL::Solve with PreconditionIdentity: 
+DEAL:cg::Starting value 5.47723
+DEAL:cg::   CG estimated residual at iteration 0: 5.47723
+DEAL:cg::   CG estimated residual at iteration 1: 3.05857
+DEAL:cg::   CG estimated residual at iteration 2: 2.21614
+DEAL:cg::   CG estimated residual at iteration 3: 1.69418
+DEAL:cg::   CG estimated residual at iteration 4: 1.30657
+DEAL:cg::   CG estimated residual at iteration 5: 0.998837
+DEAL:cg::   CG estimated residual at iteration 6: 0.750194
+DEAL:cg::   CG estimated residual at iteration 7: 0.550634
+DEAL:cg::   CG estimated residual at iteration 8: 0.393553
+DEAL:cg::   CG estimated residual at iteration 9: 0.273167
+DEAL:cg::   CG estimated residual at iteration 10: 0.183730
+DEAL:cg::   CG estimated residual at iteration 11: 0.119512
+DEAL:cg::   CG estimated residual at iteration 12: 0.0750441
+DEAL:cg::   CG estimated residual at iteration 13: 0.0454041
+DEAL:cg::   CG estimated residual at iteration 14: 0.0264187
+DEAL:cg::   CG estimated residual at iteration 15: 0.0147526
+DEAL:cg::   CG estimated residual at iteration 16: 0.00788820
+DEAL:cg::   CG estimated residual at iteration 17: 0.00402832
+DEAL:cg::   CG estimated residual at iteration 18: 0.00195897
+DEAL:cg::   CG estimated residual at iteration 19: 0.000904053
+DEAL:cg::   CG estimated residual at iteration 20: 0.000394320
+DEAL:cg::   CG estimated residual at iteration 21: 0.000161750
+DEAL:cg::Convergence step 22 value 6.20175e-05
+DEAL:cg::   CG estimated residual at iteration 22: 6.20175e-05
+DEAL::Solve with diagonal preconditioner: 
+DEAL:cg::Starting value 5.47723
+DEAL:cg::   CG estimated residual at iteration 0: 5.47723
+DEAL:cg::   CG estimated residual at iteration 1: 3.05857
+DEAL:cg::   CG estimated residual at iteration 2: 2.21614
+DEAL:cg::   CG estimated residual at iteration 3: 1.69418
+DEAL:cg::   CG estimated residual at iteration 4: 1.30657
+DEAL:cg::   CG estimated residual at iteration 5: 0.998837
+DEAL:cg::   CG estimated residual at iteration 6: 0.750194
+DEAL:cg::   CG estimated residual at iteration 7: 0.550634
+DEAL:cg::   CG estimated residual at iteration 8: 0.393553
+DEAL:cg::   CG estimated residual at iteration 9: 0.273167
+DEAL:cg::   CG estimated residual at iteration 10: 0.183730
+DEAL:cg::   CG estimated residual at iteration 11: 0.119512
+DEAL:cg::   CG estimated residual at iteration 12: 0.0750441
+DEAL:cg::   CG estimated residual at iteration 13: 0.0454041
+DEAL:cg::   CG estimated residual at iteration 14: 0.0264187
+DEAL:cg::   CG estimated residual at iteration 15: 0.0147526
+DEAL:cg::   CG estimated residual at iteration 16: 0.00788820
+DEAL:cg::   CG estimated residual at iteration 17: 0.00402832
+DEAL:cg::   CG estimated residual at iteration 18: 0.00195897
+DEAL:cg::   CG estimated residual at iteration 19: 0.000904053
+DEAL:cg::   CG estimated residual at iteration 20: 0.000394320
+DEAL:cg::   CG estimated residual at iteration 21: 0.000161750
+DEAL:cg::Convergence step 22 value 6.20175e-05
+DEAL:cg::   CG estimated residual at iteration 22: 6.20175e-05

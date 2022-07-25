@@ -1,9 +1,0 @@
-Deprecated: We have introduced new versions of
-DoFTools::extract_locally_active_dofs(),
-DoFTools::extract_locally_active_level_dofs(),
-DoFTools::extract_locally_relevant_dofs(), and
-DoFTools::extract_locally_relevant_level_dofs().
-These versions return the index sets directly.
-The old versions have been early deprecated.
-<br>
-(Peter Munch, 2022/02/23)

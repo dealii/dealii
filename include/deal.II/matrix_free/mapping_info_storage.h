@@ -227,6 +227,14 @@ namespace internal
        * Contains two fields for access from both sides for interior faces,
        * but the default case (cell integrals or boundary integrals) only
        * fills the zeroth component and ignores the first one.
+       *
+       * If the cell is Cartesian/affine then the Jacobian is stored at index 1
+       * of the AlignedVector. For faces on hypercube elements, the derivatives
+       * are reorder s.t the derivative orthogonal to the face is stored last,
+       * i.e for dim = 3 and face_no = 0 or 1, the derivatives are ordered as
+       * [dy, dz, dx], face_no = 2 or 3: [dz, dx, dy], and face_no = 5 or 6:
+       * [dx, dy, dz]. If the Jacobian also is stored, the components are
+       * instead reordered in the same way.
        */
       std::array<AlignedVector<Tensor<2, spacedim, Number>>, 2> jacobians;
 
@@ -301,7 +309,8 @@ namespace internal
       compute_update_flags(
         const UpdateFlags                                     update_flags,
         const std::vector<dealii::hp::QCollection<spacedim>> &quads =
-          std::vector<dealii::hp::QCollection<spacedim>>());
+          std::vector<dealii::hp::QCollection<spacedim>>(),
+        const bool piola_transform = false);
 
       /**
        * Prints a detailed summary of memory consumption in the different

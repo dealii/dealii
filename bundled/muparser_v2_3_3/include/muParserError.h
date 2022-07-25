@@ -47,6 +47,8 @@
 	\brief This file defines the error class used by the parser.
 */
 
+namespace dealii
+{
 namespace mu
 {
 	/** \brief A class that handles the error messages.	*/
@@ -108,6 +110,7 @@ namespace mu
 		const ParserErrorMsg& m_ErrMsg;
 	};
 } // namespace mu
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)

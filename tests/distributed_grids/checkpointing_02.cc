@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 by the deal.II authors
+ * Copyright (C) 2021 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -22,7 +22,7 @@
 // Run with 2 MPI ranks to test a single process above 2GB. Both cases were
 // broken before this test was made. Warning, you probably need in the
 // order of 32GB of RAM to run this.
-const bool big = false;
+const bool run_big = false;
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
@@ -161,7 +161,7 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
 
       setup_system();
 
-      const unsigned int n_vectors = (big) ? 70 : 2;
+      const unsigned int n_vectors = (run_big) ? 70 : 2;
       {
         deallog << "checkpointing..." << std::endl;
         std::vector<VectorType> vectors(n_vectors);
@@ -240,7 +240,7 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
 int
 main(int argc, char *argv[])
 {
-  unsigned int n_cycles_global   = (big) ? 3 : 1;
+  unsigned int n_cycles_global   = (run_big) ? 3 : 1;
   unsigned int n_cycles_adaptive = 1;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

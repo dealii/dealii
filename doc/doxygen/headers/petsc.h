@@ -28,7 +28,5 @@
  * during configuration of deal.II. Refer to the README file for more details
  * about this.
  *
- * @author Wolfgang Bangerth, 2004
- *
  * @ingroup LAC
  */

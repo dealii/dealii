@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2021 by the deal.II authors
+ * Copyright (C) 2009 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -472,13 +472,14 @@ namespace Step37
   // appearing on locally owned cells (plus those referenced via hanging node
   // constraints) are necessary. However, in deal.II we often set all the
   // degrees of freedom on ghosted elements as ghosted vector entries, called
-  // the @ref GlossLocallyRelevantDof "locally relevant DoFs described in the
-  // glossary". In that case, the MPI-local index of a ghosted vector entry
-  // can in general be different in the two possible ghost sets, despite
-  // referring to the same global index. To avoid problems, FEEvaluation
-  // checks that the partitioning of the vector used for the matrix-vector
-  // product does indeed match with the partitioning of the indices in
-  // MatrixFree by a check called
+  // the
+  // @ref GlossLocallyRelevantDof "locally relevant DoFs described in the glossary".
+  // In that case, the MPI-local index of a ghosted vector entry can in
+  // general be different in the two possible ghost sets, despite referring
+  // to the same global index. To avoid problems, FEEvaluation checks that
+  // the partitioning of the vector used for the matrix-vector product does
+  // indeed match with the partitioning of the indices in MatrixFree by a
+  // check called
   // LinearAlgebra::distributed::Vector::partitioners_are_compatible. To
   // facilitate things, the MatrixFreeOperators::Base class includes a
   // mechanism to fit the ghost set to the correct layout. This happens in the
@@ -841,11 +842,10 @@ namespace Step37
     const unsigned int nlevels = triangulation.n_global_levels();
     mg_matrices.resize(0, nlevels - 1);
 
-    std::set<types::boundary_id> dirichlet_boundary;
-    dirichlet_boundary.insert(0);
+    const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
     mg_constrained_dofs.initialize(dof_handler);
     mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary);
+                                                       dirichlet_boundary_ids);
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {

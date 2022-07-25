@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,7 +130,7 @@ namespace CUDAWrappers
 
       /**
        * Evaluate the values and the gradients of the finite element function at
-       *  the quadrature points.
+       * the quadrature points.
        */
       __device__ void
       value_and_gradient_at_quad_pts(Number *const u, Number *grad_u[dim]);

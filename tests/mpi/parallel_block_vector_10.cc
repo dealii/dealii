@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,7 +105,7 @@ test(const unsigned int n_blocks = 5)
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.tasks_block_size      = 7;
-    mf_data->reinit(dof, constraints, quad, data);
+    mf_data->reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeOperators::MassOperator<dim,

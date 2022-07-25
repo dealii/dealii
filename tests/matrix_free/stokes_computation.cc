@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2021 by the deal.II authors
+// Copyright (C) 2012 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1070,7 +1070,8 @@ namespace StokesClass
 
     std::shared_ptr<MatrixFree<dim, double>> stokes_mf_storage(
       new MatrixFree<dim, double>());
-    stokes_mf_storage->reinit(stokes_dofs,
+    stokes_mf_storage->reinit(MappingQ1<dim>{},
+                              stokes_dofs,
                               stokes_constraints,
                               QGauss<1>(degree_u + 1),
                               additional_data_stokes);
@@ -1086,7 +1087,8 @@ namespace StokesClass
       (update_values | update_JxW_values | update_quadrature_points);
     std::shared_ptr<MatrixFree<dim, double>> mass_mf_storage(
       new MatrixFree<dim, double>());
-    mass_mf_storage->reinit(dof_handler_p,
+    mass_mf_storage->reinit(MappingQ1<dim>{},
+                            dof_handler_p,
                             constraints_p,
                             QGauss<1>(degree_u + 1),
                             additional_data_mass);
@@ -1102,8 +1104,7 @@ namespace StokesClass
     mg_matrices.resize(0, n_levels - 1);
 
     mg_constrained_dofs.clear();
-    std::set<types::boundary_id> dirichlet_boundary;
-    dirichlet_boundary.insert(0);
+    const std::set<types::boundary_id> dirichlet_boundary = {0};
     mg_constrained_dofs.initialize(dof_handler_u);
     mg_constrained_dofs.make_zero_boundary_constraints(dof_handler_u,
                                                        dirichlet_boundary);
@@ -1129,7 +1130,8 @@ namespace StokesClass
         additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, double>> mg_mf_storage_level(
           new MatrixFree<dim, double>());
-        mg_mf_storage_level->reinit(dof_handler_u,
+        mg_mf_storage_level->reinit(MappingQ1<dim>{},
+                                    dof_handler_u,
                                     level_constraints,
                                     QGauss<1>(degree_u + 1),
                                     additional_data);
@@ -1188,7 +1190,8 @@ namespace StokesClass
 
     std::shared_ptr<MatrixFree<dim, double>> matrix_free_homogeneous(
       new MatrixFree<dim, double>());
-    matrix_free_homogeneous->reinit(dofs,
+    matrix_free_homogeneous->reinit(MappingQ1<dim>{},
+                                    dofs,
                                     constraints_no_dirchlet,
                                     QGauss<1>(degree_u + 1),
                                     data);

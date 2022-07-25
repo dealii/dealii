@@ -19,13 +19,16 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/cgal/utilities.h>
 
 #ifdef DEAL_II_WITH_CGAL
+#  include <CGAL/Polygon_mesh_processing/stitch_borders.h>
 #  include <CGAL/Surface_mesh.h>
+#  include <deal.II/cgal/point_conversion.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -66,6 +69,26 @@ namespace CGALWrappers
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
     const dealii::Mapping<dim, spacedim> &                              mapping,
     CGAL::Surface_mesh<CGALPointType> &                                 mesh);
+
+  /**
+   * Convert a deal.II triangulation to a CGAL::Surface_mesh. The output depends
+   * on the intrinsic dimension of the input deal.II triangulation.
+   *
+   * In 2D, i.e. with a
+   * Triangulation<2> or a Triangulation<2,3>, the output is the
+   * CGAL::Surface_mesh describing the whole triangulation.
+   *
+   * In 3D, the boundary the of the deal.II Triangulation is converted to
+   * a CGAL::Surface_mesh by looping over all the boundary faces.
+   *
+   * @param[in] triangulation The input deal.II triangulation.
+   * @param[out] mesh The output CGAL::Surface_mesh.
+   */
+  template <typename CGALPointType, int dim, int spacedim>
+  void
+  dealii_tria_to_cgal_surface_mesh(
+    const dealii::Triangulation<dim, spacedim> &triangulation,
+    CGAL::Surface_mesh<CGALPointType> &         mesh);
 } // namespace CGALWrappers
 
 

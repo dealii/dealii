@@ -1,9 +1,0 @@
-Changed: The step-43 tutorial program used `Amg_preconditioner` and
-`Mp_preconditioner` to denote the preconditioners for the top left and
-bottom right block of a mixed-Laplace matrix. These variable names
-were taken from step-31/step-32 where they made sense, but in the
-current context, the names do not reflect what is in the corresponding
-matrix blocks. They have been renamed to `top_left_preconditioner` and
-`bottom_right_preconditioner`, respectively.
-<br>
-(Wolfgang Bangerth, 2022/01/07)

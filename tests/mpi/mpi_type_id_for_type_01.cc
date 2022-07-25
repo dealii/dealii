@@ -82,7 +82,7 @@ main(int argc, char *argv[])
   // aliases for some of the types above and consequently are
   // indistinguishable even though the tags are distinguishable. That
   // is: while the type system cannot distinguish between 'unsigned
-  // char' and 'uint8_t', the tags 'MPI_SIGNED_CHAR' and 'MPI_INT8_T'
+  // char' and 'std::uint8_t', the tags 'MPI_SIGNED_CHAR' and 'MPI_INT8_T'
   // are different. We cannot test, then, that the tag we get for
   // these types equals their tags...
 
@@ -90,10 +90,10 @@ main(int argc, char *argv[])
   // TEST(int16_t, MPI_INT16_T);
   // TEST(int32_t, MPI_INT32_T);
   // TEST(int64_t, MPI_INT64_T);
-  // TEST(uint8_t, MPI_UINT8_T);
-  // TEST(uint16_t, MPI_UINT16_T);
-  // TEST(uint32_t, MPI_UINT32_T);
-  // TEST(uint64_t, MPI_UINT64_T);
+  // TEST(std::uint8_t, MPI_UINT8_T);
+  // TEST(std::uint16_t, MPI_UINT16_T);
+  // TEST(std::uint32_t, MPI_UINT32_T);
+  // TEST(std::uint64_t, MPI_UINT64_T);
 
   // Now make sure that the following type is not supported:
   struct X

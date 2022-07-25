@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -459,8 +459,7 @@ namespace Step31
       stokes_constraints.clear();
       DoFTools::make_hanging_node_constraints(stokes_dof_handler,
                                               stokes_constraints);
-      std::set<types::boundary_id> no_normal_flux_boundaries;
-      no_normal_flux_boundaries.insert(0);
+      const std::set<types::boundary_id> no_normal_flux_boundaries = {0};
       VectorTools::compute_no_normal_flux_constraints(stokes_dof_handler,
                                                       0,
                                                       no_normal_flux_boundaries,

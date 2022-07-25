@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,7 +83,12 @@ public:
 
 /**
  * The midpoint rule for numerical quadrature. This one-point formula is exact
- * for linear polynomials.
+ * for linear integrands.
+ *
+ * @note This class only works for cells that are tensor product (hypercube) cells,
+ *   that is, are either ReferenceCells::Line, ReferenceCells::Quadrilateral,
+ *   or ReferenceCells::Hexahedron. For other cell shapes, this class is not
+ *   appropriate. Use ReferenceCell::get_midpoint_quadrature() instead.
  */
 template <int dim>
 class QMidpoint : public Quadrature<dim>
@@ -120,22 +125,6 @@ class QTrapezoid : public Quadrature<dim>
 public:
   QTrapezoid();
 };
-
-
-/**
- * An alias for QTrapezoid available for historic reasons. This name is
- * deprecated.
- *
- * The class was originally named QTrapez, a poorly named choice since the
- * proper name of the quadrature formula
- * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
- * misnomer resulted from the fact that its original authors' poor English
- * language skills led them to translate the name incorrectly from the German
- * "Trapezregel".
- */
-template <int dim>
-using QTrapez DEAL_II_DEPRECATED = QTrapezoid<dim>;
-
 
 
 /**
@@ -809,8 +798,6 @@ public:
  * For 1D, the quadrature rule degenerates to a
  * `dealii::QGauss<1>(n_points_1D)`.
  *
- * @ingroup simplex
- *
  * @note The quadrature rules implemented by this class come from a variety of
  * sources, but all of them have positive quadrature weights.
  *
@@ -818,6 +805,8 @@ public:
  * respect to the vertices - i.e., the locations of the mapped quadrature points
  * depends on the numbering of the cell vertices. If you need rules that are
  * independent of the vertex numbering then use QWitherdenVincentSimplex.
+ *
+ * @relates simplex
  */
 template <int dim>
 class QGaussSimplex : public QSimplex<dim>
@@ -858,7 +847,7 @@ public:
  * @note Some rules (2D 2 odd and 3D 2 even) do not yet exist and instead a
  * higher-order rule is used in their place.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim>
 class QWitherdenVincentSimplex : public QSimplex<dim>

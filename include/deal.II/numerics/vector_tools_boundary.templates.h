@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -160,60 +160,65 @@ namespace VectorTools
           dof_values_system.reserve(
             dof.get_fe_collection().max_dofs_per_face());
 
-          // TODO: get support for each face -> PR #10764
-          const unsigned int face_no = 0;
-
           // before we start with the loop over all cells create an hp::FEValues
           // object that holds the interpolation points of all finite elements
           // that may ever be in use
           const dealii::hp::FECollection<dim, spacedim> &finite_elements =
             dof.get_fe_collection();
-          dealii::hp::QCollection<dim - 1> q_collection;
+          std::vector<dealii::hp::QCollection<dim - 1>> q_collection(
+            finite_elements.size());
           for (unsigned int f = 0; f < finite_elements.size(); ++f)
-            {
-              const FiniteElement<dim, spacedim> &fe = finite_elements[f];
+            for (unsigned int face_no = 0;
+                 face_no < (finite_elements[f].n_unique_faces() == 1 ?
+                              1 :
+                              finite_elements[f].reference_cell().n_faces());
+                 ++face_no)
+              {
+                const FiniteElement<dim, spacedim> &fe = finite_elements[f];
 
-              // generate a quadrature rule on the face from the unit support
-              // points. this will be used to obtain the quadrature points on
-              // the real cell's face
-              //
-              // to do this, we check whether the FE has support points on the
-              // face at all:
-              if (fe.has_face_support_points(face_no))
-                q_collection.push_back(Quadrature<dim - 1>(
-                  fe.get_unit_face_support_points(face_no)));
-              else
-                {
-                  // if not, then we should try a more clever way. the idea is
-                  // that a finite element may not offer support points for all
-                  // its shape functions, but maybe only some. if it offers
-                  // support points for the components we are interested in in
-                  // this function, then that's fine. if not, the function we
-                  // call in the finite element will raise an exception. the
-                  // support points for the other shape functions are left
-                  // uninitialized (well, initialized by the default
-                  // constructor), since we don't need them anyway.
-                  //
-                  // As a detour, we must make sure we only query
-                  // face_system_to_component_index if the index corresponds to
-                  // a primitive shape function. since we know that all the
-                  // components we are interested in are primitive (by the above
-                  // check), we can safely put such a check in front
-                  std::vector<Point<dim - 1>> unit_support_points(
-                    fe.n_dofs_per_face(face_no));
+                // generate a quadrature rule on the face from the unit support
+                // points. this will be used to obtain the quadrature points on
+                // the real cell's face
+                //
+                // to do this, we check whether the FE has support points on the
+                // face at all:
+                if (fe.has_face_support_points(face_no))
+                  q_collection[f].push_back(Quadrature<dim - 1>(
+                    fe.get_unit_face_support_points(face_no)));
+                else
+                  {
+                    // if not, then we should try a more clever way. the idea is
+                    // that a finite element may not offer support points for
+                    // all its shape functions, but maybe only some. if it
+                    // offers support points for the components we are
+                    // interested in in this function, then that's fine. if not,
+                    // the function we call in the finite element will raise an
+                    // exception. the support points for the other shape
+                    // functions are left uninitialized (well, initialized by
+                    // the default constructor), since we don't need them
+                    // anyway.
+                    //
+                    // As a detour, we must make sure we only query
+                    // face_system_to_component_index if the index corresponds
+                    // to a primitive shape function. since we know that all the
+                    // components we are interested in are primitive (by the
+                    // above check), we can safely put such a check in front
+                    std::vector<Point<dim - 1>> unit_support_points(
+                      fe.n_dofs_per_face(face_no));
 
-                  for (unsigned int i = 0; i < fe.n_dofs_per_face(face_no); ++i)
-                    if (fe.is_primitive(fe.face_to_cell_index(i, face_no)))
-                      if (component_mask[fe.face_system_to_component_index(
-                                             i, face_no)
-                                           .first] == true)
-                        unit_support_points[i] =
-                          fe.unit_face_support_point(i, face_no);
+                    for (unsigned int i = 0; i < fe.n_dofs_per_face(face_no);
+                         ++i)
+                      if (fe.is_primitive(fe.face_to_cell_index(i, face_no)))
+                        if (component_mask[fe.face_system_to_component_index(
+                                               i, face_no)
+                                             .first] == true)
+                          unit_support_points[i] =
+                            fe.unit_face_support_point(i, face_no);
 
-                  q_collection.push_back(
-                    Quadrature<dim - 1>(unit_support_points));
-                }
-            }
+                    q_collection[f].push_back(
+                      Quadrature<dim - 1>(unit_support_points));
+                  }
+              }
           // now that we have a q_collection object with all the right
           // quadrature points, create an hp::FEFaceValues object that we can
           // use to evaluate the boundary values at
@@ -278,21 +283,15 @@ namespace VectorTools
                       // dofs on this face
                       face_dofs.resize(fe.n_dofs_per_face(face_no));
                       face->get_dof_indices(face_dofs, cell->active_fe_index());
-                      const std::vector<Point<spacedim>> &dof_locations =
+                      std::vector<Point<spacedim>> dof_locations =
                         fe_values.get_quadrature_points();
+                      dof_locations.resize(fe.n_dofs_per_face(face_no));
 
                       if (fe_is_system)
                         {
-                          // resize array. avoid construction of a memory
-                          // allocating temporary if possible
-                          if (dof_values_system.size() <
-                              fe.n_dofs_per_face(face_no))
-                            dof_values_system.resize(
-                              fe.n_dofs_per_face(face_no),
-                              Vector<number>(fe.n_components()));
-                          else
-                            dof_values_system.resize(
-                              fe.n_dofs_per_face(face_no));
+                          dof_values_system.resize(fe.n_dofs_per_face(face_no),
+                                                   Vector<number>(
+                                                     fe.n_components()));
 
                           function_map.find(boundary_component)
                             ->second->vector_value_list(dof_locations,
@@ -1969,8 +1968,11 @@ namespace VectorTools
                         {
                           edge_quadrature_collection.push_back(
                             QProjector<dim>::project_to_face(
+                              ReferenceCells::get_hypercube<dim>(),
                               QProjector<dim - 1>::project_to_face(
-                                reference_edge_quadrature, line),
+                                ReferenceCells::get_hypercube<dim - 1>(),
+                                reference_edge_quadrature,
+                                line),
                               face));
                         }
                     }
@@ -2151,16 +2153,16 @@ namespace VectorTools
   {
     // This function computes the projection of the boundary function on the
     // boundary in 2d.
-    template <typename cell_iterator>
+    template <typename cell_iterator, typename number, typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &                       cell,
       const unsigned int                          face,
       const FEFaceValues<2> &                     fe_values,
       const unsigned int                          first_vector_component,
-      const Function<2> &                         boundary_function,
+      const Function<2, number2> &                boundary_function,
       const std::vector<DerivativeForm<1, 2, 2>> &jacobians,
-      AffineConstraints<double> &                 constraints)
+      AffineConstraints<number> &                 constraints)
     {
       // Compute the integral over the product of the normal components of
       // the boundary function times the normal components of the shape
@@ -2173,9 +2175,9 @@ namespace VectorTools
                                                                       1,
                                                                       0,
                                                                       0};
-      std::vector<Vector<double>> values(fe_values.n_quadrature_points,
-                                         Vector<double>(2));
-      Vector<double>              dof_values(fe.n_dofs_per_face(face));
+      std::vector<Vector<number2>> values(fe_values.n_quadrature_points,
+                                          Vector<number2>(2));
+      Vector<number2>              dof_values(fe.n_dofs_per_face(face));
 
       // Get the values of the boundary function at the quadrature points.
       {
@@ -2188,7 +2190,7 @@ namespace VectorTools
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
            ++q_point)
         {
-          double tmp = 0.0;
+          number2 tmp = 0.0;
 
           for (unsigned int d = 0; d < 2; ++d)
             tmp += normals[q_point][d] * values[q_point](d);
@@ -2237,32 +2239,35 @@ namespace VectorTools
     }
 
     // dummy implementation of above function for all other dimensions
-    template <int dim, typename cell_iterator>
+    template <int dim,
+              typename cell_iterator,
+              typename number,
+              typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &,
       const unsigned int,
       const FEFaceValues<dim> &,
       const unsigned int,
-      const Function<dim> &,
+      const Function<dim, number2> &,
       const std::vector<DerivativeForm<1, dim, dim>> &,
-      AffineConstraints<double> &)
+      AffineConstraints<number> &)
     {
       Assert(false, ExcNotImplemented());
     }
 
     // This function computes the projection of the boundary function on the
     // boundary in 3d.
-    template <typename cell_iterator>
+    template <typename cell_iterator, typename number, typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &                       cell,
       const unsigned int                          face,
       const FEFaceValues<3> &                     fe_values,
       const unsigned int                          first_vector_component,
-      const Function<3> &                         boundary_function,
+      const Function<3, number2> &                boundary_function,
       const std::vector<DerivativeForm<1, 3, 3>> &jacobians,
-      std::vector<double> &                       dof_values,
+      std::vector<number> &                       dof_values,
       std::vector<types::global_dof_index> &      projected_dofs)
     {
       // Compute the intergral over the product of the normal components of
@@ -2274,9 +2279,9 @@ namespace VectorTools
       const unsigned int
         face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2] = {
           {1, 2}, {1, 2}, {2, 0}, {2, 0}, {0, 1}, {0, 1}};
-      std::vector<Vector<double>> values(fe_values.n_quadrature_points,
-                                         Vector<double>(3));
-      Vector<double>              dof_values_local(fe.n_dofs_per_face(face));
+      std::vector<Vector<number2>> values(fe_values.n_quadrature_points,
+                                          Vector<number2>(3));
+      Vector<number2>              dof_values_local(fe.n_dofs_per_face(face));
 
       {
         const std::vector<Point<3>> &quadrature_points =
@@ -2288,7 +2293,7 @@ namespace VectorTools
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
            ++q_point)
         {
-          double tmp = 0.0;
+          number2 tmp = 0.0;
 
           for (unsigned int d = 0; d < 3; ++d)
             tmp += normals[q_point][d] * values[q_point](d);
@@ -2344,16 +2349,19 @@ namespace VectorTools
     // dummy implementation of above
     // function for all other
     // dimensions
-    template <int dim, typename cell_iterator>
+    template <int dim,
+              typename cell_iterator,
+              typename number,
+              typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &,
       const unsigned int,
       const FEFaceValues<dim> &,
       const unsigned int,
-      const Function<dim> &,
+      const Function<dim, number2> &,
       const std::vector<DerivativeForm<1, dim, dim>> &,
-      std::vector<double> &,
+      std::vector<number> &,
       std::vector<types::global_dof_index> &)
     {
       Assert(false, ExcNotImplemented());
@@ -2361,15 +2369,15 @@ namespace VectorTools
   } // namespace internals
 
 
-  template <int dim>
+  template <int dim, typename number, typename number2>
   void
   project_boundary_values_div_conforming(
-    const DoFHandler<dim> &    dof_handler,
-    const unsigned int         first_vector_component,
-    const Function<dim> &      boundary_function,
-    const types::boundary_id   boundary_component,
-    AffineConstraints<double> &constraints,
-    const Mapping<dim> &       mapping)
+    const DoFHandler<dim> &       dof_handler,
+    const unsigned int            first_vector_component,
+    const Function<dim, number2> &boundary_function,
+    const types::boundary_id      boundary_component,
+    AffineConstraints<number> &   constraints,
+    const Mapping<dim> &          mapping)
   {
     const unsigned int spacedim = dim;
     // Interpolate the normal components
@@ -2396,8 +2404,8 @@ namespace VectorTools
     hp::QCollection<dim>             quadrature_collection;
 
     for (unsigned int face : GeometryInfo<dim>::face_indices())
-      quadrature_collection.push_back(
-        QProjector<dim>::project_to_face(face_quadrature, face));
+      quadrature_collection.push_back(QProjector<dim>::project_to_face(
+        ReferenceCells::get_hypercube<dim>(), face_quadrature, face));
 
     hp::FEValues<dim> fe_values(mapping_collection,
                                 fe_collection,
@@ -2432,7 +2440,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
-                              nullptr,
+                                nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &fe) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
@@ -2487,7 +2497,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
-                              nullptr,
+                                nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &fe) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
@@ -2531,14 +2543,14 @@ namespace VectorTools
   }
 
 
-  template <int dim>
+  template <int dim, typename number, typename number2>
   void
   project_boundary_values_div_conforming(
     const DoFHandler<dim> &                dof_handler,
     const unsigned int                     first_vector_component,
-    const Function<dim> &                  boundary_function,
+    const Function<dim, number2> &         boundary_function,
     const types::boundary_id               boundary_component,
-    AffineConstraints<double> &            constraints,
+    AffineConstraints<number> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection)
   {
     const unsigned int           spacedim = dim;
@@ -2554,8 +2566,8 @@ namespace VectorTools
         face_quadrature_collection.push_back(quadrature);
 
         for (unsigned int face : GeometryInfo<dim>::face_indices())
-          quadrature_collection.push_back(
-            QProjector<dim>::project_to_face(quadrature, face));
+          quadrature_collection.push_back(QProjector<dim>::project_to_face(
+            ReferenceCells::get_hypercube<dim>(), quadrature, face));
       }
 
     hp::FEFaceValues<dim> fe_face_values(mapping_collection,
@@ -2590,7 +2602,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr,
+                              &cell->get_fe()) != nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &cell->get_fe()) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
@@ -2620,7 +2634,7 @@ namespace VectorTools
         case 3:
           {
             const unsigned int                   n_dofs = dof_handler.n_dofs();
-            std::vector<double>                  dof_values(n_dofs);
+            std::vector<number2>                 dof_values(n_dofs);
             std::vector<types::global_dof_index> projected_dofs(n_dofs);
 
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
@@ -2642,7 +2656,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr,
+                              &cell->get_fe()) != nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &cell->get_fe()) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }

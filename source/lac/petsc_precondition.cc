@@ -892,7 +892,6 @@ namespace PETScWrappers
     PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCBDDC));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    // TODO: Add BDDC options, in particular the additional primal nodes
     std::stringstream ssStream;
 
     if (additional_data.use_vertices)
@@ -911,7 +910,8 @@ namespace PETScWrappers
       set_option_value("-pc_bddc_symmetric", "true");
     else
       set_option_value("-pc_bddc_symmetric", "false");
-    if (additional_data.coords_cdim)
+    if (additional_data.coords_cdim && additional_data.coords_n &&
+        additional_data.coords_data)
       {
         set_option_value("-pc_bddc_corner_selection", "true");
         ierr = PCSetCoordinates(pc,

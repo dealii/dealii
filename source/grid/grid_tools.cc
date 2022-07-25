@@ -58,6 +58,7 @@
 
 #include <deal.II/physics/transformations.h>
 
+
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -478,14 +479,14 @@ namespace GridTools
       void
       insert_face_data(const FaceIteratorType &face)
       {
-        CellData<dim - 1> face_cell_data;
+        CellData<dim - 1> face_cell_data(face->n_vertices());
         for (unsigned int vertex_n = 0; vertex_n < face->n_vertices();
              ++vertex_n)
           face_cell_data.vertices[vertex_n] = face->vertex_index(vertex_n);
         face_cell_data.boundary_id = face->boundary_id();
         face_cell_data.manifold_id = face->manifold_id();
 
-        face_data.insert(face_cell_data);
+        face_data.insert(std::move(face_cell_data));
       }
 
       /**
@@ -571,23 +572,32 @@ namespace GridTools
         if (dim > 1)
           {
             for (const unsigned int face_n : cell->face_indices())
-              face_data.insert_face_data(cell->face(face_n));
+              // We don't need to insert anything if we have default values
+              {
+                const auto face = cell->face(face_n);
+                if (face->boundary_id() != numbers::internal_face_boundary_id ||
+                    face->manifold_id() != numbers::flat_manifold_id)
+                  face_data.insert_face_data(face);
+              }
           }
         // Save line data
         if (dim == 3)
           {
             for (unsigned int line_n = 0; line_n < cell->n_lines(); ++line_n)
               {
-                const auto  line = cell->line(line_n);
-                CellData<1> line_cell_data;
-                for (unsigned int vertex_n = 0; vertex_n < line->n_vertices();
-                     ++vertex_n)
-                  line_cell_data.vertices[vertex_n] =
-                    line->vertex_index(vertex_n);
-                line_cell_data.boundary_id = line->boundary_id();
-                line_cell_data.manifold_id = line->manifold_id();
-
-                line_data.insert(line_cell_data);
+                const auto line = cell->line(line_n);
+                // We don't need to insert anything if we have default values
+                if (line->boundary_id() != numbers::internal_face_boundary_id ||
+                    line->manifold_id() != numbers::flat_manifold_id)
+                  {
+                    CellData<1> line_cell_data(line->n_vertices());
+                    for (unsigned int vertex_n : line->vertex_indices())
+                      line_cell_data.vertices[vertex_n] =
+                        line->vertex_index(vertex_n);
+                    line_cell_data.boundary_id = line->boundary_id();
+                    line_cell_data.manifold_id = line->manifold_id();
+                    line_data.insert(std::move(line_cell_data));
+                  }
               }
           }
       }
@@ -735,8 +745,6 @@ namespace GridTools
                              const double                  tol)
   {
     AssertIndexRange(2, vertices.size());
-    // create a vector of vertex indices. initialize it to the identity, later
-    // on change that if necessary.
     std::vector<unsigned int> new_vertex_numbers(vertices.size());
     std::iota(new_vertex_numbers.begin(), new_vertex_numbers.end(), 0);
 
@@ -756,14 +764,12 @@ namespace GridTools
     // number of points that need to be compared against each-other in a
     // single set for typical geometries.
     const BoundingBox<spacedim> bbox(vertices);
-    const auto &                min = bbox.get_boundary_points().first;
-    const auto &                max = bbox.get_boundary_points().second;
 
     unsigned int longest_coordinate_direction = 0;
-    double       longest_coordinate_length    = max[0] - min[0];
+    double       longest_coordinate_length    = bbox.side_length(0);
     for (unsigned int d = 1; d < spacedim; ++d)
       {
-        const double coordinate_length = max[d] - min[d];
+        const double coordinate_length = bbox.side_length(d);
         if (longest_coordinate_length < coordinate_length)
           {
             longest_coordinate_length    = coordinate_length;
@@ -864,16 +870,8 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
-    // This function only works for quads and hexes,
-    // and triangles. From the examples we tested,
-    // tetrahedron meshes loaded from Gmsh don't have
-    // negative measures, so we skip them for now.
-
-    // Since we use std::abs() in GridTools::cell_measure() to
-    // compute the measures of tetrahdra, the measures
-    // are always positive. But if the orientation is wrong,
-    // we may get negative determinants of the Jacobians in
-    // MappingFE, which will triger the assert there.
+    // This function is presently only implemented for hypercube and simplex
+    // volumetric (codimension 0) elements.
 
     if (dim == 1)
       return 0;
@@ -912,15 +910,11 @@ namespace GridTools
                        .is_simplex())
               {
                 ++n_negative_cells;
-                if (dim == 2)
-                  {
-                    // Triangular mesh, swap any two vertices
-                    std::swap(cell.vertices[1], cell.vertices[2]);
-                  }
-                else
-                  {
-                    AssertThrow(false, ExcNotImplemented());
-                  }
+                // By basic rules for computing determinants we can just swap
+                // two vertices to fix a negative volume. Arbitrarily pick the
+                // last two.
+                std::swap(cell.vertices[n_vertices - 2],
+                          cell.vertices[n_vertices - 1]);
               }
             else
               {
@@ -5241,6 +5235,7 @@ namespace GridTools
                 ExcMessage("The input Triangulation cannot "
                            "have hanging nodes."));
 
+    AssertThrow(tria.all_reference_cells_are_hyper_cube(), ExcNotImplemented());
 
     bool has_cells_with_more_than_dim_faces_on_boundary = true;
     bool has_cells_with_dim_faces_on_boundary           = false;
@@ -5463,7 +5458,7 @@ namespace GridTools
       {
         if (cells_to_remove[cell->active_cell_index()] == false)
           {
-            CellData<dim> c;
+            CellData<dim> c(cell->n_vertices());
             for (const unsigned int v : cell->vertex_indices())
               c.vertices[v] = cell->vertex_index(v);
             c.manifold_id = cell->manifold_id();
@@ -5502,7 +5497,7 @@ namespace GridTools
             }
           if (dim == 3)
             {
-              CellData<2> quad;
+              CellData<2> quad(face->n_vertices());
               for (const unsigned int v : face->vertex_indices())
                 quad.vertices[v] = face->vertex_index(v);
               quad.boundary_id = face->boundary_id();
@@ -5979,6 +5974,9 @@ namespace GridTools
           "The marked_vertices vector has to be either empty or its size has "
           "to equal the number of vertices of the triangulation."));
 
+      using RequestType = std::vector<std::pair<unsigned int, Point<spacedim>>>;
+      using AnswerType  = std::vector<unsigned int>;
+
       // In the case that a marked_vertices vector has been given and none
       // of its entries is true, we know that this process does not own
       // any of the incoming points (and it will not send any data) so
@@ -5991,36 +5989,31 @@ namespace GridTools
       const auto create_request = [&](const unsigned int other_rank) {
         const auto other_rank_index = translate(other_rank);
 
-        std::vector<std::pair<unsigned int, Point<spacedim>>> temp;
-        temp.reserve(potential_owners_ptrs[other_rank_index + 1] -
-                     potential_owners_ptrs[other_rank_index]);
+        RequestType request;
+        request.reserve(potential_owners_ptrs[other_rank_index + 1] -
+                        potential_owners_ptrs[other_rank_index]);
 
         for (unsigned int i = potential_owners_ptrs[other_rank_index];
              i < potential_owners_ptrs[other_rank_index + 1];
              ++i)
-          temp.emplace_back(potential_owners_indices[i],
-                            points[potential_owners_indices[i]]);
+          request.emplace_back(potential_owners_indices[i],
+                               points[potential_owners_indices[i]]);
 
-        return Utilities::pack(temp, false);
+        return request;
       };
 
       const auto answer_request =
-        [&](const unsigned int &     other_rank,
-            const std::vector<char> &request) -> std::vector<char> {
-        const auto recv_buffer_unpacked = Utilities::unpack<
-          std::vector<std::pair<unsigned int, Point<spacedim>>>>(request,
-                                                                 false);
-
-        std::vector<unsigned int> request_buffer_temp(
-          recv_buffer_unpacked.size(), 0);
+        [&](const unsigned int &other_rank,
+            const RequestType & request) -> AnswerType {
+        AnswerType answer(request.size(), 0);
 
         if (has_relevant_vertices)
           {
             cell_hint = cache.get_triangulation().begin_active();
 
-            for (unsigned int i = 0; i < recv_buffer_unpacked.size(); ++i)
+            for (unsigned int i = 0; i < request.size(); ++i)
               {
-                const auto &index_and_point = recv_buffer_unpacked[i];
+                const auto &index_and_point = request[i];
 
                 const auto cells_and_reference_positions =
                   find_all_locally_owned_active_cells_around_point(
@@ -6045,27 +6038,24 @@ namespace GridTools
                       numbers::invalid_unsigned_int);
                   }
 
-                request_buffer_temp[i] = cells_and_reference_positions.size();
+                answer[i] = cells_and_reference_positions.size();
               }
           }
 
         if (perform_handshake)
-          return Utilities::pack(request_buffer_temp, false);
+          return answer;
         else
           return {};
       };
 
-      const auto process_answer = [&](const unsigned int       other_rank,
-                                      const std::vector<char> &answer) {
+      const auto process_answer = [&](const unsigned int other_rank,
+                                      const AnswerType & answer) {
         if (perform_handshake)
           {
-            const auto recv_buffer_unpacked =
-              Utilities::unpack<std::vector<unsigned int>>(answer, false);
-
             const auto other_rank_index = translate(other_rank);
 
-            for (unsigned int i = 0; i < recv_buffer_unpacked.size(); ++i)
-              for (unsigned int j = 0; j < recv_buffer_unpacked[i]; ++j)
+            for (unsigned int i = 0; i < answer.size(); ++i)
+              for (unsigned int j = 0; j < answer[i]; ++j)
                 recv_components.emplace_back(
                   other_rank,
                   potential_owners_indices
@@ -6074,7 +6064,7 @@ namespace GridTools
           }
       };
 
-      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>().run(
+      Utilities::MPI::ConsensusAlgorithms::selector<RequestType, AnswerType>(
         potential_owners_ranks,
         create_request,
         answer_request,

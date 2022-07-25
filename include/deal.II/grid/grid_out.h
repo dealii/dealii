@@ -655,19 +655,19 @@ namespace GridOutFlags
   struct Svg
   {
     /**
-     *  Height of the plot in SVG units, computed from width if zero. Defaults
-     *  to 1000.
+     * Height of the plot in SVG units, computed from width if zero. Defaults
+     * to 1000.
      */
     unsigned int height;
 
     /**
-     *  The width of the plot. Computed automatically from height if zero
-     *  (default).
+     * The width of the plot. Computed automatically from height if zero
+     * (default).
      */
     unsigned int width;
 
     /**
-     *  Thickness of the lines between cells.
+     * Thickness of the lines between cells.
      */
     unsigned int line_thickness;
     /**
@@ -676,7 +676,7 @@ namespace GridOutFlags
     unsigned int boundary_line_thickness;
 
     /**
-     *  Margin around the plotted area.
+     * Margin around the plotted area.
      */
     bool margin;
 

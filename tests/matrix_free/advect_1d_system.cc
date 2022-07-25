@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -294,7 +294,7 @@ test(const unsigned int n_refine)
     (update_gradients | update_JxW_values);
 
   MatrixFree<dim, double> mf_data;
-  mf_data.reinit(dof, constraints, quad, data);
+  mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
 
   mf_data.initialize_dof_vector(in);
   mf_data.initialize_dof_vector(out);

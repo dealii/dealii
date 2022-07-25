@@ -257,7 +257,7 @@ namespace Utilities
        *   we use an arbitrary type of size 1 byte. The type is cast to the
        *   requested type in the relevant functions.
        */
-      mutable std::vector<uint8_t> buffers;
+      mutable std::vector<std::uint8_t> buffers;
 
       /**
        * MPI requests for sending and receiving.

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -946,7 +946,7 @@ namespace FEValuesViews
     Vector(const Vector<dim, spacedim> &) = delete;
 
     /**
-     * Move constuctor.
+     * Move constructor.
      */
     // NOLINTNEXTLINE OSX does not compile with noexcept
     Vector(Vector<dim, spacedim> &&) = default;
