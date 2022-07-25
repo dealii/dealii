@@ -250,7 +250,7 @@ namespace Utilities
          *   the default constructor of this class along with the run()
          *   function that takes an argument.
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         Interface(Process<RequestType, AnswerType> &process,
                   const MPI_Comm &                  comm);
 
@@ -269,7 +269,7 @@ namespace Utilities
          *   been provided to the non-default constructor. Use the run()
          *   functions taking arguments instead.
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         std::vector<unsigned int>
         run();
 
@@ -325,7 +325,7 @@ namespace Utilities
          * and the run() function without argument. It is a `nullptr`
          * otherwise
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         Process<RequestType, AnswerType> *process;
 
         /**
@@ -334,7 +334,7 @@ namespace Utilities
          * This member variable is only used in the deprecated constructor
          * and the run() function without argument.
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         MPI_Comm comm;
       };
 
@@ -373,7 +373,7 @@ namespace Utilities
          *   the default constructor of this class along with the run()
          *   function that takes an argument.
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         NBX(Process<RequestType, AnswerType> &process, const MPI_Comm &comm);
 
         /**
@@ -617,7 +617,7 @@ namespace Utilities
          *   the default constructor of this class along with the run()
          *   function that takes an argument.
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         PEX(Process<RequestType, AnswerType> &process, const MPI_Comm &comm);
 
         /**
@@ -830,7 +830,7 @@ namespace Utilities
          *   the default constructor of this class along with the run()
          *   function that takes an argument.
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         Serial(Process<RequestType, AnswerType> &process, const MPI_Comm &comm);
 
         // Import the declarations from the base class.
@@ -962,7 +962,7 @@ namespace Utilities
          *   the default constructor of this class along with the run()
          *   function that takes an argument.
          */
-        DEAL_II_DEPRECATED
+        DEAL_II_DEPRECATED_EARLY
         Selector(Process<RequestType, AnswerType> &process,
                  const MPI_Comm &                  comm);
 
@@ -1083,7 +1083,7 @@ namespace Utilities
        * own implementation but can register lambda functions directly.
        */
       template <typename RequestType, typename AnswerType>
-      class DEAL_II_DEPRECATED AnonymousProcess
+      class DEAL_II_DEPRECATED_EARLY AnonymousProcess
         : public Process<RequestType, AnswerType>
       {
       public:
