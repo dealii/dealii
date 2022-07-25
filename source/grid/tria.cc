@@ -13987,8 +13987,8 @@ Triangulation<dim, spacedim>::has_hanging_nodes() const
     }
   else
     {
-      for (const auto cell : active_cell_iterators())
-        for (const auto i : cell->face_indices())
+      for (const auto &cell : active_cell_iterators())
+        for (const auto &i : cell->face_indices())
           if (cell->face(i)->has_children())
             return true;
     }
