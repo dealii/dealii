@@ -108,14 +108,12 @@ public:
    * Number>. In particular, if order == 1 and the derivative is the Jacobian of
    * $\mathbf F(\mathbf x)$, then Tensor[i] = $\nabla F_i(\mathbf x)$.
    */
-  template <typename Number2>
-  operator Tensor<order + 1, dim, Number2>() const;
+  operator Tensor<order + 1, dim, Number>() const;
 
   /**
    * Converts a DerivativeForm<1, dim, 1, Number> to Tensor<1, dim, Number>.
    */
-  template <typename Number2>
-  operator Tensor<1, dim, Number2>() const;
+  operator Tensor<1, dim, Number>() const;
 
   /**
    * Return the transpose of a rectangular DerivativeForm,
@@ -275,9 +273,8 @@ DerivativeForm<order, dim, spacedim, Number>::operator[](
 
 
 template <int order, int dim, int spacedim, typename Number>
-template <typename Number2>
 inline DerivativeForm<order, dim, spacedim, Number>::
-operator Tensor<1, dim, Number2>() const
+operator Tensor<1, dim, Number>() const
 {
   Assert((1 == spacedim) && (order == 1),
          ExcMessage("Only allowed for spacedim==1."));
@@ -288,13 +285,12 @@ operator Tensor<1, dim, Number2>() const
 
 
 template <int order, int dim, int spacedim, typename Number>
-template <typename Number2>
 inline DerivativeForm<order, dim, spacedim, Number>::
-operator Tensor<order + 1, dim, Number2>() const
+operator Tensor<order + 1, dim, Number>() const
 {
   Assert((dim == spacedim), ExcMessage("Only allowed when dim==spacedim."));
 
-  Tensor<order + 1, dim, Number2> t;
+  Tensor<order + 1, dim, Number> t;
 
   if (dim == spacedim)
     for (unsigned int j = 0; j < dim; ++j)
@@ -462,6 +458,31 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
 {
   DerivativeForm<1, spacedim, dim, typename ProductType<Number1, Number2>::type>
     dest;
+  for (unsigned int i = 0; i < dim; ++i)
+    dest[i] = apply_transformation(grad_F, D_X[i]);
+
+  return dest;
+}
+
+
+
+/**
+ * Similar to the previous apply_transformation(), specialized for the case `dim
+ * == spacedim` where we can return a rank-2 tensor instead of the more general
+ * `DerivativeForm`.
+ * Each row of the result corresponds to one of the rows of @p D_X transformed
+ * by @p grad_F, equivalent to $\mathrm{D\_X} \, \mathrm{grad\_F}^T$ in matrix
+ * notation.
+ *
+ * @relatesalso DerivativeForm
+ */
+// rank=2
+template <int dim, typename Number1, typename Number2>
+inline Tensor<2, dim, typename ProductType<Number1, Number2>::type>
+apply_transformation(const DerivativeForm<1, dim, dim, Number1> &grad_F,
+                     const Tensor<2, dim, Number2> &             D_X)
+{
+  Tensor<2, dim, typename ProductType<Number1, Number2>::type> dest;
   for (unsigned int i = 0; i < dim; ++i)
     dest[i] = apply_transformation(grad_F, D_X[i]);
 

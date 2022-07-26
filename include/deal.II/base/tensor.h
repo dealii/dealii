@@ -1069,7 +1069,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
   Tensor<0, dim, Number>::operator=(const Tensor<0, dim, OtherNumber> &p)
 {
-  value = internal::NumberType<Number>::value(p);
+  value = internal::NumberType<Number>::value(p.value);
   return *this;
 }
 
@@ -1361,7 +1361,7 @@ template <typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const
 {
-  return Tensor<1, dim, Tensor<rank_ - 1, dim, Number>>(values);
+  return Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>(values);
 }
 
 
