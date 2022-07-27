@@ -337,18 +337,6 @@ namespace PETScWrappers
                           static_cast<PetscInt>(ghost_indices.n_elements()));
       }
 #  endif
-
-
-      // in PETSc versions up to 3.5, VecCreateGhost zeroed out the locally
-      // owned vector elements but forgot about the ghost elements. we need to
-      // do this ourselves
-      //
-      // see https://code.google.com/p/dealii/issues/detail?id=233
-#  if DEAL_II_PETSC_VERSION_LT(3, 6, 0)
-      PETScWrappers::MPI::Vector zero;
-      zero.reinit(communicator, this->size(), locally_owned_size);
-      *this = zero;
-#  endif
     }
 
 
