@@ -132,6 +132,8 @@ namespace PETScWrappers
                 preset_nonzero_locations);
     }
 
+
+
     template <typename SparsityPatternType>
     void
     SparseMatrix::reinit(const IndexSet &           local_rows,

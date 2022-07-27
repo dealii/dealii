@@ -1,0 +1,5 @@
+Removed: Deprecated constructors for PETScWrappers::MPI::SparseMatrix,
+a deprecated overload for PETScWrappers::MatrixBase::add and a deprecated
+constructor for PETScWrappers::MPI::Vector have been removed.
+<br>
+(Daniel Arndt, 2020/04/21)
