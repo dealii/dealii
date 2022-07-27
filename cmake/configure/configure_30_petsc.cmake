@@ -30,16 +30,15 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     SET(${var} TRUE)
 
     #
-    # We support petsc from version 3.3.x onwards
+    # We support petsc from version 3.7.x onwards
     #
-    IF(PETSC_VERSION_MAJOR LESS 3 OR
-        ((PETSC_VERSION_MAJOR EQUAL 3) AND (PETSC_VERSION_MINOR LESS 3)))
+    IF(${PETSC_VERSION} VERSION_LESS 3.7.0)
       MESSAGE(STATUS "Could not find a sufficiently modern PETSc installation: "
-        "Version >=3.3.0 required!"
+        "Version >=3.7.0 required!"
         )
       SET(PETSC_ADDITIONAL_ERROR_STRING
         "Could not find a sufficiently modern PETSc installation: "
-        "Version >=3.3.0 required!\n"
+        "Version >=3.7.0 required!\n"
         )
       SET(${var} FALSE)
     ENDIF()
@@ -121,7 +120,7 @@ ENDMACRO()
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
   SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
-  SET(DEAL_II_EXPAND_PETSC_SPARSE_MATRICES 
+  SET(DEAL_II_EXPAND_PETSC_SPARSE_MATRICES
       "PETScWrappers::SparseMatrix"
       "PETScWrappers::MPI::SparseMatrix"
       "PETScWrappers::MPI::BlockSparseMatrix")
@@ -141,7 +140,7 @@ MACRO(FEATURE_PETSC_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find the petsc library!\n"
     ${PETSC_ADDITIONAL_ERROR_STRING}
-    "\nPlease ensure that the petsc library version 3.3.0 or newer is "
+    "\nPlease ensure that the petsc library version 3.7.0 or newer is "
     "installed on your computer and is configured with the same mpi options "
     "as deal.II\n"
     "If the library is not at a default location, either provide some hints\n"
