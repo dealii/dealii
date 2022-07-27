@@ -891,8 +891,8 @@ namespace numbers
   value_is_less_than(const adouble &value_1, const Number &value_2)
   {
     // Use the specialized definition for two ADOL-C taped types
-    return value_is_less_than(value_1,
-                              ::internal::NumberType<adouble>::value(value_2));
+    return value_is_less_than(
+      value_1, dealii::internal::NumberType<adouble>::value(value_2));
   }
 
 
