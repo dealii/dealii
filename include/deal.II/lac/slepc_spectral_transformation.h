@@ -203,9 +203,13 @@ namespace SLEPcWrappers
    * Spectrum Folding. This transformation type has been removed in SLEPc
    * 3.5.0 and thus cannot be used in the newer versions.
    *
+   * @deprecated Since deal.II requires PETSc 3.7 or newer this class no longer
+   * does anything.
+   *
    * @ingroup SLEPcWrappers
    */
-  class TransformationSpectrumFolding : public TransformationBase
+  class DEAL_II_DEPRECATED TransformationSpectrumFolding
+    : public TransformationBase
   {
   public:
     /**
