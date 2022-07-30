@@ -788,7 +788,7 @@ namespace internal
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // this function should only be called for dim<3 where there are
-          // no quad dof identies. for dim==3, the specialization below should
+          // no quad dof identities. for dim==3, the specialization below should
           // take care of it
           Assert(dim < 3, ExcInternalError());
 
@@ -1518,7 +1518,7 @@ namespace internal
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // this function should only be called for dim<3 where there are
-          // no quad dof identies. for dim>=3, the specialization below should
+          // no quad dof identities. for dim>=3, the specialization below should
           // take care of it
           Assert(dim < 3, ExcInternalError());
         }

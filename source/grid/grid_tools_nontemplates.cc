@@ -96,7 +96,7 @@ namespace GridTools
 
       # C(measure, optimized);
 
-      additional optimizaton: divide by 2 only one time
+      additional optimization: divide by 2 only one time
     */
 
     const double x[4] = {all_vertices[vertex_indices[0]](0),

@@ -76,7 +76,7 @@ namespace NonMatching
     reinit(const typename Triangulation<dim>::cell_iterator &cell);
 
     /**
-     * Reinitialize quantitites (shape function values, gradients, etc) for the
+     * Reinitialize quantities (shape function values, gradients, etc) for the
      * given cell of type "iterator into a DoFHandler object", and the finite
      * element associated with this object.
      */

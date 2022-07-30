@@ -503,7 +503,7 @@ public:
      * Such an example is "local time stepping", where cells of different
      * caterogries progress with different time-step sizes and, as a
      * consequence, can only processed together with cells with the same
-     * cateogry.
+     * category.
      *
      * This array is accessed by the number given by cell->active_cell_index()
      * when working on the active cells (with

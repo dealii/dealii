@@ -142,7 +142,7 @@ namespace OpenCASCADE
    * mesh it automatically. We remark that the automatic mesh generation in
    * OpenCASCADE takes care only of the geometrical resemblance between the
    * shape and the mesh, to control the shape and regularity of the triangles
-   * you should use other meshing softwares. The two arguments `deflection` and
+   * you should use other meshing software. The two arguments `deflection` and
    * `angular_deflection` select the accuracy of the created triangulation with
    * respect to the original topological shape. The argument
    * `sew_different_faces` gives the possibility to use a Sewer from OpenCASCADE

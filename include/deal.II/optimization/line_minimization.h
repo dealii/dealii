@@ -251,7 +251,7 @@ namespace LineMinimization
    *
    *   // Next we can write a function to determine if taking the full Newton
    *   // step is a good idea or not (i.e. if it offers good convergence
-   *   // characterisics). This function calls the one we defined above,
+   *   // characteristics). This function calls the one we defined above,
    *   // and actually only performs the line search if an early exit
    *   // criterion is not met.
    *   auto perform_linesearch = [&]()

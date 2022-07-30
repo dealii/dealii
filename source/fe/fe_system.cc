@@ -1535,7 +1535,7 @@ void
 FESystem<dim, spacedim>::build_interface_constraints()
 {
   // check whether all base elements implement their interface constraint
-  // matrices. if this is not the case, then leave the interface costraints of
+  // matrices. if this is not the case, then leave the interface constraints of
   // this composed element empty as well; however, the rest of the element is
   // usable
   for (unsigned int base = 0; base < this->n_base_elements(); ++base)

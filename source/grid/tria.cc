@@ -13288,7 +13288,7 @@ Triangulation<dim, spacedim>::end(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
-  // triangulation. In that case, just retrn the end iterator.
+  // triangulation. In that case, just return the end iterator.
   //
   // We need to use levels.size() instead of n_levels() because the
   // latter function uses the cache, but we need to be able to call

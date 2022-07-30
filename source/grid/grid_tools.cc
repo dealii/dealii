@@ -6443,7 +6443,7 @@ namespace GridTools
     std::map<unsigned int, std::vector<unsigned int>> &coinciding_vertex_groups,
     std::map<unsigned int, unsigned int> &vertex_to_coinciding_vertex_group)
   {
-    // 1) determine for each vertex a vertex it concides with and
+    // 1) determine for each vertex a vertex it coincides with and
     //    put it into a map
     {
       static const int lookup_table_2d[2][2] =
