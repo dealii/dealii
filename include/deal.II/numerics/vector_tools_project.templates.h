@@ -179,19 +179,16 @@ namespace VectorTools
       (void)project_to_boundary_first;
       (void)q_boundary;
 
-      AssertDimension(dof.get_fe_collection().size(), 1);
-
-      Assert(dof.get_fe(0).n_components() == function.n_components,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                  function.n_components));
-      Assert(dof.get_fe(0).n_components() == components,
-             ExcDimensionMismatch(components, dof.get_fe(0).n_components()));
+      for (const auto &fe : dof.get_fe_collection())
+        {
+          AssertDimension(fe.n_components(), function.n_components);
+          AssertDimension(fe.n_components(), components);
+        }
 
       Quadrature<dim> quadrature_mf;
 
-      if (dof.get_fe(0).reference_cell() ==
-          ReferenceCells::get_hypercube<dim>())
-        quadrature_mf = QGauss<dim>(dof.get_fe().degree + 2);
+      if (dof.get_triangulation().all_reference_cells_are_hyper_cube())
+        quadrature_mf = QGauss<dim>(dof.get_fe_collection().max_degree() + 2);
       else
         // TODO: since we have currently only implemented a handful quadrature
         // rules for non-hypercube objects, we do not construct a new
@@ -793,18 +790,22 @@ namespace VectorTools
       const Quadrature<dim - 1> &q_boundary,
       const bool                 project_to_boundary_first)
     {
-      // If we can, use the matrix-free implementation
-      bool use_matrix_free =
-        MatrixFree<dim, typename VectorType::value_type>::is_supported(
-          dof.get_fe()) &&
-        dof.get_fe().n_base_elements() == 1;
+      // If we can, use the matrix-free implementation.
+      // We have explicit instantiations only if the number of components is not
+      // too high.
+      bool use_matrix_free = std::all_of(
+        dof.get_fe_collection().begin(),
+        dof.get_fe_collection().end(),
+        [](const FiniteElement<dim, spacedim> &fe) {
+          return (
+            MatrixFree<dim, typename VectorType::value_type>::is_supported(
+              fe) &&
+            (fe.n_base_elements() == 1) && (fe.n_components() <= 4));
+        });
 
-      // enforce_zero_boundary and project_to_boundary_first
-      // are not yet supported.
-      // We have explicit instantiations only if
-      // the number of components is not too high.
-      if (enforce_zero_boundary || project_to_boundary_first ||
-          dof.get_fe(0).n_components() > 4)
+      // enforce_zero_boundary and project_to_boundary_first are not yet
+      // supported.
+      if (enforce_zero_boundary || project_to_boundary_first)
         use_matrix_free = false;
 
       if (use_matrix_free)
