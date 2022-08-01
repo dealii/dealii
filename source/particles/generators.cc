@@ -361,7 +361,7 @@ namespace Particles
           std::llround(static_cast<double>(n_particles_to_create) *
                        local_start_weight / global_weight_integral);
 
-        // Calcualate number of local particles
+        // Calculate number of local particles
         const types::particle_index end_particle_id =
           std::llround(static_cast<double>(n_particles_to_create) *
                        ((local_start_weight + local_weight_integral) /

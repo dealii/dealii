@@ -200,7 +200,7 @@
  *
  * With the aid of the diagram below (it and some of the listed details courtesy of this
  * <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Wikipedia article</a>),
- * let us think about the represention of the calculation of the function
+ * let us think about the representation of the calculation of the function
  * $f (\mathbf{x}) = \sin (x_{1}) + x_{1} x_{2}$ and its derivatives:
  *
  * <div class="twocolumn" style="width: 80%">

@@ -592,7 +592,7 @@ namespace LinearAlgebra
       Assert(dynamic_cast<const Vector<Number> *>(&W) != nullptr,
              ExcVectorTypeNotCompatible());
 
-      // Downcast V and W. If it fails, throw an exceptiion.
+      // Downcast V and W. If it fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
       Assert(down_V.size() == this->size(),
              ExcMessage("Vector V has the wrong size."));

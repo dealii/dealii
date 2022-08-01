@@ -368,7 +368,7 @@ namespace CGALWrappers
           // This is a degenerate Triangulation_2, made of edges
           for (const auto &e : cgal_triangulation.finite_edges())
             {
-              // An edge is idendified by a face and a vertex index in the
+              // An edge is identified by a face and a vertex index in the
               // face
               const auto &  f = e.first;
               const auto &  i = e.second;
@@ -408,7 +408,7 @@ namespace CGALWrappers
           // This is a degenerate Triangulation_3, made of triangles
           for (const auto &facet : cgal_triangulation.finite_facets())
             {
-              // A facet is idenfied by a cell and the opposite vertex index
+              // A facet is identified by a cell and the opposite vertex index
               // in the face
               const auto &  c = facet.first;
               const auto &  i = facet.second;
@@ -430,7 +430,7 @@ namespace CGALWrappers
           // This is a degenerate Triangulation_3, made of edges
           for (const auto &edge : cgal_triangulation.finite_edges())
             {
-              // An edge is idenfied by a cell and its two vertices
+              // An edge is identified by a cell and its two vertices
               const auto &[c, i, j] = edge;
               CellData<dim> cell(ReferenceCells::Line.n_vertices());
               cell.vertices[0] = vertex_map[c->vertex(i)];

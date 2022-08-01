@@ -134,7 +134,7 @@ enum MappingKind
   /**
    * The mappings for 2-forms and third order tensors.
    *
-   * These are mappings typpically applied to hessians transformed to the
+   * These are mappings typically applied to hessians transformed to the
    * reference cell.
    *
    * Mapping of the hessian of a covariant vector field (see
