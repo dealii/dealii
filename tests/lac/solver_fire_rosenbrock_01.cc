@@ -24,7 +24,7 @@
 
 
 
-// Test to verify correctness of SolverFIRE::sovle()
+// Test to verify correctness of SolverFIRE::solve()
 // The objective function is the extended Rosenbrock function.
 // The Rosenbrock function is a non-convex function used as a test problem
 // for optimization algorithms introduced by Howard H. Rosenbrock.

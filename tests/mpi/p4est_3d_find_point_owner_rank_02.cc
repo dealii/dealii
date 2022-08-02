@@ -31,7 +31,7 @@ main(int argc, char *argv[])
 
 
   /*
-   * We craete a distrubuted mesh with three cells (tree roots), e.g., a
+   * We create a distributed mesh with three cells (tree roots), e.g., a
    * hyper_L. We want to find the mpi rank of a set of fixed points. On all
    * processes we must find the same owner ranks.
    */

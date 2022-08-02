@@ -21,7 +21,7 @@
 // experiencing was the mesh I was testing on was too coarse for
 // larger number of processors. This test case shows that as
 // well. For 4 processors the code produces output without error
-// for both the 12 repitions and the 2 repititions. For 6 and 12
+// for both the 12 repitions and the 2 repetitions. For 6 and 12
 // processors only the 12 repetition case produces the proper
 // output. Fortunately it does show as long as the mesh is
 // adequately refined DataOutFaces produces the output for each

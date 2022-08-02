@@ -56,7 +56,7 @@ test()
         GridTools::get_cells_at_coarsest_common_level<Triangulation<dim>>(
           patch_cells);
 
-      // in uniform refinemenet(without any hanging nodes), we expect the size
+      // in uniform refinement(without any hanging nodes), we expect the size
       // of vector of patch_cells for each cell be equal to the vector of
       // coarse_cells around that cell
       Assert(patch_cells.size() == coarse_cells.size(), ExcInternalError());

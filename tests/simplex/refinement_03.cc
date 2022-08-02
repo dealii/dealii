@@ -53,7 +53,7 @@ test()
       unrefined_f = f;
 
   // verify whether unrefined cell and neighboring children have matching
-  // vertices on their correpsonding subface
+  // vertices on their corresponding subface
   for (unsigned int sf = 0; sf < GeometryInfo<dim>::max_children_per_face; ++sf)
     {
       // unrefined vertex on subface

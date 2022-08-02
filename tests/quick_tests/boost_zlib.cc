@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Adoptation of base/utilities_pack_unpack_01.cc as a quick test.
+// Adaptation of base/utilities_pack_unpack_01.cc as a quick test.
 
 // test Utilities::pack/unpack on some types.
 

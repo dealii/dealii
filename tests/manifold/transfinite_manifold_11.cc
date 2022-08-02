@@ -138,7 +138,7 @@ main()
    *   -0.1271 -0.0177875 -> 0.253794 -0.0323121
    *   -0.1271 -0.015564 -> 0.251301 -0.0309146
    *
-   * The following is a simplified version that fails with a sligthly
+   * The following is a simplified version that fails with a slightly
    * different error message.
    */
 

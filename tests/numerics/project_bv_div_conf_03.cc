@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 // Test VectorTools::project_boundary_values_div_conforming convergence rates
-// for the case that the DoFHandler constains more than one
+// for the case that the DoFHandler contains more than one
 // FE_RaviartThomas element.
 
 #include <deal.II/base/function.h>

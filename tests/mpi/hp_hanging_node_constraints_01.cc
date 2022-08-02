@@ -66,7 +66,7 @@ test()
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  // setup finite elemets
+  // setup finite elements
   hp::FECollection<dim> fes;
   fes.push_back(FE_Q<dim>(1));
 

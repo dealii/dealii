@@ -129,7 +129,7 @@ test()
   const unsigned int n_refinements_1 = 2;
   const unsigned int n_refinements_2 = 3;
 
-  // backgroud mesh
+  // background mesh
   parallel::distributed::Triangulation<dim> tria_1(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria_1, -1.0, +1.0);
   tria_1.refine_global(n_refinements_1);

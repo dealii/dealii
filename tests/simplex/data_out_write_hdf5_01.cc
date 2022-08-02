@@ -114,7 +114,7 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
 
   deallog << "Files " << output_basename + ".h5"
           << " and " << output_basename + ".xdmf"
-          << " created succesfully!" << std::endl;
+          << " created successfully!" << std::endl;
 }
 
 int

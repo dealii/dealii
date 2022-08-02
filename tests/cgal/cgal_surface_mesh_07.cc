@@ -15,8 +15,8 @@
 
 // Create a Surface_mesh from each cell of an hyper ball, to check for
 // orientation issues that may arise in Hexaedrons with non-standard face
-// orientations. Make sure this works also when tranforming the grid to a
-// simplex one.
+// orientations. Make sure this works also when transforming the grid to
+// a simplex one.
 
 #include <deal.II/base/config.h>
 

@@ -523,7 +523,7 @@ write_test(HDF5::Group &root_group)
                                           0, // fourth point
                                           0,
                                           0,
-                                          3}; // fith point
+                                          3}; // fifth point
       std::vector<Number>  data        = {32, 33, 35, 36, 38};
 
       dataset.write_selection(data, coordinates);
@@ -720,7 +720,7 @@ write_test(HDF5::Group &root_group)
                                           0, // fourth point
                                           0,
                                           0,
-                                          3}; // fith point
+                                          3}; // fifth point
       Vector<Number>       data(5);
       data[0] = 32;
       data[1] = 33;
@@ -1037,7 +1037,7 @@ read_test(HDF5::Group root_group)
                                           1, // fourth point
                                           0,
                                           3,
-                                          2}; // fith point
+                                          2}; // fifth point
 
       auto data = dataset.read_selection<std::vector<Number>>(coordinates);
 
@@ -1073,7 +1073,7 @@ read_test(HDF5::Group root_group)
                                           1, // fourth point
                                           0,
                                           3,
-                                          2}; // fith point
+                                          2}; // fifth point
 
       auto data = dataset.read_selection<Vector<Number>>(coordinates);
 

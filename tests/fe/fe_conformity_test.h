@@ -206,7 +206,7 @@ namespace FEConforimityTest
   {
     triangulation.clear();
 
-    // alias for better readabilty
+    // alias for better readability
     const unsigned int n_rotate_central_square = config_switch;
 
     GridGenerator::non_standard_orientation_mesh(triangulation,

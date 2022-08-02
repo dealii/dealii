@@ -92,7 +92,7 @@ test()
 
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
-      0, // starting compenent
+      0, // starting component
       BoundaryValues<dim>(),
       1, // face ID1
       constraints,
@@ -126,14 +126,14 @@ test()
 
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
-      0, // starting compenent
+      0, // starting component
       BoundaryValues<dim>(),
       1, // face ID1
       constraints,
       StaticMappingQ1<dim>::mapping);
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
-      dim, // starting compenent
+      dim, // starting component
       BoundaryValues<dim>(),
       1, // face ID1
       constraints,
