@@ -24,8 +24,8 @@
  */
 
 /*
- * MWE in Python for standard QR with 3 linearly independent columns. We will add
-the fourth one:
+ * MWE in Python for standard QR with 3 linearly independent columns. We will
+add the fourth one:
 
 import numpy as np
 from scipy import linalg
