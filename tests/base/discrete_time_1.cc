@@ -79,7 +79,7 @@ test_adjust_time_step_size()
   print_time(time);
   time.advance_time(); // Here we reach the end time.
   print_time(time);
-  // If we call time.advance_time() one more time, it fails an assersion
+  // If we call time.advance_time() one more time, it fails an assertion
   deallog << "OK" << std::endl;
 }
 

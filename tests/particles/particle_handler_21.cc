@@ -118,7 +118,7 @@ void
 ParticleTracking<dim>::generate_particles()
 {
   // We create an hyper ball triangulation which we globally refine. The bug
-  // that this test tries to reproduce only occured in curevd geometry.
+  // that this test tries to reproduce only occurred in curved geometry.
   Point<dim> center_of_triangulation;
   center_of_triangulation[0] = 0.;
   center_of_triangulation[1] = 0.;

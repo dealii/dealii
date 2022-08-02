@@ -18,7 +18,7 @@
 
 // check DynamicSparsityPattern::compute_Tmmult_pattern(). Test if
 // multiplication with each combination of SparsityPatternTypes is possible.
-// This is an adoptation of the dynamic_sparsity_pattern_compute_mmult_1.cc
+// This is an adaptation of the dynamic_sparsity_pattern_compute_mmult_1.cc
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>

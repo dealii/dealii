@@ -592,7 +592,7 @@ ParameterCollection::print()
 
 /*
  * EstimateEnrichmentFunction is used to estimate enrichment function by
- * solveing a 1D poisson problem with right hand side and boundary
+ * solving a 1D poisson problem with right hand side and boundary
  * expression provided as a string of single variable 'x', to be
  * interpreted as distance from @par center.
  *
@@ -1818,7 +1818,7 @@ LaplaceProblem<dim>::run()
       if (prm.debug_level >= 2 && this_mpi_process == 0)
         output_results(cycle);
 
-      // Donot refine if loop is at the end
+      // Do not refine if loop is at the end
       if (cycle != prm.cycles)
         refine_grid();
 

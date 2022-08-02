@@ -17,7 +17,7 @@
 
 // check that the AffineConstraints<double> with hanging nodes and
 // no-normal-flux constraints on an adaptively refined hyper_cube are the same
-// independet of the number of CPUs
+// independent of the number of CPUs
 
 #include <deal.II/base/tensor.h>
 

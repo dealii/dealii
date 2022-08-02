@@ -140,7 +140,7 @@ main()
     PRINTME("(A-B).Tvmult_add", x);
 
 
-    // Test vector reinitalization:
+    // Test vector reinitialization:
 
     op_x = op_b * op_b * op_b;
     op_x.vmult(x, u);

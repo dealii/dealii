@@ -48,7 +48,7 @@ main(int argc, char *argv[])
 
   // 0. Define some independent variables
   // Here we have two definitions of Q: One it is treated as a completely
-  // indepdent variable, and the other where its dependence on C is
+  // independent variable, and the other where its dependence on C is
   // explicitly defined
   SE::RCP<const SE::Symbol> C  = SE::symbol("C");  // Primary variable
   SE::RCP<const SE::Symbol> Qi = SE::symbol("Qi"); // Some internal variable

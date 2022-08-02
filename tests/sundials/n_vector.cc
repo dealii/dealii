@@ -69,7 +69,7 @@ namespace
   }
 
   /**
-   * Create a vector for testing and intialize all entries to @p value.
+   * Create a vector for testing and initialize all entries to @p value.
    */
   template <typename VectorType>
   VectorType

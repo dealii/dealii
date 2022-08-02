@@ -203,7 +203,7 @@ test_serialization(const int n_runs, TimerOutput &timer)
       // Optimizer
       SD::BatchOptimizer<NumberType> optimizer;
 
-      // Deserialze
+      // Deserialize
       std::cout << "Deserializing..." << std::endl;
       std::istringstream            iss(oss.str());
       boost::archive::text_iarchive ia(iss, boost::archive::no_header);

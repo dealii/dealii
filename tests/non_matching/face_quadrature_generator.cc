@@ -81,7 +81,7 @@ test_plane_cuts_through_center()
   for (int d = 0; d < dim; ++d)
     center(d) = .5;
 
-  // For each coordinate direction set up a plane throught the center.
+  // For each coordinate direction set up a plane through the center.
   for (int plane_direction = 0; plane_direction < dim; ++plane_direction)
     {
       const Tensor<1, dim> normal = Point<dim>::unit_vector(plane_direction);

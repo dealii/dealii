@@ -99,7 +99,7 @@ test()
     {
       deallog << "Case 3:" << std::endl;
       // Now do a big step so that next one in bracketing satisfies both Wolf:
-      // at the termination point the derivative is alos negative!
+      // at the termination point the derivative is also negative!
       // Also that point satisfies both Wolfe conditions as well, but
       // we are interested in another segment, which contains local
       // minimizer

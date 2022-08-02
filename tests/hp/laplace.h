@@ -188,7 +188,7 @@ protected:
 
 
 
-// implementatoin
+// implementation
 template <int dim>
 Laplace<dim>::Laplace(const Function<dim> &force_function,
                       const Function<dim> &exact_solution,
