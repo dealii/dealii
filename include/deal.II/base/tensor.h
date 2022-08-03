@@ -1727,7 +1727,9 @@ template <int rank_, int dim, typename Number>
 inline typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_, dim, Number>::norm() const
 {
-  return std::sqrt(norm_square());
+  // Make things work with AD types
+  using std::sqrt;
+  return sqrt(norm_square());
 }
 
 
@@ -3009,7 +3011,7 @@ l1_norm(const Tensor<2, dim, Number> &t)
     {
       Number sum = internal::NumberType<Number>::value(0.0);
       for (unsigned int i = 0; i < dim; ++i)
-        sum += std::fabs(t[i][j]);
+        sum += numbers::NumberTraits<Number>::abs(t[i][j]);
 
       if (sum > max)
         max = sum;
@@ -3035,7 +3037,7 @@ linfty_norm(const Tensor<2, dim, Number> &t)
     {
       Number sum = internal::NumberType<Number>::value(0.0);
       for (unsigned int j = 0; j < dim; ++j)
-        sum += std::fabs(t[i][j]);
+        sum += numbers::NumberTraits<Number>::abs(t[i][j]);
 
       if (sum > max)
         max = sum;

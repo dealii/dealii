@@ -137,15 +137,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  include <adolc/adouble.h> // Taped double
 #endif
-// Ideally we'd like to #include <deal.II/differentiation/ad/sacado_math.h>
-// but header indirectly references numbers.h. We therefore simply
-// import the whole Sacado header at this point to get the math
-// functions imported into the standard namespace.
-#ifdef DEAL_II_TRILINOS_WITH_SACADO
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <Sacado.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-#endif
 
 namespace std
 {
@@ -608,7 +599,9 @@ namespace numbers
   typename NumberTraits<number>::real_type
   NumberTraits<number>::abs(const number &x)
   {
-    return std::abs(x);
+    // Make things work with AD types
+    using std::abs;
+    return abs(x);
   }
 
 
@@ -626,7 +619,9 @@ namespace numbers
   typename NumberTraits<std::complex<number>>::real_type
   NumberTraits<std::complex<number>>::abs(const std::complex<number> &x)
   {
-    return std::abs(x);
+    // Make things work with AD types
+    using std::abs;
+    return abs(x);
   }
 
 
