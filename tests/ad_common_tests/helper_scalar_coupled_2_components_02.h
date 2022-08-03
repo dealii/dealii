@@ -42,19 +42,19 @@ struct FunctionsTestVectorScalarCoupled
   static NumberType
   psi(const Tensor<1, dim, NumberType> &v, const NumberType &s)
   {
-    return (v * v) * std::pow(s, 3);
+    return (v * v) * pow(s, 3);
   };
 
   static Tensor<1, dim, NumberType>
   dpsi_dv(const Tensor<1, dim, NumberType> &v, const NumberType &s)
   {
-    return 2.0 * v * std::pow(s, 3);
+    return 2.0 * v * pow(s, 3);
   };
 
   static NumberType
   dpsi_ds(const Tensor<1, dim, NumberType> &v, const NumberType &s)
   {
-    return 3.0 * (v * v) * std::pow(s, 2);
+    return 3.0 * (v * v) * pow(s, 2);
   };
 
   static Tensor<2, dim, NumberType>
@@ -62,13 +62,13 @@ struct FunctionsTestVectorScalarCoupled
   {
     static const Tensor<2, dim, NumberType> I(
       unit_symmetric_tensor<dim, NumberType>());
-    return 2.0 * I * std::pow(s, 3);
+    return 2.0 * I * pow(s, 3);
   };
 
   static Tensor<1, dim, NumberType>
   d2psi_ds_dv(const Tensor<1, dim, NumberType> &v, const NumberType &s)
   {
-    return 6.0 * v * std::pow(s, 2);
+    return 6.0 * v * pow(s, 2);
   };
 
   static Tensor<1, dim, NumberType>
@@ -80,7 +80,7 @@ struct FunctionsTestVectorScalarCoupled
   static NumberType
   d2psi_ds_ds(const Tensor<1, dim, NumberType> &v, const NumberType &s)
   {
-    return 6.0 * (v * v) * std::pow(s, 1);
+    return 6.0 * (v * v) * pow(s, 1);
   };
 };
 

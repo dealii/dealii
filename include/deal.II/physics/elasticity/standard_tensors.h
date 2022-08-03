@@ -321,6 +321,8 @@ DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
 Physics::Elasticity::StandardTensors<dim>::Dev_P(
   const Tensor<2, dim, Number> &F)
 {
+  // Make things work with AD types
+  using std::pow;
   const Number det_F = determinant(F);
   Assert(numbers::value_is_greater_than(det_F, 0.0),
          ExcMessage("Deformation gradient has a negative determinant."));
@@ -333,8 +335,7 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P(
     outer_product(C, C_inv);                   // Dev_P = C_x_C_inv
   Dev_P /= -dim;                               // Dev_P = -[1/dim]C_x_C_inv
   Dev_P += SymmetricTensor<4, dim, Number>(S); // Dev_P = S - [1/dim]C_x_C_inv
-  Dev_P *=
-    std::pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_x_C_inv]
+  Dev_P *= pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_x_C_inv]
 
   return Dev_P;
 }
@@ -347,6 +348,8 @@ DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
 Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
   const Tensor<2, dim, Number> &F)
 {
+  // Make things work with AD types
+  using std::pow;
   const Number det_F = determinant(F);
   Assert(numbers::value_is_greater_than(det_F, 0.0),
          ExcMessage("Deformation gradient has a negative determinant."));
@@ -360,7 +363,7 @@ Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
   Dev_P_T /= -dim;                               // Dev_P = -[1/dim]C_inv_x_C
   Dev_P_T += SymmetricTensor<4, dim, Number>(S); // Dev_P = S - [1/dim]C_inv_x_C
   Dev_P_T *=
-    std::pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_inv_x_C]
+    pow(det_F, -2.0 / dim); // Dev_P = J^{-2/dim} [S - [1/dim]C_inv_x_C]
 
   return Dev_P_T;
 }

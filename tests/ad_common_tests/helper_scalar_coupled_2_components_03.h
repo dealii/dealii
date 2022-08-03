@@ -42,19 +42,19 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   psi(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 3);
+    return double_contract<0, 0, 1, 1>(t, t) * pow(s, 3);
   };
 
   static Tensor<2, dim, NumberType>
   dpsi_dt(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 2.0 * t * std::pow(s, 3);
+    return 2.0 * t * pow(s, 3);
   };
 
   static NumberType
   dpsi_ds(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 3.0 * double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 2);
+    return 3.0 * double_contract<0, 0, 1, 1>(t, t) * pow(s, 2);
   };
 
   static Tensor<4, dim, NumberType>
@@ -70,13 +70,13 @@ struct FunctionsTestTensorScalarCoupled
           for (unsigned int l = 0; l < dim; ++l)
             II[i][j][k][l] = I[i][k] * I[j][l];
 
-    return 2.0 * II * std::pow(s, 3);
+    return 2.0 * II * pow(s, 3);
   };
 
   static Tensor<2, dim, NumberType>
   d2psi_ds_dt(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 6.0 * t * std::pow(s, 2);
+    return 6.0 * t * pow(s, 2);
   };
 
   static Tensor<2, dim, NumberType>
@@ -88,7 +88,7 @@ struct FunctionsTestTensorScalarCoupled
   static NumberType
   d2psi_ds_ds(const Tensor<2, dim, NumberType> &t, const NumberType &s)
   {
-    return 6.0 * double_contract<0, 0, 1, 1>(t, t) * std::pow(s, 1);
+    return 6.0 * double_contract<0, 0, 1, 1>(t, t) * pow(s, 1);
   };
 };
 

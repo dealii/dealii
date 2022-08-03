@@ -466,7 +466,7 @@ namespace Step44
         symmetrize(transpose(F) * F);
       const NumberType                    det_F = determinant(F);
       SymmetricTensor<2, dim, NumberType> C_bar(C);
-      C_bar *= std::pow(det_F, -2.0 / dim);
+      C_bar *= pow(det_F, -2.0 / dim);
 
       NumberType psi_CpJ = material->get_Psi_iso(C_bar);
       psi_CpJ += material->get_Psi_vol(J_tilde);
@@ -1035,9 +1035,8 @@ namespace Step44
             const double det_F_qp = determinant(
               StandardTensors<dim>::I + solution_grads_u_total[q_point]);
             const double J_tilde_qp = solution_values_J_total[q_point];
-            const double the_error_qp_squared =
-              std::pow((det_F_qp - J_tilde_qp), 2);
-            const double JxW = fe_values_ref.JxW(q_point);
+            const double the_error_qp_squared = pow((det_F_qp - J_tilde_qp), 2);
+            const double JxW                  = fe_values_ref.JxW(q_point);
             dil_L2_error += the_error_qp_squared * JxW;
             vol_current += det_F_qp * JxW;
           }

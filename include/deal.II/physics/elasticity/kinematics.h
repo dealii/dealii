@@ -288,8 +288,9 @@ template <int dim, typename Number>
 inline Tensor<2, dim, Number>
 Physics::Elasticity::Kinematics::F_iso(const Tensor<2, dim, Number> &F)
 {
-  return internal::NumberType<Number>::value(
-           std::pow(determinant(F), -1.0 / dim)) *
+  // Make things work with AD types
+  using std::pow;
+  return internal::NumberType<Number>::value(pow(determinant(F), -1.0 / dim)) *
          F;
 }
 
@@ -299,8 +300,9 @@ template <int dim, typename Number>
 inline SymmetricTensor<2, dim, Number>
 Physics::Elasticity::Kinematics::F_vol(const Tensor<2, dim, Number> &F)
 {
-  return internal::NumberType<Number>::value(
-           std::pow(determinant(F), 1.0 / dim)) *
+  // Make things work with AD types
+  using std::pow;
+  return internal::NumberType<Number>::value(pow(determinant(F), 1.0 / dim)) *
          static_cast<SymmetricTensor<2, dim, Number>>(
            unit_symmetric_tensor<dim>());
 }
