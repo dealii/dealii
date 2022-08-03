@@ -1,0 +1,4 @@
+New: Function hp::Refinement::copy_future_fe_indices() that copies
+future FE indices from one DoFHandler to another.
+<br>
+(Marc Fehling, 2022/08/02)

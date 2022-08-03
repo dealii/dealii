@@ -720,6 +720,23 @@ namespace hp
       const unsigned int                       contains_fe_index = 0);
 
     /**
+     * Transfer all future FE indices from the DoFHandler object
+     * @p dof_handler_source to the object @p dof_handler_destination.
+     *
+     * Both @p dof_handler_source and @p dof_handler_destination must have been
+     * assigned to the same Triangulation object.
+     *
+     * Returns the number of future FE indices that have been copied on the
+     * locally owned subdomain. In a MPI universe, use Utilities::MPI::sum() if
+     * you want to compute the number of indices that changed on the global
+     * mesh.
+     */
+    template <int dim, int spacedim>
+    unsigned int
+    copy_future_fe_indices(const DoFHandler<dim, spacedim> &dof_handler_source,
+                           DoFHandler<dim, spacedim> &dof_handler_destination);
+
+    /**
      * @}
      */
   } // namespace Refinement

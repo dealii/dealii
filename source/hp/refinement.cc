@@ -1059,6 +1059,38 @@ namespace hp
 
       return levels_changed;
     }
+
+
+
+    template <int dim, int spacedim>
+    unsigned int
+    copy_future_fe_indices(const DoFHandler<dim, spacedim> &dof_handler_source,
+                           DoFHandler<dim, spacedim> &dof_handler_destination)
+    {
+      Assert(dof_handler_source.get_triangulation().n_active_cells() ==
+               dof_handler_destination.get_triangulation().n_active_cells(),
+             ExcMessage(
+               "Both DoFHandler objects must work on the same Triangulation!"));
+
+      typename DoFHandler<dim, spacedim>::active_cell_iterator cell_destination;
+
+      unsigned int count_changed_indices = 0;
+      for (const auto &cell_source : dof_handler_source.active_cell_iterators())
+        if (cell_source->is_locally_owned() &&
+            cell_source->future_fe_index_set())
+          {
+            cell_destination =
+              cell_source->as_dof_handler_iterator(dof_handler_destination);
+
+            Assert(cell_destination->is_locally_owned(), ExcInternalError());
+
+            cell_destination->set_future_fe_index(
+              cell_source->future_fe_index());
+            ++count_changed_indices;
+          }
+
+      return count_changed_indices;
+    }
   } // namespace Refinement
 } // namespace hp
 
