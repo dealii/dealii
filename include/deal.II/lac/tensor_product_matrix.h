@@ -121,6 +121,12 @@ public:
   apply_inverse(const ArrayView<Number> &      dst,
                 const ArrayView<const Number> &src) const;
 
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const;
+
 protected:
   /**
    * Default constructor.
@@ -622,6 +628,21 @@ TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::apply_inverse(
   else
     Assert(false, ExcNotImplemented());
 }
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+std::size_t
+TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::
+  memory_consumption() const
+{
+  return MemoryConsumption::memory_consumption(mass_matrix) +
+         MemoryConsumption::memory_consumption(derivative_matrix) +
+         MemoryConsumption::memory_consumption(eigenvalues) +
+         MemoryConsumption::memory_consumption(eigenvectors) +
+         MemoryConsumption::memory_consumption(tmp_array);
+}
+
 
 
 //---------------------- TensorProductMatrixSymmetricSum ----------------------
