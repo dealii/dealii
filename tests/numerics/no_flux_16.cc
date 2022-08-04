@@ -37,10 +37,64 @@
 
 #include "../tests.h"
 
+bool
+compare_constraints(const AffineConstraints<double> &constraints1,
+                    const AffineConstraints<double> &constraints2)
+{
+  if (constraints1.n_constraints() != constraints2.n_constraints())
+    return false;
+
+  for (auto line : constraints1.get_lines())
+    {
+      const unsigned int line_index = line.index;
+      const std::vector<std::pair<types::global_dof_index, double>>
+        *constraint_entries_1 = constraints1.get_constraint_entries(line_index);
+      const std::vector<std::pair<types::global_dof_index, double>>
+        *constraint_entries_2 = constraints2.get_constraint_entries(line_index);
+      if (constraint_entries_1->size() != constraint_entries_2->size() ||
+          (constraints1.get_inhomogeneity(line_index) !=
+           constraints2.get_inhomogeneity(line_index)))
+        return false;
+      for (unsigned int i = 0; i < constraint_entries_1->size(); ++i)
+        {
+          if ((*constraint_entries_1)[i].first !=
+              (*constraint_entries_2)[i].first)
+            return false;
+          if ((*constraint_entries_1)[i].second !=
+              (*constraint_entries_2)[i].second)
+            return false;
+        }
+    }
+
+  return true;
+}
+
 template <int dim>
 void
-run(const Triangulation<dim> &          triangulation,
-    const std::set<types::boundary_id> &no_flux_boundary)
+constraints_on_active_cells(
+  const Triangulation<dim> &          tria,
+  const std::set<types::boundary_id> &no_normal_flux_boundaries,
+  AffineConstraints<double> &         constraints)
+{
+  SphericalManifold<dim> spherical;
+
+  MappingQ<dim> mapping(4);
+
+  FESystem<dim>   fe(FE_Q<dim>(1), dim);
+  DoFHandler<dim> dofh(tria);
+
+  dofh.distribute_dofs(fe);
+
+  VectorTools::compute_no_normal_flux_constraints(
+    dofh, 0, no_normal_flux_boundaries, constraints, mapping);
+}
+
+template <int dim>
+void
+constraints_on_levels(
+  const Triangulation<dim> &                triangulation,
+  const std::set<types::boundary_id> &      no_flux_boundary,
+  MGLevelObject<AffineConstraints<double>> &level_constraints)
 {
   FESystem<dim>   fe(FE_Q<dim>(1), dim);
   DoFHandler<dim> dof_handler(triangulation);
@@ -58,23 +112,60 @@ run(const Triangulation<dim> &          triangulation,
     {
       AffineConstraints<double> user_level_constraints;
 
-      VectorTools::compute_no_normal_flux_constraints_on_level(
-        dof_handler,
-        mg_constrained_dofs,
-        level,
-        0,
-        no_flux_boundary,
-        user_level_constraints,
-        mapping);
+      const IndexSet &refinement_edge_indices =
+        mg_constrained_dofs.get_refinement_edge_indices(level);
 
-      user_level_constraints.print(deallog.get_file_stream());
+      VectorTools::compute_no_normal_flux_constraints(dof_handler,
+                                                      0,
+                                                      no_flux_boundary,
+                                                      user_level_constraints,
+                                                      mapping,
+                                                      refinement_edge_indices,
+                                                      level);
 
-      deallog.get_file_stream() << std::flush;
+      // user_level_constraints.print(deallog.get_file_stream());
+
+      // deallog.get_file_stream() << std::flush;
       user_level_constraints.close();
-
-      deallog << "Level " << level << " OK" << std::endl;
+      level_constraints[level].copy_from(user_level_constraints);
     }
 }
+
+template <int dim>
+void
+run(Triangulation<dim> &         triangulation,
+    std::set<types::boundary_id> no_flux_boundary)
+{
+  const unsigned int                     n_levels = 2;
+  std::vector<AffineConstraints<double>> ref_constraints(n_levels);
+
+  constraints_on_active_cells<dim>(triangulation,
+                                   no_flux_boundary,
+                                   ref_constraints[0]);
+  for (unsigned int level = 1; level < n_levels; ++level)
+    {
+      triangulation.refine_global(1);
+      constraints_on_active_cells<dim>(triangulation,
+                                       no_flux_boundary,
+                                       ref_constraints[level]);
+    }
+
+  MGLevelObject<AffineConstraints<double>> mg_level_constraints(0,
+                                                                n_levels - 1);
+  constraints_on_levels<dim>(triangulation,
+                             no_flux_boundary,
+                             mg_level_constraints);
+
+  deallog << " dim " << dim << std::endl;
+  for (unsigned int i = 0; i < n_levels; ++i)
+    {
+      if (compare_constraints(ref_constraints[i], mg_level_constraints[i]))
+        deallog << "Level " << i << " OK" << std::endl;
+      else
+        deallog << "Level " << i << " failed" << std::endl;
+    }
+}
+
 
 
 int
@@ -89,17 +180,15 @@ main()
     Triangulation<dim> triangulation(
       Triangulation<dim>::limit_level_difference_at_vertices);
     GridGenerator::quarter_hyper_ball(triangulation);
-    triangulation.refine_global(1);
     std::set<types::boundary_id> no_flux_boundary{0, 1};
-    run<dim>(triangulation, no_flux_boundary);
+    run(triangulation, no_flux_boundary);
   }
   {
     const unsigned int dim = 3;
     Triangulation<dim> triangulation(
       Triangulation<dim>::limit_level_difference_at_vertices);
     GridGenerator::quarter_hyper_ball(triangulation);
-    triangulation.refine_global(1);
     std::set<types::boundary_id> no_flux_boundary{0, 1};
-    run<dim>(triangulation, no_flux_boundary);
+    run(triangulation, no_flux_boundary);
   }
 }

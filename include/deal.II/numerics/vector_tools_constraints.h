@@ -51,6 +51,9 @@ namespace VectorTools
    * i.e., normal flux constraints where $\vec u$ is a vector-valued solution
    * variable and $\vec u_\Gamma$ is a prescribed vector field whose normal
    * component we want to be equal to the normal component of the solution.
+   * This function can also be used on level meshes in the multigrid method
+   * if @p refinement_edge_indices and @p level are provided, and the former
+   * can be obtained by MGConstrainedDoFs::get_refinement_edge_indices().
    * These conditions have exactly the form handled by the
    * AffineConstraints class, in that they relate a <i>linear
    * combination</i> of boundary degrees of freedom to a corresponding
@@ -288,7 +291,9 @@ namespace VectorTools
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
-         ));
+         ),
+    const IndexSet &   refinement_edge_indices = IndexSet(),
+    const unsigned int level                   = numbers::invalid_unsigned_int);
 
   /**
    * This function does the same as the
@@ -296,6 +301,9 @@ namespace VectorTools
    * information), but for the simpler case of homogeneous normal-flux
    * constraints, i.e., for imposing the condition
    * $\vec u \cdot \vec n= 0$. This function is used in step-31 and step-32.
+   * This function can also be used on level meshes in the multigrid method
+   * if @p refinement_edge_indices and @p level are provided, and the former
+   * can be obtained by MGConstrainedDoFs::get_refinement_edge_indices().
    *
    * @ingroup constraints
    *
@@ -316,34 +324,9 @@ namespace VectorTools
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
-         ));
-
-  /**
-   * This function does the same as the
-   * compute_no_normal_flux_constraints(), but for the case of level meshes
-   * in the multigrid method.
-   * @ingroup constraints
-   *
-   * @see
-   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
-   */
-  template <int dim, int spacedim>
-  void
-  compute_no_normal_flux_constraints_on_level(
-    const DoFHandler<dim, spacedim> &   dof_handler,
-    const MGConstrainedDoFs &           mg_constrained_dofs,
-    const unsigned int                  level,
-    const unsigned int                  first_vector_component,
-    const std::set<types::boundary_id> &boundary_ids,
-    AffineConstraints<double> &         constraints,
-    const Mapping<dim> &                mapping =
-      (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
-#else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
-#endif
-         ));
+         ),
+    const IndexSet &   refinement_edge_indices = IndexSet(),
+    const unsigned int level                   = numbers::invalid_unsigned_int);
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
