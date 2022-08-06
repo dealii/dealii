@@ -21,7 +21,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
-#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor_accessors.h>
 
 #include <cmath>
