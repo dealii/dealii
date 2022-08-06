@@ -97,13 +97,12 @@ test_tensor()
   const AD_Tensor                   adt10 = outer_product(av1, av1);
 
   // Special operations
-  const ad_number_t det = determinant(adt1);
-  const ad_number_t tr  = trace(adt1);
-  //  const ad_number_t l1 = l1_norm(adt1);       // TODO: Defined with std::
-  //  math operator const ad_number_t linf = linfty_norm(adt1); // TODO: Defined
-  //  with std:: math operator
-  const AD_Tensor inv   = invert(adt1);
-  const AD_Tensor trans = transpose(adt1);
+  const ad_number_t det   = determinant(adt1);
+  const ad_number_t tr    = trace(adt1);
+  const ad_number_t l1    = l1_norm(adt1);
+  const ad_number_t linf  = linfty_norm(adt1);
+  const AD_Tensor   inv   = invert(adt1);
+  const AD_Tensor   trans = transpose(adt1);
 }
 
 template <int dim,
@@ -185,9 +184,8 @@ test_symmetric_tensor()
   const ad_number_t inv1 = first_invariant(adt1);
   const ad_number_t inv2 = second_invariant(adt1);
   const ad_number_t inv3 = third_invariant(adt1); // TODO: Return type incorrect
-  // const ad_number_t l1 = l1_norm(adt1); // TODO: Defined with std:: math
-  // operator const ad_number_t linf = linfty_norm(adt1); // TODO: Defined with
-  // std:: math operator
+  // const ad_number_t l1 = l1_norm(adt1);
+  // const ad_number_t linf = linfty_norm(adt1);
   const AD_STensor inv   = invert(adt1);
   const AD_STensor trans = transpose(adt1);
   const AD_STensor dev   = deviator(adt1);
