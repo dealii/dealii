@@ -3003,13 +3003,13 @@ project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &A);
  * @relatesalso Tensor
  */
 template <int dim, typename Number>
-inline Number
+inline typename numbers::NumberTraits<Number>::real_type
 l1_norm(const Tensor<2, dim, Number> &t)
 {
-  Number max = internal::NumberType<Number>::value(0.0);
+  typename numbers::NumberTraits<Number>::real_type max(0.0);
   for (unsigned int j = 0; j < dim; ++j)
     {
-      Number sum = internal::NumberType<Number>::value(0.0);
+      typename numbers::NumberTraits<Number>::real_type sum(0.0);
       for (unsigned int i = 0; i < dim; ++i)
         sum += numbers::NumberTraits<Number>::abs(t[i][j]);
 
@@ -3029,13 +3029,13 @@ l1_norm(const Tensor<2, dim, Number> &t)
  * @relatesalso Tensor
  */
 template <int dim, typename Number>
-inline Number
+inline typename numbers::NumberTraits<Number>::real_type
 linfty_norm(const Tensor<2, dim, Number> &t)
 {
-  Number max = internal::NumberType<Number>::value(0.0);
+  typename numbers::NumberTraits<Number>::real_type max(0.0);
   for (unsigned int i = 0; i < dim; ++i)
     {
-      Number sum = internal::NumberType<Number>::value(0.0);
+      typename numbers::NumberTraits<Number>::real_type sum(0.0);
       for (unsigned int j = 0; j < dim; ++j)
         sum += numbers::NumberTraits<Number>::abs(t[i][j]);
 
