@@ -14,31 +14,31 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_thread_management_h
-#  define dealii_thread_management_h
+#define dealii_thread_management_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/multithread_info.h>
-#  include <deal.II/base/std_cxx17/tuple.h>
-#  include <deal.II/base/template_constraints.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/mutex.h>
+#include <deal.II/base/std_cxx17/tuple.h>
+#include <deal.II/base/template_constraints.h>
 
-#  include <atomic>
-#  include <functional>
-#  include <future>
-#  include <list>
-#  include <memory>
-#  include <mutex>
-#  include <thread>
-#  include <utility>
-#  include <vector>
+#include <atomic>
+#include <functional>
+#include <future>
+#include <list>
+#include <memory>
+#include <thread>
+#include <utility>
+#include <vector>
 
-#  ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TBB
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#    include <tbb/task_group.h>
+#  include <tbb/task_group.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-#  endif
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -54,55 +54,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup threads
  */
-namespace Threads
-{
-  /**
-   * A class implementing a <a
-   * href="https://en.wikipedia.org/wiki/Lock_(computer_science)">mutex</a>.
-   * Mutexes are used to lock data structures to ensure that only a
-   * single thread of execution can access them at the same time.
-   *
-   * This class is a thin wrapper around `std::mutex`. The only difference
-   * is that this class is copyable when `std::mutex` is not.  Indeed, when
-   * copied, the receiving object does not copy any state from the object
-   * being copied, i.e. an entirely new mutex is created. These semantics
-   * are consistent with the common use case if a mutex is used as a member
-   * variable to lock the other member variables of a class: in that case,
-   * the mutex of the copied-to object should only guard the members of the
-   * copied-to object, not the members of both the copied-to and
-   * copied-from object. Since at the time when the class is copied, the
-   * destination's member variable is not used yet, its corresponding mutex
-   * should also remain in its original state.
-   */
-  class Mutex : public std::mutex
-  {
-  public:
-    /**
-     * Default constructor.
-     */
-    Mutex() = default;
-
-    /**
-     * Copy constructor. As discussed in this class's documentation, no state
-     * is copied from the object given as argument.
-     */
-    Mutex(const Mutex &)
-      : std::mutex()
-    {}
-
-    /**
-     * Copy operators. As discussed in this class's documentation, no state
-     * is copied from the object given as argument.
-     */
-    Mutex &
-    operator=(const Mutex &)
-    {
-      return *this;
-    }
-  };
-} // namespace Threads
-
-
 namespace Threads
 {
   /**
@@ -185,7 +136,7 @@ namespace Threads
 } // namespace Threads
 
 /* ----------- implementation of functions in namespace Threads ---------- */
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 namespace Threads
 {
   template <typename ForwardIterator>
@@ -236,7 +187,7 @@ namespace Threads
   }
 } // namespace Threads
 
-#  endif // DOXYGEN
+#endif // DOXYGEN
 
 namespace Threads
 {
@@ -1034,7 +985,7 @@ namespace Threads
     {
       if (MultithreadInfo::n_threads() > 1)
         {
-#  ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TBB
           // Create a promise object and from it extract a future that
           // we can use to refer to the outcome of the task. For reasons
           // explained below, we can't just create a std::promise object,
@@ -1102,7 +1053,7 @@ namespace Threads
                 }
             });
 
-#  else
+#else
           // If no threading library is supported, just fall back onto C++11
           // facilities. The problem with this is that the standard does
           // not actually say what std::async should do. The first
@@ -1123,7 +1074,7 @@ namespace Threads
           task_data = std::make_shared<TaskData>(
             std::async(std::launch::async | std::launch::deferred,
                        function_object));
-#  endif
+#endif
         }
       else
         {
@@ -1410,7 +1361,7 @@ namespace Threads
           return;
         else
           {
-#  ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TBB
             // If we build on the TBB, then we can't just wait for the
             // std::future object to get ready. Apparently the TBB happily
             // enqueues a task into an arena and then just sits on it without
@@ -1419,7 +1370,7 @@ namespace Threads
             // tbb::task_group, and then here wait for the single task
             // associated with that task group.
             task_group.wait();
-#  endif
+#endif
 
             // Wait for the task to finish and then move its
             // result. (We could have made the set_from() function
@@ -1488,14 +1439,14 @@ namespace Threads
        */
       internal::return_value<RT> returned_object;
 
-#  ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TBB
       /**
        * A task group object we can wait for.
        */
       tbb::task_group task_group;
 
       friend class Task<RT>;
-#  endif
+#endif
     };
 
     /**
@@ -1744,8 +1695,5 @@ namespace Threads
  */
 
 
-//---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE
-// end of #ifndef dealii_thread_management_h
 #endif
-//---------------------------------------------------------------------------

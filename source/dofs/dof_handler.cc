@@ -18,6 +18,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.templates.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/distributed/cell_data_transfer.templates.h>
 #include <deal.II/distributed/fully_distributed_tria.h>

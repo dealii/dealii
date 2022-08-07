@@ -20,9 +20,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/tensor_polynomials_base.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe.h>
 
@@ -536,7 +536,7 @@ protected:
   /**
    * A mutex to be used to guard access to the variables below.
    */
-  mutable std::mutex cache_mutex;
+  mutable Threads::Mutex cache_mutex;
 
   /**
    * If a shape function is computed at a single point, we must compute all of

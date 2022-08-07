@@ -20,9 +20,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/synchronous_iterator.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/thread_management.h>
 
 #include <cstddef>
 #include <functional>
@@ -612,7 +612,7 @@ namespace parallel
       /**
        * A mutex to guard the access to the in_use flag.
        */
-      std::mutex mutex;
+      Threads::Mutex mutex;
 #endif
     };
   } // namespace internal

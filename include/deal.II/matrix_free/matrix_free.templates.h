@@ -22,6 +22,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/multithread_info.h>
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>

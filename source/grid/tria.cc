@@ -16,6 +16,7 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/mapping_q1.h>
 
