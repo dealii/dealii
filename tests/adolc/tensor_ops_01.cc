@@ -62,6 +62,8 @@ test_tensor()
   // Comparison
   const bool res_1 = (adt1 == adt2);
   const bool res_2 = (adt1 != adt2);
+  const bool res_3 = adt1 == t1;
+  const bool res_4 = t1 == adt1;
 
   // Scalar operations
   adt4 *= 2.0;
