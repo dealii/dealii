@@ -41,28 +41,74 @@ bool
 compare_constraints(const AffineConstraints<double> &constraints1,
                     const AffineConstraints<double> &constraints2)
 {
+  const double tol = 1.e-15;
   if (constraints1.n_constraints() != constraints2.n_constraints())
     return false;
 
-  for (auto line : constraints1.get_lines())
+  auto line1    = (constraints1.get_lines()).begin();
+  auto line2    = (constraints2.get_lines()).begin();
+  auto line_end = (constraints1.get_lines()).end();
+
+  for (; line1 != line_end; ++line1, ++line2)
     {
-      const unsigned int line_index = line.index;
+      const unsigned int line_index  = line1->index;
+      const unsigned int line_index2 = line2->index;
+      if (line_index != line_index2)
+        return false;
+
       const std::vector<std::pair<types::global_dof_index, double>>
         *constraint_entries_1 = constraints1.get_constraint_entries(line_index);
       const std::vector<std::pair<types::global_dof_index, double>>
         *constraint_entries_2 = constraints2.get_constraint_entries(line_index);
-      if (constraint_entries_1->size() != constraint_entries_2->size() ||
-          (constraints1.get_inhomogeneity(line_index) !=
-           constraints2.get_inhomogeneity(line_index)))
-        return false;
-      for (unsigned int i = 0; i < constraint_entries_1->size(); ++i)
+      if (constraint_entries_1 == nullptr && constraint_entries_2 == nullptr)
         {
-          if ((*constraint_entries_1)[i].first !=
-              (*constraint_entries_2)[i].first)
-            return false;
-          if ((*constraint_entries_1)[i].second !=
-              (*constraint_entries_2)[i].second)
-            return false;
+          return true;
+        }
+      else if (constraint_entries_1 != nullptr &&
+               constraint_entries_2 != nullptr)
+        {
+          if (constraint_entries_1->size() != constraint_entries_2->size() ||
+              std::abs(constraints1.get_inhomogeneity(line_index) -
+                       constraints2.get_inhomogeneity(line_index)) > tol)
+            {
+              deallog << " constraints1.get_inhomogeneity(line_index) "
+                      << constraints1.get_inhomogeneity(line_index)
+                      << " constraints2.get_inhomogeneity(line_index) "
+                      << constraints2.get_inhomogeneity(line_index) << std::endl
+                      << " constraint_entries_1->size() "
+                      << constraint_entries_1->size()
+                      << " constraint_entries_2->size() "
+                      << constraint_entries_2->size() << std::endl;
+              return false;
+            }
+          for (unsigned int i = 0; i < constraint_entries_1->size(); ++i)
+            {
+              if (std::abs((*constraint_entries_1)[i].first !=
+                           (*constraint_entries_2)[i].first) > tol ||
+                  std::abs((*constraint_entries_1)[i].second -
+                           (*constraint_entries_2)[i].second) > tol)
+                {
+                  deallog << " (*constraint_entries_1)[i].first "
+                          << (*constraint_entries_1)[i].first
+                          << " (*constraint_entries_1)[i].second "
+                          << (*constraint_entries_1)[i].second << " diff: "
+                          << (*constraint_entries_1)[i].first -
+                               (*constraint_entries_2)[i].first
+                          << std::endl
+                          << " (*constraint_entries_2)[i].first "
+                          << (*constraint_entries_2)[i].first
+                          << " (*constraint_entries_2)[i].second "
+                          << (*constraint_entries_2)[i].second << " diff: "
+                          << (*constraint_entries_1)[i].first -
+                               (*constraint_entries_2)[i].first
+                          << std::endl;
+                  return false;
+                }
+            }
+        }
+      else
+        {
+          return false;
         }
     }
 
@@ -71,13 +117,11 @@ compare_constraints(const AffineConstraints<double> &constraints1,
 
 template <int dim>
 void
-constraints_on_active_cells(
+get_constraints_on_active_cells(
   const Triangulation<dim> &          tria,
   const std::set<types::boundary_id> &no_normal_flux_boundaries,
   AffineConstraints<double> &         constraints)
 {
-  SphericalManifold<dim> spherical;
-
   MappingQ<dim> mapping(4);
 
   FESystem<dim>   fe(FE_Q<dim>(1), dim);
@@ -87,11 +131,12 @@ constraints_on_active_cells(
 
   VectorTools::compute_no_normal_flux_constraints(
     dofh, 0, no_normal_flux_boundaries, constraints, mapping);
+  constraints.close();
 }
 
 template <int dim>
 void
-constraints_on_levels(
+get_constraints_on_levels(
   const Triangulation<dim> &                triangulation,
   const std::set<types::boundary_id> &      no_flux_boundary,
   MGLevelObject<AffineConstraints<double>> &level_constraints)
@@ -122,10 +167,6 @@ constraints_on_levels(
                                                       mapping,
                                                       refinement_edge_indices,
                                                       level);
-
-      // user_level_constraints.print(deallog.get_file_stream());
-
-      // deallog.get_file_stream() << std::flush;
       user_level_constraints.close();
       level_constraints[level].copy_from(user_level_constraints);
     }
@@ -139,22 +180,21 @@ run(Triangulation<dim> &         triangulation,
   const unsigned int                     n_levels = 2;
   std::vector<AffineConstraints<double>> ref_constraints(n_levels);
 
-  constraints_on_active_cells<dim>(triangulation,
-                                   no_flux_boundary,
-                                   ref_constraints[0]);
+  get_constraints_on_active_cells<dim>(triangulation,
+                                       no_flux_boundary,
+                                       ref_constraints[0]);
   for (unsigned int level = 1; level < n_levels; ++level)
     {
       triangulation.refine_global(1);
-      constraints_on_active_cells<dim>(triangulation,
-                                       no_flux_boundary,
-                                       ref_constraints[level]);
+      get_constraints_on_active_cells<dim>(triangulation,
+                                           no_flux_boundary,
+                                           ref_constraints[level]);
     }
 
-  MGLevelObject<AffineConstraints<double>> mg_level_constraints(0,
-                                                                n_levels - 1);
-  constraints_on_levels<dim>(triangulation,
-                             no_flux_boundary,
-                             mg_level_constraints);
+  MGLevelObject<AffineConstraints<double>> mg_level_constraints(0, n_levels);
+  get_constraints_on_levels<dim>(triangulation,
+                                 no_flux_boundary,
+                                 mg_level_constraints);
 
   deallog << " dim " << dim << std::endl;
   for (unsigned int i = 0; i < n_levels; ++i)
@@ -166,8 +206,6 @@ run(Triangulation<dim> &         triangulation,
     }
 }
 
-
-
 int
 main()
 {
@@ -176,6 +214,7 @@ main()
   deallog.get_file_stream().setf(std::ios::fixed);
 
   {
+    deallog << " quarter_hyper_ball: " << std::endl;
     const unsigned int dim = 2;
     Triangulation<dim> triangulation(
       Triangulation<dim>::limit_level_difference_at_vertices);
@@ -190,5 +229,81 @@ main()
     GridGenerator::quarter_hyper_ball(triangulation);
     std::set<types::boundary_id> no_flux_boundary{0, 1};
     run(triangulation, no_flux_boundary);
+  }
+  {
+    deallog << " hyper_shell: " << std::endl;
+    const unsigned int dim = 2;
+    Triangulation<dim> triangulation(
+      Triangulation<dim>::limit_level_difference_at_vertices);
+    GridGenerator::hyper_shell(triangulation, Point<dim>(), 0.5, 1.);
+    std::set<types::boundary_id> no_flux_boundary{0};
+    run(triangulation, no_flux_boundary);
+  }
+  {
+    const unsigned int dim = 3;
+    Triangulation<dim> triangulation(
+      Triangulation<dim>::limit_level_difference_at_vertices);
+    GridGenerator::hyper_shell(triangulation, Point<dim>(), 0.5, 1.);
+    std::set<types::boundary_id> no_flux_boundary{0};
+    run(triangulation, no_flux_boundary);
+  }
+  {
+    deallog << " half_hyper_shell: " << std::endl;
+    const unsigned int dim = 2;
+    Triangulation<dim> triangulation(
+      Triangulation<dim>::limit_level_difference_at_vertices);
+    GridGenerator::half_hyper_shell(triangulation, Point<dim>(), 0.5, 1.);
+    std::set<types::boundary_id> no_flux_boundary{0};
+    run(triangulation, no_flux_boundary);
+  }
+  {
+    const unsigned int dim = 3;
+    Triangulation<dim> triangulation(
+      Triangulation<dim>::limit_level_difference_at_vertices);
+    GridGenerator::half_hyper_shell(triangulation, Point<dim>(), 0.5, 1.);
+    std::set<types::boundary_id> no_flux_boundary{0};
+    run(triangulation, no_flux_boundary);
+  }
+  {
+    deallog << " quarter_hyper_shell: " << std::endl;
+    const unsigned int dim = 2;
+    Triangulation<dim> triangulation(
+      Triangulation<dim>::limit_level_difference_at_vertices);
+    GridGenerator::quarter_hyper_shell(triangulation, Point<dim>(), 0.5, 1.);
+    std::set<types::boundary_id> no_flux_boundary{0};
+    run(triangulation, no_flux_boundary);
+  }
+  {
+    const unsigned int dim = 3;
+    Triangulation<dim> triangulation(
+      Triangulation<dim>::limit_level_difference_at_vertices);
+    GridGenerator::quarter_hyper_shell(triangulation, Point<dim>(), 0.5, 1.);
+    std::set<types::boundary_id> no_flux_boundary{0};
+    run(triangulation, no_flux_boundary);
+  }
+  {
+    deallog << " hyper_cube:" << std::endl;
+    const unsigned int           dim = 2;
+    std::set<types::boundary_id> no_flux_boundary;
+    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      {
+        no_flux_boundary.insert(i);
+        Triangulation<dim> triangulation(
+          Triangulation<dim>::limit_level_difference_at_vertices);
+        GridGenerator::hyper_cube(triangulation, 0., 1., true);
+        run(triangulation, no_flux_boundary);
+      }
+  }
+  {
+    const unsigned int           dim = 3;
+    std::set<types::boundary_id> no_flux_boundary;
+    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      {
+        no_flux_boundary.insert(i);
+        Triangulation<dim> triangulation(
+          Triangulation<dim>::limit_level_difference_at_vertices);
+        GridGenerator::hyper_cube(triangulation, 0., 1., true);
+        run(triangulation, no_flux_boundary);
+      }
   }
 }
