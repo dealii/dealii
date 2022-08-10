@@ -1563,7 +1563,7 @@ namespace internal
         // whether we have to fear that the matrix is not regular.
         Number diagonal_sum = internal::NumberType<Number>::value(0.0);
         for (unsigned int i = 0; i < N; ++i)
-          diagonal_sum += std::fabs(tmp.data[i][i]);
+          diagonal_sum += numbers::NumberTraits<Number>::abs(tmp.data[i][i]);
         const Number typical_diagonal_element =
           diagonal_sum / static_cast<double>(N);
         (void)typical_diagonal_element;
@@ -1576,12 +1576,12 @@ namespace internal
           {
             // Pivot search: search that part of the line on and right of the
             // diagonal for the largest element.
-            Number       max = std::fabs(tmp.data[j][j]);
-            unsigned int r   = j;
+            Number max     = numbers::NumberTraits<Number>::abs(tmp.data[j][j]);
+            unsigned int r = j;
             for (unsigned int i = j + 1; i < N; ++i)
-              if (std::fabs(tmp.data[i][j]) > max)
+              if (numbers::NumberTraits<Number>::abs(tmp.data[i][j]) > max)
                 {
-                  max = std::fabs(tmp.data[i][j]);
+                  max = numbers::NumberTraits<Number>::abs(tmp.data[i][j]);
                   r   = i;
                 }
 
@@ -2343,25 +2343,25 @@ namespace internal
   compute_norm(const typename SymmetricTensorAccessors::
                  StorageType<2, dim, Number>::base_tensor_type &data)
   {
+    // Make things work with AD types
+    using std::sqrt;
     switch (dim)
       {
         case 1:
           return numbers::NumberTraits<Number>::abs(data[0]);
 
         case 2:
-          return std::sqrt(
-            numbers::NumberTraits<Number>::abs_square(data[0]) +
-            numbers::NumberTraits<Number>::abs_square(data[1]) +
-            2. * numbers::NumberTraits<Number>::abs_square(data[2]));
+          return sqrt(numbers::NumberTraits<Number>::abs_square(data[0]) +
+                      numbers::NumberTraits<Number>::abs_square(data[1]) +
+                      2. * numbers::NumberTraits<Number>::abs_square(data[2]));
 
         case 3:
-          return std::sqrt(
-            numbers::NumberTraits<Number>::abs_square(data[0]) +
-            numbers::NumberTraits<Number>::abs_square(data[1]) +
-            numbers::NumberTraits<Number>::abs_square(data[2]) +
-            2. * numbers::NumberTraits<Number>::abs_square(data[3]) +
-            2. * numbers::NumberTraits<Number>::abs_square(data[4]) +
-            2. * numbers::NumberTraits<Number>::abs_square(data[5]));
+          return sqrt(numbers::NumberTraits<Number>::abs_square(data[0]) +
+                      numbers::NumberTraits<Number>::abs_square(data[1]) +
+                      numbers::NumberTraits<Number>::abs_square(data[2]) +
+                      2. * numbers::NumberTraits<Number>::abs_square(data[3]) +
+                      2. * numbers::NumberTraits<Number>::abs_square(data[4]) +
+                      2. * numbers::NumberTraits<Number>::abs_square(data[5]));
 
         default:
           {
@@ -2375,7 +2375,7 @@ namespace internal
               return_value +=
                 2. * numbers::NumberTraits<Number>::abs_square(data[d]);
 
-            return std::sqrt(return_value);
+            return sqrt(return_value);
           }
       }
   }
@@ -2387,6 +2387,8 @@ namespace internal
   compute_norm(const typename SymmetricTensorAccessors::
                  StorageType<4, dim, Number>::base_tensor_type &data)
   {
+    // Make things work with AD types
+    using std::sqrt;
     switch (dim)
       {
         case 1:
@@ -2416,7 +2418,7 @@ namespace internal
                 return_value +=
                   4. * numbers::NumberTraits<Number>::abs_square(data[i][j]);
 
-            return std::sqrt(return_value);
+            return sqrt(return_value);
           }
       }
   }

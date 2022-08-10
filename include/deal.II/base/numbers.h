@@ -36,6 +36,16 @@
 #  define DEAL_II_CUDA_HOST_DEV
 #endif
 
+// Forward-declare the automatic differentiation types so we can add prototypes
+// for our own wrappers.
+#ifdef DEAL_II_WITH_ADOLC
+class adouble;
+namespace adtl
+{
+  class adouble;
+}
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -128,24 +138,29 @@ template <typename T>
 struct EnableIfScalar;
 #endif
 
-DEAL_II_NAMESPACE_CLOSE
-
-// Declare / Import auto-differentiable math functions in(to) standard
-// namespace before numbers::NumberTraits is defined
 #ifdef DEAL_II_WITH_ADOLC
-#  include <deal.II/differentiation/ad/adolc_math.h>
+#  ifndef DOXYGEN
+// Prototype some inline functions present in adolc_math.h for use in
+// NumberTraits.
+//
+// ADOL-C uses fabs(), but for genericity we want to use abs(). Simultaneously,
+// though, we don't want to include ADOL-C headers in this header since
+// numbers.h is in everything. To get around this: use C++ rules which permit
+// the use of forward-declared classes in function prototypes to declare some
+// functions which are defined in adolc_math.h. This permits us to write "using
+// dealii::abs;" in NumberTraits which will allow us to select the correct
+// overload (the one in dealii::) when instantiating NumberTraits for ADOL-C
+// types.
 
-#  include <adolc/adouble.h> // Taped double
+adouble
+abs(const adouble &x);
+
+adtl::adouble
+abs(const adtl::adouble &x);
+#  endif
 #endif
-// Ideally we'd like to #include <deal.II/differentiation/ad/sacado_math.h>
-// but header indirectly references numbers.h. We therefore simply
-// import the whole Sacado header at this point to get the math
-// functions imported into the standard namespace.
-#ifdef DEAL_II_TRILINOS_WITH_SACADO
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <Sacado.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-#endif
+
+DEAL_II_NAMESPACE_CLOSE
 
 namespace std
 {
@@ -608,7 +623,16 @@ namespace numbers
   typename NumberTraits<number>::real_type
   NumberTraits<number>::abs(const number &x)
   {
-    return std::abs(x);
+    // Make things work with AD types
+    using std::abs;
+#ifdef DEAL_II_WITH_ADOLC
+    // This one is a little tricky - we have our own abs function in dealii::,
+    // prototyped with forward-declared types in this file, but it only exists
+    // if we have ADOL-C: hence we only add this using statement in that
+    // situation
+    using dealii::abs;
+#endif
+    return abs(x);
   }
 
 
@@ -626,7 +650,13 @@ namespace numbers
   typename NumberTraits<std::complex<number>>::real_type
   NumberTraits<std::complex<number>>::abs(const std::complex<number> &x)
   {
-    return std::abs(x);
+    // Make things work with AD types
+    using std::abs;
+#ifdef DEAL_II_WITH_ADOLC
+    // Same comment as the non-complex case holds here
+    using dealii::abs;
+#endif
+    return abs(x);
   }
 
 

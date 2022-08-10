@@ -912,8 +912,12 @@ template <typename Number>
 Tensor<2, 2, Number>
 Physics::Transformations::Rotations::rotation_matrix_2d(const Number &angle)
 {
-  const Number rotation[2][2] = {{std::cos(angle), -std::sin(angle)},
-                                 {std::sin(angle), std::cos(angle)}};
+  // Make things work with AD types
+  using std::cos;
+  using std::sin;
+
+  const Number rotation[2][2] = {{cos(angle), -sin(angle)},
+                                 {sin(angle), cos(angle)}};
   return Tensor<2, 2>(rotation);
 }
 
@@ -925,10 +929,15 @@ Physics::Transformations::Rotations::rotation_matrix_3d(
   const Tensor<1, 3, Number> &axis,
   const Number &              angle)
 {
-  Assert(std::abs(axis.norm() - 1.0) < 1e-9,
+  // Make things work with AD types
+  using std::abs;
+  using std::cos;
+  using std::sin;
+
+  Assert(abs(axis.norm() - 1.0) < 1e-9,
          ExcMessage("The supplied axial vector is not a unit vector."));
-  const Number c              = std::cos(angle);
-  const Number s              = std::sin(angle);
+  const Number c              = cos(angle);
+  const Number s              = sin(angle);
   const Number t              = 1. - c;
   const Number rotation[3][3] = {{t * axis[0] * axis[0] + c,
                                   t * axis[0] * axis[1] - s * axis[2],

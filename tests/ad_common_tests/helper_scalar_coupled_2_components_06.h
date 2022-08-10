@@ -96,22 +96,22 @@ struct FunctionsTestSymmetricTensorVectorCoupled
   psi(const SymmetricTensor<2, dim, NumberType> &t,
       const Tensor<1, dim, NumberType> &         v)
   {
-    return std::pow(det_t(t), 2) * std::pow(v_squ(v), 3);
+    return pow(det_t(t), 2) * pow(v_squ(v), 3);
   };
 
   static SymmetricTensor<2, dim, NumberType>
   dpsi_dt(const SymmetricTensor<2, dim, NumberType> &t,
           const Tensor<1, dim, NumberType> &         v)
   {
-    return SymmetricTensor<2, dim, NumberType>(
-      2.0 * std::pow(det_t(t), 1) * ddet_t_dt(t) * std::pow(v_squ(v), 3));
+    return SymmetricTensor<2, dim, NumberType>(2.0 * pow(det_t(t), 1) *
+                                               ddet_t_dt(t) * pow(v_squ(v), 3));
   };
 
   static Tensor<1, dim, NumberType>
   dpsi_dv(const SymmetricTensor<2, dim, NumberType> &t,
           const Tensor<1, dim, NumberType> &         v)
   {
-    return std::pow(det_t(t), 2) * 3.0 * std::pow(v_squ(v), 2) * dv_squ_dv(v);
+    return pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) * dv_squ_dv(v);
   };
 
   static SymmetricTensor<4, dim, NumberType>
@@ -119,16 +119,16 @@ struct FunctionsTestSymmetricTensorVectorCoupled
               const Tensor<1, dim, NumberType> &         v)
   {
     return SymmetricTensor<4, dim, NumberType>(
-      2.0 * std::pow(v_squ(v), 3) *
+      2.0 * pow(v_squ(v), 3) *
       (pow(det_t(t), 0) * outer_product(ddet_t_dt(t), ddet_t_dt(t)) +
-       std::pow(det_t(t), 1) * d2det_t_dt_dt(t)));
+       pow(det_t(t), 1) * d2det_t_dt_dt(t)));
   };
 
   static Tensor<3, dim, NumberType>
   d2psi_dv_dt(const SymmetricTensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &         v)
   {
-    return 2.0 * std::pow(det_t(t), 1) * 3.0 * std::pow(v_squ(v), 2) *
+    return 2.0 * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(static_cast<Tensor<2, dim, NumberType>>(ddet_t_dt(t)),
                          dv_squ_dv(v));
   };
@@ -137,7 +137,7 @@ struct FunctionsTestSymmetricTensorVectorCoupled
   d2psi_dt_dv(const SymmetricTensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &         v)
   {
-    return 2.0 * std::pow(det_t(t), 1) * 3.0 * std::pow(v_squ(v), 2) *
+    return 2.0 * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(dv_squ_dv(v),
                          static_cast<Tensor<2, dim, NumberType>>(ddet_t_dt(t)));
   };
@@ -146,10 +146,9 @@ struct FunctionsTestSymmetricTensorVectorCoupled
   d2psi_dv_dv(const SymmetricTensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &         v)
   {
-    return std::pow(det_t(t), 2) * 3.0 *
-           (2.0 * std::pow(v_squ(v), 1) *
-              outer_product(dv_squ_dv(v), dv_squ_dv(v)) +
-            std::pow(v_squ(v), 2) * d2v_squ_dv_dv(v));
+    return pow(det_t(t), 2) * 3.0 *
+           (2.0 * pow(v_squ(v), 1) * outer_product(dv_squ_dv(v), dv_squ_dv(v)) +
+            pow(v_squ(v), 2) * d2v_squ_dv_dv(v));
   };
 };
 

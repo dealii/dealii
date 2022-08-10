@@ -43,7 +43,9 @@ template <int dim, typename NumberType>
 NumberType
 J(const SymmetricTensor<2, dim, NumberType> &C)
 {
-  return std::sqrt(determinant(C));
+  // Make things work with AD types
+  using std::sqrt;
+  return sqrt(determinant(C));
 }
 
 template <int dim, typename NumberType>
@@ -53,7 +55,9 @@ struct IncompressibleNeoHookean
   static NumberType
   psi(const SymmetricTensor<2, dim, NumberType> &C)
   {
-    return 0.5 * mu() * (trace(C) - dim) - mu() * std::log(J(C));
+    // Make things work with AD types
+    using std::log;
+    return 0.5 * mu() * (trace(C) - dim) - mu() * log(J(C));
   }
 
   static SymmetricTensor<2, dim, NumberType>

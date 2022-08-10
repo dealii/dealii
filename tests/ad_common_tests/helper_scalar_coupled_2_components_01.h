@@ -42,31 +42,31 @@ struct FunctionsTestScalarScalarCoupled
   static NumberType
   psi(const NumberType &s1, const NumberType &s2)
   {
-    return 2.0 * std::pow(s1, 4) * std::pow(s2, 3);
+    return 2.0 * pow(s1, 4) * pow(s2, 3);
   };
 
   static NumberType
   dpsi_ds1(const NumberType &s1, const NumberType &s2)
   {
-    return 8.0 * std::pow(s1, 3) * std::pow(s2, 3);
+    return 8.0 * pow(s1, 3) * pow(s2, 3);
   };
 
   static NumberType
   dpsi_ds2(const NumberType &s1, const NumberType &s2)
   {
-    return 6.0 * std::pow(s1, 4) * std::pow(s2, 2);
+    return 6.0 * pow(s1, 4) * pow(s2, 2);
   };
 
   static NumberType
   d2psi_ds1_ds1(const NumberType &s1, const NumberType &s2)
   {
-    return 24.0 * std::pow(s1, 2) * std::pow(s2, 3);
+    return 24.0 * pow(s1, 2) * pow(s2, 3);
   };
 
   static NumberType
   d2psi_ds2_ds1(const NumberType &s1, const NumberType &s2)
   {
-    return 24.0 * std::pow(s1, 3) * std::pow(s2, 2);
+    return 24.0 * pow(s1, 3) * pow(s2, 2);
   };
 
   static NumberType
@@ -78,7 +78,7 @@ struct FunctionsTestScalarScalarCoupled
   static NumberType
   d2psi_ds2_ds2(const NumberType &s1, const NumberType &s2)
   {
-    return 12.0 * std::pow(s1, 4) * std::pow(s2, 1);
+    return 12.0 * pow(s1, 4) * pow(s2, 1);
   };
 };
 
