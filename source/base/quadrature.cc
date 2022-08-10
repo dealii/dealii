@@ -372,26 +372,24 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
   : Quadrature<dim>(qx.size() * qy.size())
 {
   Assert(dim == 2, ExcImpossibleInDim(dim));
-}
 
+  // placate compiler in the dim == 1 case
+  constexpr int dim_1 = dim == 2 ? 1 : 0;
 
-
-template <>
-QAnisotropic<2>::QAnisotropic(const Quadrature<1> &qx, const Quadrature<1> &qy)
-  : Quadrature<2>(qx.size() * qy.size())
-{
   unsigned int k = 0;
   for (unsigned int k2 = 0; k2 < qy.size(); ++k2)
     for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
       {
-        this->quadrature_points[k](0) = qx.point(k1)(0);
-        this->quadrature_points[k](1) = qy.point(k2)(0);
-        this->weights[k++]            = qx.weight(k1) * qy.weight(k2);
+        this->quadrature_points[k](0)     = qx.point(k1)(0);
+        this->quadrature_points[k](dim_1) = qy.point(k2)(0);
+        this->weights[k++]                = qx.weight(k1) * qy.weight(k2);
       }
   Assert(k == this->size(), ExcInternalError());
+
   this->is_tensor_product_flag = true;
-  const std::array<Quadrature<1>, 2> q_array{{qx, qy}};
-  this->tensor_basis = std::make_unique<std::array<Quadrature<1>, 2>>(q_array);
+  this->tensor_basis       = std::make_unique<std::array<Quadrature<1>, dim>>();
+  (*this->tensor_basis)[0] = qx;
+  (*this->tensor_basis)[dim_1] = qy;
 }
 
 
@@ -403,30 +401,28 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
   : Quadrature<dim>(qx.size() * qy.size() * qz.size())
 {
   Assert(dim == 3, ExcImpossibleInDim(dim));
-}
 
+  // placate compiler in lower dimensions
+  constexpr int dim_1 = dim == 3 ? 1 : 0;
+  constexpr int dim_2 = dim == 3 ? 2 : 0;
 
-
-template <>
-QAnisotropic<3>::QAnisotropic(const Quadrature<1> &qx,
-                              const Quadrature<1> &qy,
-                              const Quadrature<1> &qz)
-  : Quadrature<3>(qx.size() * qy.size() * qz.size())
-{
   unsigned int k = 0;
   for (unsigned int k3 = 0; k3 < qz.size(); ++k3)
     for (unsigned int k2 = 0; k2 < qy.size(); ++k2)
       for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
         {
-          this->quadrature_points[k](0) = qx.point(k1)(0);
-          this->quadrature_points[k](1) = qy.point(k2)(0);
-          this->quadrature_points[k](2) = qz.point(k3)(0);
+          this->quadrature_points[k](0)     = qx.point(k1)(0);
+          this->quadrature_points[k](dim_1) = qy.point(k2)(0);
+          this->quadrature_points[k](dim_2) = qz.point(k3)(0);
           this->weights[k++] = qx.weight(k1) * qy.weight(k2) * qz.weight(k3);
         }
   Assert(k == this->size(), ExcInternalError());
+
   this->is_tensor_product_flag = true;
-  const std::array<Quadrature<1>, 3> q_array{{qx, qy, qz}};
-  this->tensor_basis = std::make_unique<std::array<Quadrature<1>, 3>>(q_array);
+  this->tensor_basis       = std::make_unique<std::array<Quadrature<1>, dim>>();
+  (*this->tensor_basis)[0] = qx;
+  (*this->tensor_basis)[dim_1] = qy;
+  (*this->tensor_basis)[dim_2] = qz;
 }
 
 
