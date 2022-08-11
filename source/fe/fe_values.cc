@@ -19,6 +19,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/differentiation/ad.h>
 

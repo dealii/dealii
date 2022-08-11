@@ -20,8 +20,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/vector.h>
 

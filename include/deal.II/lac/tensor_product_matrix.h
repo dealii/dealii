@@ -20,7 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
-#include <deal.II/base/thread_management.h>
+#include <deal.II/base/mutex.h>
 
 #include <deal.II/lac/lapack_full_matrix.h>
 

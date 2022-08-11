@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/thread_management.h>
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/utilities.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
