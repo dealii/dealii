@@ -420,7 +420,7 @@ namespace Step52
           }
         case TimeStepping::BOGACKI_SHAMPINE:
           {
-            method_name = "bocacki_shampine";
+            method_name = "bogacki_shampine";
             break;
           }
         case TimeStepping::DOPRI:
