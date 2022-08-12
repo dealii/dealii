@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
@@ -31,40 +32,6 @@
 #include <numeric>
 #include <set>
 #include <vector>
-
-#if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
-// without MPI, we would still like to use
-// some constructs with MPI data
-// types. Therefore, create some dummies
-using MPI_Comm     = int;
-using MPI_Request  = int;
-using MPI_Datatype = int;
-using MPI_Op       = int;
-#  ifndef MPI_COMM_WORLD
-#    define MPI_COMM_WORLD 0
-#  endif
-#  ifndef MPI_COMM_SELF
-#    define MPI_COMM_SELF 0
-#  endif
-#  ifndef MPI_COMM_NULL
-#    define MPI_COMM_NULL 0
-#  endif
-#  ifndef MPI_REQUEST_NULL
-#    define MPI_REQUEST_NULL 0
-#  endif
-#  ifndef MPI_MIN
-#    define MPI_MIN 0
-#  endif
-#  ifndef MPI_MAX
-#    define MPI_MAX 0
-#  endif
-#  ifndef MPI_SUM
-#    define MPI_SUM 0
-#  endif
-#  ifndef MPI_LOR
-#    define MPI_LOR 0
-#  endif
-#endif
 
 
 

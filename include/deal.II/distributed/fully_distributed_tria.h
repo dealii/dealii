@@ -19,14 +19,12 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi_stub.h>
+
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <vector>
-
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 

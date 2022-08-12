@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/bounding_box.h>
-#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_stub.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>

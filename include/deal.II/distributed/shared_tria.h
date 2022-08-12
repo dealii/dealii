@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
@@ -32,11 +33,6 @@
 #include <set>
 #include <utility>
 #include <vector>
-
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
-
 
 DEAL_II_NAMESPACE_OPEN
 

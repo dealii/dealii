@@ -22,14 +22,13 @@
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/mpi.h>
+#  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/mutex.h>
 #  include <deal.II/base/process_grid.h>
 
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/lapack_full_matrix.h>
 #  include <deal.II/lac/lapack_support.h>
-
-#  include <mpi.h>
 
 #  include <memory>
 

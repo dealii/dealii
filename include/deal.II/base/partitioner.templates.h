@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/cuda_size.h>
+#include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/partitioner.h>
 
 #include <deal.II/lac/cuda_kernels.templates.h>

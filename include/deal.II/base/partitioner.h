@@ -22,13 +22,13 @@
 #include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_space.h>
-#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/types.h>
 
 #include <deal.II/lac/vector_operation.h>
 
 #include <limits>
-
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 

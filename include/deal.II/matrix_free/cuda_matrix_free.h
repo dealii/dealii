@@ -22,7 +22,8 @@
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
 #  include <deal.II/base/cuda_size.h>
-#  include <deal.II/base/mpi.h>
+#  include <deal.II/base/mpi_stub.h>
+#  include <deal.II/base/partitioner.h>
 #  include <deal.II/base/quadrature.h>
 #  include <deal.II/base/tensor.h>
 

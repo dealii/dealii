@@ -18,6 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_tags.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 DEAL_II_NAMESPACE_OPEN

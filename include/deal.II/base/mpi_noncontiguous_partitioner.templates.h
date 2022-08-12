@@ -22,6 +22,7 @@
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_noncontiguous_partitioner.h>
+#include <deal.II/base/mpi_tags.h>
 
 #include <deal.II/lac/vector_space_vector.h>
 
