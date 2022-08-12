@@ -22,8 +22,7 @@
 
 #  include <deal.II/base/thread_management.h>
 
-#  include <deal.II/lac/sparsity_tools.h>
-
+#  include <algorithm>
 #  include <functional>
 #  include <set>
 #  include <unordered_map>
@@ -32,6 +31,8 @@
 
 
 DEAL_II_NAMESPACE_OPEN
+
+class SparsityPattern;
 
 /**
  * A namespace containing functions that can color graphs.

@@ -18,6 +18,8 @@
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/thread_management.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
