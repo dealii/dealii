@@ -100,6 +100,7 @@ SET(_unity_include_src
   thread_management.cc
   timer.cc
   time_stepping.cc
+  trilinos_utilities.cc
   utilities.cc
   vectorization.cc
   )
