@@ -27,6 +27,7 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_q_base.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>

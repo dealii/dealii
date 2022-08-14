@@ -21,7 +21,7 @@
 #include <deal.II/base/std_cxx20/iota_view.h>
 
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/hp/q_collection.h>
 

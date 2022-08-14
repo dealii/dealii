@@ -31,7 +31,6 @@
 
 #  include <deal.II/fe/fe_update_flags.h>
 #  include <deal.II/fe/mapping.h>
-#  include <deal.II/fe/mapping_q1.h>
 
 #  include <deal.II/grid/filtered_iterator.h>
 

@@ -26,7 +26,6 @@
 
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe.h>
-#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_tools_cache.h>
 

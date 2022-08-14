@@ -21,12 +21,12 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/vector.h>
@@ -512,8 +512,7 @@ DataOutRotation<dim, spacedim>::build_patches(
       n_postprocessor_outputs[dataset] = 0;
 
   Assert(!this->triangulation->is_mixed_mesh(), ExcNotImplemented());
-  const auto reference_cell =
-    this->triangulation->get_reference_cells()[0];
+  const auto reference_cell = this->triangulation->get_reference_cells()[0];
   internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
     thread_data(
       n_datasets,

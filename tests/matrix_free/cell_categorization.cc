@@ -23,6 +23,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>

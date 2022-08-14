@@ -23,7 +23,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/subscriptor.h>
 
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/grid_tools_cache_update_flags.h>
 #include <deal.II/grid/tria.h>

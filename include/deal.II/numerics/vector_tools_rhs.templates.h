@@ -16,6 +16,7 @@
 #ifndef dealii_vector_tools_rhs_templates_h
 #define dealii_vector_tools_rhs_templates_h
 
+#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/hp/fe_values.h>
 

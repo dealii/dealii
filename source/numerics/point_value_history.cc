@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/lac/block_vector.h>
@@ -710,7 +709,8 @@ PointValueHistory<dim>::evaluate_field(
   typename std::vector<
     internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
     point = point_geometry_data.begin();
-  Assert(!dof_handler->get_triangulation().is_mixed_mesh(), ExcNotImplemented());
+  Assert(!dof_handler->get_triangulation().is_mixed_mesh(),
+         ExcNotImplemented());
   const auto reference_cell =
     dof_handler->get_triangulation().get_reference_cells()[0];
   for (unsigned int data_store_index = 0; point != point_geometry_data.end();
@@ -1275,7 +1275,8 @@ PointValueHistory<dim>::get_postprocessor_locations(
   typename std::vector<
     internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
     point = point_geometry_data.begin();
-  Assert(!dof_handler->get_triangulation().is_mixed_mesh(), ExcNotImplemented());
+  Assert(!dof_handler->get_triangulation().is_mixed_mesh(),
+         ExcNotImplemented());
   const auto reference_cell =
     dof_handler->get_triangulation().get_reference_cells()[0];
   for (unsigned int data_store_index = 0; point != point_geometry_data.end();
