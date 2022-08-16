@@ -20,6 +20,8 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/grid_out.h>
@@ -29,7 +31,6 @@
 
 #include <deal.II/numerics/data_out.h>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
 #ifdef DEAL_II_GMSH_WITH_API

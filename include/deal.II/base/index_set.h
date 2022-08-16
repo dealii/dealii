@@ -21,7 +21,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/utilities.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>

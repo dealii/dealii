@@ -19,6 +19,8 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -81,7 +83,7 @@ namespace internal
 
 template <>
 void
-QProjector<1>::project_to_face(const ReferenceCell reference_cell,
+QProjector<1>::project_to_face(const ReferenceCell &reference_cell,
                                const Quadrature<0> &,
                                const unsigned int     face_no,
                                std::vector<Point<1>> &q_points)
@@ -100,7 +102,7 @@ QProjector<1>::project_to_face(const ReferenceCell reference_cell,
 
 template <>
 void
-QProjector<2>::project_to_face(const ReferenceCell    reference_cell,
+QProjector<2>::project_to_face(const ReferenceCell &  reference_cell,
                                const Quadrature<1> &  quadrature,
                                const unsigned int     face_no,
                                std::vector<Point<2>> &q_points)
@@ -162,7 +164,7 @@ QProjector<2>::project_to_face(const ReferenceCell    reference_cell,
 
 template <>
 void
-QProjector<3>::project_to_face(const ReferenceCell    reference_cell,
+QProjector<3>::project_to_face(const ReferenceCell &  reference_cell,
                                const Quadrature<2> &  quadrature,
                                const unsigned int     face_no,
                                std::vector<Point<3>> &q_points)
@@ -212,7 +214,7 @@ QProjector<3>::project_to_face(const ReferenceCell    reference_cell,
 
 template <>
 void
-QProjector<1>::project_to_subface(const ReferenceCell reference_cell,
+QProjector<1>::project_to_subface(const ReferenceCell &reference_cell,
                                   const Quadrature<0> &,
                                   const unsigned int face_no,
                                   const unsigned int,
@@ -233,7 +235,7 @@ QProjector<1>::project_to_subface(const ReferenceCell reference_cell,
 
 template <>
 void
-QProjector<2>::project_to_subface(const ReferenceCell    reference_cell,
+QProjector<2>::project_to_subface(const ReferenceCell &  reference_cell,
                                   const Quadrature<1> &  quadrature,
                                   const unsigned int     face_no,
                                   const unsigned int     subface_no,
@@ -377,7 +379,7 @@ QProjector<2>::project_to_subface(const ReferenceCell    reference_cell,
 
 template <>
 void
-QProjector<3>::project_to_subface(const ReferenceCell      reference_cell,
+QProjector<3>::project_to_subface(const ReferenceCell &    reference_cell,
                                   const Quadrature<2> &    quadrature,
                                   const unsigned int       face_no,
                                   const unsigned int       subface_no,
@@ -467,7 +469,7 @@ QProjector<3>::project_to_subface(const ReferenceCell      reference_cell,
 
 template <>
 Quadrature<1>
-QProjector<1>::project_to_all_faces(const ReferenceCell       reference_cell,
+QProjector<1>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<0> &quadrature)
 {
   AssertDimension(quadrature.size(), 1);
@@ -514,7 +516,7 @@ QProjector<1>::project_to_all_faces(const ReferenceCell       reference_cell,
 
 template <>
 Quadrature<2>
-QProjector<2>::project_to_all_faces(const ReferenceCell       reference_cell,
+QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<1> &quadrature)
 {
   if (reference_cell == ReferenceCells::Triangle)
@@ -638,7 +640,7 @@ QProjector<2>::project_to_all_faces(const ReferenceCell       reference_cell,
 
 template <>
 Quadrature<3>
-QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
+QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<2> &quadrature)
 {
   const auto support_points_tri =
@@ -945,7 +947,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell       reference_cell,
 
 template <>
 Quadrature<1>
-QProjector<1>::project_to_all_subfaces(const ReferenceCell  reference_cell,
+QProjector<1>::project_to_all_subfaces(const ReferenceCell &reference_cell,
                                        const Quadrature<0> &quadrature)
 {
   Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
@@ -992,7 +994,7 @@ QProjector<1>::project_to_all_subfaces(const ReferenceCell  reference_cell,
 
 template <>
 Quadrature<2>
-QProjector<2>::project_to_all_subfaces(const ReferenceCell  reference_cell,
+QProjector<2>::project_to_all_subfaces(const ReferenceCell &reference_cell,
                                        const SubQuadrature &quadrature)
 {
   if (reference_cell == ReferenceCells::Triangle ||
@@ -1043,7 +1045,7 @@ QProjector<2>::project_to_all_subfaces(const ReferenceCell  reference_cell,
 
 template <>
 Quadrature<3>
-QProjector<3>::project_to_all_subfaces(const ReferenceCell  reference_cell,
+QProjector<3>::project_to_all_subfaces(const ReferenceCell &reference_cell,
                                        const SubQuadrature &quadrature)
 {
   if (reference_cell == ReferenceCells::Triangle ||
@@ -1127,7 +1129,7 @@ QProjector<3>::project_to_all_subfaces(const ReferenceCell  reference_cell,
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_child(const ReferenceCell    reference_cell,
+QProjector<dim>::project_to_child(const ReferenceCell &  reference_cell,
                                   const Quadrature<dim> &quadrature,
                                   const unsigned int     child_no)
 {
@@ -1159,7 +1161,7 @@ QProjector<dim>::project_to_child(const ReferenceCell    reference_cell,
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_all_children(const ReferenceCell    reference_cell,
+QProjector<dim>::project_to_all_children(const ReferenceCell &  reference_cell,
                                          const Quadrature<dim> &quadrature)
 {
   Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
@@ -1191,7 +1193,7 @@ QProjector<dim>::project_to_all_children(const ReferenceCell    reference_cell,
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_line(const ReferenceCell  reference_cell,
+QProjector<dim>::project_to_line(const ReferenceCell &reference_cell,
                                  const Quadrature<1> &quadrature,
                                  const Point<dim> &   p1,
                                  const Point<dim> &   p2)
@@ -1219,11 +1221,11 @@ QProjector<dim>::project_to_line(const ReferenceCell  reference_cell,
 
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::face(const ReferenceCell reference_cell,
-                                         const unsigned int  face_no,
-                                         const bool          face_orientation,
-                                         const bool          face_flip,
-                                         const bool          face_rotation,
+QProjector<dim>::DataSetDescriptor::face(const ReferenceCell &reference_cell,
+                                         const unsigned int   face_no,
+                                         const bool           face_orientation,
+                                         const bool           face_flip,
+                                         const bool           face_rotation,
                                          const unsigned int n_quadrature_points)
 {
   if (reference_cell == ReferenceCells::Triangle ||
@@ -1309,7 +1311,7 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell reference_cell,
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
 QProjector<dim>::DataSetDescriptor::face(
-  const ReferenceCell             reference_cell,
+  const ReferenceCell &           reference_cell,
   const unsigned int              face_no,
   const bool                      face_orientation,
   const bool                      face_flip,
@@ -1446,9 +1448,9 @@ QProjector<dim>::DataSetDescriptor::face(
 template <>
 QProjector<1>::DataSetDescriptor
 QProjector<1>::DataSetDescriptor::subface(
-  const ReferenceCell reference_cell,
-  const unsigned int  face_no,
-  const unsigned int  subface_no,
+  const ReferenceCell &reference_cell,
+  const unsigned int   face_no,
+  const unsigned int   subface_no,
   const bool,
   const bool,
   const bool,
@@ -1471,9 +1473,9 @@ QProjector<1>::DataSetDescriptor::subface(
 template <>
 QProjector<2>::DataSetDescriptor
 QProjector<2>::DataSetDescriptor::subface(
-  const ReferenceCell reference_cell,
-  const unsigned int  face_no,
-  const unsigned int  subface_no,
+  const ReferenceCell &reference_cell,
+  const unsigned int   face_no,
+  const unsigned int   subface_no,
   const bool,
   const bool,
   const bool,
@@ -1496,7 +1498,7 @@ QProjector<2>::DataSetDescriptor::subface(
 template <>
 QProjector<3>::DataSetDescriptor
 QProjector<3>::DataSetDescriptor::subface(
-  const ReferenceCell            reference_cell,
+  const ReferenceCell &          reference_cell,
   const unsigned int             face_no,
   const unsigned int             subface_no,
   const bool                     face_orientation,
@@ -1753,7 +1755,7 @@ QProjector<3>::DataSetDescriptor::subface(
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_face(const ReferenceCell  reference_cell,
+QProjector<dim>::project_to_face(const ReferenceCell &reference_cell,
                                  const SubQuadrature &quadrature,
                                  const unsigned int   face_no)
 {
@@ -1770,7 +1772,7 @@ QProjector<dim>::project_to_face(const ReferenceCell  reference_cell,
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_subface(const ReferenceCell  reference_cell,
+QProjector<dim>::project_to_subface(const ReferenceCell &reference_cell,
                                     const SubQuadrature &quadrature,
                                     const unsigned int   face_no,
                                     const unsigned int   subface_no,

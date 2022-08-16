@@ -23,6 +23,8 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 #include "../tests.h"
 
 template <int dim>

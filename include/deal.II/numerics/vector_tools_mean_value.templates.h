@@ -16,6 +16,7 @@
 #ifndef dealii_vector_tools_mean_value_templates_h
 #define dealii_vector_tools_mean_value_templates_h
 
+#include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/fe/fe_values.h>
 
