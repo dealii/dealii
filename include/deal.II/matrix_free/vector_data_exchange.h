@@ -30,20 +30,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifndef DOXYGEN
-
-// forward declaration
-namespace Utilities
-{
-  namespace MPI
-  {
-    class Partitioner;
-  }
-} // namespace Utilities
-
-#endif
-
-
 namespace internal
 {
   namespace MatrixFreeFunctions
