@@ -150,6 +150,11 @@ public:
   operator=(const FEEvaluationData &other);
 
   /**
+   * Destructor.
+   */
+  virtual ~FEEvaluationData() = default;
+
+  /**
    * Sets the pointers for values, gradients, hessians to the central
    * scratch_data_array inside the given scratch array, for a given number of
    * components as provided by one of the derived classes.
