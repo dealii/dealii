@@ -511,14 +511,18 @@ DataOutRotation<dim, spacedim>::build_patches(
     else
       n_postprocessor_outputs[dataset] = 0;
 
+  Assert(!this->triangulation->is_mixed_mesh(), ExcNotImplemented());
+  const auto reference_cell =
+    this->triangulation->get_reference_cells()[0];
   internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
-    thread_data(n_datasets,
-                n_subdivisions,
-                n_patches_per_circle,
-                n_postprocessor_outputs,
-                StaticMappingQ1<dim, spacedim>::mapping,
-                this->get_fes(),
-                update_flags);
+    thread_data(
+      n_datasets,
+      n_subdivisions,
+      n_patches_per_circle,
+      n_postprocessor_outputs,
+      reference_cell.template get_default_linear_mapping<dim, spacedim>(),
+      this->get_fes(),
+      update_flags);
   std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> new_patches(
     n_patches_per_circle);
   for (unsigned int i = 0; i < new_patches.size(); ++i)
