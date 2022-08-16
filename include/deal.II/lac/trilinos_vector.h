@@ -21,7 +21,7 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/base/index_set.h>
-#  include <deal.II/base/mpi.h>
+#  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/base/utilities.h>
 
@@ -35,7 +35,6 @@
 #  include <Epetra_LocalMap.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
-#  include <mpi.h>
 
 #  include <memory>
 #  include <utility>

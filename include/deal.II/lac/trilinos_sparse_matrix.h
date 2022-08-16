@@ -22,6 +22,7 @@
 #  ifdef DEAL_II_WITH_TRILINOS
 
 #    include <deal.II/base/index_set.h>
+#    include <deal.II/base/mpi_stub.h>
 #    include <deal.II/base/subscriptor.h>
 
 #    include <deal.II/lac/exceptions.h>
@@ -41,7 +42,6 @@
 #    include <Epetra_MpiComm.h>
 #    include <Epetra_MultiVector.h>
 #    include <Epetra_Operator.h>
-#    include <mpi.h>
 
 #    include <cmath>
 #    include <iterator>

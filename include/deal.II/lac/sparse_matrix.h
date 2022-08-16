@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
@@ -25,9 +26,6 @@
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/vector_operation.h>
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
 
 #include <iterator>
 #include <memory>

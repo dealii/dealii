@@ -20,6 +20,7 @@
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
+#include <deal.II/base/mpi_tags.h>
 
 DEAL_II_NAMESPACE_OPEN
 
