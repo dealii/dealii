@@ -157,6 +157,10 @@ namespace parallel
             &dof_handler->get_triangulation())));
       Assert(tria != nullptr, ExcInternalError());
 
+      Assert(handle == numbers::invalid_unsigned_int,
+             ExcMessage("You can only add one solution per "
+                        "SolutionTransfer object."));
+
       handle = tria->register_data_attach(
         [this](
           const typename Triangulation<dim, spacedim>::cell_iterator &cell_,
@@ -287,6 +291,7 @@ namespace parallel
         }
 
       input_vectors.clear();
+      handle = numbers::invalid_unsigned_int;
     }
 
 
