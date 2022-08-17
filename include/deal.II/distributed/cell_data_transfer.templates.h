@@ -104,6 +104,10 @@ namespace parallel
           &(*triangulation));
       Assert(tria != nullptr, ExcInternalError());
 
+      Assert(handle == numbers::invalid_unsigned_int,
+             ExcMessage("You can only add one data container per "
+                        "CellDataTransfer object."));
+
       handle = tria->register_data_attach(
         [this](const typename parallel::distributed::
                  Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -193,6 +197,7 @@ namespace parallel
         post_unpack_action(all_out);
 
       input_vectors.clear();
+      handle = numbers::invalid_unsigned_int;
     }
 
 
