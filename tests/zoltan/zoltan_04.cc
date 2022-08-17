@@ -23,6 +23,8 @@
 
 #include <deal.II/base/graph_coloring.h>
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+
 #include "../tests.h"
 
 
