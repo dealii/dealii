@@ -466,13 +466,14 @@ namespace VectorTools
 
     template <int dim, int spacedim>
     void
-    map_dof_to_normals_on_level(
-      const DoFHandler<dim, spacedim> &   dof_handler,
+    get_dof_pairs(
+      const typename DoFHandler<dim, spacedim>::cell_iterator &cell,
       const unsigned int                  first_vector_component,
       const std::set<types::boundary_id> &boundary_ids,
       const std::map<types::boundary_id, const Function<spacedim> *>
         &                              function_map,
       hp::FEFaceValues<dim, spacedim> &x_fe_face_values,
+      const unsigned int               n_dofs,
       const IndexSet &                 refinement_edge_indices,
       const unsigned int               level,
       std::multimap<
@@ -483,330 +484,156 @@ namespace VectorTools
       std::map<internal::VectorDoFTuple<dim>, Vector<double>>
         &dof_vector_to_b_values)
     {
-      Assert(level < dof_handler.get_triangulation().n_levels(),
-             ExcInternalError());
-
-      std::vector<types::global_dof_index> face_dofs;
-
-      const auto &face_quadrature_collection =
-        x_fe_face_values.get_quadrature_collection();
-
-      // now loop over all cells and all faces
       std::set<types::boundary_id>::iterator b_id;
-      for (const auto &cell : dof_handler.cell_iterators_on_level(level))
-        if (cell->level_subdomain_id() != numbers::artificial_subdomain_id &&
-            cell->level_subdomain_id() != numbers::invalid_subdomain_id)
-          for (const unsigned int face_no : cell->face_indices())
-            if ((b_id = boundary_ids.find(
-                   cell->face(face_no)->boundary_id())) != boundary_ids.end())
-              {
-                const FiniteElement<dim> &fe = cell->get_fe();
-                typename DoFHandler<dim, spacedim>::level_face_iterator face =
-                  cell->face(face_no);
+      for (const unsigned int face_no : cell->face_indices())
+        if ((b_id = boundary_ids.find(cell->face(face_no)->boundary_id())) !=
+            boundary_ids.end())
+          {
+            const FiniteElement<dim> &fe = cell->get_fe();
+            typename DoFHandler<dim, spacedim>::level_face_iterator face =
+              cell->face(face_no);
 
-                // get the indices of the dofs on this cell...
-                face_dofs.resize(fe.n_dofs_per_face(face_no));
+            std::vector<types::global_dof_index> face_dofs;
+            // get the indices of the dofs on this cell...
+            face_dofs.resize(fe.n_dofs_per_face(face_no));
 
-                face->get_mg_dof_indices(level,
-                                         face_dofs,
-                                         cell->active_fe_index());
+            if (level != numbers::invalid_unsigned_int)
+              face->get_mg_dof_indices(level,
+                                       face_dofs,
+                                       cell->active_fe_index());
+            else
+              face->get_dof_indices(face_dofs, cell->active_fe_index());
 
-                x_fe_face_values.reinit(cell, face_no);
-                const FEFaceValues<dim> &fe_values =
-                  x_fe_face_values.get_present_fe_values();
+            x_fe_face_values.reinit(cell, face_no);
+            const FEFaceValues<dim> &fe_values =
+              x_fe_face_values.get_present_fe_values();
 
-                // then identify which of them correspond to the selected set of
-                // vector components
-                for (unsigned int i = 0; i < face_dofs.size(); ++i)
-                  if (fe.face_system_to_component_index(i, face_no).first ==
-                      first_vector_component)
-                    // Refinement edge indices are going to be constrained to 0
-                    // during a multigrid cycle and do not need no-normal-flux
-                    // constraints, so skip them:
-                    if (!refinement_edge_indices.is_element(face_dofs[i]))
-                      {
-                        // find corresponding other components of vector
-                        internal::VectorDoFTuple<dim> vector_dofs;
-                        vector_dofs.dof_indices[0] = face_dofs[i];
+            const auto &face_quadrature_collection =
+              x_fe_face_values.get_quadrature_collection();
 
-                        Assert(
-                          first_vector_component + dim <= fe.n_components(),
-                          ExcMessage(
-                            "Error: the finite element does not have enough components "
-                            "to define a normal direction."));
+            // then identify which of them correspond to the selected set of
+            // vector components
+            for (unsigned int i = 0; i < face_dofs.size(); ++i)
+              if (fe.face_system_to_component_index(i, face_no).first ==
+                  first_vector_component)
+                // Refinement edge indices are going to be constrained to 0
+                // during a multigrid cycle and do not need no-normal-flux
+                // constraints, so skip them:
+                if (!refinement_edge_indices.is_element(face_dofs[i]) ||
+                    level == numbers::invalid_unsigned_int)
+                  {
+                    // find corresponding other components of vector
+                    internal::VectorDoFTuple<dim> vector_dofs;
+                    vector_dofs.dof_indices[0] = face_dofs[i];
 
-                        for (unsigned int k = 0;
-                             k < fe.n_dofs_per_face(face_no);
-                             ++k)
-                          if ((k != i) &&
-                              (face_quadrature_collection[cell
-                                                            ->active_fe_index()]
-                                 .point(k) ==
-                               face_quadrature_collection[cell
-                                                            ->active_fe_index()]
-                                 .point(i)) &&
-                              (fe.face_system_to_component_index(k, face_no)
-                                 .first >= first_vector_component) &&
-                              (fe.face_system_to_component_index(k, face_no)
-                                 .first < first_vector_component + dim))
-                            vector_dofs.dof_indices
-                              [fe.face_system_to_component_index(k, face_no)
-                                 .first -
-                               first_vector_component] = face_dofs[k];
+                    Assert(
+                      first_vector_component + dim <= fe.n_components(),
+                      ExcMessage(
+                        "Error: the finite element does not have enough components "
+                        "to define a normal direction."));
 
-                        for (unsigned int d = 0; d < dim; ++d)
-                          Assert(vector_dofs.dof_indices[d] <
-                                   dof_handler.n_dofs(),
-                                 ExcInternalError());
+                    for (unsigned int k = 0; k < fe.n_dofs_per_face(face_no);
+                         ++k)
+                      if ((k != i) &&
+                          (face_quadrature_collection[cell->active_fe_index()]
+                             .point(k) ==
+                           face_quadrature_collection[cell->active_fe_index()]
+                             .point(i)) &&
+                          (fe.face_system_to_component_index(k, face_no)
+                             .first >= first_vector_component) &&
+                          (fe.face_system_to_component_index(k, face_no).first <
+                           first_vector_component + dim))
+                        vector_dofs.dof_indices
+                          [fe.face_system_to_component_index(k, face_no).first -
+                           first_vector_component] = face_dofs[k];
 
-                        // we need the normal vector on this face. we know that
-                        // it is a vector of length 1 but at least with higher
-                        // order mappings it isn't always possible to guarantee
-                        // that each component is exact up to zero tolerance. in
-                        // particular, as shown in the deal.II/no_flux_06 test,
-                        // if we just take the normal vector as given by the
-                        // fe_values object, we can get entries in the normal
-                        // vectors of the unit cube that have entries up to
-                        // several times 1e-14.
-                        //
-                        // the problem with this is that this later yields
-                        // constraints that are circular (e.g., in the testcase,
-                        // we get constraints of the form
-                        //
-                        // x22 =  2.93099e-14*x21 + 2.93099e-14*x23
-                        // x21 = -2.93099e-14*x22 + 2.93099e-14*x21
-                        //
-                        // in both of these constraints, the small numbers
-                        // should be zero and the constraints should simply be
-                        // x22 = x21 = 0
-                        //
-                        // to achieve this, we utilize that we know that the
-                        // normal vector has (or should have) length 1 and that
-                        // we can simply set small elements to zero (without
-                        // having to check that they are small *relative to
-                        // something else*). we do this and then normalize the
-                        // length of the vector back to one, just to be on the
-                        // safe side
-                        //
-                        // one more point: we would like to use the "real"
-                        // normal vector here, as provided by the boundary
-                        // description and as opposed to what we get from the
-                        // FEValues object. we do this in the immediately next
-                        // line, but as is obvious, the boundary only has a
-                        // vague idea which side of a cell it is on -- indicated
-                        // by the face number. in other words, it may provide
-                        // the inner or outer normal. by and large, there is no
-                        // harm from this, since the tangential vector we
-                        // compute is still the same. however, we do average
-                        // over normal vectors from adjacent cells and if they
-                        // have recorded normal vectors from the inside once and
-                        // from the outside the other time, then this averaging
-                        // is going to run into trouble. as a consequence we ask
-                        // the mapping after all for its normal vector, but we
-                        // only ask it so that we can possibly correct the sign
-                        // of the normal vector provided by the boundary if they
-                        // should point in different directions. this is the
-                        // case in tests/deal.II/no_flux_11.
-                        Tensor<1, dim> normal_vector =
-                          (cell->face(face_no)->get_manifold().normal_vector(
-                            cell->face(face_no),
-                            fe_values.quadrature_point(i)));
-                        if (normal_vector * fe_values.normal_vector(i) < 0)
-                          normal_vector *= -1;
-                        Assert(std::fabs(normal_vector.norm() - 1) < 1e-14,
-                               ExcInternalError());
-                        for (unsigned int d = 0; d < dim; ++d)
-                          if (std::fabs(normal_vector[d]) < 1e-13)
-                            normal_vector[d] = 0;
-                        normal_vector /= normal_vector.norm();
-
-                        const Point<dim> &point = fe_values.quadrature_point(i);
-                        Vector<double>    b_values(dim);
-                        function_map.at(*b_id)->vector_value(point, b_values);
-
-                        // now enter the (dofs,(normal_vector,cell)) entry into
-                        // the map
-                        dof_to_normals_map.insert(
-                          std::make_pair(vector_dofs,
-                                         std::make_pair(normal_vector, cell)));
-                        dof_vector_to_b_values.insert(
-                          std::make_pair(vector_dofs, b_values));
-
-#ifdef DEBUG_NO_NORMAL_FLUX
-                        std::cout << "Adding normal vector:" << std::endl
-                                  << "   dofs=" << vector_dofs << std::endl
-                                  << "   cell=" << cell << " at "
-                                  << cell->center() << std::endl
-                                  << "   normal=" << normal_vector << std::endl;
-#endif
-                      }
-              }
-    }
-
-
-
-    template <int dim, int spacedim>
-    void
-    map_dof_to_normals(
-      const DoFHandler<dim, spacedim> &   dof_handler,
-      const unsigned int                  first_vector_component,
-      const std::set<types::boundary_id> &boundary_ids,
-      const std::map<types::boundary_id, const Function<spacedim> *>
-        &                              function_map,
-      hp::FEFaceValues<dim, spacedim> &x_fe_face_values,
-      std::multimap<
-        internal::VectorDoFTuple<dim>,
-        std::pair<Tensor<1, dim>,
-                  typename DoFHandler<dim, spacedim>::cell_iterator>>
-        &dof_to_normals_map,
-      std::map<internal::VectorDoFTuple<dim>, Vector<double>>
-        &dof_vector_to_b_values)
-    {
-      std::vector<types::global_dof_index> face_dofs;
-
-      const auto &face_quadrature_collection =
-        x_fe_face_values.get_quadrature_collection();
-
-      // now loop over all cells and all faces
-      std::set<types::boundary_id>::iterator b_id;
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (!cell->is_artificial())
-          for (const unsigned int face_no : cell->face_indices())
-            if ((b_id = boundary_ids.find(
-                   cell->face(face_no)->boundary_id())) != boundary_ids.end())
-              {
-                const FiniteElement<dim> &fe = cell->get_fe();
-                typename DoFHandler<dim, spacedim>::face_iterator face =
-                  cell->face(face_no);
-
-                // get the indices of the dofs on this cell...
-                face_dofs.resize(fe.n_dofs_per_face(face_no));
-                face->get_dof_indices(face_dofs, cell->active_fe_index());
-
-                x_fe_face_values.reinit(cell, face_no);
-                const FEFaceValues<dim> &fe_values =
-                  x_fe_face_values.get_present_fe_values();
-
-                // then identify which of them correspond to the selected set of
-                // vector components
-                for (unsigned int i = 0; i < face_dofs.size(); ++i)
-                  if (fe.face_system_to_component_index(i, face_no).first ==
-                      first_vector_component)
-                    {
-                      // find corresponding other components of vector
-                      internal::VectorDoFTuple<dim> vector_dofs;
-                      vector_dofs.dof_indices[0] = face_dofs[i];
-
-                      Assert(
-                        first_vector_component + dim <= fe.n_components(),
-                        ExcMessage(
-                          "Error: the finite element does not have enough components "
-                          "to define a normal direction."));
-
-                      for (unsigned int k = 0; k < fe.n_dofs_per_face(face_no);
-                           ++k)
-                        if ((k != i) &&
-                            (face_quadrature_collection[cell->active_fe_index()]
-                               .point(k) ==
-                             face_quadrature_collection[cell->active_fe_index()]
-                               .point(i)) &&
-                            (fe.face_system_to_component_index(k, face_no)
-                               .first >= first_vector_component) &&
-                            (fe.face_system_to_component_index(k, face_no)
-                               .first < first_vector_component + dim))
-                          vector_dofs
-                            .dof_indices[fe.face_system_to_component_index(
-                                             k, face_no)
-                                           .first -
-                                         first_vector_component] = face_dofs[k];
-
-                      for (unsigned int d = 0; d < dim; ++d)
-                        Assert(vector_dofs.dof_indices[d] <
-                                 dof_handler.n_dofs(),
-                               ExcInternalError());
-
-                      // we need the normal vector on this face. we know that it
-                      // is a vector of length 1 but at least with higher order
-                      // mappings it isn't always possible to guarantee that
-                      // each component is exact up to zero tolerance. in
-                      // particular, as shown in the deal.II/no_flux_06 test, if
-                      // we just take the normal vector as given by the
-                      // fe_values object, we can get entries in the normal
-                      // vectors of the unit cube that have entries up to
-                      // several times 1e-14.
-                      //
-                      // the problem with this is that this later yields
-                      // constraints that are circular (e.g., in the testcase,
-                      // we get constraints of the form
-                      //
-                      // x22 =  2.93099e-14*x21 + 2.93099e-14*x23
-                      // x21 = -2.93099e-14*x22 + 2.93099e-14*x21
-                      //
-                      // in both of these constraints, the small numbers should
-                      // be zero and the constraints should simply be
-                      // x22 = x21 = 0
-                      //
-                      // to achieve this, we utilize that we know that the
-                      // normal vector has (or should have) length 1 and that we
-                      // can simply set small elements to zero (without having
-                      // to check that they are small *relative to something
-                      // else*). we do this and then normalize the length of the
-                      // vector back to one, just to be on the safe side
-                      //
-                      // one more point: we would like to use the "real" normal
-                      // vector here, as provided by the boundary description
-                      // and as opposed to what we get from the FEValues object.
-                      // we do this in the immediately next line, but as is
-                      // obvious, the boundary only has a vague idea which side
-                      // of a cell it is on -- indicated by the face number. in
-                      // other words, it may provide the inner or outer normal.
-                      // by and large, there is no harm from this, since the
-                      // tangential vector we compute is still the same.
-                      // however, we do average over normal vectors from
-                      // adjacent cells and if they have recorded normal vectors
-                      // from the inside once and from the outside the other
-                      // time, then this averaging is going to run into trouble.
-                      // as a consequence we ask the mapping after all for its
-                      // normal vector, but we only ask it so that we can
-                      // possibly correct the sign of the normal vector provided
-                      // by the boundary if they should point in different
-                      // directions. this is the case in
-                      // tests/deal.II/no_flux_11.
-                      Tensor<1, dim> normal_vector =
-                        (cell->face(face_no)->get_manifold().normal_vector(
-                          cell->face(face_no), fe_values.quadrature_point(i)));
-                      if (normal_vector * fe_values.normal_vector(i) < 0)
-                        normal_vector *= -1;
-                      Assert(std::fabs(normal_vector.norm() - 1) < 1e-14,
+                    for (unsigned int d = 0; d < dim; ++d)
+                      Assert(vector_dofs.dof_indices[d] < n_dofs,
                              ExcInternalError());
-                      for (unsigned int d = 0; d < dim; ++d)
-                        if (std::fabs(normal_vector[d]) < 1e-13)
-                          normal_vector[d] = 0;
-                      normal_vector /= normal_vector.norm();
+                    (void)n_dofs;
 
-                      const Point<dim> &point = fe_values.quadrature_point(i);
-                      Vector<double>    b_values(dim);
-                      function_map.at(*b_id)->vector_value(point, b_values);
+                    // we need the normal vector on this face. we know that
+                    // it is a vector of length 1 but at least with higher
+                    // order mappings it isn't always possible to guarantee
+                    // that each component is exact up to zero tolerance. in
+                    // particular, as shown in the deal.II/no_flux_06 test,
+                    // if we just take the normal vector as given by the
+                    // fe_values object, we can get entries in the normal
+                    // vectors of the unit cube that have entries up to
+                    // several times 1e-14.
+                    //
+                    // the problem with this is that this later yields
+                    // constraints that are circular (e.g., in the testcase,
+                    // we get constraints of the form
+                    //
+                    // x22 =  2.93099e-14*x21 + 2.93099e-14*x23
+                    // x21 = -2.93099e-14*x22 + 2.93099e-14*x21
+                    //
+                    // in both of these constraints, the small numbers
+                    // should be zero and the constraints should simply be
+                    // x22 = x21 = 0
+                    //
+                    // to achieve this, we utilize that we know that the
+                    // normal vector has (or should have) length 1 and that
+                    // we can simply set small elements to zero (without
+                    // having to check that they are small *relative to
+                    // something else*). we do this and then normalize the
+                    // length of the vector back to one, just to be on the
+                    // safe side
+                    //
+                    // one more point: we would like to use the "real"
+                    // normal vector here, as provided by the boundary
+                    // description and as opposed to what we get from the
+                    // FEValues object. we do this in the immediately next
+                    // line, but as is obvious, the boundary only has a
+                    // vague idea which side of a cell it is on -- indicated
+                    // by the face number. in other words, it may provide
+                    // the inner or outer normal. by and large, there is no
+                    // harm from this, since the tangential vector we
+                    // compute is still the same. however, we do average
+                    // over normal vectors from adjacent cells and if they
+                    // have recorded normal vectors from the inside once and
+                    // from the outside the other time, then this averaging
+                    // is going to run into trouble. as a consequence we ask
+                    // the mapping after all for its normal vector, but we
+                    // only ask it so that we can possibly correct the sign
+                    // of the normal vector provided by the boundary if they
+                    // should point in different directions. this is the
+                    // case in tests/deal.II/no_flux_11.
+                    Tensor<1, dim> normal_vector =
+                      (cell->face(face_no)->get_manifold().normal_vector(
+                        cell->face(face_no), fe_values.quadrature_point(i)));
+                    if (normal_vector * fe_values.normal_vector(i) < 0)
+                      normal_vector *= -1;
+                    Assert(std::fabs(normal_vector.norm() - 1) < 1e-14,
+                           ExcInternalError());
+                    for (unsigned int d = 0; d < dim; ++d)
+                      if (std::fabs(normal_vector[d]) < 1e-13)
+                        normal_vector[d] = 0;
+                    normal_vector /= normal_vector.norm();
 
-                      // now enter the (dofs,(normal_vector,cell)) entry into
-                      // the map
-                      dof_to_normals_map.insert(
-                        std::make_pair(vector_dofs,
-                                       std::make_pair(normal_vector, cell)));
-                      dof_vector_to_b_values.insert(
-                        std::make_pair(vector_dofs, b_values));
+                    const Point<dim> &point = fe_values.quadrature_point(i);
+                    Vector<double>    b_values(dim);
+                    function_map.at(*b_id)->vector_value(point, b_values);
+
+                    // now enter the (dofs,(normal_vector,cell)) entry into
+                    // the map
+                    dof_to_normals_map.insert(
+                      std::make_pair(vector_dofs,
+                                     std::make_pair(normal_vector, cell)));
+                    dof_vector_to_b_values.insert(
+                      std::make_pair(vector_dofs, b_values));
 
 #ifdef DEBUG_NO_NORMAL_FLUX
-                      std::cout << "Adding normal vector:" << std::endl
-                                << "   dofs=" << vector_dofs << std::endl
-                                << "   cell=" << cell << " at "
-                                << cell->center() << std::endl
-                                << "   normal=" << normal_vector << std::endl;
+                    std::cout << "Adding normal vector:" << std::endl
+                              << "   dofs=" << vector_dofs << std::endl
+                              << "   cell=" << cell << " at " << cell->center()
+                              << std::endl
+                              << "   normal=" << normal_vector << std::endl;
 #endif
-                    }
-              }
+                  }
+          }
     }
-
   } // namespace internal
 
 
@@ -886,32 +713,45 @@ namespace VectorTools
 
     DoFToNormalsMap dof_to_normals_map;
 
+    const unsigned int n_dof = dof_handler.n_dofs();
+
     if (level == numbers::invalid_unsigned_int)
       {
         // active cells
-        internal::map_dof_to_normals<dim, spacedim>(dof_handler,
-                                                    first_vector_component,
-                                                    boundary_ids,
-                                                    function_map,
-                                                    x_fe_face_values,
-                                                    dof_to_normals_map,
-                                                    dof_vector_to_b_values);
+        for (const auto &cell : dof_handler.active_cell_iterators())
+          if (!cell->is_artificial())
+            {
+              internal::get_dof_pairs(cell,
+                                      first_vector_component,
+                                      boundary_ids,
+                                      function_map,
+                                      x_fe_face_values,
+                                      n_dof,
+                                      refinement_edge_indices,
+                                      level,
+                                      dof_to_normals_map,
+                                      dof_vector_to_b_values);
+            }
       }
     else
-      { // level cells
-        internal::map_dof_to_normals_on_level<dim, spacedim>(
-          dof_handler,
-          first_vector_component,
-          boundary_ids,
-          function_map,
-          x_fe_face_values,
-          refinement_edge_indices,
-          level,
-          dof_to_normals_map,
-          dof_vector_to_b_values);
+      {
+        // level cells
+        for (const auto &cell : dof_handler.cell_iterators_on_level(level))
+          if (cell->level_subdomain_id() != numbers::artificial_subdomain_id &&
+              cell->level_subdomain_id() != numbers::invalid_subdomain_id)
+            {
+              internal::get_dof_pairs(cell,
+                                      first_vector_component,
+                                      boundary_ids,
+                                      function_map,
+                                      x_fe_face_values,
+                                      n_dof,
+                                      refinement_edge_indices,
+                                      level,
+                                      dof_to_normals_map,
+                                      dof_vector_to_b_values);
+            }
       }
-
-
 
     // Now do something with the collected information. To this end, loop
     // through all sets of pairs (dofs,normal_vector) and identify which
