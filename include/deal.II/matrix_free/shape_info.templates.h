@@ -34,6 +34,7 @@
 #include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_dg0.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
@@ -913,10 +914,14 @@ namespace internal
       if (element_type == tensor_general &&
           check_1d_shapes_symmetric(univariate_shape_data))
         {
-          if (check_1d_shapes_collocation(univariate_shape_data))
+          if (dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe) &&
+              fe.tensor_degree() > 1)
+            element_type = tensor_symmetric_no_collocation;
+          else if (check_1d_shapes_collocation(univariate_shape_data))
             element_type = tensor_symmetric_collocation;
           else
             element_type = tensor_symmetric;
+
           if (n_dofs_1d > 2 && element_type == tensor_symmetric)
             {
               // check if we are a Hermite type
