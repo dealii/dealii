@@ -251,6 +251,17 @@ namespace internal
     struct Implementation
     {
       /**
+       * In several applications of DoFAccessor::get_dof_values(), we want to
+       * extract some indices without having to allocate memory. We do this by
+       * setting a boost small_vector with 27 elements on the stack, and only
+       * allocate when we exceed 27. The number 27 is heuristic and allows up
+       * to quadratic shape functions on scalar problems in 3D, or linear
+       * shape functions on systems (elasticity).
+       */
+      using dof_index_vector_type =
+        boost::container::small_vector<dealii::types::global_dof_index, 27>;
+
+      /**
        * Process the @p local_index-th degree of freedom corresponding to the
        * finite element specified by @p fe_index on the vertex with global
        * number @p vertex_index to @p global_index.
@@ -1449,8 +1460,8 @@ namespace internal
     void
     get_cell_dof_indices(
       const dealii::DoFCellAccessor<dim, spacedim, level_dof_access> &accessor,
-      boost::container::small_vector<types::global_dof_index, 27> &dof_indices,
-      const unsigned int                                           fe_index);
+      Implementation::dof_index_vector_type &dof_indices,
+      const unsigned int                     fe_index);
   } // namespace DoFAccessorImplementation
 } // namespace internal
 
@@ -2551,8 +2562,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
   Assert(values.size() == this->get_dof_handler().n_dofs(),
          typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
-  boost::container::small_vector<types::global_dof_index, 27> dof_indices(
-    this->get_fe().n_dofs_per_cell());
+  internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
+    dof_indices(this->get_fe().n_dofs_per_cell());
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
   dealii::internal::DoFAccessorImplementation::Implementation::
@@ -2584,8 +2595,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
          typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
 
-  boost::container::small_vector<types::global_dof_index, 27> dof_indices(
-    this->get_fe().n_dofs_per_cell());
+  internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
+    dof_indices(this->get_fe().n_dofs_per_cell());
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
 
@@ -2616,8 +2627,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::set_dof_values(
 
 
   Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
-  boost::container::small_vector<types::global_dof_index, 27> dof_indices(
-    this->get_fe().n_dofs_per_cell());
+  internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
+    dof_indices(this->get_fe().n_dofs_per_cell());
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
 
@@ -2845,8 +2856,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   const unsigned int n_dofs = local_source_end - local_source_begin;
 
-  boost::container::small_vector<types::global_dof_index, 27> dof_indices(
-    n_dofs);
+  internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
+    dof_indices(n_dofs);
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
 
@@ -2876,8 +2887,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   Assert(!this->has_children(), ExcMessage("Cell must be active."));
 
-  boost::container::small_vector<types::global_dof_index, 27> dof_indices(
-    this->get_fe().n_dofs_per_cell());
+  internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
+    dof_indices(this->get_fe().n_dofs_per_cell());
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
 
@@ -2912,8 +2923,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   const unsigned int n_dofs = local_source.m();
 
-  boost::container::small_vector<types::global_dof_index, 27> dof_indices(
-    n_dofs);
+  internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
+    dof_indices(n_dofs);
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
 
@@ -2954,8 +2965,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
   Assert(!this->has_children(), ExcMessage("Cell must be active."));
 
   const unsigned int n_dofs = this->get_fe().n_dofs_per_cell();
-  boost::container::small_vector<types::global_dof_index, 27> dof_indices(
-    n_dofs);
+  internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
+    dof_indices(n_dofs);
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
 
