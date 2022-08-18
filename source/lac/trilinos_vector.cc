@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/mpi.h>
+#  include <deal.II/base/trilinos_utilities.h>
 
 #  include <deal.II/lac/read_write_vector.h>
 #  include <deal.II/lac/trilinos_index_access.h>

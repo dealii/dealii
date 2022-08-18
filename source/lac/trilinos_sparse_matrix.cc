@@ -18,6 +18,7 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#  include <deal.II/base/trilinos_utilities.h>
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
