@@ -8,7 +8,7 @@ An error occurred in file <parameter_handler.cc> in function
 The violated condition was: 
     false
 Additional information: 
-    You can't ask for entry <Precison> you have not yet declared.
+    You can't ask for entry <Precision> you have not yet declared.
 --------------------------------------------------------
 
 DEAL::

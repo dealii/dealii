@@ -87,7 +87,7 @@ fail()
   try
     {
       prm.enter_subsection("General");
-      prm.set("Precison", "float"); // here is a typo!
+      prm.set("Precision", "float"); // here is a typo!
       // dim is not set!
       prm.leave_subsection();
     }
