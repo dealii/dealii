@@ -32,7 +32,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_reordering.h>
@@ -2155,8 +2154,15 @@ namespace GridTools
 
     QGauss<dim> quadrature(4);
 
+    Assert(triangulation.all_reference_cells_are_hyper_cube(),
+           ExcNotImplemented());
+    const auto reference_cell = ReferenceCells::get_hypercube<dim>();
     MatrixCreator::create_laplace_matrix(
-      StaticMappingQ1<dim>::mapping, dof_handler, quadrature, S, coefficient);
+      reference_cell.template get_default_linear_mapping<dim, dim>(),
+      dof_handler,
+      quadrature,
+      S,
+      coefficient);
 
     // set up the boundary values for the laplace problem
     std::array<AffineConstraints<double>, dim>                  constraints;

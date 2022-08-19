@@ -21,6 +21,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
 

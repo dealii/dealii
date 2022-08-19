@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/lac/block_vector.h>
@@ -710,15 +709,20 @@ PointValueHistory<dim>::evaluate_field(
   typename std::vector<
     internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
     point = point_geometry_data.begin();
+  Assert(!dof_handler->get_triangulation().is_mixed_mesh(),
+         ExcNotImplemented());
+  const auto reference_cell =
+    dof_handler->get_triangulation().get_reference_cells()[0];
   for (unsigned int data_store_index = 0; point != point_geometry_data.end();
        ++point, ++data_store_index)
     {
       // we now have a point to query, need to know what cell it is in
       const Point<dim> requested_location = point->requested_location;
       const typename DoFHandler<dim>::active_cell_iterator cell =
-        GridTools::find_active_cell_around_point(StaticMappingQ1<dim>::mapping,
-                                                 *dof_handler,
-                                                 requested_location)
+        GridTools::find_active_cell_around_point(
+          reference_cell.template get_default_linear_mapping<dim, dim>(),
+          *dof_handler,
+          requested_location)
           .first;
 
 
@@ -1271,6 +1275,10 @@ PointValueHistory<dim>::get_postprocessor_locations(
   typename std::vector<
     internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
     point = point_geometry_data.begin();
+  Assert(!dof_handler->get_triangulation().is_mixed_mesh(),
+         ExcNotImplemented());
+  const auto reference_cell =
+    dof_handler->get_triangulation().get_reference_cells()[0];
   for (unsigned int data_store_index = 0; point != point_geometry_data.end();
        ++point, ++data_store_index)
     {
@@ -1278,9 +1286,10 @@ PointValueHistory<dim>::get_postprocessor_locations(
       // need to know what cell it is in
       Point<dim> requested_location = point->requested_location;
       typename DoFHandler<dim>::active_cell_iterator cell =
-        GridTools::find_active_cell_around_point(StaticMappingQ1<dim>::mapping,
-                                                 *dof_handler,
-                                                 requested_location)
+        GridTools::find_active_cell_around_point(
+          reference_cell.template get_default_linear_mapping<dim, dim>(),
+          *dof_handler,
+          requested_location)
           .first;
       fe_values.reinit(cell);
 

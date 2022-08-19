@@ -19,6 +19,8 @@
 // anything. Latter is especially important if run with MPI.
 //
 
+#include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>

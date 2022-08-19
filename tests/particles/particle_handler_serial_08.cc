@@ -15,6 +15,8 @@
 
 // Test constructing an rtree of particles from a ParticleHandler object.
 
+#include <deal.II/fe/mapping_q1.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 

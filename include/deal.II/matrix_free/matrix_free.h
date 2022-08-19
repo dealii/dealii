@@ -30,7 +30,6 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
-#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>

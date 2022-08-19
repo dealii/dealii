@@ -16,6 +16,8 @@
 
 #include <deal.II/base/memory_consumption.h>
 
+#include <deal.II/fe/mapping_q1.h>
+
 #include <deal.II/hp/mapping_collection.h>
 
 DEAL_II_NAMESPACE_OPEN

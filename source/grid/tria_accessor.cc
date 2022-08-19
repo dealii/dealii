@@ -19,7 +19,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold.h>
@@ -2157,9 +2157,11 @@ CellAccessor<dim, spacedim>::point_inside_codim(const Point<spacedim_> &p) const
   Assert(this->reference_cell().is_hyper_cube(), ExcNotImplemented());
 
   const TriaRawIterator<CellAccessor<dim_, spacedim_>> cell_iterator(*this);
-  const Point<dim_>                                    p_unit =
-    StaticMappingQ1<dim_, spacedim_>::mapping.transform_real_to_unit_cell(
-      cell_iterator, p);
+
+  const Point<dim_> p_unit =
+    this->reference_cell()
+      .template get_default_linear_mapping<dim_, spacedim_>()
+      .transform_real_to_unit_cell(cell_iterator, p);
 
   return GeometryInfo<dim_>::is_inside_unit_cell(p_unit);
 }

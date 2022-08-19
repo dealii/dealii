@@ -32,7 +32,6 @@
 
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
-#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
