@@ -83,8 +83,14 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     #   %cd  - the commit date (for which we use the strict iso date format)
     #
 
+    # --date=iso-strict has been introduced in git 2.2 (released Dec 2014)
+    SET(_date_format)
+    IF(NOT ${GIT_VERSION_STRING} VERSION_LESS 2.2)
+      SET(_date_format "--date=iso-strict")
+    ENDIF()
+
     EXECUTE_PROCESS(
-       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"revision=%H, shortrev=%h, date=%cd" --date=iso-strict
+       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"revision=%H, shortrev=%h, date=%cd" ${_date_format}
        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
        OUTPUT_VARIABLE _info
        RESULT_VARIABLE _result
