@@ -80,11 +80,11 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     # Format options for git log:
     #   %H   - the full sha1 hash of the commit, aka "revision"
     #   %h   - the abbreviated sha1 hash of the commit, aka "shortrev"
-    #   %cd  - the commit date (for which we use the strict iso date format)
+    #   %cd  - the commit date (for which we use the default date format)
     #
 
     EXECUTE_PROCESS(
-       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"revision=%H, shortrev=%h, date=%cd" --date=iso-strict
+       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"revision=%H, shortrev=%h, date=%cd" --date=default
        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
        OUTPUT_VARIABLE _info
        RESULT_VARIABLE _result
