@@ -587,6 +587,22 @@ public:
   get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
 
   /**
+   * Go through the triangulation and set the future FE indices of all
+   * locally owned cells to the values given in @p future_fe_indices.
+   * Cells corresponding to invalid_active_fe_index will be skipped.
+   */
+  void
+  set_future_fe_indices(const std::vector<unsigned int> &future_fe_indices);
+
+  /**
+   * Go through the triangulation and return a vector of future FE indices of
+   * all locally owned cells. If no future FE index has been set on a cell,
+   * its value will be invalid_active_fe_index.
+   */
+  std::vector<unsigned int>
+  get_future_fe_indices() const;
+
+  /**
    * Assign a Triangulation to the DoFHandler.
    *
    * Remove all associations with the previous Triangulation object and

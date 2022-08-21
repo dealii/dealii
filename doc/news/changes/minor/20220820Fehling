@@ -1,0 +1,6 @@
+New: Functions DoFHandler::get_future_fe_indices() and
+DoFHandler::set_future_fe_indices() that store and recover future FE
+indices on a DoFHandler. They can also be used to transfer future FE
+indices between different DoFHandler objects.
+<br>
+(Marc Fehling, 2022/08/20)
