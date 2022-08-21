@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// Copyright (C) 2005 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,7 @@
 
 
 // distribute different finite elements randomly across the domain, then use
-// DoFTools::get_active_fe_indices()
+// DoFHandler::get_active_fe_indices()
 
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -54,16 +54,13 @@ test()
 
   DoFHandler<dim> dof_handler(tria);
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell =
-         dof_handler.begin_active();
-       cell != dof_handler.end();
-       ++cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     cell->set_active_fe_index(Testing::rand() % fe_collection.size());
 
   dof_handler.distribute_dofs(fe_collection);
 
-  std::vector<unsigned int> active_fe_indices(tria.n_active_cells());
-  DoFTools::get_active_fe_indices(dof_handler, active_fe_indices);
+  std::vector<unsigned int> active_fe_indices =
+    dof_handler.get_active_fe_indices();
   for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
     deallog << active_fe_indices[i] << std::endl;
 }
