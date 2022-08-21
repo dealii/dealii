@@ -25,6 +25,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -523,8 +524,10 @@ public:
 
   /**
    * The type in which we store the active FE index.
+   *
+   * @deprecated Use types::fe_index instead.
    */
-  using active_fe_index_type = unsigned short int;
+  using active_fe_index_type DEAL_II_DEPRECATED = types::fe_index;
 
   /**
    * The type in which we store the offsets in the CRS data structures.
@@ -535,8 +538,8 @@ public:
    * Invalid active FE index which will be used as a default value to determine
    * whether a future FE index has been set or not.
    */
-  static const active_fe_index_type invalid_active_fe_index =
-    static_cast<active_fe_index_type>(-1);
+  static const types::fe_index invalid_active_fe_index =
+    static_cast<types::fe_index>(-1);
 
   /**
    * Standard constructor, not initializing any data. After constructing an
@@ -1489,7 +1492,7 @@ private:
    * of the appropriate position of a cell in the vectors is done via
    * hp_object_fe_ptr (CRS scheme).
    */
-  mutable std::array<std::vector<active_fe_index_type>, dim + 1>
+  mutable std::array<std::vector<types::fe_index>, dim + 1>
     hp_object_fe_indices;
 
   /**
@@ -1501,15 +1504,13 @@ private:
    * Active FE index of an active cell (identified by level and level index).
    * This vector is only used in hp-mode.
    */
-  mutable std::vector<std::vector<active_fe_index_type>>
-    hp_cell_active_fe_indices;
+  mutable std::vector<std::vector<types::fe_index>> hp_cell_active_fe_indices;
 
   /**
    * Future FE index of an active cell (identified by level and level index).
    * This vector is only used in hp-mode.
    */
-  mutable std::vector<std::vector<active_fe_index_type>>
-    hp_cell_future_fe_indices;
+  mutable std::vector<std::vector<types::fe_index>> hp_cell_future_fe_indices;
 
   /**
    * An array to store the indices for level degrees of freedom located at
