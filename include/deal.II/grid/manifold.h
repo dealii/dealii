@@ -548,7 +548,10 @@ public:
 
   /**
    * Return the normal vector to a face embedded in this manifold, at
-   * the point p. If p is not in fact on the surface, but only
+   * the point p. It is not required that the normals actually point
+   * outward from the domain even if the face iterator given points
+   * to a face on the boundary of the domain.
+   * If p is not in fact on the surface, but only
    * close-by, try to return something reasonable, for example the
    * normal vector at the surface point closest to p.  (The point p
    * will in fact not normally lie on the actual surface, but rather
