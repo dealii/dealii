@@ -573,16 +573,26 @@ public:
 
   /**
    * Go through the triangulation and set the active FE indices of all
-   * active cells to the values given in @p active_fe_indices.
+   * locally owned cells to the values given in @p active_fe_indices.
    */
   void
   set_active_fe_indices(const std::vector<unsigned int> &active_fe_indices);
 
   /**
-   * Go through the triangulation and store the active FE indices of all
-   * active cells to the vector @p active_fe_indices. This vector is
-   * resized, if necessary.
+   * Go through the triangulation and return a vector of active FE indices of
+   * all locally relevant cells.
    */
+  std::vector<unsigned int>
+  get_active_fe_indices() const;
+
+  /**
+   * Go through the triangulation and store the active FE indices of all
+   * locally relevant cells to the vector @p active_fe_indices. This vector
+   * is resized, if necessary.
+   *
+   * @deprecated Use the function that returns the result vector.
+   */
+  DEAL_II_DEPRECATED_EARLY
   void
   get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
 

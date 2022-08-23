@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2645,11 +2645,11 @@ DoFHandler<dim, spacedim>::set_active_fe_indices(
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::get_active_fe_indices(
-  std::vector<unsigned int> &active_fe_indices) const
+std::vector<unsigned int>
+DoFHandler<dim, spacedim>::get_active_fe_indices() const
 {
-  active_fe_indices.resize(this->get_triangulation().n_active_cells());
+  std::vector<unsigned int> active_fe_indices(
+    this->get_triangulation().n_active_cells(), invalid_active_fe_index);
 
   // we could try to extract the values directly, since they are
   // stored as protected data of this object, but for simplicity we
@@ -2657,6 +2657,18 @@ DoFHandler<dim, spacedim>::get_active_fe_indices(
   for (const auto &cell : this->active_cell_iterators())
     if (!cell->is_artificial())
       active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
+
+  return active_fe_indices;
+}
+
+
+
+template <int dim, int spacedim>
+void
+DoFHandler<dim, spacedim>::get_active_fe_indices(
+  std::vector<unsigned int> &active_fe_indices) const
+{
+  active_fe_indices = get_active_fe_indices();
 }
 
 
@@ -3026,7 +3038,7 @@ DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
   // active FE indices since ownership of cells may change.
 
   // Gather all current active FE indices
-  get_active_fe_indices(active_fe_index_transfer->active_fe_indices);
+  active_fe_index_transfer->active_fe_indices = get_active_fe_indices();
 
   // Attach to transfer object
   active_fe_index_transfer->cell_data_transfer->prepare_for_serialization(

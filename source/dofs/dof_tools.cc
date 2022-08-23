@@ -1373,8 +1373,7 @@ namespace DoFTools
     AssertDimension(active_fe_indices.size(),
                     dof_handler.get_triangulation().n_active_cells());
 
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
+    active_fe_indices = dof_handler.get_active_fe_indices();
   }
 
   template <int dim, int spacedim>
