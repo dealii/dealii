@@ -2100,7 +2100,22 @@ public:
    * @note The vector returned by this function is always a minimal set of
    * *unique* support points. This is in contrast to the behavior of
    * get_unit_support_points() that returns a repeated list of unit support
-   * points for an FESystem of numerous (Lagrangian) base elements.
+   * points for an FESystem of numerous (Lagrangian) base elements. As a
+   * consequence, it is possible to have fewer generalized support points
+   * than degrees of freedom in the element. An example is  the
+   * element `FESystem<dim>(FE_Q<dim>(1), 2)`, which has two
+   * copies of the $Q_1$ element. In 2d, each copy has 4 degrees of
+   * freedom, and each copy has its support points in the
+   * four vertices of the cell. While the get_support_points()
+   * function would return a vector of size 8 in which each of the
+   * vertices is listed twice, this function strips
+   * out the duplicates and returns a vector of length 4 in which each
+   * vertex is listed only once. This is possible because the purpose of this
+   * function is to return a list of points so that it is possible to
+   * interpolate an arbitrary function onto the finite element
+   * space, and this is possible by knowing the two components of the
+   * function in question at the four vertices of the cell -- it is not
+   * necessary to ask for this information twice at each vertex.
    *
    * See the
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
