@@ -2664,6 +2664,47 @@ DoFHandler<dim, spacedim>::get_active_fe_indices(
 
 template <int dim, int spacedim>
 void
+DoFHandler<dim, spacedim>::set_future_fe_indices(
+  const std::vector<unsigned int> &future_fe_indices)
+{
+  Assert(future_fe_indices.size() == this->get_triangulation().n_active_cells(),
+         ExcDimensionMismatch(future_fe_indices.size(),
+                              this->get_triangulation().n_active_cells()));
+
+  this->create_active_fe_table();
+  // we could set the values directly, since they are stored as
+  // protected data of this object, but for simplicity we use the
+  // cell-wise access. this way we also have to pass some debug-mode
+  // tests which we would have to duplicate ourselves otherwise
+  for (const auto &cell : this->active_cell_iterators())
+    if (cell->is_locally_owned() &&
+        future_fe_indices[cell->active_cell_index()] != invalid_active_fe_index)
+      cell->set_future_fe_index(future_fe_indices[cell->active_cell_index()]);
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<unsigned int>
+DoFHandler<dim, spacedim>::get_future_fe_indices() const
+{
+  std::vector<unsigned int> future_fe_indices(
+    this->get_triangulation().n_active_cells(), invalid_active_fe_index);
+
+  // we could try to extract the values directly, since they are
+  // stored as protected data of this object, but for simplicity we
+  // use the cell-wise access.
+  for (const auto &cell : this->active_cell_iterators())
+    if (cell->is_locally_owned() && cell->future_fe_index_set())
+      future_fe_indices[cell->active_cell_index()] = cell->future_fe_index();
+
+  return future_fe_indices;
+}
+
+
+
+template <int dim, int spacedim>
+void
 DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 {
   // make sure this is called during initialization in hp-mode
