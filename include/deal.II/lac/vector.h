@@ -22,9 +22,8 @@
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/subscriptor.h>
-
-#include <deal.II/differentiation/ad/ad_number_traits.h>
 
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
@@ -109,11 +108,18 @@ template <typename Number>
 class Vector : public Subscriptor
 {
 public:
-  // The assertion in vector.templates.h for whether or not a number is
-  // finite is not compatible for AD number types.
+  /**
+   * This class only supports basic numeric types (i.e., we support double and
+   * float but not automatically differentiated numbers).
+   *
+   * @note we test real_type here to get the underlying scalar type when using
+   * std::complex.
+   */
   static_assert(
-    !Differentiation::AD::is_ad_number<Number>::value,
-    "The Vector class does not support auto-differentiable numbers.");
+    std::is_arithmetic<
+      typename numbers::NumberTraits<Number>::real_type>::value,
+    "The Vector class only supports basic numeric types. In particular, it "
+    "does not support automatically differentiated numbers.");
 
   /**
    * Declare standard types used in all containers. These types parallel those

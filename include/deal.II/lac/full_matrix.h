@@ -23,8 +23,6 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/differentiation/ad/ad_number_traits.h>
-
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/identity_matrix.h>
 
@@ -80,11 +78,19 @@ template <typename number>
 class FullMatrix : public Table<2, number>
 {
 public:
-  // The assertion in full_matrix.templates.h for whether or not a number is
-  // finite is not compatible for AD number types.
+  /**
+   * This class only supports basic numeric types (i.e., we support double and
+   * float but not automatically differentiated numbers).
+   *
+   * @note we test real_type here to get the underlying scalar type when using
+   * std::complex.
+   */
   static_assert(
-    !Differentiation::AD::is_ad_number<number>::value,
-    "The FullMatrix class does not support auto-differentiable numbers.");
+    std::is_arithmetic<
+      typename numbers::NumberTraits<number>::real_type>::value,
+    "The FullMatrix class only supports basic numeric types. In particular, it "
+    "does not support automatically differentiated numbers.");
+
 
   /**
    * A type of used to index into this container.
