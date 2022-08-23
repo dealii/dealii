@@ -116,10 +116,27 @@ public:
    * described in the main documentation of TensorProductMatrixSymmetricSum.
    * This function is operating on ArrayView to allow checks of
    * array bounds with respect to @p dst and @p src.
+   *
+   * @warning This function works on an internal temporal array, leading to
+   * increased memory consumption if many instances of this class are created,
+   * e.g., a different object on every cell with different underlying
+   * coefficients each. Furthermore, only one thread run this function at once
+   * (ensured internally with a mutex). If these two limitations are an issue
+   * for you, please consider the other version of this function.
    */
   void
   apply_inverse(const ArrayView<Number> &      dst,
                 const ArrayView<const Number> &src) const;
+
+  /**
+   * Same as above but the user can provide a user-owned temporal array,
+   * resolving the two issues described above. This array is resized
+   * internally to the needed size.
+   */
+  void
+  apply_inverse(const ArrayView<Number> &      dst,
+                const ArrayView<const Number> &src,
+                AlignedVector<Number> &        tmp) const;
 
   /**
    * Return the memory consumption of the allocated memory in this class.
@@ -560,9 +577,21 @@ TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::apply_inverse(
   const ArrayView<Number> &      dst_view,
   const ArrayView<const Number> &src_view) const
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  this->apply_inverse(dst_view, src_view, this->tmp_array);
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+inline void
+TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::apply_inverse(
+  const ArrayView<Number> &      dst_view,
+  const ArrayView<const Number> &src_view,
+  AlignedVector<Number> &        tmp_array) const
+{
   AssertDimension(dst_view.size(), this->n());
   AssertDimension(src_view.size(), this->m());
-  std::lock_guard<std::mutex> lock(this->mutex);
   const unsigned int n = n_rows_1d > 0 ? n_rows_1d : eigenvalues[0].size();
   tmp_array.resize_fast(Utilities::fixed_power<dim>(n));
   constexpr int kernel_size = n_rows_1d > 0 ? n_rows_1d : 0;
