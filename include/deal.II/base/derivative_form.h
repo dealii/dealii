@@ -467,6 +467,31 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
 
 
 /**
+ * Similar to the previous apply_transformation(), specialized for the case `dim
+ * == spacedim` where we can return a rank-2 tensor instead of the more general
+ * `DerivativeForm`.
+ * Each row of the result corresponds to one of the rows of @p D_X transformed
+ * by @p grad_F, equivalent to $\mathrm{D\_X} \, \mathrm{grad\_F}^T$ in matrix
+ * notation.
+ *
+ * @relatesalso DerivativeForm
+ */
+// rank=2
+template <int dim, typename Number1, typename Number2>
+inline Tensor<2, dim, typename ProductType<Number1, Number2>::type>
+apply_transformation(const DerivativeForm<1, dim, dim, Number1> &grad_F,
+                     const Tensor<2, dim, Number2> &             D_X)
+{
+  Tensor<2, dim, typename ProductType<Number1, Number2>::type> dest;
+  for (unsigned int i = 0; i < dim; ++i)
+    dest[i] = apply_transformation(grad_F, D_X[i]);
+
+  return dest;
+}
+
+
+
+/**
  * Similar to the previous apply_transformation().
  * Each row of the result corresponds to one of the rows of @p D_X transformed
  * by @p grad_F.
