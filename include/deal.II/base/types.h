@@ -54,6 +54,11 @@ namespace types
 #define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UINT64_T
 
   /**
+   * The type in which we store the active and future FE indices.
+   */
+  using fe_index = unsigned short int;
+
+  /**
    * The type used to denote the global index of degrees of freedom. This
    * type is then also used for querying the global *number* of degrees
    * of freedom, since the number is simply the largest index plus one.

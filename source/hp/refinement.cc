@@ -811,8 +811,7 @@ namespace hp
 
       // there can be as many levels in the hierarchy as active FE indices are
       // possible
-      using level_type =
-        typename DoFHandler<dim, spacedim>::active_fe_index_type;
+      using level_type         = types::fe_index;
       const auto invalid_level = static_cast<level_type>(-1);
 
       // map from FE index to level in hierarchy
