@@ -1665,6 +1665,16 @@ public:
                            const unsigned int lane_index) const;
 
   /**
+   * Get MatrixFree index associated to a deal.II @p cell. To get
+   * the actual cell batch index and lane, do the postprocessing
+   * `index / VectorizedArrayType::size()` and `index %
+   * VectorizedArrayType::size()`.
+   */
+  unsigned int
+  get_matrix_free_cell_index(
+    const typename Triangulation<dim>::cell_iterator &cell) const;
+
+  /**
    * Return the cell iterator in deal.II speak to an interior/exterior cell of
    * a face in a pair of a face batch and lane index. The second element of
    * the pair is the face number so that the face iterator can be accessed:
@@ -2059,6 +2069,11 @@ private:
    */
   std::vector<std::pair<unsigned int, unsigned int>> cell_level_index;
 
+  /**
+   * Conversion from deal.II index (active or level index) to MatrixFree index
+   * (inverse of cell_level_index).
+   */
+  std::vector<unsigned int> mf_cell_indices;
 
   /**
    * For discontinuous Galerkin, the cell_level_index includes cells that are
