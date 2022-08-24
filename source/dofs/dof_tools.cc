@@ -40,10 +40,7 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 
 #include <algorithm>
