@@ -40,7 +40,6 @@
 #  include <iostream>
 #  include <iterator>
 #  include <numeric>
-#  include <set>
 
 DEAL_II_NAMESPACE_OPEN
 

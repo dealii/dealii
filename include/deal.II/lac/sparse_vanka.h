@@ -23,7 +23,6 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/smartpointer.h>
 
-#include <map>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

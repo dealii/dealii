@@ -32,7 +32,6 @@
 #include <boost/any.hpp>
 
 #include <algorithm>
-#include <map>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

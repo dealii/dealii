@@ -30,8 +30,6 @@
 
 #include <deal.II/matrix_free/fe_point_evaluation.h>
 
-#include <map>
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace VectorTools

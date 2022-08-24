@@ -50,7 +50,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <set>
 
 
 DEAL_II_NAMESPACE_OPEN
