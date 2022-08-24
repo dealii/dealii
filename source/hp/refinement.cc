@@ -27,7 +27,6 @@
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/hp/refinement.h>
 

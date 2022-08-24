@@ -28,7 +28,6 @@
 
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/vector.h>
