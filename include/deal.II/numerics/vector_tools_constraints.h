@@ -291,6 +291,33 @@ namespace VectorTools
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
+         ));
+
+  /**
+   * This function does the same as
+   * compute_nonzero_normal_flux_constraints(), but for the case of multigrid
+   * levels.
+   * @ingroup constraints
+   *
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   */
+  template <int dim, int spacedim>
+  void
+  compute_nonzero_normal_flux_constraints_on_level(
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
+    const std::map<types::boundary_id, const Function<spacedim, double> *>
+      &                           function_map,
+    AffineConstraints<double> &   constraints,
+    const Mapping<dim, spacedim> &mapping =
+      (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+         .template get_default_linear_mapping<dim, spacedim>()
+#else
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
          ),
     const IndexSet &   refinement_edge_indices = IndexSet(),
     const unsigned int level                   = numbers::invalid_unsigned_int);
@@ -313,6 +340,31 @@ namespace VectorTools
   template <int dim, int spacedim>
   void
   compute_no_normal_flux_constraints(
+    const DoFHandler<dim, spacedim> &   dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
+    AffineConstraints<double> &         constraints,
+    const Mapping<dim, spacedim> &      mapping =
+      (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+         .template get_default_linear_mapping<dim, spacedim>()
+#else
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+         ));
+
+  /**
+   * This function does the same as
+   * compute_no_normal_flux_constraints(), but for the case of multigrid
+   * levels.
+   * @ingroup constraints
+   *
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   */
+  template <int dim, int spacedim>
+  void
+  compute_no_normal_flux_constraints_on_level(
     const DoFHandler<dim, spacedim> &   dof_handler,
     const unsigned int                  first_vector_component,
     const std::set<types::boundary_id> &boundary_ids,

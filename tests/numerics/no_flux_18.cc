@@ -1133,13 +1133,14 @@ namespace StokesClass
         const auto &  refinement_edge_indices =
           mg_constrained_dofs.get_refinement_edge_indices(level);
 
-        VectorTools::compute_no_normal_flux_constraints(dof_handler_u,
-                                                        0,
-                                                        dirichlet_boundary,
-                                                        level_constraints,
-                                                        mapping,
-                                                        refinement_edge_indices,
-                                                        level);
+        VectorTools::compute_no_normal_flux_constraints_on_level(
+          dof_handler_u,
+          0,
+          dirichlet_boundary,
+          level_constraints,
+          mapping,
+          refinement_edge_indices,
+          level);
         level_constraints.close();
 
         mg_constrained_dofs.add_user_constraints(level, level_constraints);

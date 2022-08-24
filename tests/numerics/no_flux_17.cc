@@ -15,7 +15,7 @@
 
 
 
-// add tests for compute_no_normal_flux_constraints_on_level()
+// test compute_no_normal_flux_constraints_on_lefel().
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
@@ -172,13 +172,14 @@ get_constraints_on_levels(
       const IndexSet &refinement_edge_indices =
         mg_constrained_dofs.get_refinement_edge_indices(level);
 
-      VectorTools::compute_no_normal_flux_constraints(dof_handler,
-                                                      0,
-                                                      no_flux_boundary,
-                                                      user_level_constraints,
-                                                      mapping,
-                                                      refinement_edge_indices,
-                                                      level);
+      VectorTools::compute_no_normal_flux_constraints_on_level(
+        dof_handler,
+        0,
+        no_flux_boundary,
+        user_level_constraints,
+        mapping,
+        refinement_edge_indices,
+        level);
       user_level_constraints.close();
       level_constraints[level].copy_from(user_level_constraints);
       // deallog<<" ***level cell constraints:
