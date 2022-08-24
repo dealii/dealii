@@ -22,7 +22,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/full_matrix.h>

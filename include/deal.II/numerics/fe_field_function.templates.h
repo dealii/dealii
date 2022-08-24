@@ -20,7 +20,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/fe_values.h>
 

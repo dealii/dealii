@@ -279,9 +279,7 @@ namespace Differentiation
         s << "cse|";
 
       // LLVM optimization level
-      s << "-O" +
-             dealii::Utilities::to_string(
-               internal::get_LLVM_optimization_level(o)) +
+      s << "-O" + std::to_string(internal::get_LLVM_optimization_level(o)) +
              "|";
 
       return s;

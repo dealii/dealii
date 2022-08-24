@@ -21,7 +21,6 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/utilities.h>
 
 #include <chrono>
 #include <list>
