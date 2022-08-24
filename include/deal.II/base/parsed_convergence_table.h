@@ -21,7 +21,6 @@
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>
-#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -35,6 +34,10 @@
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DOXYGEN
+class ParameterHandler;
+#endif
 
 /**
  * @brief The ParsedConvergenceTable class

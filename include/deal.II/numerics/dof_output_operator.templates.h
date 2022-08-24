@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/parameter_handler.h>
+
 #include <deal.II/numerics/dof_output_operator.h>
 
 DEAL_II_NAMESPACE_OPEN
