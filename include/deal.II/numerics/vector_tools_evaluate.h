@@ -343,6 +343,42 @@ namespace VectorTools
 
 
 
+    /**
+     * Perform reduction for tensors of tensors (e.g., gradient of
+     * vectorial quantities).
+     */
+    template <int n_components, int rank, int dim, typename Number>
+    Tensor<1, n_components, Tensor<rank, dim, Number>>
+    reduce(
+      const EvaluationFlags::EvaluationFlags &flags,
+      const ArrayView<const Tensor<1, n_components, Tensor<rank, dim, Number>>>
+        &values)
+    {
+      switch (flags)
+        {
+          case EvaluationFlags::avg:
+            {
+              Tensor<1, n_components, Tensor<rank, dim, Number>> temp;
+
+              for (unsigned int j = 0; j < values.size(); ++j)
+                for (unsigned int i = 0; i < n_components; ++i)
+                  temp[i] = temp[i] + values[j][i];
+
+              for (unsigned int i = 0; i < n_components; ++i)
+                temp[i] /= Number(values.size());
+
+              return temp;
+            }
+          case EvaluationFlags::insert:
+            return values[0];
+          default:
+            Assert(false, ExcNotImplemented());
+            return values[0];
+        }
+    }
+
+
+
     template <int n_components,
               int dim,
               int spacedim,
@@ -459,6 +495,26 @@ namespace VectorTools
 
 
 
+    template <typename Number, typename Number2>
+    void
+    set_value(Number &dst, const Number2 &src)
+    {
+      dst = src;
+    }
+
+
+
+    template <typename Number, int rank, int dim, typename Number2>
+    void
+    set_value(Tensor<rank, dim, Number> &, const Number2 &)
+    {
+      Assert(false,
+             ExcMessage(
+               "A cell-data vector can only have a single component."));
+    }
+
+
+
     template <int n_components,
               int dim,
               int spacedim,
@@ -491,8 +547,9 @@ namespace VectorTools
     {
       (void)evaluation_flags;
 
-      static_assert(n_components == 1,
-                    "A cell-data vector can only have a single component.");
+      Assert(n_components == 1,
+             ExcMessage(
+               "A cell-data vector can only have a single component."));
 
       Assert(evaluation_flags ==
                dealii::EvaluationFlags::EvaluationFlags::values,
@@ -506,7 +563,7 @@ namespace VectorTools
       for (unsigned int q = cell_data.reference_point_ptrs[i];
            q < cell_data.reference_point_ptrs[i + 1];
            ++q)
-        values[q] = value;
+        set_value(values[q], value);
     }
 
 
