@@ -44,6 +44,7 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 

@@ -25,6 +25,9 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/matrix_free/fe_point_evaluation.h>
 
 #include <map>
