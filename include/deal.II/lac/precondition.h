@@ -1163,6 +1163,7 @@ namespace internal
                     const unsigned int i,
                     const bool         transposed)
     {
+      (void)transposed;
       using Number = typename VectorType::value_type;
 
       if (i == 0)
