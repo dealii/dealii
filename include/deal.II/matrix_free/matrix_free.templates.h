@@ -869,7 +869,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 
     mf_cell_indices.resize((mg_level == numbers::invalid_unsigned_int) ?
                              tria.n_active_cells() :
-                             tria.n_cells(mg_level),
+                             (mg_level < tria.n_levels() ?
+                                tria.n_raw_cells(mg_level) :
+                                0),
                            numbers::invalid_unsigned_int);
 
     for (unsigned int cell = 0;
