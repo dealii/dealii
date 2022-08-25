@@ -10719,14 +10719,6 @@ namespace internal
         using raw_line_iterator =
           typename Triangulation<dim, spacedim>::raw_line_iterator;
 
-        // first clear flags on lines, since we need them to determine
-        // which lines will be refined
-        triangulation.clear_user_flags_line();
-
-        // also clear flags on hexes, since we need them to mark those
-        // cells which are to be coarsened
-        triangulation.clear_user_flags_hex();
-
         // variable to store whether the mesh was changed in the
         // present loop and in the whole process
         bool mesh_changed = false;
@@ -10740,6 +10732,9 @@ namespace internal
             // decision. the following function sets these flags:
             triangulation.fix_coarsen_flags();
 
+            // first clear flags on lines, since we need them to determine
+            // which lines will be refined
+            triangulation.clear_user_flags_line();
 
             // flag those lines that are refined and will not be
             // coarsened and those that will be refined
@@ -10953,7 +10948,7 @@ namespace internal
           {
             // if the cell is not refined along that face, coarsening
             // will not change anything, so do nothing. the same
-            // applies, if the face is at the boandary
+            // applies, if the face is at the boundary
             const RefinementCase<dim - 1> face_ref_case =
               GeometryInfo<dim>::face_refinement_case(cell->refinement_case(),
                                                       n);
@@ -10972,30 +10967,32 @@ namespace internal
                 const typename Triangulation<dim, spacedim>::cell_iterator
                   child_neighbor = child->neighbor(n);
                 if (!child->neighbor_is_coarser(n))
-                  // in 2d, if the child's neighbor is coarser, then
-                  // it has no children. however, in 3d it might be
-                  // otherwise. consider for example, that our face
-                  // might be refined with cut_x, but the neighbor is
-                  // refined with cut_xy at that face. then the
-                  // neighbor pointers of the children of our cell
-                  // will point to the common neighbor cell, not to
-                  // its children. what we really want to know in the
-                  // following is, whether the neighbor cell is
-                  // refined twice with reference to our cell.  that
-                  // only has to be asked, if the child's neighbor is
-                  // not a coarser one.
-                  if ((child_neighbor->has_children() &&
-                       !child_neighbor->user_flag_set()) ||
-                      // neighbor has children, which are further
-                      // refined along the face, otherwise something
-                      // went wrong in the construction of neighbor
-                      // pointers.  then only allow coarsening if this
-                      // neighbor will be coarsened as well
-                      // (user_pointer is set).  the same applies, if
-                      // the neighbors children are not refined but
-                      // will be after refinement
-                      child_neighbor->refine_flag_set())
-                    return false;
+                  {
+                    // in 2d, if the child's neighbor is coarser, then it has
+                    // no children. however, in 3d it might be
+                    // otherwise. consider for example, that our face might be
+                    // refined with cut_x, but the neighbor is refined with
+                    // cut_xy at that face. then the neighbor pointers of the
+                    // children of our cell will point to the common neighbor
+                    // cell, not to its children. what we really want to know
+                    // in the following is, whether the neighbor cell is
+                    // refined twice with reference to our cell. that only
+                    // has to be asked, if the child's neighbor is not a
+                    // coarser one. we check whether some of the children on
+                    // the neighbor are not flagged for coarsening, in that
+                    // case we may not coarsen. it is enough to check the
+                    // first child because we have already fixed the coarsen
+                    // flags on finer levels
+                    if (child_neighbor->has_children() &&
+                        !(child_neighbor->child(0)->is_active() &&
+                          child_neighbor->child(0)->coarsen_flag_set()))
+                      return false;
+
+                    // the same applies, if the neighbors children are not
+                    // refined but will be after refinement
+                    if (child_neighbor->refine_flag_set())
+                      return false;
+                  }
               }
           }
         return true;
@@ -11122,10 +11119,9 @@ namespace internal
       template <int dim, int spacedim>
       static bool
       coarsening_allowed(
-        const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+        const typename Triangulation<dim, spacedim>::cell_iterator &)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)cell;
 
         return false;
       }
@@ -14947,8 +14943,6 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
   // until the flags don't change any more
   auto previous_coarsen_flags = internal::extract_raw_coarsen_flags(levels);
 
-  std::vector<int> vertex_level(vertices.size(), 0);
-
   bool continue_iterating = true;
 
   do
@@ -14962,7 +14956,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
 
           // store highest level one of the cells adjacent to a vertex
           // belongs to
-          std::fill(vertex_level.begin(), vertex_level.end(), 0);
+          std::vector<int> vertex_level(vertices.size(), 0);
           for (const auto &cell : this->active_cell_iterators())
             {
               if (cell->refine_flag_set())
@@ -15038,25 +15032,17 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
               }
         }
 
-      // loop over all cells. Flag all cells of which all children are
-      // flagged for coarsening and delete the childrens' flags. Also
-      // delete all flags of cells for which not all children of a
-      // cell are flagged. In effect, only those cells are flagged of
-      // which originally all children were flagged and for which all
-      // children are on the same refinement level. For flagging, the
-      // user flags are used, to avoid confusion and because
-      // non-active cells can't be flagged for coarsening
-      //
-      // In effect, all coarsen flags are turned into user flags of
-      // the mother cell if coarsening is possible or deleted
-      // otherwise.
-      clear_user_flags();
+      // loop over all cells and remove the coarsen flags for those cells that
+      // have sister cells not marked for coarsening, or where some neighbors
+      // are more refined.
+
       // Coarsen flags of cells with no mother cell, i.e. on the
-      // coarsest level are deleted explicitly.
+      // coarsest level, are deleted explicitly.
       for (const auto &acell : this->active_cell_iterators_on_level(0))
         acell->clear_coarsen_flag();
 
-      for (const auto &cell : this->cell_iterators())
+      const cell_iterator endc = end();
+      for (cell_iterator cell = begin(n_levels() - 1); cell != endc; --cell)
         {
           // nothing to do if we are already on the finest level
           if (cell->is_active())
@@ -15065,62 +15051,28 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           const unsigned int n_children       = cell->n_children();
           unsigned int       flagged_children = 0;
           for (unsigned int child = 0; child < n_children; ++child)
-            if (cell->child(child)->is_active() &&
-                cell->child(child)->coarsen_flag_set())
-              {
-                ++flagged_children;
-                // clear flag since we don't need it anymore
-                cell->child(child)->clear_coarsen_flag();
-              }
+            {
+              const auto child_cell = cell->child(child);
+              if (child_cell->is_active() && child_cell->coarsen_flag_set())
+                {
+                  ++flagged_children;
+                  // clear flag since we don't need it anymore
+                  child_cell->clear_coarsen_flag();
+                }
+            }
 
-          // flag this cell for coarsening if all children were
-          // flagged
-          if (flagged_children == n_children)
-            cell->set_user_flag();
-        }
-
-        // in principle no coarsen flags should be set any more at this
-        // point
-#if DEBUG
-      for (auto &cell : this->cell_iterators())
-        Assert(cell->coarsen_flag_set() == false, ExcInternalError());
-#endif
-
-      // now loop over all cells which have the user flag set. their
-      // children were flagged for coarsening. set the coarsen flag
-      // again if we are sure that none of the neighbors of these
-      // children are refined, or will be refined, since then we would
-      // get a two-level jump in refinement. on the other hand, if one
-      // of the children's neighbors has their user flag set, then we
-      // know that its children will go away by coarsening, and we
-      // will be ok.
-      //
-      // note on the other hand that we do allow level-2 jumps in
-      // refinement between neighbors in 1d, so this whole procedure
-      // is only necessary if we are not in 1d
-      //
-      // since we remove some coarsening/user flags in the process, we
-      // have to work from the finest level to the coarsest one, since
-      // we occasionally inspect user flags of cells on finer levels
-      // and need to be sure that these flags are final
-      cell_iterator cell = begin(), endc = end();
-      for (cell = last(); cell != endc; --cell)
-        if (cell->user_flag_set())
-          // if allowed: flag the
-          // children for coarsening
-          if (this->policy->coarsening_allowed(cell))
-            for (unsigned int c = 0; c < cell->n_children(); ++c)
+          // flag the children for coarsening again if all children were
+          // flagged and if the policy allows it
+          if (flagged_children == n_children &&
+              this->policy->coarsening_allowed(cell))
+            for (unsigned int c = 0; c < n_children; ++c)
               {
                 Assert(cell->child(c)->refine_flag_set() == false,
                        ExcInternalError());
 
                 cell->child(c)->set_coarsen_flag();
               }
-
-      // clear all user flags again, now that we don't need them any
-      // more
-      clear_user_flags();
-
+        }
 
       // now see if anything has changed in the last iteration of this
       // function
@@ -15131,6 +15083,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
     }
   while (continue_iterating == true);
 }
+
 
 
 // TODO: merge the following 3 functions since they are the same
@@ -15151,6 +15104,7 @@ Triangulation<1, 1>::prepare_coarsening_and_refinement()
 }
 
 
+
 template <>
 bool
 Triangulation<1, 2>::prepare_coarsening_and_refinement()
@@ -15166,6 +15120,7 @@ Triangulation<1, 2>::prepare_coarsening_and_refinement()
 
   return (flags_before != flags_after);
 }
+
 
 
 template <>
@@ -16344,16 +16299,14 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
 
       //------------------------------------
       // STEP 7:
-      //    take care that no double refinement
-      //    is done at each line in 3d or higher
-      //    dimensions.
+      //    take care that no double refinement is done at each line in 3d or
+      //    higher dimensions.
       this->policy->prepare_refinement_dim_dependent(*this);
 
       //------------------------------------
       // STEP 8:
-      //    make sure that all children of each
-      //    cell are either flagged for coarsening
-      //    or none of the children is
+      //    make sure that all children of each cell are either flagged for
+      //    coarsening or none of the children is
       fix_coarsen_flags();
 
       // get the refinement and coarsening flags
