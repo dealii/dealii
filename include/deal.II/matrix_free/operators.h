@@ -2382,7 +2382,8 @@ namespace MatrixFreeOperators
         VectorizedArrayType local_diagonal_vector[phi.static_dofs_per_cell];
         for (unsigned int i = 0; i < phi.dofs_per_component; ++i)
           {
-            for (unsigned int j = 0; j < phi.dofs_per_component; ++j)
+            for (unsigned int j = 0; j < phi.dofs_per_component * n_components;
+                 ++j)
               phi.begin_dof_values()[j] = VectorizedArrayType();
             phi.begin_dof_values()[i] = 1.;
             do_operation_on_cell(phi, cell);
