@@ -408,56 +408,6 @@ namespace
 
 
   /**
-   * Fill the vector @p line_cell_count
-   * needed by @p delete_children with the
-   * number of cells bounded by a given
-   * line.
-   */
-  template <int dim, int spacedim>
-  std::vector<unsigned int>
-  count_cells_bounded_by_line(const Triangulation<dim, spacedim> &triangulation)
-  {
-    if (dim >= 2)
-      {
-        std::vector<unsigned int> line_cell_count(triangulation.n_raw_lines(),
-                                                  0);
-        for (const auto &cell : triangulation.cell_iterators())
-          for (unsigned int l = 0; l < cell->n_lines(); ++l)
-            ++line_cell_count[cell->line_index(l)];
-        return line_cell_count;
-      }
-    else
-      return std::vector<unsigned int>();
-  }
-
-
-
-  /**
-   * Fill the vector @p quad_cell_count
-   * needed by @p delete_children with the
-   * number of cells bounded by a given
-   * quad.
-   */
-  template <int dim, int spacedim>
-  std::vector<unsigned int>
-  count_cells_bounded_by_quad(const Triangulation<dim, spacedim> &triangulation)
-  {
-    if (dim >= 3)
-      {
-        std::vector<unsigned int> quad_cell_count(triangulation.n_raw_quads(),
-                                                  0);
-        for (const auto &cell : triangulation.cell_iterators())
-          for (unsigned int q : cell->face_indices())
-            ++quad_cell_count[cell->quad_index(q)];
-        return quad_cell_count;
-      }
-    else
-      return {};
-  }
-
-
-
-  /**
    * A set of three functions that
    * reorder the data given to
    * create_triangulation_compatibility
@@ -5075,18 +5025,8 @@ namespace internal
         // first clear user flags for quads and lines; we're going to
         // use them to flag which lines and quads need refinement
         triangulation.faces->quads.clear_user_data();
-
-        for (typename Triangulation<dim, spacedim>::line_iterator line =
-               triangulation.begin_line();
-             line != triangulation.end_line();
-             ++line)
-          line->clear_user_flag();
-
-        for (typename Triangulation<dim, spacedim>::quad_iterator quad =
-               triangulation.begin_quad();
-             quad != triangulation.end_quad();
-             ++quad)
-          quad->clear_user_flag();
+        triangulation.faces->lines.clear_user_flags();
+        triangulation.faces->quads.clear_user_flags();
 
         // check how much space is needed on every level. We need not
         // check the highest level since either
@@ -14851,57 +14791,67 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::execute_coarsening()
 {
-  // create a vector counting for each line how many cells contain
-  // this line. in 3D, this is used later on to decide which lines can
-  // be deleted after coarsening a cell. in other dimensions it will
-  // be ignored
-  std::vector<unsigned int> line_cell_count =
-    count_cells_bounded_by_line(*this);
-  std::vector<unsigned int> quad_cell_count =
-    count_cells_bounded_by_quad(*this);
-
-  // loop over all cells. Flag all cells of which all children are
-  // flagged for coarsening and delete the childrens' flags. In
-  // effect, only those cells are flagged of which originally all
-  // children were flagged and for which all children are on the same
-  // refinement level. For flagging, the user flags are used, to avoid
-  // confusion and because non-active cells can't be flagged for
-  // coarsening. Note that because of the effects of
-  // @p{fix_coarsen_flags}, of a cell either all or no children must
-  // be flagged for coarsening, so it is ok to only check the first
-  // child
-  clear_user_flags();
-
-  for (const auto &cell : this->cell_iterators())
-    if (!cell->is_active())
-      if (cell->child(0)->coarsen_flag_set())
+  // first find out if there are any cells at all to be coarsened in the
+  // loop below
+  const cell_iterator endc       = end();
+  bool                do_coarsen = false;
+  if (levels.size() >= 2)
+    for (cell_iterator cell = begin(n_levels() - 1); cell != endc; --cell)
+      if (!cell->is_active() && cell->child(0)->coarsen_flag_set())
         {
-          cell->set_user_flag();
+          do_coarsen = true;
+          break;
+        }
+
+  if (!do_coarsen)
+    return;
+
+  // create a vector counting for each line and quads how many cells contain
+  // the respective object. this is used later to decide which lines can be
+  // deleted after coarsening a cell.
+  std::vector<unsigned int> line_cell_count(dim > 1 ? this->n_raw_lines() : 0);
+  std::vector<unsigned int> quad_cell_count(dim > 2 ? this->n_raw_quads() : 0);
+  if (dim > 1)
+    for (const auto &cell : this->cell_iterators())
+      {
+        if (dim > 2)
+          {
+            const auto line_indices = internal::TriaAccessorImplementation::
+              Implementation::get_line_indices_of_cell(*cell);
+            for (unsigned int l = 0; l < cell->n_lines(); ++l)
+              ++line_cell_count[line_indices[l]];
+            for (unsigned int q : cell->face_indices())
+              ++quad_cell_count[cell->face_index(q)];
+          }
+        else
+          for (unsigned int l = 0; l < cell->n_lines(); ++l)
+            ++line_cell_count[cell->line(l)->index()];
+      }
+
+  // Since the loop goes over used cells we only need not worry about
+  // deleting some cells since the ++operator will then just hop over them
+  // if we should hit one. Do the loop in the reverse way since we may
+  // only delete some cells if their neighbors have already been deleted
+  // (if the latter are on a higher level for example). In effect, only
+  // those cells are deleted of which originally all children were flagged
+  // and for which all children are on the same refinement level. Note
+  // that because of the effects of
+  // @p{fix_coarsen_flags}, of a cell either all or no children must be
+  // flagged for coarsening, so it is ok to only check the first child
+  //
+  // since we delete the *children* of cells, we can ignore cells on the
+  // highest level, i.e., level must be less than or equal to
+  // n_levels()-2.
+  if (levels.size() >= 2)
+    for (cell_iterator cell = begin(n_levels() - 1); cell != endc; --cell)
+      if (!cell->is_active() && cell->child(0)->coarsen_flag_set())
+        {
           for (unsigned int child = 0; child < cell->n_children(); ++child)
             {
               Assert(cell->child(child)->coarsen_flag_set(),
                      ExcInternalError());
               cell->child(child)->clear_coarsen_flag();
             }
-        }
-
-
-  // now do the actual coarsening step. Since the loop goes over used
-  // cells we only need not worry about deleting some cells since the
-  // ++operator will then just hop over them if we should hit one. Do
-  // the loop in the reverse way since we may only delete some cells
-  // if their neighbors have already been deleted (if the latter are
-  // on a higher level for example)
-  //
-  // since we delete the *children* of cells, we can ignore cells
-  // on the highest level, i.e., level must be less than or equal
-  // to n_levels()-2.
-  cell_iterator cell = begin(), endc = end();
-  if (levels.size() >= 2)
-    for (cell = last(); cell != endc; --cell)
-      if (cell->level() <= static_cast<int>(levels.size() - 2) &&
-          cell->user_flag_set())
-        {
           // inform all listeners that cell coarsening is going to happen
           signals.pre_coarsening_on_cell(cell);
           // use a separate function, since this is dimension specific
@@ -14914,12 +14864,6 @@ Triangulation<dim, spacedim>::execute_coarsening()
   // re-compute number of lines and quads
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
-
-  // in principle no user flags should be set any more at this point
-#if DEBUG
-  for (cell = begin(); cell != endc; ++cell)
-    Assert(cell->user_flag_set() == false, ExcInternalError());
-#endif
 }
 
 
