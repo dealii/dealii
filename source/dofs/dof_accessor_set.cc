@@ -180,12 +180,12 @@ namespace internal
     const DoFCellAccessor<dim, spacedim, lda> &      cell,
     const Vector<number> &                           local_values,
     OutputVector &                                   values,
-    const unsigned int                               fe_index_,
+    const types::fe_index                            fe_index_,
     const std::function<void(const DoFCellAccessor<dim, spacedim, lda> &cell,
                              const Vector<number> &local_values,
                              OutputVector &        values)> &processor)
   {
-    const unsigned int fe_index =
+    const types::fe_index fe_index =
       (cell.get_dof_handler().has_hp_capabilities() == false &&
        fe_index_ == numbers::invalid_fe_index) ?
         DoFHandler<dim, spacedim>::default_fe_index :
@@ -272,7 +272,7 @@ void
 DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
   const Vector<number> &local_values,
   OutputVector &        values,
-  const unsigned int    fe_index_,
+  const types::fe_index fe_index_,
   const bool            perform_check) const
 {
   internal::process_by_interpolation<dim, spacedim, lda, OutputVector, number>(
@@ -295,7 +295,7 @@ DoFCellAccessor<dim, spacedim, lda>::
   distribute_local_to_global_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
-    const unsigned int    fe_index_) const
+    const types::fe_index fe_index_) const
 {
   internal::process_by_interpolation<dim, spacedim, lda, OutputVector, number>(
     *this,

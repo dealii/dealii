@@ -239,7 +239,7 @@ namespace hp
       }
 
     // If we couldn't find the dominating object, return an invalid one.
-    return numbers::invalid_unsigned_int;
+    return numbers::invalid_fe_index;
   }
 
 
@@ -286,7 +286,7 @@ namespace hp
       }
 
     // If we couldn't find the dominated object, return an invalid one.
-    return numbers::invalid_unsigned_int;
+    return numbers::invalid_fe_index;
   }
 
 
@@ -299,7 +299,7 @@ namespace hp
   {
     unsigned int fe_index = find_dominating_fe(fes, codim);
 
-    if (fe_index == numbers::invalid_unsigned_int)
+    if (fe_index == numbers::invalid_fe_index)
       {
         const std::set<unsigned int> dominating_fes =
           find_common_fes(fes, codim);
@@ -319,7 +319,7 @@ namespace hp
   {
     unsigned int fe_index = find_dominated_fe(fes, codim);
 
-    if (fe_index == numbers::invalid_unsigned_int)
+    if (fe_index == numbers::invalid_fe_index)
       {
         const std::set<unsigned int> dominated_fes =
           find_enclosing_fes(fes, codim);

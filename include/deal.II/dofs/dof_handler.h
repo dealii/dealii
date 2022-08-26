@@ -515,7 +515,7 @@ public:
   /**
    * The default index of the finite element to be used on a given cell.
    */
-  static const unsigned int default_fe_index = 0;
+  static const types::fe_index default_fe_index = 0;
 
   /**
    * Invalid index of the finite element to be used on a given cell.
@@ -580,45 +580,85 @@ public:
   operator=(const DoFHandler &) = delete;
 
   /**
-   * Go through the triangulation and set the active FE indices of all
-   * locally owned cells to the values given in @p active_fe_indices.
+   * For each locally owned cell, set the active finite element index to the
+   * corresponding value given in @p active_fe_indices. Indices must be in the
+   * order how we iterate over active cells.
+   *
+   * Active FE indices will only be set for locally owned cells. Ghost and
+   * artificial cells will be ignored; no active FE index will be assigned to
+   * them.
+   *
+   * The vector @p active_fe_indices is assumed to have as many entries as
+   * there are active cells.
    */
+  void
+  set_active_fe_indices(const std::vector<types::fe_index> &active_fe_indices);
+
+  /**
+   * @copydoc set_active_fe_indices()
+   *
+   * @deprecated Use set_active_fe_indices() with the types::fe_index datatype.
+   */
+  DEAL_II_DEPRECATED_EARLY
   void
   set_active_fe_indices(const std::vector<unsigned int> &active_fe_indices);
 
   /**
-   * Go through the triangulation and return a vector of active FE indices of
-   * all locally relevant cells. Artificial cells will have the value
-   * numbers::invalid_fe_index assigned.
+   * For each locally relevant cell, extract the active finite element index and
+   * return them in the order how we iterate over active cells.
+   *
+   * As we do not know the active FE index on artificial cells, they are set to
+   * the invalid value numbers::invalid_fe_index.
+   *
+   * For DoFHandler objects without hp-capabilities, the vector will consist of
+   * zeros, indicating that all cells use the same finite element. In hp-mode,
+   * the values may be different, though.
    */
-  std::vector<unsigned int>
+  std::vector<types::fe_index>
   get_active_fe_indices() const;
 
   /**
-   * Go through the triangulation and store the active FE indices of all
-   * locally relevant cells to the vector @p active_fe_indices. This vector
-   * is resized, if necessary.
+   * For each locally relevant cell, extract the active finite element index and
+   * fill the vector @p active_fe_indices in the order how we iterate over
+   * active cells. This vector is resized, if necessary.
    *
-   * @deprecated Use the function that returns the result vector.
+   * As we do not know the active FE index on artificial cells, they are set to
+   * the invalid value numbers::invalid_fe_index.
+   *
+   * For DoFHandler objects without hp-capabilities, the vector will consist of
+   * zeros, indicating that all cells use the same finite element. In hp-mode,
+   * the values may be different, though.
+   *
+   * @deprecated Use get_active_fe_indices() that returns the result vector.
    */
   DEAL_II_DEPRECATED_EARLY
   void
   get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
 
   /**
-   * Go through the triangulation and set the future FE indices of all
-   * locally owned cells to the values given in @p future_fe_indices.
-   * Cells corresponding to numbers::invalid_fe_index will be skipped.
+   * For each locally owned cell, set the future finite element index to the
+   * corresponding value given in @p future_fe_indices. Indices must be in the
+   * order how we iterate over active cells.
+   *
+   * Future FE indices will only be set for locally owned cells. Ghost and
+   * artificial cells will be ignored; no future FE index will be assigned to
+   * them.
+   *
+   * The vector @p future_fe_indices is assumed to have as many entries as
+   * there are active cells.
    */
   void
-  set_future_fe_indices(const std::vector<unsigned int> &future_fe_indices);
+  set_future_fe_indices(const std::vector<types::fe_index> &future_fe_indices);
 
   /**
-   * Go through the triangulation and return a vector of future FE indices of
-   * all locally owned cells. If no future FE index has been set on a cell,
-   * its value will be numbers::invalid_fe_index.
+   * For each locally owned cell, extract the future finite element index and
+   * return them in the order how we iterate over active cells.
+   *
+   * As we do not know the future FE index on ghost and artificial cells, they
+   * are set to the invalid value numbers::invalid_fe_index. The same applies to
+   * locally owned cells that have no future FE index assigned.
    */
-  std::vector<unsigned int>
+  std::vector<types::fe_index>
   get_future_fe_indices() const;
 
   /**
@@ -1173,7 +1213,7 @@ public:
    * used by this object.
    */
   const FiniteElement<dim, spacedim> &
-  get_fe(const unsigned int index = 0) const;
+  get_fe(const types::fe_index index = 0) const;
 
   /**
    * Return a constant reference to the set of finite element objects that
@@ -1407,26 +1447,28 @@ private:
      * Container to temporarily store the iterator and future active FE index
      * of cells that persist.
      */
-    std::map<const cell_iterator, const unsigned int> persisting_cells_fe_index;
+    std::map<const cell_iterator, const types::fe_index>
+      persisting_cells_fe_index;
 
     /**
      * Container to temporarily store the iterator and future active FE index
      * of cells that will be refined.
      */
-    std::map<const cell_iterator, const unsigned int> refined_cells_fe_index;
+    std::map<const cell_iterator, const types::fe_index> refined_cells_fe_index;
 
     /**
      * Container to temporarily store the iterator and future active FE index
      * of parent cells that will remain after coarsening.
      */
-    std::map<const cell_iterator, const unsigned int> coarsened_cells_fe_index;
+    std::map<const cell_iterator, const types::fe_index>
+      coarsened_cells_fe_index;
 
     /**
      * Container to temporarily store the active FE index of every locally
      * owned cell for transfer across parallel::distributed::Triangulation
      * objects.
      */
-    std::vector<unsigned int> active_fe_indices;
+    std::vector<types::fe_index> active_fe_indices;
 
     /**
      * Helper object to transfer all active FE indices on
@@ -1435,7 +1477,7 @@ private:
      */
     std::unique_ptr<
       parallel::distributed::
-        CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>
+        CellDataTransfer<dim, spacedim, std::vector<types::fe_index>>>
       cell_data_transfer;
   };
 
@@ -1843,7 +1885,7 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 
 template <int dim, int spacedim>
 inline const FiniteElement<dim, spacedim> &
-DoFHandler<dim, spacedim>::get_fe(const unsigned int number) const
+DoFHandler<dim, spacedim>::get_fe(const types::fe_index number) const
 {
   Assert(fe_collection.size() > 0,
          ExcMessage("No finite element collection is associated with "

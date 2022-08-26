@@ -446,7 +446,7 @@ public:
   void
   get_dof_indices(
     std::vector<types::global_dof_index> &dof_indices,
-    const unsigned int fe_index = numbers::invalid_fe_index) const;
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Return the global multilevel indices of the degrees of freedom that live
@@ -458,15 +458,16 @@ public:
   get_mg_dof_indices(
     const int                             level,
     std::vector<types::global_dof_index> &dof_indices,
-    const unsigned int fe_index = numbers::invalid_fe_index) const;
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Set the level DoF indices that are returned by get_mg_dof_indices.
    */
   void
-  set_mg_dof_indices(const int                                   level,
-                     const std::vector<types::global_dof_index> &dof_indices,
-                     const unsigned int fe_index = numbers::invalid_fe_index);
+  set_mg_dof_indices(
+    const int                                   level,
+    const std::vector<types::global_dof_index> &dof_indices,
+    const types::fe_index fe_index = numbers::invalid_fe_index);
 
   /**
    * Global DoF index of the <i>i</i> degree associated with the @p vertexth
@@ -491,9 +492,9 @@ public:
    */
   types::global_dof_index
   vertex_dof_index(
-    const unsigned int vertex,
-    const unsigned int i,
-    const unsigned int fe_index = numbers::invalid_fe_index) const;
+    const unsigned int    vertex,
+    const unsigned int    i,
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Return the global DoF index of the <code>i</code>th degree of freedom
@@ -502,10 +503,10 @@ public:
    */
   types::global_dof_index
   mg_vertex_dof_index(
-    const int          level,
-    const unsigned int vertex,
-    const unsigned int i,
-    const unsigned int fe_index = numbers::invalid_fe_index) const;
+    const int             level,
+    const unsigned int    vertex,
+    const unsigned int    i,
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree of freedom of this object.
@@ -535,8 +536,8 @@ public:
    * the face.
    */
   types::global_dof_index
-  dof_index(const unsigned int i,
-            const unsigned int fe_index = numbers::invalid_fe_index) const;
+  dof_index(const unsigned int    i,
+            const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Return the dof_index on the given level. Also see dof_index.
@@ -575,7 +576,7 @@ public:
    * n_active_fe_indices() active finite elements, and this function can be
    * queried for their indices.
    */
-  unsigned int
+  types::fe_index
   nth_active_fe_index(const unsigned int n) const;
 
   /**
@@ -584,7 +585,7 @@ public:
    * The size of the returned set equals the number of finite elements that
    * are active on this object.
    */
-  std::set<unsigned int>
+  std::set<types::fe_index>
   get_active_fe_indices() const;
 
   /**
@@ -597,7 +598,7 @@ public:
    * n_active_fe_indices()).
    */
   bool
-  fe_index_is_active(const unsigned int fe_index) const;
+  fe_index_is_active(const types::fe_index fe_index) const;
 
   /**
    * Return a reference to the finite element used on this object with the
@@ -605,7 +606,7 @@ public:
    * <code>fe_index_is_active(fe_index)</code> must return true.
    */
   const FiniteElement<dim, spacedim> &
-  get_fe(const unsigned int fe_index) const;
+  get_fe(const types::fe_index fe_index) const;
 
   /**
    * @}
@@ -711,9 +712,10 @@ protected:
    * active_fe_index().
    */
   void
-  set_dof_index(const unsigned int            i,
-                const types::global_dof_index index,
-                const unsigned int fe_index = numbers::invalid_fe_index) const;
+  set_dof_index(
+    const unsigned int            i,
+    const types::global_dof_index index,
+    const types::fe_index         fe_index = numbers::invalid_fe_index) const;
 
   void
   set_mg_dof_index(const int                     level,
@@ -726,7 +728,7 @@ protected:
     const unsigned int            vertex,
     const unsigned int            i,
     const types::global_dof_index index,
-    const unsigned int            fe_index = numbers::invalid_fe_index) const;
+    const types::fe_index         fe_index = numbers::invalid_fe_index) const;
 
   // Iterator classes need to be friends because they need to access
   // operator== and operator!=.
@@ -994,7 +996,7 @@ public:
   void
   get_dof_indices(
     std::vector<types::global_dof_index> &dof_indices,
-    const unsigned int fe_index = AccessorData::invalid_fe_index) const;
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Return the global multilevel indices of the degrees of freedom that live
@@ -1006,7 +1008,7 @@ public:
   get_mg_dof_indices(
     const int                             level,
     std::vector<types::global_dof_index> &dof_indices,
-    const unsigned int fe_index = AccessorData::invalid_fe_index) const;
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Global DoF index of the <i>i</i> degree associated with the @p vertexth
@@ -1028,9 +1030,9 @@ public:
    */
   types::global_dof_index
   vertex_dof_index(
-    const unsigned int vertex,
-    const unsigned int i,
-    const unsigned int fe_index = AccessorData::invalid_fe_index) const;
+    const unsigned int    vertex,
+    const unsigned int    i,
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree of freedom of this object.
@@ -1050,8 +1052,8 @@ public:
    * active_fe_index().
    */
   types::global_dof_index
-  dof_index(const unsigned int i,
-            const unsigned int fe_index = AccessorData::invalid_fe_index) const;
+  dof_index(const unsigned int    i,
+            const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * @}
@@ -1081,7 +1083,7 @@ public:
    * calculated, this method just raises an exception and only exists to
    * enable dimension-independent programming.
    */
-  unsigned int
+  types::fe_index
   nth_active_fe_index(const unsigned int n) const;
 
   /**
@@ -1093,7 +1095,7 @@ public:
    * enable dimension-independent programming.
    */
   bool
-  fe_index_is_active(const unsigned int fe_index) const;
+  fe_index_is_active(const types::fe_index fe_index) const;
 
   /**
    * Return a reference to the finite element used on this object with the
@@ -1101,7 +1103,7 @@ public:
    * <code>fe_index_is_active(fe_index)</code> must return true.
    */
   const FiniteElement<1, spacedim> &
-  get_fe(const unsigned int fe_index) const;
+  get_fe(const types::fe_index fe_index) const;
 
   /**
    * @}
@@ -1198,7 +1200,7 @@ protected:
   set_dof_index(
     const unsigned int            i,
     const types::global_dof_index index,
-    const unsigned int fe_index = AccessorData::invalid_fe_index) const;
+    const types::fe_index         fe_index = numbers::invalid_fe_index) const;
 
   // Iterator classes need to be friends because they need to access
   // operator== and operator!=.
@@ -1287,8 +1289,8 @@ public:
    * all other functions in this class this function only throws an exception.
    */
   types::global_dof_index
-  dof_index(const unsigned int i,
-            const unsigned int fe_index =
+  dof_index(const unsigned int    i,
+            const types::fe_index fe_index =
               DoFHandler<dim, spacedim>::default_fe_index) const;
 
   /**
@@ -1297,9 +1299,10 @@ public:
    * all other functions in this class this function only throws an exception.
    */
   void
-  set_dof_index(const unsigned int            i,
-                const types::global_dof_index index,
-                const unsigned int fe_index = numbers::invalid_fe_index) const;
+  set_dof_index(
+    const unsigned int            i,
+    const types::global_dof_index index,
+    const types::fe_index         fe_index = numbers::invalid_fe_index) const;
 };
 
 
@@ -1687,9 +1690,9 @@ public:
   template <class InputVector, typename number>
   void
   get_interpolated_dof_values(
-    const InputVector &values,
-    Vector<number> &   interpolated_values,
-    const unsigned int fe_index = numbers::invalid_fe_index) const;
+    const InputVector &   values,
+    Vector<number> &      interpolated_values,
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * This function is the counterpart to get_interpolated_dof_values(): you
@@ -1757,7 +1760,7 @@ public:
   set_dof_values_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
-    const unsigned int    fe_index      = numbers::invalid_fe_index,
+    const types::fe_index fe_index      = numbers::invalid_fe_index,
     const bool            perform_check = false) const;
 
   /**
@@ -1774,7 +1777,7 @@ public:
   distribute_local_to_global_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
-    const unsigned int    fe_index = numbers::invalid_fe_index) const;
+    const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping the
@@ -1979,7 +1982,7 @@ public:
    * this cell as a ghost cell. See the documentation of DoFHandler for more
    * information.
    */
-  unsigned int
+  types::fe_index
   active_fe_index() const;
 
   /**
@@ -2009,7 +2012,7 @@ public:
    * information.
    */
   void
-  set_active_fe_index(const unsigned int i) const;
+  set_active_fe_index(const types::fe_index i) const;
   /**
    * @}
    */
@@ -2073,7 +2076,7 @@ public:
    * parallel::shared::Triangulation or parallel::distributed::Triangulation
    * classes, it is only allowed to call this function on locally owned cells.
    */
-  unsigned int
+  types::fe_index
   future_fe_index() const;
 
   /**
@@ -2085,7 +2088,7 @@ public:
    * functionality.
    */
   void
-  set_future_fe_index(const unsigned int i) const;
+  set_future_fe_index(const types::fe_index i) const;
 
   /**
    * Return whether a future finite element has been set.

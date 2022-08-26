@@ -43,7 +43,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
-const unsigned int DoFHandler<dim, spacedim>::default_fe_index;
+const types::fe_index DoFHandler<dim, spacedim>::default_fe_index;
 
 
 namespace internal
@@ -977,8 +977,8 @@ namespace internal
                            (cell->active_fe_index() ==
                             cell->neighbor(face)->active_fe_index())))
                         {
-                          const unsigned int fe = cell->active_fe_index();
-                          const unsigned int n_dofs =
+                          const types::fe_index fe = cell->active_fe_index();
+                          const unsigned int    n_dofs =
                             dof_handler.get_fe(fe)
                               .template n_dofs_per_object<dim - 1>(face);
                           const unsigned int offset =
@@ -994,9 +994,9 @@ namespace internal
                         }
                       else
                         {
-                          unsigned int fe_1      = cell->active_fe_index();
-                          unsigned int face_no_1 = face;
-                          unsigned int fe_2 =
+                          types::fe_index fe_1      = cell->active_fe_index();
+                          unsigned int    face_no_1 = face;
+                          types::fe_index fe_2 =
                             cell->neighbor(face)->active_fe_index();
                           unsigned int face_no_2 = cell->neighbor_face_no(face);
 
@@ -1509,7 +1509,7 @@ namespace internal
                                    dim>::ExcInconsistentCoarseningFlags());
 #endif
 
-                        const unsigned int fe_index = dealii::internal::hp::
+                        const types::fe_index fe_index = dealii::internal::hp::
                           DoFHandlerImplementation::Implementation::
                             dominated_future_fe_on_children<dim, spacedim>(
                               parent);
@@ -1595,23 +1595,24 @@ namespace internal
          * one dominated by all children for the parent cell.
          */
         template <int dim, int spacedim>
-        static unsigned int
+        static types::fe_index
         determine_fe_from_children(
           const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const std::vector<unsigned int> &              children_fe_indices,
+          const std::vector<types::fe_index> &           children_fe_indices,
           const dealii::hp::FECollection<dim, spacedim> &fe_collection)
         {
           Assert(!children_fe_indices.empty(), ExcInternalError());
 
           // convert vector to set
+          // TODO: Change set to types::fe_index
           const std::set<unsigned int> children_fe_indices_set(
             children_fe_indices.begin(), children_fe_indices.end());
 
-          const unsigned int dominated_fe_index =
+          const types::fe_index dominated_fe_index =
             fe_collection.find_dominated_fe_extended(children_fe_indices_set,
                                                      /*codim=*/0);
 
-          Assert(dominated_fe_index != numbers::invalid_unsigned_int,
+          Assert(dominated_fe_index != numbers::invalid_fe_index,
                  ExcNoDominatedFiniteElementOnChildren());
 
           return dominated_fe_index;
@@ -1626,7 +1627,7 @@ namespace internal
          * See documentation in the header file for more information.
          */
         template <int dim, int spacedim>
-        static unsigned int
+        static types::fe_index
         dominated_future_fe_on_children(
           const typename DoFHandler<dim, spacedim>::cell_iterator &parent)
         {
@@ -1641,6 +1642,7 @@ namespace internal
             dof_handler.has_hp_capabilities(),
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
+          // TODO: Change set to types::fe_index
           std::set<unsigned int> future_fe_indices_children;
           for (const auto &child : parent->child_iterators())
             {
@@ -1656,7 +1658,7 @@ namespace internal
               // here and thus call the internal function that does not check
               // for cell ownership. This requires that future FE indices have
               // been communicated prior to calling this function.
-              const unsigned int future_fe_index_child =
+              const types::fe_index future_fe_index_child =
                 dealii::internal::DoFCellAccessorImplementation::
                   Implementation::future_fe_index<dim, spacedim, false>(*child);
 
@@ -1664,12 +1666,12 @@ namespace internal
             }
           Assert(!future_fe_indices_children.empty(), ExcInternalError());
 
-          const unsigned int future_fe_index =
+          const types::fe_index future_fe_index =
             dof_handler.fe_collection.find_dominated_fe_extended(
               future_fe_indices_children,
               /*codim=*/0);
 
-          Assert(future_fe_index != numbers::invalid_unsigned_int,
+          Assert(future_fe_index != numbers::invalid_fe_index,
                  ExcNoDominatedFiniteElementOnChildren());
 
           return future_fe_index;
@@ -2564,7 +2566,7 @@ DoFHandler<dim, spacedim>::max_couplings_between_dofs() const
 template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::set_active_fe_indices(
-  const std::vector<unsigned int> &active_fe_indices)
+  const std::vector<types::fe_index> &active_fe_indices)
 {
   Assert(active_fe_indices.size() == this->get_triangulation().n_active_cells(),
          ExcDimensionMismatch(active_fe_indices.size(),
@@ -2583,10 +2585,21 @@ DoFHandler<dim, spacedim>::set_active_fe_indices(
 
 
 template <int dim, int spacedim>
-std::vector<unsigned int>
+void
+DoFHandler<dim, spacedim>::set_active_fe_indices(
+  const std::vector<unsigned int> &active_fe_indices)
+{
+  set_active_fe_indices(std::vector<types::fe_index>(active_fe_indices.begin(),
+                                                     active_fe_indices.end()));
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<types::fe_index>
 DoFHandler<dim, spacedim>::get_active_fe_indices() const
 {
-  std::vector<unsigned int> active_fe_indices(
+  std::vector<types::fe_index> active_fe_indices(
     this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
   // we could try to extract the values directly, since they are
@@ -2606,7 +2619,9 @@ void
 DoFHandler<dim, spacedim>::get_active_fe_indices(
   std::vector<unsigned int> &active_fe_indices) const
 {
-  active_fe_indices = get_active_fe_indices();
+  std::vector<types::fe_index> indices = get_active_fe_indices();
+
+  active_fe_indices.assign(indices.begin(), indices.end());
 }
 
 
@@ -2614,7 +2629,7 @@ DoFHandler<dim, spacedim>::get_active_fe_indices(
 template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::set_future_fe_indices(
-  const std::vector<unsigned int> &future_fe_indices)
+  const std::vector<types::fe_index> &future_fe_indices)
 {
   Assert(future_fe_indices.size() == this->get_triangulation().n_active_cells(),
          ExcDimensionMismatch(future_fe_indices.size(),
@@ -2635,10 +2650,10 @@ DoFHandler<dim, spacedim>::set_future_fe_indices(
 
 
 template <int dim, int spacedim>
-std::vector<unsigned int>
+std::vector<types::fe_index>
 DoFHandler<dim, spacedim>::get_future_fe_indices() const
 {
-  std::vector<unsigned int> future_fe_indices(
+  std::vector<types::fe_index> future_fe_indices(
     this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
   // we could try to extract the values directly, since they are
@@ -2877,7 +2892,7 @@ DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
 
   // Gather all current future FE indices.
   active_fe_index_transfer->active_fe_indices.resize(
-    get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
+    get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
   for (const auto &cell : active_cell_iterators())
     if (cell->is_locally_owned())
@@ -2891,16 +2906,16 @@ DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
 
   active_fe_index_transfer->cell_data_transfer = std::make_unique<
     parallel::distributed::
-      CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
+      CellDataTransfer<dim, spacedim, std::vector<types::fe_index>>>(
     *distributed_tria,
     /*transfer_variable_size_data=*/false,
     /*refinement_strategy=*/
     &dealii::AdaptationStrategies::Refinement::
-      preserve<dim, spacedim, unsigned int>,
+      preserve<dim, spacedim, types::fe_index>,
     /*coarsening_strategy=*/
     [this](const typename Triangulation<dim, spacedim>::cell_iterator &parent,
-           const std::vector<unsigned int> &children_fe_indices)
-      -> unsigned int {
+           const std::vector<types::fe_index> &children_fe_indices)
+      -> types::fe_index {
       return dealii::internal::hp::DoFHandlerImplementation::Implementation::
         determine_fe_from_children<dim, spacedim>(parent,
                                                   children_fe_indices,
@@ -2951,7 +2966,7 @@ DoFHandler<dim, spacedim>::post_distributed_transfer_action()
 
   // Unpack active FE indices.
   this->active_fe_index_transfer->active_fe_indices.resize(
-    this->get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
+    this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
   this->active_fe_index_transfer->cell_data_transfer->unpack(
     this->active_fe_index_transfer->active_fe_indices);
 
@@ -2998,16 +3013,16 @@ DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
 
   active_fe_index_transfer->cell_data_transfer = std::make_unique<
     parallel::distributed::
-      CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
+      CellDataTransfer<dim, spacedim, std::vector<types::fe_index>>>(
     *distributed_tria,
     /*transfer_variable_size_data=*/false,
     /*refinement_strategy=*/
     &dealii::AdaptationStrategies::Refinement::
-      preserve<dim, spacedim, unsigned int>,
+      preserve<dim, spacedim, types::fe_index>,
     /*coarsening_strategy=*/
     [this](const typename Triangulation<dim, spacedim>::cell_iterator &parent,
-           const std::vector<unsigned int> &children_fe_indices)
-      -> unsigned int {
+           const std::vector<types::fe_index> &children_fe_indices)
+      -> types::fe_index {
       return dealii::internal::hp::DoFHandlerImplementation::Implementation::
         determine_fe_from_children<dim, spacedim>(parent,
                                                   children_fe_indices,
@@ -3056,16 +3071,16 @@ DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
 
   active_fe_index_transfer->cell_data_transfer = std::make_unique<
     parallel::distributed::
-      CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
+      CellDataTransfer<dim, spacedim, std::vector<types::fe_index>>>(
     *distributed_tria,
     /*transfer_variable_size_data=*/false,
     /*refinement_strategy=*/
     &dealii::AdaptationStrategies::Refinement::
-      preserve<dim, spacedim, unsigned int>,
+      preserve<dim, spacedim, types::fe_index>,
     /*coarsening_strategy=*/
     [this](const typename Triangulation<dim, spacedim>::cell_iterator &parent,
-           const std::vector<unsigned int> &children_fe_indices)
-      -> unsigned int {
+           const std::vector<types::fe_index> &children_fe_indices)
+      -> types::fe_index {
       return dealii::internal::hp::DoFHandlerImplementation::Implementation::
         determine_fe_from_children<dim, spacedim>(parent,
                                                   children_fe_indices,
@@ -3074,7 +3089,7 @@ DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
 
   // Unpack active FE indices.
   active_fe_index_transfer->active_fe_indices.resize(
-    get_triangulation().n_active_cells(), numbers::invalid_unsigned_int);
+    get_triangulation().n_active_cells(), numbers::invalid_fe_index);
   active_fe_index_transfer->cell_data_transfer->deserialize(
     active_fe_index_transfer->active_fe_indices);
 

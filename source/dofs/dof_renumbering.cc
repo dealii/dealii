@@ -873,8 +873,8 @@ namespace DoFRenumbering
         // on each cell: get dof indices
         // and insert them into the global
         // list using their component
-        const unsigned int fe_index = cell->active_fe_index();
-        const unsigned int dofs_per_cell =
+        const types::fe_index fe_index = cell->active_fe_index();
+        const unsigned int    dofs_per_cell =
           fe_collection[fe_index].n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);
@@ -1146,8 +1146,8 @@ namespace DoFRenumbering
         // on each cell: get dof indices
         // and insert them into the global
         // list using their component
-        const unsigned int fe_index = cell->active_fe_index();
-        const unsigned int dofs_per_cell =
+        const types::fe_index fe_index = cell->active_fe_index();
+        const unsigned int    dofs_per_cell =
           fe_collection[fe_index].n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);

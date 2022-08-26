@@ -506,7 +506,8 @@ LaplaceProblem<dim>::refine_grid()
         {
           cell->clear_refine_flag();
           cell->set_active_fe_index(
-            std::min(cell->active_fe_index() + 1, fe_collection.size() - 1));
+            std::min<types::fe_index>(cell->active_fe_index() + 1,
+                                      fe_collection.size() - 1));
         }
   }
 

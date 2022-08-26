@@ -44,11 +44,11 @@ template <int dim, int spacedim, bool lda>
 template <class InputVector, typename number>
 void
 DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
-  const InputVector &values,
-  Vector<number> &   interpolated_values,
-  const unsigned int fe_index_) const
+  const InputVector &   values,
+  Vector<number> &      interpolated_values,
+  const types::fe_index fe_index_) const
 {
-  const unsigned int fe_index =
+  const types::fe_index fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
      fe_index_ == numbers::invalid_fe_index) ?
       DoFHandler<dim, spacedim>::default_fe_index :

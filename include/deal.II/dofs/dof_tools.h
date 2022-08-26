@@ -2134,7 +2134,11 @@ namespace DoFTools
    * returned vector will consist of only zeros, indicating that all cells use
    * the same finite element. In hp-mode, the values may be different, though.
    *
-   * @deprecated Use DoFHandler::get_active_fe_indices() instead.
+   * As we do not know the active FE index on artificial cells, we set them to
+   * the invalid value numbers::invalid_fe_index.
+   *
+   * @deprecated Use DoFHandler::get_active_fe_indices() that returns the result
+   * vector.
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED_EARLY void

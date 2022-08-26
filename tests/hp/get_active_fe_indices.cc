@@ -59,7 +59,7 @@ test()
 
   dof_handler.distribute_dofs(fe_collection);
 
-  std::vector<unsigned int> active_fe_indices =
+  const std::vector<types::fe_index> active_fe_indices =
     dof_handler.get_active_fe_indices();
   for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
     deallog << active_fe_indices[i] << std::endl;
