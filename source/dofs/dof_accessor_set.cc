@@ -186,7 +186,7 @@ namespace internal
   {
     const unsigned int fe_index =
       (cell.get_dof_handler().has_hp_capabilities() == false &&
-       fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+       fe_index_ == numbers::invalid_fe_index) ?
         DoFHandler<dim, spacedim>::default_fe_index :
         fe_index_;
 
@@ -197,7 +197,7 @@ namespace internal
             // active cells, you either don't specify an fe_index,
             // or that you specify the correct one
             (fe_index == cell.active_fe_index()) ||
-            (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
+            (fe_index == numbers::invalid_fe_index))
           // simply set the values on this cell
           processor(cell, local_values, values);
         else
@@ -228,7 +228,7 @@ namespace internal
       // otherwise distribute them to the children
       {
         Assert((cell.get_dof_handler().has_hp_capabilities() == false) ||
-                 (fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
+                 (fe_index != numbers::invalid_fe_index),
                ExcMessage(
                  "You cannot call this function on non-active cells "
                  "of DoFHandler objects unless you provide an explicit "
