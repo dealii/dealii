@@ -976,11 +976,14 @@ namespace MatrixFreeOperators
     /**
      * Apply Laplace operator on a cell @p cell.
      */
+    template <int n_components_compute>
     void
-    do_operation_on_cell(
-      FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, value_type>
-        &                phi,
-      const unsigned int cell) const;
+    do_operation_on_cell(FEEvaluation<dim,
+                                      fe_degree,
+                                      n_q_points_1d,
+                                      n_components_compute,
+                                      value_type> &phi,
+                         const unsigned int        cell) const;
 
     /**
      * User-provided heterogeneity coefficient.
@@ -2255,6 +2258,7 @@ namespace MatrixFreeOperators
             int n_components,
             typename VectorType,
             typename VectorizedArrayType>
+  template <int n_components_compute>
   void
   LaplaceOperator<dim,
                   fe_degree,
@@ -2267,7 +2271,7 @@ namespace MatrixFreeOperators
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
+        n_components_compute,
         typename Base<dim, VectorType, VectorizedArrayType>::value_type> &phi,
       const unsigned int cell) const
   {
@@ -2374,26 +2378,31 @@ namespace MatrixFreeOperators
     using Number =
       typename Base<dim, VectorType, VectorizedArrayType>::value_type;
 
-    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
+    FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> eval(
       data, this->selected_rows[0]);
+    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
+      eval_vector(data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        phi.reinit(cell);
-        VectorizedArrayType local_diagonal_vector[phi.static_dofs_per_cell];
-        for (unsigned int i = 0; i < phi.dofs_per_component; ++i)
+        eval.reinit(cell);
+        eval_vector.reinit(cell);
+        // This function assumes that we have the same result on all
+        // components, so we only need to go through the columns of one scalar
+        // component, which can then be broadcast to all components
+        for (unsigned int i = 0; i < eval.dofs_per_cell; ++i)
           {
-            for (unsigned int j = 0; j < phi.dofs_per_component * n_components;
-                 ++j)
-              phi.begin_dof_values()[j] = VectorizedArrayType();
-            phi.begin_dof_values()[i] = 1.;
-            do_operation_on_cell(phi, cell);
-            local_diagonal_vector[i] = phi.begin_dof_values()[i];
+            for (unsigned int j = 0; j < eval.dofs_per_cell; ++j)
+              eval.begin_dof_values()[j] = VectorizedArrayType();
+            eval.begin_dof_values()[i] = 1.;
+
+            do_operation_on_cell(eval, cell);
+
+            for (unsigned int c = 0; c < n_components; ++c)
+              eval_vector
+                .begin_dof_values()[i + c * eval_vector.dofs_per_component] =
+                eval.begin_dof_values()[i];
           }
-        for (unsigned int i = 0; i < phi.dofs_per_component; ++i)
-          for (unsigned int c = 0; c < phi.n_components; ++c)
-            phi.begin_dof_values()[i + c * phi.dofs_per_component] =
-              local_diagonal_vector[i];
-        phi.distribute_local_to_global(dst);
+        eval_vector.distribute_local_to_global(dst);
       }
   }
 
