@@ -21,6 +21,7 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/vectorization.h>
 
 #include <deal.II/lac/lapack_full_matrix.h>
 
@@ -502,6 +503,167 @@ TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::n() const
 }
 
 
+namespace internal
+{
+  namespace TensorProductMatrixSymmetricSum
+  {
+    template <int n_rows_1d_templated, std::size_t dim, typename Number>
+    void
+    vmult(Number *                                 dst,
+          const Number *                           src,
+          AlignedVector<Number> &                  tmp,
+          const std::array<Table<2, Number>, dim> &mass_matrix,
+          const std::array<Table<2, Number>, dim> &derivative_matrix)
+    {
+      const unsigned int n_rows_1d = mass_matrix[0].n_rows();
+      const unsigned int n         = Utilities::fixed_power<dim>(n_rows_1d);
+
+      tmp.resize_fast(n * 2);
+      Number *t = tmp.begin();
+
+      internal::EvaluatorTensorProduct<internal::evaluate_general,
+                                       dim,
+                                       n_rows_1d_templated,
+                                       n_rows_1d_templated,
+                                       Number>
+        eval({}, {}, {}, n_rows_1d, n_rows_1d);
+
+      if (dim == 1)
+        {
+          const Number *A = &derivative_matrix[0](0, 0);
+          eval.template apply<0, false, false>(A, src, dst);
+        }
+
+      else if (dim == 2)
+        {
+          const Number *A0 = &derivative_matrix[0](0, 0);
+          const Number *M0 = &mass_matrix[0](0, 0);
+          const Number *A1 = &derivative_matrix[1](0, 0);
+          const Number *M1 = &mass_matrix[1](0, 0);
+          eval.template apply<0, false, false>(M0, src, t);
+          eval.template apply<1, false, false>(A1, t, dst);
+          eval.template apply<0, false, false>(A0, src, t);
+          eval.template apply<1, false, true>(M1, t, dst);
+        }
+
+      else if (dim == 3)
+        {
+          const Number *A0 = &derivative_matrix[0](0, 0);
+          const Number *M0 = &mass_matrix[0](0, 0);
+          const Number *A1 = &derivative_matrix[1](0, 0);
+          const Number *M1 = &mass_matrix[1](0, 0);
+          const Number *A2 = &derivative_matrix[2](0, 0);
+          const Number *M2 = &mass_matrix[2](0, 0);
+          eval.template apply<0, false, false>(M0, src, t + n);
+          eval.template apply<1, false, false>(M1, t + n, t);
+          eval.template apply<2, false, false>(A2, t, dst);
+          eval.template apply<1, false, false>(A1, t + n, t);
+          eval.template apply<0, false, false>(A0, src, t + n);
+          eval.template apply<1, false, true>(M1, t + n, t);
+          eval.template apply<2, false, true>(M2, t, dst);
+        }
+
+      else
+        AssertThrow(false, ExcNotImplemented());
+    }
+
+
+
+    template <int n_rows_1d_templated, std::size_t dim, typename Number>
+    void
+    apply_inverse(Number *                                      dst,
+                  const Number *                                src,
+                  AlignedVector<Number> &                       tmp,
+                  const std::array<Table<2, Number>, dim> &     eigenvectors,
+                  const std::array<AlignedVector<Number>, dim> &eigenvalues)
+    {
+      const unsigned int n_rows_1d = eigenvectors[0].n_rows();
+      const unsigned int n         = Utilities::fixed_power<dim>(n_rows_1d);
+
+      tmp.resize_fast(n);
+      Number *t = tmp.begin();
+
+      internal::EvaluatorTensorProduct<internal::evaluate_general,
+                                       dim,
+                                       n_rows_1d_templated,
+                                       n_rows_1d_templated,
+                                       Number>
+        eval({}, {}, {}, n_rows_1d, n_rows_1d);
+
+      // NOTE: dof_to_quad has to be interpreted as 'dof to eigenvalue index'
+      //       --> apply<.,true,.> (S,src,dst) calculates dst = S^T * src,
+      //       --> apply<.,false,.> (S,src,dst) calculates dst = S * src,
+      //       while the eigenvectors are stored column-wise in S, i.e.
+      //       rows correspond to dofs whereas columns to eigenvalue indices!
+      if (dim == 1)
+        {
+          const Number *S = &eigenvectors[0](0, 0);
+          eval.template apply<0, true, false>(S, src, t);
+          for (unsigned int i = 0; i < n_rows_1d; ++i)
+            t[i] /= eigenvalues[0][i];
+          eval.template apply<0, false, false>(S, t, dst);
+        }
+
+      else if (dim == 2)
+        {
+          const Number *S0 = &(eigenvectors[0](0, 0));
+          const Number *S1 = &(eigenvectors[1](0, 0));
+          eval.template apply<0, true, false>(S0, src, t);
+          eval.template apply<1, true, false>(S1, t, dst);
+          for (unsigned int i1 = 0, c = 0; i1 < n_rows_1d; ++i1)
+            for (unsigned int i0 = 0; i0 < n_rows_1d; ++i0, ++c)
+              dst[c] /= (eigenvalues[1][i1] + eigenvalues[0][i0]);
+          eval.template apply<0, false, false>(S0, dst, t);
+          eval.template apply<1, false, false>(S1, t, dst);
+        }
+
+      else if (dim == 3)
+        {
+          const Number *S0 = &eigenvectors[0](0, 0);
+          const Number *S1 = &eigenvectors[1](0, 0);
+          const Number *S2 = &eigenvectors[2](0, 0);
+          eval.template apply<0, true, false>(S0, src, t);
+          eval.template apply<1, true, false>(S1, t, dst);
+          eval.template apply<2, true, false>(S2, dst, t);
+          for (unsigned int i2 = 0, c = 0; i2 < n_rows_1d; ++i2)
+            for (unsigned int i1 = 0; i1 < n_rows_1d; ++i1)
+              for (unsigned int i0 = 0; i0 < n_rows_1d; ++i0, ++c)
+                t[c] /= (eigenvalues[2][i2] + eigenvalues[1][i1] +
+                         eigenvalues[0][i0]);
+          eval.template apply<0, false, false>(S0, t, dst);
+          eval.template apply<1, false, false>(S1, dst, t);
+          eval.template apply<2, false, false>(S2, t, dst);
+        }
+
+      else
+        Assert(false, ExcNotImplemented());
+    }
+
+
+
+    template <int n_rows_1d_templated, std::size_t dim, typename Number>
+    void
+    select_vmult(Number *                                 dst,
+                 const Number *                           src,
+                 AlignedVector<Number> &                  tmp,
+                 const std::array<Table<2, Number>, dim> &mass_matrix,
+                 const std::array<Table<2, Number>, dim> &derivative_matrix);
+
+
+
+    template <int n_rows_1d_templated, std::size_t dim, typename Number>
+    void
+    select_apply_inverse(
+      Number *                                      dst,
+      const Number *                                src,
+      AlignedVector<Number> &                       tmp,
+      const std::array<Table<2, Number>, dim> &     eigenvectors,
+      const std::array<AlignedVector<Number>, dim> &eigenvalues);
+  } // namespace TensorProductMatrixSymmetricSum
+
+} // namespace internal
+
+
 
 template <int dim, typename Number, int n_rows_1d>
 inline void
@@ -512,61 +674,17 @@ TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::vmult(
   AssertDimension(dst_view.size(), this->m());
   AssertDimension(src_view.size(), this->n());
   std::lock_guard<std::mutex> lock(this->mutex);
-  const unsigned int          n = Utilities::fixed_power<dim>(
-    n_rows_1d > 0 ? n_rows_1d : eigenvalues[0].size());
-  tmp_array.resize_fast(n * 2);
-  constexpr int kernel_size = n_rows_1d > 0 ? n_rows_1d : 0;
-  internal::EvaluatorTensorProduct<internal::evaluate_general,
-                                   dim,
-                                   kernel_size,
-                                   kernel_size,
-                                   Number>
-                eval(AlignedVector<Number>{},
-         AlignedVector<Number>{},
-         AlignedVector<Number>{},
-         mass_matrix[0].n_rows(),
-         mass_matrix[0].n_rows());
-  Number *      t   = tmp_array.begin();
+
+  Number *      dst = dst_view.begin();
   const Number *src = src_view.begin();
-  Number *      dst = dst_view.data();
 
-  if (dim == 1)
-    {
-      const Number *A = &derivative_matrix[0](0, 0);
-      eval.template apply<0, false, false>(A, src, dst);
-    }
-
-  else if (dim == 2)
-    {
-      const Number *A0 = &derivative_matrix[0](0, 0);
-      const Number *M0 = &mass_matrix[0](0, 0);
-      const Number *A1 = &derivative_matrix[1](0, 0);
-      const Number *M1 = &mass_matrix[1](0, 0);
-      eval.template apply<0, false, false>(M0, src, t);
-      eval.template apply<1, false, false>(A1, t, dst);
-      eval.template apply<0, false, false>(A0, src, t);
-      eval.template apply<1, false, true>(M1, t, dst);
-    }
-
-  else if (dim == 3)
-    {
-      const Number *A0 = &derivative_matrix[0](0, 0);
-      const Number *M0 = &mass_matrix[0](0, 0);
-      const Number *A1 = &derivative_matrix[1](0, 0);
-      const Number *M1 = &mass_matrix[1](0, 0);
-      const Number *A2 = &derivative_matrix[2](0, 0);
-      const Number *M2 = &mass_matrix[2](0, 0);
-      eval.template apply<0, false, false>(M0, src, t + n);
-      eval.template apply<1, false, false>(M1, t + n, t);
-      eval.template apply<2, false, false>(A2, t, dst);
-      eval.template apply<1, false, false>(A1, t + n, t);
-      eval.template apply<0, false, false>(A0, src, t + n);
-      eval.template apply<1, false, true>(M1, t + n, t);
-      eval.template apply<2, false, true>(M2, t, dst);
-    }
-
+  if (n_rows_1d != -1)
+    internal::TensorProductMatrixSymmetricSum::vmult<
+      n_rows_1d == -1 ? 0 : n_rows_1d>(
+      dst, src, tmp_array, mass_matrix, derivative_matrix);
   else
-    AssertThrow(false, ExcNotImplemented());
+    internal::TensorProductMatrixSymmetricSum::select_vmult<1>(
+      dst, src, tmp_array, mass_matrix, derivative_matrix);
 }
 
 
@@ -592,70 +710,17 @@ TensorProductMatrixSymmetricSumBase<dim, Number, n_rows_1d>::apply_inverse(
 {
   AssertDimension(dst_view.size(), this->n());
   AssertDimension(src_view.size(), this->m());
-  const unsigned int n = n_rows_1d > 0 ? n_rows_1d : eigenvalues[0].size();
-  tmp_array.resize_fast(Utilities::fixed_power<dim>(n));
-  constexpr int kernel_size = n_rows_1d > 0 ? n_rows_1d : 0;
-  internal::EvaluatorTensorProduct<internal::evaluate_general,
-                                   dim,
-                                   kernel_size,
-                                   kernel_size,
-                                   Number>
-                eval(AlignedVector<Number>(),
-         AlignedVector<Number>(),
-         AlignedVector<Number>(),
-         mass_matrix[0].n_rows(),
-         mass_matrix[0].n_rows());
-  Number *      t   = tmp_array.begin();
-  const Number *src = src_view.data();
-  Number *      dst = dst_view.data();
 
-  // NOTE: dof_to_quad has to be interpreted as 'dof to eigenvalue index'
-  //       --> apply<.,true,.> (S,src,dst) calculates dst = S^T * src,
-  //       --> apply<.,false,.> (S,src,dst) calculates dst = S * src,
-  //       while the eigenvectors are stored column-wise in S, i.e.
-  //       rows correspond to dofs whereas columns to eigenvalue indices!
-  if (dim == 1)
-    {
-      const Number *S = &eigenvectors[0](0, 0);
-      eval.template apply<0, true, false>(S, src, t);
-      for (unsigned int i = 0; i < n; ++i)
-        t[i] /= eigenvalues[0][i];
-      eval.template apply<0, false, false>(S, t, dst);
-    }
+  Number *      dst = dst_view.begin();
+  const Number *src = src_view.begin();
 
-  else if (dim == 2)
-    {
-      const Number *S0 = &(eigenvectors[0](0, 0));
-      const Number *S1 = &(eigenvectors[1](0, 0));
-      eval.template apply<0, true, false>(S0, src, t);
-      eval.template apply<1, true, false>(S1, t, dst);
-      for (unsigned int i1 = 0, c = 0; i1 < n; ++i1)
-        for (unsigned int i0 = 0; i0 < n; ++i0, ++c)
-          dst[c] /= (eigenvalues[1][i1] + eigenvalues[0][i0]);
-      eval.template apply<0, false, false>(S0, dst, t);
-      eval.template apply<1, false, false>(S1, t, dst);
-    }
-
-  else if (dim == 3)
-    {
-      const Number *S0 = &eigenvectors[0](0, 0);
-      const Number *S1 = &eigenvectors[1](0, 0);
-      const Number *S2 = &eigenvectors[2](0, 0);
-      eval.template apply<0, true, false>(S0, src, t);
-      eval.template apply<1, true, false>(S1, t, dst);
-      eval.template apply<2, true, false>(S2, dst, t);
-      for (unsigned int i2 = 0, c = 0; i2 < n; ++i2)
-        for (unsigned int i1 = 0; i1 < n; ++i1)
-          for (unsigned int i0 = 0; i0 < n; ++i0, ++c)
-            t[c] /=
-              (eigenvalues[2][i2] + eigenvalues[1][i1] + eigenvalues[0][i0]);
-      eval.template apply<0, false, false>(S0, t, dst);
-      eval.template apply<1, false, false>(S1, dst, t);
-      eval.template apply<2, false, false>(S2, t, dst);
-    }
-
+  if (n_rows_1d != -1)
+    internal::TensorProductMatrixSymmetricSum::apply_inverse<
+      n_rows_1d == -1 ? 0 : n_rows_1d>(
+      dst, src, tmp_array, eigenvectors, eigenvalues);
   else
-    Assert(false, ExcNotImplemented());
+    internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
+      dst, src, tmp_array, eigenvectors, eigenvalues);
 }
 
 
