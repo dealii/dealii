@@ -2388,7 +2388,9 @@ namespace MatrixFreeOperators
         eval_vector.reinit(cell);
         // This function assumes that we have the same result on all
         // components, so we only need to go through the columns of one scalar
-        // component, which can then be broadcast to all components
+        // component, for which we have created a separate evaluator (attached
+        // to the first component, but the component does not matter because
+        // we only use the underlying integrals)
         for (unsigned int i = 0; i < eval.dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < eval.dofs_per_cell; ++j)
@@ -2397,6 +2399,9 @@ namespace MatrixFreeOperators
 
             do_operation_on_cell(eval, cell);
 
+            // We now pick up the value on the diagonal (row i) and broadcast
+            // it to a second evaluator for all vector components, which we
+            // will distribute to the result vector afterwards
             for (unsigned int c = 0; c < n_components; ++c)
               eval_vector
                 .begin_dof_values()[i + c * eval_vector.dofs_per_component] =
