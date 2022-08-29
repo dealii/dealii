@@ -11597,7 +11597,7 @@ Triangulation<dim, spacedim>::create_triangulation(
       setting the cell direction flag on those cell that produce the wrong
       orientation.
 
-      To determine if 2 neighbours have the same or opposite orientation we use
+      To determine if 2 neighbors have the same or opposite orientation we use
       a table of truth. Its entries are indexes by the local indices of the
       common face. For example if two elements share a face, and this face is
       face 0 for element 0 and face 1 for element 1, then table(0,1) will tell
@@ -11614,8 +11614,8 @@ Triangulation<dim, spacedim>::create_triangulation(
       - 2D surface: (0,1),(0,2),(1,3),(2,3)
 
       We store this data using an n_faces x n_faces full matrix, which is
-     actually much bigger than the minimal data required, but it makes the code
-     more readable.
+      actually much bigger than the minimal data required, but it makes the code
+      more readable.
 
     */
   if (dim < spacedim && all_reference_cells_are_hyper_cube())
@@ -11700,10 +11700,8 @@ Triangulation<dim, spacedim>::create_triangulation(
                 }
             }
 
-          // Before we quit let's check
-          // that if the triangulation
-          // is disconnected that we
-          // still get all cells
+          // Before we quit let's check that if the triangulation is
+          // disconnected that we still get all cells
           if (next_round.size() == 0)
             for (const auto &cell : this->active_cell_iterators())
               if (cell->user_flag_set() == false)
@@ -11717,6 +11715,7 @@ Triangulation<dim, spacedim>::create_triangulation(
           this_round = next_round;
           next_round.clear();
         }
+      clear_user_flags();
     }
 
   // inform all listeners that the triangulation has been created
