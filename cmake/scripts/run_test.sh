@@ -58,8 +58,18 @@ case $STAGE in
       export TEST_N_THREADS
     fi
 
-    # Limit the OpenMP pool to two threads.
+    # Limit the OpenMP pool to two threads. Set both variables in case the
+    # caller has either one set.
+    #
+    # These variables do different things and are interpreted by, e.g., GOMP and
+    # openBLAS in slightly different ways so it is best to set both to avoid
+    # inconsistencies. For reference:
+    # 1. OMP_NUM_THREADS permits nesting, e.g., if we were using OpenMP we could
+    #    set it to 4,2,1 to set parallelization levels inside parallelized blocks
+    # 2. OMP_THREAD_LIMIT limits the total number of threads, independent of
+    #    nesting
     export OMP_NUM_THREADS="2"
+    export OMP_THREAD_LIMIT="2"
 
     # Allow oversubscription for MPI (needed for Openmpi@3.0)
     export OMPI_MCA_rmaps_base_oversubscribe=1
