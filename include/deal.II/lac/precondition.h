@@ -550,6 +550,11 @@ namespace internal
        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
                                           MemorySpace::Host>>::value);
 
+
+  template <typename MatrixType, typename VectorType>
+  constexpr bool has_vmult_with_std_functions_for_precondition =
+    is_supported_operation<vmult_functions_t, MatrixType, VectorType>;
+
   namespace PreconditionRelaxation
   {
     template <typename T, typename VectorType>
@@ -1195,8 +1200,7 @@ namespace internal
             tmp,
             dst,
             [&](const unsigned int start_range, const unsigned int end_range) {
-              // zero 'tmp' before running the vmult
-              // operation
+              // zero 'tmp' before running the vmult operation
               if (end_range > start_range)
                 std::memset(tmp.begin() + start_range,
                             0,
@@ -2491,6 +2495,175 @@ namespace internal
         }
 
       solution.swap(solution_old);
+    }
+
+    // generic part for deal.II vectors
+    template <
+      typename Number,
+      typename PreconditionerType,
+      std::enable_if_t<
+        !has_vmult_with_std_functions_for_precondition<
+          PreconditionerType,
+          LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>,
+        int> * = nullptr>
+    inline void
+    vector_updates(
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &rhs,
+      const PreconditionerType &preconditioner,
+      const unsigned int        iteration_index,
+      const double              factor1_,
+      const double              factor2_,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &solution_old,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &temp_vector1,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &temp_vector2,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution)
+    {
+      const Number factor1        = factor1_;
+      const Number factor1_plus_1 = 1. + factor1_;
+      const Number factor2        = factor2_;
+
+      if (iteration_index == 0)
+        {
+          const auto solution_old_ptr = solution_old.begin();
+
+          // compute t = P^{-1} * (b)
+          preconditioner.vmult(solution_old, rhs);
+
+          // compute x^{n+1} = f_2 * t
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
+            solution_old_ptr[i] = solution_old_ptr[i] * factor2;
+        }
+      else if (iteration_index == 1)
+        {
+          const auto solution_ptr     = solution.begin();
+          const auto solution_old_ptr = solution_old.begin();
+
+          // compute t = P^{-1} * (b-A*x^{n})
+          temp_vector1.sadd(-1.0, 1.0, rhs);
+
+          preconditioner.vmult(solution_old, temp_vector1);
+
+          // compute x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * t
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
+            solution_old_ptr[i] =
+              factor1_plus_1 * solution_ptr[i] + solution_old_ptr[i] * factor2;
+        }
+      else
+        {
+          const auto solution_ptr     = solution.begin();
+          const auto solution_old_ptr = solution_old.begin();
+          const auto temp_vector2_ptr = temp_vector2.begin();
+
+          // compute t = P^{-1} * (b-A*x^{n})
+          temp_vector1.sadd(-1.0, 1.0, rhs);
+
+          preconditioner.vmult(temp_vector2, temp_vector1);
+
+          // compute x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1}) + f_2 * t
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
+            solution_old_ptr[i] = factor1_plus_1 * solution_ptr[i] -
+                                  factor1 * solution_old_ptr[i] +
+                                  temp_vector2_ptr[i] * factor2;
+        }
+
+      solution.swap(solution_old);
+    }
+
+    template <
+      typename Number,
+      typename PreconditionerType,
+      std::enable_if_t<
+        has_vmult_with_std_functions_for_precondition<
+          PreconditionerType,
+          LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>,
+        int> * = nullptr>
+    inline void
+    vector_updates(
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &rhs,
+      const PreconditionerType &preconditioner,
+      const unsigned int        iteration_index,
+      const double              factor1_,
+      const double              factor2_,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &solution_old,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &temp_vector1,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &temp_vector2,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution)
+    {
+      const Number factor1        = factor1_;
+      const Number factor1_plus_1 = 1. + factor1_;
+      const Number factor2        = factor2_;
+
+      const auto rhs_ptr          = rhs.begin();
+      const auto temp_vector1_ptr = temp_vector1.begin();
+      const auto temp_vector2_ptr = temp_vector2.begin();
+      const auto solution_ptr     = solution.begin();
+      const auto solution_old_ptr = solution_old.begin();
+
+      if (iteration_index == 0)
+        {
+          preconditioner.vmult(
+            solution,
+            rhs,
+            [&](const auto start_range, const auto end_range) {
+              if (end_range > start_range)
+                std::memset(solution.begin() + start_range,
+                            0,
+                            sizeof(Number) * (end_range - start_range));
+            },
+            [&](const auto begin, const auto end) {
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i = begin; i < end; ++i)
+                solution_ptr[i] *= factor2;
+            });
+        }
+      else
+        {
+          preconditioner.vmult(
+            temp_vector2,
+            temp_vector1,
+            [&](const auto begin, const auto end) {
+              if (end > begin)
+                std::memset(temp_vector2.begin() + begin,
+                            0,
+                            sizeof(Number) * (end - begin));
+
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i = begin; i < end; ++i)
+                temp_vector1_ptr[i] = rhs_ptr[i] - temp_vector1_ptr[i];
+            },
+            [&](const auto begin, const auto end) {
+              if (iteration_index == 1)
+                {
+                  DEAL_II_OPENMP_SIMD_PRAGMA
+                  for (std::size_t i = begin; i < end; ++i)
+                    temp_vector2_ptr[i] = factor1_plus_1 * solution_ptr[i] +
+                                          factor2 * temp_vector2_ptr[i];
+                }
+              else
+                {
+                  DEAL_II_OPENMP_SIMD_PRAGMA
+                  for (std::size_t i = begin; i < end; ++i)
+                    temp_vector2_ptr[i] = factor1_plus_1 * solution_ptr[i] -
+                                          factor1 * solution_old_ptr[i] +
+                                          factor2 * temp_vector2_ptr[i];
+                }
+            });
+        }
+
+      if (iteration_index > 0)
+        {
+          solution_old.swap(temp_vector2);
+          solution_old.swap(solution);
+        }
     }
 
     // worker routine for deal.II vectors. Because of vectorization, we need
