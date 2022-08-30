@@ -147,9 +147,12 @@ test_rank_0_tensors()
   const Vector<double>     vA = Notation::Kelvin::to_vector(A);
   const FullMatrix<double> mA = Notation::Kelvin::to_matrix(A);
 
-  using InpType      = typename std::decay<decltype(A)>::type;
-  const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
-  const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+  using InpType = typename std::decay<decltype(A)>::type;
+  // Here and below we need both types to work around a problem present in GCC
+  // 5.4.0 in which the compiler does not correctly handle SFINAE with
+  // static_assert(). This was fixed by GCC 9.
+  const auto vA_conv = Notation::Kelvin::to_tensor<InpType, double>(vA);
+  const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
   Assert(std::abs(vA_conv - A) < 1e-12,
          ExcMessage("Different result for vector conversion"));
@@ -167,7 +170,7 @@ test_rank_1_tensors()
   const Vector<double> vA = Notation::Kelvin::to_vector(A);
 
   using InpType      = typename std::decay<decltype(A)>::type;
-  const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
+  const auto vA_conv = Notation::Kelvin::to_tensor<InpType, double>(vA);
 
   Assert((vA_conv - A).norm() < 1e-12,
          ExcMessage("Different result for vector conversion"));
@@ -186,8 +189,8 @@ test_rank_2_tensors()
     const FullMatrix<double> mA = Notation::Kelvin::to_matrix(A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto vA_conv = Notation::Kelvin::to_tensor<InpType, double>(vA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((vA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for vector conversion"));
@@ -204,8 +207,8 @@ test_rank_2_tensors()
     const FullMatrix<double> mA = Notation::Kelvin::to_matrix(A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto vA_conv = Notation::Kelvin::to_tensor<InpType, double>(vA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((vA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for vector conversion"));
@@ -227,7 +230,7 @@ test_rank_3_tensors()
       Notation::Kelvin::to_matrix<dim, Tensor<1, dim>, Tensor<2, dim>>(A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((mA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for matrix conversion"));
@@ -242,7 +245,7 @@ test_rank_3_tensors()
       Notation::Kelvin::to_matrix<dim, Tensor<2, dim>, Tensor<1, dim>>(A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((mA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for matrix conversion"));
@@ -258,7 +261,7 @@ test_rank_3_tensors()
         A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((mA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for matrix conversion"));
@@ -274,7 +277,7 @@ test_rank_3_tensors()
         A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((mA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for matrix conversion"));
@@ -293,7 +296,7 @@ test_rank_4_tensors()
     const FullMatrix<double> mA = Notation::Kelvin::to_matrix(A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((mA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for matrix conversion"));
@@ -307,7 +310,7 @@ test_rank_4_tensors()
     const FullMatrix<double> mA = Notation::Kelvin::to_matrix(A);
 
     using InpType      = typename std::decay<decltype(A)>::type;
-    const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
+    const auto mA_conv = Notation::Kelvin::to_tensor<InpType, double>(mA);
 
     Assert((mA_conv - A).norm() < 1e-12,
            ExcMessage("Different result for matrix conversion"));
