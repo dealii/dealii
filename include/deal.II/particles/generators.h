@@ -274,7 +274,10 @@ namespace Particles
      * @param[in] global_bounding_boxes A vector that contains all the bounding
      * boxes for all processors. This vector can be established by first using
      * 'GridTools::compute_mesh_predicate_bounding_box()' and gathering all the
-     * bounding boxes using 'Utilities::MPI::all_gather.
+     * bounding boxes using 'Utilities::MPI::all_gather. Of course, if you are
+     * applying this function on a sequential triangulation, then this argument
+     * is simply an (outer) vector with just one element, and that one element
+     * would be the result of the function mentioned above.
      *
      * @param[in,out] particle_handler The particle handler that will take
      * ownership of the generated particles.
