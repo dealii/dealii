@@ -938,15 +938,6 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException1(ExcGridHasInvalidCell,
-                   int,
-                   << "Something went wrong when making cell " << arg1
-                   << ". Read the docs and the source code "
-                   << "for more information.");
-    /**
-     * Exception
-     * @ingroup Exceptions
-     */
     DeclException1(ExcInternalErrorOnCell,
                    int,
                    << "Something went wrong upon construction of cell "
