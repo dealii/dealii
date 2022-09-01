@@ -26,6 +26,7 @@
 
 #include <deal.II/numerics/history.h>
 
+#include <algorithm>
 #include <fstream>
 #include <string>
 
