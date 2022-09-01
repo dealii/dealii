@@ -26,6 +26,7 @@ SET(_unity_include_src
   tria_base.cc
   shared_tria.cc
   p4est_wrappers.cc
+  field_transfer.cc
   )
 
 SET(_separate_src
@@ -44,6 +45,7 @@ SET(_inst
   grid_refinement.inst.in
   cell_weights.inst.in
   cell_data_transfer.inst.in
+  field_transfer.inst.in
   fully_distributed_tria.inst.in
   repartitioning_policy_tools.inst.in
   solution_transfer.inst.in
