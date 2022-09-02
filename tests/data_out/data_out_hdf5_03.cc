@@ -40,13 +40,7 @@ void
 test()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-  std::vector<unsigned int>                 repetitions(dim, 1);
-  repetitions[0] = 1; // 2x1x1 cells
-  Point<dim> p1;
-  Point<dim> p2;
-  for (int i = 0; i < dim; ++i)
-    p2[i] = 1.0;
-  GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
   FE_Q<dim> fe(1);
