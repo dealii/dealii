@@ -43,6 +43,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/solver_cg.h>
 
 // We use the same strategy as in step-40 to switch between PETSc and
