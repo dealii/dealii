@@ -18,6 +18,8 @@
 
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/fe/mapping_q1.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
@@ -27,22 +29,75 @@
 
 #include "../tests.h"
 
+struct swap_coordinates
+{
+  swap_coordinates(const unsigned int i, const unsigned int j)
+    : i(i)
+    , j(j)
+  {}
+
+  Point<3>
+  operator()(const Point<3> &p_init) const
+  {
+    Point<3> p = p_init;
+    std::swap(p[i], p[j]);
+    return p;
+  }
+
+private:
+  const unsigned int i;
+  const unsigned int j;
+};
+
 void
 test_intersection_inside(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
 {
   GridGenerator::hyper_cube(tria0, -1., 1.);
   GridGenerator::hyper_cube(tria1, -0.4, 0.2);
-  const double expected_measure = 0.36;
-  const auto   vec_of_arrays =
-    CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                         tria1.begin_active(),
-                                                         MappingQ1<3>(),
-                                                         MappingQ1<2, 3>());
 
-  const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
-  const double sum =
-    std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
-  assert(std::abs(sum - expected_measure) < 1e-15);
+  {
+    const double expected_measure = 0.36;
+    const auto   vec_of_arrays =
+      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
+                                                           tria1.begin_active(),
+                                                           MappingQ1<3>(),
+                                                           MappingQ1<2, 3>());
+
+    const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
+    const double sum =
+      std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
+    assert(std::abs(sum - expected_measure) < 1e-15);
+  }
+
+  {
+    GridTools::transform(swap_coordinates(1, 2), tria1);
+    const double expected_measure = 0.36;
+    const auto   vec_of_arrays =
+      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
+                                                           tria1.begin_active(),
+                                                           MappingQ1<3>(),
+                                                           MappingQ1<2, 3>());
+
+    const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
+    const double sum =
+      std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
+    assert(std::abs(sum - expected_measure) < 1e-15);
+  }
+
+  {
+    GridTools::transform(swap_coordinates(0, 1), tria1);
+    const double expected_measure = 0.36;
+    const auto   vec_of_arrays =
+      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
+                                                           tria1.begin_active(),
+                                                           MappingQ1<3>(),
+                                                           MappingQ1<2, 3>());
+
+    const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
+    const double sum =
+      std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
+    assert(std::abs(sum - expected_measure) < 1e-15);
+  }
   deallog << "OK" << std::endl;
 }
 
@@ -53,17 +108,50 @@ test_intersection(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
 {
   GridGenerator::hyper_cube(tria0, -1., 1.);
   GridGenerator::hyper_cube(tria1, .5, 1.5);
-  const double expected_measure = 0.25;
-  const auto   vec_of_arrays =
-    CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                         tria1.begin_active(),
-                                                         MappingQ1<3>(),
-                                                         MappingQ1<2, 3>());
 
-  const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
-  const double sum =
-    std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
-  assert(std::abs(sum - expected_measure) < 1e-15);
+  {
+    const double expected_measure = 0.25;
+    const auto   vec_of_arrays =
+      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
+                                                           tria1.begin_active(),
+                                                           MappingQ1<3>(),
+                                                           MappingQ1<2, 3>());
+
+    const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
+    const double sum =
+      std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
+    assert(std::abs(sum - expected_measure) < 1e-15);
+  }
+
+  {
+    GridTools::transform(swap_coordinates(1, 2), tria1);
+    const double expected_measure = 0.25;
+    const auto   vec_of_arrays =
+      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
+                                                           tria1.begin_active(),
+                                                           MappingQ1<3>(),
+                                                           MappingQ1<2, 3>());
+
+    const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
+    const double sum =
+      std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
+    assert(std::abs(sum - expected_measure) < 1e-15);
+  }
+
+  {
+    GridTools::transform(swap_coordinates(0, 1), tria1);
+    const double expected_measure = 0.25;
+    const auto   vec_of_arrays =
+      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
+                                                           tria1.begin_active(),
+                                                           MappingQ1<3>(),
+                                                           MappingQ1<2, 3>());
+
+    const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
+    const double sum =
+      std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
+    assert(std::abs(sum - expected_measure) < 1e-15);
+  }
   deallog << "OK" << std::endl;
 }
 

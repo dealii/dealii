@@ -77,8 +77,6 @@ using Triangulation2         = CGAL::Triangulation_2<K>;
 using Triangulation3         = CGAL::Triangulation_3<K>;
 using Triangulation3_exact   = CGAL::Triangulation_3<K_exact>;
 using Triangulation3_inexact = CGAL::Triangulation_3<K_inexact>;
-typedef CGAL::Projection_traits_xy_3<K_exact> Gt;
-typedef CGAL::Delaunay_triangulation_2<Gt>    Delaunay;
 
 struct FaceInfo2
 {
@@ -596,13 +594,14 @@ namespace CGALWrappers
     tria.insert(pts_hex.begin(), pts_hex.end());
 
     // Subdivide quad into triangles
-    Delaunay tria_quad(pts_quad.begin(), pts_quad.end());
+    Triangulation3_exact tria_quad;
+    tria_quad.insert(pts_quad.begin(), pts_quad.end());
 
     for (const auto &c : tria.finite_cell_handles())
       {
         const auto &tet = tria.tetrahedron(c);
 
-        for (const auto f : tria_quad.finite_face_handles())
+        for (const auto f : tria_quad.finite_facets())
           {
             if (CGAL::do_intersect(tet, tria_quad.triangle(f)))
               {
@@ -624,22 +623,24 @@ namespace CGALWrappers
                 if (const std::vector<CGALPoint3_exact> *vps =
                       boost::get<std::vector<CGALPoint3_exact>>(&*intersection))
                   {
-                    Delaunay tria_inter(vps->begin(), vps->end());
-                    for (auto it = tria_inter.finite_faces_begin();
-                         it != tria_inter.finite_faces_end();
+                    Triangulation3_exact tria_inter;
+                    tria_inter.insert(vps->begin(), vps->end());
+
+                    for (auto it = tria_inter.finite_facets_begin();
+                         it != tria_inter.finite_facets_end();
                          ++it)
                       {
-                        if (CGAL::to_double(
-                              tria_inter.triangle(it).squared_area()) >
+                        const auto triangle = tria_inter.triangle(*it);
+                        if (CGAL::to_double(triangle.squared_area()) >
                             tol * tol)
                           {
                             std::array<Point<3>, 3> verts = {
                               {CGALWrappers::cgal_point_to_dealii_point<3>(
-                                 it->vertex(0)->point()),
+                                 triangle[0]),
                                CGALWrappers::cgal_point_to_dealii_point<3>(
-                                 it->vertex(1)->point()),
+                                 triangle[1]),
                                CGALWrappers::cgal_point_to_dealii_point<3>(
-                                 it->vertex(2)->point())}};
+                                 triangle[2])}};
 
                             vertices.push_back(verts);
                           }
