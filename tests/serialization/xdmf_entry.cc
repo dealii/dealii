@@ -32,8 +32,14 @@ test()
   const unsigned int dim      = 2;
   const unsigned int spacedim = 3;
 
-  XDMFEntry entry1(
-    mesh_filename, solution_filename, time, nodes, cells, dim, spacedim);
+  XDMFEntry entry1(mesh_filename,
+                   solution_filename,
+                   time,
+                   nodes,
+                   cells,
+                   dim,
+                   spacedim,
+                   ReferenceCells::Quadrilateral);
   XDMFEntry entry2;
 
   // save data to archive

@@ -8196,7 +8196,10 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
               ExcMessage("XDMF only supports 2 or 3 space dimensions."));
 
   local_node_cell_count[0] = data_filter.n_nodes();
-  local_node_cell_count[1] = data_filter.n_cells();
+  // n_cells returns an invalid unsigned int if the object is empty:
+  local_node_cell_count[1] =
+    (data_filter.n_nodes() > 0) ? data_filter.n_cells() : 0;
+
 
   // And compute the global total
 #ifdef DEAL_II_WITH_MPI
@@ -8215,11 +8218,36 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   global_node_cell_count[1] = local_node_cell_count[1];
 #endif
 
-  // Output the XDMF file only on the root process
-  if (myrank == 0)
+  // The implementation is a bit complicated because we are supposed to return
+  // the correct data on rank 0 and an empty object on all other ranks but all
+  // information (for example the attributes) are only available on ranks that
+  // have any cells.
+  // We will identify the smallest rank that has data and then communicate
+  // from this rank to rank 0 (if they are different ranks).
+
+  const bool have_data = (data_filter.n_nodes() > 0);
+  MPI_Comm   split_comm;
+  {
+    const int key   = myrank;
+    const int color = (have_data ? 1 : 0);
+    const int ierr  = MPI_Comm_split(comm, color, key, &split_comm);
+    AssertThrowMPI(ierr);
+  }
+
+  const bool am_i_first_rank_with_data =
+    have_data && (Utilities::MPI::this_mpi_process(split_comm) == 0);
+
+  ierr = MPI_Comm_free(&split_comm);
+  AssertThrowMPI(ierr);
+
+  const int tag = 47381;
+
+  // Output the XDMF file only on the root process of all ranks with data:
+  if (am_i_first_rank_with_data)
     {
       const auto &patches = get_patches();
       Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
+
       // We currently don't support writing mixed meshes:
 #ifdef DEBUG
       for (const auto &patch : patches)
@@ -8227,8 +8255,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                ExcNotImplemented());
 #endif
 
-
-      XDMFEntry    entry(h5_mesh_filename,
+      XDMFEntry          entry(h5_mesh_filename,
                       h5_solution_filename,
                       cur_time,
                       global_node_cell_count[0],
@@ -8236,23 +8263,56 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                       dim,
                       spacedim,
                       patches[0].reference_cell);
-      unsigned int n_data_sets = data_filter.n_data_sets();
+      const unsigned int n_data_sets = data_filter.n_data_sets();
 
-      // The vector names generated here must match those generated in the HDF5
-      // file
-      unsigned int i;
-      for (i = 0; i < n_data_sets; ++i)
+      // The vector names generated here must match those generated in
+      // the HDF5 file
+      for (unsigned int i = 0; i < n_data_sets; ++i)
         {
           entry.add_attribute(data_filter.get_data_set_name(i),
                               data_filter.get_data_set_dim(i));
         }
 
-      return entry;
+      if (myrank != 0)
+        {
+          // send to rank 0
+          const std::vector<char> buffer = Utilities::pack(entry, false);
+          ierr = MPI_Send(buffer.data(), buffer.size(), MPI_CHAR, 0, tag, comm);
+          AssertThrowMPI(ierr);
+
+          return {};
+        }
+      else
+        return entry;
     }
-  else
+
+  if (myrank == 0 && !am_i_first_rank_with_data)
     {
-      return {};
+      // receive the XDMF data on rank 0 if we don't have it...
+
+      MPI_Status status;
+      int        ierr = MPI_Probe(MPI_ANY_SOURCE, tag, comm, &status);
+      AssertThrowMPI(ierr);
+
+      int len;
+      ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+      AssertThrowMPI(ierr);
+
+      std::vector<char> buffer(len);
+      ierr = MPI_Recv(buffer.data(),
+                      len,
+                      MPI_BYTE,
+                      status.MPI_SOURCE,
+                      tag,
+                      comm,
+                      MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
+
+      return Utilities::unpack<XDMFEntry>(buffer, false);
     }
+
+  // default case for any other rank is to return an empty object
+  return {};
 }
 
 template <int dim, int spacedim>
