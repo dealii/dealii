@@ -63,6 +63,35 @@ private:
   DiagonalMatrix<VectorType> diagonal_matrix;
 };
 
+template <typename VectorType>
+class MyDiagonalMatrixWithPreAndPost
+{
+public:
+  void
+  vmult(VectorType &      dst,
+        const VectorType &src,
+        const std::function<void(const unsigned int, const unsigned int)>
+          &operation_before_matrix_vector_product,
+        const std::function<void(const unsigned int, const unsigned int)>
+          &operation_after_matrix_vector_product) const
+  {
+    operation_before_matrix_vector_product(0, src.size());
+
+    diagonal_matrix.vmult(dst, src);
+
+    operation_after_matrix_vector_product(0, src.size());
+  }
+
+  VectorType &
+  get_vector()
+  {
+    return diagonal_matrix.get_vector();
+  }
+
+private:
+  DiagonalMatrix<VectorType> diagonal_matrix;
+};
+
 template <typename SparseMatrixType>
 class MySparseMatrix : public Subscriptor
 {
@@ -257,6 +286,25 @@ main()
           preconditioner.initialize(system_matrix, ad);
 
           results.emplace_back(test(preconditioner, src));
+        }
+
+        {
+          // Test PreconditionRelaxation + wrapper around DiagonalMatrix with
+          // pre and post: alternative optimized path is taken
+          using PreconditionerType = MyDiagonalMatrixWithPreAndPost<VectorType>;
+
+          PreconditionRelaxation<MatrixType, PreconditionerType> preconditioner;
+
+          PreconditionRelaxation<MatrixType, PreconditionerType>::AdditionalData
+            ad;
+          ad.relaxation     = relaxation;
+          ad.n_iterations   = n_iterations;
+          ad.preconditioner = std::make_shared<PreconditionerType>();
+          ad.preconditioner->get_vector() = diagonal;
+
+          preconditioner.initialize(system_matrix, ad);
+
+          results.emplace_back(test(preconditioner, src, false));
         }
 
         if (std::equal(results.begin(),
