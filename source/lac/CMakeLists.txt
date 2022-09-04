@@ -45,6 +45,7 @@ SET(_unity_include_src
   sparse_vanka.cc
   sparsity_pattern.cc
   sparsity_tools.cc
+  tensor_product_matrix.cc
   vector.cc
   vector_memory.cc
   )
@@ -86,6 +87,7 @@ SET(_inst
   solver.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
+  tensor_product_matrix.inst.in
   vector.inst.in
   vector_memory.inst.in
   vector_memory_release.inst.in
