@@ -5647,7 +5647,7 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
   // general/affine cell type
   else
     {
-      const Tensor<2, dim, VectorizedArrayType> &jac =
+      const Tensor<2, dim, VectorizedArrayType> jac =
         this->cell_type > internal::MatrixFreeFunctions::affine ?
           this->jacobian[q_point] :
           this->jacobian[0];
@@ -6533,7 +6533,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
         }
       else
         {
-          const Tensor<2, dim, VectorizedArrayType> &jac =
+          const Tensor<2, dim, VectorizedArrayType> jac =
             this->cell_type == internal::MatrixFreeFunctions::general ?
               this->jacobian[q_point] :
               this->jacobian[0];
@@ -6609,7 +6609,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
         this->cell_type == internal::MatrixFreeFunctions::general ?
           this->J_value[q_point] :
           this->J_value[0] * this->quadrature_weights[q_point];
-      const Tensor<2, dim, VectorizedArrayType> &jac =
+      const Tensor<2, dim, VectorizedArrayType> jac =
         this->cell_type == internal::MatrixFreeFunctions::general ?
           this->jacobian[q_point] :
           this->jacobian[0];
@@ -6924,7 +6924,7 @@ FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::submit_gradient(
   this->gradients_quad_submitted = true;
 #  endif
 
-  const Tensor<2, 1, VectorizedArrayType> &jac =
+  const Tensor<2, 1, VectorizedArrayType> jac =
     this->cell_type == internal::MatrixFreeFunctions::general ?
       this->jacobian[q_point] :
       this->jacobian[0];
