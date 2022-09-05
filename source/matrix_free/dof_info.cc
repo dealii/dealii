@@ -863,7 +863,7 @@ namespace internal
                             vectorization_length);
             AssertIndexRange(
               row_starts[i * vectorization_length * n_components].first,
-              this->dof_indices_interleaved.size());
+              this->dof_indices_interleaved.size() + 1);
             AssertIndexRange(
               row_starts[i * vectorization_length * n_components].first +
                 ndofs * vectorization_length,
