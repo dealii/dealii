@@ -87,12 +87,12 @@ namespace PETScWrappers
 
     template <typename SparsityPatternType>
     void
-    SparseMatrix::reinit_IS(const IndexSet &           local_rows,
-                            const IndexSet &           local_active_rows,
-                            const IndexSet &           local_columns,
-                            const IndexSet &           local_active_columns,
-                            const SparsityPatternType &sparsity_pattern,
-                            const MPI_Comm &           communicator)
+    SparseMatrix::reinit(const IndexSet &           local_rows,
+                         const IndexSet &           local_active_rows,
+                         const IndexSet &           local_columns,
+                         const IndexSet &           local_active_columns,
+                         const SparsityPatternType &sparsity_pattern,
+                         const MPI_Comm &           communicator)
     {
       this->communicator = communicator;
 
@@ -100,11 +100,11 @@ namespace PETScWrappers
       const PetscErrorCode ierr = destroy_matrix(matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      do_reinit_IS(local_rows,
-                   local_active_rows,
-                   local_columns,
-                   local_active_columns,
-                   sparsity_pattern);
+      do_reinit(local_rows,
+                local_active_rows,
+                local_columns,
+                local_active_columns,
+                sparsity_pattern);
     }
 
 
@@ -431,11 +431,11 @@ namespace PETScWrappers
     // BDDC
     template <typename SparsityPatternType>
     void
-    SparseMatrix::do_reinit_IS(const IndexSet &           local_rows,
-                               const IndexSet &           local_active_rows,
-                               const IndexSet &           local_columns,
-                               const IndexSet &           local_active_columns,
-                               const SparsityPatternType &sparsity_pattern)
+    SparseMatrix::do_reinit(const IndexSet &           local_rows,
+                            const IndexSet &           local_active_rows,
+                            const IndexSet &           local_columns,
+                            const IndexSet &           local_active_columns,
+                            const SparsityPatternType &sparsity_pattern)
     {
       Assert(sparsity_pattern.n_rows() == local_rows.size(),
              ExcMessage(
@@ -479,14 +479,13 @@ namespace PETScWrappers
       IndexSet::size_type n_local_active_rows = local_active_rows.n_elements();
       IndexSet::size_type n_local_active_cols =
         local_active_columns.n_elements();
-      std::vector<int> idx_glob_row(n_local_active_rows);
-      std::vector<int> idx_glob_col(n_local_active_cols);
-      unsigned int     k;
-      for (k = 0; k < n_local_active_rows; ++k)
+      std::vector<PetscInt> idx_glob_row(n_local_active_rows);
+      std::vector<PetscInt> idx_glob_col(n_local_active_cols);
+      for (IndexSet::size_type k = 0; k < n_local_active_rows; ++k)
         {
           idx_glob_row[k] = local_active_rows.nth_index_in_set(k);
         }
-      for (k = 0; k < n_local_active_cols; ++k)
+      for (IndexSet::size_type k = 0; k < n_local_active_cols; ++k)
         {
           idx_glob_col[k] = local_active_columns.nth_index_in_set(k);
         }
@@ -707,32 +706,32 @@ namespace PETScWrappers
                             const DynamicSparsityPattern &);
 
     template void
-    SparseMatrix::reinit_IS(const IndexSet &,
-                            const IndexSet &,
-                            const IndexSet &,
-                            const IndexSet &,
-                            const SparsityPattern &,
-                            const MPI_Comm &);
+    SparseMatrix::reinit(const IndexSet &,
+                         const IndexSet &,
+                         const IndexSet &,
+                         const IndexSet &,
+                         const SparsityPattern &,
+                         const MPI_Comm &);
     template void
-    SparseMatrix::reinit_IS(const IndexSet &,
-                            const IndexSet &,
-                            const IndexSet &,
-                            const IndexSet &,
-                            const DynamicSparsityPattern &,
-                            const MPI_Comm &);
+    SparseMatrix::reinit(const IndexSet &,
+                         const IndexSet &,
+                         const IndexSet &,
+                         const IndexSet &,
+                         const DynamicSparsityPattern &,
+                         const MPI_Comm &);
 
     template void
-    SparseMatrix::do_reinit_IS(const IndexSet &,
-                               const IndexSet &,
-                               const IndexSet &,
-                               const IndexSet &,
-                               const SparsityPattern &);
+    SparseMatrix::do_reinit(const IndexSet &,
+                            const IndexSet &,
+                            const IndexSet &,
+                            const IndexSet &,
+                            const SparsityPattern &);
     template void
-    SparseMatrix::do_reinit_IS(const IndexSet &,
-                               const IndexSet &,
-                               const IndexSet &,
-                               const IndexSet &,
-                               const DynamicSparsityPattern &);
+    SparseMatrix::do_reinit(const IndexSet &,
+                            const IndexSet &,
+                            const IndexSet &,
+                            const IndexSet &,
+                            const DynamicSparsityPattern &);
 #  endif
 
 

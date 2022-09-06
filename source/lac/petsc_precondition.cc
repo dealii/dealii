@@ -852,25 +852,24 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionBDDC -------------------- */
 
-  PreconditionBDDC::AdditionalData::AdditionalData(
+  template <int dim>
+  PreconditionBDDC<dim>::AdditionalData::AdditionalData(
     const bool                    use_vertices,
     const bool                    use_edges,
     const bool                    use_faces,
     const bool                    symmetric,
-    const unsigned int            coords_cdim,
-    const types::global_dof_index coords_n,
-    const PetscReal *             coords_data)
+    const std::vector<Point<dim>> coords)
     : use_vertices(use_vertices)
     , use_edges(use_edges)
     , use_faces(use_faces)
     , symmetric(symmetric)
-    , coords_cdim(coords_cdim)
-    , coords_n(coords_n)
-    , coords_data(coords_data)
+    , coords(coords)
   {}
 
-  PreconditionBDDC::PreconditionBDDC(const MPI_Comm        comm,
-                                     const AdditionalData &additional_data_)
+  template <int dim>
+  PreconditionBDDC<dim>::PreconditionBDDC(
+    const MPI_Comm        comm,
+    const AdditionalData &additional_data_)
   {
     additional_data = additional_data_;
 
@@ -880,14 +879,17 @@ namespace PETScWrappers
     initialize();
   }
 
-  PreconditionBDDC::PreconditionBDDC(const MatrixBase &    matrix,
-                                     const AdditionalData &additional_data)
+  template <int dim>
+  PreconditionBDDC<dim>::PreconditionBDDC(const MatrixBase &    matrix,
+                                          const AdditionalData &additional_data)
   {
     initialize(matrix, additional_data);
   }
 
+
+  template <int dim>
   void
-  PreconditionBDDC::initialize()
+  PreconditionBDDC<dim>::initialize()
   {
     PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCBDDC));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -914,10 +916,19 @@ namespace PETScWrappers
         additional_data.coords_data)
       {
         set_option_value("-pc_bddc_corner_selection", "true");
+        // Convert coords vector to PETSc data array
+        std::vector<PetscReal> coords_petsc(additional_data.coords.size() *
+                                            dim);
+        for (unsigned int i = 0, j = 0; i < additional_data.coords.size(); ++i)
+          {
+            for (j = 0; j < dim; ++j)
+              coords_petsc[dim * i + j] = additional_data.coords[i][j];
+          }
+
         ierr = PCSetCoordinates(pc,
-                                additional_data.coords_cdim,
-                                additional_data.coords_n,
-                                (PetscReal *)additional_data.coords_data);
+                                dim,
+                                additional_data.coords.size(),
+                                coords_petsc.data());
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
     else
@@ -932,9 +943,10 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
+  template <int dim>
   void
-  PreconditionBDDC::initialize(const MatrixBase &    matrix_,
-                               const AdditionalData &additional_data_)
+  PreconditionBDDC<dim>::initialize(const MatrixBase &    matrix_,
+                                    const AdditionalData &additional_data_)
   {
     clear();
 

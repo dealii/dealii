@@ -19,6 +19,7 @@
 
 #  include <deal.II/base/config.h>
 
+#  include <deal.II/base/point.h>
 #  include <deal.II/base/subscriptor.h>
 
 #  ifdef DEAL_II_WITH_PETSC
@@ -974,6 +975,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
+  template <int dim>
   class PreconditionBDDC : public PreconditionBase
   {
   public:
@@ -987,13 +989,12 @@ namespace PETScWrappers
        * Constructor. Note that BDDC offers a lot more options to set
        * than what is exposed here.
        */
-      AdditionalData(const bool                    use_vertices = true,
-                     const bool                    use_edges    = false,
-                     const bool                    use_faces    = false,
-                     const bool                    symmetric    = false,
-                     const unsigned int            coords_cdim  = 0,
-                     const types::global_dof_index coords_n     = 0,
-                     const PetscReal *             coords_data  = nullptr);
+      AdditionalData(const bool              use_vertices = true,
+                     const bool              use_edges    = false,
+                     const bool              use_faces    = false,
+                     const bool              symmetric    = false,
+                     std::vector<Point<dim>> coords       = {});
+
       /**
        * This flag sets the use of degrees of freedom in the vertices of the
        * subdomains as primal variables for the creation of the coarse space.
@@ -1020,21 +1021,10 @@ namespace PETScWrappers
       bool symmetric;
 
       /**
-       * Set the number of coordinates that each DoF has, i.e. 2 in 2D and 3 in
-       * 3D.
-       */
-      unsigned int coords_cdim;
-
-      /**
-       * Set the number of degrees of freedom that the problem has.
-       */
-      types::global_dof_index coords_n;
-
-      /**
        * Set the location of each DoF. This helps in improving the definition of
        * the vertices for unstructured meshes.
        */
-      const PetscReal *coords_data;
+      const std::vector<Point<dim>> coords;
     };
 
     /**
@@ -1088,7 +1078,6 @@ namespace PETScWrappers
    */
   using PreconditionerBase DEAL_II_DEPRECATED = PreconditionBase;
 } // namespace PETScWrappers
-
 
 
 DEAL_II_NAMESPACE_CLOSE

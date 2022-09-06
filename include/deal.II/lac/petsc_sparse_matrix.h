@@ -25,10 +25,10 @@
 #    include <deal.II/lac/petsc_matrix_base.h>
 #    include <deal.II/lac/petsc_vector.h>
 
-#    include <vector>
+#    include <petscis.h>
+#    include <petscistypes.h>
 
-#    include "petscis.h"
-#    include "petscistypes.h"
+#    include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 // forward declaration
@@ -512,12 +512,12 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      reinit_IS(const IndexSet &           local_rows,
-                const IndexSet &           local_active_rows,
-                const IndexSet &           local_columns,
-                const IndexSet &           local_active_columns,
-                const SparsityPatternType &sparsity_pattern,
-                const MPI_Comm &           communicator);
+      reinit(const IndexSet &           local_rows,
+             const IndexSet &           local_active_rows,
+             const IndexSet &           local_columns,
+             const IndexSet &           local_active_columns,
+             const SparsityPatternType &sparsity_pattern,
+             const MPI_Comm &           communicator);
 
       /**
        * Return a reference to the MPI communicator object in use with this
@@ -640,11 +640,11 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      do_reinit_IS(const IndexSet &           local_rows,
-                   const IndexSet &           local_active_rows,
-                   const IndexSet &           local_columns,
-                   const IndexSet &           local_active_columns,
-                   const SparsityPatternType &sparsity_pattern);
+      do_reinit(const IndexSet &           local_rows,
+                const IndexSet &           local_active_rows,
+                const IndexSet &           local_columns,
+                const IndexSet &           local_active_columns,
+                const SparsityPatternType &sparsity_pattern);
 
       // To allow calling protected prepare_add() and prepare_set().
       friend class BlockMatrixBase<SparseMatrix>;
