@@ -2819,7 +2819,12 @@ namespace internal
             //           + f_2 * P^{-1} * (b-A*x^{n})
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (std::size_t i = begin; i < end; ++i)
-              solution_old[i] =
+              // for efficiency reason, write back to temp_vector, which is
+              // already modified during vmult (in best case, the modified
+              // values are not written back to main memory yet so that
+              // we do not have to pay additional costs for writing and
+              // read-for-ownershop)
+              tmp_vector[i] =
                 factor1_plus_1 * solution[i] - factor1 * solution_old[i] +
                 factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);
           }
@@ -2892,13 +2897,11 @@ namespace internal
           // nothing to do here because we can immediately write into the
           // solution vector without remembering any of the other vectors
         }
-      else if (iteration_index == 1)
+      else
         {
           solution.swap(temp_vector1);
           solution_old.swap(temp_vector1);
         }
-      else
-        solution.swap(solution_old);
     }
 
     // selection for diagonal matrix around parallel deal.II vector
@@ -2934,13 +2937,11 @@ namespace internal
           // nothing to do here because we can immediately write into the
           // solution vector without remembering any of the other vectors
         }
-      else if (iteration_index == 1)
+      else
         {
           solution.swap(temp_vector1);
           solution_old.swap(temp_vector1);
         }
-      else
-        solution.swap(solution_old);
     }
 
     // We need to have a separate declaration for static const members
@@ -3031,13 +3032,11 @@ namespace internal
           // nothing to do here because we can immediately write into the
           // solution vector without remembering any of the other vectors
         }
-      else if (iteration_index == 1)
+      else
         {
           solution.swap(temp_vector1);
           solution_old.swap(temp_vector1);
         }
-      else
-        solution.swap(solution_old);
     }
 
     template <typename MatrixType, typename PreconditionerType>
