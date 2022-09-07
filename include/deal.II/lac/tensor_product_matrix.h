@@ -304,7 +304,8 @@ public:
    * and TensorProductMatrixSymmetricSumBase::eigenvectors, respectively.
    * Note that the current implementation requires each $M_{d}$ to be symmetric
    * and positive definite and every $A_{d}$ to be symmetric and invertible but
-   * not necessarily positive definite.
+   * not necessarily positive definite. Columns and rows filled with zero are
+   * ignored.
    */
   void
   reinit(const std::array<Table<2, Number>, dim> &mass_matrix,
@@ -450,13 +451,35 @@ namespace internal
     {
       Assert(n_rows == n_cols, ExcNotImplemented());
 
-      auto &&transpose_fill_nm = [](Number *           out,
-                                    const Number *     in,
-                                    const unsigned int n,
-                                    const unsigned int m) {
-        for (unsigned int mm = 0; mm < m; ++mm)
-          for (unsigned int nn = 0; nn < n; ++nn)
-            out[mm + nn * m] = *(in++);
+      std::vector<bool> constrained_dofs(n_rows, false);
+
+      for (unsigned int i = 0; i < n_rows; ++i)
+        {
+          if (mass_matrix[i + i * n_rows] == 0.0)
+            {
+              Assert(derivative_matrix[i + i * n_rows] == 0.0,
+                     ExcInternalError());
+
+              for (unsigned int j = 0; j < n_rows; ++j)
+                {
+                  Assert(derivative_matrix[i + j * n_rows] == 0,
+                         ExcInternalError());
+                  Assert(derivative_matrix[j + i * n_rows] == 0,
+                         ExcInternalError());
+                }
+
+              constrained_dofs[i] = true;
+            }
+        }
+
+      const auto transpose_fill_nm = [&constrained_dofs](Number *           out,
+                                                         const Number *     in,
+                                                         const unsigned int n,
+                                                         const unsigned int m) {
+        for (unsigned int mm = 0, c = 0; mm < m; ++mm)
+          for (unsigned int nn = 0; nn < n; ++nn, ++c)
+            out[mm + nn * m] =
+              (mm == nn && constrained_dofs[mm]) ? Number(1.0) : in[c];
       };
 
       std::vector<dealii::Vector<Number>> eigenvecs(n_rows);
@@ -469,9 +492,10 @@ namespace internal
       deriv_copy.compute_generalized_eigenvalues_symmetric(mass_copy,
                                                            eigenvecs);
       AssertDimension(eigenvecs.size(), n_rows);
-      for (unsigned int i = 0; i < n_rows; ++i)
-        for (unsigned int j = 0; j < n_cols; ++j, ++eigenvectors)
-          *eigenvectors = eigenvecs[j][i];
+      for (unsigned int i = 0, c = 0; i < n_rows; ++i)
+        for (unsigned int j = 0; j < n_cols; ++j, ++c)
+          if (constrained_dofs[i] == false)
+            eigenvectors[c] = eigenvecs[j][i];
 
       for (unsigned int i = 0; i < n_rows; ++i, ++eigenvalues)
         *eigenvalues = deriv_copy.eigenvalue(i).real();
