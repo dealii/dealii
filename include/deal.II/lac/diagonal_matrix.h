@@ -24,6 +24,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// forward declarations
+#ifndef DOXYGEN
+template <typename number>
+class Vector;
+namespace LinearAlgebra
+{
+  namespace distributed
+  {
+    template <typename, typename>
+    class Vector;
+  } // namespace distributed
+} // namespace LinearAlgebra
+#endif
+
 /**
  * This class represents a <i>n x n</i> diagonal matrix based on a vector of
  * size <i>n</i>. The matrix-vector products are realized by @p
@@ -386,12 +400,46 @@ DiagonalMatrix<VectorType>::add(const size_type  i,
 
 
 
+namespace internal
+{
+  namespace DiagonalMatrix
+  {
+    template <typename VectorType>
+    void
+    assign_and_scale(VectorType &      dst,
+                     const VectorType &src,
+                     const VectorType &diagonal)
+    {
+      dst = src;
+      dst.scale(diagonal);
+    }
+
+    template <typename Number>
+    void
+    assign_and_scale(
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &      dst,
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &src,
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
+        &diagonal)
+    {
+      const auto dst_ptr      = dst.begin();
+      const auto src_ptr      = src.begin();
+      const auto diagonal_ptr = diagonal.begin();
+
+      DEAL_II_OPENMP_SIMD_PRAGMA
+      for (unsigned int i = 0; i < src.locally_owned_size(); ++i)
+        dst_ptr[i] = src_ptr[i] * diagonal_ptr[i];
+    }
+  } // namespace DiagonalMatrix
+} // namespace internal
+
+
+
 template <typename VectorType>
 void
 DiagonalMatrix<VectorType>::vmult(VectorType &dst, const VectorType &src) const
 {
-  dst = src;
-  dst.scale(diagonal);
+  internal::DiagonalMatrix::assign_and_scale(dst, src, diagonal);
 }
 
 
