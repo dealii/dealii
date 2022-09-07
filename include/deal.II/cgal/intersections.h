@@ -32,9 +32,10 @@ namespace CGALWrappers
    * Given two deal.II affine cells, compute the intersection and return a
    * vector of simplices, each one identified by an array of deal.II Points. All
    * the simplices together are a subdivision of the intersection. If cells are
-   * non-affine, a geometrical error will be necessarily introduced. If the
-   * measure of one of the simplices is below a certain treshold, than it is
-   * discarded.
+   * non-affine, a geometrical error is introduced. If the
+   * measure of one of the simplices is below a certain treshold which defaults
+   * to 1e-9, then it is discarded. In case the two cells are disjoint, an empty
+   * array is returned.
    *
    * @note If the two cells have different intrinsic dimensions, than the
    * first iterator is assumed to have with higher intrinsic dimension.

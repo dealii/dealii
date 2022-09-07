@@ -82,18 +82,45 @@ test_intersection(Triangulation<2> &tria0, Triangulation<1, 2> &tria1)
 
 
 
+void
+test_failing_intersection(Triangulation<2> &tria0, Triangulation<1, 2> &tria1)
+{
+  GridGenerator::hyper_cube(tria0, -1., 1.);
+  GridGenerator::hyper_cube(tria1, 1.5, 2.);
+  const double expected_area = 0.;
+  const auto   cell0         = tria0.begin_active();
+  const auto   cell1         = tria1.begin_active();
+
+  const auto vec_of_arrays =
+    CGALWrappers::compute_intersection_of_cells<2, 1, 2>(cell0,
+                                                         cell1,
+                                                         MappingQ1<2>(),
+                                                         MappingQ1<1, 2>());
+
+  const auto   quad = qgauss.mapped_quadrature(vec_of_arrays);
+  const double sum =
+    std::accumulate(quad.get_weights().begin(), quad.get_weights().end(), 0.);
+  assert(std::abs(expected_area - sum) < 1e-15);
+  deallog << "OK" << std::endl;
+}
+
+
+
 int
 main()
 {
   initlog();
   Triangulation<2>    tria0; // ambient space
   Triangulation<1, 2> tria1; // immersed grid
-  deallog << "Inside: " << std::endl;
   test_inside_intersection(tria0, tria1);
 
   tria0.clear();
   tria1.clear();
 
-  deallog << "Intersecting: " << std::endl;
   test_intersection(tria0, tria1);
+
+  tria0.clear();
+  tria1.clear();
+
+  test_failing_intersection(tria0, tria1);
 }

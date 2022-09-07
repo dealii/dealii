@@ -416,6 +416,21 @@
 #endif
 
 /*
+ * CGAL:
+ */
+
+#ifdef DEAL_II_WITH_CGAL
+#  define DEAL_II_CGAL_VERSION_MAJOR @CGAL_VERSION_MAJOR@
+#  define DEAL_II_CGAL_VERSION_MINOR @CGAL_VERSION_MINOR@
+#  define DEAL_II_CGAL_VERSION_SUBMINOR @CGAL_VERSION_SUBMINOR@
+
+#  define DEAL_II_CGAL_VERSION_GTE(major, minor, subminor)                    \
+    ((DEAL_II_CGAL_VERSION_MAJOR * 10000 + DEAL_II_CGAL_VERSION_MINOR * 100 + \
+      DEAL_II_CGAL_VERSION_SUBMINOR) >=                                       \
+     (major)*10000 + (minor)*100 + (subminor))
+#endif
+
+/*
  * MPI
  */
 

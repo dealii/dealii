@@ -1160,6 +1160,15 @@ namespace StandardExceptions
     "was configured to use Trilinos' SEACAS library (which provides ExodusII), "
     "but cmake did not find a valid SEACAS library.");
 
+  /**
+   * This function requires support for the CGAL library.
+   */
+  DeclExceptionMsg(
+    ExcNeedsCGAL,
+    "You are attempting to use functionality that is only available "
+    "if deal.II was configured to use CGAL, but cmake did not "
+    "find a valid CGAL library.");
+
 #ifdef DEAL_II_WITH_MPI
   /**
    * Exception for MPI errors. This exception is only defined if

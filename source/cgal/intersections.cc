@@ -56,57 +56,57 @@
 #  include <fstream>
 #  include <type_traits>
 
-using K           = CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt;
-using K_exact     = CGAL::Exact_predicates_exact_constructions_kernel;
-using K_inexact   = CGAL::Exact_predicates_inexact_constructions_kernel;
-using CGALPolygon = CGAL::Polygon_2<K>;
-using Polygon_with_holes_2   = CGAL::Polygon_with_holes_2<K>;
-using CGALTriangle2          = K::Triangle_2;
-using CGALTriangle3          = K::Triangle_3;
-using CGALTriangle3_exact    = K_exact::Triangle_3;
-using CGALPoint2             = K::Point_2;
-using CGALPoint3             = K::Point_3;
-using CGALPoint3_exact       = K_exact::Point_3;
-using CGALSegment2           = K::Segment_2;
-using Surface_mesh           = CGAL::Surface_mesh<K_inexact::Point_3>;
-using CGALSegment3           = K::Segment_3;
-using CGALSegment3_exact     = K_exact::Segment_3;
-using CGALTetra              = K::Tetrahedron_3;
-using CGALTetra_exact        = K_exact::Tetrahedron_3;
-using Triangulation2         = CGAL::Triangulation_2<K>;
-using Triangulation3         = CGAL::Triangulation_3<K>;
-using Triangulation3_exact   = CGAL::Triangulation_3<K_exact>;
-using Triangulation3_inexact = CGAL::Triangulation_3<K_inexact>;
-
-struct FaceInfo2
-{
-  FaceInfo2()
-  {}
-  int nesting_level;
-  bool
-  in_domain()
-  {
-    return nesting_level % 2 == 1;
-  }
-};
-
-using Vb            = CGAL::Triangulation_vertex_base_2<K>;
-using Fbb           = CGAL::Triangulation_face_base_with_info_2<FaceInfo2, K>;
-using CFb           = CGAL::Constrained_triangulation_face_base_2<K, Fbb>;
-using Fb            = CGAL::Delaunay_mesh_face_base_2<K, CFb>;
-using Tds           = CGAL::Triangulation_data_structure_2<Vb, Fb>;
-using Itag          = CGAL::Exact_predicates_tag;
-using CDT           = CGAL::Constrained_Delaunay_triangulation_2<K, Tds, Itag>;
-using Criteria      = CGAL::Delaunay_mesh_size_criteria_2<CDT>;
-using Vertex_handle = CDT::Vertex_handle;
-using Face_handle   = CDT::Face_handle;
-
 
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace CGALWrappers
 {
+  using K         = CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt;
+  using K_exact   = CGAL::Exact_predicates_exact_constructions_kernel;
+  using K_inexact = CGAL::Exact_predicates_inexact_constructions_kernel;
+  using CGALPolygon            = CGAL::Polygon_2<K>;
+  using Polygon_with_holes_2   = CGAL::Polygon_with_holes_2<K>;
+  using CGALTriangle2          = K::Triangle_2;
+  using CGALTriangle3          = K::Triangle_3;
+  using CGALTriangle3_exact    = K_exact::Triangle_3;
+  using CGALPoint2             = K::Point_2;
+  using CGALPoint3             = K::Point_3;
+  using CGALPoint3_exact       = K_exact::Point_3;
+  using CGALSegment2           = K::Segment_2;
+  using Surface_mesh           = CGAL::Surface_mesh<K_inexact::Point_3>;
+  using CGALSegment3           = K::Segment_3;
+  using CGALSegment3_exact     = K_exact::Segment_3;
+  using CGALTetra              = K::Tetrahedron_3;
+  using CGALTetra_exact        = K_exact::Tetrahedron_3;
+  using Triangulation2         = CGAL::Triangulation_2<K>;
+  using Triangulation3         = CGAL::Triangulation_3<K>;
+  using Triangulation3_exact   = CGAL::Triangulation_3<K_exact>;
+  using Triangulation3_inexact = CGAL::Triangulation_3<K_inexact>;
+
+  struct FaceInfo2
+  {
+    FaceInfo2()
+    {}
+    int nesting_level;
+    bool
+    in_domain()
+    {
+      return nesting_level % 2 == 1;
+    }
+  };
+
+  using Vb       = CGAL::Triangulation_vertex_base_2<K>;
+  using Fbb      = CGAL::Triangulation_face_base_with_info_2<FaceInfo2, K>;
+  using CFb      = CGAL::Constrained_triangulation_face_base_2<K, Fbb>;
+  using Fb       = CGAL::Delaunay_mesh_face_base_2<K, CFb>;
+  using Tds      = CGAL::Triangulation_data_structure_2<Vb, Fb>;
+  using Itag     = CGAL::Exact_predicates_tag;
+  using CDT      = CGAL::Constrained_Delaunay_triangulation_2<K, Tds, Itag>;
+  using Criteria = CGAL::Delaunay_mesh_size_criteria_2<CDT>;
+  using Vertex_handle = CDT::Vertex_handle;
+  using Face_handle   = CDT::Face_handle;
+
   namespace internal
   {
     void
@@ -237,7 +237,7 @@ namespace CGALWrappers
 
 
     // rectangle-rectangle
-    decltype(auto)
+    std::vector<Polygon_with_holes_2>
     compute_intersection(const std::array<Point<2>, 4> &first_simplex,
                          const std::array<Point<2>, 4> &second_simplex)
     {
@@ -270,7 +270,7 @@ namespace CGALWrappers
     compute_intersection(const std::array<Point<3>, 2> &first_simplex,
                          const std::array<Point<3>, 4> &second_simplex)
     {
-#  if defined(CGAL_GEQ_515)
+#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
 
       std::array<CGALPoint3, 4> pts0;
       std::array<CGALPoint3, 2> pts1;
@@ -317,7 +317,7 @@ namespace CGALWrappers
     compute_intersection(const std::array<Point<3>, 3> &first_simplex,
                          const std::array<Point<3>, 4> &second_simplex)
     {
-#  if defined(CGAL_GEQ_515)
+#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
       std::array<CGALPoint3, 4> pts0;
       std::array<CGALPoint3, 3> pts1;
       std::transform(
@@ -363,6 +363,15 @@ namespace CGALWrappers
     const Mapping<2, 2> &                              mapping1,
     const double                                       tol)
   {
+    Assert(ReferenceCell::n_vertices_to_type(
+             2, mapping0.get_vertices(cell0).size()) ==
+             ReferenceCells::Quadrilateral,
+           ExcNotImplemented());
+    Assert(ReferenceCell::n_vertices_to_type(
+             2, mapping1.get_vertices(cell1).size()) ==
+             ReferenceCells::Quadrilateral,
+           ExcNotImplemented());
+
     std::array<Point<2>, 4> vertices0, vertices1;
     std::copy_n(mapping0.get_vertices(cell0).begin(), 4, vertices0.begin());
     std::copy_n(mapping1.get_vertices(cell1).begin(), 4, vertices1.begin());
@@ -398,7 +407,7 @@ namespace CGALWrappers
             internal::mark_domains(cdt);
             std::array<Point<2>, 3> vertices;
 
-            for (Face_handle f : cdt.finite_face_handles())
+            for (const Face_handle &f : cdt.finite_face_handles())
               {
                 if (f->info().in_domain() &&
                     CGAL::to_double(cdt.triangle(f).area()) > tol)
@@ -422,7 +431,6 @@ namespace CGALWrappers
       }
     else
       {
-        Assert(false, ExcMessage("Cells do not intersect."));
         return {};
       }
   }
@@ -439,6 +447,14 @@ namespace CGALWrappers
     const Mapping<1, 2> &                              mapping1,
     const double                                       tol)
   {
+    Assert(ReferenceCell::n_vertices_to_type(
+             2, mapping0.get_vertices(cell0).size()) ==
+             ReferenceCells::Quadrilateral,
+           ExcNotImplemented());
+    Assert(ReferenceCell::n_vertices_to_type(
+             1, mapping1.get_vertices(cell1).size()) == ReferenceCells::Line,
+           ExcNotImplemented());
+
     std::array<Point<2>, 4> vertices0;
     std::array<Point<2>, 2> vertices1;
     std::copy_n(mapping0.get_vertices(cell0).begin(), 4, vertices0.begin());
@@ -492,8 +508,17 @@ namespace CGALWrappers
     const Mapping<1, 3> &                              mapping1,
     const double                                       tol)
   {
-#  if defined(CGAL_GEQ_515)
-    (void)tol;                         //
+#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
+
+    Assert(ReferenceCell::n_vertices_to_type(
+             3, mapping0.get_vertices(cell0).size()) ==
+             ReferenceCells::Hexahedron,
+           ExcNotImplemented());
+    Assert(ReferenceCell::n_vertices_to_type(
+             1, mapping1.get_vertices(cell1).size()) == ReferenceCells::Line,
+           ExcNotImplemented());
+    (void)tol;
+
     std::array<Point<3>, 8> vertices0; // 8 vertices of the hex
     std::array<Point<3>, 2> vertices1; // 2 endpoints of the segment
     std::copy_n(mapping0.get_vertices(cell0).begin(), 8, vertices0.begin());
@@ -562,7 +587,16 @@ namespace CGALWrappers
     const Mapping<2, 3> &                              mapping1,
     const double                                       tol)
   {
-#  if defined(CGAL_GEQ_515)
+#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
+
+    Assert(ReferenceCell::n_vertices_to_type(
+             3, mapping0.get_vertices(cell0).size()) ==
+             ReferenceCells::Hexahedron,
+           ExcNotImplemented());
+    Assert(ReferenceCell::n_vertices_to_type(
+             2, mapping1.get_vertices(cell1).size()) ==
+             ReferenceCells::Quadrilateral,
+           ExcNotImplemented());
 
     std::array<Point<3>, 8> vertices0; // 8 vertices of the hex
     std::array<Point<3>, 4> vertices1; // 4 vertices of the quad
@@ -668,6 +702,7 @@ namespace CGALWrappers
   }
 
 
+
   template <>
   std::vector<std::array<Point<3>, 4>>
   compute_intersection_of_cells<3, 3, 3>(
@@ -677,6 +712,14 @@ namespace CGALWrappers
     const Mapping<3, 3> &                              mapping1,
     const double                                       tol)
   {
+    Assert(ReferenceCell::n_vertices_to_type(
+             3, mapping0.get_vertices(cell0).size()) ==
+             ReferenceCells::Hexahedron,
+           ExcNotImplemented());
+    Assert(ReferenceCell::n_vertices_to_type(
+             3, mapping1.get_vertices(cell1).size()) ==
+             ReferenceCells::Hexahedron,
+           ExcNotImplemented());
     Surface_mesh surf0, surf1, sm;
     CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell0, mapping0, surf0);
     CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell1, mapping1, surf1);
@@ -684,11 +727,11 @@ namespace CGALWrappers
     CGAL::Polygon_mesh_processing::triangulate_faces(surf1);
     CGALWrappers::compute_boolean_operation(
       surf0, surf1, CGALWrappers::BooleanOperation::compute_intersection, sm);
+    std::vector<std::array<Point<3>, 4>> vertices;
     if (CGAL::Polygon_mesh_processing::volume(sm) > tol)
       {
         // Collect tetrahedrons
-        std::vector<std::array<Point<3>, 4>> vertices;
-        Triangulation3_inexact               tria;
+        Triangulation3_inexact tria;
         tria.insert(sm.points().begin(), sm.points().end());
         for (const auto &c : tria.finite_cell_handles())
           {
@@ -703,7 +746,7 @@ namespace CGALWrappers
       }
     else
       {
-        return {};
+        return vertices;
       }
   }
 
@@ -722,14 +765,14 @@ compute_intersection_of_cells(
   const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
   const Mapping<dim0, spacedim> &                              mapping0,
   const Mapping<dim1, spacedim> &                              mapping1,
-  const double                                                 tol = 1e-9)
+  const double                                                 tol)
 {
   (void)cell0;
   (void)cell1;
   (void)mapping0;
   (void)mapping1;
   (void)tol;
-  AssertThrow(false, ExcMessage("This function needs CGAL to be installed."));
+  AssertThrow(false, ExcNeedsCGAL());
 }
 
 DEAL_II_NAMESPACE_CLOSE
