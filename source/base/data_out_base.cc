@@ -8825,7 +8825,11 @@ DataOutBase::write_hdf5_parallel(
   (void)mesh_filename;
   (void)solution_filename;
   (void)comm;
-  AssertThrow(false, ExcMessage("HDF5 support is disabled."));
+  AssertThrow(false,
+              ExcMessage(
+                "This function requires that deal.II is configured "
+                "with HDF5 support, but when you called 'cmake', HDF5 support "
+                "was not detected."));
 #else
 
   const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
