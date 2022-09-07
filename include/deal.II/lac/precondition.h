@@ -1086,13 +1086,16 @@ namespace internal
 
     // 1) specialized implementation with a preconditioner that accepts
     // ranges
-    template <typename MatrixType,
-              typename PreconditionerType,
-              typename VectorType,
-              std::enable_if_t<has_vmult_with_std_functions_for_precondition<
-                                 PreconditionerType,
-                                 VectorType>,
-                               int> * = nullptr>
+    template <
+      typename MatrixType,
+      typename PreconditionerType,
+      typename VectorType,
+      std::enable_if_t<
+        has_vmult_with_std_functions_for_precondition<PreconditionerType,
+                                                      VectorType> &&
+          !has_vmult_with_std_functions_for_precondition<MatrixType,
+                                                         VectorType>,
+        int> * = nullptr>
     void
     step_operations(const MatrixType &        A,
                     const PreconditionerType &preconditioner,
@@ -1172,7 +1175,100 @@ namespace internal
         }
     }
 
-    // 2) specialized implementation for inverse-diagonal preconditioner
+    // 2) specialized implementation with a preconditioner and a matrix that
+    // accepts ranges
+    template <
+      typename MatrixType,
+      typename PreconditionerType,
+      typename VectorType,
+      std::enable_if_t<
+        has_vmult_with_std_functions_for_precondition<PreconditionerType,
+                                                      VectorType> &&
+          has_vmult_with_std_functions_for_precondition<MatrixType, VectorType>,
+        int> * = nullptr>
+    void
+    step_operations(const MatrixType &        A,
+                    const PreconditionerType &preconditioner,
+                    VectorType &              dst,
+                    const VectorType &        src,
+                    const double              relaxation,
+                    VectorType &              tmp,
+                    VectorType &,
+                    const unsigned int i,
+                    const bool         transposed)
+    {
+      using Number = typename VectorType::value_type;
+
+      if (i == 0)
+        {
+          Number *      dst_ptr = dst.begin();
+          const Number *src_ptr = src.begin();
+
+          preconditioner.vmult(
+            dst,
+            src,
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              // zero 'dst' before running the vmult operation
+              if (end_range > start_range)
+                std::memset(dst.begin() + start_range,
+                            0,
+                            sizeof(Number) * (end_range - start_range));
+            },
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              if (relaxation == 1.0)
+                return; // nothing to do
+
+              const auto src_ptr = src.begin();
+              const auto dst_ptr = dst.begin();
+
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i = start_range; i < end_range; ++i)
+                dst_ptr[i] *= relaxation;
+            });
+        }
+      else
+        {
+          tmp.reinit(src, true);
+
+          Assert(transposed == false, ExcNotImplemented());
+
+          A.vmult(
+            tmp,
+            src,
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              // zero 'tmp' before running the vmult
+              // operation
+              if (end_range > start_range)
+                std::memset(tmp.begin() + start_range,
+                            0,
+                            sizeof(Number) * (end_range - start_range));
+            },
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              const auto src_ptr = src.begin();
+              const auto tmp_ptr = tmp.begin();
+
+              if (relaxation == 1.0)
+                {
+                  DEAL_II_OPENMP_SIMD_PRAGMA
+                  for (std::size_t i = start_range; i < end_range; ++i)
+                    tmp_ptr[i] = src_ptr[i] - tmp_ptr[i];
+                }
+              else
+                {
+                  // note: we scale the residual here to be able to add into
+                  // the dst vector, which contains the solution from the last
+                  // iteration
+                  DEAL_II_OPENMP_SIMD_PRAGMA
+                  for (std::size_t i = start_range; i < end_range; ++i)
+                    tmp_ptr[i] = relaxation * (src_ptr[i] - tmp_ptr[i]);
+                }
+            });
+
+          preconditioner.vmult(dst, tmp);
+        }
+    }
+
+    // 3) specialized implementation for inverse-diagonal preconditioner
     template <typename MatrixType,
               typename VectorType,
               std::enable_if_t<
@@ -1243,7 +1339,7 @@ namespace internal
         }
     }
 
-    // 3) specialized implementation for inverse-diagonal preconditioner and
+    // 4) specialized implementation for inverse-diagonal preconditioner and
     // matrix that accepts ranges
     template <typename MatrixType,
               typename VectorType,
