@@ -28,6 +28,24 @@
 DEAL_II_NAMESPACE_OPEN
 namespace CGALWrappers
 {
+  template <int dim0,
+            int dim1,
+            int spacedim,
+            int n_components0,
+            int n_components1>
+  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  compute_intersection_of_cells(
+    const std::array<Point<spacedim>, n_components0> &vertices0,
+    const std::array<Point<spacedim>, n_components1> &vertices1,
+    const double                                      tol)
+  {
+    (void)vertices0;
+    (void)vertices1;
+    (void)tol;
+    Assert(false, ExcMessage("No explicit template instantiation available"));
+    return {};
+  }
+
   /**
    * Given two deal.II affine cells, compute the intersection and return a
    * vector of simplices, each one identified by an array of deal.II Points. All

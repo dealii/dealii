@@ -26,6 +26,7 @@ SET(_src
 
 SET(_inst
 surface_mesh.inst.in
+intersections.inst.in
 )
 
 FILE(GLOB _header

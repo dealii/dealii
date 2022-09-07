@@ -19,7 +19,6 @@
 
 #include <algorithm>
 
-
 #ifdef DEAL_II_WITH_CGAL
 
 #  include <deal.II/base/quadrature_lib.h>
@@ -55,8 +54,6 @@
 
 #  include <fstream>
 #  include <type_traits>
-
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -144,8 +141,6 @@ namespace CGALWrappers
         }
     }
 
-
-
     void
     mark_domains(CDT &cdt)
     {
@@ -205,8 +200,6 @@ namespace CGALWrappers
       return CGAL::intersection(triangle1, triangle2);
     }
 
-
-
     boost::optional<boost::variant<CGALPoint2, CGALSegment2>>
     compute_intersection(const std::array<Point<2>, 3> &first_simplex,
                          const std::array<Point<2>, 2> &second_simplex)
@@ -233,8 +226,6 @@ namespace CGALWrappers
       CGALSegment2  segm{pts1[0], pts1[1]};
       return CGAL::intersection(segm, triangle);
     }
-
-
 
     // rectangle-rectangle
     std::vector<Polygon_with_holes_2>
@@ -264,14 +255,11 @@ namespace CGALWrappers
       return poly_list;
     }
 
-
-
     boost::optional<boost::variant<CGALPoint3, CGALSegment3>>
     compute_intersection(const std::array<Point<3>, 2> &first_simplex,
                          const std::array<Point<3>, 4> &second_simplex)
     {
 #  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
-
       std::array<CGALPoint3, 4> pts0;
       std::array<CGALPoint3, 2> pts1;
       std::transform(
@@ -294,9 +282,7 @@ namespace CGALWrappers
       CGALTetra    tetra{pts0[0], pts0[1], pts0[2], pts0[3]};
       CGALSegment3 segm{pts1[0], pts1[1]};
       return CGAL::intersection(segm, tetra);
-
 #  else
-
       Assert(
         false,
         ExcMessage(
@@ -306,8 +292,6 @@ namespace CGALWrappers
       return {};
 #  endif
     }
-
-
 
     // tetra, triangle
     boost::optional<boost::variant<CGALPoint3,
@@ -351,33 +335,14 @@ namespace CGALWrappers
     }
   } // namespace internal
 
-
-
   // Specialization for quads
   template <>
   std::vector<std::array<Point<2>, 3>>
-  compute_intersection_of_cells<2, 2, 2>(
-    const typename Triangulation<2, 2>::cell_iterator &cell0,
-    const typename Triangulation<2, 2>::cell_iterator &cell1,
-    const Mapping<2, 2> &                              mapping0,
-    const Mapping<2, 2> &                              mapping1,
-    const double                                       tol)
+  compute_intersection_of_cells<2, 2, 2, 4, 4>(
+    const std::array<Point<2>, 4> &vertices0,
+    const std::array<Point<2>, 4> &vertices1,
+    const double                   tol)
   {
-    Assert(ReferenceCell::n_vertices_to_type(
-             2, mapping0.get_vertices(cell0).size()) ==
-             ReferenceCells::Quadrilateral,
-           ExcNotImplemented());
-    Assert(ReferenceCell::n_vertices_to_type(
-             2, mapping1.get_vertices(cell1).size()) ==
-             ReferenceCells::Quadrilateral,
-           ExcNotImplemented());
-
-    std::array<Point<2>, 4> vertices0, vertices1;
-    std::copy_n(mapping0.get_vertices(cell0).begin(), 4, vertices0.begin());
-    std::copy_n(mapping1.get_vertices(cell1).begin(), 4, vertices1.begin());
-
-    std::swap(vertices0[2], vertices0[3]);
-    std::swap(vertices1[2], vertices1[3]);
     const auto intersection_test =
       internal::compute_intersection(vertices0, vertices1);
 
@@ -435,33 +400,14 @@ namespace CGALWrappers
       }
   }
 
-
-
   // Specialization for quad \cap line
   template <>
   std::vector<std::array<Point<2>, 2>>
-  compute_intersection_of_cells<2, 1, 2>(
-    const typename Triangulation<2, 2>::cell_iterator &cell0,
-    const typename Triangulation<1, 2>::cell_iterator &cell1,
-    const Mapping<2, 2> &                              mapping0,
-    const Mapping<1, 2> &                              mapping1,
-    const double                                       tol)
+  compute_intersection_of_cells<2, 1, 2, 4, 2>(
+    const std::array<Point<2>, 4> &vertices0,
+    const std::array<Point<2>, 2> &vertices1,
+    const double                   tol)
   {
-    Assert(ReferenceCell::n_vertices_to_type(
-             2, mapping0.get_vertices(cell0).size()) ==
-             ReferenceCells::Quadrilateral,
-           ExcNotImplemented());
-    Assert(ReferenceCell::n_vertices_to_type(
-             1, mapping1.get_vertices(cell1).size()) == ReferenceCells::Line,
-           ExcNotImplemented());
-
-    std::array<Point<2>, 4> vertices0;
-    std::array<Point<2>, 2> vertices1;
-    std::copy_n(mapping0.get_vertices(cell0).begin(), 4, vertices0.begin());
-    std::copy_n(mapping1.get_vertices(cell1).begin(), 2, vertices1.begin());
-
-    std::swap(vertices0[2], vertices0[3]);
-
     std::array<CGALPoint2, 4> pts;
     std::transform(
       vertices0.begin(), vertices0.end(), pts.begin(), [&](const Point<2> &p) {
@@ -496,34 +442,15 @@ namespace CGALWrappers
     return vertices;
   }
 
-
-
   // specialization for hex \cap line
   template <>
   std::vector<std::array<Point<3>, 2>>
-  compute_intersection_of_cells<3, 1, 3>(
-    const typename Triangulation<3, 3>::cell_iterator &cell0,
-    const typename Triangulation<1, 3>::cell_iterator &cell1,
-    const Mapping<3, 3> &                              mapping0,
-    const Mapping<1, 3> &                              mapping1,
-    const double                                       tol)
+  compute_intersection_of_cells<3, 1, 3, 8, 2>(
+    const std::array<Point<3>, 8> &vertices0,
+    const std::array<Point<3>, 2> &vertices1,
+    const double                   tol)
   {
 #  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
-
-    Assert(ReferenceCell::n_vertices_to_type(
-             3, mapping0.get_vertices(cell0).size()) ==
-             ReferenceCells::Hexahedron,
-           ExcNotImplemented());
-    Assert(ReferenceCell::n_vertices_to_type(
-             1, mapping1.get_vertices(cell1).size()) == ReferenceCells::Line,
-           ExcNotImplemented());
-    (void)tol;
-
-    std::array<Point<3>, 8> vertices0; // 8 vertices of the hex
-    std::array<Point<3>, 2> vertices1; // 2 endpoints of the segment
-    std::copy_n(mapping0.get_vertices(cell0).begin(), 8, vertices0.begin());
-    std::copy_n(mapping1.get_vertices(cell1).begin(), 2, vertices1.begin());
-
     std::array<CGALPoint3_exact, 8> pts;
     std::transform(
       vertices0.begin(), vertices0.end(), pts.begin(), [&](const Point<3> &p) {
@@ -566,43 +493,21 @@ namespace CGALWrappers
       false,
       ExcMessage(
         "This function requires a version of CGAL greater or equal than 5.1.5."));
-    (void)cell0;
-    (void)cell1;
-    (void)mapping0;
-    (void)mapping1;
+    (void)vertices0;
+    (void)vertices1;
     (void)tol;
     return {};
-
 #  endif
   }
 
-
-
   template <>
   std::vector<std::array<Point<3>, 3>>
-  compute_intersection_of_cells<3, 2, 3>(
-    const typename Triangulation<3, 3>::cell_iterator &cell0,
-    const typename Triangulation<2, 3>::cell_iterator &cell1,
-    const Mapping<3, 3> &                              mapping0,
-    const Mapping<2, 3> &                              mapping1,
-    const double                                       tol)
+  compute_intersection_of_cells<3, 2, 3, 8, 4>(
+    const std::array<Point<3>, 8> &vertices0,
+    const std::array<Point<3>, 4> &vertices1,
+    const double                   tol)
   {
 #  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
-
-    Assert(ReferenceCell::n_vertices_to_type(
-             3, mapping0.get_vertices(cell0).size()) ==
-             ReferenceCells::Hexahedron,
-           ExcNotImplemented());
-    Assert(ReferenceCell::n_vertices_to_type(
-             2, mapping1.get_vertices(cell1).size()) ==
-             ReferenceCells::Quadrilateral,
-           ExcNotImplemented());
-
-    std::array<Point<3>, 8> vertices0; // 8 vertices of the hex
-    std::array<Point<3>, 4> vertices1; // 4 vertices of the quad
-    std::copy_n(mapping0.get_vertices(cell0).begin(), 8, vertices0.begin());
-    std::copy_n(mapping1.get_vertices(cell1).begin(), 4, vertices1.begin());
-
     std::array<CGALPoint3_exact, 8> pts_hex;
     std::array<CGALPoint3_exact, 4> pts_quad;
     std::transform(
@@ -620,7 +525,6 @@ namespace CGALWrappers
       [&](const Point<3> &p) {
         return CGALWrappers::dealii_point_to_cgal_point<CGALPoint3_exact>(p);
       });
-
 
     // Subdivide hex into tetrahedrons
     std::vector<std::array<Point<3>, 3>> vertices;
@@ -685,70 +589,95 @@ namespace CGALWrappers
       }
 
     return vertices;
-
 #  else
-
     Assert(
       false,
       ExcMessage(
         "This function requires a version of CGAL greater or equal than 5.1.5."));
-    (void)cell0;
-    (void)cell1;
-    (void)mapping0;
-    (void)mapping1;
+    (void)vertices0;
+    (void)vertices1;
     (void)tol;
     return {};
 #  endif
   }
 
-
-
   template <>
   std::vector<std::array<Point<3>, 4>>
-  compute_intersection_of_cells<3, 3, 3>(
-    const typename Triangulation<3, 3>::cell_iterator &cell0,
-    const typename Triangulation<3, 3>::cell_iterator &cell1,
-    const Mapping<3, 3> &                              mapping0,
-    const Mapping<3, 3> &                              mapping1,
-    const double                                       tol)
+  compute_intersection_of_cells<3, 3, 3, 8, 8>(
+    const std::array<Point<3>, 8> &vertices0,
+    const std::array<Point<3>, 8> &vertices1,
+    const double                   tol)
   {
-    Assert(ReferenceCell::n_vertices_to_type(
-             3, mapping0.get_vertices(cell0).size()) ==
-             ReferenceCells::Hexahedron,
-           ExcNotImplemented());
-    Assert(ReferenceCell::n_vertices_to_type(
-             3, mapping1.get_vertices(cell1).size()) ==
-             ReferenceCells::Hexahedron,
-           ExcNotImplemented());
-    Surface_mesh surf0, surf1, sm;
-    CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell0, mapping0, surf0);
-    CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell1, mapping1, surf1);
-    CGAL::Polygon_mesh_processing::triangulate_faces(surf0);
-    CGAL::Polygon_mesh_processing::triangulate_faces(surf1);
-    CGALWrappers::compute_boolean_operation(
-      surf0, surf1, CGALWrappers::BooleanOperation::compute_intersection, sm);
-    std::vector<std::array<Point<3>, 4>> vertices;
-    if (CGAL::Polygon_mesh_processing::volume(sm) > tol)
-      {
-        // Collect tetrahedrons
-        Triangulation3_inexact tria;
-        tria.insert(sm.points().begin(), sm.points().end());
-        for (const auto &c : tria.finite_cell_handles())
-          {
-            const auto &tet = tria.tetrahedron(c);
-            vertices.push_back(
-              {{CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(0)),
-                CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(1)),
-                CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(2)),
-                CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(3))}});
-          }
-        return vertices;
-      }
-    else
-      {
-        return vertices;
-      }
+    // Surface_mesh surf0, surf1, sm;
+    // CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell0, mapping0, surf0);
+    // CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell1, mapping1, surf1);
+    // CGAL::Polygon_mesh_processing::triangulate_faces(surf0);
+    // CGAL::Polygon_mesh_processing::triangulate_faces(surf1);
+    // CGALWrappers::compute_boolean_operation(
+    //   surf0, surf1, CGALWrappers::BooleanOperation::compute_intersection,
+    //   sm);
+    // std::vector<std::array<Point<3>, 4>> vertices;
+    // if (CGAL::Polygon_mesh_processing::volume(sm) > tol)
+    //   {
+    //     // Collect tetrahedrons
+    //     Triangulation3_inexact tria;
+    //     tria.insert(sm.points().begin(), sm.points().end());
+    //     for (const auto &c : tria.finite_cell_handles())
+    //       {
+    //         const auto &tet = tria.tetrahedron(c);
+    //         vertices.push_back(
+    //           {{CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(0)),
+    //             CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(1)),
+    //             CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(2)),
+    //             CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(3))}});
+    //       }
+    //     return vertices;
+    //   }
+    // else
+    //   {
+    //     return vertices;
+    //   }
+
+    // TODO: implememnt 3d/3d cut
+    AssertThrow(false, ExcMessage("Not yet implemented"));
+    (void)vertices0;
+    (void)vertices1;
+    (void)tol;
+    return {};
   }
+
+  template <int dim0, int dim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  compute_intersection_of_cells(
+    const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
+    const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
+    const Mapping<dim0, spacedim> &                              mapping0,
+    const Mapping<dim1, spacedim> &                              mapping1,
+    const double                                                 tol)
+  {
+    Assert(mapping0.get_vertices(cell0).size() == std::pow(2, dim0),
+           ExcNotImplemented());
+    Assert(mapping1.get_vertices(cell1).size() == std::pow(2, dim1),
+           ExcNotImplemented());
+
+    const auto vertices0 =
+      CGALWrappers::get_vertices_in_cgal_order<int(std::pow(2, dim0))>(
+        cell0, mapping0);
+
+    const auto vertices1 =
+      CGALWrappers::get_vertices_in_cgal_order<int(std::pow(2, dim1))>(
+        cell1, mapping1);
+
+    return compute_intersection_of_cells<dim0,
+                                         dim1,
+                                         spacedim,
+                                         int(std::pow(2, dim0)),
+                                         int(std::pow(2, dim1))>(vertices0,
+                                                                 vertices1,
+                                                                 tol);
+  }
+
+#  include "intersections.inst"
 
 } // namespace CGALWrappers
 
@@ -757,6 +686,23 @@ DEAL_II_NAMESPACE_CLOSE
 #else
 
 DEAL_II_NAMESPACE_OPEN
+
+template <int dim0,
+          int dim1,
+          int spacedim,
+          int n_components0,
+          int n_components1>
+std::vector<std::array<Point<spacedim>, dim1 + 1>>
+compute_intersection_of_cells(
+  const std::array<Point<spacedim>, n_components0> &vertices0,
+  const std::array<Point<spacedim>, n_components1> &vertices1,
+  const double                                      tol)
+{
+  (void)vertices0;
+  (void)vertices1;
+  (void)tol;
+  AssertThrow(false, ExcNeedsCGAL());
+}
 
 template <int dim0, int dim1, int spacedim>
 std::vector<std::array<Point<spacedim>, dim1 + 1>>
