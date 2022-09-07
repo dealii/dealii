@@ -989,11 +989,11 @@ namespace PETScWrappers
        * Constructor. Note that BDDC offers a lot more options to set
        * than what is exposed here.
        */
-      AdditionalData(const bool              use_vertices = true,
-                     const bool              use_edges    = false,
-                     const bool              use_faces    = false,
-                     const bool              symmetric    = false,
-                     std::vector<Point<dim>> coords       = {});
+      AdditionalData(const bool                    use_vertices = true,
+                     const bool                    use_edges    = false,
+                     const bool                    use_faces    = false,
+                     const bool                    symmetric    = false,
+                     const std::vector<Point<dim>> coords       = {});
 
       /**
        * This flag sets the use of degrees of freedom in the vertices of the
@@ -1024,7 +1024,7 @@ namespace PETScWrappers
        * Set the location of each DoF. This helps in improving the definition of
        * the vertices for unstructured meshes.
        */
-      const std::vector<Point<dim>> coords;
+      std::vector<Point<dim>> coords;
     };
 
     /**
@@ -1079,6 +1079,8 @@ namespace PETScWrappers
   using PreconditionerBase DEAL_II_DEPRECATED = PreconditionBase;
 } // namespace PETScWrappers
 
+template class PETScWrappers::PreconditionBDDC<2>;
+template class PETScWrappers::PreconditionBDDC<3>;
 
 DEAL_II_NAMESPACE_CLOSE
 

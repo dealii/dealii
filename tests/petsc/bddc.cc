@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// Copyright (C) 2016 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,9 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-// Test that it is possible to instantiate a LinearOperator object for all
-// different kinds of PETSc matrices and vectors
-// TODO: A bit more tests...
+// This test provides a minimal Laplace equation in 2D for testing
+// the BDDC preconditioner. It cannot be simpler as it fails to setup
+// in simpler matrices (i.e. diagonal), and the preset matrix factories
+// create non-IS matrices, which are not supported by BDDC.
 
 #include <deal.II/base/index_set.h>
 
@@ -44,6 +45,7 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -87,12 +89,12 @@ main(int argc, char *argv[])
                                              locally_relevant_dofs);
 
   PETScWrappers::MPI::SparseMatrix system_matrix;
-  system_matrix.reinit_IS(locally_owned_dofs,
-                          locally_active_dofs,
-                          locally_owned_dofs,
-                          locally_active_dofs,
-                          dsp,
-                          MPI_COMM_WORLD);
+  system_matrix.reinit(locally_owned_dofs,
+                       locally_active_dofs,
+                       locally_owned_dofs,
+                       locally_active_dofs,
+                       dsp,
+                       MPI_COMM_WORLD);
   deallog << "MATIS:OK" << std::endl;
   PETScWrappers::MPI::Vector locally_relevant_solution(locally_owned_dofs,
                                                        locally_relevant_dofs,
@@ -154,9 +156,22 @@ main(int argc, char *argv[])
 
   SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
-  PETScWrappers::SolverCG         solver(solver_control, MPI_COMM_WORLD);
-  PETScWrappers::PreconditionBDDC preconditioner(system_matrix);
+  PETScWrappers::SolverCG            solver(solver_control, MPI_COMM_WORLD);
+  PETScWrappers::PreconditionBDDC<2> preconditioner;
+  PETScWrappers::PreconditionBDDC<2>::AdditionalData data;
 
+  // Now we setup the dof coordinates
+  std::map<types::global_dof_index, Point<2>> dof_2_point;
+  DoFTools::map_dofs_to_support_points(MappingQ1<2>(),
+                                       dof_handler,
+                                       dof_2_point);
+  std::vector<Point<2>> coords(locally_active_dofs.size());
+  for (const auto &d2p : dof_2_point)
+    {
+      coords[d2p.first] = d2p.second;
+    }
+
+  preconditioner.initialize(system_matrix, data);
   check_solver_within_range(solver.solve(system_matrix,
                                          completely_distributed_solution,
                                          system_rhs,

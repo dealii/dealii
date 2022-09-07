@@ -912,8 +912,7 @@ namespace PETScWrappers
       set_option_value("-pc_bddc_symmetric", "true");
     else
       set_option_value("-pc_bddc_symmetric", "false");
-    if (additional_data.coords_cdim && additional_data.coords_n &&
-        additional_data.coords_data)
+    if (additional_data.coords.size() > 0)
       {
         set_option_value("-pc_bddc_corner_selection", "true");
         // Convert coords vector to PETSc data array
