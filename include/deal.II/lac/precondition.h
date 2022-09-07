@@ -542,7 +542,8 @@ namespace internal
             typename PreconditionerType>
   constexpr bool has_vmult_with_std_functions =
     is_supported_operation<vmult_functions_t, MatrixType, VectorType> &&
-      std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value &&
+      std::is_same<PreconditionerType,
+                   dealii::DiagonalMatrix<VectorType>>::value &&
     (std::is_same<VectorType,
                   dealii::Vector<typename VectorType::value_type>>::value ||
      std::is_same<
@@ -1175,19 +1176,19 @@ namespace internal
     // 2) specialized implementation for inverse-diagonal preconditioner
     template <typename MatrixType,
               typename VectorType,
-              std::enable_if_t<
-                !IsBlockVector<VectorType>::value &&
-                  !has_vmult_with_std_functions<MatrixType,
-                                                VectorType,
-                                                DiagonalMatrix<VectorType>>,
-                VectorType> * = nullptr>
+              std::enable_if_t<!IsBlockVector<VectorType>::value &&
+                                 !has_vmult_with_std_functions<
+                                   MatrixType,
+                                   VectorType,
+                                   dealii::DiagonalMatrix<VectorType>>,
+                               VectorType> * = nullptr>
     void
-    step_operations(const MatrixType &                A,
-                    const DiagonalMatrix<VectorType> &preconditioner,
-                    VectorType &                      dst,
-                    const VectorType &                src,
-                    const double                      relaxation,
-                    VectorType &                      tmp,
+    step_operations(const MatrixType &                        A,
+                    const dealii::DiagonalMatrix<VectorType> &preconditioner,
+                    VectorType &                              dst,
+                    const VectorType &                        src,
+                    const double                              relaxation,
+                    VectorType &                              tmp,
                     VectorType &,
                     const unsigned int i,
                     const bool         transposed)
@@ -1247,19 +1248,19 @@ namespace internal
     // matrix that accepts ranges
     template <typename MatrixType,
               typename VectorType,
-              std::enable_if_t<
-                !IsBlockVector<VectorType>::value &&
-                  has_vmult_with_std_functions<MatrixType,
-                                               VectorType,
-                                               DiagonalMatrix<VectorType>>,
-                VectorType> * = nullptr>
+              std::enable_if_t<!IsBlockVector<VectorType>::value &&
+                                 has_vmult_with_std_functions<
+                                   MatrixType,
+                                   VectorType,
+                                   dealii::DiagonalMatrix<VectorType>>,
+                               VectorType> * = nullptr>
     void
-    step_operations(const MatrixType &                A,
-                    const DiagonalMatrix<VectorType> &preconditioner,
-                    VectorType &                      dst,
-                    const VectorType &                src,
-                    const double                      relaxation,
-                    VectorType &                      tmp,
+    step_operations(const MatrixType &                        A,
+                    const dealii::DiagonalMatrix<VectorType> &preconditioner,
+                    VectorType &                              dst,
+                    const VectorType &                        src,
+                    const double                              relaxation,
+                    VectorType &                              tmp,
                     VectorType &,
                     const unsigned int i,
                     const bool         transposed)
@@ -2871,15 +2872,16 @@ namespace internal
     // selection for diagonal matrix around deal.II vector
     template <typename Number>
     inline void
-    vector_updates(const ::dealii::Vector<Number> &                rhs,
-                   const DiagonalMatrix<::dealii::Vector<Number>> &jacobi,
-                   const unsigned int        iteration_index,
-                   const double              factor1,
-                   const double              factor2,
-                   ::dealii::Vector<Number> &solution_old,
-                   ::dealii::Vector<Number> &temp_vector1,
-                   ::dealii::Vector<Number> &,
-                   ::dealii::Vector<Number> &solution)
+    vector_updates(
+      const ::dealii::Vector<Number> &                        rhs,
+      const dealii::DiagonalMatrix<::dealii::Vector<Number>> &jacobi,
+      const unsigned int                                      iteration_index,
+      const double                                            factor1,
+      const double                                            factor2,
+      ::dealii::Vector<Number> &                              solution_old,
+      ::dealii::Vector<Number> &                              temp_vector1,
+      ::dealii::Vector<Number> &,
+      ::dealii::Vector<Number> &solution)
     {
       VectorUpdater<Number> upd(rhs.begin(),
                                 jacobi.get_vector().begin(),
@@ -2909,7 +2911,7 @@ namespace internal
     inline void
     vector_updates(
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &rhs,
-      const DiagonalMatrix<
+      const dealii::DiagonalMatrix<
         LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>> &jacobi,
       const unsigned int iteration_index,
       const double       factor1,
@@ -3053,13 +3055,14 @@ namespace internal
     template <typename MatrixType, typename VectorType>
     inline void
     initialize_preconditioner(
-      const MatrixType &                           matrix,
-      std::shared_ptr<DiagonalMatrix<VectorType>> &preconditioner)
+      const MatrixType &                                   matrix,
+      std::shared_ptr<dealii::DiagonalMatrix<VectorType>> &preconditioner)
     {
       if (preconditioner.get() == nullptr || preconditioner->m() != matrix.m())
         {
           if (preconditioner.get() == nullptr)
-            preconditioner = std::make_shared<DiagonalMatrix<VectorType>>();
+            preconditioner =
+              std::make_shared<dealii::DiagonalMatrix<VectorType>>();
 
           Assert(
             preconditioner->m() == 0,
@@ -3438,8 +3441,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   // We do not need the second temporary vector in case we have a
   // DiagonalMatrix as preconditioner and use deal.II's own vectors
   using NumberType = typename VectorType::value_type;
-  if (std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value ==
-        false ||
+  if (std::is_same<PreconditionerType,
+                   dealii::DiagonalMatrix<VectorType>>::value == false ||
       (std::is_same<VectorType, dealii::Vector<NumberType>>::value == false &&
        ((std::is_same<VectorType,
                       LinearAlgebra::distributed::
