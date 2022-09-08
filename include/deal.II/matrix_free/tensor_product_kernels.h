@@ -2007,6 +2007,8 @@ namespace internal
       : shape_values(shape_values.begin())
       , shape_gradients(nullptr)
       , shape_hessians(nullptr)
+      , n_rows(n_rows)
+      , n_columns(n_columns)
     {
       AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
     }
