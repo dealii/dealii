@@ -894,6 +894,19 @@ namespace PETScWrappers
     PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCBDDC));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
+    // The matrix must be of IS type. We check for this to avoid the PETSc error
+    // in order to suggest the correct matrix reinit method.
+    {
+      MatType current_type;
+      ierr = MatGetType(matrix, &current_type);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(
+        strcmp(current_type, MATIS) == 0,
+        ExcMessage(
+          "Matrix must be of IS type. For this, the variant of reinit that includes the active dofs must be used."));
+    }
+
+
     std::stringstream ssStream;
 
     if (additional_data.use_vertices)
@@ -961,6 +974,9 @@ namespace PETScWrappers
 
 
 } // namespace PETScWrappers
+
+template class PETScWrappers::PreconditionBDDC<2>;
+template class PETScWrappers::PreconditionBDDC<3>;
 
 DEAL_II_NAMESPACE_CLOSE
 

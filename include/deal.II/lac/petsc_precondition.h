@@ -971,7 +971,7 @@ namespace PETScWrappers
    *   <li> A coarse solver: Continuity between each subdomain is imposed in a small number of DoFs, referred to as <em>primal DoFs</em>. This solver solves such problem.
    * </ul>
    *
-   * The size of the primal space is determined through the @p AdditionalData parameters.
+   * The size of the primal space is determined through the @p AdditionalData parameters. A thorough study of the performance of this solver in the context of cardiac mechanics, together with further details on this interface, is available in @cite Barnafi2022.
    *
    * @ingroup PETScWrappers
    */
@@ -1079,8 +1079,6 @@ namespace PETScWrappers
   using PreconditionerBase DEAL_II_DEPRECATED = PreconditionBase;
 } // namespace PETScWrappers
 
-template class PETScWrappers::PreconditionBDDC<2>;
-template class PETScWrappers::PreconditionBDDC<3>;
 
 DEAL_II_NAMESPACE_CLOSE
 
