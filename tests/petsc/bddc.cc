@@ -63,7 +63,6 @@ main(int argc, char *argv[])
 
   initlog();
   deallog << std::setprecision(10);
-#if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
   parallel::distributed::Triangulation<2> triangulation(MPI_COMM_WORLD);
   FE_Q<2>                                 fe(1);
   DoFHandler<2>                           dof_handler(triangulation);
@@ -186,10 +185,5 @@ main(int argc, char *argv[])
                             2);
 
   deallog << "CG/BDDC:OK" << std::endl;
-#else
-  deallog << "MATIS:OK" << std::endl;
-  deallog << "DEAL::Solver stopped within 1 - 2 iterations" << std::endl;
-  deallog << "CG/BDDC:OK" << std::endl;
-#endif
   return 0;
 }
