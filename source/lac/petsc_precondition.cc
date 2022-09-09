@@ -891,6 +891,7 @@ namespace PETScWrappers
   void
   PreconditionBDDC<dim>::initialize()
   {
+#  if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
     PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCBDDC));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -926,7 +927,6 @@ namespace PETScWrappers
     else
       set_option_value("-pc_bddc_symmetric", "false");
     if (additional_data.coords.size() > 0)
-#  if DEAL_II_PETSC_VERSION_GTE(3, 9, 0)
       {
         set_option_value("-pc_bddc_corner_selection", "true");
         // Convert coords vector to PETSc data array
@@ -950,15 +950,15 @@ namespace PETScWrappers
         ierr = PCSetCoordinates(pc, 0, 0, NULL);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
-#  else
-      {
-        AssertThrow(false, ExcMessage("Corner selection in BDDC is only available with PETSc 3.9.0 or newer");
-      }
-#  endif
 
 
     ierr = PCSetFromOptions(pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+#  else
+    {
+        AssertThrow(false, ExcMessage("BDDC preconditioner requires PETSc 3.10.0 or newer");
+    }
+#  endif
   }
 
   template <int dim>

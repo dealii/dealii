@@ -63,6 +63,7 @@ main(int argc, char *argv[])
 
   initlog();
   deallog << std::setprecision(10);
+#if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
   parallel::distributed::Triangulation<2> triangulation(MPI_COMM_WORLD);
   FE_Q<2>                                 fe(1);
   DoFHandler<2>                           dof_handler(triangulation);
@@ -160,19 +161,19 @@ main(int argc, char *argv[])
   PETScWrappers::PreconditionBDDC<2> preconditioner;
   PETScWrappers::PreconditionBDDC<2>::AdditionalData data;
 
-// Now we setup the dof coordinates if a sufficiently new PETSc is used
-#if DEAL_II_PETSC_VERSION_GTE(3, 9, 0)
+  // Now we setup the dof coordinates if a sufficiently new PETSc is used
   std::map<types::global_dof_index, Point<2>> dof_2_point;
   DoFTools::map_dofs_to_support_points(MappingQ1<2>(),
                                        dof_handler,
                                        dof_2_point);
-  std::vector<Point<2>> coords(locally_active_dofs.size());
-  for (const auto &d2p : dof_2_point)
+  std::vector<Point<2>> coords(locally_owned_dofs.n_elements());
+  unsigned int          k = 0;
+  for (auto it = locally_owned_dofs.begin(); it != locally_owned_dofs.end();
+       ++it, ++k)
     {
-      coords[d2p.first] = d2p.second;
+      coords[k] = dof_2_point[*it];
     }
-  data.coords = coords;
-#endif
+  data.coords       = coords;
   data.use_vertices = true;
 
   preconditioner.initialize(system_matrix, data);
@@ -185,6 +186,10 @@ main(int argc, char *argv[])
                             2);
 
   deallog << "CG/BDDC:OK" << std::endl;
-
+#else
+  deallog << "MATIS:OK" << std::endl;
+  deallog << "DEAL::Solver stopped within 1 - 2 iterations" << std::endl;
+  deallog << "CG/BDDC:OK" << std::endl;
+#endif
   return 0;
 }

@@ -437,6 +437,7 @@ namespace PETScWrappers
                             const IndexSet &           local_active_columns,
                             const SparsityPatternType &sparsity_pattern)
     {
+#  if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
       Assert(sparsity_pattern.n_rows() == local_rows.size(),
              ExcMessage(
                "SparsityPattern and IndexSet have different number of rows."));
@@ -449,7 +450,7 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-#  ifdef DEBUG
+#    ifdef DEBUG
       {
         // check indexsets
         types::global_dof_index row_owners =
@@ -472,7 +473,7 @@ namespace PETScWrappers
             " but sum(local_columns.n_elements())=" +
             std::to_string(col_owners) + ")"));
       }
-#  endif
+#    endif
       PetscErrorCode ierr;
 
       // create the local to global mappings as arrays.
@@ -637,6 +638,11 @@ namespace PETScWrappers
       }
       ierr = MatISRestoreLocalMat(matrix, &local_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
+#  else
+      {
+        AssertThrow(false, ExcMessage("BDDC preconditioner requires PETSc 3.10.0 or newer");
+      }
+#  endif
     }
 
 #  ifndef DOXYGEN
