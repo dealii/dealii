@@ -70,6 +70,7 @@ namespace CGALWrappers
   using CGALPoint2             = K::Point_2;
   using CGALPoint3             = K::Point_3;
   using CGALPoint3_exact       = K_exact::Point_3;
+  using CGALPoint3_inexact     = K_inexact::Point_3;
   using CGALSegment2           = K::Segment_2;
   using Surface_mesh           = CGAL::Surface_mesh<K_inexact::Point_3>;
   using CGALSegment3           = K::Segment_3;
@@ -141,6 +142,8 @@ namespace CGALWrappers
         }
     }
 
+
+
     void
     mark_domains(CDT &cdt)
     {
@@ -200,6 +203,8 @@ namespace CGALWrappers
       return CGAL::intersection(triangle1, triangle2);
     }
 
+
+
     boost::optional<boost::variant<CGALPoint2, CGALSegment2>>
     compute_intersection(const std::array<Point<2>, 3> &first_simplex,
                          const std::array<Point<2>, 2> &second_simplex)
@@ -226,6 +231,8 @@ namespace CGALWrappers
       CGALSegment2  segm{pts1[0], pts1[1]};
       return CGAL::intersection(segm, triangle);
     }
+
+
 
     // rectangle-rectangle
     std::vector<Polygon_with_holes_2>
@@ -254,6 +261,8 @@ namespace CGALWrappers
       CGAL::intersection(first, second, std::back_inserter(poly_list));
       return poly_list;
     }
+
+
 
     boost::optional<boost::variant<CGALPoint3, CGALSegment3>>
     compute_intersection(const std::array<Point<3>, 2> &first_simplex,
@@ -335,6 +344,8 @@ namespace CGALWrappers
     }
   } // namespace internal
 
+
+
   // Specialization for quads
   template <>
   std::vector<std::array<Point<2>, 3>>
@@ -399,6 +410,8 @@ namespace CGALWrappers
         return {};
       }
   }
+
+
 
   // Specialization for quad \cap line
   template <>
@@ -601,50 +614,92 @@ namespace CGALWrappers
 #  endif
   }
 
+
+
   template <>
   std::vector<std::array<Point<3>, 4>>
   compute_intersection_of_cells<3, 3, 3, 8, 8>(
     const std::array<Point<3>, 8> &vertices0,
     const std::array<Point<3>, 8> &vertices1,
-    const double                   tol)
-  {
-    // Surface_mesh surf0, surf1, sm;
-    // CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell0, mapping0, surf0);
-    // CGALWrappers::dealii_cell_to_cgal_surface_mesh(cell1, mapping1, surf1);
-    // CGAL::Polygon_mesh_processing::triangulate_faces(surf0);
-    // CGAL::Polygon_mesh_processing::triangulate_faces(surf1);
-    // CGALWrappers::compute_boolean_operation(
-    //   surf0, surf1, CGALWrappers::BooleanOperation::compute_intersection,
-    //   sm);
-    // std::vector<std::array<Point<3>, 4>> vertices;
-    // if (CGAL::Polygon_mesh_processing::volume(sm) > tol)
-    //   {
-    //     // Collect tetrahedrons
-    //     Triangulation3_inexact tria;
-    //     tria.insert(sm.points().begin(), sm.points().end());
-    //     for (const auto &c : tria.finite_cell_handles())
-    //       {
-    //         const auto &tet = tria.tetrahedron(c);
-    //         vertices.push_back(
-    //           {{CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(0)),
-    //             CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(1)),
-    //             CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(2)),
-    //             CGALWrappers::cgal_point_to_dealii_point<3>(tet.vertex(3))}});
-    //       }
-    //     return vertices;
-    //   }
-    // else
-    //   {
-    //     return vertices;
-    //   }
 
-    // TODO: implememnt 3d/3d cut
-    AssertThrow(false, ExcMessage("Not yet implemented"));
-    (void)vertices0;
-    (void)vertices1;
-    (void)tol;
-    return {};
+    const double tol)
+  {
+    std::array<CGALPoint3_inexact, 8> pts_hex0;
+    std::array<CGALPoint3_inexact, 8> pts_hex1;
+    std::transform(
+      vertices0.begin(),
+      vertices0.end(),
+      pts_hex0.begin(),
+      [&](const Point<3> &p) {
+        return CGALWrappers::dealii_point_to_cgal_point<CGALPoint3_inexact>(p);
+      });
+
+    std::transform(
+      vertices1.begin(),
+      vertices1.end(),
+      pts_hex1.begin(),
+      [&](const Point<3> &p) {
+        return CGALWrappers::dealii_point_to_cgal_point<CGALPoint3_inexact>(p);
+      });
+
+
+    Surface_mesh surf0, surf1, sm;
+    // Subdivide hex into tetrahedrons
+    std::vector<std::array<Point<3>, 4>> vertices;
+    Triangulation3_inexact               tria0, tria1;
+
+    tria0.insert(pts_hex0.begin(), pts_hex0.end());
+    tria1.insert(pts_hex1.begin(), pts_hex1.end());
+
+    for (const auto &c0 : tria0.finite_cell_handles())
+      {
+        const auto &                 tet0 = tria1.tetrahedron(c0);
+        [[maybe_unused]] const auto &tetg0 =
+          CGAL::make_tetrahedron(tet0.vertex(0),
+                                 tet0.vertex(1),
+                                 tet0.vertex(2),
+                                 tet0.vertex(3),
+                                 surf0);
+        for (const auto &c1 : tria1.finite_cell_handles())
+          {
+            const auto &                 tet1 = tria1.tetrahedron(c1);
+            [[maybe_unused]] const auto &tetg1 =
+              CGAL::make_tetrahedron(tet1.vertex(0),
+                                     tet1.vertex(1),
+                                     tet1.vertex(2),
+                                     tet1.vertex(3),
+                                     surf1);
+            const bool test_intersection =
+              CGAL::PMP::corefine_and_compute_intersection(surf0, surf1, sm);
+            if (CGAL::Polygon_mesh_processing::volume(sm) > tol &&
+                test_intersection)
+              {
+                // Collect tetrahedrons
+                Triangulation3_inexact tria;
+                tria.insert(sm.points().begin(), sm.points().end());
+                for (const auto &c : tria.finite_cell_handles())
+                  {
+                    const auto &tet = tria.tetrahedron(c);
+                    vertices.push_back(
+                      {{CGALWrappers::cgal_point_to_dealii_point<3>(
+                          tet.vertex(0)),
+                        CGALWrappers::cgal_point_to_dealii_point<3>(
+                          tet.vertex(1)),
+                        CGALWrappers::cgal_point_to_dealii_point<3>(
+                          tet.vertex(2)),
+                        CGALWrappers::cgal_point_to_dealii_point<3>(
+                          tet.vertex(3))}});
+                  }
+              }
+            surf1.clear();
+            sm.clear();
+          }
+        surf0.clear();
+      }
+    return vertices;
   }
+
+
 
   template <int dim0, int dim1, int spacedim>
   std::vector<std::array<Point<spacedim>, dim1 + 1>>
@@ -663,7 +718,6 @@ namespace CGALWrappers
     const auto vertices0 =
       CGALWrappers::get_vertices_in_cgal_order<int(std::pow(2, dim0))>(
         cell0, mapping0);
-
     const auto vertices1 =
       CGALWrappers::get_vertices_in_cgal_order<int(std::pow(2, dim1))>(
         cell1, mapping1);

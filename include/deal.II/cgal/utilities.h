@@ -595,11 +595,11 @@ namespace CGALWrappers
 
 
   /**
-   * Get vertices of cell in CGAL ordering
+   * Get vertices of cell in CGAL ordering.
    *
-   * @param [in] cell A cell_iterator to a deal.II cell.
-   * @param [in] mapping Mapping object for the cell.
-   * @return [out] Array of vertices in CGAL order.
+   * @param cell A cell_iterator to a deal.II cell.
+   * @param mapping Mapping object for the cell.
+   * @return  Array of vertices in CGAL order.
    */
   template <int n_vertices, int dim, int spacedim>
   std::array<Point<spacedim>, n_vertices>

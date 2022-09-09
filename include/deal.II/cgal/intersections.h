@@ -28,26 +28,8 @@
 DEAL_II_NAMESPACE_OPEN
 namespace CGALWrappers
 {
-  template <int dim0,
-            int dim1,
-            int spacedim,
-            int n_components0,
-            int n_components1>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
-  compute_intersection_of_cells(
-    const std::array<Point<spacedim>, n_components0> &vertices0,
-    const std::array<Point<spacedim>, n_components1> &vertices1,
-    const double                                      tol)
-  {
-    (void)vertices0;
-    (void)vertices1;
-    (void)tol;
-    Assert(false, ExcMessage("No explicit template instantiation available"));
-    return {};
-  }
-
   /**
-   * Given two deal.II affine cells, compute the intersection and return a
+   * Given two deal.II affine cells, compute their intersection and return a
    * vector of simplices, each one identified by an array of deal.II Points. All
    * the simplices together are a subdivision of the intersection. If cells are
    * non-affine, a geometrical error is introduced. If the
@@ -75,6 +57,24 @@ namespace CGALWrappers
     const Mapping<dim0, spacedim> &                              mapping0,
     const Mapping<dim1, spacedim> &                              mapping1,
     const double                                                 tol = 1e-9);
+
+
+  /**
+   * Same function as above, but working directly with vertices.
+   */
+  template <int dim0, int dim1, int spacedim, int n_vertices0, int n_vertices1>
+  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  compute_intersection_of_cells(
+    const std::array<Point<spacedim>, n_vertices0> &vertices0,
+    const std::array<Point<spacedim>, n_vertices1> &vertices1,
+    const double                                    tol = 1e-9)
+  {
+    (void)vertices0;
+    (void)vertices1;
+    (void)tol;
+    Assert(false, ExcMessage("No explicit template instantiation available"));
+    return {};
+  }
 } // namespace CGALWrappers
 
 DEAL_II_NAMESPACE_CLOSE
