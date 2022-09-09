@@ -160,7 +160,8 @@ main(int argc, char *argv[])
   PETScWrappers::PreconditionBDDC<2> preconditioner;
   PETScWrappers::PreconditionBDDC<2>::AdditionalData data;
 
-  // Now we setup the dof coordinates
+// Now we setup the dof coordinates if a sufficiently new PETSc is used
+#if DEAL_II_PETSC_VERSION_GTE(3, 9, 0)
   std::map<types::global_dof_index, Point<2>> dof_2_point;
   DoFTools::map_dofs_to_support_points(MappingQ1<2>(),
                                        dof_handler,
@@ -170,6 +171,9 @@ main(int argc, char *argv[])
     {
       coords[d2p.first] = d2p.second;
     }
+  data.coords = coords;
+#endif
+  data.use_vertices = true;
 
   preconditioner.initialize(system_matrix, data);
   check_solver_within_range(solver.solve(system_matrix,
