@@ -8180,7 +8180,8 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const double                      cur_time,
   const MPI_Comm &                  comm) const
 {
-  std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
+  AssertThrow(spacedim == 2 || spacedim == 3,
+              ExcMessage("XDMF only supports 2 or 3 space dimensions."));
 
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
@@ -8192,8 +8193,8 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   (void)comm;
   AssertThrow(false, ExcMessage("XDMF support requires HDF5 to be turned on."));
 #endif
-  AssertThrow(spacedim == 2 || spacedim == 3,
-              ExcMessage("XDMF only supports 2 or 3 space dimensions."));
+
+  std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
 
   local_node_cell_count[0] = data_filter.n_nodes();
   // n_cells returns an invalid unsigned int if the object is empty:
