@@ -8202,22 +8202,17 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
     (data_filter.n_nodes() > 0) ? data_filter.n_cells() : 0;
 
 
-  // And compute the global total
 #ifdef DEAL_II_WITH_MPI
+
   const int myrank = Utilities::MPI::this_mpi_process(comm);
-  int       ierr   = MPI_Allreduce(local_node_cell_count,
+  // And compute the global total
+  int ierr = MPI_Allreduce(local_node_cell_count,
                            global_node_cell_count,
                            2,
                            MPI_UINT64_T,
                            MPI_SUM,
                            comm);
   AssertThrowMPI(ierr);
-#else
-  (void)comm;
-  const int myrank = 0;
-  global_node_cell_count[0] = local_node_cell_count[0];
-  global_node_cell_count[1] = local_node_cell_count[1];
-#endif
 
   // The implementation is a bit complicated because we are supposed to return
   // the correct data on rank 0 and an empty object on all other ranks but all
@@ -8242,6 +8237,17 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   AssertThrowMPI(ierr);
 
   const int tag = 47381;
+
+#else
+  (void)comm;
+  global_node_cell_count[0] = local_node_cell_count[0];
+  global_node_cell_count[1] = local_node_cell_count[1];
+
+  const bool am_i_first_rank_with_data = true;
+
+#endif
+
+
 
   // Output the XDMF file only on the root process of all ranks with data:
   if (am_i_first_rank_with_data)
@@ -8274,6 +8280,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                               data_filter.get_data_set_dim(i));
         }
 
+#ifdef DEAL_II_WITH_MPI
       if (myrank != 0)
         {
           // send to rank 0
@@ -8283,10 +8290,12 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
 
           return {};
         }
-      else
-        return entry;
+#endif
+
+      return entry;
     }
 
+#ifdef DEAL_II_WITH_MPI
   if (myrank == 0 && !am_i_first_rank_with_data)
     {
       // receive the XDMF data on rank 0 if we don't have it...
@@ -8311,6 +8320,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
 
       return Utilities::unpack<XDMFEntry>(buffer, false);
     }
+#endif
 
   // default case for any other rank is to return an empty object
   return {};
