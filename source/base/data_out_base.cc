@@ -8192,7 +8192,10 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   (void)cur_time;
   (void)comm;
   AssertThrow(false, ExcMessage("XDMF support requires HDF5 to be turned on."));
-#endif
+
+  return {};
+
+#else
 
   std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
 
@@ -8200,9 +8203,6 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   // n_cells returns an invalid unsigned int if the object is empty:
   local_node_cell_count[1] =
     (data_filter.n_nodes() > 0) ? data_filter.n_cells() : 0;
-
-
-#ifdef DEAL_II_WITH_MPI
 
   const int myrank = Utilities::MPI::this_mpi_process(comm);
   // And compute the global total
@@ -8222,11 +8222,11 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   // from this rank to rank 0 (if they are different ranks).
 
   const bool have_data = (data_filter.n_nodes() > 0);
-  MPI_Comm   split_comm;
+  MPI_Comm split_comm;
   {
-    const int key   = myrank;
+    const int key = myrank;
     const int color = (have_data ? 1 : 0);
-    const int ierr  = MPI_Comm_split(comm, color, key, &split_comm);
+    const int ierr = MPI_Comm_split(comm, color, key, &split_comm);
     AssertThrowMPI(ierr);
   }
 
@@ -8238,17 +8238,6 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
 
   const int tag = 47381;
 
-#else
-  (void)comm;
-  global_node_cell_count[0] = local_node_cell_count[0];
-  global_node_cell_count[1] = local_node_cell_count[1];
-
-  const bool am_i_first_rank_with_data = true;
-
-#endif
-
-
-
   // Output the XDMF file only on the root process of all ranks with data:
   if (am_i_first_rank_with_data)
     {
@@ -8256,13 +8245,13 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
       Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
 
       // We currently don't support writing mixed meshes:
-#ifdef DEBUG
+#  ifdef DEBUG
       for (const auto &patch : patches)
         Assert(patch.reference_cell == patches[0].reference_cell,
                ExcNotImplemented());
-#endif
+#  endif
 
-      XDMFEntry          entry(h5_mesh_filename,
+      XDMFEntry entry(h5_mesh_filename,
                       h5_solution_filename,
                       cur_time,
                       global_node_cell_count[0],
@@ -8280,7 +8269,6 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                               data_filter.get_data_set_dim(i));
         }
 
-#ifdef DEAL_II_WITH_MPI
       if (myrank != 0)
         {
           // send to rank 0
@@ -8290,18 +8278,16 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
 
           return {};
         }
-#endif
 
       return entry;
     }
 
-#ifdef DEAL_II_WITH_MPI
   if (myrank == 0 && !am_i_first_rank_with_data)
     {
       // receive the XDMF data on rank 0 if we don't have it...
 
       MPI_Status status;
-      int        ierr = MPI_Probe(MPI_ANY_SOURCE, tag, comm, &status);
+      int ierr = MPI_Probe(MPI_ANY_SOURCE, tag, comm, &status);
       AssertThrowMPI(ierr);
 
       int len;
@@ -8320,10 +8306,10 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
 
       return Utilities::unpack<XDMFEntry>(buffer, false);
     }
-#endif
 
   // default case for any other rank is to return an empty object
   return {};
+#endif
 }
 
 template <int dim, int spacedim>
