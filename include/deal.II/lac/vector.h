@@ -1354,6 +1354,23 @@ Vector<Number>::update_ghost_values() const
 
 
 
+template <typename Number>
+template <typename Number2>
+inline void
+Vector<Number>::reinit(const Vector<Number2> &v,
+                       const bool             omit_zeroing_entries)
+{
+  // go to actual reinit functions in case we need to change something with
+  // the vector, else there is nothing to be done
+  if (!omit_zeroing_entries || size() != v.size())
+    {
+      do_reinit(v.size(), omit_zeroing_entries, false);
+      thread_loop_partitioner = v.thread_loop_partitioner;
+    }
+}
+
+
+
 // Moved from vector.templates.h as an inline function by Luca Heltai
 // on 2009/04/12 to prevent strange compiling errors, after making
 // swap virtual.
