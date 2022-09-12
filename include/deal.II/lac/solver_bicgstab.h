@@ -301,9 +301,12 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
   t.reinit(x, true);
   v.reinit(x, true);
 
+  using value_type = typename VectorType::value_type;
+  using real_type  = typename numbers::NumberTraits<value_type>::real_type;
+
   A.vmult(r, x);
   r.sadd(-1., 1., b);
-  double res = r.l2_norm();
+  value_type res = r.l2_norm();
 
   unsigned int step = last_step;
 
@@ -313,23 +316,23 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
 
   rbar = r;
 
-  double alpha = 1.;
-  double rho   = 1.;
-  double omega = 1.;
+  value_type alpha = 1.;
+  value_type rho   = 1.;
+  value_type omega = 1.;
 
   do
     {
       ++step;
 
-      const double rhobar = (step == 1 + last_step) ? res * res : r * rbar;
+      const value_type rhobar = (step == 1 + last_step) ? res * res : r * rbar;
 
       if (std::fabs(rhobar) < additional_data.breakdown)
         {
           return IterationResult(true, state, step, res);
         }
 
-      const double beta = rhobar * alpha / (rho * omega);
-      rho               = rhobar;
+      const value_type beta = rhobar * alpha / (rho * omega);
+      rho                   = rhobar;
       if (step == last_step + 1)
         {
           p = r;
@@ -342,7 +345,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
 
       preconditioner.vmult(y, p);
       A.vmult(v, y);
-      const double rbar_dot_v = rbar * v;
+      const value_type rbar_dot_v = rbar * v;
       if (std::fabs(rbar_dot_v) < additional_data.breakdown)
         {
           return IterationResult(true, state, step, res);
@@ -350,7 +353,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
 
       alpha = rho / rbar_dot_v;
 
-      res = std::sqrt(r.add_and_dot(-alpha, v, r));
+      res = std::sqrt(real_type(r.add_and_dot(-alpha, v, r)));
 
       // check for early success, see the lac/bicgstab_early testcase as to
       // why this is necessary
@@ -367,8 +370,8 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
 
       preconditioner.vmult(z, r);
       A.vmult(t, z);
-      const double t_dot_r   = t * r;
-      const double t_squared = t * t;
+      const value_type t_dot_r   = t * r;
+      const real_type  t_squared = t * t;
       if (t_squared < additional_data.breakdown)
         {
           return IterationResult(true, state, step, res);
@@ -382,7 +385,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
           res = criterion(A, x, b, t);
         }
       else
-        res = std::sqrt(r.add_and_dot(-omega, t, r));
+        res = std::sqrt(real_type(r.add_and_dot(-omega, t, r)));
 
       state = this->iteration_status(step, res, x);
       print_vectors(step, x, r, y);
