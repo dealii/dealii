@@ -277,12 +277,16 @@ namespace internal
     {
       Vectorization_multiply_factor(Number *const val, const Number factor)
         : val(val)
-        , factor(factor)
+        , stored_factor(factor)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        // create a local copy of the variable to help the compiler with the
+        // aliasing analysis
+        const Number factor = stored_factor;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -297,7 +301,7 @@ namespace internal
       }
 
       Number *const val;
-      const Number  factor;
+      const Number  stored_factor;
     };
 
     template <typename Number>
@@ -308,12 +312,15 @@ namespace internal
                            const Number        factor)
         : val(val)
         , v_val(v_val)
-        , factor(factor)
+        , stored_factor(factor)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        // create a local copy of the variable to help the compiler with the
+        // aliasing analysis
+        const Number factor = stored_factor;
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -329,7 +336,7 @@ namespace internal
 
       Number *const       val;
       const Number *const v_val;
-      const Number        factor;
+      const Number        stored_factor;
     };
 
     template <typename Number>
@@ -341,13 +348,17 @@ namespace internal
                              const Number        x)
         : val(val)
         , v_val(v_val)
-        , a(a)
-        , x(x)
+        , stored_a(a)
+        , stored_x(x)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        // create a local copy of the variable to help the compiler with the
+        // aliasing analysis
+        const Number x = stored_x, a = stored_a;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -363,8 +374,8 @@ namespace internal
 
       Number *const       val;
       const Number *const v_val;
-      const Number        a;
-      const Number        x;
+      const Number        stored_a;
+      const Number        stored_x;
     };
 
     template <typename Number>
@@ -400,12 +411,14 @@ namespace internal
     {
       Vectorization_add_factor(Number *const val, const Number factor)
         : val(val)
-        , factor(factor)
+        , stored_factor(factor)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        const Number factor = stored_factor;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -420,7 +433,7 @@ namespace internal
       }
 
       Number *const val;
-      const Number  factor;
+      const Number  stored_factor;
     };
 
     template <typename Number>
@@ -462,13 +475,15 @@ namespace internal
         : val(val)
         , v_val(v_val)
         , w_val(w_val)
-        , a(a)
-        , b(b)
+        , stored_a(a)
+        , stored_b(b)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        const Number a = stored_a, b = stored_b;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -485,8 +500,8 @@ namespace internal
       Number *const       val;
       const Number *const v_val;
       const Number *const w_val;
-      const Number        a;
-      const Number        b;
+      const Number        stored_a;
+      const Number        stored_b;
     };
 
     template <typename Number>
@@ -497,12 +512,14 @@ namespace internal
                             const Number        x)
         : val(val)
         , v_val(v_val)
-        , x(x)
+        , stored_x(x)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        const Number x = stored_x;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -518,7 +535,7 @@ namespace internal
 
       Number *const       val;
       const Number *const v_val;
-      const Number        x;
+      const Number        stored_x;
     };
 
     template <typename Number>
@@ -533,14 +550,16 @@ namespace internal
         : val(val)
         , v_val(v_val)
         , w_val(w_val)
-        , x(x)
-        , a(a)
-        , b(b)
+        , stored_x(x)
+        , stored_a(a)
+        , stored_b(b)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        const Number x = stored_x, a = stored_a, b = stored_b;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -557,9 +576,9 @@ namespace internal
       Number *const       val;
       const Number *const v_val;
       const Number *const w_val;
-      const Number        x;
-      const Number        a;
-      const Number        b;
+      const Number        stored_x;
+      const Number        stored_a;
+      const Number        stored_b;
     };
 
     template <typename Number>
@@ -598,12 +617,14 @@ namespace internal
                            const Number        a)
         : val(val)
         , u_val(u_val)
-        , a(a)
+        , stored_a(a)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        const Number a = stored_a;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -619,7 +640,7 @@ namespace internal
 
       Number *const       val;
       const Number *const u_val;
-      const Number        a;
+      const Number        stored_a;
     };
 
     template <typename Number>
@@ -633,13 +654,15 @@ namespace internal
         : val(val)
         , u_val(u_val)
         , v_val(v_val)
-        , a(a)
-        , b(b)
+        , stored_a(a)
+        , stored_b(b)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        const Number a = stored_a, b = stored_b;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -656,8 +679,8 @@ namespace internal
       Number *const       val;
       const Number *const u_val;
       const Number *const v_val;
-      const Number        a;
-      const Number        b;
+      const Number        stored_a;
+      const Number        stored_b;
     };
 
     template <typename Number>
@@ -674,14 +697,16 @@ namespace internal
         , u_val(u_val)
         , v_val(v_val)
         , w_val(w_val)
-        , a(a)
-        , b(b)
-        , c(c)
+        , stored_a(a)
+        , stored_b(b)
+        , stored_c(c)
       {}
 
       void
       operator()(const size_type begin, const size_type end) const
       {
+        const Number a = stored_a, b = stored_b, c = stored_c;
+
         if (::dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
             DEAL_II_OPENMP_SIMD_PRAGMA
@@ -699,9 +724,9 @@ namespace internal
       const Number *const u_val;
       const Number *const v_val;
       const Number *const w_val;
-      const Number        a;
-      const Number        b;
-      const Number        c;
+      const Number        stored_a;
+      const Number        stored_b;
+      const Number        stored_c;
     };
 
     template <typename Number>
@@ -1126,7 +1151,7 @@ namespace internal
     template <typename Operation, typename ResultType>
     void
     accumulate_regular(
-      const Operation &op,
+      const Operation  op,
       const size_type &n_chunks,
       size_type &      index,
       ResultType (&outer_results)[vector_accumulation_recursion_threshold],
@@ -1164,9 +1189,9 @@ namespace internal
     template <typename Operation, typename Number>
     void
     accumulate_regular(
-      const Operation &op,
-      size_type &      n_chunks,
-      size_type &      index,
+      const Operation op,
+      size_type &     n_chunks,
+      size_type &     index,
       Number (&outer_results)[vector_accumulation_recursion_threshold],
       std::integral_constant<bool, true>)
     {
@@ -1350,14 +1375,17 @@ namespace internal
      * parallel.
      */
     template <typename Operation, typename ResultType>
-    void
-    parallel_reduce(
-      const Operation &op,
-      const size_type  start,
-      const size_type  end,
-      ResultType &     result,
-      const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-        &partitioner)
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      parallel_reduce(
+        const Operation &op,
+        const size_type  start,
+        const size_type  end,
+        ResultType &     result,
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &partitioner)
     {
 #ifdef DEAL_II_WITH_TBB
       const size_type vec_size = end - start;
