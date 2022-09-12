@@ -30,6 +30,8 @@
 
 #include <deal.II/grid/grid_generator.h>
 
+#include <deal.II/lac/la_parallel_vector.h>
+
 #include "../tests.h"
 
 using namespace dealii;

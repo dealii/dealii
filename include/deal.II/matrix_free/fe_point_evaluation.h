@@ -26,8 +26,7 @@
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_cartesian.h>
-#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/shape_info.h>

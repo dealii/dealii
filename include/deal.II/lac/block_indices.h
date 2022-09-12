@@ -22,10 +22,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/utilities.h>
 
+#include <algorithm>
 #include <cstddef>
-#include <iterator>
+#include <string>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -380,7 +380,7 @@ BlockIndices::block_size(const unsigned int block) const
 inline std::string
 BlockIndices::to_string() const
 {
-  std::string result = "[" + Utilities::int_to_string(n_blocks) + "->";
+  std::string result = "[" + std::to_string(n_blocks) + "->";
   for (unsigned int i = 0; i < n_blocks; ++i)
     {
       if (i > 0)

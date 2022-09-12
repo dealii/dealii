@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/parsed_convergence_table.h>
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/utilities.h>

@@ -20,7 +20,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria_base.h>
 

@@ -24,7 +24,6 @@
 #include <deal.II/base/thread_local_storage.h>
 
 #include <cmath>
-#include <map>
 #include <memory>
 #include <sstream>
 #include <stack>

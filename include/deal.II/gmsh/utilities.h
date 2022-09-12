@@ -30,11 +30,13 @@
 #    include <TopoDS_Vertex.hxx>
 #  endif
 
-#  include <deal.II/base/parameter_handler.h>
-
 #  include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+#  ifndef DOXYGEN
+class ParameterHandler;
+#  endif
 
 /**
  * A collection of %Gmsh related utilities and classes.

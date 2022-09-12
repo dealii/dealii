@@ -18,16 +18,25 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/la_parallel_vector.h>
-
 
 DEAL_II_NAMESPACE_OPEN
+#ifndef DOXYGEN
+namespace LinearAlgebra
+{
+  namespace distributed
+  {
+    template <typename Number, typename MemorySpace>
+    class Vector;
+  }
+} // namespace LinearAlgebra
+#endif
 
 /*------------------------------------------------------------------------*/
 
@@ -547,9 +556,10 @@ namespace TriangulationDescription
     template <int dim, int spacedim>
     Description<dim, spacedim>
     create_description_from_triangulation(
-      const Triangulation<dim, spacedim> &              tria,
-      const LinearAlgebra::distributed::Vector<double> &partition,
-      const TriangulationDescription::Settings          settings =
+      const Triangulation<dim, spacedim> &tria,
+      const LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
+        &                                      partition,
+      const TriangulationDescription::Settings settings =
         TriangulationDescription::Settings::default_setting);
 
     /**
@@ -559,9 +569,11 @@ namespace TriangulationDescription
     template <int dim, int spacedim>
     Description<dim, spacedim>
     create_description_from_triangulation(
-      const Triangulation<dim, spacedim> &              tria,
-      const LinearAlgebra::distributed::Vector<double> &partition,
-      const std::vector<LinearAlgebra::distributed::Vector<double>>
+      const Triangulation<dim, spacedim> &tria,
+      const LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
+        &partition,
+      const std::vector<
+        LinearAlgebra::distributed::Vector<double, MemorySpace::Host>>
         &                                      mg_partitions,
       const TriangulationDescription::Settings settings =
         TriangulationDescription::Settings::default_setting);

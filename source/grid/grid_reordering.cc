@@ -24,7 +24,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <set>
 
 DEAL_II_NAMESPACE_OPEN
 

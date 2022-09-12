@@ -37,7 +37,6 @@
 
 #  include <cstdio>
 #  include <iostream>
-#  include <set>
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
 #    include <Standard_Transient.hxx>
 #  else

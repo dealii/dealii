@@ -15,6 +15,7 @@
 
 // Output standard parameters for ParsedConvergenceTable class
 
+#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/parsed_convergence_table.h>
 
 #include "../tests.h"

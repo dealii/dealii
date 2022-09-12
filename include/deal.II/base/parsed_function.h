@@ -21,9 +21,12 @@
 
 #include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/function_parser.h>
-#include <deal.II/base/parameter_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DOXYGEN
+class ParameterHandler;
+#endif
 
 namespace Functions
 {

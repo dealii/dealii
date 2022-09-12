@@ -26,8 +26,6 @@
 #  include <deal.II/dofs/dof_renumbering.h>
 #  include <deal.II/dofs/dof_tools.h>
 
-#  include <map>
-#  include <set>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN

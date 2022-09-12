@@ -22,10 +22,10 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/std_cxx17/optional.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/numerics/history.h>
 
+#include <algorithm>
 #include <fstream>
 #include <string>
 

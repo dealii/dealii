@@ -28,9 +28,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
 
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/vector.h>
-
 #include <algorithm>
 #include <array>
 #include <cmath>
