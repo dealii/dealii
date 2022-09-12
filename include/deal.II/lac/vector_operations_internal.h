@@ -1147,7 +1147,11 @@ namespace internal
     // this is the inner working routine for the accumulation loops
     // below. This is the standard case where the loop bounds are known. We
     // pulled this function out of the regular accumulate routine because we
-    // might do this thing vectorized (see specialized function below)
+    // might do this thing vectorized (see specialized function below). As
+    // opposed to the vector add functions above, we here pass the functor
+    // 'op' by value, because we cannot create a copy of the scalar inline,
+    // and instead make sure that the numbers get local (and thus definitely
+    // not aliased) for the compiler
     template <typename Operation, typename ResultType>
     void
     accumulate_regular(
@@ -1185,7 +1189,8 @@ namespace internal
     // below. This is the specialized case where the loop bounds are known and
     // where we can vectorize. In that case, we request the 'do_vectorized'
     // routine of the operation instead of the regular one which does several
-    // operations at once.
+    // operations at once. As above, pass in the functor by value to create a
+    // local copy of the variables in the function (if there are any).
     template <typename Operation, typename Number>
     void
     accumulate_regular(
