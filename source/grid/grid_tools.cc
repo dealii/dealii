@@ -6089,13 +6089,22 @@ namespace GridTools
                 for (const auto &cell_and_reference_position :
                      cells_and_reference_positions)
                   {
+                    const auto cell = cell_and_reference_position.first;
+                    auto       reference_position =
+                      cell_and_reference_position.second;
+
+                    // TODO: we need to implement
+                    // ReferenceCell::project_to_unit_cell()
+                    if (cell->reference_cell().is_hyper_cube())
+                      reference_position =
+                        GeometryInfo<dim>::project_to_unit_cell(
+                          reference_position);
+
                     send_components.emplace_back(
-                      std::pair<int, int>(
-                        cell_and_reference_position.first->level(),
-                        cell_and_reference_position.first->index()),
+                      std::pair<int, int>(cell->level(), cell->index()),
                       other_rank,
                       index_and_point.first,
-                      cell_and_reference_position.second,
+                      reference_position,
                       index_and_point.second,
                       numbers::invalid_unsigned_int);
                   }
