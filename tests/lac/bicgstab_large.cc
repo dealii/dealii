@@ -31,6 +31,7 @@ main()
 {
   initlog();
   deallog << std::setprecision(4);
+  deallog.depth_file(1);
 
   SparsityPattern sparsity_pattern(4, 4);
   sparsity_pattern.compress();
@@ -46,17 +47,19 @@ main()
 
   Vector<double> solution(4);
 
+  unsigned int n_iter = 0;
   {
     SolverControl    control(100, 1.e-3);
     SolverBicgstab<> bicgstab(control);
     bicgstab.solve(M, solution, rhs, PreconditionIdentity());
+    n_iter = control.last_step();
   }
 
   solution.print(deallog.get_file_stream());
 
   Vector<double> res(4);
   M.residual(res, solution, rhs);
-  deallog << "residual=" << res.l2_norm() << std::endl;
+  deallog << "residual=" << res.l2_norm() << " niter=" << n_iter << std::endl;
 
   // now set up the same problem but with matrix entries scaled by 1e10 and
   // solver tolerance scaled by 1e10. should get the same solution
@@ -69,8 +72,10 @@ main()
     SolverControl    control(100, 1.e7);
     SolverBicgstab<> bicgstab(control);
     bicgstab.solve(M1, solution, rhs, PreconditionIdentity());
+    n_iter = control.last_step();
   }
   solution.print(deallog.get_file_stream());
   M1.residual(res, solution, rhs);
-  deallog << "residual=" << res.l2_norm() << std::endl;
+  deallog << "scaled residual=" << res.l2_norm() / 1e10 << " niter=" << n_iter
+          << std::endl;
 }
