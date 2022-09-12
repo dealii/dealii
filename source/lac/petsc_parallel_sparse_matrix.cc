@@ -640,7 +640,9 @@ namespace PETScWrappers
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 #  else
       {
-        AssertThrow(false, ExcMessage("BDDC preconditioner requires PETSc 3.10.0 or newer"));
+        AssertThrow(false,
+                    ExcMessage(
+                      "BDDC preconditioner requires PETSc 3.10.0 or newer"));
       }
 #  endif
     }
