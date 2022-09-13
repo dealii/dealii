@@ -14,26 +14,23 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_tria_iterator_h
-#  define dealii_tria_iterator_h
+#define dealii_tria_iterator_h
 
 
-/*----------------------------   tria-iterator.h ---------------------------*/
+#include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/point.h>
 
-#  include <deal.II/base/config.h>
+#include <deal.II/grid/tria_iterator_base.h>
 
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/point.h>
-
-#  include <deal.II/grid/tria_iterator_base.h>
-
-#  include <iterator>
-#  include <ostream>
+#include <iterator>
+#include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class Triangulation;
 template <int, int, int>
@@ -43,7 +40,7 @@ template <typename>
 class TriaIterator;
 template <typename>
 class TriaActiveIterator;
-#  endif
+#endif
 
 
 
@@ -1165,7 +1162,7 @@ inline TriaIterator<Accessor>::TriaIterator(
   const TriaRawIterator<OtherAccessor> &i)
   : TriaRawIterator<Accessor>(i.accessor)
 {
-#  ifdef DEBUG
+#ifdef DEBUG
   // do this like this, because:
   // if we write
   // "Assert (IteratorState::past_the_end || used)"
@@ -1174,7 +1171,7 @@ inline TriaIterator<Accessor>::TriaIterator(
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#  endif
+#endif
 }
 
 template <typename Accessor>
@@ -1182,7 +1179,7 @@ template <typename OtherAccessor>
 TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a)
   : TriaRawIterator<Accessor>(a)
 {
-#  ifdef DEBUG
+#ifdef DEBUG
   // do this like this, because:
   // if we write
   // "Assert (IteratorState::past_the_end || used)"
@@ -1191,7 +1188,7 @@ TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a)
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#  endif
+#endif
 }
 
 template <typename Accessor>
@@ -1209,7 +1206,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaRawIterator<OtherAccessor> &i)
   : TriaIterator<Accessor>(i)
 {
-#  ifdef DEBUG
+#ifdef DEBUG
   // do this like this, because:
   // if we write
   // "Assert (IteratorState::past_the_end || !has_children())"
@@ -1219,7 +1216,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   if (this->state() != IteratorState::past_the_end)
     Assert(this->accessor.has_children() == false,
            ExcAssignmentOfInactiveObject());
-#  endif
+#endif
 }
 
 
@@ -1272,11 +1269,8 @@ DEAL_II_NAMESPACE_CLOSE
 
 
 // if in optimized mode: include more templates
-#  ifndef DEBUG
-#    include "tria_iterator.templates.h"
-#  endif
-
-
-/*----------------------------   tria-iterator.h ---------------------------*/
+#ifndef DEBUG
+#  include "tria_iterator.templates.h"
 #endif
-/*----------------------------   tria-iterator.h ---------------------------*/
+
+#endif

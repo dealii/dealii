@@ -14,22 +14,22 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_ginkgo_solver_h
-#  define dealii_ginkgo_solver_h
+#define dealii_ginkgo_solver_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_GINKGO
+#ifdef DEAL_II_WITH_GINKGO
 
-#    include <deal.II/lac/block_sparse_matrix.h>
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/solver_control.h>
-#    include <deal.II/lac/sparse_matrix.h>
-#    include <deal.II/lac/vector.h>
+#  include <deal.II/lac/block_sparse_matrix.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/solver_control.h>
+#  include <deal.II/lac/sparse_matrix.h>
+#  include <deal.II/lac/vector.h>
 
-#    include <ginkgo/ginkgo.hpp>
+#  include <ginkgo/ginkgo.hpp>
 
-#    include <memory>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -572,7 +572,6 @@ namespace GinkgoWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_GINKGO
+#endif // DEAL_II_WITH_GINKGO
 
 #endif
-/*----------------------------   ginkgo_solver.h ---------------------------*/

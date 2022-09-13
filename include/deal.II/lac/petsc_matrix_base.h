@@ -14,34 +14,34 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_petsc_matrix_base_h
-#  define dealii_petsc_matrix_base_h
+#define dealii_petsc_matrix_base_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
-#    include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/subscriptor.h>
 
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/full_matrix.h>
-#    include <deal.II/lac/petsc_compatibility.h>
-#    include <deal.II/lac/petsc_vector_base.h>
-#    include <deal.II/lac/vector_operation.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/petsc_compatibility.h>
+#  include <deal.II/lac/petsc_vector_base.h>
+#  include <deal.II/lac/vector_operation.h>
 
-#    include <petscmat.h>
+#  include <petscmat.h>
 
-#    include <cmath>
-#    include <memory>
-#    include <vector>
+#  include <cmath>
+#  include <memory>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <typename Matrix>
 class BlockMatrixBase;
-#    endif
+#  endif
 
 
 namespace PETScWrappers
@@ -1070,7 +1070,7 @@ namespace PETScWrappers
 
 
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
   // ---------------------- inline and template functions ---------------------
 
 
@@ -1610,14 +1610,13 @@ namespace PETScWrappers
     prepare_action(VectorOperation::insert);
   }
 
-#    endif // DOXYGEN
+#  endif // DOXYGEN
 } // namespace PETScWrappers
 
 
 DEAL_II_NAMESPACE_CLOSE
 
 
-#  endif // DEAL_II_WITH_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 #endif
-/*---------------------------- petsc_matrix_base.h --------------------------*/

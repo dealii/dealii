@@ -14,47 +14,47 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_trilinos_precondition_h
-#  define dealii_trilinos_precondition_h
+#define dealii_trilinos_precondition_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
-#    include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/subscriptor.h>
 
-#    include <deal.II/lac/la_parallel_vector.h>
-#    include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/trilinos_vector.h>
 
-#    include <Epetra_Map.h>
-#    include <Epetra_MpiComm.h>
-#    include <Epetra_MultiVector.h>
-#    include <Epetra_RowMatrix.h>
-#    include <Epetra_Vector.h>
-#    include <Teuchos_ParameterList.hpp>
+#  include <Epetra_Map.h>
+#  include <Epetra_MpiComm.h>
+#  include <Epetra_MultiVector.h>
+#  include <Epetra_RowMatrix.h>
+#  include <Epetra_Vector.h>
+#  include <Teuchos_ParameterList.hpp>
 
-#    include <memory>
+#  include <memory>
 
 // forward declarations
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 class Ifpack_Preconditioner;
 class Ifpack_Chebyshev;
 namespace ML_Epetra
 {
   class MultiLevelPreconditioner;
 }
-#    endif
+#  endif
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <typename number>
 class SparseMatrix;
 template <typename number>
 class Vector;
 class SparsityPattern;
-#    endif
+#  endif
 
 /**
  * @addtogroup TrilinosWrappers
@@ -1700,7 +1700,7 @@ namespace TrilinosWrappers
 
 
 
-#    if defined(DOXYGEN) || defined(DEAL_II_TRILINOS_WITH_MUELU)
+#  if defined(DOXYGEN) || defined(DEAL_II_TRILINOS_WITH_MUELU)
   /**
    * This class implements an algebraic multigrid (AMG) preconditioner based
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
@@ -1941,7 +1941,7 @@ namespace TrilinosWrappers
      */
     std::shared_ptr<SparseMatrix> trilinos_matrix;
   };
-#    endif
+#  endif
 
 
 
@@ -2024,7 +2024,7 @@ namespace TrilinosWrappers
   // ----------------------- inline and template functions --------------------
 
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 
 
   inline void
@@ -2177,7 +2177,7 @@ namespace TrilinosWrappers
     preconditioner->SetUseTranspose(false);
   }
 
-#    endif
+#  endif
 
 } // namespace TrilinosWrappers
 
@@ -2187,7 +2187,6 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
-#endif // trilinos_precondition_h
-/*------------------------- trilinos_precondition.h -------------------------*/
+#endif
