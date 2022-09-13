@@ -25,7 +25,8 @@
 
 template <int dim>
 void
-test(Triangulation<dim> &tria, const std::vector<BoundingBox<dim, double>> &bbs)
+create_mesh(Triangulation<dim> &                         tria,
+            const std::vector<BoundingBox<dim, double>> &bbs)
 {
   GridGenerator::subdivided_hyper_cube(tria, 2);
 
@@ -40,14 +41,26 @@ test(Triangulation<dim> &tria, const std::vector<BoundingBox<dim, double>> &bbs)
 
       tria.execute_coarsening_and_refinement();
     }
+}
 
-  for (unsigned int l = 0; l <= bbs.size(); ++l)
+template <int dim>
+void
+print_mesh(Triangulation<dim> &tria)
+{
+  for (unsigned int l = 0; l < tria.n_global_levels(); ++l)
     {
+      deallog << "level " << std::to_string(l) << ":" << std::endl;
       for (const auto cell : tria.cell_iterators_on_level(l))
         deallog << " " << cell->center() << std::endl;
 
       deallog << std::endl << std::endl;
     }
+
+  deallog << "active level:" << std::endl;
+  for (const auto cell : tria.active_cell_iterators())
+    deallog << " " << cell->center() << std::endl;
+
+  deallog << std::endl << std::endl;
 }
 
 
@@ -68,10 +81,16 @@ test()
   std::vector<BoundingBox<dim, double>> bbs1(no_refinement,
                                              BoundingBox<dim, double>(points));
 
-  // ... run test
+  // ... perform refinement
   Triangulation<dim> tria1(
     Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
-  test(tria1, bbs1);
+  create_mesh(tria1, bbs1);
+
+  // ... remove last level
+  for (const auto cell : tria1.cell_iterators_on_level(bbs1.size()))
+    cell->set_coarsen_flag();
+  tria1.execute_coarsening_and_refinement();
+  print_mesh(tria1);
 
   // 2) create triangulation by refining only cells on the
   // finest level
@@ -79,11 +98,11 @@ test()
   // ... specify the cells to refine on each level by a boundig box
   std::vector<BoundingBox<dim, double>> bbs2;
 
-  for (unsigned int l = 0; l < no_refinement; ++l)
+  for (unsigned int l = 1; l < tria1.n_global_levels(); ++l)
     {
       std::vector<Point<dim, double>> points;
 
-      for (const auto cell : tria1.cell_iterators_on_level(l + 1))
+      for (const auto cell : tria1.cell_iterators_on_level(l))
         for (const auto v : cell->vertex_indices())
           points.push_back(cell->vertex(v));
 
@@ -93,7 +112,8 @@ test()
   // ... run test
   Triangulation<dim> tria2(
     Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
-  test(tria2, bbs2);
+  create_mesh(tria2, bbs2);
+  print_mesh(tria2);
 }
 
 int
