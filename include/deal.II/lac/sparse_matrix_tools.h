@@ -198,6 +198,7 @@ namespace SparseMatrixTools
     MPI_Comm
     get_mpi_communicator(const SparseMatrixType &sparse_matrix)
     {
+      (void)sparse_matrix;
       return MPI_COMM_SELF;
     }
 
