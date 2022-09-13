@@ -38,6 +38,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <algorithm>
 #include <array>
 #include <deque>
+#include <limits>
 #include <list>
 #include <map>
 #include <memory>

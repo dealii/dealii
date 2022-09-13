@@ -30,6 +30,7 @@
 #  include <deal.II/lac/lapack_full_matrix.h>
 #  include <deal.II/lac/lapack_support.h>
 
+#  include <limits>
 #  include <memory>
 
 DEAL_II_NAMESPACE_OPEN

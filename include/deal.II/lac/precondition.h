@@ -32,6 +32,8 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/vector_memory.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations

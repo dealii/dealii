@@ -42,6 +42,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN

@@ -27,6 +27,7 @@
 #include <deal.II/physics/transformations.h>
 
 #include <array>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

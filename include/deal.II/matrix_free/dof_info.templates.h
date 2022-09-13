@@ -31,6 +31,8 @@
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal

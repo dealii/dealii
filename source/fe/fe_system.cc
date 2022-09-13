@@ -27,6 +27,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <limits>
 #include <memory>
 #include <sstream>
 

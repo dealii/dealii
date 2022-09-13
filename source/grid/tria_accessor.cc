@@ -32,6 +32,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

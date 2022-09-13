@@ -66,6 +66,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <list>
 #include <numeric>
 #include <set>

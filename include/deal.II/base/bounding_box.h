@@ -22,6 +22,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**

@@ -23,6 +23,8 @@
 #include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/table.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**

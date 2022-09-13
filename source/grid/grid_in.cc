@@ -39,6 +39,7 @@
 #include <cctype>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <map>
 
 #ifdef DEAL_II_WITH_ASSIMP

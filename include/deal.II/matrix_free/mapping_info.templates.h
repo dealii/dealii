@@ -34,6 +34,8 @@
 #include <deal.II/matrix_free/mapping_info_storage.templates.h>
 #include <deal.II/matrix_free/util.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 

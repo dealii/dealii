@@ -45,6 +45,8 @@
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace

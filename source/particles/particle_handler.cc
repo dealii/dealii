@@ -20,6 +20,7 @@
 
 #include <deal.II/particles/particle_handler.h>
 
+#include <limits>
 #include <memory>
 #include <utility>
 

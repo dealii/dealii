@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <list>
 #include <map>
 #include <numeric>

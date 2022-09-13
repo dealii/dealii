@@ -25,6 +25,8 @@
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**

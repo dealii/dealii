@@ -23,6 +23,7 @@
 #include <deal.II/grid/tria_accessor.h>
 
 #include <cstdint>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

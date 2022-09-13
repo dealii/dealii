@@ -33,6 +33,7 @@
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -25,6 +25,7 @@
 
 #  include <ROL_Vector.hpp>
 
+#  include <limits>
 #  include <type_traits>
 
 
