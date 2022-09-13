@@ -67,7 +67,7 @@ create_mesh(Triangulation<dim> &                         tria,
 
 template <int dim>
 void
-print_mesh(Triangulation<dim> &tria)
+print_mesh(const Triangulation<dim> &tria)
 {
   for (unsigned int l = 0; l < tria.n_global_levels(); ++l)
     {
@@ -85,10 +85,9 @@ print_mesh(Triangulation<dim> &tria)
   deallog << std::endl << std::endl;
 }
 
-
 template <int dim>
 void
-test()
+create_meshes(Triangulation<dim> &tria1, Triangulation<dim> &tria2)
 {
   const unsigned int no_refinement = 2;
 
@@ -104,8 +103,6 @@ test()
                                              BoundingBox<dim, double>(points));
 
   // ... perform refinement
-  Triangulation<dim> tria1(
-    Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
   create_mesh(tria1, bbs1);
 
   // ... remove last level
@@ -132,10 +129,21 @@ test()
     }
 
   // ... run test
-  Triangulation<dim> tria2(
-    Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
   create_mesh(tria2, bbs2);
   print_mesh(tria2);
+}
+
+
+template <int dim>
+void
+test()
+{
+  Triangulation<dim> tria1(
+    Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
+  Triangulation<dim> tria2(
+    Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
+
+  create_meshes(tria1, tria2);
 
   MappingQ1<dim> mapping;
   FE_Q<dim>      fe(2);
