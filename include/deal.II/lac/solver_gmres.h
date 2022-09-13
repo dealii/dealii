@@ -621,7 +621,7 @@ namespace internal
 
     // A function to solve the (upper) triangular system after Givens
     // rotations on a matrix that has possibly unused rows and columns
-    void
+    inline void
     solve_triangular(const unsigned int        dim,
                      const FullMatrix<double> &H,
                      const Vector<double> &    rhs,
