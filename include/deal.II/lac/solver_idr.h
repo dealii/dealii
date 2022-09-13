@@ -338,8 +338,11 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
   A.vmult(r, x);
   r.sadd(-1.0, 1.0, b);
 
+  using value_type = typename VectorType::value_type;
+  using real_type  = typename numbers::NumberTraits<value_type>::real_type;
+
   // Check for convergent initial guess
-  double res      = r.l2_norm();
+  real_type res   = r.l2_norm();
   iteration_state = this->iteration_status(step, res, x);
   if (iteration_state == SolverControl::success)
     return;
@@ -348,7 +351,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
   internal::SolverIDRImplementation::TmpVectors<VectorType> G(s, this->memory);
   internal::SolverIDRImplementation::TmpVectors<VectorType> U(s, this->memory);
   internal::SolverIDRImplementation::TmpVectors<VectorType> Q(s, this->memory);
-  FullMatrix<double>                                        M(s, s);
+  FullMatrix<value_type>                                    M(s, s);
 
   // Random number generator for vector entries of
   // Q (normal distribution, mean=0 sigma=1)
@@ -393,7 +396,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
       M(i, i) = 1.;
     }
 
-  double omega = 1.;
+  value_type omega = 1.;
 
   bool early_exit = false;
 
@@ -403,7 +406,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
       ++step;
 
       // Compute phi
-      Vector<double> phi(s);
+      Vector<value_type> phi(s);
       for (unsigned int i = 0; i < s; ++i)
         phi(i) = Q[i] * r;
 
@@ -411,10 +414,10 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
       for (unsigned int k = 0; k < s; ++k)
         {
           // Solve M(k:s)*gamma = phi(k:s)
-          Vector<double> gamma(s - k);
+          Vector<value_type> gamma(s - k);
           {
-            Vector<double>            phik(s - k);
-            FullMatrix<double>        Mk(s - k, s - k);
+            Vector<value_type>        phik(s - k);
+            FullMatrix<value_type>    Mk(s - k, s - k);
             std::vector<unsigned int> indices;
             unsigned int              j = 0;
             for (unsigned int i = k; i < s; ++i, ++j)
@@ -424,7 +427,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
               }
             Mk.extract_submatrix_from(M, indices, indices);
 
-            FullMatrix<double> Mk_inv(s - k, s - k);
+            FullMatrix<value_type> Mk_inv(s - k, s - k);
             Mk_inv.invert(Mk);
             Mk_inv.vmult(gamma, phik);
           }
@@ -454,10 +457,10 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
           // Orthogonalize G[k] to Q0,..,Q_{k-1} and update uhat
           if (k > 0)
             {
-              double alpha = Q[0] * G[k] / M(0, 0);
+              value_type alpha = Q[0] * G[k] / M(0, 0);
               for (unsigned int i = 1; i < k; ++i)
                 {
-                  const double alpha_old = alpha;
+                  const value_type alpha_old = alpha;
                   alpha = G[k].add_and_dot(-alpha, G[i - 1], Q[i]) / M(i, i);
 
                   // update uhat every other iteration to reduce vector access
@@ -479,7 +482,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
 
           // Orthogonalize r to Q0,...,Qk, update x
           {
-            const double beta = phi(k) / M(k, k);
+            const value_type beta = phi(k) / M(k, k);
             r.add(-beta, G[k]);
             x.add(beta, U[k]);
 
