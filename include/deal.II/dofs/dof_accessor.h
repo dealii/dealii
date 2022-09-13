@@ -1689,8 +1689,7 @@ public:
   get_interpolated_dof_values(
     const InputVector &values,
     Vector<number> &   interpolated_values,
-    const unsigned int fe_index =
-      DoFHandler<dimension_, space_dimension_>::invalid_fe_index) const;
+    const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   /**
    * This function is the counterpart to get_interpolated_dof_values(): you
@@ -1758,9 +1757,8 @@ public:
   set_dof_values_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
-    const unsigned int    fe_index =
-      DoFHandler<dimension_, space_dimension_>::invalid_fe_index,
-    const bool perform_check = false) const;
+    const unsigned int    fe_index      = numbers::invalid_fe_index,
+    const bool            perform_check = false) const;
 
   /**
    * Similar to set_dof_values_by_interpolation() with the difference that
@@ -1776,8 +1774,7 @@ public:
   distribute_local_to_global_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
-    const unsigned int    fe_index =
-      DoFHandler<dimension_, space_dimension_>::invalid_fe_index) const;
+    const unsigned int    fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping the
