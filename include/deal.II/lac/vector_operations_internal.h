@@ -1383,7 +1383,7 @@ namespace internal
 #ifndef DEBUG
     DEAL_II_ALWAYS_INLINE
 #endif
-      void
+      inline void
       parallel_reduce(
         const Operation &op,
         const size_type  start,
