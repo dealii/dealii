@@ -174,19 +174,30 @@ test()
   ss2.add_vector(vec2);
   ss2.load("temp");
 
-  Vector<float> norm_per_cell(tria2.n_active_cells());
+  Vector<float> norm_per_cell(tria1.n_active_cells());
+  VectorTools::integrate_difference(dof_handler_1,
+                                    vec2,
+                                    RightHandSideFunction<dim>(),
+                                    norm_per_cell,
+                                    quad,
+                                    VectorTools::L2_norm);
+  const double error_L2_norm_1 =
+    VectorTools::compute_global_error(tria1,
+                                      norm_per_cell,
+                                      VectorTools::L2_norm);
+
   VectorTools::integrate_difference(dof_handler_2,
                                     vec2,
                                     RightHandSideFunction<dim>(),
                                     norm_per_cell,
                                     quad,
                                     VectorTools::L2_norm);
-  const double error_L2_norm =
+  const double error_L2_norm_2 =
     VectorTools::compute_global_error(tria2,
                                       norm_per_cell,
                                       VectorTools::L2_norm);
 
-  if (error_L2_norm < 1e-10)
+  if (error_L2_norm_1 > 1e-10 && error_L2_norm_2 < 1e-10)
     deallog << "OK!" << std::endl;
 }
 
