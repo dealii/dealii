@@ -796,5 +796,4 @@ namespace FETools
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*---------------------- fe_tools_interpolate_templates.h -------------------*/
-#endif // dealii_fe_tools_interpolate_templates_H
+#endif

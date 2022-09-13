@@ -14,17 +14,17 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_sparse_ilu_templates_h
-#  define dealii_sparse_ilu_templates_h
+#define dealii_sparse_ilu_templates_h
 
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/lac/sparse_ilu.h>
-#  include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_ilu.h>
+#include <deal.II/lac/vector.h>
 
-#  include <algorithm>
-#  include <cmath>
+#include <algorithm>
+#include <cmath>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -308,4 +308,3 @@ SparseILU<number>::memory_consumption() const
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*-------------------------- sparse_ilu.templates.h -------------------------*/

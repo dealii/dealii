@@ -14,25 +14,25 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_petsc_sparse_matrix_h
-#  define dealii_petsc_sparse_matrix_h
+#define dealii_petsc_sparse_matrix_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/petsc_matrix_base.h>
-#    include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_matrix_base.h>
+#  include <deal.II/lac/petsc_vector.h>
 
-#    include <vector>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 // forward declaration
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <typename MatrixType>
 class BlockMatrixBase;
-#    endif
+#  endif
 
 namespace PETScWrappers
 {
@@ -631,7 +631,6 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 #endif
-/*--------------------------- petsc_sparse_matrix.h -------------------------*/

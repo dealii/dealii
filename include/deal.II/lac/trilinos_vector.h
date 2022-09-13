@@ -2263,8 +2263,6 @@ struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_TRILINOS
+#endif
 
-/*----------------------------   trilinos_vector.h ---------------------------*/
-
-#endif // dealii_trilinos_vector_h
+#endif

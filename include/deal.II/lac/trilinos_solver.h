@@ -14,24 +14,24 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_trilinos_solver_h
-#  define dealii_trilinos_solver_h
+#define dealii_trilinos_solver_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/la_parallel_vector.h>
-#    include <deal.II/lac/solver_control.h>
-#    include <deal.II/lac/vector.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/solver_control.h>
+#  include <deal.II/lac/vector.h>
 
-#    include <Amesos.h>
-#    include <AztecOO.h>
-#    include <Epetra_LinearProblem.h>
-#    include <Epetra_Operator.h>
+#  include <Amesos.h>
+#  include <AztecOO.h>
+#  include <Epetra_LinearProblem.h>
+#  include <Epetra_Operator.h>
 
-#    include <memory>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -39,10 +39,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace TrilinosWrappers
 {
   // forward declarations
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
   class SparseMatrix;
   class PreconditionBase;
-#    endif
+#  endif
 
 
   /**
@@ -722,9 +722,6 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_TRILINOS
-
-/*----------------------------   trilinos_solver.h ---------------------------*/
+#endif // DEAL_II_WITH_TRILINOS
 
 #endif
-/*----------------------------   trilinos_solver.h ---------------------------*/

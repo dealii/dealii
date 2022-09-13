@@ -14,29 +14,29 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_petsc_vector_base_h
-#  define dealii_petsc_vector_base_h
+#define dealii_petsc_vector_base_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
-#    include <deal.II/base/index_set.h>
-#    include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/base/subscriptor.h>
 
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/vector.h>
-#    include <deal.II/lac/vector_operation.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_operation.h>
 
-#    include <petscvec.h>
+#  include <petscvec.h>
 
-#    include <utility>
-#    include <vector>
+#  include <utility>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <typename number>
 class Vector;
 
@@ -44,7 +44,7 @@ namespace PETScWrappers
 {
   class VectorBase;
 }
-#    endif
+#  endif
 
 /**
  * A namespace in which wrapper classes for PETSc objects reside.
@@ -858,7 +858,7 @@ namespace PETScWrappers
     u.swap(v);
   }
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
   namespace internal
   {
     inline VectorReference::VectorReference(const VectorBase &vector,
@@ -1054,11 +1054,11 @@ namespace PETScWrappers
     inline PetscReal
     VectorReference::real() const
     {
-#      ifndef PETSC_USE_COMPLEX
+#    ifndef PETSC_USE_COMPLEX
       return static_cast<PetscScalar>(*this);
-#      else
+#    else
       return PetscRealPart(static_cast<PetscScalar>(*this));
-#      endif
+#    endif
     }
 
 
@@ -1066,11 +1066,11 @@ namespace PETScWrappers
     inline PetscReal
     VectorReference::imag() const
     {
-#      ifndef PETSC_USE_COMPLEX
+#    ifndef PETSC_USE_COMPLEX
       return PetscReal(0);
-#      else
+#    else
       return PetscImaginaryPart(static_cast<PetscScalar>(*this));
-#      endif
+#    endif
     }
 
   } // namespace internal
@@ -1271,12 +1271,11 @@ namespace PETScWrappers
       }
   }
 
-#    endif // DOXYGEN
+#  endif // DOXYGEN
 } // namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 #endif
-/*---------------------------- petsc_vector_base.h --------------------------*/

@@ -14,31 +14,31 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_chunk_sparse_matrix_h
-#  define dealii_chunk_sparse_matrix_h
+#define dealii_chunk_sparse_matrix_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/smartpointer.h>
-#  include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 
-#  include <deal.II/lac/chunk_sparsity_pattern.h>
-#  include <deal.II/lac/exceptions.h>
-#  include <deal.II/lac/identity_matrix.h>
+#include <deal.II/lac/chunk_sparsity_pattern.h>
+#include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/identity_matrix.h>
 
-#  include <iterator>
-#  include <memory>
+#include <iterator>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
 class FullMatrix;
-#  endif
+#endif
 
 /**
  * @addtogroup Matrix1
@@ -1443,7 +1443,7 @@ private:
 
 /** @} */
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 /*---------------------- Inline functions -----------------------------------*/
 
 
@@ -2071,9 +2071,8 @@ ChunkSparseMatrix<number>::end(const unsigned int r)
 
 
 
-#  endif // DOXYGEN
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*--------------------------- chunk_sparse_matrix.h -------------------------*/

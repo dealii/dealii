@@ -14,27 +14,27 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_sparse_matrix_ez_h
-#  define dealii_sparse_matrix_ez_h
+#define dealii_sparse_matrix_ez_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/smartpointer.h>
-#  include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 
-#  include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/exceptions.h>
 
-#  include <vector>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
 class FullMatrix;
-#  endif
+#endif
 
 /**
  * @addtogroup Matrix1
@@ -1598,4 +1598,3 @@ SparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*----------------------------   sparse_matrix.h ---------------------------*/
