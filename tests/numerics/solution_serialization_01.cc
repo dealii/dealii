@@ -18,10 +18,32 @@
 // This test is used to make sure that FESeries::Fourier/Legendre
 // work with non-primitive elements
 
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q1.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/numerics/solution_serialization.h>
+#include <deal.II/numerics/vector_tools.h>
+
 #include "../tests.h"
+
+template <int dim>
+class RightHandSideFunction : public Function<dim>
+{
+public:
+  RightHandSideFunction()
+  {}
+
+  virtual double
+  value(const Point<dim> &p, const unsigned int component = 0) const
+  {
+    (void)component;
+
+    return p[0];
+  }
+};
 
 template <int dim>
 void
@@ -114,11 +136,57 @@ test()
     Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
   create_mesh(tria2, bbs2);
   print_mesh(tria2);
+
+  MappingQ1<dim> mapping;
+  FE_Q<dim>      fe(2);
+  QGauss<dim>    quad(3);
+
+  DoFHandler<dim> dof_handler_1(tria1);
+  dof_handler_1.distribute_dofs(fe);
+
+  DoFHandler<dim> dof_handler_2(tria2);
+  dof_handler_2.distribute_dofs(fe);
+
+  using VectorType = LinearAlgebra::distributed::Vector<double>;
+
+  VectorType vec1(dof_handler_1.n_dofs());
+  VectorType vec2(dof_handler_2.n_dofs());
+
+  AffineConstraints<double> dummy;
+  dummy.close();
+
+  VectorTools::project(
+    mapping, dof_handler_1, dummy, quad, RightHandSideFunction<dim>(), vec1);
+
+  SolutionSerialization<dim, VectorType> ss1(dof_handler_1);
+  ss1.add_vector(vec1);
+  ss1.save("temp");
+
+  SolutionSerialization<dim, VectorType> ss2(dof_handler_2);
+  ss2.add_vector(vec2);
+  ss2.load("temp");
+
+  Vector<float> norm_per_cell(tria2.n_active_cells());
+  VectorTools::integrate_difference(dof_handler_2,
+                                    vec2,
+                                    RightHandSideFunction<dim>(),
+                                    norm_per_cell,
+                                    quad,
+                                    VectorTools::L2_norm);
+  const double error_L2_norm =
+    VectorTools::compute_global_error(tria2,
+                                      norm_per_cell,
+                                      VectorTools::L2_norm);
+
+  if (error_L2_norm < 1e-10)
+    deallog << "OK!" << std::endl;
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+
   initlog();
 
   test<2>();
