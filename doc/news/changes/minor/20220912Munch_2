@@ -1,0 +1,6 @@
+Fixed: The function GridTools::internal::distributed_compute_point_locations()
+now projects reference points outside of a cell (but within a tolerance) onto
+the unit cell. This enables the use of FE_Q_iso_Q1 in 
+Utilities::MPI::RemotePointEvaluation.
+<br>
+(Peter Munch, Magdalena Schreter, 2022/09/12)
