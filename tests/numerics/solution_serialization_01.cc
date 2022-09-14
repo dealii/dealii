@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,8 +15,8 @@
 
 
 
-// This test is used to make sure that FESeries::Fourier/Legendre
-// work with non-primitive elements
+// Test SolutionSerialization for a serial simulation, where active
+// cells are ordered differently (due to construction history).
 //
 // enumeration of active cells:
 //   2  3 14 15     13 14 15 16
@@ -148,8 +148,11 @@ template <int dim>
 void
 test()
 {
+  // mesh with construction history
   Triangulation<dim> tria1(
     Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
+
+  // mesh without construction history
   Triangulation<dim> tria2(
     Triangulation<dim>::MeshSmoothing::limit_level_difference_at_vertices);
 
