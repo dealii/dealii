@@ -2212,9 +2212,7 @@ namespace Utilities
           const unsigned int mpi_tag)
     {
 #  ifndef DEAL_II_WITH_MPI
-      Assert(false,
-             ExcMessage(
-               "This function is not useful when called without MPI."));
+      Assert(false, ExcNeedsMPI());
       (void)object;
       (void)communicator;
       (void)target_rank;
@@ -2283,9 +2281,7 @@ namespace Utilities
           const unsigned int mpi_tag)
     {
 #  ifndef DEAL_II_WITH_MPI
-      Assert(false,
-             ExcMessage(
-               "This function is not useful when called without MPI."));
+      Assert(false, ExcNeedsMPI());
       (void)communicator;
       (void)source_rank;
       (void)mpi_tag;
