@@ -17,6 +17,7 @@
 
 // Test SolutionSerialization for a parallel simulation.
 
+#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -50,7 +51,7 @@ public:
 
 template <int dim>
 void
-test()
+test(const bool use_ss)
 {
   const MPI_Comm comm = MPI_COMM_WORLD;
 
@@ -101,13 +102,28 @@ test()
                              SolutionFunction<dim>(),
                              vector);
 
-    // save mesh
-    tria.save("mesh");
+    if (use_ss)
+      {
+        // save vector
+        SolutionSerialization<dim, VectorType> ss(dof_handler);
+        ss.add_vector(vector);
+        ss.save("vector");
 
-    // save vector
-    SolutionSerialization<dim, VectorType> ss(dof_handler);
-    ss.add_vector(vector);
-    ss.save("vector");
+        // save mesh
+        tria.save("mesh");
+      }
+    else
+      {
+        // save vector
+        vector.update_ghost_values();
+
+        parallel::distributed::SolutionTransfer<dim, VectorType>
+          solution_transfer(dof_handler);
+        solution_transfer.prepare_for_coarsening_and_refinement(vector);
+
+        // save mesh
+        tria.save("mesh");
+      }
   }
 
   {
@@ -118,7 +134,9 @@ test()
 
     // load mesh
     tria.load("mesh");
-    tria.repartition();
+
+    if (use_ss)
+      tria.repartition();
 
     // create dof-handler and empty vector
     DoFHandler<dim> dof_handler(tria);
@@ -130,9 +148,18 @@ test()
       comm));
 
     // load vector
-    SolutionSerialization<dim, VectorType> ss(dof_handler);
-    ss.add_vector(vector);
-    ss.load("vector");
+    if (use_ss)
+      {
+        SolutionSerialization<dim, VectorType> ss(dof_handler);
+        ss.add_vector(vector);
+        ss.load("vector");
+      }
+    else
+      {
+        parallel::distributed::SolutionTransfer<dim, VectorType>
+          solution_transfer(dof_handler);
+        solution_transfer.deserialize(vector);
+      }
 
     // check correctness
     vector.update_ghost_values();
@@ -161,5 +188,6 @@ main(int argc, char *argv[])
 
   initlog();
 
-  test<2>();
+  test<2>(true);  // use SolutionSerialization
+  test<2>(false); // use SolutionTransfer
 }
