@@ -3046,14 +3046,21 @@ namespace internal
 
     // We need to have a separate declaration for static const members
 
+    // general case and the case that the preconditioner can work on
+    // ranges (covered by vector_updates())
     template <
       typename MatrixType,
       typename VectorType,
       typename PreconditionerType,
-      std::enable_if_t<!has_vmult_with_std_functions<MatrixType,
-                                                     VectorType,
-                                                     PreconditionerType>,
-                       int> * = nullptr>
+      std::enable_if_t<
+        !has_vmult_with_std_functions<MatrixType,
+                                      VectorType,
+                                      PreconditionerType> &&
+          !(has_vmult_with_std_functions_for_precondition<PreconditionerType,
+                                                          VectorType> &&
+            has_vmult_with_std_functions_for_precondition<MatrixType,
+                                                          VectorType>),
+        int> * = nullptr>
     inline void
     vmult_and_update(const MatrixType &        matrix,
                      const PreconditionerType &preconditioner,
@@ -3079,6 +3086,126 @@ namespace internal
                      solution);
     }
 
+    // case that both the operator and the preconditioner can work on
+    // subranges
+    template <
+      typename MatrixType,
+      typename VectorType,
+      typename PreconditionerType,
+      std::enable_if_t<
+        !has_vmult_with_std_functions<MatrixType,
+                                      VectorType,
+                                      PreconditionerType> &&
+          (has_vmult_with_std_functions_for_precondition<PreconditionerType,
+                                                         VectorType> &&
+           has_vmult_with_std_functions_for_precondition<MatrixType,
+                                                         VectorType>),
+        int> * = nullptr>
+    inline void
+    vmult_and_update(const MatrixType &        matrix,
+                     const PreconditionerType &preconditioner,
+                     const VectorType &        rhs,
+                     const unsigned int        iteration_index,
+                     const double              factor1_,
+                     const double              factor2_,
+                     VectorType &              solution,
+                     VectorType &              solution_old,
+                     VectorType &              temp_vector1,
+                     VectorType &              temp_vector2)
+    {
+      using Number = typename VectorType::value_type;
+
+      const Number factor1        = factor1_;
+      const Number factor1_plus_1 = 1. + factor1_;
+      const Number factor2        = factor2_;
+
+      if (iteration_index == 0)
+        {
+          preconditioner.vmult(
+            solution,
+            rhs,
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              // zero 'solution' before running the vmult operation
+              if (end_range > start_range)
+                std::memset(solution.begin() + start_range,
+                            0,
+                            sizeof(Number) * (end_range - start_range));
+            },
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              const auto solution_ptr = solution.begin();
+
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i = start_range; i < end_range; ++i)
+                solution_ptr[i] *= factor2;
+            });
+        }
+      else
+        {
+          temp_vector1.reinit(rhs, true);
+          temp_vector2.reinit(rhs, true);
+
+          // 1) compute rediduum (including operator application)
+          matrix.vmult(
+            temp_vector1,
+            solution,
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              // zero 'temp_vector1' before running the vmult
+              // operation
+              if (end_range > start_range)
+                std::memset(temp_vector1.begin() + start_range,
+                            0,
+                            sizeof(Number) * (end_range - start_range));
+            },
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              const auto rhs_ptr = rhs.begin();
+              const auto tmp_ptr = temp_vector1.begin();
+
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i = start_range; i < end_range; ++i)
+                tmp_ptr[i] = factor2 * (rhs_ptr[i] - tmp_ptr[i]);
+            });
+
+          // 2) perform vector updates (including preconditioner application)
+          preconditioner.vmult(
+            temp_vector2,
+            temp_vector1,
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              // zero 'temp_vector2' before running the vmult
+              // operation
+              if (end_range > start_range)
+                std::memset(temp_vector2.begin() + start_range,
+                            0,
+                            sizeof(Number) * (end_range - start_range));
+            },
+            [&](const unsigned int start_range, const unsigned int end_range) {
+              const auto solution_ptr     = solution.begin();
+              const auto solution_old_ptr = solution_old.begin();
+              const auto tmp_ptr          = temp_vector2.begin();
+
+              if (iteration_index == 1)
+                {
+                  DEAL_II_OPENMP_SIMD_PRAGMA
+                  for (std::size_t i = start_range; i < end_range; ++i)
+                    tmp_ptr[i] =
+                      factor1_plus_1 * solution_ptr[i] + factor2 * tmp_ptr[i];
+                }
+              else
+                {
+                  DEAL_II_OPENMP_SIMD_PRAGMA
+                  for (std::size_t i = start_range; i < end_range; ++i)
+                    tmp_ptr[i] = factor1_plus_1 * solution_ptr[i] -
+                                 factor1 * solution_old_ptr[i] +
+                                 factor2 * tmp_ptr[i];
+                }
+            });
+
+          solution.swap(temp_vector2);
+          solution_old.swap(temp_vector2);
+        }
+    }
+
+    // case that the operator can work on subranges and the preconditioner
+    // is a diagonal
     template <typename MatrixType,
               typename VectorType,
               typename PreconditionerType,
