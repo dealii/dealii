@@ -1499,9 +1499,9 @@ namespace IteratorFilters
   ActiveFEIndexEqualTo::operator()(const Iterator &i) const
   {
     return only_locally_owned == true ?
-             (active_fe_indices.find(i->active_fe_index()) !=
-                active_fe_indices.end() &&
-              i->is_locally_owned()) :
+             (i->is_locally_owned() &&
+              active_fe_indices.find(i->active_fe_index()) !=
+                active_fe_indices.end()) :
              active_fe_indices.find(i->active_fe_index()) !=
                active_fe_indices.end();
   }
