@@ -17,6 +17,12 @@
 
 // This test is used to make sure that FESeries::Fourier/Legendre
 // work with non-primitive elements
+//
+// enumeration of active cells:
+//   2  3 14 15     13 14 15 16
+//   0  1 12 13  =>  9 10 11 12
+//   6  7 10 11      5  6  7  8
+//   1  5  8  9      0  1  2  3
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -30,10 +36,10 @@
 #include "../tests.h"
 
 template <int dim>
-class RightHandSideFunction : public Function<dim>
+class SolutionFunction : public Function<dim>
 {
 public:
-  RightHandSideFunction()
+  SolutionFunction()
   {}
 
   virtual double
@@ -109,7 +115,9 @@ create_meshes(Triangulation<dim> &tria1, Triangulation<dim> &tria2)
   for (const auto cell : tria1.cell_iterators_on_level(bbs1.size()))
     cell->set_coarsen_flag();
   tria1.execute_coarsening_and_refinement();
-  print_mesh(tria1);
+
+  if (false)
+    print_mesh(tria1);
 
   // 2) create triangulation by refining only cells on the
   // finest level
@@ -130,7 +138,9 @@ create_meshes(Triangulation<dim> &tria1, Triangulation<dim> &tria2)
 
   // ... run test
   create_mesh(tria2, bbs2);
-  print_mesh(tria2);
+
+  if (false)
+    print_mesh(tria2);
 }
 
 
@@ -164,7 +174,7 @@ test()
   dummy.close();
 
   VectorTools::project(
-    mapping, dof_handler_1, dummy, quad, RightHandSideFunction<dim>(), vec1);
+    mapping, dof_handler_1, dummy, quad, SolutionFunction<dim>(), vec1);
 
   SolutionSerialization<dim, VectorType> ss1(dof_handler_1);
   ss1.add_vector(vec1);
@@ -177,7 +187,7 @@ test()
   Vector<float> norm_per_cell(tria1.n_active_cells());
   VectorTools::integrate_difference(dof_handler_1,
                                     vec2,
-                                    RightHandSideFunction<dim>(),
+                                    SolutionFunction<dim>(),
                                     norm_per_cell,
                                     quad,
                                     VectorTools::L2_norm);
@@ -188,7 +198,7 @@ test()
 
   VectorTools::integrate_difference(dof_handler_2,
                                     vec2,
-                                    RightHandSideFunction<dim>(),
+                                    SolutionFunction<dim>(),
                                     norm_per_cell,
                                     quad,
                                     VectorTools::L2_norm);
@@ -204,8 +214,6 @@ test()
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
   initlog();
 
   test<2>();

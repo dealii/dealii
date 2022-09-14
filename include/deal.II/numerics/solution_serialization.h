@@ -22,6 +22,8 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <fstream>
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, typename VectorType, int spacedim = dim>
@@ -166,58 +168,90 @@ private:
   {
     const size_type local_size = src.size();
 
-    size_type offset = 0;
+    if ((Utilities::MPI::job_supports_mpi() == false) ||
+        (Utilities::MPI::n_mpi_processes(comm) == 1))
+      {
+        std::fstream file;
 
-    int ierr = MPI_Exscan(&local_size,
-                          &offset,
-                          1,
-                          Utilities::MPI::mpi_type_id_for_type<size_type>,
-                          MPI_SUM,
-                          comm);
-    AssertThrowMPI(ierr);
+        if (do_read)
+          {
+            file.open(filename, std::ios_base::in | std::ios::binary);
 
-    // local displacement in file (in bytes)
-    MPI_Offset disp =
-      static_cast<unsigned long int>(offset) * sizeof(value_type);
+            if (!src.empty())
+              file.read(reinterpret_cast<char *>(src.data()),
+                        src.size() * sizeof(value_type));
+          }
+        else
+          {
+            file.open(filename, std::ios_base::out | std::ios::binary);
 
-    // ooen file ...
-    MPI_File fh;
-    ierr = MPI_File_open(comm,
-                         filename.c_str(),
-                         do_read ? (MPI_MODE_RDONLY) :
-                                   (MPI_MODE_CREATE | MPI_MODE_WRONLY),
-                         MPI_INFO_NULL,
-                         &fh);
-    AssertThrowMPI(ierr);
+            if (!src.empty())
+              file.write(reinterpret_cast<char *>(src.data()),
+                         src.size() * sizeof(value_type));
+          }
 
-    // ... set view
-    MPI_File_set_view(fh,
-                      disp,
-                      Utilities::MPI::mpi_type_id_for_type<value_type>,
-                      Utilities::MPI::mpi_type_id_for_type<value_type>,
-                      "native",
-                      MPI_INFO_NULL);
+        file.close();
+      }
+    else
+      {
+#ifdef DEAL_II_WITH_MPI
+        size_type offset = 0;
 
-    if (do_read)
-      // ... read file
-      ierr = MPI_File_read_all(fh,
+        int ierr = MPI_Exscan(&local_size,
+                              &offset,
+                              1,
+                              Utilities::MPI::mpi_type_id_for_type<size_type>,
+                              MPI_SUM,
+                              comm);
+        AssertThrowMPI(ierr);
+
+        // local displacement in file (in bytes)
+        MPI_Offset disp =
+          static_cast<unsigned long int>(offset) * sizeof(value_type);
+
+        // ooen file ...
+        MPI_File fh;
+        ierr = MPI_File_open(comm,
+                             filename.c_str(),
+                             do_read ? (MPI_MODE_RDONLY) :
+                                       (MPI_MODE_CREATE | MPI_MODE_WRONLY),
+                             MPI_INFO_NULL,
+                             &fh);
+        AssertThrowMPI(ierr);
+
+        // ... set view
+        MPI_File_set_view(fh,
+                          disp,
+                          Utilities::MPI::mpi_type_id_for_type<value_type>,
+                          Utilities::MPI::mpi_type_id_for_type<value_type>,
+                          "native",
+                          MPI_INFO_NULL);
+
+        if (do_read)
+          // ... read file
+          ierr =
+            MPI_File_read_all(fh,
+                              src.data(),
+                              src.size(),
+                              Utilities::MPI::mpi_type_id_for_type<value_type>,
+                              MPI_STATUSES_IGNORE);
+        else
+          // ... write file
+          ierr =
+            MPI_File_write_all(fh,
                                src.data(),
                                src.size(),
                                Utilities::MPI::mpi_type_id_for_type<value_type>,
                                MPI_STATUSES_IGNORE);
-    else
-      // ... write file
-      ierr =
-        MPI_File_write_all(fh,
-                           src.data(),
-                           src.size(),
-                           Utilities::MPI::mpi_type_id_for_type<value_type>,
-                           MPI_STATUSES_IGNORE);
-    AssertThrowMPI(ierr);
+        AssertThrowMPI(ierr);
 
-    // ... close file
-    ierr = MPI_File_close(&fh);
-    AssertThrowMPI(ierr);
+        // ... close file
+        ierr = MPI_File_close(&fh);
+        AssertThrowMPI(ierr);
+#else
+        AssertThrow(false, ExcNeedsMPI());
+#endif
+      }
   }
 };
 
