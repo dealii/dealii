@@ -23,6 +23,8 @@
 
 #include <deal.II/numerics/vector_tools_constraints.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace VectorTools

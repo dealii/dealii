@@ -41,6 +41,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools_boundary.h>
 
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

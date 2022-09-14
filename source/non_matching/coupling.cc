@@ -38,6 +38,8 @@
 
 #include <deal.II/non_matching/coupling.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {

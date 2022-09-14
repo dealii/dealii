@@ -27,6 +27,8 @@
 
 #include <deal.II/particles/generators.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Particles

@@ -28,6 +28,7 @@
 #    include <hdf5.h>
 #  endif
 
+#  include <limits>
 #  include <memory>
 
 DEAL_II_NAMESPACE_OPEN

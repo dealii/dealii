@@ -19,6 +19,7 @@
 
 #  include <deal.II/lac/lapack_full_matrix.h>
 
+#  include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

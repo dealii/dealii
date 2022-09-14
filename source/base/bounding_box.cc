@@ -16,6 +16,8 @@
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/geometry_info.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int spacedim, typename Number>

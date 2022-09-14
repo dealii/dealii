@@ -30,6 +30,7 @@
 #include <deal.II/cgal/additional_data.h>
 
 #include <array>
+#include <limits>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN

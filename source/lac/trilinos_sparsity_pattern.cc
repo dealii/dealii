@@ -26,6 +26,8 @@
 
 #  include <Epetra_Export.h>
 
+#  include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers

@@ -16,6 +16,7 @@
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/tria.h>
 
+#include <limits>
 #include <sstream>
 
 DEAL_II_NAMESPACE_OPEN

@@ -19,6 +19,7 @@
 
 #include <boost/serialization/utility.hpp>
 
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

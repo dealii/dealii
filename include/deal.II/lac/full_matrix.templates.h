@@ -37,6 +37,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

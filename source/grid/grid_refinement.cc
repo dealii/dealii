@@ -29,6 +29,7 @@
 #include <cmath>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <numeric>
 
 DEAL_II_NAMESPACE_OPEN

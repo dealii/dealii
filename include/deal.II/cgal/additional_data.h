@@ -24,6 +24,7 @@
 
 #  include <CGAL/Mesh_facet_topology.h>
 
+#  include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 namespace CGALWrappers

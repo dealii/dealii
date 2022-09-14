@@ -54,6 +54,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <limits>
 #include <numeric>
 #include <vector>
 

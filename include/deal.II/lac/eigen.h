@@ -29,6 +29,7 @@
 #include <deal.II/lac/vector_memory.h>
 
 #include <cmath>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

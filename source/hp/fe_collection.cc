@@ -19,6 +19,7 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 
+#include <limits>
 #include <set>
 
 

@@ -28,6 +28,7 @@
 #include <boost/signals2.hpp>
 
 #include <complex>
+#include <limits>
 #include <map>
 #include <numeric>
 #include <set>
