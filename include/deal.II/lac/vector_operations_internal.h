@@ -1017,108 +1017,57 @@ namespace internal
                          const size_type  last,
                          ResultType &     result)
     {
+      if (first == last)
+        {
+          result = ResultType();
+          return;
+        }
+
       const size_type vec_size = last - first;
       if (vec_size <= vector_accumulation_recursion_threshold * 32)
         {
-          // the vector is short enough so we perform the summation. first
-          // work on the regular part. The innermost 32 values are expanded in
-          // order to obtain known loop bounds for most of the work.
-          size_type  index = first;
-          ResultType outer_results[vector_accumulation_recursion_threshold];
-
-          // set the zeroth element to zero to correctly handle the case where
-          // vec_size == 0
-          outer_results[0] = ResultType();
-
-          // the variable serves two purposes: (i)  number of chunks (each 32
-          // indices) for the given size; all results are stored in
-          // outer_results[0,n_chunks) (ii) in the SIMD case n_chunks is also a
-          // next free index in outer_results[] to which we can write after
-          // accumulate_regular() is executed.
-          size_type       n_chunks  = vec_size / 32;
-          const size_type remainder = vec_size % 32;
-          Assert(remainder == 0 ||
-                   n_chunks < vector_accumulation_recursion_threshold,
-                 ExcInternalError());
+          // The vector is short enough so we perform the summation.
+          // We store the number of chunks (each 32 indices) for the given
+          // vector length; all results are stored in
+          // outer_results[0,n_chunks+1), the last entry comes from parts that
+          // are not in the regular part, but might still all be filled up due
+          // to SIMD storing full width results
+          ResultType outer_results[vector_accumulation_recursion_threshold * 2];
 
           // Select between the regular version and vectorized version based
           // on the number types we are given. To choose the vectorized
           // version often enough, we need to have all tasks but the last one
           // to be divisible by the vectorization length
-          accumulate_regular(
+          size_type n_chunks = do_accumulate(
             op,
-            n_chunks,
-            index,
+            vec_size,
+            first,
             outer_results,
             std::integral_constant<bool, Operation::vectorizes>());
 
-          // now work on the remainder, i.e., the last up to 32 values. Use
-          // switch statement with fall-through to work on these values.
-          if (remainder > 0)
-            {
-              // if we got here, it means that (vec_size <=
-              // vector_accumulation_recursion_threshold * 32), which is to say
-              // that the domain can be split into n_chunks <=
-              // vector_accumulation_recursion_threshold:
-              AssertIndexRange(n_chunks,
-                               vector_accumulation_recursion_threshold + 1);
-              // split the remainder into chunks of 8, there could be up to 3
-              // such chunks since remainder < 32.
-              // Work on those chunks without any SIMD, that is we call
-              // op(index).
-              const size_type inner_chunks = remainder / 8;
-              Assert(inner_chunks <= 3, ExcInternalError());
-              const size_type remainder_inner = remainder % 8;
-              ResultType      r0 = ResultType(), r1 = ResultType(),
-                         r2 = ResultType();
-              switch (inner_chunks)
-                {
-                  case 3:
-                    r2 = op(index++);
-                    for (size_type j = 1; j < 8; ++j)
-                      r2 += op(index++);
-                    DEAL_II_FALLTHROUGH;
-                  case 2:
-                    r1 = op(index++);
-                    for (size_type j = 1; j < 8; ++j)
-                      r1 += op(index++);
-                    r1 += r2;
-                    DEAL_II_FALLTHROUGH;
-                  case 1:
-                    r2 = op(index++);
-                    for (size_type j = 1; j < 8; ++j)
-                      r2 += op(index++);
-                    DEAL_II_FALLTHROUGH;
-                  default:
-                    for (size_type j = 0; j < remainder_inner; ++j)
-                      r0 += op(index++);
-                    r0 += r2;
-                    r0 += r1;
-                    if (n_chunks == vector_accumulation_recursion_threshold)
-                      outer_results[vector_accumulation_recursion_threshold -
-                                    1] += r0;
-                    else
-                      {
-                        outer_results[n_chunks] = r0;
-                        n_chunks++;
-                      }
-                    break;
-                }
-            }
-          // make sure we worked through all indices
-          AssertDimension(index, last);
+          AssertIndexRange(n_chunks,
+                           vector_accumulation_recursion_threshold + 1);
 
           // now sum the results from the chunks stored in
           // outer_results[0,n_chunks) recursively
-          while (n_chunks > 1)
+          unsigned int           j       = 0;
+          constexpr unsigned int n_lanes = VectorizedArray<ResultType>::size();
+          for (; j + 2 * n_lanes - 1 < n_chunks;
+               j += 2 * n_lanes, n_chunks += n_lanes)
             {
-              if (n_chunks % 2 == 1)
-                outer_results[n_chunks++] = ResultType();
-              for (size_type i = 0; i < n_chunks; i += 2)
-                outer_results[i / 2] = outer_results[i] + outer_results[i + 1];
-              n_chunks /= 2;
+              VectorizedArray<ResultType> a, b;
+              a.load(outer_results + j);
+              b.load(outer_results + j + n_lanes);
+              a += b;
+              a.store(outer_results + n_chunks);
             }
-          result = outer_results[0];
+          for (; j + 1 < n_chunks; j += 2, ++n_chunks)
+            outer_results[n_chunks] = outer_results[j] + outer_results[j + 1];
+
+          AssertIndexRange(n_chunks,
+                           2 * vector_accumulation_recursion_threshold + 1);
+          Assert(n_chunks > 0, ExcInternalError());
+          result = outer_results[n_chunks - 1];
         }
       else
         {
@@ -1137,9 +1086,7 @@ namespace internal
                                first + 3 * new_size,
                                r2);
           accumulate_recursive(op, first + 3 * new_size, last, r3);
-          r0 += r1;
-          r2 += r3;
-          result = r0 + r2;
+          result = (r0 + r1) + (r2 + r3);
         }
     }
 
@@ -1153,34 +1100,77 @@ namespace internal
     // and instead make sure that the numbers get local (and thus definitely
     // not aliased) for the compiler
     template <typename Operation, typename ResultType>
-    void
-    accumulate_regular(
-      const Operation  op,
-      const size_type &n_chunks,
-      size_type &      index,
-      ResultType (&outer_results)[vector_accumulation_recursion_threshold],
-      std::integral_constant<bool, false>)
+    size_type
+    do_accumulate(const Operation op,
+                  const size_type vec_size,
+                  const size_type start_index,
+                  ResultType *    outer_results,
+                  std::integral_constant<bool, false>)
     {
-      // note that each chunk is chosen to have a width of 32, thereby the index
+      // Create local copy to indicate no aliasing to the compiler
+      size_type index = start_index;
+
+      // choose each chunk to have a width of 32, thereby the index
       // is incremented by 4*8 for each @p i.
+      size_type n_chunks = vec_size / 32;
       for (size_type i = 0; i < n_chunks; ++i)
         {
-          ResultType r0 = op(index);
-          ResultType r1 = op(index + 1);
-          ResultType r2 = op(index + 2);
-          ResultType r3 = op(index + 3);
-          index += 4;
-          for (size_type j = 1; j < 8; ++j, index += 4)
+          ResultType r = {};
+          for (unsigned int k = 0; k < 2; ++k)
             {
-              r0 += op(index);
-              r1 += op(index + 1);
-              r2 += op(index + 2);
-              r3 += op(index + 3);
+              ResultType r0 = op(index);
+              ResultType r1 = op(index + 1);
+              ResultType r2 = op(index + 2);
+              ResultType r3 = op(index + 3);
+              index += 4;
+              for (size_type j = 1; j < 4; ++j, index += 4)
+                {
+                  r0 += op(index);
+                  r1 += op(index + 1);
+                  r2 += op(index + 2);
+                  r3 += op(index + 3);
+                }
+              r += (r0 + r1) + (r2 + r3);
             }
-          r0 += r1;
-          r2 += r3;
-          outer_results[i] = r0 + r2;
+          outer_results[i] = r;
         }
+
+      if (n_chunks * 32 < vec_size)
+        {
+          const size_type remainder       = vec_size - n_chunks * 32;
+          const size_type inner_chunks    = remainder / 8;
+          const size_type remainder_inner = remainder % 8;
+          ResultType r0 = ResultType(), r1 = ResultType(), r2 = ResultType();
+          switch (inner_chunks)
+            {
+              case 3:
+                r2 = op(index++);
+                for (size_type j = 1; j < 8; ++j)
+                  r2 += op(index++);
+                DEAL_II_FALLTHROUGH;
+              case 2:
+                r1 = op(index++);
+                for (size_type j = 1; j < 8; ++j)
+                  r1 += op(index++);
+                r1 += r2;
+                DEAL_II_FALLTHROUGH;
+              case 1:
+                r2 = op(index++);
+                for (size_type j = 1; j < 8; ++j)
+                  r2 += op(index++);
+                DEAL_II_FALLTHROUGH;
+              default:
+                for (size_type j = 0; j < remainder_inner; ++j)
+                  r0 += op(index++);
+                outer_results[n_chunks++] = (r0 + r2) + r1;
+                break;
+            }
+        }
+
+      // make sure we worked through all indices
+      AssertDimension(index, start_index + vec_size);
+
+      return n_chunks;
     }
 
 
@@ -1192,70 +1182,96 @@ namespace internal
     // operations at once. As above, pass in the functor by value to create a
     // local copy of the variables in the function (if there are any).
     template <typename Operation, typename Number>
-    void
-    accumulate_regular(
-      const Operation op,
-      size_type &     n_chunks,
-      size_type &     index,
-      Number (&outer_results)[vector_accumulation_recursion_threshold],
-      std::integral_constant<bool, true>)
+    size_type
+    do_accumulate(const Operation op,
+                  const size_type vec_size,
+                  const size_type start_index,
+                  Number *        outer_results,
+                  std::integral_constant<bool, true>)
     {
+      // Create local copy to indicate no aliasing to the compiler
+      size_type index = start_index;
+
       // we start from @p index and workout @p n_chunks each of size 32.
       // in order employ SIMD and work on @p nvecs at a time, we split this
       // loop yet again:
       // First we work on (n_chunks/nvecs) chunks, where each chunk processes
       // nvecs*(4*8) elements.
 
-      constexpr unsigned int nvecs          = VectorizedArray<Number>::size();
-      const size_type        regular_chunks = n_chunks / nvecs;
+      constexpr size_type n_lanes        = VectorizedArray<Number>::size();
+      const size_type     regular_chunks = vec_size / (32 * n_lanes);
       for (size_type i = 0; i < regular_chunks; ++i)
         {
-          VectorizedArray<Number> r0 = op.do_vectorized(index);
-          VectorizedArray<Number> r1 = op.do_vectorized(index + nvecs);
-          VectorizedArray<Number> r2 = op.do_vectorized(index + 2 * nvecs);
-          VectorizedArray<Number> r3 = op.do_vectorized(index + 3 * nvecs);
-          index += nvecs * 4;
-          for (size_type j = 1; j < 8; ++j, index += nvecs * 4)
+          VectorizedArray<Number> r = {};
+          for (unsigned int k = 0; k < 2; ++k)
             {
-              r0 += op.do_vectorized(index);
-              r1 += op.do_vectorized(index + nvecs);
-              r2 += op.do_vectorized(index + 2 * nvecs);
-              r3 += op.do_vectorized(index + 3 * nvecs);
+              VectorizedArray<Number> r0 = op.do_vectorized(index);
+              VectorizedArray<Number> r1 = op.do_vectorized(index + n_lanes);
+              VectorizedArray<Number> r2 =
+                op.do_vectorized(index + 2 * n_lanes);
+              VectorizedArray<Number> r3 =
+                op.do_vectorized(index + 3 * n_lanes);
+              index += n_lanes * 4;
+              for (size_type j = 1; j < 4; ++j, index += n_lanes * 4)
+                {
+                  r0 += op.do_vectorized(index);
+                  r1 += op.do_vectorized(index + n_lanes);
+                  r2 += op.do_vectorized(index + 2 * n_lanes);
+                  r3 += op.do_vectorized(index + 3 * n_lanes);
+                }
+              r += (r0 + r1) + (r2 + r3);
             }
-          r0 += r1;
-          r2 += r3;
-          r0 += r2;
-          r0.store(&outer_results[i * nvecs]);
+          r.store(&outer_results[i * n_lanes]);
         }
 
       // If we are treating a case where the vector length is not divisible by
       // the vectorization length, need a cleanup loop
       // The remaining chunks are processed one by one starting from
-      // regular_chunks * nvecs; We do as much as possible with 2 SIMD
-      // operations within each chunk. Here we assume that nvecs < 32/2 = 16 as
-      // well as 16%nvecs==0.
-      static_assert(
-        VectorizedArray<Number>::size() <= 16 &&
-          16 % VectorizedArray<Number>::size() == 0,
-        "VectorizedArray::size() must be a power of 2 and not more than 16");
-      Assert(16 % nvecs == 0, ExcInternalError());
-      if (n_chunks % nvecs != 0)
+      // regular_chunks * n_lanes; We do as much as possible with 2 SIMD
+      // operations within each chunk. Here we assume that n_lanes < 32/2 = 16
+      // as well as 16 % n_lanes == 0.
+      static_assert(n_lanes <= 16 && 16 % n_lanes == 0,
+                    "VectorizedArray::size() must be 1, 2, 4, 8, or 16");
+      size_type       n_chunks        = regular_chunks * n_lanes;
+      const size_type start_irregular = regular_chunks * n_lanes * 32;
+      if (start_irregular < vec_size)
         {
           VectorizedArray<Number> r0  = VectorizedArray<Number>(),
                                   r1  = VectorizedArray<Number>();
-          const size_type start_irreg = regular_chunks * nvecs;
-          for (size_type c = start_irreg; c < n_chunks; ++c)
-            for (size_type j = 0; j < 32; j += 2 * nvecs, index += 2 * nvecs)
-              {
-                r0 += op.do_vectorized(index);
-                r1 += op.do_vectorized(index + nvecs);
-              }
+          const size_type remainder   = vec_size - start_irregular;
+          const size_type loop_length = remainder / (2 * n_lanes);
+          for (size_type j = 0; j < loop_length; ++j, index += 2 * n_lanes)
+            {
+              r0 += op.do_vectorized(index);
+              r1 += op.do_vectorized(index + n_lanes);
+            }
+          Number    scalar_part = Number();
+          size_type last        = remainder % (2 * n_lanes);
+          if (last > 0)
+            {
+              if (last >= n_lanes)
+                {
+                  r0 += op.do_vectorized(index);
+                  index += n_lanes;
+                  last -= n_lanes;
+                }
+              for (unsigned int i = 0; i < last; ++i)
+                scalar_part += op(index++);
+            }
+
           r0 += r1;
-          r0.store(&outer_results[start_irreg]);
-          // update n_chunks to denote unused element in outer_results[] from
-          // which we can keep writing.
-          n_chunks = start_irreg + VectorizedArray<Number>::size();
+          r0.store(&outer_results[n_chunks]);
+          outer_results[n_chunks] += scalar_part;
+
+          // update n_chunks to denote range of entries to sum up in
+          // outer_results[].
+          n_chunks += n_lanes;
         }
+
+      // make sure we worked through all indices
+      AssertDimension(index, start_index + vec_size);
+
+      return n_chunks;
     }
 
 
