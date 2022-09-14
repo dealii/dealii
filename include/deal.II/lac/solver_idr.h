@@ -222,7 +222,7 @@ namespace internal
       if (data[i] == nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
-          data[i]->reinit(temp);
+          data[i]->reinit(temp, true);
         }
       return *data[i];
     }
@@ -324,28 +324,25 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
   // Define temporary vectors which do not do not depend on s
   typename VectorMemory<VectorType>::Pointer r_pointer(this->memory);
   typename VectorMemory<VectorType>::Pointer v_pointer(this->memory);
-  typename VectorMemory<VectorType>::Pointer vhat_pointer(this->memory);
   typename VectorMemory<VectorType>::Pointer uhat_pointer(this->memory);
-  typename VectorMemory<VectorType>::Pointer ghat_pointer(this->memory);
 
   VectorType &r    = *r_pointer;
   VectorType &v    = *v_pointer;
-  VectorType &vhat = *vhat_pointer;
   VectorType &uhat = *uhat_pointer;
-  VectorType &ghat = *ghat_pointer;
 
   r.reinit(x, true);
   v.reinit(x, true);
-  vhat.reinit(x, true);
   uhat.reinit(x, true);
-  ghat.reinit(x, true);
 
   // Initial residual
   A.vmult(r, x);
   r.sadd(-1.0, 1.0, b);
 
+  using value_type = typename VectorType::value_type;
+  using real_type  = typename numbers::NumberTraits<value_type>::real_type;
+
   // Check for convergent initial guess
-  double res      = r.l2_norm();
+  real_type res   = r.l2_norm();
   iteration_state = this->iteration_status(step, res, x);
   if (iteration_state == SolverControl::success)
     return;
@@ -354,7 +351,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
   internal::SolverIDRImplementation::TmpVectors<VectorType> G(s, this->memory);
   internal::SolverIDRImplementation::TmpVectors<VectorType> U(s, this->memory);
   internal::SolverIDRImplementation::TmpVectors<VectorType> Q(s, this->memory);
-  FullMatrix<double>                                        M(s, s);
+  FullMatrix<value_type>                                    M(s, s);
 
   // Random number generator for vector entries of
   // Q (normal distribution, mean=0 sigma=1)
@@ -362,10 +359,9 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
   std::normal_distribution<> normal_distribution(0.0, 1.0);
   for (unsigned int i = 0; i < s; ++i)
     {
-      VectorType &tmp_g = G(i, x);
-      VectorType &tmp_u = U(i, x);
-      tmp_g             = 0;
-      tmp_u             = 0;
+      // Initialize vectors
+      G(i, x);
+      U(i, x);
 
       // Compute random set of s orthonormalized vectors Q
       // Note: the first vector is chosen to be the initial
@@ -400,7 +396,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
       M(i, i) = 1.;
     }
 
-  double omega = 1.;
+  value_type omega = 1.;
 
   bool early_exit = false;
 
@@ -410,7 +406,7 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
       ++step;
 
       // Compute phi
-      Vector<double> phi(s);
+      Vector<value_type> phi(s);
       for (unsigned int i = 0; i < s; ++i)
         phi(i) = Q[i] * r;
 
@@ -418,10 +414,10 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
       for (unsigned int k = 0; k < s; ++k)
         {
           // Solve M(k:s)*gamma = phi(k:s)
-          Vector<double> gamma(s - k);
+          Vector<value_type> gamma(s - k);
           {
-            Vector<double>            phik(s - k);
-            FullMatrix<double>        Mk(s - k, s - k);
+            Vector<value_type>        phik(s - k);
+            FullMatrix<value_type>    Mk(s - k, s - k);
             std::vector<unsigned int> indices;
             unsigned int              j = 0;
             for (unsigned int i = k; i < s; ++i, ++j)
@@ -431,48 +427,63 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
               }
             Mk.extract_submatrix_from(M, indices, indices);
 
-            FullMatrix<double> Mk_inv(s - k, s - k);
+            FullMatrix<value_type> Mk_inv(s - k, s - k);
             Mk_inv.invert(Mk);
             Mk_inv.vmult(gamma, phik);
           }
 
-          {
-            v = r;
+          v = r;
 
-            unsigned int j = 0;
-            for (unsigned int i = k; i < s; ++i, ++j)
-              v.add(-1.0 * gamma(j), G[i]);
-            preconditioner.vmult(vhat, v);
+          if (step > 1)
+            {
+              for (unsigned int i = k, j = 0; i < s; ++i, ++j)
+                v.add(-gamma(j), G[i]);
+            }
 
-            uhat = vhat;
+          preconditioner.vmult(uhat, v);
+
+          if (step > 1)
+            {
+              uhat.sadd(omega, gamma(0), U[k]);
+              for (unsigned int i = k + 1, j = 1; i < s; ++i, ++j)
+                uhat.add(gamma(j), U[i]);
+            }
+          else
             uhat *= omega;
-            j = 0;
-            for (unsigned int i = k; i < s; ++i, ++j)
-              uhat.add(gamma(j), U[i]);
-            A.vmult(ghat, uhat);
-          }
+
+          A.vmult(G[k], uhat);
 
           // Update G and U
-          // Orthogonalize ghat to Q0,..,Q_{k-1}
-          // and update uhat
-          for (unsigned int i = 0; i < k; ++i)
+          // Orthogonalize G[k] to Q0,..,Q_{k-1} and update uhat
+          if (k > 0)
             {
-              double alpha = (Q[i] * ghat) / M(i, i);
-              ghat.add(-alpha, G[i]);
-              uhat.add(-alpha, U[i]);
+              value_type alpha = Q[0] * G[k] / M(0, 0);
+              for (unsigned int i = 1; i < k; ++i)
+                {
+                  const value_type alpha_old = alpha;
+                  alpha = G[k].add_and_dot(-alpha, G[i - 1], Q[i]) / M(i, i);
+
+                  // update uhat every other iteration to reduce vector access
+                  if (i % 2 == 1)
+                    uhat.add(-alpha_old, U[i - 1], -alpha, U[i]);
+                }
+              M(k, k) = G[k].add_and_dot(-alpha, G[k - 1], Q[k]);
+              if (k % 2 == 1)
+                uhat.add(-alpha, U[k - 1]);
             }
-          G[k] = ghat;
-          U[k] = uhat;
+          else
+            M(k, k) = G[k] * Q[k];
+
+          U[k].swap(uhat);
 
           // Update kth column of M
-          for (unsigned int i = k; i < s; ++i)
+          for (unsigned int i = k + 1; i < s; ++i)
             M(i, k) = Q[i] * G[k];
 
-          // Orthogonalize r to Q0,...,Qk,
-          // update x
+          // Orthogonalize r to Q0,...,Qk, update x
           {
-            double beta = phi(k) / M(k, k);
-            r.add(-1.0 * beta, G[k]);
+            const value_type beta = phi(k) / M(k, k);
+            r.add(-beta, G[k]);
             x.add(beta, U[k]);
 
             print_vectors(step, x, r, U[k]);
@@ -502,18 +513,17 @@ SolverIDR<VectorType>::solve(const MatrixType &        A,
         break;
 
       // Update r and x
-      preconditioner.vmult(vhat, r);
-      A.vmult(v, vhat);
+      preconditioner.vmult(uhat, r);
+      A.vmult(v, uhat);
 
       omega = (v * r) / (v * v);
 
-      r.add(-1.0 * omega, v);
-      x.add(omega, vhat);
+      res = std::sqrt(r.add_and_dot(-1.0 * omega, v, r));
+      x.add(omega, uhat);
 
-      print_vectors(step, x, r, vhat);
+      print_vectors(step, x, r, uhat);
 
       // Check for convergence
-      res             = r.l2_norm();
       iteration_state = this->iteration_status(step, res, x);
       if (iteration_state != SolverControl::iterate)
         break;

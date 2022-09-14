@@ -1,0 +1,7 @@
+Improved: The vector operations in SolverIDR::solve() have been revised for
+performance.  The new implementation should show a speedup in case the
+matrix-vector product and preconditioner are not much more expensive than the
+vector operations. Furthermore, the usage of temporary vectors has been
+reduced by two.
+<br>
+(Martin Kronbichler, 2022/09/12)
