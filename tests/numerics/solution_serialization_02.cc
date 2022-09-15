@@ -51,7 +51,7 @@ public:
 
 template <int dim>
 void
-test(const bool use_ss)
+test(const unsigned int version)
 {
   const MPI_Comm comm = MPI_COMM_WORLD;
 
@@ -102,7 +102,7 @@ test(const bool use_ss)
                              SolutionFunction<dim>(),
                              vector);
 
-    if (use_ss)
+    if (version == 0)
       {
         // save vector
         SolutionSerialization<dim, VectorType> ss(dof_handler);
@@ -112,7 +112,17 @@ test(const bool use_ss)
         // save mesh
         tria.save("mesh");
       }
-    else
+    else if (version == 1)
+      {
+        // save vector
+        SolutionSerialization<dim, VectorType> ss(dof_handler);
+        ss.add_vector(vector);
+        ss.save();
+
+        // save mesh
+        tria.save("mesh");
+      }
+    else if (version == 2)
       {
         // save vector
         vector.update_ghost_values();
@@ -123,6 +133,10 @@ test(const bool use_ss)
 
         // save mesh
         tria.save("mesh");
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
       }
   }
 
@@ -135,7 +149,7 @@ test(const bool use_ss)
     // load mesh
     tria.load("mesh");
 
-    if (use_ss)
+    if (version == 0)
       tria.repartition();
 
     // create dof-handler and empty vector
@@ -148,17 +162,27 @@ test(const bool use_ss)
       comm));
 
     // load vector
-    if (use_ss)
+    if (version == 0)
       {
         SolutionSerialization<dim, VectorType> ss(dof_handler);
         ss.add_vector(vector);
         ss.load("vector");
       }
-    else
+    else if (version == 1)
+      {
+        SolutionSerialization<dim, VectorType> ss(dof_handler);
+        ss.add_vector(vector);
+        ss.load();
+      }
+    else if (version == 2)
       {
         parallel::distributed::SolutionTransfer<dim, VectorType>
           solution_transfer(dof_handler);
         solution_transfer.deserialize(vector);
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
       }
 
     // check correctness
@@ -188,6 +212,7 @@ main(int argc, char *argv[])
 
   initlog();
 
-  test<2>(true);  // use SolutionSerialization
-  test<2>(false); // use SolutionTransfer
+  test<2>(0); // use SolutionSerialization -> manual
+  test<2>(1); // use SolutionSerialization -> via Triangulation
+  test<2>(2); // use SolutionTransfer      -> via Triangulation
 }

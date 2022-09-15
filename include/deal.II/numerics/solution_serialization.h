@@ -66,6 +66,12 @@ public:
   }
 
   void
+  save()
+  {
+    AssertThrow(false, ExcNotImplemented());
+  }
+
+  void
   save(const std::string file_name)
   {
     // determine local size
@@ -80,6 +86,12 @@ public:
 
     // write to hard drive
     mpi_io_read_or_write(false /*write*/, file_name, temp);
+  }
+
+  void
+  load()
+  {
+    AssertThrow(false, ExcNotImplemented());
   }
 
   void
