@@ -111,6 +111,12 @@ namespace VectorTools
    *   cache, dof_handler_2, vector_2);
    * @endcode
    *
+   * The function also works with FiniteElement objects with multiple
+   * components. If one is interested only in a range of components, one can
+   * select these by the parameters @p first_selected_component and
+   * @p n_components. For further details on supported FiniteElement
+   * objects, see the documentation of FEPointEvaluation.
+   *
    * The function can also be used to evaluate cell-data vectors. For this
    * purpose, one passes in a Triangulation instead of a DoFHandler and a
    * vector of size Trinagulation::n_active_cells() or a vector, which
@@ -142,7 +148,8 @@ namespace VectorTools
     const VectorType &                                    vector,
     const std::vector<Point<spacedim>> &                  evaluation_points,
     Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg);
+    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
+    const unsigned int                     first_selected_component = 0);
 
   /**
    * Given a (distributed) solution vector @p vector, evaluate the values at
@@ -171,7 +178,8 @@ namespace VectorTools
     const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
     const MeshType<dim, spacedim> &                             mesh,
     const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg);
+    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
+    const unsigned int                     first_selected_component = 0);
 
   /**
    * Given a (distributed) solution vector @p vector, evaluate the gradients at
@@ -200,7 +208,8 @@ namespace VectorTools
     const VectorType &                                    vector,
     const std::vector<Point<spacedim>> &                  evaluation_points,
     Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg);
+    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
+    const unsigned int                     first_selected_component = 0);
 
   /**
    * Given a (distributed) solution vector @p vector, evaluate the gradients at
@@ -228,7 +237,8 @@ namespace VectorTools
     const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
     const MeshType<dim, spacedim> &                             mesh,
     const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg);
+    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
+    const unsigned int                     first_selected_component = 0);
 
 
 
@@ -252,11 +262,13 @@ namespace VectorTools
                const VectorType &                  vector,
                const std::vector<Point<spacedim>> &evaluation_points,
                Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-               const EvaluationFlags::EvaluationFlags                flags)
+               const EvaluationFlags::EvaluationFlags                flags,
+               const unsigned int first_selected_component)
   {
     cache.reinit(evaluation_points, mesh.get_triangulation(), mapping);
 
-    return point_values<n_components>(cache, mesh, vector, flags);
+    return point_values<n_components>(
+      cache, mesh, vector, flags, first_selected_component);
   }
 
 
@@ -277,11 +289,13 @@ namespace VectorTools
                   const VectorType &                  vector,
                   const std::vector<Point<spacedim>> &evaluation_points,
                   Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-                  const EvaluationFlags::EvaluationFlags                flags)
+                  const EvaluationFlags::EvaluationFlags                flags,
+                  const unsigned int first_selected_component)
   {
     cache.reinit(evaluation_points, mesh.get_triangulation(), mapping);
 
-    return point_gradients<n_components>(cache, mesh, vector, flags);
+    return point_gradients<n_components>(
+      cache, mesh, vector, flags, first_selected_component);
   }
 
 
@@ -396,6 +410,7 @@ namespace VectorTools
       const VectorType &                                          vector,
       const UpdateFlags                                           update_flags,
       const dealii::EvaluationFlags::EvaluationFlags evaluation_flags,
+      const unsigned int                             first_selected_component,
       const std::function<
         value_type(const FEPointEvaluation<n_components,
                                            dim,
@@ -438,7 +453,10 @@ namespace VectorTools
                                              dim,
                                              spacedim,
                                              typename VectorType::value_type>>(
-            cache.get_mapping(), cell->get_fe(), update_flags);
+            cache.get_mapping(),
+            cell->get_fe(),
+            update_flags,
+            first_selected_component);
       auto &evaluator = *evaluators[cell->active_fe_index()];
 
       evaluator.reinit(cell, unit_points);
@@ -532,6 +550,7 @@ namespace VectorTools
       const VectorType &                  vector,
       const UpdateFlags,
       const dealii::EvaluationFlags::EvaluationFlags evaluation_flags,
+      const unsigned int                             first_selected_component,
       const std::function<
         value_type(const FEPointEvaluation<n_components,
                                            dim,
@@ -547,8 +566,9 @@ namespace VectorTools
                                           typename VectorType::value_type>>> &)
     {
       (void)evaluation_flags;
+      (void)first_selected_component;
 
-      Assert(n_components == 1,
+      Assert(n_components == 1 && first_selected_component == 0,
              ExcMessage(
                "A cell-data vector can only have a single component."));
 
@@ -581,7 +601,8 @@ namespace VectorTools
       const MeshType &                                            mesh,
       const VectorType &                                          vector,
       const EvaluationFlags::EvaluationFlags                      flags,
-      const UpdateFlags                                           update_flags,
+      const unsigned int                             first_selected_component,
+      const UpdateFlags                              update_flags,
       const dealii::EvaluationFlags::EvaluationFlags evaluation_flags,
       const std::function<
         value_type(const FEPointEvaluation<n_components,
@@ -627,6 +648,7 @@ namespace VectorTools
               vector,
               update_flags,
               evaluation_flags,
+              first_selected_component,
               process_quadrature_point,
               values,
               solution_values,
@@ -688,7 +710,8 @@ namespace VectorTools
     const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
     const MeshType<dim, spacedim> &                             mesh,
     const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags                      flags)
+    const EvaluationFlags::EvaluationFlags                      flags,
+    const unsigned int first_selected_component)
   {
     return internal::evaluate_at_points<
       n_components,
@@ -704,6 +727,7 @@ namespace VectorTools
       mesh,
       vector,
       flags,
+      first_selected_component,
       update_values,
       dealii::EvaluationFlags::values,
       [](const auto &evaluator, const auto &q) {
@@ -726,7 +750,8 @@ namespace VectorTools
     const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
     const MeshType<dim, spacedim> &                             mesh,
     const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags                      flags)
+    const EvaluationFlags::EvaluationFlags                      flags,
+    const unsigned int first_selected_component)
   {
     return internal::evaluate_at_points<
       n_components,
@@ -743,6 +768,7 @@ namespace VectorTools
       mesh,
       vector,
       flags,
+      first_selected_component,
       update_gradients,
       dealii::EvaluationFlags::gradients,
       [](const auto &evaluator, const unsigned &q) {
