@@ -642,6 +642,12 @@ namespace PETScWrappers
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 #  else
       {
+        // Use this to avoid unused variables warning
+        (void)local_rows;
+        (void)local_active_rows;
+        (void)local_columns;
+        (void)local_active_columns;
+        (void)sparsity_pattern;
         AssertThrow(false,
                     ExcMessage(
                       "BDDC preconditioner requires PETSc 3.10.0 or newer"));
