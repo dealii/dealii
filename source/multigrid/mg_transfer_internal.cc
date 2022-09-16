@@ -291,31 +291,16 @@ namespace internal
               {
                 requests.push_back(MPI_Request());
                 std::vector<DoFPair> &data = send_data[dest];
-                // If there is nothing to send, we still need to send a message,
-                // because the receiving end will be waitng. In that case we
-                // just send an empty message.
-                if (data.size())
-                  {
-                    const int ierr = MPI_Isend(data.data(),
-                                               data.size() * sizeof(data[0]),
-                                               MPI_BYTE,
-                                               dest,
-                                               mpi_tag,
-                                               tria->get_communicator(),
-                                               &*requests.rbegin());
-                    AssertThrowMPI(ierr);
-                  }
-                else
-                  {
-                    const int ierr = MPI_Isend(nullptr,
-                                               0,
-                                               MPI_BYTE,
-                                               dest,
-                                               mpi_tag,
-                                               tria->get_communicator(),
-                                               &*requests.rbegin());
-                    AssertThrowMPI(ierr);
-                  }
+
+                const int ierr =
+                  MPI_Isend(data.data(),
+                            data.size() * sizeof(decltype(*data.data())),
+                            MPI_BYTE,
+                            dest,
+                            mpi_tag,
+                            tria->get_communicator(),
+                            &*requests.rbegin());
+                AssertThrowMPI(ierr);
               }
           }
 

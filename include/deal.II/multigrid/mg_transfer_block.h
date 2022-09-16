@@ -46,8 +46,10 @@ class DoFHandler;
  * MGTransferBase is defined in mg_base.h
  */
 
-/*!@addtogroup mg */
-/*@{*/
+/**
+ * @addtogroup mg
+ * @{
+ */
 
 /**
  * Implementation of matrix generation for MGTransferBlock.
@@ -456,7 +458,7 @@ private:
   unsigned int selected_block;
 };
 
-/*@}*/
+/** @} */
 
 //------------------------- inline function definition ------------------------
 template <typename number>

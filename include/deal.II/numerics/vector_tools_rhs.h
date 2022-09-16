@@ -46,7 +46,7 @@ namespace VectorTools
   /**
    * @name Assembling of right hand sides
    */
-  //@{
+  /** @{ */
 
   /**
    * Create a right hand side vector. Prior content of the given @p rhs_vector
@@ -177,7 +177,7 @@ namespace VectorTools
     VectorType &                                               rhs_vector,
     const std::set<types::boundary_id> &                       boundary_ids =
       std::set<types::boundary_id>());
-  // @}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

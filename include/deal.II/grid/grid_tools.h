@@ -32,7 +32,6 @@
 
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
-#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
@@ -131,7 +130,7 @@ namespace GridTools
   /**
    * @name Information about meshes and cells
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Return the diameter of a triangulation. The diameter is computed using
@@ -396,11 +395,11 @@ namespace GridTools
     tuple<std::vector<Point<spacedim>>, std::vector<CellData<dim>>, SubCellData>
     get_coarse_mesh_description(const Triangulation<dim, spacedim> &tria);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Functions supporting the creation of meshes
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Remove vertices that are not referenced by any of the cells. This
@@ -439,7 +438,8 @@ namespace GridTools
    * vertices.
    *
    * Two vertices are considered equal if their difference in each coordinate
-   * direction is less than @p tol.
+   * direction is less than @p tol. This implies that nothing happens if
+   * the tolerance is set to zero.
    */
   template <int dim, int spacedim>
   void
@@ -502,11 +502,11 @@ namespace GridTools
   void
   consistently_order_cells(std::vector<CellData<dim>> &cells);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Rotating, stretching and otherwise transforming meshes
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Transform the vertices of the given triangulation by applying the
@@ -910,11 +910,11 @@ namespace GridTools
   regularize_corner_cells(Triangulation<dim, spacedim> &tria,
                           const double limit_angle_fraction = .75);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Finding cells and vertices of a triangulation
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Given a Triangulation's @p cache and a list of @p points, call
@@ -1896,7 +1896,13 @@ namespace GridTools
    * the given predicate is true, are completely enclosed in at least one of the
    * bounding boxes. Notice the cover is only guaranteed to contain all these
    * active cells but it's not necessarily exact i.e. it can include a bigger
-   * area than their union.
+   * area than their union. (This is of course unavoidable in any case if cells
+   * are not rectangular or brick-shaped, but it is also true if cells are
+   * since it is inefficient to create as many bounding boxes as there are
+   * cells; rather, the algorithm here tries to combine the bounding boxes
+   * of multiple cells into a cheaper representation, at the cost of a set
+   * of bounding boxes that may be larger than the union of the cells -- see
+   * the description of the relevant function arguments below.)
    *
    * For each cell at a given refinement level containing active cells for which @p predicate is true,
    * the function creates a bounding box of its children for which @p predicate is true.
@@ -1905,30 +1911,42 @@ namespace GridTools
    * @p allow_merge and @p max_boxes are used to reduce the number of cells at a computational cost and
    * covering a bigger n-dimensional volume.
    *
-   * The parameters to control the algorithm are:
-   * - @p predicate : the property of the cells to enclose e.g. IteratorFilters::LocallyOwnedCell .
-   *  The predicate is tested only on active cells.
-   * - @p refinement_level : it defines the level at which the initial bounding box are created. The refinement
-   *  should be set to a coarse refinement level. A bounding box is created for
-   * each active cell at coarser
-   *  level than @p refinement_level; if @p refinement_level is higher than the number of levels of the
+   * @param[in] mesh The mesh object this function is to work on. This
+   *   is generally either a triangulation of some kind, or a DoFHandler
+   *   object.
+   * @param[in] predicate A function-like object that returns true or
+   *   false depending on whether the property of the cells to enclose
+   *   is satisfied. An example is IteratorFilters::LocallyOwnedCell,
+   *   but it can also be a lambda function or anything else that can be
+   *   called with a cell as argument.
+   *   This predicate is tested only on active cells.
+   * @param[in] refinement_level Defines the level at which the
+   *  initial bounding boxes are created. The refinement should be set
+   *  to a coarse refinement level. A bounding box is created for each
+   *  active cell at a coarser level than @p refinement_level; if @p
+   *  refinement_level is higher than the number of levels of the
    *  triangulation an exception is thrown.
-   * - @p allow_merge : This flag allows for box merging and, by default, is false. The algorithm has a cost of
-   *  O(N^2) where N is the number of the bounding boxes created from the
-   * refinement level; for this reason, if
-   *  the flag is set to true, make sure to choose wisely a coarse enough @p refinement_level.
-   * - @p max_boxes : the maximum number of bounding boxes to compute. If more are created the smaller ones are
-   *  merged with neighbors. By default after merging the boxes which can be
-   * expressed as a single one no more boxes are merged. See the
-   * BoundingBox::get_neighbor_type () function for details.
-   *  Notice only neighboring cells are merged (see the @p get_neighbor_type  function in bounding box class): if
-   *  the target number of bounding boxes max_boxes can't be reached by merging
-   * neighbors an exception is thrown
+   * @param[in] allow_merge This flag allows for box merging and, by
+   *  default, is false. The algorithm has a cost of O(N^2) where N is
+   *  the number of the bounding boxes created from the refinement
+   *  level; for this reason, if the flag is set to true, make sure to
+   *  choose wisely a coarse enough @p refinement_level.
+   * @param[in] max_boxes The maximum number of bounding boxes to
+   *  compute. If more are created the smaller ones are merged with
+   *  neighbors. By default after merging the boxes which can be
+   *  expressed as a single one no more boxes are merged. See the
+   *  BoundingBox::get_neighbor_type () function for details.  Notice
+   *  only neighboring cells are merged (see the @p get_neighbor_type
+   *  function in bounding box class): if the target number of
+   *  bounding boxes max_boxes can't be reached by merging neighbors
+   *  an exception is thrown.
    *
-   * The following image describes an example of the algorithm with @p refinement_level = 2, @p allow_merge = true
-   * and @p max_boxes = 1. The cells with the property predicate are in red, the area of a bounding box is
-   * slightly orange.
+   * The following image describes an example of the algorithm with @p
+   * refinement_level = 2, @p allow_merge = true and @p max_boxes =
+   * 1. The cells with the property predicate are in red, the area of
+   * a bounding box is slightly orange.
    * @image html bounding_box_predicate.png
+   *
    * - 1. In black we can see the cells of the current level.
    * - 2. For each cell containing the red area a bounding box is created: by
    * default these are returned.
@@ -2127,11 +2145,11 @@ namespace GridTools
   get_longest_direction(
     typename Triangulation<dim, spacedim>::active_cell_iterator cell);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Partitions and subdomains of triangulations
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Produce a sparsity pattern in which nonzero entries indicate that two
@@ -2408,11 +2426,11 @@ namespace GridTools
   std::vector<bool>
   get_locally_owned_vertices(const Triangulation<dim, spacedim> &triangulation);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Comparing different meshes
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Given two meshes (i.e. objects of type Triangulation or DoFHandler) that
@@ -2479,11 +2497,11 @@ namespace GridTools
   bool
   have_same_coarse_mesh(const MeshType &mesh_1, const MeshType &mesh_2);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Dealing with distorted cells
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Given a triangulation and a list of cells whose children have become
@@ -2509,14 +2527,14 @@ namespace GridTools
 
 
 
-  /*@}*/
+  /** @} */
   /**
    * @name Extracting and creating patches of cells
    *
    * These functions extract and create patches of cells surrounding a single
    * cell, and creating triangulation out of them.
    */
-  /*@{*/
+  /** @{ */
 
 
   /**
@@ -2702,12 +2720,12 @@ namespace GridTools
   get_dof_to_support_patch_map(DoFHandler<dim, spacedim> &dof_handler);
 
 
-  /*@}*/
+  /** @} */
 
   /**
    * @name Dealing with periodic domains
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Data type that provides all information necessary to create periodicity
@@ -2944,11 +2962,11 @@ namespace GridTools
       dealii::Tensor<1, MeshType::space_dimension>(),
     const FullMatrix<double> &matrix = FullMatrix<double>());
 
-  /*@}*/
+  /** @} */
   /**
    * @name Dealing with boundary and manifold ids
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Copy boundary ids to manifold ids on faces and edges at the boundary. The
@@ -3075,7 +3093,7 @@ namespace GridTools
           return numbers::flat_manifold_id;
       },
     bool overwrite_only_flat_manifold_ids = true);
-  /*@}*/
+  /** @} */
 
   /**
    * Exchange arbitrary data of type @p DataType provided by the function
@@ -3510,7 +3528,7 @@ namespace GridTools
   /**
    * @name Exceptions
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Exception
@@ -3547,7 +3565,7 @@ namespace GridTools
                  << "The given vertex with index " << arg1
                  << " is not used in the given triangulation.");
 
-  /*@}*/
+  /** @} */
 
 } /*namespace GridTools*/
 

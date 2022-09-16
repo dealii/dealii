@@ -67,7 +67,7 @@ namespace CUDAWrappers
     /**
      * @name Constructors and initialization
      */
-    //@{
+    /** @{ */
     /**
      * Constructor. Initialize the matrix to be empty, without any structure,
      * i.e., the matrix is not usable at all. This constructor is therefore
@@ -121,12 +121,12 @@ namespace CUDAWrappers
     void
     reinit(Utilities::CUDA::Handle &             handle,
            const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
-    //@}
+    /** @} */
 
     /**
      * @name Information on the matrix
      */
-    //@{
+    /** @{ */
     /**
      * Return the dimension of the codomain (or range) space. Note that the
      * matrix is of dimension $m \times n$.
@@ -192,12 +192,12 @@ namespace CUDAWrappers
                     const unsigned int width       = 0,
                     const char *       zero_string = " ",
                     const double       denominator = 1.) const;
-    //@}
+    /** @} */
 
     /**
      * @name Modifying entries
      */
-    //@{
+    /** @{ */
     /**
      * Multiply the entire matrix by a fixed factor.
      */
@@ -209,12 +209,12 @@ namespace CUDAWrappers
      */
     SparseMatrix &
     operator/=(const Number factor);
-    //@}
+    /** @} */
 
     /**
      * @name Multiplications
      */
-    //@{
+    /** @{ */
     /**
      * Matrix-vector multiplication: let $dst = M \cdot src$ with $M$
      * being this matrix.
@@ -281,12 +281,12 @@ namespace CUDAWrappers
     residual(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
              const LinearAlgebra::CUDAWrappers::Vector<Number> &x,
              const LinearAlgebra::CUDAWrappers::Vector<Number> &b) const;
-    //@}
+    /** @} */
 
     /**
      * @name Matrix norms
      */
-    //@{
+    /** @{ */
     /**
      * Return the $l_1$-norm of the matrix, that is $|M|_1=\max_{\mathrm{all\
      * columns\ }j}\sum_{\mathrm{all\ rows\ }i} |M_{ij}|$, (max. sum of
@@ -312,12 +312,12 @@ namespace CUDAWrappers
      */
     Number
     frobenius_norm() const;
-    //@}
+    /** @} */
 
     /**
      * @name Access to underlying CUDA data
      */
-    //@{
+    /** @{ */
     /**
      * Return a tuple containing the pointer to the values of matrix, the
      * pointer to the columns indices, the pointer to the rows pointer,
@@ -325,7 +325,7 @@ namespace CUDAWrappers
      */
     std::tuple<Number *, int *, int *, cusparseMatDescr_t, cusparseSpMatDescr_t>
     get_cusparse_matrix() const;
-    //@}
+    /** @} */
 
   private:
     /**

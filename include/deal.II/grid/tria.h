@@ -4067,7 +4067,7 @@ private:
   reset_active_cell_indices();
 
   /**
-   * Reset global cell ids and globale level cell ids.
+   * Reset global cell ids and global level cell ids.
    */
   void
   reset_global_cell_indices();

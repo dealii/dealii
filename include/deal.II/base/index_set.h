@@ -19,8 +19,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/thread_management.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/mutex.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
@@ -34,15 +34,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
-#  endif
-#endif
-
-#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
-#  include <mpi.h>
-#else
-using MPI_Comm = int;
-#  ifndef MPI_COMM_WORLD
-#    define MPI_COMM_WORLD 0
 #  endif
 #endif
 

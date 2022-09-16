@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.templates.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/distributed/cell_data_transfer.templates.h>
 #include <deal.II/distributed/fully_distributed_tria.h>
@@ -43,11 +44,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 const unsigned int DoFHandler<dim, spacedim>::default_fe_index;
-
-
-template <int dim, int spacedim>
-const typename DoFHandler<dim, spacedim>::active_fe_index_type
-  DoFHandler<dim, spacedim>::invalid_active_fe_index;
 
 
 namespace internal
@@ -1321,9 +1317,6 @@ namespace internal
             dof_handler.hp_capability_enabled == true,
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-          using active_fe_index_type =
-            typename dealii::DoFHandler<dim, spacedim>::active_fe_index_type;
-
           if (const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
                 dynamic_cast<
                   const dealii::parallel::shared::Triangulation<dim, spacedim>
@@ -1339,7 +1332,7 @@ namespace internal
               // on the other cells to zero. then we add all of these vectors
               // up, and because every vector entry has exactly one processor
               // that owns it, the sum is correct
-              std::vector<active_fe_index_type> active_fe_indices(
+              std::vector<types::fe_index> active_fe_indices(
                 tr->n_active_cells(), 0u);
               for (const auto &cell : dof_handler.active_cell_iterators())
                 if (cell->is_locally_owned())
@@ -1375,17 +1368,15 @@ namespace internal
               // to have functions that can pack and unpack the data we want to
               // transport -- namely, the single unsigned int active_fe_index
               // objects
-              auto pack =
-                [](const typename dealii::DoFHandler<dim, spacedim>::
-                     active_cell_iterator &cell) -> active_fe_index_type {
+              auto pack = [](const typename dealii::DoFHandler<dim, spacedim>::
+                               active_cell_iterator &cell) -> types::fe_index {
                 return cell->active_fe_index();
               };
 
-              auto unpack =
-                [&dof_handler](
-                  const typename dealii::DoFHandler<dim, spacedim>::
-                    active_cell_iterator &   cell,
-                  const active_fe_index_type active_fe_index) -> void {
+              auto unpack = [&dof_handler](
+                              const typename dealii::DoFHandler<dim, spacedim>::
+                                active_cell_iterator &cell,
+                              const types::fe_index   active_fe_index) -> void {
                 // we would like to say
                 //   cell->set_active_fe_index(active_fe_index);
                 // but this is not allowed on cells that are not
@@ -1396,7 +1387,7 @@ namespace internal
               };
 
               GridTools::exchange_cell_data_to_ghosts<
-                active_fe_index_type,
+                types::fe_index,
                 dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
             }
           else
@@ -1433,15 +1424,12 @@ namespace internal
             dof_handler.hp_capability_enabled == true,
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-          using active_fe_index_type =
-            typename dealii::DoFHandler<dim, spacedim>::active_fe_index_type;
-
           if (const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
                 dynamic_cast<
                   const dealii::parallel::shared::Triangulation<dim, spacedim>
                     *>(&dof_handler.get_triangulation()))
             {
-              std::vector<active_fe_index_type> future_fe_indices(
+              std::vector<types::fe_index> future_fe_indices(
                 tr->n_active_cells(), 0u);
               for (const auto &cell : dof_handler.active_cell_iterators() |
                                         IteratorFilters::LocallyOwnedCell())
@@ -1466,26 +1454,24 @@ namespace internal
                            DistributedTriangulationBase<dim, spacedim> *>(
                          &dof_handler.get_triangulation()))
             {
-              auto pack =
-                [&dof_handler](
-                  const typename dealii::DoFHandler<dim, spacedim>::
-                    active_cell_iterator &cell) -> active_fe_index_type {
+              auto pack = [&dof_handler](
+                            const typename dealii::DoFHandler<dim, spacedim>::
+                              active_cell_iterator &cell) -> types::fe_index {
                 return dof_handler
                   .hp_cell_future_fe_indices[cell->level()][cell->index()];
               };
 
-              auto unpack =
-                [&dof_handler](
-                  const typename dealii::DoFHandler<dim, spacedim>::
-                    active_cell_iterator &   cell,
-                  const active_fe_index_type future_fe_index) -> void {
+              auto unpack = [&dof_handler](
+                              const typename dealii::DoFHandler<dim, spacedim>::
+                                active_cell_iterator &cell,
+                              const types::fe_index   future_fe_index) -> void {
                 dof_handler
                   .hp_cell_future_fe_indices[cell->level()][cell->index()] =
                   future_fe_index;
               };
 
               GridTools::exchange_cell_data_to_ghosts<
-                active_fe_index_type,
+                types::fe_index,
                 dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
             }
           else
@@ -2644,11 +2630,11 @@ DoFHandler<dim, spacedim>::set_active_fe_indices(
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::get_active_fe_indices(
-  std::vector<unsigned int> &active_fe_indices) const
+std::vector<unsigned int>
+DoFHandler<dim, spacedim>::get_active_fe_indices() const
 {
-  active_fe_indices.resize(this->get_triangulation().n_active_cells());
+  std::vector<unsigned int> active_fe_indices(
+    this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
   // we could try to extract the values directly, since they are
   // stored as protected data of this object, but for simplicity we
@@ -2656,6 +2642,60 @@ DoFHandler<dim, spacedim>::get_active_fe_indices(
   for (const auto &cell : this->active_cell_iterators())
     if (!cell->is_artificial())
       active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
+
+  return active_fe_indices;
+}
+
+
+
+template <int dim, int spacedim>
+void
+DoFHandler<dim, spacedim>::get_active_fe_indices(
+  std::vector<unsigned int> &active_fe_indices) const
+{
+  active_fe_indices = get_active_fe_indices();
+}
+
+
+
+template <int dim, int spacedim>
+void
+DoFHandler<dim, spacedim>::set_future_fe_indices(
+  const std::vector<unsigned int> &future_fe_indices)
+{
+  Assert(future_fe_indices.size() == this->get_triangulation().n_active_cells(),
+         ExcDimensionMismatch(future_fe_indices.size(),
+                              this->get_triangulation().n_active_cells()));
+
+  this->create_active_fe_table();
+  // we could set the values directly, since they are stored as
+  // protected data of this object, but for simplicity we use the
+  // cell-wise access. this way we also have to pass some debug-mode
+  // tests which we would have to duplicate ourselves otherwise
+  for (const auto &cell : this->active_cell_iterators())
+    if (cell->is_locally_owned() &&
+        future_fe_indices[cell->active_cell_index()] !=
+          numbers::invalid_fe_index)
+      cell->set_future_fe_index(future_fe_indices[cell->active_cell_index()]);
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<unsigned int>
+DoFHandler<dim, spacedim>::get_future_fe_indices() const
+{
+  std::vector<unsigned int> future_fe_indices(
+    this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
+
+  // we could try to extract the values directly, since they are
+  // stored as protected data of this object, but for simplicity we
+  // use the cell-wise access.
+  for (const auto &cell : this->active_cell_iterators())
+    if (cell->is_locally_owned() && cell->future_fe_index_set())
+      future_fe_indices[cell->active_cell_index()] = cell->future_fe_index();
+
+  return future_fe_indices;
 }
 
 
@@ -2777,7 +2817,7 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
           this->hp_cell_active_fe_indices[level].resize(
             this->tria->n_raw_cells(level), 0);
           this->hp_cell_future_fe_indices[level].resize(
-            this->tria->n_raw_cells(level), invalid_active_fe_index);
+            this->tria->n_raw_cells(level), numbers::invalid_fe_index);
         }
       else
         {
@@ -2836,7 +2876,7 @@ DoFHandler<dim, spacedim>::update_active_fe_table()
       // We have used future FE indices to update all active FE indices
       // before refinement happened, thus we are safe to clear them now.
       this->hp_cell_future_fe_indices[i].assign(this->tria->n_raw_cells(i),
-                                                invalid_active_fe_index);
+                                                numbers::invalid_fe_index);
     }
 }
 
@@ -3025,7 +3065,7 @@ DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
   // active FE indices since ownership of cells may change.
 
   // Gather all current active FE indices
-  get_active_fe_indices(active_fe_index_transfer->active_fe_indices);
+  active_fe_index_transfer->active_fe_indices = get_active_fe_indices();
 
   // Attach to transfer object
   active_fe_index_transfer->cell_data_transfer->prepare_for_serialization(

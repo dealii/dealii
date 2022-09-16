@@ -36,8 +36,9 @@ DEAL_II_NAMESPACE_OPEN
 class DynamicSparsityPattern;
 #endif
 
-/*! @addtogroup Sparsity
- *@{
+/**
+ * @addtogroup Sparsity
+ * @{
  */
 
 
@@ -603,7 +604,7 @@ public:
   iterator
   end(const size_type r) const;
 
-  // @}
+  /** @} */
 
   /**
    * Compute the bandwidth of the matrix represented by this structure. The
@@ -736,7 +737,7 @@ private:
   friend class DynamicSparsityPatternIterators::Accessor;
 };
 
-/*@}*/
+/** @} */
 /*---------------------- Inline functions -----------------------------------*/
 
 

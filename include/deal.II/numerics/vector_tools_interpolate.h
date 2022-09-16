@@ -48,7 +48,7 @@ namespace VectorTools
   /**
    * @name Interpolation and projection
    */
-  //@{
+  /** @{ */
 
   /**
    * Compute the interpolation of @p function at the support points to the
@@ -248,12 +248,12 @@ namespace VectorTools
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType &                                              u2);
 
-  //@}
+  /** @} */
 
   /**
    * Geometrical interpolation
    */
-  //@{
+  /** @{ */
   /**
    * Given a DoFHandler containing at least a spacedim vector field, this
    * function interpolates the Triangulation at the support points of a FE_Q()
@@ -300,7 +300,7 @@ namespace VectorTools
                       VectorType &                     vector,
                       const ComponentMask &            mask = ComponentMask());
 
-  //@}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

@@ -40,8 +40,9 @@ namespace LinearAlgebra
 
 namespace LinearAlgebra
 {
-  /*! @addtogroup Vectors
-   *@{
+  /**
+   * @addtogroup Vectors
+   * @{
    */
 
   /**
@@ -268,7 +269,7 @@ namespace LinearAlgebra
      */
     virtual ~VectorSpaceVector() = default;
   };
-  /*@}*/
+  /** @} */
 } // namespace LinearAlgebra
 
 // ---------------------------- Free functions --------------------------

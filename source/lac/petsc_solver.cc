@@ -94,16 +94,7 @@ namespace PETScWrappers
 
         // setting the preconditioner overwrites the used matrices.
         // hence, we need to set the matrices after the preconditioner.
-#  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-        // the last argument is irrelevant here,
-        // since we use the solver only once anyway
-        ierr = KSPSetOperators(solver_data->ksp,
-                               A,
-                               preconditioner,
-                               SAME_PRECONDITIONER);
-#  else
         ierr = KSPSetOperators(solver_data->ksp, A, preconditioner);
-#  endif
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         // then a convergence monitor
@@ -398,37 +389,10 @@ namespace PETScWrappers
     PetscErrorCode ierr = KSPSetType(ksp, KSPGMRES);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    // set the restart parameter from the
-    // data. we would like to use the simple
-    // code that is commented out, but this
-    // leads to nasty warning and error
-    // messages due to some stupidity on
-    // PETSc's side: KSPGMRESSetRestart is
-    // implemented as a macro in which return
-    // statements are hidden. This may work
-    // if people strictly follow the PETSc
-    // coding style of always having
-    // functions return an integer error
-    // code, but the present function isn't
-    // like this.
-    /*
-        ierr = KSPGMRESSetRestart (ksp, additional_data.restart_parameter);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-    */
-    // so rather expand their macros by hand,
-    // and do some equally nasty stuff that at
-    // least doesn't yield warnings...
-    int (*fun_ptr)(KSP, int);
-    ierr = PetscObjectQueryFunction(reinterpret_cast<PetscObject>(ksp),
-                                    "KSPGMRESSetRestart_C",
-                                    reinterpret_cast<void (**)()>(&fun_ptr));
+    ierr = KSPGMRESSetRestart(ksp, additional_data.restart_parameter);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    ierr = (*fun_ptr)(ksp, additional_data.restart_parameter);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    // Set preconditioning side to
-    // right
+    // Set preconditioning side to right
     if (additional_data.right_preconditioning)
       {
         ierr = KSPSetPCSide(ksp, PC_RIGHT);
@@ -711,12 +675,7 @@ namespace PETScWrappers
          * set the matrices involved. the last argument is irrelevant here,
          * since we use the solver only once anyway
          */
-#    if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-        ierr =
-          KSPSetOperators(solver_data->ksp, A, A, DIFFERENT_NONZERO_PATTERN);
-#    else
         ierr = KSPSetOperators(solver_data->ksp, A, A);
-#    endif
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /*

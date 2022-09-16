@@ -157,6 +157,188 @@ namespace MatrixFreeTools
     const unsigned int first_selected_component = 0);
 
 
+
+  /**
+   * A wrapper around MatrixFree to help users to deal with DoFHandler
+   * objects involving cells without degrees of freedom, i.e.,
+   * cells using FENothing as element type.  In the following we call such cells
+   * deactivated. All other cells are activated. In contrast to MatrixFree,
+   * this class skips deactivated cells and faces between activated and
+   * deactivated cells are treated as boundary faces.
+   */
+  template <int dim,
+            typename Number,
+            typename VectorizedArrayType = VectorizedArray<Number>>
+  class ElementActivationAndDeactivationMatrixFree
+  {
+  public:
+    /**
+     * Struct that helps to configure
+     * ElementActivationAndDeactivationMatrixFree.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor.
+       */
+      AdditionalData(const unsigned int dof_index = 0)
+        : dof_index(dof_index)
+      {}
+
+      /**
+       * Index of the DoFHandler within MatrixFree to be used.
+       */
+      unsigned int dof_index;
+    };
+
+    /**
+     * Reinitialize class based on a given MatrixFree instance.
+     * Particularly, the index of the valid FE is determined.
+     *
+     * @note At the moment, only DoFHandler objects are accepted
+     * that are initialized with FECollection objects with at most
+     * two finite elements (i.e., `FENothing` and another finite
+     * element).
+     */
+    void
+    reinit(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+           const AdditionalData &additional_data = AdditionalData())
+    {
+      this->matrix_free = &matrix_free;
+
+      std::vector<unsigned int> valid_fe_indices;
+
+      const auto &fe_collection =
+        matrix_free.get_dof_handler(additional_data.dof_index)
+          .get_fe_collection();
+
+      for (unsigned int i = 0; i < fe_collection.size(); ++i)
+        if (fe_collection[i].n_dofs_per_cell() > 0)
+          valid_fe_indices.push_back(i);
+
+      // TODO: relax this so that arbitrary number of valid
+      // FEs can be accepted
+      AssertDimension(valid_fe_indices.size(), 1);
+
+      fe_index_valid = *valid_fe_indices.begin();
+    }
+
+    /**
+     * Loop over all activated cells.
+     *
+     * For the meaning of the parameters see MatrixFree::cell_loop().
+     */
+    template <typename VectorTypeOut, typename VectorTypeIn>
+    void
+    cell_loop(const std::function<void(
+                const MatrixFree<dim, Number, VectorizedArrayType> &,
+                VectorTypeOut &,
+                const VectorTypeIn &,
+                const std::pair<unsigned int, unsigned int>)> &cell_operation,
+              VectorTypeOut &                                  dst,
+              const VectorTypeIn &                             src,
+              const bool zero_dst_vector = false)
+    {
+      const auto ebd_cell_operation = [&](const auto &matrix_free,
+                                          auto &      dst,
+                                          const auto &src,
+                                          const auto  range) {
+        const auto category = matrix_free.get_cell_range_category(range);
+
+        if (category != fe_index_valid)
+          return;
+
+        cell_operation(matrix_free, dst, src, range);
+      };
+
+      matrix_free->template cell_loop<VectorTypeOut, VectorTypeIn>(
+        ebd_cell_operation, dst, src, zero_dst_vector);
+    }
+
+    /**
+     * Loop over all activated cells and faces. Faces between activated and
+     * deactivated cells are treated as boundary faces with the boundary ID
+     * numbers::internal_face_boundary_id.
+     *
+     * For the meaning of the parameters see MatrixFree::cell_loop().
+     */
+    template <typename VectorTypeOut, typename VectorTypeIn>
+    void
+    loop(const std::function<
+           void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+                VectorTypeOut &,
+                const VectorTypeIn &,
+                const std::pair<unsigned int, unsigned int>)> &cell_operation,
+         const std::function<
+           void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+                VectorTypeOut &,
+                const VectorTypeIn &,
+                const std::pair<unsigned int, unsigned int>)> &face_operation,
+         const std::function<
+           void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+                VectorTypeOut &,
+                const VectorTypeIn &,
+                const std::pair<unsigned int, unsigned int>,
+                const bool)> &boundary_operation,
+         VectorTypeOut &      dst,
+         const VectorTypeIn & src,
+         const bool           zero_dst_vector = false)
+    {
+      const auto ebd_cell_operation = [&](const auto &matrix_free,
+                                          auto &      dst,
+                                          const auto &src,
+                                          const auto  range) {
+        const auto category = matrix_free.get_cell_range_category(range);
+
+        if (category != fe_index_valid)
+          return;
+
+        cell_operation(matrix_free, dst, src, range);
+      };
+
+      const auto ebd_internal_or_boundary_face_operation =
+        [&](const auto &matrix_free,
+            auto &      dst,
+            const auto &src,
+            const auto  range) {
+          const auto category = matrix_free.get_face_range_category(range);
+
+          const unsigned int type =
+            static_cast<unsigned int>(category.first == fe_index_valid) +
+            static_cast<unsigned int>(category.second == fe_index_valid);
+
+          if (type == 0)
+            return; // deactivated face -> nothing to do
+
+          if (type == 1) // boundary face
+            boundary_operation(
+              matrix_free, dst, src, range, category.first == fe_index_valid);
+          else if (type == 2) // internal face
+            face_operation(matrix_free, dst, src, range);
+        };
+
+      matrix_free->template loop<VectorTypeOut, VectorTypeIn>(
+        ebd_cell_operation,
+        ebd_internal_or_boundary_face_operation,
+        ebd_internal_or_boundary_face_operation,
+        dst,
+        src,
+        zero_dst_vector);
+    }
+
+  private:
+    /**
+     * Reference to the underlying MatrixFree object.
+     */
+    SmartPointer<const MatrixFree<dim, Number, VectorizedArrayType>>
+      matrix_free;
+
+    /**
+     * Index of the valid FE. Currently, ony a single one is supported.
+     */
+    unsigned int fe_index_valid;
+  };
+
   // implementations
 
 #ifndef DOXYGEN
@@ -950,11 +1132,11 @@ namespace MatrixFreeTools
      */
     template <typename MatrixType,
               typename Number,
-              typename std::enable_if<std::is_same<
+              std::enable_if_t<std::is_same<
                 typename std::remove_const<typename std::remove_reference<
                   typename MatrixType::value_type>::type>::type,
                 typename std::remove_const<typename std::remove_reference<
-                  Number>::type>::type>::value>::type * = nullptr>
+                  Number>::type>::type>::value> * = nullptr>
     const AffineConstraints<typename MatrixType::value_type> &
     create_new_affine_constraints_if_needed(
       const MatrixType &,
@@ -971,11 +1153,11 @@ namespace MatrixFreeTools
      */
     template <typename MatrixType,
               typename Number,
-              typename std::enable_if<!std::is_same<
+              std::enable_if_t<!std::is_same<
                 typename std::remove_const<typename std::remove_reference<
                   typename MatrixType::value_type>::type>::type,
                 typename std::remove_const<typename std::remove_reference<
-                  Number>::type>::type>::value>::type * = nullptr>
+                  Number>::type>::type>::value> * = nullptr>
     const AffineConstraints<typename MatrixType::value_type> &
     create_new_affine_constraints_if_needed(
       const MatrixType &,

@@ -37,7 +37,7 @@ namespace Physics
       /**
        * @name Rotation matrices
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the rotation matrix for 2-d Euclidean space, namely
@@ -100,7 +100,7 @@ namespace Physics
       DEAL_II_DEPRECATED Tensor<2, 3, Number>
       rotation_matrix_3d(const Point<3, Number> &axis, const Number &angle);
 
-      //@}
+      /** @} */
 
     } // namespace Rotations
 
@@ -125,7 +125,7 @@ namespace Physics
       /**
        * @name Push forward operations
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the result of the push forward transformation on a
@@ -223,12 +223,12 @@ namespace Physics
       push_forward(const SymmetricTensor<4, dim, Number> &H,
                    const Tensor<2, dim, Number> &         F);
 
-      //@}
+      /** @} */
 
       /**
        * @name Pull back operations
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the result of the pull back transformation on a contravariant
@@ -324,7 +324,7 @@ namespace Physics
       pull_back(const SymmetricTensor<4, dim, Number> &h,
                 const Tensor<2, dim, Number> &         F);
 
-      //@}
+      /** @} */
     } // namespace Contravariant
 
     /**
@@ -350,7 +350,7 @@ namespace Physics
       /**
        * @name Push forward operations
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the result of the push forward transformation on a covariant
@@ -448,12 +448,12 @@ namespace Physics
       push_forward(const SymmetricTensor<4, dim, Number> &H,
                    const Tensor<2, dim, Number> &         F);
 
-      //@}
+      /** @} */
 
       /**
        * @name Pull back operations
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the result of the pull back transformation on a covariant
@@ -549,7 +549,7 @@ namespace Physics
       pull_back(const SymmetricTensor<4, dim, Number> &h,
                 const Tensor<2, dim, Number> &         F);
 
-      //@}
+      /** @} */
     } // namespace Covariant
 
     /**
@@ -562,7 +562,7 @@ namespace Physics
       /**
        * @name Push forward operations
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the result of the push forward transformation on a
@@ -668,12 +668,12 @@ namespace Physics
       push_forward(const SymmetricTensor<4, dim, Number> &H,
                    const Tensor<2, dim, Number> &         F);
 
-      //@}
+      /** @} */
 
       /**
        * @name Pull back operations
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the result of the pull back transformation on a contravariant
@@ -777,13 +777,13 @@ namespace Physics
       pull_back(const SymmetricTensor<4, dim, Number> &h,
                 const Tensor<2, dim, Number> &         F);
 
-      //@}
+      /** @} */
     } // namespace Piola
 
     /**
      * @name Special operations
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the result of applying Nanson's formula for the transformation
@@ -812,12 +812,12 @@ namespace Physics
     nansons_formula(const Tensor<1, dim, Number> &N,
                     const Tensor<2, dim, Number> &F);
 
-    //@}
+    /** @} */
 
     /**
      * @name Basis transformations
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a vector with a changed basis, i.e.
@@ -897,7 +897,7 @@ namespace Physics
     basis_transformation(const SymmetricTensor<4, dim, Number> &H,
                          const Tensor<2, dim, Number> &         B);
 
-    //@}
+    /** @} */
 
   } // namespace Transformations
 } // namespace Physics
@@ -912,8 +912,12 @@ template <typename Number>
 Tensor<2, 2, Number>
 Physics::Transformations::Rotations::rotation_matrix_2d(const Number &angle)
 {
-  const Number rotation[2][2] = {{std::cos(angle), -std::sin(angle)},
-                                 {std::sin(angle), std::cos(angle)}};
+  // Make things work with AD types
+  using std::cos;
+  using std::sin;
+
+  const Number rotation[2][2] = {{cos(angle), -sin(angle)},
+                                 {sin(angle), cos(angle)}};
   return Tensor<2, 2>(rotation);
 }
 
@@ -925,10 +929,15 @@ Physics::Transformations::Rotations::rotation_matrix_3d(
   const Tensor<1, 3, Number> &axis,
   const Number &              angle)
 {
-  Assert(std::abs(axis.norm() - 1.0) < 1e-9,
+  // Make things work with AD types
+  using std::abs;
+  using std::cos;
+  using std::sin;
+
+  Assert(abs(axis.norm() - 1.0) < 1e-9,
          ExcMessage("The supplied axial vector is not a unit vector."));
-  const Number c              = std::cos(angle);
-  const Number s              = std::sin(angle);
+  const Number c              = cos(angle);
+  const Number s              = sin(angle);
   const Number t              = 1. - c;
   const Number rotation[3][3] = {{t * axis[0] * axis[0] + c,
                                   t * axis[0] * axis[1] - s * axis[2],

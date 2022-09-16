@@ -131,14 +131,14 @@ output_vector(const VectorType &     v,
 
 
 template <typename VectorType>
-typename std::enable_if<!IsBlockVector<VectorType>::value, VectorType>::type
+std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
 build_ghosted(const IndexSet &owned_indices, const IndexSet &ghosted_indices)
 {
   return VectorType(owned_indices, ghosted_indices, MPI_COMM_WORLD);
 }
 
 template <typename VectorType>
-typename std::enable_if<IsBlockVector<VectorType>::value, VectorType>::type
+std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
 build_ghosted(const IndexSet &owned_indices, const IndexSet &ghosted_indices)
 {
   std::vector<IndexSet> owned_indices_vector(1, owned_indices);
@@ -151,14 +151,14 @@ build_ghosted(const IndexSet &owned_indices, const IndexSet &ghosted_indices)
 
 
 template <typename VectorType>
-typename std::enable_if<!IsBlockVector<VectorType>::value, VectorType>::type
+std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
 build_distributed(const IndexSet &owned_indices)
 {
   return VectorType(owned_indices, MPI_COMM_WORLD);
 }
 
 template <typename VectorType>
-typename std::enable_if<IsBlockVector<VectorType>::value, VectorType>::type
+std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
 build_distributed(const IndexSet &owned_indices)
 {
   std::vector<IndexSet> owned_indices_vector(1, owned_indices);

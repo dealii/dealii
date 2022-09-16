@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/table.h>
 
 #include <deal.II/fe/fe.h>
@@ -27,8 +28,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * Implementation of Raviart-Thomas (RT) elements. The Raviart-Thomas space
@@ -420,7 +423,7 @@ private:
   mutable Threads::Mutex mutex;
 };
 
-/*@}*/
+/** @} */
 
 /* -------------- declaration of explicit specializations ------------- */
 

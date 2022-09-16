@@ -15,7 +15,7 @@
 
 
 
-// Similar to compute_diagonal_02 but testing block vectorss.
+// Similar to compute_diagonal_02 but testing block vectors.
 
 #include <deal.II/lac/la_parallel_block_vector.h>
 

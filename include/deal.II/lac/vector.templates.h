@@ -42,6 +42,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN
@@ -238,18 +239,6 @@ Vector<Number>::grow_or_shrink(const size_type n)
   values.resize(n);
 
   maybe_reset_thread_partitioner();
-}
-
-
-
-template <typename Number>
-template <typename Number2>
-void
-Vector<Number>::reinit(const Vector<Number2> &v,
-                       const bool             omit_zeroing_entries)
-{
-  do_reinit(v.size(), omit_zeroing_entries, false);
-  thread_loop_partitioner = v.thread_loop_partitioner;
 }
 
 

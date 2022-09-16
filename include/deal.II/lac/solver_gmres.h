@@ -32,13 +32,16 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 namespace internal
 {
@@ -185,12 +188,14 @@ public:
      * Constructor. By default, set the number of temporary vectors to 30,
      * i.e. do a restart every 28 iterations. Also set preconditioning from
      * left, the residual of the stopping criterion to the default residual,
-     * and re-orthogonalization only if necessary.
+     * and re-orthogonalization only if necessary. Also, the batched mode with
+     * reduced functionality to track information is disabled by default.
      */
     explicit AdditionalData(const unsigned int max_n_tmp_vectors     = 30,
                             const bool         right_preconditioning = false,
                             const bool         use_default_residual  = true,
-                            const bool force_re_orthogonalization    = false);
+                            const bool force_re_orthogonalization    = false,
+                            const bool batched_mode                  = false);
 
     /**
      * Maximum number of temporary vectors. This parameter controls the size
@@ -221,6 +226,14 @@ public:
      * if necessary.
      */
     bool force_re_orthogonalization;
+
+    /**
+     * Flag to control whether a reduced mode of the solver should be
+     * run. This is necessary when running (several) SolverGMRES instances
+     * involving very small and cheap linear systems where the feedback from
+     * all signals, eigenvalue computations, and log stream are disabled.
+     */
+    bool batched_mode;
   };
 
   /**
@@ -371,6 +384,13 @@ protected:
   boost::signals2::signal<void(int)> re_orthogonalize_signal;
 
   /**
+   * A reference to the underlying SolverControl object. In the regular case,
+   * this is not needed, as the signal from the base class is used, but the
+   * batched variant cannot use those mechanisms due to the high costs.
+   */
+  SolverControl &solver_control;
+
+  /**
    * Implementation of the computation of the norm of the residual.
    */
   virtual double
@@ -431,10 +451,27 @@ protected:
   FullMatrix<double> H;
 
   /**
-   * Auxiliary matrix for inverting @p H
+   * Auxiliary vector for orthogonalization
    */
-  FullMatrix<double> H1;
+  Vector<double> gamma;
+
+  /**
+   * Auxiliary vector for orthogonalization
+   */
+  Vector<double> ci;
+
+  /**
+   * Auxiliary vector for orthogonalization
+   */
+  Vector<double> si;
+
+  /**
+   * Auxiliary vector for orthogonalization
+   */
+  Vector<double> h;
 };
+
+
 
 /**
  * Implementation of the Generalized minimal residual method with flexible
@@ -519,7 +556,7 @@ private:
   FullMatrix<double> H1;
 };
 
-/*@}*/
+/** @} */
 /* --------------------- Inline and template functions ------------------- */
 
 
@@ -558,7 +595,7 @@ namespace internal
       if (data[i] == nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
-          data[i]->reinit(temp);
+          data[i]->reinit(temp, true);
         }
       return *data[i];
     }
@@ -582,6 +619,24 @@ namespace internal
       return x.real() < y.real() ||
              (x.real() == y.real() && x.imag() < y.imag());
     }
+
+    // A function to solve the (upper) triangular system after Givens
+    // rotations on a matrix that has possibly unused rows and columns
+    inline void
+    solve_triangular(const unsigned int        dim,
+                     const FullMatrix<double> &H,
+                     const Vector<double> &    rhs,
+                     Vector<double> &          solution)
+    {
+      for (int i = dim - 1; i >= 0; --i)
+        {
+          double s = rhs(i);
+          for (unsigned int j = i + 1; j < dim; ++j)
+            s -= solution(j) * H(i, j);
+          solution(i) = s / H(i, i);
+          AssertIsFinite(solution(i));
+        }
+    }
   } // namespace SolverGMRESImplementation
 } // namespace internal
 
@@ -592,11 +647,13 @@ inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
   const unsigned int max_n_tmp_vectors,
   const bool         right_preconditioning,
   const bool         use_default_residual,
-  const bool         force_re_orthogonalization)
+  const bool         force_re_orthogonalization,
+  const bool         batched_mode)
   : max_n_tmp_vectors(max_n_tmp_vectors)
   , right_preconditioning(right_preconditioning)
   , use_default_residual(use_default_residual)
   , force_re_orthogonalization(force_re_orthogonalization)
+  , batched_mode(batched_mode)
 {
   Assert(3 <= max_n_tmp_vectors,
          ExcMessage("SolverGMRES needs at least three "
@@ -611,6 +668,7 @@ SolverGMRES<VectorType>::SolverGMRES(SolverControl &           cn,
                                      const AdditionalData &    data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
+  , solver_control(cn)
 {}
 
 
@@ -620,6 +678,7 @@ SolverGMRES<VectorType>::SolverGMRES(SolverControl &       cn,
                                      const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
+  , solver_control(cn)
 {}
 
 
@@ -789,7 +848,9 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
   // TODO:[GK] Make sure the parameter in the constructor means maximum basis
   // size
 
-  LogStream::Prefix prefix("GMRES");
+  std::unique_ptr<LogStream::Prefix> prefix;
+  if (!additional_data.batched_mode)
+    prefix = std::make_unique<LogStream::Prefix>("GMRES");
 
   // extra call to std::max to placate static analyzers: coverity rightfully
   // complains that data.max_n_tmp_vectors - 2 may overflow
@@ -806,9 +867,11 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
   unsigned int accumulated_iterations = 0;
 
   const bool do_eigenvalues =
-    !condition_number_signal.empty() || !all_condition_numbers_signal.empty() ||
-    !eigenvalues_signal.empty() || !all_eigenvalues_signal.empty() ||
-    !hessenberg_signal.empty() || !all_hessenberg_signal.empty();
+    !additional_data.batched_mode &&
+    (!condition_number_signal.empty() ||
+     !all_condition_numbers_signal.empty() || !eigenvalues_signal.empty() ||
+     !all_eigenvalues_signal.empty() || !hessenberg_signal.empty() ||
+     !all_hessenberg_signal.empty());
   // for eigenvalue computation, need to collect the Hessenberg matrix (before
   // applying Givens rotations)
   FullMatrix<double> H_orig;
@@ -819,9 +882,10 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
   H.reinit(n_tmp_vectors, n_tmp_vectors - 1);
 
   // some additional vectors, also used in the orthogonalization
-  dealii::Vector<double> gamma(n_tmp_vectors), ci(n_tmp_vectors - 1),
-    si(n_tmp_vectors - 1), h(n_tmp_vectors - 1);
-
+  gamma.reinit(n_tmp_vectors);
+  ci.reinit(n_tmp_vectors - 1);
+  si.reinit(n_tmp_vectors - 1);
+  h.reinit(n_tmp_vectors - 1);
 
   unsigned int dim = 0;
 
@@ -887,8 +951,11 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
       if (use_default_residual)
         {
           last_res = rho;
-          iteration_state =
-            this->iteration_status(accumulated_iterations, rho, x);
+          if (additional_data.batched_mode)
+            iteration_state = solver_control.check(accumulated_iterations, rho);
+          else
+            iteration_state =
+              this->iteration_status(accumulated_iterations, rho, x);
 
           if (iteration_state != SolverControl::iterate)
             break;
@@ -907,8 +974,11 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
 
           double res = r->l2_norm();
           last_res   = res;
-          iteration_state =
-            this->iteration_status(accumulated_iterations, res, x);
+          if (additional_data.batched_mode)
+            iteration_state = solver_control.check(accumulated_iterations, rho);
+          else
+            iteration_state =
+              this->iteration_status(accumulated_iterations, res, x);
 
           if (iteration_state != SolverControl::iterate)
             break;
@@ -976,32 +1046,33 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
           if (use_default_residual)
             {
               last_res = rho;
-              iteration_state =
-                this->iteration_status(accumulated_iterations, rho, x);
+              if (additional_data.batched_mode)
+                iteration_state =
+                  solver_control.check(accumulated_iterations, rho);
+              else
+                iteration_state =
+                  this->iteration_status(accumulated_iterations, rho, x);
             }
           else
             {
-              deallog << "default_res=" << rho << std::endl;
+              if (!additional_data.batched_mode)
+                deallog << "default_res=" << rho << std::endl;
 
-              dealii::Vector<double> h_(dim);
               *x_     = x;
               *gamma_ = gamma;
-              H1.reinit(dim + 1, dim);
-
-              for (unsigned int i = 0; i < dim + 1; ++i)
-                for (unsigned int j = 0; j < dim; ++j)
-                  H1(i, j) = H(i, j);
-
-              H1.backward(h_, *gamma_);
+              internal::SolverGMRESImplementation::solve_triangular(dim,
+                                                                    H,
+                                                                    *gamma_,
+                                                                    h);
 
               if (left_precondition)
                 for (unsigned int i = 0; i < dim; ++i)
-                  x_->add(h_(i), tmp_vectors[i]);
+                  x_->add(h(i), tmp_vectors[i]);
               else
                 {
                   p = 0.;
                   for (unsigned int i = 0; i < dim; ++i)
-                    p.add(h_(i), tmp_vectors[i]);
+                    p.add(h(i), tmp_vectors[i]);
                   preconditioner.vmult(*r, p);
                   x_->add(1., *r);
                 };
@@ -1022,37 +1093,36 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
                   const double preconditioned_res = x_->l2_norm();
                   last_res                        = preconditioned_res;
 
-                  iteration_state =
-                    this->iteration_status(accumulated_iterations,
-                                           preconditioned_res,
-                                           x);
+                  if (additional_data.batched_mode)
+                    iteration_state =
+                      solver_control.check(accumulated_iterations, rho);
+                  else
+                    iteration_state =
+                      this->iteration_status(accumulated_iterations,
+                                             preconditioned_res,
+                                             x);
                 }
             }
-        };
+        }
+
       // end of inner iteration. now calculate the solution from the temporary
       // vectors
-      h.reinit(dim);
-      H1.reinit(dim + 1, dim);
+      internal::SolverGMRESImplementation::solve_triangular(dim, H, gamma, h);
 
-      for (unsigned int i = 0; i < dim + 1; ++i)
-        for (unsigned int j = 0; j < dim; ++j)
-          H1(i, j) = H(i, j);
-
-      compute_eigs_and_cond(H_orig,
-                            dim,
-                            all_eigenvalues_signal,
-                            all_hessenberg_signal,
-                            condition_number_signal);
-
-      H1.backward(h, gamma);
+      if (do_eigenvalues)
+        compute_eigs_and_cond(H_orig,
+                              dim,
+                              all_eigenvalues_signal,
+                              all_hessenberg_signal,
+                              condition_number_signal);
 
       if (left_precondition)
         for (unsigned int i = 0; i < dim; ++i)
           x.add(h(i), tmp_vectors[i]);
       else
         {
-          p = 0.;
-          for (unsigned int i = 0; i < dim; ++i)
+          p.equ(h(0), tmp_vectors[0]);
+          for (unsigned int i = 1; i < dim; ++i)
             p.add(h(i), tmp_vectors[i]);
           preconditioner.vmult(v, p);
           x.add(1., v);
@@ -1062,13 +1132,14 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
     }
   while (iteration_state == SolverControl::iterate);
 
-  compute_eigs_and_cond(H_orig,
-                        dim,
-                        eigenvalues_signal,
-                        hessenberg_signal,
-                        condition_number_signal);
+  if (do_eigenvalues)
+    compute_eigs_and_cond(H_orig,
+                          dim,
+                          eigenvalues_signal,
+                          hessenberg_signal,
+                          condition_number_signal);
 
-  if (!krylov_space_signal.empty())
+  if (!additional_data.batched_mode && !krylov_space_signal.empty())
     krylov_space_signal(tmp_vectors);
 
   // in case of failure: throw exception

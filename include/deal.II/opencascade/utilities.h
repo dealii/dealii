@@ -15,34 +15,34 @@
 
 
 #ifndef dealii_occ_utilities_h
-#  define dealii_occ_utilities_h
+#define dealii_occ_utilities_h
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_OPENCASCADE
+#ifdef DEAL_II_WITH_OPENCASCADE
 
-#    include <deal.II/base/point.h>
+#  include <deal.II/base/point.h>
 
-#    include <deal.II/fe/mapping_q1.h>
+#  include <deal.II/fe/mapping_q1.h>
 
-#    include <deal.II/grid/tria.h>
+#  include <deal.II/grid/tria.h>
 
-#    include <string>
+#  include <string>
 
 // opencascade needs "HAVE_CONFIG_H" to be exported...
-#    define HAVE_CONFIG_H
-#    include <IFSelect_ReturnStatus.hxx>
-#    include <TopoDS_CompSolid.hxx>
-#    include <TopoDS_Compound.hxx>
-#    include <TopoDS_Edge.hxx>
-#    include <TopoDS_Face.hxx>
-#    include <TopoDS_Shape.hxx>
-#    include <TopoDS_Shell.hxx>
-#    include <TopoDS_Solid.hxx>
-#    include <TopoDS_Vertex.hxx>
-#    include <TopoDS_Wire.hxx>
-#    include <gp_Pnt.hxx>
-#    undef HAVE_CONFIG_H
+#  define HAVE_CONFIG_H
+#  include <IFSelect_ReturnStatus.hxx>
+#  include <TopoDS_CompSolid.hxx>
+#  include <TopoDS_Compound.hxx>
+#  include <TopoDS_Edge.hxx>
+#  include <TopoDS_Face.hxx>
+#  include <TopoDS_Shape.hxx>
+#  include <TopoDS_Shell.hxx>
+#  include <TopoDS_Solid.hxx>
+#  include <TopoDS_Vertex.hxx>
+#  include <TopoDS_Wire.hxx>
+#  include <gp_Pnt.hxx>
+#  undef HAVE_CONFIG_H
 
 
 
@@ -467,7 +467,6 @@ namespace OpenCASCADE
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_OPENCASCADE
+#endif // DEAL_II_WITH_OPENCASCADE
 
-#endif // dealii_occ_utilities_h
-/*----------------------------- occ_utilities.h -----------------------------*/
+#endif

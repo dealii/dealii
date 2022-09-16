@@ -76,7 +76,7 @@ struct FunctionsTestSymmetricTensorSymmetricTensorCoupled
   psi(const SymmetricTensor<2, dim, NumberType> &t1,
       const SymmetricTensor<2, dim, NumberType> &t2)
   {
-    return std::pow(det_t(t1), 2) * std::pow(det_t(t2), 3);
+    return pow(det_t(t1), 2) * pow(det_t(t2), 3);
   };
 
   static SymmetricTensor<2, dim, NumberType>
@@ -84,7 +84,7 @@ struct FunctionsTestSymmetricTensorSymmetricTensorCoupled
            const SymmetricTensor<2, dim, NumberType> &t2)
   {
     return SymmetricTensor<2, dim, NumberType>(
-      2.0 * std::pow(det_t(t1), 1) * ddet_t_dt(t1) * std::pow(det_t(t2), 3));
+      2.0 * pow(det_t(t1), 1) * ddet_t_dt(t1) * pow(det_t(t2), 3));
   };
 
   static SymmetricTensor<2, dim, NumberType>
@@ -92,7 +92,7 @@ struct FunctionsTestSymmetricTensorSymmetricTensorCoupled
            const SymmetricTensor<2, dim, NumberType> &t2)
   {
     return SymmetricTensor<2, dim, NumberType>(
-      pow(det_t(t1), 2) * 3.0 * std::pow(det_t(t2), 2) * ddet_t_dt(t2));
+      pow(det_t(t1), 2) * 3.0 * pow(det_t(t2), 2) * ddet_t_dt(t2));
   };
 
   static SymmetricTensor<4, dim, NumberType>
@@ -100,9 +100,9 @@ struct FunctionsTestSymmetricTensorSymmetricTensorCoupled
                 const SymmetricTensor<2, dim, NumberType> &t2)
   {
     return SymmetricTensor<4, dim, NumberType>(
-      2.0 * std::pow(det_t(t2), 3) *
+      2.0 * pow(det_t(t2), 3) *
       (pow(det_t(t1), 0) * outer_product(ddet_t_dt(t1), ddet_t_dt(t1)) +
-       std::pow(det_t(t1), 1) * d2det_t_dt_dt(t1)));
+       pow(det_t(t1), 1) * d2det_t_dt_dt(t1)));
   };
 
   static SymmetricTensor<4, dim, NumberType>
@@ -110,7 +110,7 @@ struct FunctionsTestSymmetricTensorSymmetricTensorCoupled
                 const SymmetricTensor<2, dim, NumberType> &t2)
   {
     return SymmetricTensor<4, dim, NumberType>(
-      2.0 * std::pow(det_t(t1), 1) * 3.0 * std::pow(det_t(t2), 2) *
+      2.0 * pow(det_t(t1), 1) * 3.0 * pow(det_t(t2), 2) *
       outer_product(ddet_t_dt(t1), ddet_t_dt(t2)));
   };
 
@@ -119,7 +119,7 @@ struct FunctionsTestSymmetricTensorSymmetricTensorCoupled
                 const SymmetricTensor<2, dim, NumberType> &t2)
   {
     return SymmetricTensor<4, dim, NumberType>(
-      2.0 * std::pow(det_t(t1), 1) * 3.0 * std::pow(det_t(t2), 2) *
+      2.0 * pow(det_t(t1), 1) * 3.0 * pow(det_t(t2), 2) *
       outer_product(ddet_t_dt(t2), ddet_t_dt(t1)));
   };
 
@@ -129,9 +129,8 @@ struct FunctionsTestSymmetricTensorSymmetricTensorCoupled
   {
     return SymmetricTensor<4, dim, NumberType>(
       pow(det_t(t1), 2) * 3.0 *
-      (2.0 * std::pow(det_t(t2), 1) *
-         outer_product(ddet_t_dt(t2), ddet_t_dt(t2)) +
-       std::pow(det_t(t2), 2) * d2det_t_dt_dt(t2)));
+      (2.0 * pow(det_t(t2), 1) * outer_product(ddet_t_dt(t2), ddet_t_dt(t2)) +
+       pow(det_t(t2), 2) * d2det_t_dt_dt(t2)));
   };
 };
 

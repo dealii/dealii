@@ -17,6 +17,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometric_utilities.h>
 
+#include <array>
+#include <cmath>
+#include <limits>
+
 
 DEAL_II_NAMESPACE_OPEN
 

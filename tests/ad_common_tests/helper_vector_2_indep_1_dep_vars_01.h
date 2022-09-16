@@ -42,19 +42,19 @@ struct FunctionsTestSquare
   static NumberType
   f0(const NumberType &s0, const NumberType &s1)
   {
-    return 2.0 * std::pow(s0, 4) * std::pow(s1, 3);
+    return 2.0 * pow(s0, 4) * pow(s1, 3);
   };
 
   static NumberType
   df0_ds0(const NumberType &s0, const NumberType &s1)
   {
-    return 8.0 * std::pow(s0, 3) * std::pow(s1, 3);
+    return 8.0 * pow(s0, 3) * pow(s1, 3);
   };
 
   static NumberType
   df0_ds1(const NumberType &s0, const NumberType &s1)
   {
-    return 6.0 * std::pow(s0, 4) * std::pow(s1, 2);
+    return 6.0 * pow(s0, 4) * pow(s1, 2);
   };
 };
 

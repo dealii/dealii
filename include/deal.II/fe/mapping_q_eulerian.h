@@ -19,8 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -37,8 +37,10 @@ template <typename>
 class Vector;
 
 
-/*!@addtogroup mapping */
-/*@{*/
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class is an extension of the MappingQ1Eulerian class to higher order
@@ -223,7 +225,7 @@ private:
   mutable Threads::Mutex fe_values_mutex;
 };
 
-/*@}*/
+/** @} */
 
 
 /*----------------------------------------------------------------------*/

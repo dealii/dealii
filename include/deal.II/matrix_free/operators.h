@@ -33,6 +33,7 @@
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -45,32 +46,31 @@ namespace MatrixFreeOperators
     // a non-block vector has one block and the only subblock is the vector
     // itself
     template <typename VectorType>
-    typename std::enable_if<IsBlockVector<VectorType>::value,
-                            unsigned int>::type
+    std::enable_if_t<IsBlockVector<VectorType>::value, unsigned int>
     n_blocks(const VectorType &vector)
     {
       return vector.n_blocks();
     }
 
     template <typename VectorType>
-    typename std::enable_if<!IsBlockVector<VectorType>::value,
-                            unsigned int>::type
+    std::enable_if_t<!IsBlockVector<VectorType>::value, unsigned int>
     n_blocks(const VectorType &)
     {
       return 1;
     }
 
     template <typename VectorType>
-    typename std::enable_if<IsBlockVector<VectorType>::value,
-                            typename VectorType::BlockType &>::type
+    std::enable_if_t<IsBlockVector<VectorType>::value,
+                     typename VectorType::BlockType &>
     subblock(VectorType &vector, unsigned int block_no)
     {
+      AssertIndexRange(block_no, vector.n_blocks());
       return vector.block(block_no);
     }
 
     template <typename VectorType>
-    typename std::enable_if<IsBlockVector<VectorType>::value,
-                            const typename VectorType::BlockType &>::type
+    std::enable_if_t<IsBlockVector<VectorType>::value,
+                     const typename VectorType::BlockType &>
     subblock(const VectorType &vector, unsigned int block_no)
     {
       AssertIndexRange(block_no, vector.n_blocks());
@@ -78,30 +78,28 @@ namespace MatrixFreeOperators
     }
 
     template <typename VectorType>
-    typename std::enable_if<!IsBlockVector<VectorType>::value,
-                            VectorType &>::type
+    std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType &>
     subblock(VectorType &vector, unsigned int)
     {
       return vector;
     }
 
     template <typename VectorType>
-    typename std::enable_if<!IsBlockVector<VectorType>::value,
-                            const VectorType &>::type
+    std::enable_if_t<!IsBlockVector<VectorType>::value, const VectorType &>
     subblock(const VectorType &vector, unsigned int)
     {
       return vector;
     }
 
     template <typename VectorType>
-    typename std::enable_if<IsBlockVector<VectorType>::value, void>::type
+    std::enable_if_t<IsBlockVector<VectorType>::value, void>
     collect_sizes(VectorType &vector)
     {
       vector.collect_sizes();
     }
 
     template <typename VectorType>
-    typename std::enable_if<!IsBlockVector<VectorType>::value, void>::type
+    std::enable_if_t<!IsBlockVector<VectorType>::value, void>
     collect_sizes(const VectorType &)
     {}
   } // namespace BlockHelper
@@ -730,7 +728,7 @@ namespace MatrixFreeOperators
   /**
    * This class implements the operation of the action of a mass matrix.
    *
-   * Note that this class only supports the non-blocked vector variant of the
+   * @note This class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
    * apply function.
    */
@@ -979,11 +977,14 @@ namespace MatrixFreeOperators
     /**
      * Apply Laplace operator on a cell @p cell.
      */
+    template <int n_components_compute>
     void
-    do_operation_on_cell(
-      FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, value_type>
-        &                phi,
-      const unsigned int cell) const;
+    do_operation_on_cell(FEEvaluation<dim,
+                                      fe_degree,
+                                      n_q_points_1d,
+                                      n_components_compute,
+                                      value_type> &phi,
+                         const unsigned int        cell) const;
 
     /**
      * User-provided heterogeneity coefficient.
@@ -1831,7 +1832,14 @@ namespace MatrixFreeOperators
                VectorType,
                VectorizedArrayType>::MassOperator()
     : Base<dim, VectorType, VectorizedArrayType>()
-  {}
+  {
+    AssertThrow(
+      IsBlockVector<VectorType>::value == false,
+      ExcNotImplemented(
+        "This class only supports the non-blocked vector variant of the Base "
+        "operator because only a single FEEvaluation object is used in the "
+        "apply function."));
+  }
 
 
 
@@ -2251,6 +2259,7 @@ namespace MatrixFreeOperators
             int n_components,
             typename VectorType,
             typename VectorizedArrayType>
+  template <int n_components_compute>
   void
   LaplaceOperator<dim,
                   fe_degree,
@@ -2263,7 +2272,7 @@ namespace MatrixFreeOperators
         dim,
         fe_degree,
         n_q_points_1d,
-        n_components,
+        n_components_compute,
         typename Base<dim, VectorType, VectorizedArrayType>::value_type> &phi,
       const unsigned int cell) const
   {
@@ -2370,25 +2379,36 @@ namespace MatrixFreeOperators
     using Number =
       typename Base<dim, VectorType, VectorizedArrayType>::value_type;
 
-    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
+    FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> eval(
       data, this->selected_rows[0]);
+    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
+      eval_vector(data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        phi.reinit(cell);
-        VectorizedArrayType local_diagonal_vector[phi.static_dofs_per_cell];
-        for (unsigned int i = 0; i < phi.dofs_per_component; ++i)
+        eval.reinit(cell);
+        eval_vector.reinit(cell);
+        // This function assumes that we have the same result on all
+        // components, so we only need to go through the columns of one scalar
+        // component, for which we have created a separate evaluator (attached
+        // to the first component, but the component does not matter because
+        // we only use the underlying integrals)
+        for (unsigned int i = 0; i < eval.dofs_per_cell; ++i)
           {
-            for (unsigned int j = 0; j < phi.dofs_per_component; ++j)
-              phi.begin_dof_values()[j] = VectorizedArrayType();
-            phi.begin_dof_values()[i] = 1.;
-            do_operation_on_cell(phi, cell);
-            local_diagonal_vector[i] = phi.begin_dof_values()[i];
+            for (unsigned int j = 0; j < eval.dofs_per_cell; ++j)
+              eval.begin_dof_values()[j] = VectorizedArrayType();
+            eval.begin_dof_values()[i] = 1.;
+
+            do_operation_on_cell(eval, cell);
+
+            // We now pick up the value on the diagonal (row i) and broadcast
+            // it to a second evaluator for all vector components, which we
+            // will distribute to the result vector afterwards
+            for (unsigned int c = 0; c < n_components; ++c)
+              eval_vector
+                .begin_dof_values()[i + c * eval_vector.dofs_per_component] =
+                eval.begin_dof_values()[i];
           }
-        for (unsigned int i = 0; i < phi.dofs_per_component; ++i)
-          for (unsigned int c = 0; c < phi.n_components; ++c)
-            phi.begin_dof_values()[i + c * phi.dofs_per_component] =
-              local_diagonal_vector[i];
-        phi.distribute_local_to_global(dst);
+        eval_vector.distribute_local_to_global(dst);
       }
   }
 

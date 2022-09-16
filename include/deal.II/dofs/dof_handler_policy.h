@@ -14,29 +14,27 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_dof_handler_policy_h
-#  define dealii_dof_handler_policy_h
+#define dealii_dof_handler_policy_h
 
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/template_constraints.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/template_constraints.h>
 
-#  include <deal.II/dofs/dof_renumbering.h>
-#  include <deal.II/dofs/dof_tools.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#  include <map>
-#  include <set>
-#  include <vector>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 template <int, int>
 class DoFHandler;
-#  endif
+#endif
 
 namespace internal
 {
@@ -260,4 +258,3 @@ namespace internal
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*--------------------------   dof_handler_policy.h -------------------------*/

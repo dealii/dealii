@@ -24,7 +24,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q_cache.h>
 
 #include <deal.II/lac/la_parallel_vector.h>

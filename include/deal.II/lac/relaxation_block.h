@@ -25,7 +25,6 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 
-#include <set>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

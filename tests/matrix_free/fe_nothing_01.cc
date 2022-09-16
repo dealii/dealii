@@ -18,9 +18,12 @@
 // test MatrixFree::reinit when some procs have only FE_Nothing and thus zero
 // dofs
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 

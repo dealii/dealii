@@ -14,19 +14,19 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_petsc_precondition_h
-#  define dealii_petsc_precondition_h
+#define dealii_petsc_precondition_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/point.h>
-#  include <deal.II/base/subscriptor.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/subscriptor.h>
 
-#  ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
-#    include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/exceptions.h>
 
-#    include <petscpc.h>
+#  include <petscpc.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,11 +35,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace PETScWrappers
 {
   // forward declarations
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
   class MatrixBase;
   class VectorBase;
   class SolverBase;
-#    endif
+#  endif
 
   /**
    * Base class for preconditioner classes using the PETSc functionality. The
@@ -1083,7 +1083,6 @@ namespace PETScWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 
-#  endif // DEAL_II_WITH_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 #endif
-/*--------------------------- petsc_precondition.h --------------------------*/

@@ -18,6 +18,7 @@
 #define dealii_vector_tools_boundary_templates_h
 
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -40,6 +41,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools_boundary.h>
 
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -990,7 +992,7 @@ namespace VectorTools
   namespace internals
   {
     template <int dim, typename cell_iterator, typename number>
-    typename std::enable_if<dim == 3>::type
+    std::enable_if_t<dim == 3>
     compute_edge_projection_l2(const cell_iterator &        cell,
                                const unsigned int           face,
                                const unsigned int           line,
@@ -1280,7 +1282,7 @@ namespace VectorTools
 
 
     template <int dim, typename cell_iterator, typename number>
-    typename std::enable_if<dim != 3>::type
+    std::enable_if_t<dim != 3>
     compute_edge_projection_l2(const cell_iterator &,
                                const unsigned int,
                                const unsigned int,

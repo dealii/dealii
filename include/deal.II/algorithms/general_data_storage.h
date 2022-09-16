@@ -177,8 +177,8 @@ public:
 
   /**
    * @name Data storage and access
+   * @{
    */
-  //@{
 
   /**
    * Store internally a copy of the given object. The copied object is
@@ -327,7 +327,7 @@ public:
   void
   remove_object_with_name(const std::string &name);
 
-  //@}
+  /** @} */
 
   /**
    * An entry with this name does not exist in the internal boost::any map.

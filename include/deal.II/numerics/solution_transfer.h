@@ -14,22 +14,22 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_solution_transfer_h
-#  define dealii_solution_transfer_h
+#define dealii_solution_transfer_h
 
 
 /*----------------------------   solutiontransfer.h     ----------------------*/
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/smartpointer.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/smartpointer.h>
 
-#  include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
 
-#  include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector.h>
 
-#  include <vector>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -569,5 +569,4 @@ private:
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii_solutiontransfer_h
-/*---------------------------- solutiontransfer.h ---------------------------*/
+#endif

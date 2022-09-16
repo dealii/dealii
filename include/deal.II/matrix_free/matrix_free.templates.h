@@ -22,10 +22,10 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/multithread_info.h>
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -229,6 +229,23 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
+const AffineConstraints<Number> &
+MatrixFree<dim, Number, VectorizedArrayType>::get_affine_constraints(
+  const unsigned int dof_handler_index) const
+{
+  AssertIndexRange(dof_handler_index, n_components());
+
+  AssertThrow(affine_constraints[dof_handler_index] != nullptr,
+              ExcMessage(
+                "AffineConstraints are only accessible if its Number type "
+                "matches with Number type of MatrixFree!"));
+
+  return *(affine_constraints[dof_handler_index]);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
 typename DoFHandler<dim>::cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
   const unsigned int cell_batch_index,
@@ -266,6 +283,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
     cell_level_index[cell_batch_index * VectorizedArrayType::size() +
                      lane_index];
   return level_index_pair;
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+unsigned int
+MatrixFree<dim, Number, VectorizedArrayType>::get_matrix_free_cell_index(
+  const typename Triangulation<dim>::cell_iterator &cell) const
+{
+  return mf_cell_indices[(this->get_mg_level() ==
+                          numbers::invalid_unsigned_int) ?
+                           cell->active_cell_index() :
+                           cell->index()];
 }
 
 
@@ -330,6 +360,29 @@ MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
 
 
 
+namespace internal
+{
+  template <typename Number, typename Number2>
+  void
+  store_affine_constraints(
+    const dealii::AffineConstraints<Number2> *,
+    SmartPointer<const dealii::AffineConstraints<Number>> &stored_constraints)
+  {
+    stored_constraints = nullptr;
+  }
+
+  template <typename Number>
+  void
+  store_affine_constraints(
+    const dealii::AffineConstraints<Number> *              affine_constraints,
+    SmartPointer<const dealii::AffineConstraints<Number>> &stored_constraints)
+  {
+    stored_constraints = affine_constraints;
+  }
+} // namespace internal
+
+
+
 template <int dim, typename Number, typename VectorizedArrayType>
 template <typename number2, int q_dim>
 void
@@ -373,6 +426,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
               shape_info(c, nq, fe_no, q_no)
                 .reinit(quad[nq][q_no], dof_handler[no]->get_fe(fe_no), b);
   }
+
+  // Store pointers to AffineConstraints objects if Number type matches
+  affine_constraints.resize(constraints.size());
+  for (unsigned int no = 0; no < constraints.size(); ++no)
+    internal::store_affine_constraints(constraints[no], affine_constraints[no]);
 
   if (additional_data.initialize_indices == true)
     {
@@ -802,6 +860,31 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 
       mapping_is_initialized = true;
     }
+
+  // set up map: deal.II index -> MatrixFree index
+  {
+    const auto &tria     = dof_handler[0]->get_triangulation();
+    const auto  mg_level = this->get_mg_level();
+
+    mf_cell_indices.resize((mg_level == numbers::invalid_unsigned_int) ?
+                             tria.n_active_cells() :
+                             (mg_level < tria.n_levels() ?
+                                tria.n_raw_cells(mg_level) :
+                                0),
+                           numbers::invalid_unsigned_int);
+
+    for (unsigned int cell = 0;
+         cell < n_cell_batches() + n_ghost_cell_batches();
+         ++cell)
+      for (unsigned int v = 0; v < n_active_entries_per_cell_batch(cell); ++v)
+        {
+          const auto tria_cell = get_cell_iterator(cell, v);
+          mf_cell_indices[(mg_level == numbers::invalid_unsigned_int) ?
+                            tria_cell->active_cell_index() :
+                            tria_cell->index()] =
+            cell * VectorizedArrayType::size() + v;
+        }
+  }
 }
 
 

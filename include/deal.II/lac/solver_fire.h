@@ -30,8 +30,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 /**
  * FIRE (Fast Inertial Relaxation Engine) for minimization of (potentially
@@ -179,7 +181,7 @@ protected:
   const AdditionalData additional_data;
 };
 
-/*@}*/
+/** @} */
 
 /*------------------------- Implementation ----------------------------*/
 

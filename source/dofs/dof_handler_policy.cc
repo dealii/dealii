@@ -788,7 +788,7 @@ namespace internal
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // this function should only be called for dim<3 where there are
-          // no quad dof identies. for dim==3, the specialization below should
+          // no quad dof identities. for dim==3, the specialization below should
           // take care of it
           Assert(dim < 3, ExcInternalError());
 
@@ -990,17 +990,14 @@ namespace internal
          * Returns the final number of degrees of freedom, which is the number
          * of all valid DoF indices in @p new_dof_indices.
          */
-        template <int dim, int spacedim>
         static types::global_dof_index
         enumerate_dof_indices_for_renumbering(
           std::vector<types::global_dof_index> &new_dof_indices,
           const std::vector<
             std::map<types::global_dof_index, types::global_dof_index>>
-            &all_constrained_indices,
-          const DoFHandler<dim, spacedim> &)
+            &                           all_constrained_indices,
+          const types::global_dof_index start_dof_index)
         {
-          Assert(all_constrained_indices.size() == dim, ExcInternalError());
-
           // first preset the new DoF indices that are identities
           for (const auto &constrained_dof_indices : all_constrained_indices)
             for (const auto &p : constrained_dof_indices)
@@ -1013,7 +1010,7 @@ namespace internal
                 }
 
           // then enumerate the rest
-          types::global_dof_index next_free_dof = 0;
+          types::global_dof_index next_free_dof = start_dof_index;
           for (auto &new_dof_index : new_dof_indices)
             if (new_dof_index == enumeration_dof_index)
               new_dof_index = next_free_dof++;
@@ -1073,7 +1070,7 @@ namespace internal
           const types::global_dof_index n_dofs =
             enumerate_dof_indices_for_renumbering(renumbering,
                                                   all_constrained_indices,
-                                                  dof_handler);
+                                                  0);
 
           renumber_dofs(renumbering, IndexSet(0), dof_handler, check_validity);
 
@@ -1521,7 +1518,7 @@ namespace internal
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
           // this function should only be called for dim<3 where there are
-          // no quad dof identies. for dim>=3, the specialization below should
+          // no quad dof identities. for dim>=3, the specialization below should
           // take care of it
           Assert(dim < 3, ExcInternalError());
         }
@@ -3715,11 +3712,19 @@ namespace internal
         // the order in which we handle Phases 2 and 3 is important,
         // since we want to clarify ownership of degrees of freedom before
         // we actually unify and enumerate their indices. otherwise, we could
-        // end up having a degee of freedom to which only invalid indices will
+        // end up having a degree of freedom to which only invalid indices will
         // be assigned.
+        types::global_dof_index n_identity_constrained_indices = 0;
+        for (const auto &constrained_indices : all_constrained_indices)
+          for (const auto index : constrained_indices)
+            if (renumbering[index.first] != numbers::invalid_dof_index)
+              ++n_identity_constrained_indices;
+
         const types::global_dof_index n_locally_owned_dofs =
-          Implementation::enumerate_dof_indices_for_renumbering(
-            renumbering, all_constrained_indices, *dof_handler);
+          std::count(renumbering.begin(),
+                     renumbering.end(),
+                     enumeration_dof_index) -
+          n_identity_constrained_indices;
 
         // --------- Phase 4: shift indices so that each processor has a unique
         //                    range of indices
@@ -3733,9 +3738,8 @@ namespace internal
         AssertThrowMPI(ierr);
 
         // make dof indices globally consecutive
-        for (auto &new_index : renumbering)
-          if (new_index != numbers::invalid_dof_index)
-            new_index += my_shift;
+        Implementation::enumerate_dof_indices_for_renumbering(
+          renumbering, all_constrained_indices, my_shift);
 
         // now re-enumerate all dofs to this shifted and condensed
         // numbering form.  we renumber some dofs as invalid, so

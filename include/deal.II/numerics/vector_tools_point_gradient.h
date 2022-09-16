@@ -47,7 +47,7 @@ namespace VectorTools
   /**
    * @name Evaluation of functions and errors
    */
-  //@{
+  /** @{ */
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -301,7 +301,7 @@ namespace VectorTools
                  const VectorType &                          fe_function,
                  const Point<spacedim, double> &             point);
 
-  //@}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

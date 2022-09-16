@@ -19,6 +19,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/differentiation/ad.h>
 
@@ -26,7 +27,7 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -125,8 +126,7 @@ namespace internal
     template <typename Number>
     struct CheckForZero<
       Number,
-      typename std::enable_if<
-        Differentiation::AD::is_ad_number<Number>::value>::type>
+      std::enable_if_t<Differentiation::AD::is_ad_number<Number>::value>>
     {
       static bool
       value(const Number & /*value*/)

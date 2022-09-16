@@ -22,7 +22,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <array>
 
@@ -32,8 +32,10 @@ template <typename>
 class Vector;
 
 
-/*!@addtogroup mapping */
-/*@{*/
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class provides a mapping that adds to the location of each cell
@@ -186,7 +188,7 @@ protected:
     shiftmap_dof_handler;
 };
 
-/*@}*/
+/** @} */
 
 /*----------------------------------------------------------------------*/
 

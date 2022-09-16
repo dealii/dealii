@@ -2485,7 +2485,7 @@ public:
   /// @name Access to shape function values
   ///
   /// These fields are filled by the finite element.
-  //@{
+  /** @{ */
 
   /**
    * Value of a shape function at a quadrature point on the cell, face or
@@ -2674,9 +2674,9 @@ public:
                                  const unsigned int point_no,
                                  const unsigned int component) const;
 
-  //@}
+  /** @} */
   /// @name Access to values of global finite element fields
-  //@{
+  /** @{ */
 
   /**
    * Return the values of a finite element function restricted to the current
@@ -2847,9 +2847,9 @@ public:
     ArrayView<std::vector<typename InputVector::value_type>> values,
     const bool quadrature_points_fastest) const;
 
-  //@}
+  /** @} */
   /// @name Access to derivatives of global finite element fields
-  //@{
+  /** @{ */
 
   /**
    * Compute the gradients of a finite element at the quadrature points of a
@@ -2952,11 +2952,11 @@ public:
                gradients,
     const bool quadrature_points_fastest = false) const;
 
-  //@}
+  /** @} */
   /// @name Access to second derivatives
   ///
   /// Hessian matrices and Laplacians of global finite element fields
-  //@{
+  /** @{ */
 
   /**
    * Compute the tensor of second derivatives of a finite element at the
@@ -3179,9 +3179,9 @@ public:
     std::vector<std::vector<typename InputVector::value_type>> &laplacians,
     const bool quadrature_points_fastest = false) const;
 
-  //@}
+  /** @} */
   /// @name Access to third derivatives of global finite element fields
-  //@{
+  /** @{ */
 
   /**
    * Compute the tensor of third derivatives of a finite element at the
@@ -3288,10 +3288,10 @@ public:
       std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
                third_derivatives,
     const bool quadrature_points_fastest = false) const;
-  //@}
+  /** @} */
 
   /// @name Cell degrees of freedom
-  //@{
+  /** @{ */
 
   /**
    * Return an object that can be thought of as an array containing all
@@ -3387,10 +3387,10 @@ public:
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   dof_indices_ending_at(const unsigned int end_dof_index) const;
 
-  //@}
+  /** @} */
 
   /// @name Geometry of the cell
-  //@{
+  /** @{ */
 
   /**
    * Return an object that can be thought of as an array containing all
@@ -3645,10 +3645,10 @@ public:
   const std::vector<Tensor<1, spacedim>> &
   get_normal_vectors() const;
 
-  //@}
+  /** @} */
 
   /// @name Extractors Methods to extract individual components
-  //@{
+  /** @{ */
 
   /**
    * Create a view of the current FEValues object that represents a particular
@@ -3696,10 +3696,10 @@ public:
   const FEValuesViews::Tensor<2, dim, spacedim> &
   operator[](const FEValuesExtractors::Tensor<2> &tensor) const;
 
-  //@}
+  /** @} */
 
   /// @name Access to the raw data
-  //@{
+  /** @{ */
 
   /**
    * Constant reference to the selected mapping object.
@@ -3739,7 +3739,7 @@ public:
    */
   std::size_t
   memory_consumption() const;
-  //@}
+  /** @} */
 
 
   /**

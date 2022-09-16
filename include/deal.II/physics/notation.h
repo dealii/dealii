@@ -337,7 +337,7 @@ namespace Physics
       /**
        * @name Forward operation: Tensor notation to Kelvin notation
        */
-      //@{
+      /** @{ */
 
       /**
        * Convert a scalar value to its compressed vector equivalent.
@@ -505,12 +505,12 @@ namespace Physics
       FullMatrix<Number>
       to_matrix(const SymmetricTensor<4, dim, Number> &st);
 
-      //@}
+      /** @} */
 
       /**
        * @name Reverse operation: Kelvin notation to tensor notation
        */
-      //@{
+      /** @{ */
 
       /**
        * Convert a compressed vector to its equivalent scalar value.
@@ -640,7 +640,7 @@ namespace Physics
       template <typename TensorType, typename Number>
       TensorType
       to_tensor(const FullMatrix<Number> &vec);
-      //@}
+      /** @} */
 
     } // namespace Kelvin
 

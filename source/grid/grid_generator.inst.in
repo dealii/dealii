@@ -84,6 +84,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           const Triangulation<deal_II_dimension, deal_II_space_dimension> *> &,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         const double,
+        const bool,
         const bool);
 
       template void
@@ -94,7 +95,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &triangulation_2,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &result,
         const double duplicated_vertex_tolerance,
-        const bool   copy_manifold_ids);
+        const bool   copy_manifold_ids,
+        const bool   copy_boundary_ids);
 
       template void
       replicate_triangulation(

@@ -16,8 +16,10 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 
+#include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold.h>
@@ -30,6 +32,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2003,6 +2006,9 @@ template <>
 bool
 CellAccessor<2>::point_inside(const Point<2> &p) const
 {
+  Assert(this->reference_cell() == ReferenceCells::Quadrilateral,
+         ExcNotImplemented());
+
   // we check whether the point is
   // inside the cell by making sure
   // that it on the inner side of
@@ -2065,6 +2071,9 @@ template <>
 bool
 CellAccessor<3>::point_inside(const Point<3> &p) const
 {
+  Assert(this->reference_cell() == ReferenceCells::Hexahedron,
+         ExcNotImplemented());
+
   // original implementation by Joerg
   // Weimar
 
@@ -2116,6 +2125,27 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
 
 /*------------------- Functions: CellAccessor<dim,spacedim> -----------------*/
 
+// The return type is the same as DoFHandler<dim,spacedim>::active_cell_iterator
+template <int dim, int spacedim>
+TriaActiveIterator<DoFCellAccessor<dim, spacedim, false>>
+CellAccessor<dim, spacedim>::as_dof_handler_iterator(
+  const DoFHandler<dim, spacedim> &dof_handler) const
+{
+  Assert(is_active(),
+         ExcMessage("The current iterator points to an inactive cell. "
+                    "You cannot convert it to an iterator to an active cell."));
+  Assert(&this->get_triangulation() == &dof_handler.get_triangulation(),
+         ExcMessage("The triangulation associated with the iterator does not "
+                    "match that of the DoFHandler."));
+
+  return typename DoFHandler<dim, spacedim>::active_cell_iterator(
+    &dof_handler.get_triangulation(),
+    this->level(),
+    this->index(),
+    &dof_handler);
+}
+
+
 // For codim>0 we proceed as follows:
 // 1) project point onto manifold and
 // 2) transform to the unit cell with a Q1 mapping
@@ -2125,10 +2155,14 @@ template <int dim_, int spacedim_>
 bool
 CellAccessor<dim, spacedim>::point_inside_codim(const Point<spacedim_> &p) const
 {
+  Assert(this->reference_cell().is_hyper_cube(), ExcNotImplemented());
+
   const TriaRawIterator<CellAccessor<dim_, spacedim_>> cell_iterator(*this);
-  const Point<dim_>                                    p_unit =
-    StaticMappingQ1<dim_, spacedim_>::mapping.transform_real_to_unit_cell(
-      cell_iterator, p);
+
+  const Point<dim_> p_unit =
+    this->reference_cell()
+      .template get_default_linear_mapping<dim_, spacedim_>()
+      .transform_real_to_unit_cell(cell_iterator, p);
 
   return GeometryInfo<dim_>::is_inside_unit_cell(p_unit);
 }
@@ -2155,6 +2189,8 @@ template <>
 bool
 CellAccessor<2, 3>::point_inside(const Point<3> &p) const
 {
+  Assert(this->reference_cell() == ReferenceCells::Quadrilateral,
+         ExcNotImplemented());
   return point_inside_codim<2, 3>(p);
 }
 

@@ -22,10 +22,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/utilities.h>
 
+#include <algorithm>
 #include <cstddef>
-#include <iterator>
+#include <string>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -119,7 +119,7 @@ public:
   /**
    * @name Size information
    */
-  //@{
+  /** @{ */
 
   /**
    * Number of blocks in index field.
@@ -148,7 +148,7 @@ public:
   std::string
   to_string() const;
 
-  //@}
+  /** @} */
 
   /**
    * @name Index conversion
@@ -158,7 +158,7 @@ public:
    * object. If applied to other objects, the numbers obtained from these
    * functions are meaningless.
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the block and the index within that block for the global index @p
@@ -179,7 +179,7 @@ public:
    */
   size_type
   block_start(const unsigned int i) const;
-  //@}
+  /** @} */
 
   /**
    * Copy operator.
@@ -380,7 +380,7 @@ BlockIndices::block_size(const unsigned int block) const
 inline std::string
 BlockIndices::to_string() const
 {
-  std::string result = "[" + Utilities::int_to_string(n_blocks) + "->";
+  std::string result = "[" + std::to_string(n_blocks) + "->";
   for (unsigned int i = 0; i < n_blocks; ++i)
     {
       if (i > 0)

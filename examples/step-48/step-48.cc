@@ -20,6 +20,7 @@
 
 // The necessary files from the deal.II library.
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/conditional_ostream.h>
@@ -32,6 +33,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/distributed/tria.h>

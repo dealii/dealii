@@ -15,6 +15,8 @@
 
 // Test the output of MatrixFree::is_supported for various FiniteElements
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_abf.h>
 #include <deal.II/fe/fe_bdm.h>
 #include <deal.II/fe/fe_bernstein.h>

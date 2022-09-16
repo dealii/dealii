@@ -220,13 +220,12 @@ namespace LAPACKSupport
   DeclException1(
     ExcMissing,
     std::string,
-    << "When you ran 'cmake' during installation of deal.II, "
-    << "no suitable installation of the BLAS or LAPACK library could "
-    << "be found. Consequently, the function <" << arg1
-    << "> can not be called. Refer to the doc/readme.html "
-    << "file for information on how to ensure that deal.II "
-    << "picks up an existing BLAS and LAPACK installation at "
-    << "configuration time.");
+    << "When you ran 'cmake' during installation of deal.II, no suitable "
+    << "installation of the BLAS or LAPACK library could be found. "
+    << "Consequently, the function <" << arg1 << "> can not be called. "
+    << "Refer to the readme at https://dealii.org/current/readme.html for "
+    << "information on how to ensure that deal.II picks up an existing "
+    << "BLAS and LAPACK installation at configuration time.");
 } // namespace LAPACKSupport
 
 

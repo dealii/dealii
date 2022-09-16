@@ -18,11 +18,14 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi.h>
+
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/index_set.h>
+#  include <deal.II/base/trilinos_utilities.h>
 
 #  include <deal.II/lac/read_write_vector.h>
 

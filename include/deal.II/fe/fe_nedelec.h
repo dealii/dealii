@@ -19,12 +19,12 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_product_polynomials.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
@@ -33,8 +33,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * @warning Several aspects of the implementation are experimental. For the
@@ -663,7 +665,7 @@ FE_Nedelec<1>::initialize_restriction();
 
 #endif // DOXYGEN
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

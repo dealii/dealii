@@ -23,7 +23,6 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/smartpointer.h>
 
-#include <map>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -43,8 +42,9 @@ template <typename number>
 class SparseBlockVanka;
 #endif
 
-/*! @addtogroup Preconditioners
- *@{
+/**
+ * @addtogroup Preconditioners
+ * @{
  */
 
 /**
@@ -544,7 +544,7 @@ private:
                     const BlockingStrategy      blocking_strategy);
 };
 
-/*@}*/
+/** @} */
 /* ---------------------------------- Inline functions ------------------- */
 
 #ifndef DOXYGEN

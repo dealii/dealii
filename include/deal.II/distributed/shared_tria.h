@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
@@ -29,14 +30,8 @@
 
 #include <functional>
 #include <list>
-#include <set>
 #include <utility>
 #include <vector>
-
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -69,10 +64,16 @@ namespace parallel
      * about cells owned by other processors with the exception of a single
      * layer of ghost cells around their own part of the domain.
      *
-     * As a consequence of storing the entire mesh on each processor, active
-     * cells need to be flagged for refinement or coarsening consistently on
-     * all processors if you want to adapt them, regardless of being classified
-     * as locally owned, ghost or artificial.
+     * Because every MPI process has a complete copy of the entire mesh
+     * as if it were stored on only this process, it needs to know for
+     * every active cell whether it is flagged for refinement or coarsening
+     * when doing mesh refinement via
+     * Triangulation::execute_coarsening_and_refinement(). In practice,
+     * each process only needs to set this information for its own
+     * "locally owned" cells; upon calling
+     * Triangulation::execute_coarsening_and_refinement(), the
+     * relevant information is then exchanged between processes
+     * internally, via MPI communication.
      *
      * The class is also useful in cases where compute time and memory
      * considerations dictate that the program needs to be run in parallel,

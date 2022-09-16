@@ -21,6 +21,7 @@
 
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_nedelec_sz.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>

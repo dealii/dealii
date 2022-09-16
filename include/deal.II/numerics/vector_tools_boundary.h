@@ -44,7 +44,7 @@ namespace VectorTools
   /**
    * @name Interpolation and projection
    */
-  //@{
+  /** @{ */
 
   /**
    * Compute constraints on the solution that corresponds to the imposition
@@ -747,7 +747,7 @@ namespace VectorTools
     const hp::MappingCollection<dim, dim> &mapping_collection =
       hp::StaticMappingQ1<dim>::mapping_collection);
 
-  // @}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

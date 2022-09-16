@@ -14,19 +14,19 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_filtered_iterator_h
-#  define dealii_filtered_iterator_h
+#define dealii_filtered_iterator_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/iterator_range.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/iterator_range.h>
 
-#  include <deal.II/grid/tria_iterator_base.h>
+#include <deal.II/grid/tria_iterator_base.h>
 
-#  include <memory>
-#  include <set>
-#  include <tuple>
+#include <memory>
+#include <set>
+#include <tuple>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1499,9 +1499,9 @@ namespace IteratorFilters
   ActiveFEIndexEqualTo::operator()(const Iterator &i) const
   {
     return only_locally_owned == true ?
-             (active_fe_indices.find(i->active_fe_index()) !=
-                active_fe_indices.end() &&
-              i->is_locally_owned()) :
+             (i->is_locally_owned() &&
+              active_fe_indices.find(i->active_fe_index()) !=
+                active_fe_indices.end()) :
              active_fe_indices.find(i->active_fe_index()) !=
                active_fe_indices.end();
   }
@@ -1569,6 +1569,4 @@ namespace IteratorFilters
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*------------------------- filtered_iterator.h ------------------------*/
 #endif
-/*------------------------- filtered_iterator.h ------------------------*/

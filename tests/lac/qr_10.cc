@@ -18,14 +18,14 @@
 #include "../tests.h"
 
 /*
- * Test ImplicitQR::append_column() with lineary dependent columns.
+ * Test ImplicitQR::append_column() with linearly dependent columns.
  * The output should be the same as qr_03 test plus extra output due to
  * the rejected column.
  */
 
 /*
- * MWE in Python for standard QR with 3 linearly independet columns. We will add
-the fourth one:
+ * MWE in Python for standard QR with 3 linearly independent columns. We will
+add the fourth one:
 
 import numpy as np
 from scipy import linalg

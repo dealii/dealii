@@ -23,6 +23,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -149,6 +150,11 @@ public:
   operator=(const FEEvaluationData &other);
 
   /**
+   * Destructor.
+   */
+  virtual ~FEEvaluationData() = default;
+
+  /**
    * Sets the pointers for values, gradients, hessians to the central
    * scratch_data_array inside the given scratch array, for a given number of
    * components as provided by one of the derived classes.
@@ -168,7 +174,7 @@ public:
   /**
    * @name 1: Access to geometry data at quadrature points
    */
-  //@{
+  /** @{ */
 
   /**
    * Return an ArrayView to internal memory for temporary use. Note that some
@@ -222,12 +228,12 @@ public:
   Tensor<1, dim, Number>
   get_normal_vector(const unsigned int q_point) const;
 
-  //@}
+  /** @} */
 
   /**
    * @name 2: Access to internal data arrays
    */
-  //@{
+  /** @{ */
   /**
    * Return a read-only pointer to the first field of the dof values. This is
    * the data field the read_dof_values() functions write into. First come the
@@ -334,12 +340,12 @@ public:
   Number *
   begin_hessians();
 
-  //@}
+  /** @} */
 
   /**
    * @name 3: Information about the current cell this class operates on
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the index offset within the geometry fields for the cell the @p
@@ -542,12 +548,12 @@ public:
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   quadrature_point_indices() const;
 
-  //@}
+  /** @} */
 
   /**
    * @name 3: Functions to access cell- and face-data vectors.
    */
-  //@{
+  /** @{ */
 
   /**
    * Provides a unified interface to access data in a vector of
@@ -625,7 +631,7 @@ public:
   set_face_data(AlignedVector<std::array<T, Number::size()>> &array,
                 const std::array<T, Number::size()> &         value) const;
 
-  //@}
+  /** @} */
 
   /**
    * This data structure is used for the initialization by the derived
@@ -757,6 +763,13 @@ protected:
     *jacobian_gradients;
 
   /**
+   * A pointer to the gradients of the Jacobian transformation of the
+   * present cell.
+   */
+  const Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>>
+    *jacobian_gradients_non_inverse;
+
+  /**
    * A pointer to the Jacobian determinant of the present cell. If on a
    * Cartesian cell or on a cell with constant Jacobian, this is just the
    * Jacobian determinant, otherwise the Jacobian determinant times the
@@ -809,6 +822,20 @@ protected:
    * memory can get reused between different calls.
    */
   Number *values_quad;
+
+  /**
+   * This field stores the values of the finite element function on
+   * quadrature points after applying unit cell transformations or before
+   * integrating. This field is accessed when performing the contravariant
+   * Piola transform for gradients on general cells. This is done by the
+   * functions get_gradient() and submit_gradient() when using a H(div)-
+   * conforming finite element such as FE_RaviartThomasNodal.
+   *
+   * The values of this array are stored in the start section of
+   * @p scratch_data_array. Due to its access as a thread local memory, the
+   * memory can get reused between different calls.
+   */
+  Number *values_from_gradients_quad;
 
   /**
    * This field stores the gradients of the finite element function on
@@ -980,6 +1007,12 @@ protected:
     internal::MatrixFreeFunctions::MappingDataOnTheFly<dim, Number>>
     mapped_geometry;
 
+  /**
+   * Bool indicating if the divergence is requested. Used internally in the case
+   * of the Piola transform.
+   */
+  bool divergence_is_requested;
+
   // Make FEEvaluation and FEEvaluationBase objects friends for access to
   // protected member mapped_geometry.
   template <int, int, typename, bool, typename>
@@ -1039,6 +1072,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , quadrature_points(nullptr)
   , jacobian(nullptr)
   , jacobian_gradients(nullptr)
+  , jacobian_gradients_non_inverse(nullptr)
   , J_value(nullptr)
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
@@ -1063,6 +1097,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
         internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
   , subface_index(0)
   , cell_type(internal::MatrixFreeFunctions::general)
+  , divergence_is_requested(false)
 {}
 
 
@@ -1088,6 +1123,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , quadrature_points(nullptr)
   , jacobian(nullptr)
   , jacobian_gradients(nullptr)
+  , jacobian_gradients_non_inverse(nullptr)
   , J_value(nullptr)
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
@@ -1098,12 +1134,16 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , dof_access_index(internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
   , mapped_geometry(mapped_geometry)
   , is_reinitialized(false)
+  , divergence_is_requested(false)
 {
   mapping_data = &mapped_geometry->get_data_storage();
   jacobian     = mapped_geometry->get_data_storage().jacobians[0].begin();
   J_value      = mapped_geometry->get_data_storage().JxW_values.begin();
   jacobian_gradients =
     mapped_geometry->get_data_storage().jacobian_gradients[0].begin();
+  jacobian_gradients_non_inverse = mapped_geometry->get_data_storage()
+                                     .jacobian_gradients_non_inverse[0]
+                                     .begin();
   quadrature_points =
     mapped_geometry->get_data_storage().quadrature_points.begin();
 }
@@ -1121,17 +1161,18 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
   AssertDimension(active_quad_index, other.active_quad_index);
   AssertDimension(n_quadrature_points, descriptor->n_q_points);
 
-  data               = other.data;
-  dof_info           = other.dof_info;
-  mapping_data       = other.mapping_data;
-  descriptor         = other.descriptor;
-  jacobian           = nullptr;
-  J_value            = nullptr;
-  normal_vectors     = nullptr;
-  normal_x_jacobian  = nullptr;
-  jacobian_gradients = nullptr;
-  quadrature_points  = nullptr;
-  quadrature_weights = other.quadrature_weights;
+  data                           = other.data;
+  dof_info                       = other.dof_info;
+  mapping_data                   = other.mapping_data;
+  descriptor                     = other.descriptor;
+  jacobian                       = nullptr;
+  J_value                        = nullptr;
+  normal_vectors                 = nullptr;
+  normal_x_jacobian              = nullptr;
+  jacobian_gradients             = nullptr;
+  jacobian_gradients_non_inverse = nullptr;
+  quadrature_points              = nullptr;
+  quadrature_weights             = other.quadrature_weights;
 
 #  ifdef DEBUG
   is_reinitialized           = false;
@@ -1151,10 +1192,11 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior) :
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
-  face_numbers[0]      = 0;
-  face_orientations[0] = 0;
-  subface_index        = 0;
-  cell_type            = internal::MatrixFreeFunctions::general;
+  face_numbers[0]         = 0;
+  face_orientations[0]    = 0;
+  subface_index           = 0;
+  cell_type               = internal::MatrixFreeFunctions::general;
+  divergence_is_requested = false;
 
   return *this;
 }
@@ -1179,25 +1221,35 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
     2 * n_quadrature_points;
   const unsigned int size_data_arrays =
     n_components * dofs_per_component +
-    (n_components * ((dim * (dim + 1)) / 2 + 2 * dim + 1) *
+    (n_components * ((dim * (dim + 1)) / 2 + 2 * dim + 2) *
      n_quadrature_points);
 
   const unsigned int allocated_size = size_scratch_data + size_data_arrays;
+#  ifdef DEBUG
+  scratch_data_array->clear();
+  scratch_data_array->resize(allocated_size,
+                             Number(numbers::signaling_nan<ScalarNumber>()));
+#  else
   scratch_data_array->resize_fast(allocated_size);
+#  endif
   scratch_data.reinit(scratch_data_array->begin() + size_data_arrays,
                       size_scratch_data);
 
   // set the pointers to the correct position in the data array
   values_dofs = scratch_data_array->begin();
   values_quad = scratch_data_array->begin() + n_components * dofs_per_component;
-  gradients_quad = scratch_data_array->begin() +
-                   n_components * (dofs_per_component + n_quadrature_points);
+  values_from_gradients_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + n_quadrature_points);
+  gradients_quad =
+    scratch_data_array->begin() +
+    n_components * (dofs_per_component + 2 * n_quadrature_points);
   gradients_from_hessians_quad =
     scratch_data_array->begin() +
-    n_components * (dofs_per_component + (dim + 1) * n_quadrature_points);
+    n_components * (dofs_per_component + (dim + 2) * n_quadrature_points);
   hessians_quad =
     scratch_data_array->begin() +
-    n_components * (dofs_per_component + (2 * dim + 1) * n_quadrature_points);
+    n_components * (dofs_per_component + (2 * dim + 2) * n_quadrature_points);
 }
 
 

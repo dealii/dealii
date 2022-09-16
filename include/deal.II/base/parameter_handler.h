@@ -1716,7 +1716,7 @@ public:
        "file to include <"
     << arg3 << "> cannot be opened.");
 
-  //@}
+  /** @} */
 
 private:
   /**

@@ -23,8 +23,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Quadrature */
-/*@{*/
+/**
+ * @addtogroup Quadrature
+ * @{
+ */
 
 /**
  * The Gauss-Legendre family of quadrature rules for numerical integration.
@@ -609,6 +611,7 @@ public:
   QSimplex(const Quadrature<dim> &quad);
 
   /**
+   *
    * Return an affine transformation of this quadrature, that can be used to
    * integrate on the simplex identified by `vertices`.
    *
@@ -626,14 +629,36 @@ public:
    * that is $J \dealcoloneq |\text{det}(B)|$. If $J$ is zero, an empty
    * quadrature is returned. This may happen, in two dimensions, if the three
    * vertices are aligned, or in three dimensions if the four vertices are on
-   * the same plane.
+   * the same plane. The present function works also in the codimension one and
+   * codimension two case. For instance, when `dim=2` and `spacedim=3`, we can
+   * map the quadrature points so that they live on the physical triangle
+   * embedded in the three dimensional space. In such a case, the matrix $B$ is
+   * not square anymore.
    *
    * @param[in] vertices The vertices of the simplex you wish to integrate on
    * @return A quadrature object that can be used to integrate on the simplex
    */
-  Quadrature<dim>
+  template <int spacedim = dim>
+  Quadrature<spacedim>
   compute_affine_transformation(
-    const std::array<Point<dim>, dim + 1> &vertices) const;
+    const std::array<Point<spacedim>, dim + 1> &vertices) const;
+
+  /**
+   *
+   * Given a partition of a cell into simplices, this function creates a
+   * quadrature rule on the cell by collecting Quadrature objects on each
+   * simplex. A simplex is identified by its vertices, which are stored into an
+   * array of Points. Hence, this function can provide quadrature rules on
+   * polygons (or polyhedra), as they can be split into simplices.
+   *
+   *
+   * @param simplices A std::vector where each entry is an array of `dim+1` points, which identifies the vertices of a simplex.
+   * @return A Quadrature object on the cell.
+   */
+  template <int spacedim = dim>
+  Quadrature<spacedim>
+  mapped_quadrature(
+    const std::vector<std::array<Point<spacedim>, dim + 1>> &simplices) const;
 };
 
 /**
@@ -908,7 +933,7 @@ public:
   explicit QGaussPyramid(const unsigned int n_points_1D);
 };
 
-/*@}*/
+/** @} */
 
 /* -------------- declaration of explicit specializations ------------- */
 

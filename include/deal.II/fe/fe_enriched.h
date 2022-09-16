@@ -329,7 +329,7 @@ public:
     const RefinementCase<dim> &refinement_case =
       RefinementCase<dim>::isotropic_refinement) const override;
 
-  //@}
+  /** @} */
 
   /**
    * @name Functions to support hp
@@ -423,7 +423,7 @@ public:
   compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
                          const unsigned int codim = 0) const override final;
 
-  //@}
+  /** @} */
 
 
   /**

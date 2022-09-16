@@ -25,6 +25,7 @@
 #include <deal.II/base/subscriptor.h>
 
 #include <array>
+#include <limits>
 #include <memory>
 #include <vector>
 

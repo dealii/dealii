@@ -43,21 +43,21 @@ struct FunctionsTestVectorVectorCoupled
   psi(const Tensor<1, dim, NumberType> &v1,
       const Tensor<1, dim, NumberType> &v2)
   {
-    return std::pow(v1 * v1, 2) * std::pow(v2 * v2, 3);
+    return pow(v1 * v1, 2) * pow(v2 * v2, 3);
   };
 
   static Tensor<1, dim, NumberType>
   dpsi_dv1(const Tensor<1, dim, NumberType> &v1,
            const Tensor<1, dim, NumberType> &v2)
   {
-    return 2.0 * std::pow(v1 * v1, 1) * 2.0 * v1 * std::pow(v2 * v2, 3);
+    return 2.0 * pow(v1 * v1, 1) * 2.0 * v1 * pow(v2 * v2, 3);
   };
 
   static Tensor<1, dim, NumberType>
   dpsi_dv2(const Tensor<1, dim, NumberType> &v1,
            const Tensor<1, dim, NumberType> &v2)
   {
-    return std::pow(v1 * v1, 2) * 3.0 * std::pow(v2 * v2, 2) * 2.0 * v2;
+    return pow(v1 * v1, 2) * 3.0 * pow(v2 * v2, 2) * 2.0 * v2;
   };
 
   static Tensor<2, dim, NumberType>
@@ -66,9 +66,9 @@ struct FunctionsTestVectorVectorCoupled
   {
     const Tensor<2, dim, NumberType> I(
       unit_symmetric_tensor<dim, NumberType>());
-    return 2.0 * 2.0 * std::pow(v2 * v2, 3) *
+    return 2.0 * 2.0 * pow(v2 * v2, 3) *
            (pow(v1 * v1, 0) * 2.0 * outer_product(v1, v1) +
-            std::pow(v1 * v1, 1) * I);
+            pow(v1 * v1, 1) * I);
   };
 
   static Tensor<2, dim, NumberType>
@@ -78,16 +78,16 @@ struct FunctionsTestVectorVectorCoupled
     // Note: This is not symmetric, and this is why we
     // don't set the return type for hessian extractor (vector,vector)
     // operations as SymmetricTensor.
-    return (2.0 * std::pow(v1 * v1, 1) * 2.0) *
-           (3.0 * std::pow(v2 * v2, 2) * 2.0) * outer_product(v1, v2);
+    return (2.0 * pow(v1 * v1, 1) * 2.0) * (3.0 * pow(v2 * v2, 2) * 2.0) *
+           outer_product(v1, v2);
   };
 
   static Tensor<2, dim, NumberType>
   d2psi_dv1_dv2(const Tensor<1, dim, NumberType> &v1,
                 const Tensor<1, dim, NumberType> &v2)
   {
-    return (2.0 * std::pow(v1 * v1, 1) * 2.0) *
-           (3.0 * std::pow(v2 * v2, 2) * 2.0) * outer_product(v2, v1);
+    return (2.0 * pow(v1 * v1, 1) * 2.0) * (3.0 * pow(v2 * v2, 2) * 2.0) *
+           outer_product(v2, v1);
   };
 
   static Tensor<2, dim, NumberType>
@@ -96,12 +96,12 @@ struct FunctionsTestVectorVectorCoupled
   {
     const Tensor<2, dim, NumberType> I(
       unit_symmetric_tensor<dim, NumberType>());
-    // return std::pow(v1*v1,2)*3.0*
-    //        ( 2.0*std::pow(v2*v2,1)*2.0*outer_product(v2,v2) +
-    //        std::pow(v2*v2,2)*2.0*I);
-    return std::pow(v1 * v1, 2) * 3.0 * 2.0 *
-           (2.0 * std::pow(v2 * v2, 1) * 2.0 * outer_product(v2, v2) +
-            std::pow(v2 * v2, 2) * I);
+    // return pow(v1*v1,2)*3.0*
+    //        ( 2.0*pow(v2*v2,1)*2.0*outer_product(v2,v2) +
+    //        pow(v2*v2,2)*2.0*I);
+    return pow(v1 * v1, 2) * 3.0 * 2.0 *
+           (2.0 * pow(v2 * v2, 1) * 2.0 * outer_product(v2, v2) +
+            pow(v2 * v2, 2) * I);
   };
 };
 

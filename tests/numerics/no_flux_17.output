@@ -1,0 +1,105 @@
+
+DEAL:: quarter_hyper_ball: 
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: hyper_shell: 
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: half_hyper_shell: 
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: quarter_hyper_shell: 
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: hyper_cube:
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 2
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: dim 3
+DEAL::Level 0 OK
+DEAL::Level 1 OK
+DEAL:: adaptive hyper_shell:
+    0 1:  -0.7265425
+    3 2:  -0.3249197
+    4 5:  -0.7265425
+    7 6:  -0.3249197
+    13 12:  -0.7265425
+    15 14:  -0.7265425
+    19 18:  0.3249197
+    21 20:  0.3249197
+    25 = 0
+    27 = 0
+    30 31:  0.7265425
+    32 33:  0.7265425
+    37 36:  0.7265425
+    39 38:  0.7265425
+    42 = 0
+    44 = 0
+    48 49:  0.3249197
+    50 51:  0.3249197
+    54 55:  -0.7265425
+    56 57:  -0.7265425
+    60 61:  -0.3249197
+    62 63:  -0.3249197
+    67 66:  -0.3249197
+    69 68:  -0.3249197
+    73 72:  -0.7265425
+    75 74:  -0.7265425
+    79 78:  0.3249197
+    81 80:  0.3249197
+    85 = 0
+    87 = 0
+    90 91:  0.7265425
+    92 93:  0.7265425
+    97 96:  0.7265425
+    99 98:  0.7265425
+    102 = 0
+    104 = 0
+    108 109:  0.3249197
+    110 111:  0.3249197
+    114 115:  -0.3249197
+    124 125:  -0.1583844
+    134 135:  -0.5095254
+    140 141:  -0.3249197
+    146 147:  -0.1583844
+    152 153:  -0.5095254

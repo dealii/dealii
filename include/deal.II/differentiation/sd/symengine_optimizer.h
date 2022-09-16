@@ -83,7 +83,7 @@ namespace Differentiation
                      "The SymEngine LLVM optimizer does not (yet) support the "
                      "selected return type.");
 
-    //@}
+    /** @} */
 
 
     // Forward declarations
@@ -279,9 +279,7 @@ namespace Differentiation
         s << "cse|";
 
       // LLVM optimization level
-      s << "-O" +
-             dealii::Utilities::to_string(
-               internal::get_LLVM_optimization_level(o)) +
+      s << "-O" + std::to_string(internal::get_LLVM_optimization_level(o)) +
              "|";
 
       return s;
@@ -372,7 +370,7 @@ namespace Differentiation
       template <typename ReturnType_>
       struct SupportedOptimizerTypeTraits<
         ReturnType_,
-        typename std::enable_if<std::is_arithmetic<ReturnType_>::value>::type>
+        std::enable_if_t<std::is_arithmetic<ReturnType_>::value>>
       {
         static const bool is_supported = true;
 
@@ -388,9 +386,9 @@ namespace Differentiation
       template <typename ReturnType_>
       struct SupportedOptimizerTypeTraits<
         ReturnType_,
-        typename std::enable_if<
+        std::enable_if_t<
           boost::is_complex<ReturnType_>::value &&
-          std::is_arithmetic<typename ReturnType_::value_type>::value>::type>
+          std::is_arithmetic<typename ReturnType_::value_type>::value>>
       {
         static const bool is_supported = true;
 
@@ -403,10 +401,9 @@ namespace Differentiation
 
 
       template <typename ReturnType_>
-      struct DictionaryOptimizer<
-        ReturnType_,
-        typename std::enable_if<
-          SupportedOptimizerTypeTraits<ReturnType_>::is_supported>::type>
+      struct DictionaryOptimizer<ReturnType_,
+                                 std::enable_if_t<SupportedOptimizerTypeTraits<
+                                   ReturnType_>::is_supported>>
       {
         using ReturnType =
           typename SupportedOptimizerTypeTraits<ReturnType_>::ReturnType;
@@ -502,10 +499,9 @@ namespace Differentiation
 
 
       template <typename ReturnType_>
-      struct LambdaOptimizer<
-        ReturnType_,
-        typename std::enable_if<
-          SupportedOptimizerTypeTraits<ReturnType_>::is_supported>::type>
+      struct LambdaOptimizer<ReturnType_,
+                             std::enable_if_t<SupportedOptimizerTypeTraits<
+                               ReturnType_>::is_supported>>
       {
         using ReturnType =
           typename std::conditional<!boost::is_complex<ReturnType_>::value,
@@ -605,7 +601,7 @@ namespace Differentiation
       template <typename ReturnType_>
       struct LLVMOptimizer<
         ReturnType_,
-        typename std::enable_if<std::is_arithmetic<ReturnType_>::value>::type>
+        std::enable_if_t<std::is_arithmetic<ReturnType_>::value>>
       {
         using ReturnType =
           typename std::conditional<std::is_same<ReturnType_, float>::value,
@@ -719,9 +715,9 @@ namespace Differentiation
       template <typename ReturnType_>
       struct LLVMOptimizer<
         ReturnType_,
-        typename std::enable_if<
+        std::enable_if_t<
           boost::is_complex<ReturnType_>::value &&
-          std::is_arithmetic<typename ReturnType_::value_type>::value>::type>
+          std::is_arithmetic<typename ReturnType_::value_type>::value>>
       {
         // Since there is no working implementation, these are dummy types
         // that help with templating in the calling function.
@@ -821,11 +817,11 @@ namespace Differentiation
 
 
       template <typename ReturnType, typename Optimizer>
-      struct OptimizerHelper<ReturnType,
-                             Optimizer,
-                             typename std::enable_if<std::is_same<
-                               ReturnType,
-                               typename Optimizer::ReturnType>::value>::type>
+      struct OptimizerHelper<
+        ReturnType,
+        Optimizer,
+        std::enable_if_t<
+          std::is_same<ReturnType, typename Optimizer::ReturnType>::value>>
       {
         /**
          * Initialize an instance of an optimizer.
@@ -963,11 +959,11 @@ namespace Differentiation
       };
 
       template <typename ReturnType, typename Optimizer>
-      struct OptimizerHelper<ReturnType,
-                             Optimizer,
-                             typename std::enable_if<!std::is_same<
-                               ReturnType,
-                               typename Optimizer::ReturnType>::value>::type>
+      struct OptimizerHelper<
+        ReturnType,
+        Optimizer,
+        std::enable_if_t<
+          !std::is_same<ReturnType, typename Optimizer::ReturnType>::value>>
       {
         /**
          * Initialize an instance of an optimizer.
@@ -1586,7 +1582,7 @@ namespace Differentiation
       /**
        * @name Independent variables
        */
-      //@{
+      /** @{ */
 
       /**
        * Register a collection of symbols that represents an independent
@@ -1645,12 +1641,12 @@ namespace Differentiation
       std::size_t
       n_independent_variables() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Dependent variables
        */
-      //@{
+      /** @{ */
 
       /**
        * Register a scalar symbolic expression that represents a dependent
@@ -1736,12 +1732,12 @@ namespace Differentiation
       std::size_t
       n_dependent_variables() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Optimization
        */
-      //@{
+      /** @{ */
 
       /**
        * Select the @p optimization_method for the batch optimizer to
@@ -1806,12 +1802,12 @@ namespace Differentiation
       bool
       optimized() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Symbol substitution
        */
-      //@{
+      /** @{ */
 
       /**
        * Perform batch substitution of all of the registered symbols
@@ -1873,12 +1869,12 @@ namespace Differentiation
       bool
       values_substituted() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Evaluation / data extraction
        */
-      //@{
+      /** @{ */
 
       /**
        * Returns the result of a value substitution into the optimized
@@ -2001,7 +1997,7 @@ namespace Differentiation
       extract(const SymmetricTensor<rank, dim, Expression> &funcs,
               const std::vector<ReturnType> &cached_evaluation) const;
 
-      //@}
+      /** @} */
 
     private:
       /**

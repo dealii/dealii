@@ -56,6 +56,12 @@ namespace parallel
 }
 
 template <int dim, int spacedim>
+class DoFHandler;
+template <int dim, int spacedim, bool lda>
+class DoFCellAccessor;
+
+
+template <int dim, int spacedim>
 class Manifold;
 
 template <int dim, int spacedim>
@@ -3134,6 +3140,31 @@ public:
   // NOLINTNEXTLINE OSX does not compile with noexcept
   CellAccessor<dim, spacedim> &
   operator=(CellAccessor<dim, spacedim> &&) = default; // NOLINT
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Converting iterators
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * A function that converts a Triangulation active cell iterator to a
+   * DoFHandler active cell iterator, or a DoFHandler active cell iterator
+   * to an active cell iterator of another DoFHandler. The @p iterator must be
+   * associated with the triangulation of the @p dof_handler.
+   *
+   * @param dof_handler The DoFHandler for the output active cell iterator.
+   * @return An active cell iterator for the @p dof_handler, matching the cell
+   *         referenced by the input @p iterator. The type of the
+   *         returned object is a DoFHandler::active_cell_iterator.
+   */
+  TriaActiveIterator<DoFCellAccessor<dim, spacedim, false>>
+  as_dof_handler_iterator(const DoFHandler<dim, spacedim> &dof_handler) const;
 
   /**
    * @}

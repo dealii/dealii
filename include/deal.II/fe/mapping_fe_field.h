@@ -20,7 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/thread_management.h>
+#include <deal.II/base/mutex.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -36,8 +36,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup mapping */
-/*@{*/
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * The MappingFEField is a generalization of the MappingQEulerian class, for
@@ -646,7 +648,7 @@ private:
   /**
    * A variable to guard access to the fe_values variable.
    */
-  mutable std::mutex fe_values_mutex;
+  mutable Threads::Mutex fe_values_mutex;
 
   void
   compute_data(const UpdateFlags      update_flags,
@@ -666,7 +668,7 @@ private:
   friend class MappingFEField;
 };
 
-/*@}*/
+/** @} */
 
 /* -------------- declaration of explicit specializations ------------- */
 

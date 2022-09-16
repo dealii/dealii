@@ -98,16 +98,18 @@ namespace parallel
      * cycle of the adaptive finite element loop.
      *
      * In contrast to the functions in namespace dealii::GridRefinement,
-     * the functions in the current namespace are intended for distributed
-     * meshes, i.e., objects of type parallel::distributed::Triangulation.
+     * the functions in the current namespace are intended for parallel
+     * computations, i.e., computations, e.g., on objects of type
+     * parallel::distributed::Triangulation.
      *
      * @ingroup grid
      */
     namespace GridRefinement
     {
       /**
-       * Like dealii::GridRefinement::refine_and_coarsen_fixed_number, but for
-       * parallel distributed triangulations.
+       * Like dealii::GridRefinement::refine_and_coarsen_fixed_number, but
+       * designed for parallel computations, where each process has only
+       * information about locally owned cells.
        *
        * The vector of criteria needs to be a vector of refinement criteria
        * for all cells active on the current triangulation, i.e.,
@@ -152,16 +154,17 @@ namespace parallel
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_number(
-        parallel::distributed::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &                       criteria,
-        const double                   top_fraction_of_cells,
-        const double                   bottom_fraction_of_cells,
-        const types::global_cell_index max_n_cells =
+        dealii::Triangulation<dim, spacedim> &tria,
+        const dealii::Vector<Number> &        criteria,
+        const double                          top_fraction_of_cells,
+        const double                          bottom_fraction_of_cells,
+        const types::global_cell_index        max_n_cells =
           std::numeric_limits<types::global_cell_index>::max());
 
       /**
        * Like dealii::GridRefinement::refine_and_coarsen_fixed_fraction, but
-       * for parallel distributed triangulations.
+       * designed for parallel computations, where each process only has
+       * information about locally owned cells.
        *
        * The vector of criteria needs to be a vector of refinement criteria
        * for all cells active on the current triangulation, i.e.,
@@ -205,10 +208,10 @@ namespace parallel
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_fraction(
-        parallel::distributed::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &                       criteria,
-        const double                top_fraction_of_error,
-        const double                bottom_fraction_of_error,
+        dealii::Triangulation<dim, spacedim> &tria,
+        const dealii::Vector<Number> &        criteria,
+        const double                          top_fraction_of_error,
+        const double                          bottom_fraction_of_error,
         const VectorTools::NormType norm_type = VectorTools::NormType::L1_norm);
     } // namespace GridRefinement
   }   // namespace distributed

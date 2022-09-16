@@ -155,8 +155,7 @@ public:
    * current lane.
    */
   template <typename U = T>
-  typename std::enable_if<!std::is_same<U, const U>::value,
-                          typename T::value_type>::type &
+  std::enable_if_t<!std::is_same<U, const U>::value, typename T::value_type> &
   operator*()
   {
     AssertIndexRange(lane, T::size());
@@ -730,9 +729,8 @@ private:
 
 /**
  * @name Packing and unpacking of a VectorizedArray
+ * @{
  */
-//@{
-
 
 /**
  * Create a vectorized array that sets all entries in the array to the given
@@ -945,7 +943,7 @@ vectorized_transpose_and_store(const bool                            add_into,
 }
 
 
-//@}
+/** @} */
 
 #ifndef DOXYGEN
 
@@ -4697,8 +4695,8 @@ private:
 
 /**
  * @name Arithmetic operations with VectorizedArray
+ * @{
  */
-//@{
 
 /**
  * Relational operator == for VectorizedArray
@@ -5053,13 +5051,12 @@ operator<<(std::ostream &out, const VectorizedArray<Number, width> &p)
   return out;
 }
 
-//@}
+/** @} */
 
 /**
  * @name Ternary operations on VectorizedArray
+ * @{
  */
-//@{
-
 
 /**
  * enum class encoding binary operations for a component-wise comparison of
@@ -5204,7 +5201,7 @@ compare_and_apply_mask(const VectorizedArray<Number, 1> &left,
   return result;
 }
 
-//@}
+/** @} */
 
 #ifndef DOXYGEN
 #  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)

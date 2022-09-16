@@ -131,8 +131,7 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
       const Tensor<1, dim, NumberType> &         v,
       const NumberType &                         s)
   {
-    return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) *
-           std::pow(v_squ(v), 3) * std::pow(s, sf);
+    return pow(det_t(st), 2) * pow(det_t(t), 2) * pow(v_squ(v), 3) * pow(s, sf);
   };
 
   // --------------------------------------------------------------------------
@@ -146,8 +145,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
            const Tensor<1, dim, NumberType> &         v,
            const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 1) * ddet_t_dt(st) *
-           std::pow(det_t(t), 2) * std::pow(v_squ(v), 3) * std::pow(s, sf);
+    return 2.0 * pow(det_t(st), 1) * ddet_t_dt(st) * pow(det_t(t), 2) *
+           pow(v_squ(v), 3) * pow(s, sf);
   };
 
   static Tensor<2, dim, NumberType>
@@ -156,8 +155,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
           const Tensor<1, dim, NumberType> &         v,
           const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * ddet_t_dt(t) *
-           std::pow(v_squ(v), 3) * std::pow(s, sf);
+    return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * ddet_t_dt(t) *
+           pow(v_squ(v), 3) * pow(s, sf);
   };
 
   static Tensor<1, dim, NumberType>
@@ -166,8 +165,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
           const Tensor<1, dim, NumberType> &         v,
           const NumberType &                         s)
   {
-    return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
-           std::pow(v_squ(v), 2) * dv_squ_dv(v) * std::pow(s, sf);
+    return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) *
+           dv_squ_dv(v) * pow(s, sf);
   };
 
   static NumberType
@@ -176,8 +175,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
           const Tensor<1, dim, NumberType> &         v,
           const NumberType &                         s)
   {
-    return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) *
-           std::pow(v_squ(v), 3) * sf * std::pow(s, sf - 1.0);
+    return pow(det_t(st), 2) * pow(det_t(t), 2) * pow(v_squ(v), 3) * sf *
+           pow(s, sf - 1.0);
   };
 
   static SymmetricTensor<4, dim, NumberType>
@@ -186,11 +185,10 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                   const Tensor<1, dim, NumberType> &         v,
                   const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(t), 2) * std::pow(v_squ(v), 3) *
-           (std::pow(det_t(st), 0) *
-              outer_product(ddet_t_dt(st), ddet_t_dt(st)) +
-            std::pow(det_t(st), 1) * d2det_t_dt_dt(st)) *
-           std::pow(s, sf);
+    return 2.0 * pow(det_t(t), 2) * pow(v_squ(v), 3) *
+           (pow(det_t(st), 0) * outer_product(ddet_t_dt(st), ddet_t_dt(st)) +
+            pow(det_t(st), 1) * d2det_t_dt_dt(st)) *
+           pow(s, sf);
   };
 
   static Tensor<4, dim, NumberType>
@@ -199,10 +197,10 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                  const Tensor<1, dim, NumberType> &         v,
                  const NumberType &                         s)
   {
-    return 4.0 * std::pow(det_t(st), 1) * std::pow(det_t(t), 1) *
+    return 4.0 * pow(det_t(st), 1) * pow(det_t(t), 1) *
            outer_product(Tensor<2, dim, NumberType>(ddet_t_dt(st)),
                          ddet_t_dt(t)) *
-           std::pow(v_squ(v), 3) * std::pow(s, sf);
+           pow(v_squ(v), 3) * pow(s, sf);
   };
 
   static Tensor<3, dim, NumberType>
@@ -211,11 +209,10 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                  const Tensor<1, dim, NumberType> &         v,
                  const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(t), 2) * std::pow(det_t(st), 1) * 3.0 *
-           std::pow(v_squ(v), 2) *
+    return 2.0 * pow(det_t(t), 2) * pow(det_t(st), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(Tensor<2, dim, NumberType>(ddet_t_dt(st)),
                          dv_squ_dv(v)) *
-           std::pow(s, sf);
+           pow(s, sf);
   };
 
   static SymmetricTensor<2, dim, NumberType>
@@ -224,9 +221,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                  const Tensor<1, dim, NumberType> &         v,
                  const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 1) * ddet_t_dt(st) *
-           std::pow(det_t(t), 2) * std::pow(v_squ(v), 3) * sf *
-           std::pow(s, sf - 1.0);
+    return 2.0 * pow(det_t(st), 1) * ddet_t_dt(st) * pow(det_t(t), 2) *
+           pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
   };
 
   static Tensor<4, dim, NumberType>
@@ -235,10 +231,10 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                  const Tensor<1, dim, NumberType> &         v,
                  const NumberType &                         s)
   {
-    return 4.0 * std::pow(det_t(st), 1) * std::pow(det_t(t), 1) *
+    return 4.0 * pow(det_t(st), 1) * pow(det_t(t), 1) *
            outer_product(ddet_t_dt(t),
                          Tensor<2, dim, NumberType>(ddet_t_dt(st))) *
-           std::pow(v_squ(v), 3) * std::pow(s, sf);
+           pow(v_squ(v), 3) * pow(s, sf);
   };
 
   static Tensor<4, dim, NumberType>
@@ -247,10 +243,10 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 2) * std::pow(v_squ(v), 3) *
+    return 2.0 * pow(det_t(st), 2) * pow(v_squ(v), 3) *
            (pow(det_t(t), 0) * outer_product(ddet_t_dt(t), ddet_t_dt(t)) +
-            std::pow(det_t(t), 1) * d2det_t_dt_dt(t)) *
-           std::pow(s, sf);
+            pow(det_t(t), 1) * d2det_t_dt_dt(t)) *
+           pow(s, sf);
   };
 
   static Tensor<3, dim, NumberType>
@@ -259,9 +255,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * 3.0 *
-           std::pow(v_squ(v), 2) * outer_product(ddet_t_dt(t), dv_squ_dv(v)) *
-           std::pow(s, sf);
+    return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
+           outer_product(ddet_t_dt(t), dv_squ_dv(v)) * pow(s, sf);
   };
 
   static Tensor<2, dim, NumberType>
@@ -270,8 +265,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * ddet_t_dt(t) *
-           std::pow(v_squ(v), 3) * sf * std::pow(s, sf - 1.0);
+    return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * ddet_t_dt(t) *
+           pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
   };
 
   static Tensor<3, dim, NumberType>
@@ -280,11 +275,10 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                  const Tensor<1, dim, NumberType> &         v,
                  const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(t), 2) * std::pow(det_t(st), 1) * 3.0 *
-           std::pow(v_squ(v), 2) *
+    return 2.0 * pow(det_t(t), 2) * pow(det_t(st), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(dv_squ_dv(v),
                          Tensor<2, dim, NumberType>(ddet_t_dt(st))) *
-           std::pow(s, sf);
+           pow(s, sf);
   };
 
   static Tensor<3, dim, NumberType>
@@ -293,9 +287,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * 3.0 *
-           std::pow(v_squ(v), 2) * outer_product(dv_squ_dv(v), ddet_t_dt(t)) *
-           std::pow(s, sf);
+    return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
+           outer_product(dv_squ_dv(v), ddet_t_dt(t)) * pow(s, sf);
   };
 
   static Tensor<2, dim, NumberType>
@@ -304,11 +297,10 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
-           (2.0 * std::pow(v_squ(v), 1) *
-              outer_product(dv_squ_dv(v), dv_squ_dv(v)) +
-            std::pow(v_squ(v), 2) * d2v_squ_dv_dv(v)) *
-           std::pow(s, sf);
+    return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 *
+           (2.0 * pow(v_squ(v), 1) * outer_product(dv_squ_dv(v), dv_squ_dv(v)) +
+            pow(v_squ(v), 2) * d2v_squ_dv_dv(v)) *
+           pow(s, sf);
   };
 
   static Tensor<1, dim, NumberType>
@@ -317,8 +309,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
-           std::pow(v_squ(v), 2) * dv_squ_dv(v) * sf * std::pow(s, sf - 1.0);
+    return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) *
+           dv_squ_dv(v) * sf * pow(s, sf - 1.0);
   };
 
   static SymmetricTensor<2, dim, NumberType>
@@ -327,9 +319,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                  const Tensor<1, dim, NumberType> &         v,
                  const NumberType &                         s)
   {
-    return 2.0 * ddet_t_dt(st) * std::pow(det_t(t), 2) *
-           std::pow(det_t(st), 1) * std::pow(v_squ(v), 3) * sf *
-           std::pow(s, sf - 1.0);
+    return 2.0 * ddet_t_dt(st) * pow(det_t(t), 2) * pow(det_t(st), 1) *
+           pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
   };
 
   static Tensor<2, dim, NumberType>
@@ -338,8 +329,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * ddet_t_dt(t) *
-           std::pow(v_squ(v), 3) * sf * std::pow(s, sf - 1.0);
+    return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * ddet_t_dt(t) *
+           pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
   };
 
   static Tensor<1, dim, NumberType>
@@ -348,8 +339,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
-           std::pow(v_squ(v), 2) * dv_squ_dv(v) * sf * std::pow(s, sf - 1.0);
+    return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) *
+           dv_squ_dv(v) * sf * pow(s, sf - 1.0);
   };
 
   static NumberType
@@ -358,8 +349,8 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
                 const Tensor<1, dim, NumberType> &         v,
                 const NumberType &                         s)
   {
-    return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) *
-           std::pow(v_squ(v), 3) * sf * (sf - 1.0) * std::pow(s, sf - 2.0);
+    return pow(det_t(st), 2) * pow(det_t(t), 2) * pow(v_squ(v), 3) * sf *
+           (sf - 1.0) * pow(s, sf - 2.0);
   };
 };
 

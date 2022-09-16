@@ -20,8 +20,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -32,8 +32,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup VMemory */
-/*@{*/
+/**
+ * @addtogroup VMemory
+ * @{
+ */
 
 /**
  * Memory management base class for vectors. This is an abstract base class
@@ -162,7 +164,7 @@ public:
     "You are trying to deallocate a vector from a memory pool, but this "
     "vector has not actually been allocated by the same pool before.");
 
-  //@}
+  /** @} */
 
   /**
    * A class that looks like a pointer for all practical purposes and that
@@ -467,7 +469,7 @@ namespace internal
   }
 } // namespace internal
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /* --------------------- inline functions ---------------------- */

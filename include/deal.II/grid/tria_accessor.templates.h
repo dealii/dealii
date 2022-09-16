@@ -34,6 +34,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1129,9 +1130,29 @@ namespace internal
                 line_indices[10 + f] = quad->line_index(my_indices[1]);
               }
           }
+        else if (ref_cell == ReferenceCells::Tetrahedron)
+          {
+            std::array<unsigned int, 3> orientations{
+              {face_orientation_raw(cell, 0),
+               face_orientation_raw(cell, 1),
+               face_orientation_raw(cell, 2)}};
+            const std::array<unsigned int, 6> my_indices{
+              {ref_cell.standard_to_real_face_line(0, 0, orientations[0]),
+               ref_cell.standard_to_real_face_line(1, 0, orientations[0]),
+               ref_cell.standard_to_real_face_line(2, 0, orientations[0]),
+               ref_cell.standard_to_real_face_line(1, 1, orientations[1]),
+               ref_cell.standard_to_real_face_line(2, 1, orientations[1]),
+               ref_cell.standard_to_real_face_line(1, 2, orientations[2])}};
+            line_indices[0] = cell.quad(0)->line_index(my_indices[0]);
+            line_indices[1] = cell.quad(0)->line_index(my_indices[1]);
+            line_indices[2] = cell.quad(0)->line_index(my_indices[2]);
+            line_indices[3] = cell.quad(1)->line_index(my_indices[3]);
+            line_indices[4] = cell.quad(1)->line_index(my_indices[4]);
+            line_indices[5] = cell.quad(2)->line_index(my_indices[5]);
+          }
         else
-          // For other shapes (tetrahedra, wedges, pyramids), we do not
-          // currently implement an optimized function.
+          // For other shapes (wedges, pyramids), we do not currently
+          // implement an optimized function.
           for (unsigned int l = 0; l < std::min(12U, cell.n_lines()); ++l)
             line_indices[l] = cell.line_index(l);
 
@@ -1238,9 +1259,47 @@ namespace internal
                 line_orientations[10 + f] = my_orientations[1];
               }
           }
+        else if (ref_cell == ReferenceCells::Tetrahedron)
+          {
+            std::array<unsigned int, 3> orientations{
+              {face_orientation_raw(cell, 0),
+               face_orientation_raw(cell, 1),
+               face_orientation_raw(cell, 2)}};
+            const std::array<unsigned int, 6> my_indices{
+              {ref_cell.standard_to_real_face_line(0, 0, orientations[0]),
+               ref_cell.standard_to_real_face_line(1, 0, orientations[0]),
+               ref_cell.standard_to_real_face_line(2, 0, orientations[0]),
+               ref_cell.standard_to_real_face_line(1, 1, orientations[1]),
+               ref_cell.standard_to_real_face_line(2, 1, orientations[1]),
+               ref_cell.standard_to_real_face_line(1, 2, orientations[2])}};
+            line_orientations[0] = ref_cell.standard_vs_true_line_orientation(
+              0,
+              orientations[0],
+              cell.quad(0)->line_orientation(my_indices[0]));
+            line_orientations[1] = ref_cell.standard_vs_true_line_orientation(
+              1,
+              orientations[0],
+              cell.quad(0)->line_orientation(my_indices[1]));
+            line_orientations[2] = ref_cell.standard_vs_true_line_orientation(
+              2,
+              orientations[0],
+              cell.quad(0)->line_orientation(my_indices[2]));
+            line_orientations[3] = ref_cell.standard_vs_true_line_orientation(
+              1,
+              orientations[1],
+              cell.quad(1)->line_orientation(my_indices[3]));
+            line_orientations[4] = ref_cell.standard_vs_true_line_orientation(
+              2,
+              orientations[1],
+              cell.quad(1)->line_orientation(my_indices[4]));
+            line_orientations[5] = ref_cell.standard_vs_true_line_orientation(
+              1,
+              orientations[2],
+              cell.quad(2)->line_orientation(my_indices[5]));
+          }
         else
-          // For other shapes (tetrahedra, wedges, pyramids), we do not
-          // currently implement an optimized function
+          // For other shapes (wedges, pyramids), we do not currently
+          // implement an optimized function
           for (unsigned int l = 0; l < std::min(12U, cell.n_lines()); ++l)
             line_orientations[l] = cell.line_orientation(l);
 

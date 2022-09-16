@@ -1,0 +1,4 @@
+Improved: The function VectorTools::point_values() can now handle
+cell-data vectors.
+<br>
+(Peter Munch, 2022/07/06)

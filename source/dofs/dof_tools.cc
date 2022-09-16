@@ -13,10 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/quadrature.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
@@ -31,7 +31,6 @@
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
@@ -41,10 +40,7 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 
 #include <algorithm>
@@ -1373,8 +1369,7 @@ namespace DoFTools
     AssertDimension(active_fe_indices.size(),
                     dof_handler.get_triangulation().n_active_cells());
 
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
+    active_fe_indices = dof_handler.get_active_fe_indices();
   }
 
   template <int dim, int spacedim>

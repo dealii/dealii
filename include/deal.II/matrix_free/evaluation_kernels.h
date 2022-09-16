@@ -2303,7 +2303,8 @@ namespace internal
                               values_dofs,
                               fe_eval);
         }
-      else if (fe_degree >= 0 && element_type <= ElementType::tensor_symmetric)
+      else if (fe_degree >= 0 &&
+               element_type <= ElementType::tensor_symmetric_no_collocation)
         {
           FEEvaluationImpl<ElementType::tensor_symmetric,
                            dim,
@@ -2438,7 +2439,8 @@ namespace internal
                                fe_eval,
                                sum_into_values_array);
         }
-      else if (fe_degree >= 0 && element_type <= ElementType::tensor_symmetric)
+      else if (fe_degree >= 0 &&
+               element_type <= ElementType::tensor_symmetric_no_collocation)
         {
           FEEvaluationImpl<ElementType::tensor_symmetric,
                            dim,
@@ -5174,7 +5176,7 @@ namespace internal
     {
       Assert(fe_degree > -1, ExcInternalError());
       Assert(fe_eval.get_shape_info().element_type <=
-               MatrixFreeFunctions::tensor_symmetric,
+               MatrixFreeFunctions::tensor_symmetric_no_collocation,
              ExcInternalError());
 
       const unsigned int dofs_per_face = Utilities::pow(fe_degree + 1, dim - 1);
@@ -5293,7 +5295,7 @@ namespace internal
           (evaluation_flag & EvaluationFlags::hessians) ||
           vector_ptr == nullptr ||
           shape_info.data.front().element_type >
-            MatrixFreeFunctions::tensor_symmetric ||
+            MatrixFreeFunctions::tensor_symmetric_no_collocation ||
           storage <
             MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous)
         return false;
@@ -5394,7 +5396,7 @@ namespace internal
     {
       Assert(fe_degree > -1, ExcInternalError());
       Assert(fe_eval.get_shape_info().element_type <=
-               MatrixFreeFunctions::tensor_symmetric,
+               MatrixFreeFunctions::tensor_symmetric_no_collocation,
              ExcInternalError());
 
       const unsigned int dofs_per_face = Utilities::pow(fe_degree + 1, dim - 1);
@@ -5594,14 +5596,14 @@ namespace internal
         const FEEvaluationData<dim, Number, false> &fe_eval,
         const Number *                              in_array,
         Number *                                    out_array,
-        typename std::enable_if<fe_degree != -1>::type * = nullptr)
+        std::enable_if_t<fe_degree != -1> * = nullptr)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
 
       Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
       Assert(fe_eval.get_shape_info().element_type <=
-               MatrixFreeFunctions::tensor_symmetric,
+               MatrixFreeFunctions::tensor_symmetric_no_collocation,
              ExcNotImplemented());
 
       EvaluatorTensorProduct<evaluate_evenodd,
@@ -5650,7 +5652,7 @@ namespace internal
         const FEEvaluationData<dim, Number, false> &fe_eval,
         const Number *                              in_array,
         Number *                                    out_array,
-        typename std::enable_if<fe_degree == -1>::type * = nullptr)
+        std::enable_if_t<fe_degree == -1> * = nullptr)
     {
       static_assert(fe_degree == -1, "Only usable for degree -1");
       const unsigned int dofs_per_component =
@@ -5712,7 +5714,7 @@ namespace internal
         const AlignedVector<Number> &inverse_coefficients,
         const Number *               in_array,
         Number *                     out_array,
-        typename std::enable_if<fe_degree != -1>::type * = nullptr)
+        std::enable_if_t<fe_degree != -1> * = nullptr)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
@@ -5775,7 +5777,7 @@ namespace internal
         const AlignedVector<Number> &,
         const Number *,
         Number *,
-        typename std::enable_if<fe_degree == -1>::type * = nullptr)
+        std::enable_if_t<fe_degree == -1> * = nullptr)
     {
       static_assert(fe_degree == -1, "Only usable for degree -1");
       Assert(false, ExcNotImplemented());

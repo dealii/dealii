@@ -31,9 +31,8 @@
 
 // This function initializes a container of Number type
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, std::vector<Number>>::value,
-  Container<Number>>::type
+std::enable_if_t<std::is_same<Container<Number>, std::vector<Number>>::value,
+                 Container<Number>>
 initialize_container(std::vector<hsize_t> dimensions)
 {
   return Container<Number>(std::accumulate(
@@ -43,8 +42,8 @@ initialize_container(std::vector<hsize_t> dimensions)
 
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
-                        Container<Number>>::type
+std::enable_if_t<std::is_same<Container<Number>, Vector<Number>>::value,
+                 Container<Number>>
 initialize_container(std::vector<hsize_t> dimensions)
 {
   return Container<Number>(std::accumulate(
@@ -54,9 +53,8 @@ initialize_container(std::vector<hsize_t> dimensions)
 
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, FullMatrix<Number>>::value,
-  Container<Number>>::type
+std::enable_if_t<std::is_same<Container<Number>, FullMatrix<Number>>::value,
+                 Container<Number>>
 initialize_container(std::vector<hsize_t> dimensions)
 {
   return FullMatrix<Number>(dimensions[0], dimensions[1]);
@@ -66,9 +64,8 @@ initialize_container(std::vector<hsize_t> dimensions)
 
 // This function assigns data to the elements of the container
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, std::vector<Number>>::value,
-  void>::type
+std::enable_if_t<std::is_same<Container<Number>, std::vector<Number>>::value,
+                 void>
 assign_data(Container<Number> &data)
 {
   for (unsigned int idx = 0; idx < data.size(); ++idx)
@@ -80,8 +77,7 @@ assign_data(Container<Number> &data)
 
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
-                        void>::type
+std::enable_if_t<std::is_same<Container<Number>, Vector<Number>>::value, void>
 assign_data(Container<Number> &data)
 {
   for (unsigned int idx = 0; idx < data.size(); ++idx)
@@ -93,9 +89,8 @@ assign_data(Container<Number> &data)
 
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, FullMatrix<Number>>::value,
-  void>::type
+std::enable_if_t<std::is_same<Container<Number>, FullMatrix<Number>>::value,
+                 void>
 assign_data(Container<Number> &data)
 {
   for (unsigned int row_idx = 0; row_idx < data.m(); ++row_idx)
@@ -561,7 +556,7 @@ write_test(HDF5::Group &      root_group,
                                             0, // fourth point
                                             0,
                                             0,
-                                            3}; // fith point
+                                            3}; // fifth point
         std::vector<Number>  data        = {32, 33, 35, 36, 38};
 
         dataset.write_selection(data, coordinates);
@@ -781,7 +776,7 @@ write_test(HDF5::Group &      root_group,
                                             0, // fourth point
                                             0,
                                             0,
-                                            3}; // fith point
+                                            3}; // fifth point
         Vector<Number>       data(5);
         data[0] = 32;
         data[1] = 33;
@@ -1092,7 +1087,7 @@ read_test(HDF5::Group        root_group,
                                           1, // fourth point
                                           0,
                                           3,
-                                          2}; // fith point
+                                          2}; // fifth point
 
       auto data = dataset.read_selection<std::vector<Number>>(coordinates);
 
@@ -1126,7 +1121,7 @@ read_test(HDF5::Group        root_group,
                                           1, // fourth point
                                           0,
                                           3,
-                                          2}; // fith point
+                                          2}; // fifth point
 
       auto data = dataset.read_selection<Vector<Number>>(coordinates);
 

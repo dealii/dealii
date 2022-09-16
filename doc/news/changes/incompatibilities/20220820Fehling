@@ -1,0 +1,5 @@
+Changed: The function DoFHandler::get_active_fe_indices() now returns
+the result vector. The previous version that writes into the argument
+as well as DoFTools::get_active_fe_indices() have been deprecated.
+<br>
+(Marc Fehling, 08/20/2022)

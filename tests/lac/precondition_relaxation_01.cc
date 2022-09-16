@@ -63,25 +63,93 @@ private:
   DiagonalMatrix<VectorType> diagonal_matrix;
 };
 
+template <typename VectorType>
+class MyDiagonalMatrixWithPreAndPost
+{
+public:
+  void
+  vmult(VectorType &      dst,
+        const VectorType &src,
+        const std::function<void(const unsigned int, const unsigned int)>
+          &operation_before_matrix_vector_product,
+        const std::function<void(const unsigned int, const unsigned int)>
+          &operation_after_matrix_vector_product) const
+  {
+    operation_before_matrix_vector_product(0, src.size());
+
+    diagonal_matrix.vmult(dst, src);
+
+    operation_after_matrix_vector_product(0, src.size());
+  }
+
+  VectorType &
+  get_vector()
+  {
+    return diagonal_matrix.get_vector();
+  }
+
+private:
+  DiagonalMatrix<VectorType> diagonal_matrix;
+};
+
+template <typename SparseMatrixType>
+class MySparseMatrix : public Subscriptor
+{
+public:
+  MySparseMatrix(const SparseMatrixType &sparse_matrix)
+    : sparse_matrix(sparse_matrix)
+  {}
+
+  template <typename VectorType>
+  void
+  vmult(VectorType &      dst,
+        const VectorType &src,
+        const std::function<void(const unsigned int, const unsigned int)>
+          &operation_before_matrix_vector_product,
+        const std::function<void(const unsigned int, const unsigned int)>
+          &operation_after_matrix_vector_product) const
+  {
+    operation_before_matrix_vector_product(0, src.size());
+
+    sparse_matrix.vmult(dst, src);
+
+    operation_after_matrix_vector_product(0, src.size());
+  }
+
+private:
+  const SparseMatrixType &sparse_matrix;
+};
 
 
 template <typename PreconditionerType, typename VectorType>
 std::tuple<double, double, double, double>
-test(const PreconditionerType &preconditioner, const VectorType &src)
+test(const PreconditionerType &preconditioner,
+     const VectorType &        src,
+     const bool                test_transposed = true)
 {
   VectorType dst;
   dst.reinit(src);
 
+  dst = 1.0;
   preconditioner.vmult(dst, src);
   const double norm_0 = dst.l2_norm();
 
+  if (test_transposed)
+    {
+      dst = 1.0;
+      preconditioner.Tvmult(dst, src);
+    }
+  const double norm_2 = dst.l2_norm();
+
+  dst = 1.0;
   preconditioner.step(dst, src);
   const double norm_1 = dst.l2_norm();
 
-  preconditioner.Tvmult(dst, src);
-  const double norm_2 = dst.l2_norm();
-
-  preconditioner.Tstep(dst, src);
+  if (test_transposed)
+    {
+      dst = 1.0;
+      preconditioner.Tstep(dst, src);
+    }
   const double norm_3 = dst.l2_norm();
 
   return std::tuple<double, double, double, double>{norm_0,
@@ -160,6 +228,30 @@ main()
         }
 
         {
+          // Test PreconditionRelaxation + DiagonalMatrix: optimized path with
+          // lambdas
+          using PreconditionerType = DiagonalMatrix<VectorType>;
+
+          using MyMatrixType = MySparseMatrix<MatrixType>;
+
+          MyMatrixType my_system_matrix(system_matrix);
+
+          PreconditionRelaxation<MyMatrixType, PreconditionerType>
+            preconditioner;
+
+          PreconditionRelaxation<MyMatrixType,
+                                 PreconditionerType>::AdditionalData ad;
+          ad.relaxation     = relaxation;
+          ad.n_iterations   = n_iterations;
+          ad.preconditioner = std::make_shared<PreconditionerType>();
+          ad.preconditioner->get_vector() = diagonal;
+
+          preconditioner.initialize(my_system_matrix, ad);
+
+          results.emplace_back(test(preconditioner, src, false));
+        }
+
+        {
           // Test PreconditionRelaxation + DiagonalMatrix: optimized path
           using PreconditionerType = DiagonalMatrix<VectorType>;
 
@@ -194,6 +286,25 @@ main()
           preconditioner.initialize(system_matrix, ad);
 
           results.emplace_back(test(preconditioner, src));
+        }
+
+        {
+          // Test PreconditionRelaxation + wrapper around DiagonalMatrix with
+          // pre and post: alternative optimized path is taken
+          using PreconditionerType = MyDiagonalMatrixWithPreAndPost<VectorType>;
+
+          PreconditionRelaxation<MatrixType, PreconditionerType> preconditioner;
+
+          PreconditionRelaxation<MatrixType, PreconditionerType>::AdditionalData
+            ad;
+          ad.relaxation     = relaxation;
+          ad.n_iterations   = n_iterations;
+          ad.preconditioner = std::make_shared<PreconditionerType>();
+          ad.preconditioner->get_vector() = diagonal;
+
+          preconditioner.initialize(system_matrix, ad);
+
+          results.emplace_back(test(preconditioner, src, false));
         }
 
         if (std::equal(results.begin(),

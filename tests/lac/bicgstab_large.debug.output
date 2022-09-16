@@ -1,9 +1,5 @@
 
-DEAL:Bicgstab::Starting value 2.000
-DEAL:Bicgstab::Convergence step 4 value 0
-1.000  0.1000 0.09091 0.02381 
-DEAL::residual=0
-DEAL:Bicgstab::Starting value 2.000e+10
-DEAL:Bicgstab::Convergence step 4 value 0.001939
-1.000  0.1000 0.09091 0.02381 
-DEAL::residual=0.001937
+1.000e+00 1.000e-01 9.091e-02 2.381e-02 
+DEAL::residual=1.637e-14 niter=4
+1.000e+00 1.000e-01 9.091e-02 2.381e-02 
+DEAL::scaled residual=1.490e-13 niter=4

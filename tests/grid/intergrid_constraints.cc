@@ -166,7 +166,7 @@ check()
                 cell->set_refine_flag();
 
                 // make sure that the
-                // corrsponding cell
+                // corresponding cell
                 // on grid 2 is also
                 // refined if that
                 // has not yet

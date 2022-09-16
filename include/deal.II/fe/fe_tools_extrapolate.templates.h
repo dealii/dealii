@@ -1469,9 +1469,8 @@ namespace FETools
     };
 
     template <class VectorType>
-    struct BlockTypeHelper<
-      VectorType,
-      typename std::enable_if<IsBlockVector<VectorType>::value>::type>
+    struct BlockTypeHelper<VectorType,
+                           std::enable_if_t<IsBlockVector<VectorType>::value>>
     {
       using type = typename VectorType::BlockType;
     };
@@ -1773,5 +1772,4 @@ namespace FETools
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*--------------------   fe_tools_extrapolate_templates.h -------------------*/
-#endif // dealii_fe_tools_extrapolate_templates_H
+#endif

@@ -32,7 +32,6 @@
 #include <boost/any.hpp>
 
 #include <algorithm>
-#include <map>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -420,8 +419,8 @@ namespace MeshWorker
 
     /**
      * @name Methods to work on current cell
+     * @{
      */
-    /**@{*/ // CurrentCellMethods
 
     /**
      * Initialize the internal FEValues with the given @p cell, and return
@@ -538,8 +537,8 @@ namespace MeshWorker
 
     /**
      * @name Methods to work on neighbor cell
+     * @{
      */
-    /** @{ */ // NeighborCellMethods
 
     /**
      * Initialize the internal neighbor FEValues to use the given @p cell, and

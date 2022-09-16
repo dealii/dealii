@@ -1,0 +1,15 @@
+
+DEAL::Test if cell not found:
+
+Searching for point with marked cells that do not hold the point:
+Marked cells 0 2 
+Found cell: -1
+
+---------------
+
+Test if marked cell is found with cell hint that has the point but is not marked:
+
+Searching for cells 4 with cell_hint 1:
+Found cell: 4
+
+DEAL::

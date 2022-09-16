@@ -260,11 +260,10 @@ namespace Differentiation
     // Specialization for taped ADOL-C auto-differentiable numbers.
 
     template <typename ADNumberType>
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::TapedDrivers()
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::TapedDrivers()
       : active_tape(Numbers<ADNumberType>::invalid_tape_index)
       , keep_values(true)
       , is_recording_flag(false)
@@ -279,11 +278,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::is_recording()
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::is_recording()
       const
     {
       return is_recording_flag;
@@ -292,11 +290,11 @@ namespace Differentiation
 
     template <typename ADNumberType>
     typename Types<ADNumberType>::tape_index
-    TapedDrivers<ADNumberType,
-                 double,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::active_tape_index() const
+    TapedDrivers<
+      ADNumberType,
+      double,
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_taped>>::active_tape_index() const
     {
       return active_tape;
     }
@@ -306,10 +304,9 @@ namespace Differentiation
     bool
     TapedDrivers<ADNumberType,
                  double,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::keep_independent_values()
-      const
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
+      keep_independent_values() const
     {
       return keep_values;
     }
@@ -317,11 +314,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       is_registered_tape(
         const typename Types<ADNumberType>::tape_index tape_index) const
     {
@@ -391,11 +387,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       set_tape_buffer_sizes(
         const typename Types<ADNumberType>::tape_buffer_sizes in_obufsize,
         const typename Types<ADNumberType>::tape_buffer_sizes in_lbufsize,
@@ -414,11 +409,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       start_taping(const typename Types<ADNumberType>::tape_index tape_index,
                    const bool keep_independent_values)
     {
@@ -440,11 +434,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       stop_taping(
         const typename Types<ADNumberType>::tape_index active_tape_index,
         const bool                                     write_tapes_to_file)
@@ -469,11 +462,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     std::vector<typename Types<ADNumberType>::tape_index>
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       get_registered_tape_indices() const
     {
       // We've chosen to use unsigned shorts for the tape
@@ -490,11 +482,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       activate_tape(const typename Types<ADNumberType>::tape_index tape_index)
     {
       active_tape = tape_index;
@@ -503,11 +494,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       requires_retaping(
         const typename Types<ADNumberType>::tape_index tape_index) const
     {
@@ -545,11 +535,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       last_action_requires_retaping() const
     {
       return requires_retaping(active_tape);
@@ -558,11 +547,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       remove_tape(const typename Types<ADNumberType>::tape_index tape_index)
     {
       Assert(is_registered_tape(tape_index),
@@ -574,11 +562,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       reset(const bool clear_registered_tapes)
     {
       active_tape       = Numbers<ADNumberType>::invalid_tape_index;
@@ -598,9 +585,9 @@ namespace Differentiation
     void
     TapedDrivers<ADNumberType,
                  double,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::print(std::ostream &stream)
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::print(std::ostream
+                                                                      &stream)
       const
     {
       const std::vector<typename Types<ADNumberType>::tape_index>
@@ -630,11 +617,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       print_tape_stats(
         const typename Types<ADNumberType>::tape_index tape_index,
         std::ostream &                                 stream) const
@@ -675,13 +661,12 @@ namespace Differentiation
     typename TapedDrivers<
       ADNumberType,
       double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::scalar_type
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_taped>>::scalar_type
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       value(const typename Types<ADNumberType>::tape_index active_tape_index,
             const std::vector<scalar_type> &independent_variables) const
     {
@@ -703,11 +688,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       gradient(const typename Types<ADNumberType>::tape_index active_tape_index,
                const std::vector<scalar_type> &independent_variables,
                Vector<scalar_type> &           gradient) const
@@ -736,11 +720,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       hessian(const typename Types<ADNumberType>::tape_index active_tape_index,
               const std::vector<scalar_type> &independent_variables,
               FullMatrix<scalar_type> &       hessian) const
@@ -779,11 +762,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
              const unsigned int              n_dependent_variables,
              const std::vector<scalar_type> &independent_variables,
@@ -808,11 +790,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       jacobian(const typename Types<ADNumberType>::tape_index active_tape_index,
                const unsigned int              n_dependent_variables,
                const std::vector<scalar_type> &independent_variables,
@@ -847,11 +828,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::is_recording()
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::is_recording()
       const
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -861,11 +841,11 @@ namespace Differentiation
 
     template <typename ADNumberType>
     typename Types<ADNumberType>::tape_index
-    TapedDrivers<ADNumberType,
-                 double,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::active_tape_index() const
+    TapedDrivers<
+      ADNumberType,
+      double,
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_taped>>::active_tape_index() const
     {
       AssertThrow(false, ExcRequiresADOLC());
       return Numbers<ADNumberType>::invalid_tape_index;
@@ -876,10 +856,9 @@ namespace Differentiation
     bool
     TapedDrivers<ADNumberType,
                  double,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::keep_independent_values()
-      const
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
+      keep_independent_values() const
     {
       AssertThrow(false, ExcRequiresADOLC());
       return false;
@@ -888,11 +867,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       is_registered_tape(const typename Types<ADNumberType>::tape_index) const
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -902,11 +880,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       set_tape_buffer_sizes(
         const typename Types<ADNumberType>::tape_buffer_sizes,
         const typename Types<ADNumberType>::tape_buffer_sizes,
@@ -919,11 +896,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       start_taping(const typename Types<ADNumberType>::tape_index, const bool)
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -932,11 +908,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       stop_taping(const typename Types<ADNumberType>::tape_index, const bool)
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -945,11 +920,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     std::vector<typename Types<ADNumberType>::tape_index>
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       get_registered_tape_indices() const
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -959,11 +933,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       activate_tape(const typename Types<ADNumberType>::tape_index)
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -972,11 +945,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       requires_retaping(const typename Types<ADNumberType>::tape_index) const
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -986,11 +958,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       last_action_requires_retaping() const
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -1000,11 +971,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       remove_tape(const typename Types<ADNumberType>::tape_index)
     {
       AssertThrow(false, ExcRequiresADOLC());
@@ -1015,9 +985,8 @@ namespace Differentiation
     void
     TapedDrivers<ADNumberType,
                  double,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::reset(const bool)
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::reset(const bool)
     {
       AssertThrow(false, ExcRequiresADOLC());
     }
@@ -1027,9 +996,9 @@ namespace Differentiation
     void
     TapedDrivers<ADNumberType,
                  double,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::print(std::ostream &) const
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::print(std::ostream
+                                                                      &) const
     {
       AssertThrow(false, ExcRequiresADOLC());
     }
@@ -1037,11 +1006,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       print_tape_stats(const typename Types<ADNumberType>::tape_index,
                        std::ostream &) const
     {
@@ -1053,13 +1021,12 @@ namespace Differentiation
     typename TapedDrivers<
       ADNumberType,
       double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::scalar_type
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_taped>>::scalar_type
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       value(const typename Types<ADNumberType>::tape_index,
             const std::vector<scalar_type> &) const
     {
@@ -1070,11 +1037,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       gradient(const typename Types<ADNumberType>::tape_index,
                const std::vector<scalar_type> &,
                Vector<scalar_type> &) const
@@ -1085,11 +1051,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       hessian(const typename Types<ADNumberType>::tape_index,
               const std::vector<scalar_type> &,
               FullMatrix<scalar_type> &) const
@@ -1100,11 +1065,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       values(const typename Types<ADNumberType>::tape_index,
              const unsigned int,
              const std::vector<scalar_type> &,
@@ -1116,11 +1080,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      double,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 double,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       jacobian(const typename Types<ADNumberType>::tape_index,
                const unsigned int,
                const std::vector<scalar_type> &,
@@ -1137,11 +1100,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::is_recording()
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::is_recording()
       const
     {
       // ADOL-C only supports 'double', not 'float', so we can forward to
@@ -1152,11 +1114,11 @@ namespace Differentiation
 
     template <typename ADNumberType>
     typename Types<ADNumberType>::tape_index
-    TapedDrivers<ADNumberType,
-                 float,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::active_tape_index() const
+    TapedDrivers<
+      ADNumberType,
+      float,
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_taped>>::active_tape_index() const
     {
       // ADOL-C only supports 'double', not 'float', so we can forward to
       // the 'double' implementation of this function
@@ -1168,10 +1130,9 @@ namespace Differentiation
     bool
     TapedDrivers<ADNumberType,
                  float,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::keep_independent_values()
-      const
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
+      keep_independent_values() const
     {
       return taped_driver.keep_independent_values();
     }
@@ -1179,11 +1140,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       is_registered_tape(
         const typename Types<ADNumberType>::tape_index tape_index) const
     {
@@ -1195,11 +1155,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       set_tape_buffer_sizes(
         const typename Types<ADNumberType>::tape_buffer_sizes obufsize,
         const typename Types<ADNumberType>::tape_buffer_sizes lbufsize,
@@ -1217,11 +1176,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       start_taping(const typename Types<ADNumberType>::tape_index tape_index,
                    const bool keep_independent_values)
     {
@@ -1233,11 +1191,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       stop_taping(
         const typename Types<ADNumberType>::tape_index active_tape_index,
         const bool                                     write_tapes_to_file)
@@ -1250,11 +1207,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     std::vector<typename Types<ADNumberType>::tape_index>
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       get_registered_tape_indices() const
     {
       return taped_driver.get_registered_tape_indices();
@@ -1263,11 +1219,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       activate_tape(const typename Types<ADNumberType>::tape_index tape_index)
     {
       taped_driver.activate_tape(tape_index);
@@ -1276,11 +1231,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       requires_retaping(
         const typename Types<ADNumberType>::tape_index tape_index) const
     {
@@ -1290,11 +1244,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     bool
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       last_action_requires_retaping() const
     {
       return taped_driver.last_action_requires_retaping();
@@ -1303,11 +1256,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       remove_tape(const typename Types<ADNumberType>::tape_index tape_index)
     {
       taped_driver.remove_tape(tape_index);
@@ -1316,11 +1268,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       reset(const bool clear_registered_tapes)
     {
       taped_driver.reset(clear_registered_tapes);
@@ -1331,9 +1282,9 @@ namespace Differentiation
     void
     TapedDrivers<ADNumberType,
                  float,
-                 typename std::enable_if<
-                   ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::print(std::ostream &stream)
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::print(std::ostream
+                                                                      &stream)
       const
     {
       taped_driver.print(stream);
@@ -1342,11 +1293,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       print_tape_stats(
         const typename Types<ADNumberType>::tape_index tape_index,
         std::ostream &                                 stream) const
@@ -1361,13 +1311,12 @@ namespace Differentiation
     typename TapedDrivers<
       ADNumberType,
       float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::scalar_type
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_taped>>::scalar_type
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       value(const typename Types<ADNumberType>::tape_index active_tape_index,
             const std::vector<scalar_type> &independent_variables) const
     {
@@ -1380,11 +1329,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       gradient(const typename Types<ADNumberType>::tape_index active_tape_index,
                const std::vector<scalar_type> &independent_variables,
                Vector<scalar_type> &           gradient) const
@@ -1401,11 +1349,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       hessian(const typename Types<ADNumberType>::tape_index active_tape_index,
               const std::vector<scalar_type> &independent_variables,
               FullMatrix<scalar_type> &       hessian) const
@@ -1422,11 +1369,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
              const unsigned int              n_dependent_variables,
              const std::vector<scalar_type> &independent_variables,
@@ -1445,11 +1391,10 @@ namespace Differentiation
 
     template <typename ADNumberType>
     void
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       jacobian(const typename Types<ADNumberType>::tape_index active_tape_index,
                const unsigned int              n_dependent_variables,
                const std::vector<scalar_type> &independent_variables,
@@ -1469,11 +1414,10 @@ namespace Differentiation
 #  ifndef DOXYGEN
     template <typename ADNumberType>
     std::vector<double>
-    TapedDrivers<
-      ADNumberType,
-      float,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_taped>::type>::
+    TapedDrivers<ADNumberType,
+                 float,
+                 std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                  NumberTypes::adolc_taped>>::
       vector_float_to_double(const std::vector<float> &in) const
     {
       std::vector<double> out(in.size());
@@ -1580,10 +1524,10 @@ namespace Differentiation
        * reverse-mode AD.
        */
       template <typename ADNumberType>
-      typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
-                                  NumberTypes::sacado_rad ||
-                                ADNumberTraits<ADNumberType>::type_code ==
-                                  NumberTypes::sacado_rad_dfad)>::type
+      std::enable_if_t<!(ADNumberTraits<ADNumberType>::type_code ==
+                           NumberTypes::sacado_rad ||
+                         ADNumberTraits<ADNumberType>::type_code ==
+                           NumberTypes::sacado_rad_dfad)>
       reverse_mode_dependent_variable_activation(ADNumberType &)
       {}
 
@@ -1599,10 +1543,9 @@ namespace Differentiation
        * to. This function broadcasts this information.
        */
       template <typename ADNumberType>
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type
+      std::enable_if_t<
+        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_rad ||
+        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_rad_dfad>
       reverse_mode_dependent_variable_activation(
         ADNumberType &dependent_variable)
       {
@@ -1625,8 +1568,8 @@ namespace Differentiation
        * auto-differentiable numbers.
        */
       template <typename ADNumberType>
-      typename std::enable_if<!(ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless)>::type
+      std::enable_if_t<!(ADNumberTraits<ADNumberType>::type_code ==
+                         NumberTypes::adolc_tapeless)>
       configure_tapeless_mode(const unsigned int)
       {}
 
@@ -1642,8 +1585,8 @@ namespace Differentiation
        * If not then it throws an error.
        */
       template <typename ADNumberType>
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_tapeless>::type
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_tapeless>
       configure_tapeless_mode(const unsigned int n_directional_derivatives)
       {
 #    ifdef DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING
@@ -1702,8 +1645,8 @@ namespace Differentiation
 #  else // DEAL_II_WITH_ADOLC
 
       template <typename ADNumberType>
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                              NumberTypes::adolc_tapeless>::type
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                       NumberTypes::adolc_tapeless>
       configure_tapeless_mode(const unsigned int /*n_directional_derivatives*/)
       {
         AssertThrow(false, ExcRequiresADOLC());
@@ -1724,10 +1667,10 @@ namespace Differentiation
     TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<
-        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_rad ||
-        ADNumberTraits<ADNumberType>::type_code ==
-          NumberTypes::sacado_rad_dfad>::type>::TapelessDrivers()
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                         NumberTypes::sacado_rad ||
+                       ADNumberTraits<ADNumberType>::type_code ==
+                         NumberTypes::sacado_rad_dfad>>::TapelessDrivers()
       : dependent_variable_marking_safe(false)
     {}
 #  endif
@@ -1735,13 +1678,12 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad_dfad>>::
       initialize_global_environment(const unsigned int n_independent_variables)
     {
       internal::configure_tapeless_mode<ADNumberType>(n_independent_variables);
@@ -1753,11 +1695,10 @@ namespace Differentiation
     TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
-      allow_dependent_variable_marking()
+      std::enable_if_t<
+        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_rad ||
+        ADNumberTraits<ADNumberType>::type_code ==
+          NumberTypes::sacado_rad_dfad>>::allow_dependent_variable_marking()
     {
       dependent_variable_marking_safe = true;
     }
@@ -1768,11 +1709,10 @@ namespace Differentiation
     TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
-      prevent_dependent_variable_marking()
+      std::enable_if_t<
+        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_rad ||
+        ADNumberTraits<ADNumberType>::type_code ==
+          NumberTypes::sacado_rad_dfad>>::prevent_dependent_variable_marking()
     {
       dependent_variable_marking_safe = false;
     }
@@ -1780,13 +1720,12 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     bool
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad_dfad>>::
       is_dependent_variable_marking_allowed() const
     {
       return dependent_variable_marking_safe;
@@ -1795,13 +1734,12 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     ScalarType
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad_dfad>>::
       value(const std::vector<ADNumberType> &dependent_variables) const
     {
       Assert(dependent_variables.size() == 1,
@@ -1813,13 +1751,12 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad_dfad>>::
       gradient(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
                Vector<ScalarType> &             gradient) const
@@ -1849,13 +1786,12 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad_dfad>>::
       hessian(const std::vector<ADNumberType> &independent_variables,
               const std::vector<ADNumberType> &dependent_variables,
               FullMatrix<ScalarType> &         hessian) const
@@ -1904,13 +1840,12 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad_dfad>>::
       values(const std::vector<ADNumberType> &dependent_variables,
              Vector<ScalarType> &             values) const
     {
@@ -1926,13 +1861,12 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_rad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_rad_dfad>>::
       jacobian(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
                FullMatrix<ScalarType> &         jacobian) const
@@ -1994,12 +1928,12 @@ namespace Differentiation
     TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<
-        ADNumberTraits<ADNumberType>::type_code ==
-          NumberTypes::adolc_tapeless ||
-        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_dfad ||
-        ADNumberTraits<ADNumberType>::type_code ==
-          NumberTypes::sacado_dfad_dfad>::type>::TapelessDrivers()
+      std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                         NumberTypes::adolc_tapeless ||
+                       ADNumberTraits<ADNumberType>::type_code ==
+                         NumberTypes::sacado_dfad ||
+                       ADNumberTraits<ADNumberType>::type_code ==
+                         NumberTypes::sacado_dfad_dfad>>::TapelessDrivers()
       : dependent_variable_marking_safe(false)
     {}
 #  endif
@@ -2007,15 +1941,14 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::adolc_tapeless ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad_dfad>>::
       initialize_global_environment(const unsigned int n_independent_variables)
     {
       internal::configure_tapeless_mode<ADNumberType>(n_independent_variables);
@@ -2027,13 +1960,12 @@ namespace Differentiation
     TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
-      allow_dependent_variable_marking()
+      std::enable_if_t<
+        ADNumberTraits<ADNumberType>::type_code ==
+          NumberTypes::adolc_tapeless ||
+        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_dfad ||
+        ADNumberTraits<ADNumberType>::type_code ==
+          NumberTypes::sacado_dfad_dfad>>::allow_dependent_variable_marking()
     {
       dependent_variable_marking_safe = true;
     }
@@ -2044,13 +1976,12 @@ namespace Differentiation
     TapelessDrivers<
       ADNumberType,
       ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
-      prevent_dependent_variable_marking()
+      std::enable_if_t<
+        ADNumberTraits<ADNumberType>::type_code ==
+          NumberTypes::adolc_tapeless ||
+        ADNumberTraits<ADNumberType>::type_code == NumberTypes::sacado_dfad ||
+        ADNumberTraits<ADNumberType>::type_code ==
+          NumberTypes::sacado_dfad_dfad>>::prevent_dependent_variable_marking()
     {
       dependent_variable_marking_safe = false;
     }
@@ -2058,15 +1989,14 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     bool
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::adolc_tapeless ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad_dfad>>::
       is_dependent_variable_marking_allowed() const
     {
       return dependent_variable_marking_safe;
@@ -2075,15 +2005,14 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     ScalarType
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::adolc_tapeless ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad_dfad>>::
       value(const std::vector<ADNumberType> &dependent_variables) const
     {
       Assert(dependent_variables.size() == 1,
@@ -2095,15 +2024,14 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::adolc_tapeless ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad_dfad>>::
       gradient(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
                Vector<ScalarType> &             gradient) const
@@ -2131,15 +2059,14 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::adolc_tapeless ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad_dfad>>::
       hessian(const std::vector<ADNumberType> &independent_variables,
               const std::vector<ADNumberType> &dependent_variables,
               FullMatrix<ScalarType> &         hessian) const
@@ -2186,15 +2113,14 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::adolc_tapeless ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad_dfad>>::
       values(const std::vector<ADNumberType> &dependent_variables,
              Vector<ScalarType> &             values) const
     {
@@ -2210,15 +2136,14 @@ namespace Differentiation
 
     template <typename ADNumberType, typename ScalarType>
     void
-    TapelessDrivers<
-      ADNumberType,
-      ScalarType,
-      typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::adolc_tapeless ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad ||
-                              ADNumberTraits<ADNumberType>::type_code ==
-                                NumberTypes::sacado_dfad_dfad>::type>::
+    TapelessDrivers<ADNumberType,
+                    ScalarType,
+                    std::enable_if_t<ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::adolc_tapeless ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad ||
+                                     ADNumberTraits<ADNumberType>::type_code ==
+                                       NumberTypes::sacado_dfad_dfad>>::
       jacobian(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
                FullMatrix<ScalarType> &         jacobian) const

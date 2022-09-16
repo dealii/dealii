@@ -37,6 +37,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1216,10 +1217,9 @@ namespace internal
   // LAPACKFullMatrix is only implemented for
   // floats and doubles
   template <typename number>
-  struct Determinant<
-    number,
-    typename std::enable_if<std::is_same<number, float>::value ||
-                            std::is_same<number, double>::value>::type>
+  struct Determinant<number,
+                     std::enable_if_t<std::is_same<number, float>::value ||
+                                      std::is_same<number, double>::value>>
   {
 #ifdef DEAL_II_WITH_LAPACK
     static number

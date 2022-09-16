@@ -626,8 +626,8 @@ namespace StandardExceptions
 {
   /**
    * @addtogroup Exceptions
+   * @{
    */
-  //@{
 
   /**
    * Exception denoting a division by zero.
@@ -1069,6 +1069,16 @@ namespace StandardExceptions
                    "information.");
 
   /**
+   * Exception indicating that one of the cells in the input to
+   * Triangulation::create_triangulation() or a related function cannot be used.
+   */
+  DeclException1(ExcGridHasInvalidCell,
+                 int,
+                 << "Something went wrong when making cell " << arg1
+                 << ". Read the docs and the source code "
+                 << "for more information.");
+
+  /**
    * Some of our numerical classes allow for setting all entries to zero using
    * the assignment operator <tt>=</tt>.
    *
@@ -1139,7 +1149,7 @@ namespace StandardExceptions
                  std::string,
                  << "There was an error in a cuSPARSE function: " << arg1);
 #endif
-  //@}
+  /** @} */
 
   /**
    * This function requires support for the Exodus II library.

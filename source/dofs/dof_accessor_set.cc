@@ -35,6 +35,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <limits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -102,18 +103,18 @@ namespace internal
   constexpr bool has_set_ghost_state =
     is_supported_operation<set_ghost_state_t, T>;
 
-  template <typename VectorType,
-            typename std::enable_if<has_set_ghost_state<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<has_set_ghost_state<VectorType>, VectorType> * = nullptr>
   void
   set_ghost_state(VectorType &vector, const bool ghosted)
   {
     vector.set_ghost_state(ghosted);
   }
 
-  template <typename VectorType,
-            typename std::enable_if<!has_set_ghost_state<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<!has_set_ghost_state<VectorType>, VectorType> * = nullptr>
   void
   set_ghost_state(VectorType &, const bool)
   {
@@ -186,7 +187,7 @@ namespace internal
   {
     const unsigned int fe_index =
       (cell.get_dof_handler().has_hp_capabilities() == false &&
-       fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+       fe_index_ == numbers::invalid_fe_index) ?
         DoFHandler<dim, spacedim>::default_fe_index :
         fe_index_;
 
@@ -197,7 +198,7 @@ namespace internal
             // active cells, you either don't specify an fe_index,
             // or that you specify the correct one
             (fe_index == cell.active_fe_index()) ||
-            (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
+            (fe_index == numbers::invalid_fe_index))
           // simply set the values on this cell
           processor(cell, local_values, values);
         else
@@ -228,7 +229,7 @@ namespace internal
       // otherwise distribute them to the children
       {
         Assert((cell.get_dof_handler().has_hp_capabilities() == false) ||
-                 (fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
+                 (fe_index != numbers::invalid_fe_index),
                ExcMessage(
                  "You cannot call this function on non-active cells "
                  "of DoFHandler objects unless you provide an explicit "

@@ -17,7 +17,8 @@
 
 // test SparseMatrix::copy_from from a TrilinosWrappers::SparseMatrix
 
-#include <deal.II/base/utilities.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/trilinos_utilities.h>
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>

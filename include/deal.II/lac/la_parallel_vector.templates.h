@@ -21,6 +21,7 @@
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/cuda_size.h>
+#include <deal.II/base/mpi.h>
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_parallel_vector.h>

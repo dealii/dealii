@@ -32,7 +32,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_reordering.h>
@@ -67,6 +66,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <list>
 #include <numeric>
 #include <set>
@@ -744,6 +744,9 @@ namespace GridTools
                              std::vector<unsigned int> &   considered_vertices,
                              const double                  tol)
   {
+    if (tol == 0.0)
+      return; // nothing to do per definition
+
     AssertIndexRange(2, vertices.size());
     std::vector<unsigned int> new_vertex_numbers(vertices.size());
     std::iota(new_vertex_numbers.begin(), new_vertex_numbers.end(), 0);
@@ -870,8 +873,8 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
-    // This function is presently only implemented for hypercube and simplex
-    // volumetric (codimension 0) elements.
+    // This function is presently only implemented for volumetric (codimension
+    // 0) elements.
 
     if (dim == 1)
       return 0;
@@ -879,18 +882,20 @@ namespace GridTools
       Assert(false, ExcNotImplemented());
 
     std::size_t n_negative_cells = 0;
+    std::size_t cell_no          = 0;
     for (auto &cell : cells)
       {
         const ArrayView<const unsigned int> vertices(cell.vertices);
-        if (GridTools::cell_measure(all_vertices, vertices) < 0)
+        // Some pathologically twisted cells can have exactly zero measure but
+        // we can still fix them
+        if (GridTools::cell_measure(all_vertices, vertices) <= 0)
           {
-            const unsigned int n_vertices = vertices.size();
+            ++n_negative_cells;
+            const auto reference_cell =
+              ReferenceCell::n_vertices_to_type(dim, vertices.size());
 
-            if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
-                  .is_hyper_cube())
+            if (reference_cell.is_hyper_cube())
               {
-                ++n_negative_cells;
-
                 if (dim == 2)
                   {
                     // flip the cell across the y = x line in 2D
@@ -905,16 +910,26 @@ namespace GridTools
                     std::swap(cell.vertices[5], cell.vertices[7]);
                   }
               }
-
-            else if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
-                       .is_simplex())
+            else if (reference_cell.is_simplex())
               {
-                ++n_negative_cells;
                 // By basic rules for computing determinants we can just swap
                 // two vertices to fix a negative volume. Arbitrarily pick the
                 // last two.
-                std::swap(cell.vertices[n_vertices - 2],
-                          cell.vertices[n_vertices - 1]);
+                std::swap(cell.vertices[cell.vertices.size() - 2],
+                          cell.vertices[cell.vertices.size() - 1]);
+              }
+            else if (reference_cell == ReferenceCells::Wedge)
+              {
+                // swap the two triangular faces
+                std::swap(cell.vertices[0], cell.vertices[3]);
+                std::swap(cell.vertices[1], cell.vertices[4]);
+                std::swap(cell.vertices[2], cell.vertices[5]);
+              }
+            else if (reference_cell == ReferenceCells::Pyramid)
+              {
+                // Try swapping two vertices in the base - perhaps things were
+                // read in the UCD (counter-clockwise) order instead of lexical
+                std::swap(cell.vertices[2], cell.vertices[3]);
               }
             else
               {
@@ -924,8 +939,9 @@ namespace GridTools
             // If not, then the grid is seriously broken and
             // we just give up.
             AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
-                        ExcInternalError());
+                        ExcGridHasInvalidCell(cell_no));
           }
+        ++cell_no;
       }
     return n_negative_cells;
   }
@@ -2152,8 +2168,15 @@ namespace GridTools
 
     QGauss<dim> quadrature(4);
 
+    Assert(triangulation.all_reference_cells_are_hyper_cube(),
+           ExcNotImplemented());
+    const auto reference_cell = ReferenceCells::get_hypercube<dim>();
     MatrixCreator::create_laplace_matrix(
-      StaticMappingQ1<dim>::mapping, dof_handler, quadrature, S, coefficient);
+      reference_cell.template get_default_linear_mapping<dim, dim>(),
+      dof_handler,
+      quadrature,
+      S,
+      coefficient);
 
     // set up the boundary values for the laplace problem
     std::array<AffineConstraints<double>, dim>                  constraints;
@@ -2850,15 +2873,51 @@ namespace GridTools
     bool found_cell  = false;
     bool approx_cell = false;
 
-    unsigned int        closest_vertex_index = 0;
+    unsigned int closest_vertex_index = 0;
+    // ensure closest vertex index is a marked one, otherwise cell (with vertex
+    // 0) might be found even though it is not marked. This is only relevant if
+    // searching with rtree, using find_closest_vertex already can manage not
+    // finding points
+    if (marked_vertices.size() && !used_vertices_rtree.empty())
+      {
+        const auto itr =
+          std::find(marked_vertices.begin(), marked_vertices.end(), true);
+        Assert(itr != marked_vertices.end(),
+               dealii::ExcMessage("No vertex has been marked!"));
+        closest_vertex_index = std::distance(marked_vertices.begin(), itr);
+      }
+
     Tensor<1, spacedim> vertex_to_point;
     auto                current_cell = cell_hint;
+
+    // check whether cell has at least one marked vertex
+    const auto cell_marked = [&mesh, &marked_vertices](const auto &cell) {
+      if (marked_vertices.size() == 0)
+        return true;
+
+      if (cell != mesh.active_cell_iterators().end())
+        for (unsigned int i = 0; i < cell->n_vertices(); ++i)
+          if (marked_vertices[cell->vertex_index(i)])
+            return true;
+
+      return false;
+    };
+
+    // check whether any cell in collection is marked
+    const auto any_cell_marked = [&cell_marked](const auto &cells) {
+      return std::any_of(cells.begin(),
+                         cells.end(),
+                         [&cell_marked](const auto &cell) {
+                           return cell_marked(cell);
+                         });
+    };
 
     while (found_cell == false)
       {
         // First look at the vertices of the cell cell_hint. If it's an
         // invalid cell, then query for the closest global vertex
-        if (current_cell.state() == IteratorState::valid)
+        if (current_cell.state() == IteratorState::valid &&
+            cell_marked(cell_hint))
           {
             const auto cell_vertices = mapping.get_vertices(current_cell);
             const unsigned int closest_vertex =
@@ -2888,9 +2947,14 @@ namespace GridTools
                     boost::geometry::index::satisfies(marked),
                   std::back_inserter(res));
 
-                // We should have one and only one result
-                AssertDimension(res.size(), 1);
-                closest_vertex_index = res[0].second;
+                // Searching for a point which is located outside the
+                // triangulation results in res.size() = 0
+                Assert(res.size() < 2,
+                       dealii::ExcMessage("There can not be multiple results"));
+
+                if (res.size() > 0)
+                  if (any_cell_marked(vertex_to_cells[res[0].second]))
+                    closest_vertex_index = res[0].second;
               }
             else
               {
@@ -2899,6 +2963,14 @@ namespace GridTools
               }
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
+
+#ifdef DEBUG
+        {
+          // Double-check if found index is at marked cell
+          Assert(any_cell_marked(vertex_to_cells[closest_vertex_index]),
+                 dealii::ExcMessage("Found non-marked vertex"));
+        }
+#endif
 
         const double vertex_point_norm = vertex_to_point.norm();
         if (vertex_point_norm > 0)
@@ -3410,31 +3482,26 @@ namespace GridTools
              std::vector<std::tuple<types::global_vertex_index,
                                     types::global_vertex_index,
                                     std::string>>>
-                         vertices_to_send;
-    active_cell_iterator cell = triangulation.begin_active(),
-                         endc = triangulation.end();
+                                   vertices_to_send;
     std::set<active_cell_iterator> missing_vert_cells;
     std::set<unsigned int>         used_vertex_index;
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         if (cell->is_locally_owned())
           {
             for (const unsigned int i : cell->vertex_indices())
               {
                 types::subdomain_id lowest_subdomain_id = cell->subdomain_id();
-                typename std::set<active_cell_iterator>::iterator
-                  adjacent_cell = vertex_to_cell[cell->vertex_index(i)].begin(),
-                  end_adj_cell  = vertex_to_cell[cell->vertex_index(i)].end();
-                for (; adjacent_cell != end_adj_cell; ++adjacent_cell)
-                  lowest_subdomain_id =
-                    std::min(lowest_subdomain_id,
-                             (*adjacent_cell)->subdomain_id());
+                for (const auto &adjacent_cell :
+                     vertex_to_cell[cell->vertex_index(i)])
+                  lowest_subdomain_id = std::min(lowest_subdomain_id,
+                                                 adjacent_cell->subdomain_id());
 
-                // See if I "own" this vertex
+                // See if this process "owns" this vertex
                 if (lowest_subdomain_id == cell->subdomain_id())
                   {
-                    // Check that the vertex we are working on a vertex that has
-                    // not be dealt with yet
+                    // Check that the vertex we are working on is a vertex that
+                    // has not been dealt with yet
                     if (used_vertex_index.find(cell->vertex_index(i)) ==
                         used_vertex_index.end())
                       {
@@ -3444,20 +3511,19 @@ namespace GridTools
 
                         // Store the information that will be sent to the
                         // adjacent cells on other subdomains
-                        adjacent_cell =
-                          vertex_to_cell[cell->vertex_index(i)].begin();
-                        for (; adjacent_cell != end_adj_cell; ++adjacent_cell)
-                          if ((*adjacent_cell)->subdomain_id() !=
+                        for (const auto &adjacent_cell :
+                             vertex_to_cell[cell->vertex_index(i)])
+                          if (adjacent_cell->subdomain_id() !=
                               cell->subdomain_id())
                             {
                               std::pair<types::subdomain_id,
                                         types::global_vertex_index>
-                                tmp((*adjacent_cell)->subdomain_id(),
+                                tmp(adjacent_cell->subdomain_id(),
                                     cell->vertex_index(i));
                               if (vertices_added.find(tmp) ==
                                   vertices_added.end())
                                 {
-                                  vertices_to_send[(*adjacent_cell)
+                                  vertices_to_send[adjacent_cell
                                                      ->subdomain_id()]
                                     .emplace_back(i,
                                                   cell->vertex_index(i),
@@ -3531,11 +3597,8 @@ namespace GridTools
                           triangulation.get_communicator());
     AssertThrowMPI(ierr);
 
-    std::map<unsigned int, types::global_vertex_index>::iterator
-      global_index_it  = local_to_global_vertex_index.begin(),
-      global_index_end = local_to_global_vertex_index.end();
-    for (; global_index_it != global_index_end; ++global_index_it)
-      global_index_it->second += shift;
+    for (auto &global_index_it : local_to_global_vertex_index)
+      global_index_it.second += shift;
 
 
     const int mpi_tag = Utilities::MPI::internal::Tags::
@@ -6027,13 +6090,22 @@ namespace GridTools
                 for (const auto &cell_and_reference_position :
                      cells_and_reference_positions)
                   {
+                    const auto cell = cell_and_reference_position.first;
+                    auto       reference_position =
+                      cell_and_reference_position.second;
+
+                    // TODO: we need to implement
+                    // ReferenceCell::project_to_unit_cell()
+                    if (cell->reference_cell().is_hyper_cube())
+                      reference_position =
+                        GeometryInfo<dim>::project_to_unit_cell(
+                          reference_position);
+
                     send_components.emplace_back(
-                      std::pair<int, int>(
-                        cell_and_reference_position.first->level(),
-                        cell_and_reference_position.first->index()),
+                      std::pair<int, int>(cell->level(), cell->index()),
                       other_rank,
                       index_and_point.first,
-                      cell_and_reference_position.second,
+                      reference_position,
                       index_and_point.second,
                       numbers::invalid_unsigned_int);
                   }
@@ -6400,7 +6472,7 @@ namespace GridTools
     std::map<unsigned int, std::vector<unsigned int>> &coinciding_vertex_groups,
     std::map<unsigned int, unsigned int> &vertex_to_coinciding_vertex_group)
   {
-    // 1) determine for each vertex a vertex it concides with and
+    // 1) determine for each vertex a vertex it coincides with and
     //    put it into a map
     {
       static const int lookup_table_2d[2][2] =

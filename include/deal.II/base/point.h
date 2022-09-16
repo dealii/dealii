@@ -164,8 +164,7 @@ public:
    * Convert a boost::geometry::point to a dealii::Point.
    */
   template <std::size_t dummy_dim,
-            typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0),
-                                    int>::type = 0>
+            std::enable_if_t<(dim == dummy_dim) && (dummy_dim != 0), int> = 0>
   Point(const boost::geometry::model::
           point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt);
 
@@ -437,9 +436,8 @@ Point<dim, Number>::Point(const Number x, const Number y, const Number z)
 
 
 template <int dim, typename Number>
-template <
-  std::size_t dummy_dim,
-  typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type>
+template <std::size_t dummy_dim,
+          std::enable_if_t<(dim == dummy_dim) && (dummy_dim != 0), int>>
 inline Point<dim, Number>::Point(
   const boost::geometry::model::
     point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt)

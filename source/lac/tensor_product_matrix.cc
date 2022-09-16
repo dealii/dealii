@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,21 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/tensor_product_matrix.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace internal
+{
+  namespace TensorProductMatrixSymmetricSum
+  {
+#include "tensor_product_matrix.inst"
 
-internal::SolverBicgstabData::SolverBicgstabData()
-  : alpha(0.)
-  , beta(0.)
-  , omega(0.)
-  , rho(0.)
-  , rhobar(0.)
-  , step(numbers::invalid_unsigned_int)
-  , res(numbers::signaling_nan<double>())
-{}
-
+  }
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

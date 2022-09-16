@@ -84,6 +84,8 @@ foreach $step (@ARGV)
     my $tooltip = <TF>;
     close TF;
     chop $tooltip;
+    # we need to escape any double-quotes here before putting it in the dot file
+    $tooltip =~ s/"/\\"/g;
 
     # read first line of 'kind' file if it is a step;
     # otherwise assume it is a code gallery program. for

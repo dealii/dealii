@@ -686,7 +686,7 @@ main()
       f *= x; // f = x^2
       const SD_number_t df_dx = f.differentiate(x);
       Assert(static_cast<bool>(df_dx == (2.0 * x)),
-             ExcMessage("Problem with differentiaton"));
+             ExcMessage("Problem with differentiation"));
     }
 
     std::cout << "Basic differentiation (Symbol)" << std::endl;
@@ -698,7 +698,7 @@ main()
       f *= x; // f = x^2
       const SD_number_t df_dx = f.differentiate(symb_x);
       Assert(static_cast<bool>(df_dx == SD_number_t(2.0 * x)),
-             ExcMessage("Problem with differentiaton"));
+             ExcMessage("Problem with differentiation"));
     }
 
     std::cout << "Basic differentiation (Basic representing a symbolic type)"
@@ -716,7 +716,7 @@ main()
       // 2.0 * SD_number_t(symb_x_plus_y) = 2.0*(x + y)
       // Assert(static_cast<bool>(df_dxpy == (2.0 *
       // SD_number_t(symb_x_plus_y))),
-      //        ExcMessage("Problem with differentiaton"));
+      //        ExcMessage("Problem with differentiation"));
     }
   }
 

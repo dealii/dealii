@@ -30,8 +30,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup mg */
-/*@{*/
+/**
+ * @addtogroup mg
+ * @{
+ */
 
 namespace mg
 {
@@ -191,7 +193,7 @@ private:
   unsigned int col;
 };
 
-/*@}*/
+/** @} */
 
 /*----------------------------------------------------------------------*/
 

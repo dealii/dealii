@@ -23,16 +23,13 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/block_vector_base.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <numeric>
 
 DEAL_II_NAMESPACE_OPEN

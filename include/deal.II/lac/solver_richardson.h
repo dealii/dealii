@@ -25,10 +25,14 @@
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 
+#include <limits>
+
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 /**
  * Implementation of the preconditioned Richardson iteration method. The
@@ -154,7 +158,7 @@ protected:
   AdditionalData additional_data;
 };
 
-/*@}*/
+/** @} */
 /*----------------- Implementation of the Richardson Method ------------------*/
 
 #ifndef DOXYGEN

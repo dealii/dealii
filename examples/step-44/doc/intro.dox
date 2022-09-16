@@ -260,7 +260,7 @@ Similarly, the Kirchhoff stress can be decomposed into volumetric and isochoric 
 	\boldsymbol{\tau}_{\text{iso}} &=
 		2 \mathbf{b} \dfrac{\partial \Psi_{\textrm{iso}} (\overline{\mathbf{b}})}{\partial \mathbf{b}}
 		\\
-		&= \underbrace{( \mathcal{I} - \dfrac{1}{3} \mathbf{I} \otimes \mathbf{I})}_{\mathbb{P}} : \overline{\boldsymbol{\tau}} \, ,
+		&= \underbrace{( \mathcal{S} - \dfrac{1}{3} \mathbf{I} \otimes \mathbf{I})}_{\mathbb{P}} : \overline{\boldsymbol{\tau}} \, ,
 @f}
 where
 $p \dealcoloneq \dfrac{\partial \Psi_{\text{vol}}(J)}{\partial J}$ is the pressure response.

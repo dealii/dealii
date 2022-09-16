@@ -21,7 +21,6 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/mpi.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
@@ -482,9 +481,8 @@ namespace Particles
      * positions.
      */
     template <class VectorType>
-    typename std::enable_if<
-      std::is_convertible<VectorType *, Function<spacedim> *>::value ==
-      false>::type
+    std::enable_if_t<
+      std::is_convertible<VectorType *, Function<spacedim> *>::value == false>
     set_particle_positions(const VectorType &input_vector,
                            const bool        displace_particles = true);
 
@@ -1333,9 +1331,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class VectorType>
-  inline typename std::enable_if<
-    std::is_convertible<VectorType *, Function<spacedim> *>::value ==
-    false>::type
+  inline std::enable_if_t<
+    std::is_convertible<VectorType *, Function<spacedim> *>::value == false>
   ParticleHandler<dim, spacedim>::set_particle_positions(
     const VectorType &input_vector,
     const bool        displace_particles)

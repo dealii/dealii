@@ -20,9 +20,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/table.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/block_indices.h>
@@ -33,6 +33,7 @@
 #include <deal.II/lac/vector_operation.h>
 
 #include <cmath>
+#include <mutex>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -44,8 +45,9 @@ class MatrixIterator;
 #endif
 
 
-/*! @addtogroup Matrix1
- *@{
+/**
+ * @addtogroup Matrix1
+ * @{
  */
 
 /**
@@ -823,7 +825,7 @@ public:
                  int,
                  << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
                  << ',' << arg4 << "] have differing column numbers.");
-  //@}
+  /** @} */
 protected:
   /**
    * Release all memory and return to a state just like after having called
@@ -1037,7 +1039,7 @@ private:
      * A mutex variable used to guard access to the member variables of this
      * structure;
      */
-    std::mutex mutex;
+    Threads::Mutex mutex;
 
     /**
      * Copy operator. This is needed because the default copy operator of this
@@ -1073,7 +1075,7 @@ private:
 };
 
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /* ------------------------- Template functions ---------------------- */

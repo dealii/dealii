@@ -16,8 +16,7 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
-
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/grid/connectivity.h>
 #include <deal.II/grid/grid_tools.h>
@@ -28,9 +27,6 @@
 #include <deal.II/grid/tria_faces.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
-
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/vector.h>
 
 #include <algorithm>
 #include <array>
@@ -404,56 +400,6 @@ namespace
         if (max_adjacent_cell_level[k] - min_adjacent_cell_level[k] > 1)
           return false;
     return true;
-  }
-
-
-
-  /**
-   * Fill the vector @p line_cell_count
-   * needed by @p delete_children with the
-   * number of cells bounded by a given
-   * line.
-   */
-  template <int dim, int spacedim>
-  std::vector<unsigned int>
-  count_cells_bounded_by_line(const Triangulation<dim, spacedim> &triangulation)
-  {
-    if (dim >= 2)
-      {
-        std::vector<unsigned int> line_cell_count(triangulation.n_raw_lines(),
-                                                  0);
-        for (const auto &cell : triangulation.cell_iterators())
-          for (unsigned int l = 0; l < cell->n_lines(); ++l)
-            ++line_cell_count[cell->line_index(l)];
-        return line_cell_count;
-      }
-    else
-      return std::vector<unsigned int>();
-  }
-
-
-
-  /**
-   * Fill the vector @p quad_cell_count
-   * needed by @p delete_children with the
-   * number of cells bounded by a given
-   * quad.
-   */
-  template <int dim, int spacedim>
-  std::vector<unsigned int>
-  count_cells_bounded_by_quad(const Triangulation<dim, spacedim> &triangulation)
-  {
-    if (dim >= 3)
-      {
-        std::vector<unsigned int> quad_cell_count(triangulation.n_raw_quads(),
-                                                  0);
-        for (const auto &cell : triangulation.cell_iterators())
-          for (unsigned int q : cell->face_indices())
-            ++quad_cell_count[cell->quad_index(q)];
-        return quad_cell_count;
-      }
-    else
-      return {};
   }
 
 
@@ -935,15 +881,6 @@ namespace internal
     // internal::TriangulationImplementation
     using dealii::Triangulation;
 
-    /**
-     * Exception
-     * @ingroup Exceptions
-     */
-    DeclException1(ExcGridHasInvalidCell,
-                   int,
-                   << "Something went wrong when making cell " << arg1
-                   << ". Read the docs and the source code "
-                   << "for more information.");
     /**
      * Exception
      * @ingroup Exceptions
@@ -3028,8 +2965,10 @@ namespace internal
           {
             typename Triangulation<dim, spacedim>::cell_iterator child =
               cell->child(c);
-            for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-              --line_cell_count[child->line_index(l)];
+            const auto line_indices = TriaAccessorImplementation::
+              Implementation::get_line_indices_of_cell(*child);
+            for (const unsigned int l : cell->line_indices())
+              --line_cell_count[line_indices[l]];
             for (auto f : GeometryInfo<dim>::face_indices())
               --quad_cell_count[child->quad_index(f)];
           }
@@ -5074,18 +5013,8 @@ namespace internal
         // first clear user flags for quads and lines; we're going to
         // use them to flag which lines and quads need refinement
         triangulation.faces->quads.clear_user_data();
-
-        for (typename Triangulation<dim, spacedim>::line_iterator line =
-               triangulation.begin_line();
-             line != triangulation.end_line();
-             ++line)
-          line->clear_user_flag();
-
-        for (typename Triangulation<dim, spacedim>::quad_iterator quad =
-               triangulation.begin_quad();
-             quad != triangulation.end_quad();
-             ++quad)
-          quad->clear_user_flag();
+        triangulation.faces->lines.clear_user_flags();
+        triangulation.faces->quads.clear_user_flags();
 
         // check how much space is needed on every level. We need not
         // check the highest level since either
@@ -5760,9 +5689,16 @@ namespace internal
                     for (const unsigned int i : hex->vertex_indices())
                       vertex_indices[k++] = hex->vertex_index(i);
 
-                    for (const unsigned int i : hex->line_indices())
-                      vertex_indices[k++] =
-                        hex->line(i)->child(0)->vertex_index(1);
+                    const std::array<unsigned int, 12> line_indices =
+                      TriaAccessorImplementation::Implementation::
+                        get_line_indices_of_cell(*hex);
+                    for (unsigned int l = 0; l < hex->n_lines(); ++l)
+                      {
+                        raw_line_iterator line(&triangulation,
+                                               0,
+                                               line_indices[l]);
+                        vertex_indices[k++] = line->child(0)->vertex_index(1);
+                      }
 
                     if (reference_cell_type == ReferenceCells::Hexahedron)
                       {
@@ -10708,14 +10644,8 @@ namespace internal
         Triangulation<3, spacedim> &triangulation)
       {
         const unsigned int dim = 3;
-
-        // first clear flags on lines, since we need them to determine
-        // which lines will be refined
-        triangulation.clear_user_flags_line();
-
-        // also clear flags on hexes, since we need them to mark those
-        // cells which are to be coarsened
-        triangulation.clear_user_flags_hex();
+        using raw_line_iterator =
+          typename Triangulation<dim, spacedim>::raw_line_iterator;
 
         // variable to store whether the mesh was changed in the
         // present loop and in the whole process
@@ -10730,30 +10660,47 @@ namespace internal
             // decision. the following function sets these flags:
             triangulation.fix_coarsen_flags();
 
+            // first clear flags on lines, since we need them to determine
+            // which lines will be refined
+            triangulation.clear_user_flags_line();
 
             // flag those lines that are refined and will not be
             // coarsened and those that will be refined
             for (const auto &cell : triangulation.cell_iterators())
               if (cell->refine_flag_set())
                 {
-                  for (unsigned int line = 0; line < cell->n_lines(); ++line)
+                  const std::array<unsigned int, 12> line_indices =
+                    TriaAccessorImplementation::Implementation::
+                      get_line_indices_of_cell(*cell);
+                  for (unsigned int l = 0; l < cell->n_lines(); ++l)
                     if (GeometryInfo<dim>::line_refinement_case(
-                          cell->refine_flag_set(), line) ==
+                          cell->refine_flag_set(), l) ==
                         RefinementCase<1>::cut_x)
-                      // flag a line, that will be
-                      // refined
-                      cell->line(line)->set_user_flag();
+                      {
+                        raw_line_iterator line(&triangulation,
+                                               0,
+                                               line_indices[l]);
+                        // flag a line, that will be refined
+                        line->set_user_flag();
+                      }
                 }
               else if (cell->has_children() &&
                        !cell->child(0)->coarsen_flag_set())
                 {
-                  for (unsigned int line = 0; line < cell->n_lines(); ++line)
+                  const std::array<unsigned int, 12> line_indices =
+                    TriaAccessorImplementation::Implementation::
+                      get_line_indices_of_cell(*cell);
+                  for (unsigned int l = 0; l < cell->n_lines(); ++l)
                     if (GeometryInfo<dim>::line_refinement_case(
-                          cell->refinement_case(), line) ==
+                          cell->refinement_case(), l) ==
                         RefinementCase<1>::cut_x)
-                      // flag a line, that is refined
-                      // and will stay so
-                      cell->line(line)->set_user_flag();
+                      {
+                        raw_line_iterator line(&triangulation,
+                                               0,
+                                               line_indices[l]);
+                        // flag a line, that is refined and will stay so
+                        line->set_user_flag();
+                      }
                 }
               else if (cell->has_children() &&
                        cell->child(0)->coarsen_flag_set())
@@ -10768,75 +10715,92 @@ namespace internal
                    cell = triangulation.last_active();
                  cell != triangulation.end();
                  --cell)
-              for (unsigned int line = 0; line < cell->n_lines(); ++line)
-                {
-                  if (cell->line(line)->has_children())
-                    {
-                      // if this line is refined, its children should
-                      // not have further children
-                      //
-                      // however, if any of the children is flagged
-                      // for further refinement, we need to refine
-                      // this cell also (at least, if the cell is not
-                      // already flagged)
-                      bool offending_line_found = false;
+              {
+                const std::array<unsigned int, 12> line_indices =
+                  TriaAccessorImplementation::Implementation::
+                    get_line_indices_of_cell(*cell);
+                for (unsigned int l = 0; l < cell->n_lines(); ++l)
+                  {
+                    raw_line_iterator line(&triangulation, 0, line_indices[l]);
+                    if (line->has_children())
+                      {
+                        // if this line is refined, its children should
+                        // not have further children
+                        //
+                        // however, if any of the children is flagged
+                        // for further refinement, we need to refine
+                        // this cell also (at least, if the cell is not
+                        // already flagged)
+                        bool offending_line_found = false;
 
-                      for (unsigned int c = 0; c < 2; ++c)
-                        {
-                          Assert(cell->line(line)->child(c)->has_children() ==
-                                   false,
-                                 ExcInternalError());
+                        for (unsigned int c = 0; c < 2; ++c)
+                          {
+                            Assert(line->child(c)->has_children() == false,
+                                   ExcInternalError());
 
-                          if (cell->line(line)->child(c)->user_flag_set() &&
-                              (GeometryInfo<dim>::line_refinement_case(
-                                 cell->refine_flag_set(), line) ==
-                               RefinementCase<1>::no_refinement))
-                            {
-                              // tag this cell for refinement
-                              cell->clear_coarsen_flag();
-                              // if anisotropic coarsening is allowed:
-                              // extend the refine_flag in the needed
-                              // direction, else set refine_flag
-                              // (isotropic)
-                              if (triangulation.smooth_grid &
-                                  Triangulation<dim, spacedim>::
-                                    allow_anisotropic_smoothing)
-                                cell->flag_for_line_refinement(line);
-                              else
-                                cell->set_refine_flag();
+                            if (line->child(c)->user_flag_set() &&
+                                (GeometryInfo<dim>::line_refinement_case(
+                                   cell->refine_flag_set(), l) ==
+                                 RefinementCase<1>::no_refinement))
+                              {
+                                // tag this cell for refinement
+                                cell->clear_coarsen_flag();
+                                // if anisotropic coarsening is allowed:
+                                // extend the refine_flag in the needed
+                                // direction, else set refine_flag
+                                // (isotropic)
+                                if (triangulation.smooth_grid &
+                                    Triangulation<dim, spacedim>::
+                                      allow_anisotropic_smoothing)
+                                  cell->flag_for_line_refinement(l);
+                                else
+                                  cell->set_refine_flag();
 
-                              for (unsigned int l = 0; l < cell->n_lines(); ++l)
-                                if (GeometryInfo<dim>::line_refinement_case(
-                                      cell->refine_flag_set(), line) ==
-                                    RefinementCase<1>::cut_x)
-                                  // flag a line, that will be refined
-                                  cell->line(l)->set_user_flag();
+                                for (unsigned int k = 0; k < cell->n_lines();
+                                     ++k)
+                                  if (GeometryInfo<dim>::line_refinement_case(
+                                        cell->refine_flag_set(), l) ==
+                                      RefinementCase<1>::cut_x)
+                                    // flag a line, that will be refined
+                                    raw_line_iterator(&triangulation,
+                                                      0,
+                                                      line_indices[k])
+                                      ->set_user_flag();
 
-                              // note that we have changed the grid
-                              offending_line_found = true;
+                                // note that we have changed the grid
+                                offending_line_found = true;
 
-                              // it may save us several loop
-                              // iterations if we flag all lines of
-                              // this cell now (and not at the outset
-                              // of the next iteration) for refinement
-                              for (unsigned int l = 0; l < cell->n_lines(); ++l)
-                                if (!cell->line(l)->has_children() &&
-                                    (GeometryInfo<dim>::line_refinement_case(
-                                       cell->refine_flag_set(), l) !=
-                                     RefinementCase<1>::no_refinement))
-                                  cell->line(l)->set_user_flag();
+                                // it may save us several loop
+                                // iterations if we flag all lines of
+                                // this cell now (and not at the outset
+                                // of the next iteration) for refinement
+                                for (unsigned int k = 0; k < cell->n_lines();
+                                     ++k)
+                                  {
+                                    const auto line =
+                                      raw_line_iterator(&triangulation,
+                                                        0,
+                                                        line_indices[k]);
+                                    if (!line->has_children() &&
+                                        (GeometryInfo<dim>::
+                                           line_refinement_case(
+                                             cell->refine_flag_set(), k) !=
+                                         RefinementCase<1>::no_refinement))
+                                      line->set_user_flag();
+                                  }
 
-                              break;
-                            }
-                        }
+                                break;
+                              }
+                          }
 
-                      if (offending_line_found)
-                        {
-                          mesh_changed = true;
-                          break;
-                        }
-                    }
-                }
+                        if (offending_line_found)
+                          {
+                            mesh_changed = true;
+                            break;
+                          }
+                      }
+                  }
+              }
 
 
             // there is another thing here: if any of the lines will
@@ -10853,27 +10817,38 @@ namespace internal
                    triangulation.last();
                  cell != triangulation.end();
                  --cell)
-              {
-                if (cell->user_flag_set())
-                  for (unsigned int line = 0; line < cell->n_lines(); ++line)
-                    if (cell->line(line)->has_children() &&
-                        (cell->line(line)->child(0)->user_flag_set() ||
-                         cell->line(line)->child(1)->user_flag_set()))
-                      {
-                        for (unsigned int c = 0; c < cell->n_children(); ++c)
-                          cell->child(c)->clear_coarsen_flag();
-                        cell->clear_user_flag();
-                        for (unsigned int l = 0; l < cell->n_lines(); ++l)
-                          if (GeometryInfo<dim>::line_refinement_case(
-                                cell->refinement_case(), l) ==
-                              RefinementCase<1>::cut_x)
-                            // flag a line, that is refined
-                            // and will stay so
-                            cell->line(l)->set_user_flag();
-                        mesh_changed = true;
-                        break;
-                      }
-              }
+              if (cell->user_flag_set())
+                {
+                  const std::array<unsigned int, 12> line_indices =
+                    TriaAccessorImplementation::Implementation::
+                      get_line_indices_of_cell(*cell);
+                  for (unsigned int l = 0; l < cell->n_lines(); ++l)
+                    {
+                      raw_line_iterator line(&triangulation,
+                                             0,
+                                             line_indices[l]);
+                      if (line->has_children() &&
+                          (line->child(0)->user_flag_set() ||
+                           line->child(1)->user_flag_set()))
+                        {
+                          for (unsigned int c = 0; c < cell->n_children(); ++c)
+                            cell->child(c)->clear_coarsen_flag();
+                          cell->clear_user_flag();
+                          for (unsigned int k = 0; k < cell->n_lines(); ++k)
+                            if (GeometryInfo<dim>::line_refinement_case(
+                                  cell->refinement_case(), k) ==
+                                RefinementCase<1>::cut_x)
+                              // flag a line, that is refined and will
+                              // stay so
+                              raw_line_iterator(&triangulation,
+                                                0,
+                                                line_indices[k])
+                                ->set_user_flag();
+                          mesh_changed = true;
+                          break;
+                        }
+                    }
+                }
           }
         while (mesh_changed == true);
       }
@@ -10901,7 +10876,7 @@ namespace internal
           {
             // if the cell is not refined along that face, coarsening
             // will not change anything, so do nothing. the same
-            // applies, if the face is at the boandary
+            // applies, if the face is at the boundary
             const RefinementCase<dim - 1> face_ref_case =
               GeometryInfo<dim>::face_refinement_case(cell->refinement_case(),
                                                       n);
@@ -10920,30 +10895,32 @@ namespace internal
                 const typename Triangulation<dim, spacedim>::cell_iterator
                   child_neighbor = child->neighbor(n);
                 if (!child->neighbor_is_coarser(n))
-                  // in 2d, if the child's neighbor is coarser, then
-                  // it has no children. however, in 3d it might be
-                  // otherwise. consider for example, that our face
-                  // might be refined with cut_x, but the neighbor is
-                  // refined with cut_xy at that face. then the
-                  // neighbor pointers of the children of our cell
-                  // will point to the common neighbor cell, not to
-                  // its children. what we really want to know in the
-                  // following is, whether the neighbor cell is
-                  // refined twice with reference to our cell.  that
-                  // only has to be asked, if the child's neighbor is
-                  // not a coarser one.
-                  if ((child_neighbor->has_children() &&
-                       !child_neighbor->user_flag_set()) ||
-                      // neighbor has children, which are further
-                      // refined along the face, otherwise something
-                      // went wrong in the construction of neighbor
-                      // pointers.  then only allow coarsening if this
-                      // neighbor will be coarsened as well
-                      // (user_pointer is set).  the same applies, if
-                      // the neighbors children are not refined but
-                      // will be after refinement
-                      child_neighbor->refine_flag_set())
-                    return false;
+                  {
+                    // in 2d, if the child's neighbor is coarser, then it has
+                    // no children. however, in 3d it might be
+                    // otherwise. consider for example, that our face might be
+                    // refined with cut_x, but the neighbor is refined with
+                    // cut_xy at that face. then the neighbor pointers of the
+                    // children of our cell will point to the common neighbor
+                    // cell, not to its children. what we really want to know
+                    // in the following is, whether the neighbor cell is
+                    // refined twice with reference to our cell. that only
+                    // has to be asked, if the child's neighbor is not a
+                    // coarser one. we check whether some of the children on
+                    // the neighbor are not flagged for coarsening, in that
+                    // case we may not coarsen. it is enough to check the
+                    // first child because we have already fixed the coarsen
+                    // flags on finer levels
+                    if (child_neighbor->has_children() &&
+                        !(child_neighbor->child(0)->is_active() &&
+                          child_neighbor->child(0)->coarsen_flag_set()))
+                      return false;
+
+                    // the same applies, if the neighbors children are not
+                    // refined but will be after refinement
+                    if (child_neighbor->refine_flag_set())
+                      return false;
+                  }
               }
           }
         return true;
@@ -11070,10 +11047,9 @@ namespace internal
       template <int dim, int spacedim>
       static bool
       coarsening_allowed(
-        const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+        const typename Triangulation<dim, spacedim>::cell_iterator &)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)cell;
 
         return false;
       }
@@ -11417,15 +11393,22 @@ std::vector<types::manifold_id>
 Triangulation<dim, spacedim>::get_manifold_ids() const
 {
   std::set<types::manifold_id> m_ids;
-  for (auto cell : active_cell_iterators())
+  for (const auto &cell : active_cell_iterators())
     if (cell->is_locally_owned())
       {
         m_ids.insert(cell->manifold_id());
         for (const auto &face : cell->face_iterators())
           m_ids.insert(face->manifold_id());
         if (dim == 3)
-          for (const unsigned int l : cell->line_indices())
-            m_ids.insert(cell->line(l)->manifold_id());
+          {
+            const auto line_indices = internal::TriaAccessorImplementation::
+              Implementation::get_line_indices_of_cell(*cell);
+            for (unsigned int l = 0; l < cell->n_lines(); ++l)
+              {
+                raw_line_iterator line(this, 0, line_indices[l]);
+                m_ids.insert(line->manifold_id());
+              }
+          }
       }
   return {m_ids.begin(), m_ids.end()};
 }
@@ -11602,7 +11585,7 @@ Triangulation<dim, spacedim>::create_triangulation(
       setting the cell direction flag on those cell that produce the wrong
       orientation.
 
-      To determine if 2 neighbours have the same or opposite orientation we use
+      To determine if 2 neighbors have the same or opposite orientation we use
       a table of truth. Its entries are indexes by the local indices of the
       common face. For example if two elements share a face, and this face is
       face 0 for element 0 and face 1 for element 1, then table(0,1) will tell
@@ -11619,8 +11602,8 @@ Triangulation<dim, spacedim>::create_triangulation(
       - 2D surface: (0,1),(0,2),(1,3),(2,3)
 
       We store this data using an n_faces x n_faces full matrix, which is
-     actually much bigger than the minimal data required, but it makes the code
-     more readable.
+      actually much bigger than the minimal data required, but it makes the code
+      more readable.
 
     */
   if (dim < spacedim && all_reference_cells_are_hyper_cube())
@@ -11705,10 +11688,8 @@ Triangulation<dim, spacedim>::create_triangulation(
                 }
             }
 
-          // Before we quit let's check
-          // that if the triangulation
-          // is disconnected that we
-          // still get all cells
+          // Before we quit let's check that if the triangulation is
+          // disconnected that we still get all cells
           if (next_round.size() == 0)
             for (const auto &cell : this->active_cell_iterators())
               if (cell->user_flag_set() == false)
@@ -11722,6 +11703,7 @@ Triangulation<dim, spacedim>::create_triangulation(
           this_round = next_round;
           next_round.clear();
         }
+      clear_user_flags();
     }
 
   // inform all listeners that the triangulation has been created
@@ -11785,15 +11767,24 @@ Triangulation<dim, spacedim>::create_triangulation(
           {
             while (cell_info->id != cell->id().template to_binary<dim>())
               ++cell;
-            if (dim == 3)
-              for (const auto quad : cell->face_indices())
-                cell->quad(quad)->set_manifold_id(
-                  cell_info->manifold_quad_ids[quad]);
+            if (dim == 2)
+              for (const auto face : cell->face_indices())
+                cell->face(face)->set_manifold_id(
+                  cell_info->manifold_line_ids[face]);
+            else if (dim == 3)
+              {
+                for (const auto face : cell->face_indices())
+                  cell->face(face)->set_manifold_id(
+                    cell_info->manifold_quad_ids[face]);
 
-            if (dim >= 2)
-              for (const auto line : cell->line_indices())
-                cell->line(line)->set_manifold_id(
-                  cell_info->manifold_line_ids[line]);
+                const auto line_indices = internal::TriaAccessorImplementation::
+                  Implementation::get_line_indices_of_cell(*cell);
+                for (unsigned int l = 0; l < cell->n_lines(); ++l)
+                  {
+                    raw_line_iterator line(this, 0, line_indices[l]);
+                    line->set_manifold_id(cell_info->manifold_line_ids[l]);
+                  }
+              }
 
             cell->set_manifold_id(cell_info->manifold_id);
           }
@@ -13219,7 +13210,7 @@ Triangulation<dim, spacedim>::end(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
-  // triangulation. In that case, just retrn the end iterator.
+  // triangulation. In that case, just return the end iterator.
   //
   // We need to use levels.size() instead of n_levels() because the
   // latter function uses the cache, but we need to be able to call
@@ -13910,10 +13901,19 @@ template <int dim, int spacedim>
 bool
 Triangulation<dim, spacedim>::has_hanging_nodes() const
 {
-  for (unsigned int lvl = 0; lvl < n_global_levels() - 1; ++lvl)
-    if (n_active_cells(lvl) != 0)
-      return true;
-
+  if (anisotropic_refinement == false)
+    {
+      for (unsigned int lvl = 0; lvl < n_global_levels() - 1; ++lvl)
+        if (n_active_cells(lvl) != 0)
+          return true;
+    }
+  else
+    {
+      for (const auto &cell : active_cell_iterators())
+        for (const auto &i : cell->face_indices())
+          if (cell->face(i)->has_children())
+            return true;
+    }
   return false;
 }
 
@@ -14778,57 +14778,67 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::execute_coarsening()
 {
-  // create a vector counting for each line how many cells contain
-  // this line. in 3D, this is used later on to decide which lines can
-  // be deleted after coarsening a cell. in other dimensions it will
-  // be ignored
-  std::vector<unsigned int> line_cell_count =
-    count_cells_bounded_by_line(*this);
-  std::vector<unsigned int> quad_cell_count =
-    count_cells_bounded_by_quad(*this);
-
-  // loop over all cells. Flag all cells of which all children are
-  // flagged for coarsening and delete the childrens' flags. In
-  // effect, only those cells are flagged of which originally all
-  // children were flagged and for which all children are on the same
-  // refinement level. For flagging, the user flags are used, to avoid
-  // confusion and because non-active cells can't be flagged for
-  // coarsening. Note that because of the effects of
-  // @p{fix_coarsen_flags}, of a cell either all or no children must
-  // be flagged for coarsening, so it is ok to only check the first
-  // child
-  clear_user_flags();
-
-  for (const auto &cell : this->cell_iterators())
-    if (!cell->is_active())
-      if (cell->child(0)->coarsen_flag_set())
+  // first find out if there are any cells at all to be coarsened in the
+  // loop below
+  const cell_iterator endc       = end();
+  bool                do_coarsen = false;
+  if (levels.size() >= 2)
+    for (cell_iterator cell = begin(n_levels() - 1); cell != endc; --cell)
+      if (!cell->is_active() && cell->child(0)->coarsen_flag_set())
         {
-          cell->set_user_flag();
+          do_coarsen = true;
+          break;
+        }
+
+  if (!do_coarsen)
+    return;
+
+  // create a vector counting for each line and quads how many cells contain
+  // the respective object. this is used later to decide which lines can be
+  // deleted after coarsening a cell.
+  std::vector<unsigned int> line_cell_count(dim > 1 ? this->n_raw_lines() : 0);
+  std::vector<unsigned int> quad_cell_count(dim > 2 ? this->n_raw_quads() : 0);
+  if (dim > 1)
+    for (const auto &cell : this->cell_iterators())
+      {
+        if (dim > 2)
+          {
+            const auto line_indices = internal::TriaAccessorImplementation::
+              Implementation::get_line_indices_of_cell(*cell);
+            for (unsigned int l = 0; l < cell->n_lines(); ++l)
+              ++line_cell_count[line_indices[l]];
+            for (unsigned int q : cell->face_indices())
+              ++quad_cell_count[cell->face_index(q)];
+          }
+        else
+          for (unsigned int l = 0; l < cell->n_lines(); ++l)
+            ++line_cell_count[cell->line(l)->index()];
+      }
+
+  // Since the loop goes over used cells we only need not worry about
+  // deleting some cells since the ++operator will then just hop over them
+  // if we should hit one. Do the loop in the reverse way since we may
+  // only delete some cells if their neighbors have already been deleted
+  // (if the latter are on a higher level for example). In effect, only
+  // those cells are deleted of which originally all children were flagged
+  // and for which all children are on the same refinement level. Note
+  // that because of the effects of
+  // @p{fix_coarsen_flags}, of a cell either all or no children must be
+  // flagged for coarsening, so it is ok to only check the first child
+  //
+  // since we delete the *children* of cells, we can ignore cells on the
+  // highest level, i.e., level must be less than or equal to
+  // n_levels()-2.
+  if (levels.size() >= 2)
+    for (cell_iterator cell = begin(n_levels() - 1); cell != endc; --cell)
+      if (!cell->is_active() && cell->child(0)->coarsen_flag_set())
+        {
           for (unsigned int child = 0; child < cell->n_children(); ++child)
             {
               Assert(cell->child(child)->coarsen_flag_set(),
                      ExcInternalError());
               cell->child(child)->clear_coarsen_flag();
             }
-        }
-
-
-  // now do the actual coarsening step. Since the loop goes over used
-  // cells we only need not worry about deleting some cells since the
-  // ++operator will then just hop over them if we should hit one. Do
-  // the loop in the reverse way since we may only delete some cells
-  // if their neighbors have already been deleted (if the latter are
-  // on a higher level for example)
-  //
-  // since we delete the *children* of cells, we can ignore cells
-  // on the highest level, i.e., level must be less than or equal
-  // to n_levels()-2.
-  cell_iterator cell = begin(), endc = end();
-  if (levels.size() >= 2)
-    for (cell = last(); cell != endc; --cell)
-      if (cell->level() <= static_cast<int>(levels.size() - 2) &&
-          cell->user_flag_set())
-        {
           // inform all listeners that cell coarsening is going to happen
           signals.pre_coarsening_on_cell(cell);
           // use a separate function, since this is dimension specific
@@ -14841,12 +14851,6 @@ Triangulation<dim, spacedim>::execute_coarsening()
   // re-compute number of lines and quads
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
-
-  // in principle no user flags should be set any more at this point
-#if DEBUG
-  for (cell = begin(); cell != endc; ++cell)
-    Assert(cell->user_flag_set() == false, ExcInternalError());
-#endif
 }
 
 
@@ -14870,8 +14874,6 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
   // until the flags don't change any more
   auto previous_coarsen_flags = internal::extract_raw_coarsen_flags(levels);
 
-  std::vector<int> vertex_level(vertices.size(), 0);
-
   bool continue_iterating = true;
 
   do
@@ -14885,7 +14887,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
 
           // store highest level one of the cells adjacent to a vertex
           // belongs to
-          std::fill(vertex_level.begin(), vertex_level.end(), 0);
+          std::vector<int> vertex_level(vertices.size(), 0);
           for (const auto &cell : this->active_cell_iterators())
             {
               if (cell->refine_flag_set())
@@ -14927,8 +14929,8 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           // refinement flags, but we will also have to remove
           // coarsening flags on cells adjacent to vertices that will
           // see refinement
-          active_cell_iterator cell = begin_active(), endc = end();
-          for (cell = last_active(); cell != endc; --cell)
+          active_cell_iterator endc = end();
+          for (active_cell_iterator cell = last_active(); cell != endc; --cell)
             if (cell->refine_flag_set() == false)
               {
                 for (const unsigned int vertex :
@@ -14961,25 +14963,17 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
               }
         }
 
-      // loop over all cells. Flag all cells of which all children are
-      // flagged for coarsening and delete the childrens' flags. Also
-      // delete all flags of cells for which not all children of a
-      // cell are flagged. In effect, only those cells are flagged of
-      // which originally all children were flagged and for which all
-      // children are on the same refinement level. For flagging, the
-      // user flags are used, to avoid confusion and because
-      // non-active cells can't be flagged for coarsening
-      //
-      // In effect, all coarsen flags are turned into user flags of
-      // the mother cell if coarsening is possible or deleted
-      // otherwise.
-      clear_user_flags();
+      // loop over all cells and remove the coarsen flags for those cells that
+      // have sister cells not marked for coarsening, or where some neighbors
+      // are more refined.
+
       // Coarsen flags of cells with no mother cell, i.e. on the
-      // coarsest level are deleted explicitly.
+      // coarsest level, are deleted explicitly.
       for (const auto &acell : this->active_cell_iterators_on_level(0))
         acell->clear_coarsen_flag();
 
-      for (const auto &cell : this->cell_iterators())
+      const cell_iterator endc = end();
+      for (cell_iterator cell = begin(n_levels() - 1); cell != endc; --cell)
         {
           // nothing to do if we are already on the finest level
           if (cell->is_active())
@@ -14988,62 +14982,28 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
           const unsigned int n_children       = cell->n_children();
           unsigned int       flagged_children = 0;
           for (unsigned int child = 0; child < n_children; ++child)
-            if (cell->child(child)->is_active() &&
-                cell->child(child)->coarsen_flag_set())
-              {
-                ++flagged_children;
-                // clear flag since we don't need it anymore
-                cell->child(child)->clear_coarsen_flag();
-              }
+            {
+              const auto child_cell = cell->child(child);
+              if (child_cell->is_active() && child_cell->coarsen_flag_set())
+                {
+                  ++flagged_children;
+                  // clear flag since we don't need it anymore
+                  child_cell->clear_coarsen_flag();
+                }
+            }
 
-          // flag this cell for coarsening if all children were
-          // flagged
-          if (flagged_children == n_children)
-            cell->set_user_flag();
-        }
-
-        // in principle no coarsen flags should be set any more at this
-        // point
-#if DEBUG
-      for (auto &cell : this->cell_iterators())
-        Assert(cell->coarsen_flag_set() == false, ExcInternalError());
-#endif
-
-      // now loop over all cells which have the user flag set. their
-      // children were flagged for coarsening. set the coarsen flag
-      // again if we are sure that none of the neighbors of these
-      // children are refined, or will be refined, since then we would
-      // get a two-level jump in refinement. on the other hand, if one
-      // of the children's neighbors has their user flag set, then we
-      // know that its children will go away by coarsening, and we
-      // will be ok.
-      //
-      // note on the other hand that we do allow level-2 jumps in
-      // refinement between neighbors in 1d, so this whole procedure
-      // is only necessary if we are not in 1d
-      //
-      // since we remove some coarsening/user flags in the process, we
-      // have to work from the finest level to the coarsest one, since
-      // we occasionally inspect user flags of cells on finer levels
-      // and need to be sure that these flags are final
-      cell_iterator cell = begin(), endc = end();
-      for (cell = last(); cell != endc; --cell)
-        if (cell->user_flag_set())
-          // if allowed: flag the
-          // children for coarsening
-          if (this->policy->coarsening_allowed(cell))
-            for (unsigned int c = 0; c < cell->n_children(); ++c)
+          // flag the children for coarsening again if all children were
+          // flagged and if the policy allows it
+          if (flagged_children == n_children &&
+              this->policy->coarsening_allowed(cell))
+            for (unsigned int c = 0; c < n_children; ++c)
               {
                 Assert(cell->child(c)->refine_flag_set() == false,
                        ExcInternalError());
 
                 cell->child(c)->set_coarsen_flag();
               }
-
-      // clear all user flags again, now that we don't need them any
-      // more
-      clear_user_flags();
-
+        }
 
       // now see if anything has changed in the last iteration of this
       // function
@@ -15054,6 +15014,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
     }
   while (continue_iterating == true);
 }
+
 
 
 // TODO: merge the following 3 functions since they are the same
@@ -15074,6 +15035,7 @@ Triangulation<1, 1>::prepare_coarsening_and_refinement()
 }
 
 
+
 template <>
 bool
 Triangulation<1, 2>::prepare_coarsening_and_refinement()
@@ -15089,6 +15051,7 @@ Triangulation<1, 2>::prepare_coarsening_and_refinement()
 
   return (flags_before != flags_after);
 }
+
 
 
 template <>
@@ -16267,16 +16230,14 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
 
       //------------------------------------
       // STEP 7:
-      //    take care that no double refinement
-      //    is done at each line in 3d or higher
-      //    dimensions.
+      //    take care that no double refinement is done at each line in 3d or
+      //    higher dimensions.
       this->policy->prepare_refinement_dim_dependent(*this);
 
       //------------------------------------
       // STEP 8:
-      //    make sure that all children of each
-      //    cell are either flagged for coarsening
-      //    or none of the children is
+      //    make sure that all children of each cell are either flagged for
+      //    coarsening or none of the children is
       fix_coarsen_flags();
 
       // get the refinement and coarsening flags

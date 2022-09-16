@@ -98,7 +98,7 @@ test_serialization()
     // Optimizer
     SD::BatchOptimizer<NumberType> optimizer;
 
-    // Deserialze
+    // Deserialize
     deallog << "Deserializing..." << std::endl;
     std::istringstream            iss(oss.str());
     boost::archive::text_iarchive ia(iss, boost::archive::no_header);

@@ -14,28 +14,29 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_petsc_vector_h
-#  define dealii_petsc_vector_h
+#define dealii_petsc_vector_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
-#    include <deal.II/base/index_set.h>
-#    include <deal.II/base/partitioner.h>
-#    include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/base/partitioner.h>
+#  include <deal.II/base/subscriptor.h>
 
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/petsc_vector_base.h>
-#    include <deal.II/lac/vector.h>
-#    include <deal.II/lac/vector_operation.h>
-#    include <deal.II/lac/vector_type_traits.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_vector_base.h>
+#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_operation.h>
+#  include <deal.II/lac/vector_type_traits.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
-/*! @addtogroup PETScWrappers
- *@{
+/**
+ * @addtogroup PETScWrappers
+ * @{
  */
 namespace PETScWrappers
 {
@@ -201,24 +202,6 @@ namespace PETScWrappers
       explicit Vector(const MPI_Comm &              communicator,
                       const dealii::Vector<Number> &v,
                       const size_type               locally_owned_size);
-
-
-      /**
-       * Copy-constructor the values from a PETSc wrapper vector class.
-       *
-       * @arg local_size denotes the size of the chunk that shall be stored on
-       * the present process.
-       *
-       * @arg communicator denotes the MPI communicator over which the
-       * different parts of the vector shall communicate
-       *
-       * @deprecated The use of objects that are explicitly of type VectorBase
-       * is deprecated: use PETScWrappers::MPI::Vector instead.
-       */
-      DEAL_II_DEPRECATED
-      explicit Vector(const MPI_Comm &  communicator,
-                      const VectorBase &v,
-                      const size_type   local_size);
 
       /**
        * Construct a new parallel ghosted PETSc vector from IndexSets.
@@ -446,7 +429,7 @@ namespace PETScWrappers
     }
 
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 
     template <typename number>
     Vector::Vector(const MPI_Comm &              communicator,
@@ -519,8 +502,8 @@ namespace PETScWrappers
       return communicator;
     }
 
-#    endif // DOXYGEN
-  }        // namespace MPI
+#  endif // DOXYGEN
+  }      // namespace MPI
 } // namespace PETScWrappers
 
 namespace internal
@@ -562,7 +545,7 @@ namespace internal
   } // namespace LinearOperatorImplementation
 } /* namespace internal */
 
-/**@}*/
+/** @} */
 
 
 /**
@@ -575,7 +558,6 @@ struct is_serial_vector<PETScWrappers::MPI::Vector> : std::false_type
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif // DEAL_II_WITH_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 #endif
-/*------------------------- petsc_vector.h -------------------------*/

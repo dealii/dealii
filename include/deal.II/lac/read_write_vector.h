@@ -21,12 +21,11 @@
 #include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
-#include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/vector_operation.h>
 
@@ -47,6 +46,9 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #ifndef DOXYGEN
+template <typename>
+class Vector;
+
 namespace LinearAlgebra
 {
   template <typename>
@@ -92,8 +94,9 @@ namespace LinearAlgebra
 
 namespace LinearAlgebra
 {
-  /*! @addtogroup Vectors
-   *@{
+  /**
+   * @addtogroup Vectors
+   * @{
    */
 
   /**
@@ -151,7 +154,7 @@ namespace LinearAlgebra
     /**
      * @name 1: Basic Object-handling
      */
-    //@{
+    /** @{ */
     /**
      * Empty constructor.
      */
@@ -471,13 +474,13 @@ namespace LinearAlgebra
      */
     const_iterator
     end() const;
-    //@}
+    /** @} */
 
 
     /**
      * @name 2: Data-Access
      */
-    //@{
+    /** @{ */
 
     /**
      * Read access to the data in the position corresponding to @p
@@ -593,13 +596,13 @@ namespace LinearAlgebra
      */
     Number &
     local_element(const size_type local_index);
-    //@}
+    /** @} */
 
 
     /**
      * @name 3: Modification of vectors
      */
-    //@{
+    /** @{ */
 
     /**
      * This function adds a whole set of values stored in @p values to the
@@ -643,7 +646,7 @@ namespace LinearAlgebra
      */
     std::size_t
     memory_consumption() const;
-    //@}
+    /** @} */
 
   protected:
 #ifdef DEAL_II_WITH_TRILINOS
@@ -781,7 +784,7 @@ namespace LinearAlgebra
     };
   };
 
-  /*@}*/
+  /** @} */
 
 
   /*---------------------------- Inline functions ---------------------------*/

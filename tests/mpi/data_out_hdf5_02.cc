@@ -86,7 +86,7 @@ check()
     << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
 
   // Write out the entry
-  xdmf_file << entry.get_xdmf_content(3, ReferenceCells::get_hypercube<dim>());
+  xdmf_file << entry.get_xdmf_content(3);
 
   xdmf_file << "    </Grid>\n";
   xdmf_file << "  </Domain>\n";

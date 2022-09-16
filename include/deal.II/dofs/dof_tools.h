@@ -282,9 +282,7 @@ namespace DoFTools
   dof_couplings_from_component_couplings(
     const hp::FECollection<dim, spacedim> &fe,
     const Table<2, Coupling> &             component_couplings);
-  /**
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Sparsity pattern generation
@@ -1499,7 +1497,7 @@ namespace DoFTools
   extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                          const ComponentMask &            component_mask,
                          std::vector<std::vector<bool>> & constant_modes);
-  //@}
+  /** @} */
 
   /**
    * @name Parallelization and domain decomposition
@@ -1808,7 +1806,8 @@ namespace DoFTools
   dof_indices_with_subdomain_association(
     const DoFHandler<dim, spacedim> &dof_handler,
     const types::subdomain_id        subdomain);
-  // @}
+  /** @} */
+
   /**
    * @name DoF indices on patches of cells
    *
@@ -1817,7 +1816,7 @@ namespace DoFTools
    * and related classes to implement Schwarz preconditioners and smoothers,
    * where the subdomains consist of small numbers of cells only.
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the set of degrees of freedom that live on a set of cells (i.e., a
@@ -2134,9 +2133,11 @@ namespace DoFTools
    * For DoFHandler objects without hp-capabilities given as first argument, the
    * returned vector will consist of only zeros, indicating that all cells use
    * the same finite element. In hp-mode, the values may be different, though.
+   *
+   * @deprecated Use DoFHandler::get_active_fe_indices() instead.
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   get_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
                         std::vector<unsigned int> &      active_fe_indices);
 

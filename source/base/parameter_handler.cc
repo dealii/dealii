@@ -304,7 +304,7 @@ namespace
           (is_parameter_node(b.second) || is_alias_node(b.second));
 
         // If a is a parameter/alias and b is a subsection,
-        // a should go first, and viceversa.
+        // a should go first, and vice-versa.
         if (a_is_param && !b_is_param)
           return true;
 

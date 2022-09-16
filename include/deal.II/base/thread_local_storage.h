@@ -31,8 +31,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup threads */
-/*@{*/
+/**
+ * @addtogroup threads
+ * @{
+ */
 
 #  ifndef DOXYGEN
 class LogStream;
@@ -374,7 +376,7 @@ namespace Threads
      * "if constexpr".
      */
     template <typename T>
-    typename std::enable_if_t<
+    std::enable_if_t<
       std::is_copy_constructible<typename unpack_container<T>::type>::value,
       T &>
     construct_element(std::map<std::thread::id, T> &  data,
@@ -390,7 +392,7 @@ namespace Threads
     }
 
     template <typename T>
-    typename std::enable_if_t<
+    std::enable_if_t<
       !std::is_copy_constructible<typename unpack_container<T>::type>::value,
       T &>
     construct_element(std::map<std::thread::id, T> &data,

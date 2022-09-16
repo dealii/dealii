@@ -29,9 +29,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup mapping */
-/*@{*/
-
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class implements the functionality for Manifold conforming
@@ -385,7 +386,7 @@ private:
 
 
 
-/*@}*/
+/** @} */
 
 /*----------------------------------------------------------------------*/
 

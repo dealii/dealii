@@ -28,6 +28,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+#include <set>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -443,9 +444,9 @@ public:
    * <code>cell-@>active_fe_index</code> as last argument.
    */
   void
-  get_dof_indices(std::vector<types::global_dof_index> &dof_indices,
-                  const unsigned int                    fe_index =
-                    DoFHandler<dim, spacedim>::invalid_fe_index) const;
+  get_dof_indices(
+    std::vector<types::global_dof_index> &dof_indices,
+    const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Return the global multilevel indices of the degrees of freedom that live
@@ -454,19 +455,18 @@ public:
    * level this line lives on.
    */
   void
-  get_mg_dof_indices(const int                             level,
-                     std::vector<types::global_dof_index> &dof_indices,
-                     const unsigned int                    fe_index =
-                       DoFHandler<dim, spacedim>::invalid_fe_index) const;
+  get_mg_dof_indices(
+    const int                             level,
+    std::vector<types::global_dof_index> &dof_indices,
+    const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Set the level DoF indices that are returned by get_mg_dof_indices.
    */
   void
-  set_mg_dof_indices(
-    const int                                   level,
-    const std::vector<types::global_dof_index> &dof_indices,
-    const unsigned int fe_index = DoFHandler<dim, spacedim>::invalid_fe_index);
+  set_mg_dof_indices(const int                                   level,
+                     const std::vector<types::global_dof_index> &dof_indices,
+                     const unsigned int fe_index = numbers::invalid_fe_index);
 
   /**
    * Global DoF index of the <i>i</i> degree associated with the @p vertexth
@@ -490,10 +490,10 @@ public:
    * this is interpreted as equal to `cell->active_fe_index()`.
    */
   types::global_dof_index
-  vertex_dof_index(const unsigned int vertex,
-                   const unsigned int i,
-                   const unsigned int fe_index =
-                     DoFHandler<dim, spacedim>::invalid_fe_index) const;
+  vertex_dof_index(
+    const unsigned int vertex,
+    const unsigned int i,
+    const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Return the global DoF index of the <code>i</code>th degree of freedom
@@ -501,11 +501,11 @@ public:
    * see vertex_dof_index().
    */
   types::global_dof_index
-  mg_vertex_dof_index(const int          level,
-                      const unsigned int vertex,
-                      const unsigned int i,
-                      const unsigned int fe_index =
-                        DoFHandler<dim, spacedim>::invalid_fe_index) const;
+  mg_vertex_dof_index(
+    const int          level,
+    const unsigned int vertex,
+    const unsigned int i,
+    const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree of freedom of this object.
@@ -536,8 +536,7 @@ public:
    */
   types::global_dof_index
   dof_index(const unsigned int i,
-            const unsigned int fe_index =
-              DoFHandler<dim, spacedim>::invalid_fe_index) const;
+            const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Return the dof_index on the given level. Also see dof_index.
@@ -714,8 +713,7 @@ protected:
   void
   set_dof_index(const unsigned int            i,
                 const types::global_dof_index index,
-                const unsigned int            fe_index =
-                  DoFHandler<dim, spacedim>::invalid_fe_index) const;
+                const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   void
   set_mg_dof_index(const int                     level,
@@ -723,12 +721,12 @@ protected:
                    const types::global_dof_index index) const;
 
   void
-  set_mg_vertex_dof_index(const int                     level,
-                          const unsigned int            vertex,
-                          const unsigned int            i,
-                          const types::global_dof_index index,
-                          const unsigned int            fe_index =
-                            DoFHandler<dim, spacedim>::invalid_fe_index) const;
+  set_mg_vertex_dof_index(
+    const int                     level,
+    const unsigned int            vertex,
+    const unsigned int            i,
+    const types::global_dof_index index,
+    const unsigned int            fe_index = numbers::invalid_fe_index) const;
 
   // Iterator classes need to be friends because they need to access
   // operator== and operator!=.
@@ -1301,8 +1299,7 @@ public:
   void
   set_dof_index(const unsigned int            i,
                 const types::global_dof_index index,
-                const unsigned int            fe_index =
-                  DoFHandler<dim, spacedim>::invalid_fe_index) const;
+                const unsigned int fe_index = numbers::invalid_fe_index) const;
 };
 
 
@@ -1692,8 +1689,7 @@ public:
   get_interpolated_dof_values(
     const InputVector &values,
     Vector<number> &   interpolated_values,
-    const unsigned int fe_index =
-      DoFHandler<dimension_, space_dimension_>::invalid_fe_index) const;
+    const unsigned int fe_index = numbers::invalid_fe_index) const;
 
   /**
    * This function is the counterpart to get_interpolated_dof_values(): you
@@ -1761,9 +1757,8 @@ public:
   set_dof_values_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
-    const unsigned int    fe_index =
-      DoFHandler<dimension_, space_dimension_>::invalid_fe_index,
-    const bool perform_check = false) const;
+    const unsigned int    fe_index      = numbers::invalid_fe_index,
+    const bool            perform_check = false) const;
 
   /**
    * Similar to set_dof_values_by_interpolation() with the difference that
@@ -1779,8 +1774,7 @@ public:
   distribute_local_to_global_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
-    const unsigned int    fe_index =
-      DoFHandler<dimension_, space_dimension_>::invalid_fe_index) const;
+    const unsigned int    fe_index = numbers::invalid_fe_index) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping the

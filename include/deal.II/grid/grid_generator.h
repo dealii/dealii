@@ -21,7 +21,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
 
@@ -31,9 +30,14 @@
 #include <deal.II/cgal/additional_data.h>
 
 #include <array>
+#include <limits>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DOXYGEN
+class ParameterHandler;
+#endif
 
 /**
  * This namespace provides a collection of functions for generating
@@ -62,7 +66,7 @@ namespace GridGenerator
   /**
    * @name Creating meshes for basic geometries
    */
-  ///@{
+  //** @{ */
 
   /**
    * Initialize the given triangulation with a hypercube (line in 1D, square
@@ -1827,12 +1831,12 @@ namespace GridGenerator
                                   Triangulation<3> &         vol_tria,
                                   const CGALWrappers::AdditionalData<3> &data =
                                     CGALWrappers::AdditionalData<3>{});
-  ///@}
+  //** @} */
 
   /**
    * @name Creating meshes from other meshes
    */
-  ///@{
+  //** @{ */
 
   /**
    * Given the two triangulations specified as the first two arguments, create
@@ -1864,7 +1868,7 @@ namespace GridGenerator
    * {
    *   double length = std::numeric_limits<double>::max();
    *   for (const auto &cell : tria.active_cell_iterators())
-   *     for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
+   *     for (const auto n : cell->line_indices())
    *       length = std::min(length, (cell->line(n)->vertex(0) -
    *                                  cell->line(n)->vertex(1)).norm());
    *   return length;
@@ -1875,7 +1879,7 @@ namespace GridGenerator
    * @endcode
    *
    * This will merge any vertices that are closer than any pair of vertices on
-   * the input meshes.
+   * the input meshes. If the tolerance is set to zero, vertices are not merged.
    *
    * @note The two input triangulations must be
    * @ref GlossCoarseMesh "coarse meshes",
@@ -1884,10 +1888,8 @@ namespace GridGenerator
    *
    * @note The function copies the material ids of the cells of the two input
    * triangulations into the output triangulation. If @p copy_manifold_ids is
-   * set to @p true, manifold ids will be copied. Boundary indicators are never
-   * copied. In other words, if the two coarse meshes have anything but the
-   * default boundary indicators, then you will have to set boundary indicators
-   * again by hand in the output triangulation.
+   * set to @p true, manifold ids will be copied. If @p copy_boundary_ids is
+   * set to @p true, boundary_ids are copied to all remaining faces at the boundary.
    *
    * @note This function does not attach any manifolds to @p result, nor does
    * it set any manifold ids. In particular, manifolds attached to the two
@@ -1903,7 +1905,8 @@ namespace GridGenerator
                        const Triangulation<dim, spacedim> &triangulation_2,
                        Triangulation<dim, spacedim> &      result,
                        const double duplicated_vertex_tolerance = 1.0e-12,
-                       const bool   copy_manifold_ids           = false);
+                       const bool   copy_manifold_ids           = false,
+                       const bool   copy_boundary_ids           = false);
 
   /**
    * Same as above but allows to merge more than two triangulations at once.
@@ -1916,6 +1919,7 @@ namespace GridGenerator
    *   GridGenerator::merge_triangulations({&tria_1, &tria_2, &tria_3},
    *                                       merged_triangulation,
    *                                       1.0e-10,
+   *                                       false,
    *                                       false);
    * @endcode
    */
@@ -1925,7 +1929,8 @@ namespace GridGenerator
     const std::vector<const Triangulation<dim, spacedim> *> &triangulations,
     Triangulation<dim, spacedim> &                           result,
     const double duplicated_vertex_tolerance = 1.0e-12,
-    const bool   copy_manifold_ids           = false);
+    const bool   copy_manifold_ids           = false,
+    const bool   copy_boundary_ids           = false);
 
   /**
    * \brief Replicate a given triangulation in multiple coordinate axes
@@ -2512,14 +2517,14 @@ namespace GridGenerator
                                        const double       p2       = 1.0,
                                        const bool         colorize = false);
 
-  ///@}
+  //** @} */
 
   /**
    * @name Creating lower-dimensional meshes
    *
    * Created from parts of higher-dimensional meshes.
    */
-  ///@{
+  //** @{ */
 
 #ifdef _MSC_VER
   // Microsoft's VC++ has a bug where it doesn't want to recognize that
@@ -2647,13 +2652,13 @@ namespace GridGenerator
                         const std::set<types::boundary_id> &boundary_ids =
                           std::set<types::boundary_id>());
 
-  ///@}
+  //** @} */
 
 
   /**
    * @name Exceptions
    */
-  ///@{
+  //** @{ */
 
 
   /**
@@ -2680,7 +2685,7 @@ namespace GridGenerator
   DeclExceptionMsg(ExcInvalidInputOrientation,
                    "The input to this function is oriented in a way that will"
                    " cause all cells to have negative measure.");
-  ///@}
+  //** @} */
 
 #ifndef DOXYGEN
   // These functions are only implemented with specializations; declare them

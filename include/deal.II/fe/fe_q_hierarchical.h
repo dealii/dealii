@@ -24,8 +24,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * Implementation of hierarchical @p Qp shape functions that yield the finite
@@ -634,7 +636,7 @@ public:
   compare_for_domination(const FiniteElement<dim> &fe_other,
                          const unsigned int codim = 0) const override final;
 
-  /*@}*/
+  /** @} */
 
   /**
    * Return the matrix interpolating from a face of one element to the face of
@@ -793,7 +795,7 @@ private:
   friend class FE_Q_Hierarchical;
 };
 
-/*@}*/
+/** @} */
 
 /* -------------- declaration of explicit specializations ------------- */
 

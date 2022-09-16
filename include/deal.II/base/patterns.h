@@ -38,6 +38,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <algorithm>
 #include <array>
 #include <deque>
+#include <limits>
 #include <list>
 #include <map>
 #include <memory>
@@ -538,7 +539,7 @@ namespace Patterns
                    int,
                    << "The values " << arg1 << " and " << arg2
                    << " do not form a valid range.");
-    //@}
+    /** @} */
   private:
     /**
      * Copy of the pattern that each element of the list has to satisfy.
@@ -685,7 +686,7 @@ namespace Patterns
                    int,
                    << "The values " << arg1 << " and " << arg2
                    << " do not form a valid range.");
-    //@}
+    /** @} */
   private:
     /**
      * Copy of the patterns that each key and each value of the map has to
@@ -960,7 +961,7 @@ namespace Patterns
       int,
       << "A comma was found at position " << arg1
       << " of your input string, but commas are not allowed here.");
-    //@}
+    /** @} */
   private:
     /**
      * List of valid strings as passed to the constructor. We don't make this
@@ -1404,7 +1405,7 @@ namespace Patterns
                    std::string,
                    << "The string \"" << arg1
                    << "\" does not match the pattern \"" << arg2 << "\"");
-    //@}
+    /** @} */
   } // namespace Tools
 } // namespace Patterns
 
@@ -1482,38 +1483,34 @@ namespace Patterns
 
     // Arithmetic types
     template <class T>
-    struct Convert<T,
-                   typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    struct Convert<T, std::enable_if_t<std::is_arithmetic<T>::value>>
     {
       template <typename Dummy = T>
-      static
-        typename std::enable_if<std::is_same<Dummy, T>::value &&
-                                  std::is_same<T, bool>::value,
-                                std::unique_ptr<Patterns::PatternBase>>::type
-        to_pattern()
+      static std::enable_if_t<std::is_same<Dummy, T>::value &&
+                                std::is_same<T, bool>::value,
+                              std::unique_ptr<Patterns::PatternBase>>
+      to_pattern()
       {
         return std::make_unique<Patterns::Bool>();
       }
 
       template <typename Dummy = T>
-      static
-        typename std::enable_if<std::is_same<Dummy, T>::value &&
-                                  !std::is_same<T, bool>::value &&
-                                  std::is_integral<T>::value,
-                                std::unique_ptr<Patterns::PatternBase>>::type
-        to_pattern()
+      static std::enable_if_t<std::is_same<Dummy, T>::value &&
+                                !std::is_same<T, bool>::value &&
+                                std::is_integral<T>::value,
+                              std::unique_ptr<Patterns::PatternBase>>
+      to_pattern()
       {
         return std::make_unique<Patterns::Integer>(
           std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
       }
 
       template <typename Dummy = T>
-      static
-        typename std::enable_if<std::is_same<Dummy, T>::value &&
-                                  !std::is_same<T, bool>::value &&
-                                  std::is_floating_point<T>::value,
-                                std::unique_ptr<Patterns::PatternBase>>::type
-        to_pattern()
+      static std::enable_if_t<std::is_same<Dummy, T>::value &&
+                                !std::is_same<T, bool>::value &&
+                                std::is_floating_point<T>::value,
+                              std::unique_ptr<Patterns::PatternBase>>
+      to_pattern()
       {
         return std::make_unique<Patterns::Double>(
           std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
@@ -1679,9 +1676,7 @@ namespace Patterns
 
       // Rank of vector types
       template <class T>
-      struct RankInfo<
-        T,
-        typename std::enable_if<is_list_compatible<T>::value>::type>
+      struct RankInfo<T, std::enable_if_t<is_list_compatible<T>::value>>
       {
         static constexpr int list_rank =
           RankInfo<typename T::value_type>::list_rank + 1;
@@ -1691,9 +1686,7 @@ namespace Patterns
 
       // Rank of map types
       template <class T>
-      struct RankInfo<
-        T,
-        typename std::enable_if<is_map_compatible<T>::value>::type>
+      struct RankInfo<T, std::enable_if_t<is_map_compatible<T>::value>>
       {
         static constexpr int list_rank =
           max_list_rank<typename T::key_type, typename T::mapped_type>() + 1;
@@ -1766,8 +1759,7 @@ namespace Patterns
 
     // stl containers
     template <class T>
-    struct Convert<T,
-                   typename std::enable_if<is_list_compatible<T>::value>::type>
+    struct Convert<T, std::enable_if_t<is_list_compatible<T>::value>>
     {
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
@@ -1834,8 +1826,7 @@ namespace Patterns
 
     // stl maps
     template <class T>
-    struct Convert<T,
-                   typename std::enable_if<is_map_compatible<T>::value>::type>
+    struct Convert<T, std::enable_if_t<is_map_compatible<T>::value>>
     {
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()

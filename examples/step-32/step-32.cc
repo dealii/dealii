@@ -2218,8 +2218,8 @@ namespace Step32
 
     scratch.stokes_fe_values.reinit(cell);
 
-    typename DoFHandler<dim>::active_cell_iterator temperature_cell(
-      &triangulation, cell->level(), cell->index(), &temperature_dof_handler);
+    const typename DoFHandler<dim>::active_cell_iterator temperature_cell =
+      cell->as_dof_handler_iterator(temperature_dof_handler);
     scratch.temperature_fe_values.reinit(temperature_cell);
 
     if (rebuild_stokes_matrix)
@@ -2485,8 +2485,8 @@ namespace Step32
 
     scratch.temperature_fe_values.reinit(cell);
 
-    typename DoFHandler<dim>::active_cell_iterator stokes_cell(
-      &triangulation, cell->level(), cell->index(), &stokes_dof_handler);
+    typename DoFHandler<dim>::active_cell_iterator stokes_cell =
+      cell->as_dof_handler_iterator(stokes_dof_handler);
     scratch.stokes_fe_values.reinit(stokes_cell);
 
     scratch.temperature_fe_values.get_function_values(

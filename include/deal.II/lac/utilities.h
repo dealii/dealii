@@ -26,6 +26,7 @@
 
 #include <array>
 #include <complex>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

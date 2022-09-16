@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test conversion from CGAL to deal.II Point and viceversa
+// Test conversion from CGAL to deal.II Point and vice-versa
 
 #include <deal.II/base/point.h>
 

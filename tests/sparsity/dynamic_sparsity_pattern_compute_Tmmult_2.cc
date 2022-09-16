@@ -18,7 +18,7 @@
 
 // check DynamicSparsityPattern::compute_Tmmult_pattern(). Test if
 // multiplication of two patterns yield the right DynamicSparsityPattern. This
-// is an adoptation of the dynamic_sparsity_pattern_compute_mmult_2.cc
+// is an adaptation of the dynamic_sparsity_pattern_compute_mmult_2.cc
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>

@@ -25,7 +25,6 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -40,6 +39,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <list>
 #include <map>
 #include <numeric>

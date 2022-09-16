@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

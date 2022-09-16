@@ -35,8 +35,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup mg */
-/*@{*/
+/**
+ * @addtogroup mg
+ * @{
+ */
 
 /**
  * Implementation of the MGTransferBase interface for which the transfer
@@ -539,7 +541,7 @@ private:
 };
 
 
-/*@}*/
+/** @} */
 
 
 //------------------------ templated functions -------------------------

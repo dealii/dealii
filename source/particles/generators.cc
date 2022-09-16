@@ -24,10 +24,10 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/filtered_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/particles/generators.h>
+
+#include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -361,7 +361,7 @@ namespace Particles
           std::llround(static_cast<double>(n_particles_to_create) *
                        local_start_weight / global_weight_integral);
 
-        // Calcualate number of local particles
+        // Calculate number of local particles
         const types::particle_index end_particle_id =
           std::llround(static_cast<double>(n_particles_to_create) *
                        ((local_start_weight + local_weight_integral) /

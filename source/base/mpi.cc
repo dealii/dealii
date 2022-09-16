@@ -31,6 +31,7 @@
 #include <boost/serialization/utility.hpp>
 
 #include <iostream>
+#include <limits>
 #include <numeric>
 #include <set>
 #include <vector>

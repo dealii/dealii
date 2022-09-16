@@ -164,88 +164,6 @@ namespace Utilities
 
 
 
-        DictionaryPayLoad::DictionaryPayLoad(
-          const std::map<unsigned int,
-                         std::vector<std::pair<types::global_dof_index,
-                                               types::global_dof_index>>>
-            &                   buffers,
-          FlexibleIndexStorage &actually_owning_ranks,
-          const std::pair<types::global_dof_index, types::global_dof_index>
-            &                        local_range,
-          std::vector<unsigned int> &actually_owning_rank_list)
-          : buffers(buffers)
-          , actually_owning_ranks(actually_owning_ranks)
-          , local_range(local_range)
-          , actually_owning_rank_list(actually_owning_rank_list)
-        {
-          Assert(local_range.first <= local_range.second, ExcInternalError());
-        }
-
-
-
-        std::vector<unsigned int>
-        DictionaryPayLoad::compute_targets()
-        {
-          std::vector<unsigned int> targets;
-          for (const auto &rank_pair : buffers)
-            targets.push_back(rank_pair.first);
-
-          return targets;
-        }
-
-
-
-        void
-        DictionaryPayLoad::create_request(
-          const unsigned int                               other_rank,
-          std::vector<std::pair<types::global_dof_index,
-                                types::global_dof_index>> &send_buffer)
-        {
-          send_buffer = this->buffers.at(other_rank);
-        }
-
-
-
-        void
-        DictionaryPayLoad::answer_request(
-          const unsigned int                                     other_rank,
-          const std::vector<std::pair<types::global_dof_index,
-                                      types::global_dof_index>> &buffer_recv,
-          std::vector<unsigned int> &                            request_buffer)
-        {
-          (void)request_buffer; // not needed
-
-
-          // process message: loop over all intervals
-          for (auto interval : buffer_recv)
-            {
-#ifdef DEBUG
-              for (types::global_dof_index i = interval.first;
-                   i < interval.second;
-                   i++)
-                Assert(
-                  actually_owning_ranks.entry_has_been_set(
-                    i - local_range.first) == false,
-                  ExcMessage(
-                    "Multiple processes seem to own the same global index. "
-                    "A possible reason is that the sets of locally owned "
-                    "indices are not distinct."));
-              Assert(interval.first < interval.second, ExcInternalError());
-              Assert(
-                local_range.first <= interval.first &&
-                  interval.second <= local_range.second,
-                ExcMessage(
-                  "The specified interval is not handled by the current process."));
-#endif
-              actually_owning_ranks.fill(interval.first - local_range.first,
-                                         interval.second - local_range.first,
-                                         other_rank);
-            }
-          actually_owning_rank_list.push_back(other_rank);
-        }
-
-
-
         void
         Dictionary::reinit(const IndexSet &owned_indices, const MPI_Comm &comm)
         {
@@ -428,17 +346,61 @@ namespace Utilities
 
               // 3/4) use a ConsensusAlgorithm to send messages with local
               // dofs to the right dict process
-              DictionaryPayLoad temp(buffers,
-                                     actually_owning_ranks,
-                                     local_range,
-                                     actually_owning_rank_list);
 
-              ConsensusAlgorithms::Selector<
-                std::vector<
-                  std::pair<types::global_dof_index, types::global_dof_index>>,
-                std::vector<unsigned int>>
-                consensus_algo(temp, comm);
-              consensus_algo.run();
+              using RequestType = std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>;
+
+              ConsensusAlgorithms::selector<RequestType>(
+                /* targets = */
+                [&buffers]() {
+                  std::vector<unsigned int> targets;
+                  targets.reserve(buffers.size());
+                  for (const auto &rank_pair : buffers)
+                    targets.emplace_back(rank_pair.first);
+
+                  return targets;
+                }(),
+
+                /* create_request = */
+                [&buffers](const unsigned int target_rank) -> RequestType {
+                  return buffers.at(target_rank);
+                },
+
+                /* process_request = */
+                [&](const unsigned int source_rank,
+                    const RequestType &request) -> void {
+                  // process message: loop over all intervals
+                  for (auto interval : request)
+                    {
+#  ifdef DEBUG
+                      for (types::global_dof_index i = interval.first;
+                           i < interval.second;
+                           i++)
+                        Assert(
+                          actually_owning_ranks.entry_has_been_set(
+                            i - local_range.first) == false,
+                          ExcMessage(
+                            "Multiple processes seem to own the same global index. "
+                            "A possible reason is that the sets of locally owned "
+                            "indices are not distinct."));
+                      Assert(interval.first < interval.second,
+                             ExcInternalError());
+                      Assert(
+                        local_range.first <= interval.first &&
+                          interval.second <= local_range.second,
+                        ExcMessage(
+                          "The specified interval is not handled by the current process."));
+#  endif
+                      actually_owning_ranks.fill(interval.first -
+                                                   local_range.first,
+                                                 interval.second -
+                                                   local_range.first,
+                                                 source_rank);
+                    }
+                  actually_owning_rank_list.push_back(source_rank);
+                },
+
+                comm);
             }
 
           std::sort(actually_owning_rank_list.begin(),

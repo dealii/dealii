@@ -21,7 +21,7 @@
 #include <deal.II/base/std_cxx20/iota_view.h>
 
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/hp/q_collection.h>
 
@@ -149,7 +149,7 @@ namespace FEInterfaceViews
     /**
      * @name Access to shape functions
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the value of the shape function
@@ -175,12 +175,12 @@ namespace FEInterfaceViews
           const unsigned int interface_dof_index,
           const unsigned int q_point) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to jumps in shape functions and their derivatives
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the jump $\jump{u}=u_1 - u_2$ on the interface for the shape
@@ -278,12 +278,12 @@ namespace FEInterfaceViews
     jump_3rd_derivative(const unsigned int interface_dof_index,
                         const unsigned int q_point) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to the average of shape functions and their derivatives
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the average value $\average{u}=\frac{1}{2}(u_1 + u_2)$ on the
@@ -368,12 +368,12 @@ namespace FEInterfaceViews
     average_hessian(const unsigned int interface_dof_index,
                     const unsigned int q_point) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to values of global finite element fields
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the values of the selected scalar component of the finite
@@ -432,12 +432,12 @@ namespace FEInterfaceViews
       std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to jumps in global finite element fields
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the jump in the values of the selected scalar component of the
@@ -578,12 +578,12 @@ namespace FEInterfaceViews
         solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to the average of global finite element fields
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the average of the values of the selected scalar component of the
@@ -687,7 +687,7 @@ namespace FEInterfaceViews
       std::vector<solution_hessian_type<typename InputVector::value_type>>
         &hessians) const;
 
-    //@}
+    /** @} */
 
   private:
     /**
@@ -782,7 +782,7 @@ namespace FEInterfaceViews
     /**
      * @name Access to shape functions
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the value of the vector components selected by this view
@@ -808,12 +808,12 @@ namespace FEInterfaceViews
           const unsigned int interface_dof_index,
           const unsigned int q_point) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to jumps in shape functions and their derivatives
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the jump vector $[\mathbf{u}]=\mathbf{u_1} - \mathbf{u_2}$ on the
@@ -907,12 +907,12 @@ namespace FEInterfaceViews
     jump_3rd_derivative(const unsigned int interface_dof_index,
                         const unsigned int q_point) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to the average of shape functions and their derivatives
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the average vector $\average{\mathbf{u}}=\frac{1}{2}(\mathbf{u_1}
@@ -984,12 +984,12 @@ namespace FEInterfaceViews
     average_hessian(const unsigned int interface_dof_index,
                     const unsigned int q_point) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to values of global finite element fields
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the values of the selected vector component of the finite
@@ -1048,12 +1048,12 @@ namespace FEInterfaceViews
       std::vector<solution_value_type<typename InputVector::value_type>>
         &values) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to jumps in global finite element fields
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the jump in the values of the selected vector component of the
@@ -1194,12 +1194,12 @@ namespace FEInterfaceViews
         solution_third_derivative_type<typename InputVector::value_type>>
         &third_derivatives) const;
 
-    //@}
+    /** @} */
 
     /**
      * @name Access to the average of global finite element fields
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the average of the values of the selected vector component of the
@@ -1303,7 +1303,7 @@ namespace FEInterfaceViews
       std::vector<solution_hessian_type<typename InputVector::value_type>>
         &hessians) const;
 
-    //@}
+    /** @} */
 
   private:
     /**
@@ -2019,12 +2019,12 @@ public:
     std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
       &third_derivatives) const;
 
-  //@}
+  /** @} */
 
   /**
    * @name Access to the average of the function values and derivatives
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the average of the values of the

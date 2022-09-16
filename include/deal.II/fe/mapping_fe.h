@@ -34,9 +34,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup mapping */
-/*@{*/
-
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class consistently uses a user-provided finite element on all cells of a
@@ -477,7 +478,7 @@ private:
 
 
 
-/*@}*/
+/** @} */
 
 /*----------------------------------------------------------------------*/
 

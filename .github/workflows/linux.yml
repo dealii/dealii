@@ -238,3 +238,7 @@ jobs:
       run: |
         source /opt/intel/oneapi/setvars.sh
         make -j 2
+    - name: quicktest
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        make test

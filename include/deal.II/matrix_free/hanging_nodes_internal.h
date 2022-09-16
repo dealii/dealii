@@ -529,6 +529,10 @@ namespace internal
               neighbor->level() == cell->level())
             continue;
 
+          // Ignore if the neighbors are FE_Nothing
+          if (neighbor->get_fe().n_dofs_per_cell() == 0)
+            continue;
+
           face |= 1 << direction;
         }
 
@@ -549,10 +553,16 @@ namespace internal
                 std::find_if(line_to_cells[line_index].begin(),
                              line_to_cells[line_index].end(),
                              [&cell](const auto &edge_neighbor) {
+                               DoFCellAccessor<dim, dim, false> dof_cell(
+                                 &edge_neighbor.first->get_triangulation(),
+                                 edge_neighbor.first->level(),
+                                 edge_neighbor.first->index(),
+                                 &cell->get_dof_handler());
                                return edge_neighbor.first->is_artificial() ==
                                         false &&
                                       edge_neighbor.first->level() <
-                                        cell->level();
+                                        cell->level() &&
+                                      dof_cell.get_fe().n_dofs_per_cell() > 0;
                              });
 
               if (edge_neighbor == line_to_cells[line_index].end())

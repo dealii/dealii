@@ -46,8 +46,9 @@ namespace TrilinosWrappers
 #endif
 
 
-/*! @addtogroup Vectors
- *@{
+/**
+ * @addtogroup Vectors
+ * @{
  */
 
 
@@ -364,10 +365,10 @@ public:
    * Exception
    */
   DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
-  //@}
+  /** @} */
 };
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /*----------------------- Inline functions ----------------------------------*/

@@ -15,7 +15,7 @@
 
 
 
-// miscellaneous helper funcions for hanging_nodes_* tests
+// miscellaneous helper functions for hanging_nodes_* tests
 
 
 #include <deal.II/dofs/dof_handler.h>

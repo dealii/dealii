@@ -30,8 +30,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*! @addtogroup Matrix1
- *@{
+/**
+ * @addtogroup Matrix1
+ * @{
  */
 
 
@@ -74,7 +75,7 @@ public:
   /**
    * @name Constructors and initialization
    */
-  //@{
+  /** @{ */
   /**
    * Constructor; initializes the matrix to be empty, without any structure,
    * i.e.  the matrix is not usable at all. This constructor is therefore only
@@ -154,12 +155,12 @@ public:
    */
   virtual void
   reinit(const BlockSparsityPattern &sparsity);
-  //@}
+  /** @} */
 
   /**
    * @name Information on the matrix
    */
-  //@{
+  /** @{ */
   /**
    * Return whether the object is empty. It is empty if either both dimensions
    * are zero or no BlockSparsityPattern is associated.
@@ -206,12 +207,12 @@ public:
    */
   std::size_t
   memory_consumption() const;
-  //@}
+  /** @} */
 
   /**
    * @name Multiplications
    */
-  //@{
+  /** @{ */
   /**
    * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
    * matrix.
@@ -283,12 +284,12 @@ public:
   void
   Tvmult(Vector<nonblock_number> &      dst,
          const Vector<nonblock_number> &src) const;
-  //@}
+  /** @} */
 
   /**
    * @name Preconditioning methods
    */
-  //@{
+  /** @{ */
   /**
    * Apply the Jacobi preconditioner, which multiplies every element of the
    * <tt>src</tt> vector by the inverse of the respective diagonal element and
@@ -312,12 +313,12 @@ public:
   precondition_Jacobi(Vector<number2> &      dst,
                       const Vector<number2> &src,
                       const number           omega = 1.) const;
-  //@}
+  /** @} */
 
   /**
    * @name Input/Output
    */
-  //@{
+  /** @{ */
   /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
@@ -345,7 +346,7 @@ public:
                   const unsigned int width       = 0,
                   const char *       zero_string = " ",
                   const double       denominator = 1.) const;
-  //@}
+  /** @} */
   /**
    * @addtogroup Exceptions
    * @{
@@ -355,7 +356,7 @@ public:
    * Exception
    */
   DeclException0(ExcBlockDimensionMismatch);
-  //@}
+  /** @} */
 
 private:
   /**
@@ -369,7 +370,7 @@ private:
 
 
 
-/*@}*/
+/** @} */
 /* ------------------------- Template functions ---------------------- */
 
 

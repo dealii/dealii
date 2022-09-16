@@ -36,9 +36,7 @@
 #  include <p8est_search.h>
 #  include <p8est_vtk.h>
 
-#  include <map>
-#  include <set>
-
+#  include <limits>
 
 DEAL_II_NAMESPACE_OPEN
 

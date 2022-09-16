@@ -421,7 +421,7 @@ filter_out_small_numbers(const Number number, const double tolerance)
  * If we run 64 tests at the same time on a 64-core system, and each of
  * them runs 64 threads, then we get astronomical loads. Limit concurrency
  * to a fixed (small) number of threads, independent of the core count. The
- * limit defaults to 3 and can be overriden by the environment variable
+ * limit defaults to 3 and can be overridden by the environment variable
  * TEST_N_THREADS.
  */
 inline unsigned int

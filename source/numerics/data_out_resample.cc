@@ -151,32 +151,42 @@ DataOutResample<dim, patch_dim, spacedim>::build_patches(
 
       const auto &dh = *data_ptr->dof_handler;
 
-      // TODO: enable more components
-      AssertDimension(dh.get_fe_collection().n_components(), 1);
+#ifdef DEBUG
+      for (const auto &fe : dh.get_fe_collection())
+        Assert(
+          fe.n_base_elements() == 1,
+          ExcMessage(
+            "This class currently only supports scalar elements and elements "
+            "with a single base element."));
+#endif
 
-      const auto values =
-        VectorTools::point_values<1>(rpe, dh, data_ptr->vector);
+      for (unsigned int comp = 0; comp < dh.get_fe_collection().n_components();
+           ++comp)
+        {
+          const auto values = VectorTools::point_values<1>(
+            rpe, dh, data_ptr->vector, VectorTools::EvaluationFlags::avg, comp);
 
-      vectors.emplace_back(
-        std::make_shared<LinearAlgebra::distributed::Vector<double>>(
-          partitioner));
+          vectors.emplace_back(
+            std::make_shared<LinearAlgebra::distributed::Vector<double>>(
+              partitioner));
 
-      for (unsigned int j = 0; j < values.size(); ++j)
-        vectors.back()->local_element(point_to_local_vector_indices[j]) =
-          values[j];
+          for (unsigned int j = 0; j < values.size(); ++j)
+            vectors.back()->local_element(point_to_local_vector_indices[j]) =
+              values[j];
 
-      vectors.back()->set_ghost_state(true);
+          vectors.back()->set_ghost_state(true);
 
-      // we can give the vectors arbitrary names ("temp_*") here, since these
-      // are only used internally (by patch_data_out) but not later on during
-      // the actual output to file
-      patch_data_out.add_data_vector(
-        *vectors.back(),
-        std::string("temp_" + std::to_string(counter)),
-        DataOut_DoFData<patch_dim, patch_dim, spacedim, spacedim>::
-          DataVectorType::type_dof_data);
+          // we can give the vectors arbitrary names ("temp_*") here, since
+          // these are only used internally (by patch_data_out) but not later on
+          // during the actual output to file
+          patch_data_out.add_data_vector(
+            *vectors.back(),
+            std::string("temp_" + std::to_string(counter)),
+            DataOut_DoFData<patch_dim, patch_dim, spacedim, spacedim>::
+              DataVectorType::type_dof_data);
 
-      counter++;
+          counter++;
+        }
     }
 
   patch_data_out.build_patches(*patch_mapping,

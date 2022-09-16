@@ -1,0 +1,7 @@
+New: The new class MatrixFreeTools::ElementActivationAndDeactivationMatrixFree
+is a wrapper around MatrixFree designed to deal with 
+DoFHandler objects involving cells without degrees of freedom, i.e.,
+cells using FENothing as element type. The class helps to implement the
+"element birth and death technique".
+<br>
+(Peter Munch, Sebastian Proell, 2022/07/09)

@@ -131,7 +131,7 @@ template <template <int, int, typename> class TensorType1,
           template <int, int, typename>
           class TensorType2,
           typename NumberType2>
-typename std::enable_if<AreSame<TensorType1, TensorType2>::value>::type
+std::enable_if_t<AreSame<TensorType1, TensorType2>::value>
 test_two()
 {
   const unsigned int               dim = 2;
@@ -185,7 +185,7 @@ template <template <int, int, typename> class TensorType1,
           template <int, int, typename>
           class TensorType2,
           typename NumberType2>
-typename std::enable_if<!AreSame<TensorType1, TensorType2>::value>::type
+std::enable_if_t<!AreSame<TensorType1, TensorType2>::value>
 test_two()
 {}
 
@@ -194,8 +194,8 @@ template <template <int, int, typename> class TensorType1,
           template <int, int, typename>
           class TensorType2,
           typename NumberType2>
-typename std::enable_if<(AreSame<TensorType1, SymmetricTensor>::value &&
-                         AreSame<TensorType2, SymmetricTensor>::value)>::type
+std::enable_if_t<(AreSame<TensorType1, SymmetricTensor>::value &&
+                  AreSame<TensorType2, SymmetricTensor>::value)>
 test_three()
 {
   const unsigned int               dim = 2;
@@ -219,8 +219,8 @@ template <template <int, int, typename> class TensorType1,
           template <int, int, typename>
           class TensorType2,
           typename NumberType2>
-typename std::enable_if<!(AreSame<TensorType1, SymmetricTensor>::value &&
-                          AreSame<TensorType2, SymmetricTensor>::value)>::type
+std::enable_if_t<!(AreSame<TensorType1, SymmetricTensor>::value &&
+                   AreSame<TensorType2, SymmetricTensor>::value)>
 test_three()
 {}
 

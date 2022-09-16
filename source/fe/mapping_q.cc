@@ -41,6 +41,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <memory>
 #include <numeric>
 

@@ -1,0 +1,6 @@
+New: The CellAccessor::as_dof_handler_iterator() function can be used
+to convert from a Triangulation active cell iterator to a DoFHandler active cell
+iterator, or from an active cell iterator of one DoFHandler to that of another
+DoFHandler.
+<br>
+(Jean-Paul Pelteret, 2022/07/15)

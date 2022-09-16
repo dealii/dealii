@@ -620,7 +620,7 @@ public:
                  << '<' << arg1 << "> is not a tex column format. Use "
                  << "'l', 'c', or 'r' to indicate left, centered, or "
                  << "right aligned text.");
-  //@}
+  /** @} */
 protected:
   /**
    * Structure encapsulating all the data that is needed to describe one

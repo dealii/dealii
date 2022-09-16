@@ -520,7 +520,7 @@ struct RefinementPossibilities
    * local coordinate system within the global coordinate system of the
    * space it lives in.
    */
-  enum Possibilities
+  enum Possibilities : std::uint8_t
   {
     /**
      * Do not perform refinement.
@@ -590,7 +590,7 @@ struct RefinementPossibilities<1>
    * local coordinate system within the global coordinate system of the
    * space it lives in.
    */
-  enum Possibilities
+  enum Possibilities : std::uint8_t
   {
     /**
      * Do not refine.
@@ -656,7 +656,7 @@ struct RefinementPossibilities<2>
    * local coordinate system within the global coordinate system of the
    * space it lives in.
    */
-  enum Possibilities
+  enum Possibilities : std::uint8_t
   {
     /**
      * Do not refine.
@@ -731,7 +731,7 @@ struct RefinementPossibilities<3>
    * local coordinate system within the global coordinate system of the
    * space it lives in.
    */
-  enum Possibilities
+  enum Possibilities : std::uint8_t
   {
     /**
      * Do not refine.

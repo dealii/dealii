@@ -16,6 +16,7 @@
 #ifndef dealii_vector_tools_mean_value_templates_h
 #define dealii_vector_tools_mean_value_templates_h
 
+#include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/fe/fe_values.h>
 
@@ -44,8 +45,7 @@ namespace VectorTools
   namespace internal
   {
     template <typename VectorType>
-    typename std::enable_if<dealii::is_serial_vector<VectorType>::value ==
-                            true>::type
+    std::enable_if_t<dealii::is_serial_vector<VectorType>::value == true>
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
       if (p_select.size() == 0)
@@ -85,8 +85,7 @@ namespace VectorTools
 
 
     template <typename VectorType>
-    typename std::enable_if<dealii::is_serial_vector<VectorType>::value ==
-                            false>::type
+    std::enable_if_t<dealii::is_serial_vector<VectorType>::value == false>
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
       (void)p_select;

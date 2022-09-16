@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <numeric>
 
 
@@ -585,7 +586,7 @@ namespace
 
   public:
     /**
-     * Callback exectuted before point function. Last argument is always
+     * Callback executed before point function. Last argument is always
      * nullptr.
      *
      * @return `int` interpreted as a C "bool". Zero means "stop the recursion".

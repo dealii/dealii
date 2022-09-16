@@ -34,9 +34,11 @@ namespace Particles
   /**
    * This class generates graphical output for the particles stored by a
    * ParticleHandler object. From a particle handler, it generates patches which
-   * can then be used to write traditional output files. This class currently
-   * only supports witing the particle position and their ID and does not allow
-   * to write the properties attached to the particles
+   * can then be used to write traditional output files.
+   *
+   * The class does, in essence, for particles what ::DataOut does for
+   * finite element fields, using a similar interface. It is used in
+   * step-19, for example.
    *
    * @ingroup Particle
    */
