@@ -1757,7 +1757,7 @@ namespace internal
        */
       template <int dim, int spacedim>
       static void
-      compute_number_cache(
+      compute_number_cache_dim(
         const Triangulation<dim, spacedim> &                   triangulation,
         const unsigned int                                     level_objects,
         internal::TriangulationImplementation::NumberCache<1> &number_cache)
@@ -1845,7 +1845,7 @@ namespace internal
        */
       template <int dim, int spacedim>
       static void
-      compute_number_cache(
+      compute_number_cache_dim(
         const Triangulation<dim, spacedim> &                   triangulation,
         const unsigned int                                     level_objects,
         internal::TriangulationImplementation::NumberCache<2> &number_cache)
@@ -1858,7 +1858,7 @@ namespace internal
             void (*)(const Triangulation<dim, spacedim> &,
                      const unsigned int,
                      internal::TriangulationImplementation::NumberCache<1> &)>(
-            &compute_number_cache<dim, spacedim>),
+            &compute_number_cache_dim<dim, spacedim>),
           triangulation,
           level_objects,
           static_cast<internal::TriangulationImplementation::NumberCache<1> &>(
@@ -1952,7 +1952,7 @@ namespace internal
        */
       template <int dim, int spacedim>
       static void
-      compute_number_cache(
+      compute_number_cache_dim(
         const Triangulation<dim, spacedim> &                   triangulation,
         const unsigned int                                     level_objects,
         internal::TriangulationImplementation::NumberCache<3> &number_cache)
@@ -1965,7 +1965,7 @@ namespace internal
             void (*)(const Triangulation<dim, spacedim> &,
                      const unsigned int,
                      internal::TriangulationImplementation::NumberCache<2> &)>(
-            &compute_number_cache<dim, spacedim>),
+            &compute_number_cache_dim<dim, spacedim>),
           triangulation,
           level_objects,
           static_cast<internal::TriangulationImplementation::NumberCache<2> &>(
@@ -2042,6 +2042,27 @@ namespace internal
         update_quads_and_lines.join();
       }
 
+
+      template <int dim, int spacedim>
+      static void
+      compute_number_cache(
+        const Triangulation<dim, spacedim> &                     triangulation,
+        const unsigned int                                       level_objects,
+        internal::TriangulationImplementation::NumberCache<dim> &number_cache)
+      {
+        compute_number_cache_dim(triangulation, level_objects, number_cache);
+
+        number_cache.active_cell_index_partitioner =
+          std::make_shared<const Utilities::MPI::Partitioner>(
+            triangulation.n_active_cells());
+
+        number_cache.level_cell_index_partitioners.resize(
+          triangulation.n_levels());
+        for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
+          number_cache.level_cell_index_partitioners[level] =
+            std::make_shared<const Utilities::MPI::Partitioner>(
+              triangulation.n_cells(level));
+      }
 
 
       template <int spacedim>
@@ -11203,6 +11224,27 @@ MPI_Comm
 Triangulation<dim, spacedim>::get_communicator() const
 {
   return MPI_COMM_SELF;
+}
+
+
+
+template <int dim, int spacedim>
+const std::weak_ptr<const Utilities::MPI::Partitioner>
+Triangulation<dim, spacedim>::global_active_cell_index_partitioner() const
+{
+  return number_cache.active_cell_index_partitioner;
+}
+
+
+
+template <int dim, int spacedim>
+const std::weak_ptr<const Utilities::MPI::Partitioner>
+Triangulation<dim, spacedim>::global_level_cell_index_partitioner(
+  const unsigned int level) const
+{
+  AssertIndexRange(level, this->n_levels());
+
+  return number_cache.level_cell_index_partitioners[level];
 }
 
 
