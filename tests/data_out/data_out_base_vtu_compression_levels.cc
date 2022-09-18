@@ -56,7 +56,7 @@ template <int dim, int spacedim>
 void
 check_all(std::ostream &log)
 {
-  for (unsigned int i = 0; i < 4; ++i)
+  for (unsigned int i = 0; i < 5; ++i)
     {
       DataOutBase::VtkFlags flags;
       switch (i)
@@ -75,6 +75,9 @@ check_all(std::ostream &log)
           case (3):
             flags.compression_level =
               DataOutBase::CompressionLevel::default_compression;
+            break;
+          case (4):
+            flags.compression_level = DataOutBase::CompressionLevel::plain_text;
             break;
           default:
             Assert(false, ExcInternalError());

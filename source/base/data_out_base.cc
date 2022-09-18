@@ -1921,20 +1921,25 @@ namespace
   void
   VtuStream::write_point(const unsigned int, const Point<dim> &p)
   {
-#if !defined(DEAL_II_WITH_ZLIB)
-    // write out coordinates
-    stream << p;
-    // fill with zeroes
-    for (unsigned int i = dim; i < 3; ++i)
-      stream << " 0";
-    stream << '\n';
-#else
-    // if we want to compress, then first collect all the data in an array
-    for (unsigned int i = 0; i < dim; ++i)
-      vertices.push_back(p[i]);
-    for (unsigned int i = dim; i < 3; ++i)
-      vertices.push_back(0);
+#ifdef DEAL_II_WITH_ZLIB
+    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+      {
+        // if we want to compress, then first collect all the data in an array
+        for (unsigned int i = 0; i < dim; ++i)
+          vertices.push_back(p[i]);
+        for (unsigned int i = dim; i < 3; ++i)
+          vertices.push_back(0);
+      }
+    else
 #endif
+      {
+        // write out coordinates
+        stream << p;
+        // fill with zeroes
+        for (unsigned int i = dim; i < 3; ++i)
+          stream << " 0";
+        stream << '\n';
+      }
   }
 
 
@@ -1942,10 +1947,13 @@ namespace
   VtuStream::flush_points()
   {
 #ifdef DEAL_II_WITH_ZLIB
-    // compress the data we have in memory and write them to the stream. then
-    // release the data
-    *this << vertices << '\n';
-    vertices.clear();
+    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+      {
+        // compress the data we have in memory and write them to the stream.
+        // then release the data
+        *this << vertices << '\n';
+        vertices.clear();
+      }
 #endif
   }
 
@@ -1958,41 +1966,47 @@ namespace
                         unsigned int d2,
                         unsigned int d3)
   {
-#if !defined(DEAL_II_WITH_ZLIB)
-    stream << start;
-    if (dim >= 1)
+#ifdef DEAL_II_WITH_ZLIB
+    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
       {
-        stream << '\t' << start + d1;
-        if (dim >= 2)
+        cells.push_back(start);
+        if (dim >= 1)
           {
-            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
-            if (dim >= 3)
+            cells.push_back(start + d1);
+            if (dim >= 2)
               {
-                stream << '\t' << start + d3 << '\t' << start + d3 + d1 << '\t'
-                       << start + d3 + d2 + d1 << '\t' << start + d3 + d2;
+                cells.push_back(start + d2 + d1);
+                cells.push_back(start + d2);
+                if (dim >= 3)
+                  {
+                    cells.push_back(start + d3);
+                    cells.push_back(start + d3 + d1);
+                    cells.push_back(start + d3 + d2 + d1);
+                    cells.push_back(start + d3 + d2);
+                  }
               }
           }
       }
-    stream << '\n';
-#else
-    cells.push_back(start);
-    if (dim >= 1)
-      {
-        cells.push_back(start + d1);
-        if (dim >= 2)
-          {
-            cells.push_back(start + d2 + d1);
-            cells.push_back(start + d2);
-            if (dim >= 3)
-              {
-                cells.push_back(start + d3);
-                cells.push_back(start + d3 + d1);
-                cells.push_back(start + d3 + d2 + d1);
-                cells.push_back(start + d3 + d2);
-              }
-          }
-      }
+    else
 #endif
+      {
+        stream << start;
+        if (dim >= 1)
+          {
+            stream << '\t' << start + d1;
+            if (dim >= 2)
+              {
+                stream << '\t' << start + d2 + d1 << '\t' << start + d2;
+                if (dim >= 3)
+                  {
+                    stream << '\t' << start + d3 << '\t' << start + d3 + d1
+                           << '\t' << start + d3 + d2 + d1 << '\t'
+                           << start + d3 + d2;
+                  }
+              }
+          }
+        stream << '\n';
+      }
   }
 
   void
@@ -2005,17 +2019,23 @@ namespace
 
     static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
 
-#if !defined(DEAL_II_WITH_ZLIB)
-    for (unsigned int i = 0; i < n_points; ++i)
-      stream << '\t'
-             << start +
-                  (reference_cell == ReferenceCells::Pyramid ? table[i] : i);
-    stream << '\n';
-#else
-    for (unsigned int i = 0; i < n_points; ++i)
-      cells.push_back(
-        start + (reference_cell == ReferenceCells::Pyramid ? table[i] : i));
+#ifdef DEAL_II_WITH_ZLIB
+    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+      {
+        for (unsigned int i = 0; i < n_points; ++i)
+          cells.push_back(
+            start + (reference_cell == ReferenceCells::Pyramid ? table[i] : i));
+      }
+    else
 #endif
+      {
+        for (unsigned int i = 0; i < n_points; ++i)
+          stream << '\t'
+                 << start + (reference_cell == ReferenceCells::Pyramid ?
+                               table[i] :
+                               i);
+        stream << '\n';
+      }
   }
 
   template <int dim>
@@ -2024,24 +2044,32 @@ namespace
                                    const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
-#if !defined(DEAL_II_WITH_ZLIB)
-    for (const auto &c : connectivity)
-      stream << '\t' << start + c;
-    stream << '\n';
-#else
-    for (const auto &c : connectivity)
-      cells.push_back(start + c);
+#ifdef DEAL_II_WITH_ZLIB
+    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+      {
+        for (const auto &c : connectivity)
+          cells.push_back(start + c);
+      }
+    else
 #endif
+      {
+        for (const auto &c : connectivity)
+          stream << '\t' << start + c;
+        stream << '\n';
+      }
   }
 
   void
   VtuStream::flush_cells()
   {
 #ifdef DEAL_II_WITH_ZLIB
-    // compress the data we have in memory and write them to the stream. then
-    // release the data
-    *this << cells << '\n';
-    cells.clear();
+    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+      {
+        // compress the data we have in memory and write them to the stream.
+        // then release the data
+        *this << cells << '\n';
+        cells.clear();
+      }
 #endif
   }
 
@@ -2051,13 +2079,18 @@ namespace
   VtuStream::operator<<(const std::vector<T> &data)
   {
 #ifdef DEAL_II_WITH_ZLIB
-    // compress the data we have in memory and write them to the stream. then
-    // release the data
-    write_compressed_block(data, flags, stream);
-#else
-    for (unsigned int i = 0; i < data.size(); ++i)
-      stream << data[i] << ' ';
+    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+      {
+        // compress the data we have in memory and write them to the stream.
+        // then release the data
+        write_compressed_block(data, flags, stream);
+      }
+    else
 #endif
+      {
+        for (unsigned int i = 0; i < data.size(); ++i)
+          stream << data[i] << ' ';
+      }
 
     return stream;
   }
@@ -5804,7 +5837,8 @@ namespace DataOutBase
     out << "\n-->\n";
     out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
 #ifdef DEAL_II_WITH_ZLIB
-    out << " compressor=\"vtkZLibDataCompressor\"";
+    if (flags.compression_level != CompressionLevel::plain_text)
+      out << " compressor=\"vtkZLibDataCompressor\"";
 #endif
 #ifdef DEAL_II_WORDS_BIGENDIAN
     out << " byte_order=\"BigEndian\"";
@@ -5988,11 +6022,11 @@ namespace DataOutBase
         AssertDimension(n_data_sets, patches[0].data.n_rows())
       }
 
+    const char *ascii_or_binary =
 #ifdef DEAL_II_WITH_ZLIB
-    const char *ascii_or_binary = "binary";
-#else
-    const char *              ascii_or_binary = "ascii";
+      (flags.compression_level != CompressionLevel::plain_text) ? "binary" :
 #endif
+                                                                  "ascii";
 
 
     // first count the number of cells and cells for later use
@@ -6057,11 +6091,7 @@ namespace DataOutBase
 
     // std::uint8_t might be an alias to unsigned char which is then not printed
     // as ascii integers
-#ifdef DEAL_II_WITH_ZLIB
-    std::vector<std::uint8_t> cell_types;
-#else
     std::vector<unsigned int> cell_types;
-#endif
     cell_types.reserve(n_cells);
 
     unsigned int first_vertex_of_patch = 0;
@@ -6089,7 +6119,21 @@ namespace DataOutBase
         << ascii_or_binary << "\">\n";
 
     // this should compress well :-)
-    vtu_out << cell_types;
+#ifdef DEAL_II_WITH_ZLIB
+    if (flags.compression_level != CompressionLevel::plain_text)
+      {
+        std::vector<uint8_t> cell_types_uint8_t(cell_types.size());
+        for (unsigned int i = 0; i < cell_types.size(); ++i)
+          cell_types_uint8_t[i] = static_cast<std::uint8_t>(cell_types[i]);
+
+        vtu_out << cell_types_uint8_t;
+      }
+    else
+#endif
+      {
+        vtu_out << cell_types;
+      }
+
     out << '\n';
     out << "    </DataArray>\n";
     out << "  </Cells>\n";
@@ -7641,6 +7685,9 @@ namespace DataOutBase
     std::vector<char> my_buffer;
     {
       boost::iostreams::filtering_ostream f;
+
+      AssertThrow(compression != CompressionLevel::plain_text,
+                  ExcNotImplemented());
 
       if (compression != CompressionLevel::no_compression)
 #  ifdef DEAL_II_WITH_ZLIB
@@ -9334,6 +9381,11 @@ DataOutReader<dim, spacedim>::read_whole_parallel_file(std::istream &in)
       // decompress and put into datastream
       std::vector<char> temp_buffer(chunk_sizes[n]);
       in.read(temp_buffer.data(), chunk_sizes[n]);
+
+      AssertThrow(static_cast<DataOutBase::CompressionLevel>(
+                    header.compression) !=
+                    DataOutBase::CompressionLevel::plain_text,
+                  ExcNotImplemented());
 
       boost::iostreams::filtering_istreambuf f;
       if (static_cast<DataOutBase::CompressionLevel>(header.compression) !=
