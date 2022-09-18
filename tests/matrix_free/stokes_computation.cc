@@ -256,7 +256,7 @@ namespace StokesClass
       // apply the top right block
       {
         LinearAlgebra::distributed::BlockVector<double> dst_tmp(dst);
-        dst_tmp.block(0) *= 0.0;
+        dst_tmp.block(0) = 0.0;
         stokes_matrix.vmult(utmp, dst_tmp); // B^T
         utmp.block(0) *= -1.0;
         utmp.block(0) += src.block(0);
