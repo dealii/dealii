@@ -77,13 +77,13 @@ namespace internal
 
       template <typename T, typename VectorType>
       void
-      read_write_operation(const T &              operation,
-                           VectorType &           global_vector,
-                           AlignedVector<Number> &local_vector,
-                           const unsigned int     first_cell,
-                           const unsigned int     n_cells,
-                           const unsigned int     n_dofs_per_cell,
-                           const bool             apply_constraints) const;
+      read_write_operation(const T &          operation,
+                           VectorType &       global_vector,
+                           Number *           local_vector,
+                           const unsigned int first_cell,
+                           const unsigned int n_cells,
+                           const unsigned int n_dofs_per_cell,
+                           const bool         apply_constraints) const;
 
       void
       apply_hanging_node_constraints(
@@ -457,13 +457,13 @@ namespace internal
     template <typename T, typename VectorType>
     inline void
     ConstraintInfo<dim, Number>::read_write_operation(
-      const T &              operation,
-      VectorType &           global_vector,
-      AlignedVector<Number> &local_vector,
-      const unsigned int     first_cell,
-      const unsigned int     n_cells,
-      const unsigned int     n_dofs_per_cell,
-      const bool             apply_constraints) const
+      const T &          operation,
+      VectorType &       global_vector,
+      Number *           local_vector,
+      const unsigned int first_cell,
+      const unsigned int n_cells,
+      const unsigned int n_dofs_per_cell,
+      const bool         apply_constraints) const
     {
       if (apply_constraints == false)
         {
