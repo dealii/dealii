@@ -58,6 +58,6 @@ DEAL:0::n_cells on my rank: 8
 
 DEAL:0::ok
 
-DEAL:1::n_cells on my rank: 4294967295
-DEAL:1::n_cells on my rank: 4294967295
+DEAL:1::n_cells on my rank: 0
+DEAL:1::n_cells on my rank: 0
 

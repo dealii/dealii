@@ -384,7 +384,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter()
     : flags(false, true)
     , node_dim(numbers::invalid_unsigned_int)
-    , num_cells(numbers::invalid_unsigned_int)
+    , num_cells(0)
   {}
 
 
@@ -392,7 +392,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
     : flags(flags)
     , node_dim(numbers::invalid_unsigned_int)
-    , num_cells(numbers::invalid_unsigned_int)
+    , num_cells(0)
   {}
 
 
@@ -8200,9 +8200,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
 
   local_node_cell_count[0] = data_filter.n_nodes();
-  // n_cells returns an invalid unsigned int if the object is empty:
-  local_node_cell_count[1] =
-    (data_filter.n_nodes() > 0) ? data_filter.n_cells() : 0;
+  local_node_cell_count[1] = data_filter.n_cells();
 
   const int myrank = Utilities::MPI::this_mpi_process(comm);
   // And compute the global total
