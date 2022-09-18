@@ -1145,7 +1145,7 @@ namespace internal
 
           Assert(transposed == false, ExcNotImplemented());
 
-          A.vmult(tmp, src);
+          A.vmult(tmp, dst);
 
           preconditioner.vmult(
             dst,
@@ -1237,7 +1237,7 @@ namespace internal
 
           A.vmult(
             tmp,
-            src,
+            dst,
             [&](const unsigned int start_range, const unsigned int end_range) {
               // zero 'tmp' before running the vmult
               // operation
@@ -1267,7 +1267,10 @@ namespace internal
                 }
             });
 
-          preconditioner.vmult(dst, tmp);
+          preconditioner.vmult(dst, tmp, [](const auto, const auto) {
+            // note: `dst` vector does not have to be zeroed out
+            // since we add the result into it
+          });
         }
     }
 
@@ -3162,7 +3165,7 @@ namespace internal
 
               DEAL_II_OPENMP_SIMD_PRAGMA
               for (std::size_t i = start_range; i < end_range; ++i)
-                tmp_ptr[i] = factor2 * (rhs_ptr[i] - tmp_ptr[i]);
+                tmp_ptr[i] = rhs_ptr[i] - tmp_ptr[i];
             });
 
           // 2) perform vector updates (including preconditioner application)

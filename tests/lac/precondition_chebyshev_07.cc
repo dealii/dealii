@@ -79,7 +79,10 @@ public:
     if (operation_before_matrix_vector_product)
       operation_before_matrix_vector_product(0, src.size());
 
-    diagonal_matrix.vmult(dst, src);
+    if (operation_before_matrix_vector_product)
+      diagonal_matrix.vmult_add(dst, src);
+    else
+      diagonal_matrix.vmult(dst, src);
 
     if (operation_after_matrix_vector_product)
       operation_after_matrix_vector_product(0, src.size());
@@ -211,7 +214,7 @@ main()
       std::vector<std::tuple<double, double>> results;
 
       {
-        // Test PreconditionChebyshev + DiagonalMatrix and matrix with
+        // 1) Test PreconditionChebyshev + DiagonalMatrix and matrix with
         // pre/post
         using PreconditionerType = DiagonalMatrix<VectorType>;
 
@@ -234,7 +237,7 @@ main()
       }
 
       {
-        /// Test PreconditionChebyshev + DiagonalMatrix and matrix without
+        // 2) Test PreconditionChebyshev + DiagonalMatrix and matrix without
         // pre/post
         using PreconditionerType = DiagonalMatrix<VectorType>;
 
@@ -253,7 +256,7 @@ main()
       }
 
       {
-        // Test PreconditionChebyshev + arbitrary preconditioner and matrix
+        // 3) Test PreconditionChebyshev + arbitrary preconditioner and matrix
         // without pre/post
         using PreconditionerType = MyDiagonalMatrix<VectorType>;
 
@@ -272,7 +275,7 @@ main()
       }
 
       {
-        // Test PreconditionChebyshev + preconditioner with pre/post and
+        // 4) Test PreconditionChebyshev + preconditioner with pre/post and
         // matrix without pre/post
         using PreconditionerType = MyDiagonalMatrixWithPreAndPost<VectorType>;
 
@@ -291,7 +294,7 @@ main()
       }
 
       {
-        // Test PreconditionChebyshev + preconditioner with pre/post and
+        // 5) Test PreconditionChebyshev + preconditioner with pre/post and
         // matrix with pre/post
         using PreconditionerType = MyDiagonalMatrixWithPreAndPost<VectorType>;
 
@@ -313,18 +316,15 @@ main()
         results.emplace_back(test(preconditioner, src));
       }
 
-      if (std::equal(results.begin(),
-                     results.end(),
-                     results.begin(),
-                     [](const auto &a, const auto &b) {
-                       if (std::abs(std::get<0>(a) - std::get<0>(b)) > 1e-6)
-                         return false;
+      if (std::all_of(results.begin(), results.end(), [&](const auto &a) {
+            if (std::abs(std::get<0>(a) - std::get<0>(results[0])) > 1e-6)
+              return false;
 
-                       if (std::abs(std::get<1>(a) - std::get<1>(b)) > 1e-6)
-                         return false;
+            if (std::abs(std::get<1>(a) - std::get<1>(results[0])) > 1e-6)
+              return false;
 
-                       return true;
-                     }))
+            return true;
+          }))
         deallog << "OK!" << std::endl;
       else
         deallog << "ERROR!" << std::endl;
