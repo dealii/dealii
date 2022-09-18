@@ -1007,7 +1007,7 @@ ReferenceCell::n_lines() const
     return 12;
 
   Assert(false, ExcNotImplemented());
-  return numbers::invalid_unsigned_int;
+  return 0;
 }
 
 
