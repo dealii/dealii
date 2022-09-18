@@ -1,0 +1,5 @@
+Updated: The version of the vtu output has been increased to 2.2
+if high-order output is requested.
+This is necessary to fix visualization issues in Paraview.
+<br>
+(Peter Munch, Magdalena Schreter, 2022/09/18)
