@@ -2557,7 +2557,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           internal::VectorReader<Number, VectorizedArrayType> reader;
           constraint_info.read_write_operation(reader,
                                                *vec_coarse_ptr,
-                                               evaluation_data_coarse,
+                                               evaluation_data_coarse.data(),
                                                cell_counter,
                                                n_lanes_filled,
                                                scheme.n_dofs_per_cell_coarse,
@@ -2761,7 +2761,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             cell_counter, n_lanes_filled, true, evaluation_data_coarse);
           constraint_info.read_write_operation(writer,
                                                *vec_coarse_ptr,
-                                               evaluation_data_coarse,
+                                               evaluation_data_coarse.data(),
                                                cell_counter,
                                                n_lanes_filled,
                                                scheme.n_dofs_per_cell_coarse,
@@ -2894,7 +2894,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           internal::VectorSetter<Number, VectorizedArrayType> writer;
           constraint_info.read_write_operation(writer,
                                                *vec_coarse_ptr,
-                                               evaluation_data_coarse,
+                                               evaluation_data_coarse.data(),
                                                cell_counter,
                                                n_lanes_filled,
                                                scheme.n_dofs_per_cell_coarse,
