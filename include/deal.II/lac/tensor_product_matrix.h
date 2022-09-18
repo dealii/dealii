@@ -341,7 +341,8 @@ namespace internal
           std::array<Table<2, Number>, dim> &      eigenvectors,
           std::array<AlignedVector<Number>, dim> & eigenvalues)
     {
-      const int n_rows_1d = mass_matrices[0].n_cols();
+      const unsigned int n_rows_1d = mass_matrices[0].n_cols();
+      (void)n_rows_1d;
 
       for (unsigned int dir = 0; dir < dim; ++dir)
         {
@@ -376,7 +377,7 @@ namespace internal
           std::array<Table<2, VectorizedArray<Number>>, dim> &eigenvectors,
           std::array<AlignedVector<VectorizedArray<Number>>, dim> &eigenvalues)
     {
-      const int              n_rows_1d   = mass_matrix[0].n_cols();
+      const unsigned int     n_rows_1d   = mass_matrix[0].n_cols();
       constexpr unsigned int macro_size  = VectorizedArray<Number>::size();
       const std::size_t nm_flat_size_max = n_rows_1d * n_rows_1d * macro_size;
       const std::size_t n_flat_size_max  = n_rows_1d * macro_size;
