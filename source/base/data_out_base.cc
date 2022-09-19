@@ -921,7 +921,8 @@ namespace
   vtk_point_index_from_ijk(const unsigned i,
                            const unsigned j,
                            const unsigned,
-                           const std::array<unsigned, 2> &order)
+                           const std::array<unsigned, 2> &order,
+                           const bool)
   {
     const bool ibdy = (i == 0 || i == order[0]);
     const bool jbdy = (j == 0 || j == order[1]);
@@ -964,12 +965,19 @@ namespace
    *
    * Modified from
    * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
+   * (legacy_format=true) and from
+   * https://github.com/Kitware/VTK/blob/256fe70de00e3441f126276ca4a8c5477d0bcb86/Common/DataModel/vtkHigherOrderHexahedron.cxx#L593
+   * (legacy_format=false). The two versions differ regarding the ordering of
+   * lines 10 and 11 (clockwise vs. anti-clockwise). See also:
+   * https://github.com/Kitware/VTK/blob/7a0b92864c96680b1f42ee84920df556fc6ebaa3/Documentation/release/dev/node-numbering-change-for-VTK_LAGRANGE_HEXAHEDRON.md
+   *
    */
   int
   vtk_point_index_from_ijk(const unsigned                 i,
                            const unsigned                 j,
                            const unsigned                 k,
-                           const std::array<unsigned, 3> &order)
+                           const std::array<unsigned, 3> &order,
+                           const bool                     legacy_format)
   {
     const bool ibdy = (i == 0 || i == order[0]);
     const bool jbdy = (j == 0 || j == order[1]);
@@ -1000,10 +1008,16 @@ namespace
           }
         // !kbdy, On k axis
         offset += 4 * (order[0] - 1) + 4 * (order[1] - 1);
-        return (k - 1) +
-               (order[2] - 1) *
-                 (i != 0u ? (j != 0u ? 3 : 1) : (j != 0u ? 2 : 0)) +
-               offset;
+        if (legacy_format)
+          return (k - 1) +
+                 (order[2] - 1) *
+                   (i != 0u ? (j != 0u ? 3 : 1) : (j != 0u ? 2 : 0)) +
+                 offset;
+        else
+          return (k - 1) +
+                 (order[2] - 1) *
+                   (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
+                 offset;
       }
 
     offset += 4 * (order[0] - 1 + order[1] - 1 + order[2] - 1);
@@ -1040,7 +1054,8 @@ namespace
   vtk_point_index_from_ijk(const unsigned,
                            const unsigned,
                            const unsigned,
-                           const std::array<unsigned, 0> &)
+                           const std::array<unsigned, 0> &,
+                           const bool)
   {
     Assert(false, ExcNotImplemented());
     return 0;
@@ -1052,7 +1067,8 @@ namespace
   vtk_point_index_from_ijk(const unsigned,
                            const unsigned,
                            const unsigned,
-                           const std::array<unsigned, 1> &)
+                           const std::array<unsigned, 1> &,
+                           const bool)
   {
     Assert(false, ExcNotImplemented());
     return 0;
@@ -2965,7 +2981,8 @@ namespace DataOutBase
   template <int dim, int spacedim, typename StreamType>
   void
   write_high_order_cells(const std::vector<Patch<dim, spacedim>> &patches,
-                         StreamType &                             out)
+                         StreamType &                             out,
+                         const bool                               legacy_format)
   {
     Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
@@ -3013,7 +3030,8 @@ namespace DataOutBase
                     const unsigned int local_index =
                       i3 * d3 + i2 * d2 + i1 * d1;
                     const unsigned int connectivity_index =
-                      vtk_point_index_from_ijk(i1, i2, i3, cell_order);
+                      vtk_point_index_from_ijk(
+                        i1, i2, i3, cell_order, legacy_format);
                     connectivity[connectivity_index] = local_index;
                   }
 
@@ -5653,7 +5671,7 @@ namespace DataOutBase
     // now for the cells
     out << "CELLS " << n_cells << ' ' << n_points_and_n_cells << '\n';
     if (flags.write_higher_order_cells)
-      write_high_order_cells(patches, vtk_out);
+      write_high_order_cells(patches, vtk_out, /* legacy_format = */ true);
     else
       write_cells(patches, vtk_out);
     out << '\n';
@@ -5802,7 +5820,11 @@ namespace DataOutBase
     else
       out << '.';
     out << "\n-->\n";
-    out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
+
+    if (flags.write_higher_order_cells)
+      out << "<VTKFile type=\"UnstructuredGrid\" version=\"2.2\"";
+    else
+      out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
 #ifdef DEAL_II_WITH_ZLIB
     out << " compressor=\"vtkZLibDataCompressor\"";
 #endif
@@ -6042,7 +6064,7 @@ namespace DataOutBase
     out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
         << ascii_or_binary << "\">\n";
     if (flags.write_higher_order_cells)
-      write_high_order_cells(patches, vtu_out);
+      write_high_order_cells(patches, vtu_out, /* legacy_format = */ false);
     else
       write_cells(patches, vtu_out);
     out << "    </DataArray>\n";
