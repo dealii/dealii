@@ -1026,12 +1026,11 @@ namespace internal
       const size_type vec_size = last - first;
       if (vec_size <= vector_accumulation_recursion_threshold * 32)
         {
-          // The vector is short enough so we perform the summation.
-          // We store the number of chunks (each 32 indices) for the given
-          // vector length; all results are stored in
-          // outer_results[0,n_chunks+1), the last entry comes from parts that
-          // are not in the regular part, but might still all be filled up due
-          // to SIMD storing full width results
+          // The vector is short enough so we perform the summation.  We store
+          // the number of chunks (each 32 indices) for the given vector
+          // length; all results are stored in outer_results[0,n_chunks). We
+          // keep twice the number around to be able to do the pairwise
+          // summation with a single for loop (see the loop over j below)
           ResultType outer_results[vector_accumulation_recursion_threshold * 2];
 
           // Select between the regular version and vectorized version based
@@ -1061,13 +1060,40 @@ namespace internal
               a += b;
               a.store(outer_results + n_chunks);
             }
-          for (; j + 1 < n_chunks; j += 2, ++n_chunks)
-            outer_results[n_chunks] = outer_results[j] + outer_results[j + 1];
 
-          AssertIndexRange(n_chunks,
-                           2 * vector_accumulation_recursion_threshold + 1);
-          Assert(n_chunks > 0, ExcInternalError());
-          result = outer_results[n_chunks - 1];
+          // In the vectorized case, we know the loop bounds and can do things
+          // more efficiently
+          if (Operation::vectorizes)
+            {
+              AssertDimension(j + n_lanes, n_chunks);
+              AssertIndexRange(n_chunks,
+                               2 * vector_accumulation_recursion_threshold + 1);
+              ResultType *result_ptr = outer_results + j;
+              if (n_lanes >= 16)
+                for (unsigned int i = 0; i < 8; ++i)
+                  result_ptr[i] = result_ptr[i] + result_ptr[i + 8];
+              if (n_lanes >= 8)
+                for (unsigned int i = 0; i < 4; ++i)
+                  result_ptr[i] = result_ptr[i] + result_ptr[i + 4];
+              if (n_lanes >= 4)
+                for (unsigned int i = 0; i < 2; ++i)
+                  result_ptr[i] = result_ptr[i] + result_ptr[i + 2];
+              result = result_ptr[0] + result_ptr[1];
+            }
+          else
+            {
+              // Without vectorization, we do not know the exact bounds, so we
+              // need to continue the variable-length pairwise summation loop
+              // from above
+              for (; j + 1 < n_chunks; j += 2, ++n_chunks)
+                outer_results[n_chunks] =
+                  outer_results[j] + outer_results[j + 1];
+
+              AssertIndexRange(n_chunks,
+                               2 * vector_accumulation_recursion_threshold + 1);
+              Assert(n_chunks > 0, ExcInternalError());
+              result = outer_results[n_chunks - 1];
+            }
         }
       else
         {
@@ -1091,14 +1117,13 @@ namespace internal
     }
 
 
-    // this is the inner working routine for the accumulation loops
-    // below. This is the standard case where the loop bounds are known. We
-    // pulled this function out of the regular accumulate routine because we
-    // might do this thing vectorized (see specialized function below). As
-    // opposed to the vector add functions above, we here pass the functor
-    // 'op' by value, because we cannot create a copy of the scalar inline,
-    // and instead make sure that the numbers get local (and thus definitely
-    // not aliased) for the compiler
+    // this is the inner working routine for the accumulation loops below. We
+    // pulled this part out of the regular accumulate routine because we might
+    // do this thing vectorized (see specialized function below; this is the
+    // un-vectorized version). As opposed to the vector add functions above,
+    // we here pass the functor 'op' by value, because we cannot create a copy
+    // of the scalar inline, and instead make sure that the numbers get local
+    // (and thus definitely not aliased) for the compiler
     template <typename Operation, typename ResultType>
     size_type
     do_accumulate(const Operation op,
@@ -1176,11 +1201,11 @@ namespace internal
 
 
     // this is the inner working routine for the accumulation loops
-    // below. This is the specialized case where the loop bounds are known and
-    // where we can vectorize. In that case, we request the 'do_vectorized'
-    // routine of the operation instead of the regular one which does several
-    // operations at once. As above, pass in the functor by value to create a
-    // local copy of the variables in the function (if there are any).
+    // below. This is the specialized case where we can vectorize. We request
+    // the 'do_vectorized' routine of the operation instead of the regular one
+    // which does several operations at once. As above, pass in the functor by
+    // value to create a local copy of the scalar factors in the function (if
+    // there are any).
     template <typename Operation, typename Number>
     size_type
     do_accumulate(const Operation op,
