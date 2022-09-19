@@ -37,45 +37,42 @@ namespace internal
   {
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    select_vmult(Number *                                 dst,
-                 const Number *                           src,
-                 AlignedVector<Number> &                  tmp,
-                 const std::array<Table<2, Number>, dim> &mass_matrix,
-                 const std::array<Table<2, Number>, dim> &derivative_matrix)
+    select_vmult(Number *                               dst,
+                 const Number *                         src,
+                 AlignedVector<Number> &                tmp,
+                 const unsigned int                     n_rows_1d,
+                 const std::array<const Number *, dim> &mass_matrix,
+                 const std::array<const Number *, dim> &derivative_matrix)
     {
-      const int n_rows_1d = mass_matrix[0].n_rows();
-
       if (n_rows_1d_templated == n_rows_1d)
         vmult<n_rows_1d_templated>(
-          dst, src, tmp, mass_matrix, derivative_matrix);
+          dst, src, tmp, n_rows_1d, mass_matrix, derivative_matrix);
       else if (n_rows_1d_templated < FDM_DEGREE_MAX)
         select_vmult<std::min(n_rows_1d_templated + 1, FDM_DEGREE_MAX)>(
-          dst, src, tmp, mass_matrix, derivative_matrix);
+          dst, src, tmp, n_rows_1d, mass_matrix, derivative_matrix);
       else
-        vmult<0>(dst, src, tmp, mass_matrix, derivative_matrix);
+        vmult<0>(dst, src, tmp, n_rows_1d, mass_matrix, derivative_matrix);
     }
 
 
 
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    select_apply_inverse(
-      Number *                                      dst,
-      const Number *                                src,
-      AlignedVector<Number> &                       tmp,
-      const std::array<Table<2, Number>, dim> &     eigenvectors,
-      const std::array<AlignedVector<Number>, dim> &eigenvalues)
+    select_apply_inverse(Number *                               dst,
+                         const Number *                         src,
+                         AlignedVector<Number> &                tmp,
+                         const unsigned int                     n_rows_1d,
+                         const std::array<const Number *, dim> &eigenvectors,
+                         const std::array<const Number *, dim> &eigenvalues)
     {
-      const int n_rows_1d = eigenvectors[0].n_rows();
-
       if (n_rows_1d_templated == n_rows_1d)
         apply_inverse<n_rows_1d_templated>(
-          dst, src, tmp, eigenvectors, eigenvalues);
+          dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
       else if (n_rows_1d_templated < FDM_DEGREE_MAX)
         select_apply_inverse<std::min(n_rows_1d_templated + 1, FDM_DEGREE_MAX)>(
-          dst, src, tmp, eigenvectors, eigenvalues);
+          dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
       else
-        apply_inverse<0>(dst, src, tmp, eigenvectors, eigenvalues);
+        apply_inverse<0>(dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
     }
   } // namespace TensorProductMatrixSymmetricSum
 } // namespace internal
