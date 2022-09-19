@@ -202,20 +202,6 @@ class XDMFEntry;
  * writing the section headers and the new output stream class for writing a
  * single mesh object.
  *
- * <h3>Credits</h3>
- * <ul>
- *
- * <li>EPS output based on an earlier implementation by Stefan Nauber for the
- * old DataOut class
- *
- * <li>Povray output by Thomas Richter
- *
- * <li>Tecplot output by Benjamin Shelton Kirk
- *
- * <li>Lagrange VTK output by Alexander Grayver
- *
- * </ul>
- *
  * @ingroup output
  */
 namespace DataOutBase
