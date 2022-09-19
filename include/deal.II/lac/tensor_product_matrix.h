@@ -182,9 +182,26 @@ public:
    * described in the main documentation of TensorProductMatrixSymmetricSum.
    * This function is operating on ArrayView to allow checks of
    * array bounds with respect to @p dst and @p src.
+   *
+   * @warning This function works on an internal temporal array, leading to
+   * increased memory consumption if many instances of this class are created,
+   * e.g., a different object on every cell with different underlying
+   * coefficients each. Furthermore, only one thread runs this function at a
+   * time (ensured internally with a mutex). If these two limitations are an
+   * issue, please consider the other version of this function.
    */
   void
   vmult(const ArrayView<Number> &dst, const ArrayView<const Number> &src) const;
+
+  /**
+   * Same as above but letting the user provide a user-owned temporary array,
+   * resolving the two issues described above. This array is resized
+   * internally to the needed size.
+   */
+  void
+  vmult(const ArrayView<Number> &      dst,
+        const ArrayView<const Number> &src,
+        AlignedVector<Number> &        tmp) const;
 
   /**
    * Implements a matrix-vector product with the underlying matrix as
@@ -195,16 +212,16 @@ public:
    * @warning This function works on an internal temporal array, leading to
    * increased memory consumption if many instances of this class are created,
    * e.g., a different object on every cell with different underlying
-   * coefficients each. Furthermore, only one thread run this function at once
-   * (ensured internally with a mutex). If these two limitations are an issue,
-   * please consider the other version of this function.
+   * coefficients each. Furthermore, only one thread runs this function at a
+   * time (ensured internally with a mutex). If these two limitations are an
+   * issue, please consider the other version of this function.
    */
   void
   apply_inverse(const ArrayView<Number> &      dst,
                 const ArrayView<const Number> &src) const;
 
   /**
-   * Same as above but the user can provide a user-owned temporal array,
+   * Same as above but letting the user provide a user-owned temporary array,
    * resolving the two issues described above. This array is resized
    * internally to the needed size.
    */
@@ -490,13 +507,16 @@ namespace internal
 
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    vmult(Number *                                 dst,
-          const Number *                           src,
-          AlignedVector<Number> &                  tmp,
-          const std::array<Table<2, Number>, dim> &mass_matrix,
-          const std::array<Table<2, Number>, dim> &derivative_matrix)
+    vmult(Number *                               dst,
+          const Number *                         src,
+          AlignedVector<Number> &                tmp,
+          const unsigned int                     n_rows_1d_non_templated,
+          const std::array<const Number *, dim> &mass_matrix,
+          const std::array<const Number *, dim> &derivative_matrix)
     {
-      const unsigned int n_rows_1d = mass_matrix[0].n_rows();
+      const unsigned int n_rows_1d = n_rows_1d_templated == 0 ?
+                                       n_rows_1d_non_templated :
+                                       n_rows_1d_templated;
       const unsigned int n         = Utilities::fixed_power<dim>(n_rows_1d);
 
       tmp.resize_fast(n * 2);
@@ -511,16 +531,16 @@ namespace internal
 
       if (dim == 1)
         {
-          const Number *A = &derivative_matrix[0](0, 0);
+          const Number *A = derivative_matrix[0];
           eval.template apply<0, false, false>(A, src, dst);
         }
 
       else if (dim == 2)
         {
-          const Number *A0 = &derivative_matrix[0](0, 0);
-          const Number *M0 = &mass_matrix[0](0, 0);
-          const Number *A1 = &derivative_matrix[1](0, 0);
-          const Number *M1 = &mass_matrix[1](0, 0);
+          const Number *A0 = derivative_matrix[0];
+          const Number *M0 = mass_matrix[0];
+          const Number *A1 = derivative_matrix[1];
+          const Number *M1 = mass_matrix[1];
           eval.template apply<0, false, false>(M0, src, t);
           eval.template apply<1, false, false>(A1, t, dst);
           eval.template apply<0, false, false>(A0, src, t);
@@ -529,12 +549,12 @@ namespace internal
 
       else if (dim == 3)
         {
-          const Number *A0 = &derivative_matrix[0](0, 0);
-          const Number *M0 = &mass_matrix[0](0, 0);
-          const Number *A1 = &derivative_matrix[1](0, 0);
-          const Number *M1 = &mass_matrix[1](0, 0);
-          const Number *A2 = &derivative_matrix[2](0, 0);
-          const Number *M2 = &mass_matrix[2](0, 0);
+          const Number *A0 = derivative_matrix[0];
+          const Number *M0 = mass_matrix[0];
+          const Number *A1 = derivative_matrix[1];
+          const Number *M1 = mass_matrix[1];
+          const Number *A2 = derivative_matrix[2];
+          const Number *M2 = mass_matrix[2];
           eval.template apply<0, false, false>(M0, src, t + n);
           eval.template apply<1, false, false>(M1, t + n, t);
           eval.template apply<2, false, false>(A2, t, dst);
@@ -552,13 +572,16 @@ namespace internal
 
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    apply_inverse(Number *                                      dst,
-                  const Number *                                src,
-                  AlignedVector<Number> &                       tmp,
-                  const std::array<Table<2, Number>, dim> &     eigenvectors,
-                  const std::array<AlignedVector<Number>, dim> &eigenvalues)
+    apply_inverse(Number *               dst,
+                  const Number *         src,
+                  AlignedVector<Number> &tmp,
+                  const unsigned int     n_rows_1d_non_templated,
+                  const std::array<const Number *, dim> &eigenvectors,
+                  const std::array<const Number *, dim> &eigenvalues)
     {
-      const unsigned int n_rows_1d = eigenvectors[0].n_rows();
+      const unsigned int n_rows_1d = n_rows_1d_templated == 0 ?
+                                       n_rows_1d_non_templated :
+                                       n_rows_1d_templated;
       const unsigned int n         = Utilities::fixed_power<dim>(n_rows_1d);
 
       tmp.resize_fast(n);
@@ -578,7 +601,7 @@ namespace internal
       //       rows correspond to dofs whereas columns to eigenvalue indices!
       if (dim == 1)
         {
-          const Number *S = &eigenvectors[0](0, 0);
+          const Number *S = eigenvectors[0];
           eval.template apply<0, true, false>(S, src, t);
           for (unsigned int i = 0; i < n_rows_1d; ++i)
             t[i] /= eigenvalues[0][i];
@@ -587,8 +610,8 @@ namespace internal
 
       else if (dim == 2)
         {
-          const Number *S0 = &(eigenvectors[0](0, 0));
-          const Number *S1 = &(eigenvectors[1](0, 0));
+          const Number *S0 = eigenvectors[0];
+          const Number *S1 = eigenvectors[1];
           eval.template apply<0, true, false>(S0, src, t);
           eval.template apply<1, true, false>(S1, t, dst);
           for (unsigned int i1 = 0, c = 0; i1 < n_rows_1d; ++i1)
@@ -600,9 +623,9 @@ namespace internal
 
       else if (dim == 3)
         {
-          const Number *S0 = &eigenvectors[0](0, 0);
-          const Number *S1 = &eigenvectors[1](0, 0);
-          const Number *S2 = &eigenvectors[2](0, 0);
+          const Number *S0 = eigenvectors[0];
+          const Number *S1 = eigenvectors[1];
+          const Number *S2 = eigenvectors[2];
           eval.template apply<0, true, false>(S0, src, t);
           eval.template apply<1, true, false>(S1, t, dst);
           eval.template apply<2, true, false>(S2, dst, t);
@@ -624,22 +647,23 @@ namespace internal
 
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    select_vmult(Number *                                 dst,
-                 const Number *                           src,
-                 AlignedVector<Number> &                  tmp,
-                 const std::array<Table<2, Number>, dim> &mass_matrix,
-                 const std::array<Table<2, Number>, dim> &derivative_matrix);
+    select_vmult(Number *                               dst,
+                 const Number *                         src,
+                 AlignedVector<Number> &                tmp,
+                 const unsigned int                     n_rows_1d,
+                 const std::array<const Number *, dim> &mass_matrix,
+                 const std::array<const Number *, dim> &derivative_matrix);
 
 
 
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    select_apply_inverse(
-      Number *                                      dst,
-      const Number *                                src,
-      AlignedVector<Number> &                       tmp,
-      const std::array<Table<2, Number>, dim> &     eigenvectors,
-      const std::array<AlignedVector<Number>, dim> &eigenvalues);
+    select_apply_inverse(Number *                               dst,
+                         const Number *                         src,
+                         AlignedVector<Number> &                tmp,
+                         const unsigned int                     n_rows_1d,
+                         const std::array<const Number *, dim> &eigenvectors,
+                         const std::array<const Number *, dim> &eigenvalues);
   } // namespace TensorProductMatrixSymmetricSum
 } // namespace internal
 
@@ -674,20 +698,51 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::vmult(
   const ArrayView<Number> &      dst_view,
   const ArrayView<const Number> &src_view) const
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  this->vmult(dst_view, src_view, this->tmp_array);
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+inline void
+TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::vmult(
+  const ArrayView<Number> &      dst_view,
+  const ArrayView<const Number> &src_view,
+  AlignedVector<Number> &        tmp_array) const
+{
   AssertDimension(dst_view.size(), this->m());
   AssertDimension(src_view.size(), this->n());
-  std::lock_guard<std::mutex> lock(this->mutex);
 
   Number *      dst = dst_view.begin();
   const Number *src = src_view.begin();
 
+  std::array<const Number *, dim> mass_matrix, derivative_matrix;
+
+  for (unsigned int d = 0; d < dim; ++d)
+    {
+      mass_matrix[d]       = &this->mass_matrix[d](0, 0);
+      derivative_matrix[d] = &this->derivative_matrix[d](0, 0);
+    }
+
+  const unsigned int n_rows_1d_non_templated = this->mass_matrix[0].n_rows();
+
   if (n_rows_1d != -1)
     internal::TensorProductMatrixSymmetricSum::vmult<
-      n_rows_1d == -1 ? 0 : n_rows_1d>(
-      dst, src, tmp_array, mass_matrix, derivative_matrix);
+      n_rows_1d == -1 ? 0 : n_rows_1d>(dst,
+                                       src,
+                                       tmp_array,
+                                       n_rows_1d_non_templated,
+                                       mass_matrix,
+                                       derivative_matrix);
   else
     internal::TensorProductMatrixSymmetricSum::select_vmult<1>(
-      dst, src, tmp_array, mass_matrix, derivative_matrix);
+      dst,
+      src,
+      tmp_array,
+      n_rows_1d_non_templated,
+      mass_matrix,
+      derivative_matrix);
 }
 
 
@@ -717,13 +772,23 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::apply_inverse(
   Number *      dst = dst_view.begin();
   const Number *src = src_view.begin();
 
+  std::array<const Number *, dim> eigenvectors, eigenvalues;
+
+  for (unsigned int d = 0; d < dim; ++d)
+    {
+      eigenvectors[d] = &this->eigenvectors[d](0, 0);
+      eigenvalues[d]  = this->eigenvalues[d].data();
+    }
+
+  const unsigned int n_rows_1d_non_templated = this->mass_matrix[0].n_rows();
+
   if (n_rows_1d != -1)
     internal::TensorProductMatrixSymmetricSum::apply_inverse<
       n_rows_1d == -1 ? 0 : n_rows_1d>(
-      dst, src, tmp_array, eigenvectors, eigenvalues);
+      dst, src, tmp_array, n_rows_1d_non_templated, eigenvectors, eigenvalues);
   else
     internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
-      dst, src, tmp_array, eigenvectors, eigenvalues);
+      dst, src, tmp_array, n_rows_1d_non_templated, eigenvectors, eigenvalues);
 }
 
 
