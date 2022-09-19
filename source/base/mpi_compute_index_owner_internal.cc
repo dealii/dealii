@@ -486,7 +486,7 @@ namespace Utilities
                                       types::global_dof_index>> &buffer_recv,
           std::vector<unsigned int> &                            request_buffer)
         {
-          unsigned int owner_index = 0;
+          unsigned int owner_index_guess = 0;
           for (const auto &interval : buffer_recv)
             for (auto i = interval.first; i < interval.second; ++i)
               {
@@ -495,7 +495,10 @@ namespace Utilities
                 request_buffer.push_back(actual_owner);
 
                 if (track_index_requests)
-                  append_index_origin(i, owner_index, other_rank);
+                  append_index_origin(i - dict.local_range.first,
+                                      other_rank,
+                                      actual_owner,
+                                      owner_index_guess);
               }
         }
 
@@ -506,50 +509,34 @@ namespace Utilities
         {
           std::vector<unsigned int> targets;
 
-          // 1) collect relevant processes and process local dict entries
-          {
-            unsigned int index       = 0;
-            unsigned int owner_index = 0;
-            for (auto i : indices_to_look_up)
-              {
-                unsigned int other_rank = dict.dof_to_dict_rank(i);
-                if (other_rank == my_rank)
-                  {
-                    owning_ranks[index] =
-                      dict.actually_owning_ranks[i - dict.local_range.first];
-                    if (track_index_requests)
-                      append_index_origin(i, owner_index, my_rank);
-                  }
-                else if (targets.empty() || targets.back() != other_rank)
-                  targets.push_back(other_rank);
-                index++;
-              }
-          }
-
-
-          for (auto i : targets)
+          indices_to_look_up_by_dict_rank.clear();
+          unsigned int index             = 0;
+          unsigned int owner_index_guess = 0;
+          for (auto i : indices_to_look_up)
             {
-              recv_indices[i]                    = {};
-              indices_to_look_up_by_dict_rank[i] = {};
+              unsigned int other_rank = dict.dof_to_dict_rank(i);
+              if (other_rank == my_rank)
+                {
+                  owning_ranks[index] =
+                    dict.actually_owning_ranks[i - dict.local_range.first];
+                  if (track_index_requests)
+                    append_index_origin(i - dict.local_range.first,
+                                        my_rank,
+                                        owning_ranks[index],
+                                        owner_index_guess);
+                }
+              else
+                {
+                  if (targets.empty() || targets.back() != other_rank)
+                    targets.push_back(other_rank);
+                  auto &indices = indices_to_look_up_by_dict_rank[other_rank];
+                  indices.first.push_back(i);
+                  indices.second.push_back(index);
+                }
+              index++;
             }
 
-          // 3) collect indices for each process
-          {
-            unsigned int index = 0;
-            for (auto i : indices_to_look_up)
-              {
-                unsigned int other_rank = dict.dof_to_dict_rank(i);
-                if (other_rank != my_rank)
-                  {
-                    recv_indices[other_rank].push_back(index);
-                    indices_to_look_up_by_dict_rank[other_rank].push_back(i);
-                  }
-                index++;
-              }
-          }
-
-          Assert(targets.size() == recv_indices.size() &&
-                   targets.size() == indices_to_look_up_by_dict_rank.size(),
+          Assert(targets.size() == indices_to_look_up_by_dict_rank.size(),
                  ExcMessage("Size does not match!"));
 
           return targets;
@@ -564,7 +551,7 @@ namespace Utilities
                                 types::global_dof_index>> &send_buffer)
         {
           // create index set and compress data to be sent
-          auto &   indices_i = indices_to_look_up_by_dict_rank[other_rank];
+          auto &indices_i = indices_to_look_up_by_dict_rank[other_rank].first;
           IndexSet is(dict.size);
           is.add_indices(indices_i.begin(), indices_i.end());
           is.compress();
@@ -582,13 +569,11 @@ namespace Utilities
           const unsigned int               other_rank,
           const std::vector<unsigned int> &recv_buffer)
         {
-          Assert(recv_buffer.size() == recv_indices[other_rank].size(),
-                 ExcInternalError());
-          Assert(recv_indices[other_rank].size() == recv_buffer.size(),
-                 ExcMessage("Sizes do not match!"));
-
-          for (unsigned int j = 0; j < recv_indices[other_rank].size(); ++j)
-            owning_ranks[recv_indices[other_rank][j]] = recv_buffer[j];
+          const auto &recv_indices =
+            indices_to_look_up_by_dict_rank[other_rank].second;
+          AssertDimension(recv_indices.size(), recv_buffer.size());
+          for (unsigned int j = 0; j < recv_indices.size(); ++j)
+            owning_ranks[recv_indices[j]] = recv_buffer[j];
         }
 
 
@@ -752,30 +737,29 @@ namespace Utilities
 
         void
         ConsensusAlgorithmsPayload::append_index_origin(
-          const types::global_dof_index index,
-          unsigned int &                owner_index,
-          const unsigned int            rank_of_request)
+          const unsigned int index_within_dict,
+          const unsigned int rank_of_request,
+          const unsigned int rank_of_owner,
+          unsigned int &     owner_index_guess)
         {
           // remember who requested which index. We want to use an
           // std::vector with simple addressing, via a good guess from the
           // preceding index, rather than std::map, because this is an inner
           // loop and it avoids the map lookup in every iteration
-          const unsigned int rank_of_owner =
-            dict.actually_owning_ranks[index - dict.local_range.first];
-          owner_index = dict.get_owning_rank_index(rank_of_owner, owner_index);
-          if (requesters[owner_index].empty() ||
-              requesters[owner_index].back().first != rank_of_request)
-            requesters[owner_index].emplace_back(
+          owner_index_guess =
+            dict.get_owning_rank_index(rank_of_owner, owner_index_guess);
+
+          auto &request = requesters[owner_index_guess];
+          if (request.empty() || request.back().first != rank_of_request)
+            request.emplace_back(
               rank_of_request,
               std::vector<std::pair<unsigned int, unsigned int>>());
-          if (requesters[owner_index].back().second.empty() ||
-              requesters[owner_index].back().second.back().second !=
-                index - dict.local_range.first)
-            requesters[owner_index].back().second.emplace_back(
-              index - dict.local_range.first,
-              index - dict.local_range.first + 1);
+
+          auto &intervals = request.back().second;
+          if (intervals.empty() || intervals.back().second != index_within_dict)
+            intervals.emplace_back(index_within_dict, index_within_dict + 1);
           else
-            ++requesters[owner_index].back().second.back().second;
+            ++intervals.back().second;
         }
       } // namespace ComputeIndexOwner
     }   // namespace internal
