@@ -25,6 +25,9 @@
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_vector.h>
 
+#  include <petscis.h>
+#  include <petscistypes.h>
+
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -499,6 +502,24 @@ namespace PETScWrappers
       reinit(const SparseMatrix &other);
 
       /**
+       * Create a matrix where the size of the IndexSets determine the
+       * global number of rows and columns and the entries of the IndexSet
+       * give the rows and columns for the calling processor. Note that only
+       * ascending, 1:1 IndexSets are supported. The additional call to the
+       * local to global mappings is required to create the matrix of type
+       * IS (see DoFTools::extract_locally_active_dofs).
+       * This is required by the BDDC preconditioner.
+       */
+      template <typename SparsityPatternType>
+      void
+      reinit(const IndexSet &           local_rows,
+             const IndexSet &           local_active_rows,
+             const IndexSet &           local_columns,
+             const IndexSet &           local_active_columns,
+             const SparsityPatternType &sparsity_pattern,
+             const MPI_Comm &           communicator);
+
+      /**
        * Return a reference to the MPI communicator object in use with this
        * matrix.
        */
@@ -611,6 +632,18 @@ namespace PETScWrappers
       void
       do_reinit(const IndexSet &           local_rows,
                 const IndexSet &           local_columns,
+                const SparsityPatternType &sparsity_pattern);
+
+      /**
+       * Same as previous functions, but here we consider active dofs for
+       * matrices of IS type.
+       */
+      template <typename SparsityPatternType>
+      void
+      do_reinit(const IndexSet &           local_rows,
+                const IndexSet &           local_active_rows,
+                const IndexSet &           local_columns,
+                const IndexSet &           local_active_columns,
                 const SparsityPatternType &sparsity_pattern);
 
       // To allow calling protected prepare_add() and prepare_set().

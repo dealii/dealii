@@ -850,7 +850,138 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
+  /* ----------------- PreconditionBDDC -------------------- */
+
+  template <int dim>
+  PreconditionBDDC<dim>::AdditionalData::AdditionalData(
+    const bool                    use_vertices,
+    const bool                    use_edges,
+    const bool                    use_faces,
+    const bool                    symmetric,
+    const std::vector<Point<dim>> coords)
+    : use_vertices(use_vertices)
+    , use_edges(use_edges)
+    , use_faces(use_faces)
+    , symmetric(symmetric)
+    , coords(coords)
+  {}
+
+  template <int dim>
+  PreconditionBDDC<dim>::PreconditionBDDC(
+    const MPI_Comm        comm,
+    const AdditionalData &additional_data_)
+  {
+    additional_data = additional_data_;
+
+    PetscErrorCode ierr = PCCreate(comm, &pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    initialize();
+  }
+
+  template <int dim>
+  PreconditionBDDC<dim>::PreconditionBDDC(const MatrixBase &    matrix,
+                                          const AdditionalData &additional_data)
+  {
+    initialize(matrix, additional_data);
+  }
+
+
+  template <int dim>
+  void
+  PreconditionBDDC<dim>::initialize()
+  {
+#  if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
+    PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCBDDC));
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // The matrix must be of IS type. We check for this to avoid the PETSc error
+    // in order to suggest the correct matrix reinit method.
+    {
+      MatType current_type;
+      ierr = MatGetType(matrix, &current_type);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertThrow(
+        strcmp(current_type, MATIS) == 0,
+        ExcMessage(
+          "Matrix must be of IS type. For this, the variant of reinit that includes the active dofs must be used."));
+    }
+
+
+    std::stringstream ssStream;
+
+    if (additional_data.use_vertices)
+      set_option_value("-pc_bddc_use_vertices", "true");
+    else
+      set_option_value("-pc_bddc_use_vertices", "false");
+    if (additional_data.use_edges)
+      set_option_value("-pc_bddc_use_edges", "true");
+    else
+      set_option_value("-pc_bddc_use_edges", "false");
+    if (additional_data.use_faces)
+      set_option_value("-pc_bddc_use_faces", "true");
+    else
+      set_option_value("-pc_bddc_use_faces", "false");
+    if (additional_data.symmetric)
+      set_option_value("-pc_bddc_symmetric", "true");
+    else
+      set_option_value("-pc_bddc_symmetric", "false");
+    if (additional_data.coords.size() > 0)
+      {
+        set_option_value("-pc_bddc_corner_selection", "true");
+        // Convert coords vector to PETSc data array
+        std::vector<PetscReal> coords_petsc(additional_data.coords.size() *
+                                            dim);
+        for (unsigned int i = 0, j = 0; i < additional_data.coords.size(); ++i)
+          {
+            for (j = 0; j < dim; ++j)
+              coords_petsc[dim * i + j] = additional_data.coords[i][j];
+          }
+
+        ierr = PCSetCoordinates(pc,
+                                dim,
+                                additional_data.coords.size(),
+                                coords_petsc.data());
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+    else
+      {
+        set_option_value("-pc_bddc_corner_selection", "false");
+        ierr = PCSetCoordinates(pc, 0, 0, NULL);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+
+
+    ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+#  else
+    AssertThrow(
+      false, ExcMessage("BDDC preconditioner requires PETSc 3.10.0 or newer"));
+#  endif
+  }
+
+  template <int dim>
+  void
+  PreconditionBDDC<dim>::initialize(const MatrixBase &    matrix_,
+                                    const AdditionalData &additional_data_)
+  {
+    clear();
+
+    matrix          = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+
+    create_pc();
+    initialize();
+
+    PetscErrorCode ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
+
+
 } // namespace PETScWrappers
+
+template class PETScWrappers::PreconditionBDDC<2>;
+template class PETScWrappers::PreconditionBDDC<3>;
 
 DEAL_II_NAMESPACE_CLOSE
 
