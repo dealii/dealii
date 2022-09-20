@@ -5359,13 +5359,49 @@ namespace internal
   template <typename T>
   struct VectorizedArrayTrait
   {
-    using value_type = T;
+    using value_type                   = T;
+    static constexpr std::size_t width = 1;
+
+    static T &
+    get(T &value, unsigned int c)
+    {
+      AssertDimension(c, 0);
+      (void)c;
+
+      return value;
+    }
+
+    static const T &
+    get(const T &value, unsigned int c)
+    {
+      AssertDimension(c, 0);
+      (void)c;
+
+      return value;
+    }
   };
 
-  template <typename T, std::size_t width>
-  struct VectorizedArrayTrait<VectorizedArray<T, width>>
+  template <typename T, std::size_t width_>
+  struct VectorizedArrayTrait<VectorizedArray<T, width_>>
   {
-    using value_type = T;
+    using value_type                   = T;
+    static constexpr std::size_t width = width_;
+
+    static T &
+    get(VectorizedArray<T, width_> &values, unsigned int c)
+    {
+      AssertIndexRange(c, width_);
+
+      return values[c];
+    }
+
+    static const T &
+    get(const VectorizedArray<T, width_> &values, unsigned int c)
+    {
+      AssertIndexRange(c, width_);
+
+      return values[c];
+    }
   };
 } // namespace internal
 
