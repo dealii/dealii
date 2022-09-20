@@ -208,7 +208,10 @@ namespace DataOutBase
 {
   /**
    * An enum for different levels of compression used in several places
-   * to determine zlib compression levels.
+   * to determine zlib compression levels for binary output. At some
+   * places, it is possible to output the data also as plain text as
+   * an alternative, which is convenient for debugging. We use
+   * this flag to indicate such an output as well.
    */
   enum class CompressionLevel
   {
@@ -229,7 +232,11 @@ namespace DataOutBase
      * Use the default compression algorithm. This is a compromise between
      * speed and file size.
      */
-    default_compression
+    default_compression,
+    /**
+     * Output as plain text (ASCII) if available.
+     */
+    plain_text
   };
 
 
