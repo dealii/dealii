@@ -187,7 +187,9 @@ public:
    * Return an enumerator of type NeighborType.
    */
   NeighborType
-  get_neighbor_type(const BoundingBox<spacedim, Number> &other_bbox) const;
+  get_neighbor_type(
+    const BoundingBox<spacedim, Number> &other_bbox,
+    const double tolerance = std::numeric_limits<Number>::epsilon()) const;
 
   /**
    * Enlarge the current object so that it contains @p other_bbox .

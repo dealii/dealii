@@ -64,14 +64,15 @@ BoundingBox<spacedim, Number>::merge_with(
 template <int spacedim, typename Number>
 NeighborType
 BoundingBox<spacedim, Number>::get_neighbor_type(
-  const BoundingBox<spacedim, Number> &other_bbox) const
+  const BoundingBox<spacedim, Number> &other_bbox,
+  const double                         tolerance) const
 {
   if (spacedim == 1)
     {
       // In dimension 1 if the two bounding box are neighbors
       // we can merge them
-      if (this->point_inside(other_bbox.boundary_points.first) ||
-          this->point_inside(other_bbox.boundary_points.second))
+      if (this->point_inside(other_bbox.boundary_points.first, tolerance) ||
+          this->point_inside(other_bbox.boundary_points.second, tolerance))
         return NeighborType::mergeable_neighbors;
       return NeighborType::not_neighbors;
     }
@@ -86,10 +87,8 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
 
       // Step 1: testing if the boxes are close enough to intersect
       for (unsigned int d = 0; d < spacedim; ++d)
-        if (bbox1[0][d] * (1 - std::numeric_limits<Number>::epsilon()) >
-              bbox2[1][d] ||
-            bbox2[0][d] * (1 - std::numeric_limits<Number>::epsilon()) >
-              bbox1[1][d])
+        if (bbox1[0][d] * (1 - tolerance) > bbox2[1][d] ||
+            bbox2[0][d] * (1 - tolerance) > bbox1[1][d])
           return NeighborType::not_neighbors;
 
       // The boxes intersect: we need to understand now how they intersect.
@@ -106,9 +105,8 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
       int intersect_dim = spacedim;
       for (unsigned int d = 0; d < spacedim; ++d)
         if (std::abs(intersect_bbox_min[d] - intersect_bbox_max[d]) <=
-            std::numeric_limits<Number>::epsilon() *
-              (std::abs(intersect_bbox_min[d]) +
-               std::abs(intersect_bbox_max[d])))
+            tolerance * (std::abs(intersect_bbox_min[d]) +
+                         std::abs(intersect_bbox_max[d])))
           --intersect_dim;
 
       if (intersect_dim == 0 || intersect_dim == spacedim - 2)
@@ -121,12 +119,10 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
       for (unsigned int d = 0; d < spacedim; ++d)
         {
           if (std::abs(bbox2[0][d] - bbox1[0][d]) >
-              std::numeric_limits<double>::epsilon() *
-                (std::abs(bbox2[0][d]) + std::abs(bbox1[0][d])))
+              tolerance * (std::abs(bbox2[0][d]) + std::abs(bbox1[0][d])))
             ++not_align_1;
           if (std::abs(bbox1[1][d] - bbox2[1][d]) >
-              std::numeric_limits<double>::epsilon() *
-                (std::abs(bbox1[1][d]) + std::abs(bbox2[1][d])))
+              tolerance * (std::abs(bbox1[1][d]) + std::abs(bbox2[1][d])))
             ++not_align_2;
           if (not_align_1 != not_align_2)
             {
@@ -140,8 +136,8 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
 
       // Second: one box is contained/equal to the other
       if ((this->point_inside(bbox2[0]) && this->point_inside(bbox2[1])) ||
-          (other_bbox.point_inside(bbox1[0]) &&
-           other_bbox.point_inside(bbox1[1])))
+          (other_bbox.point_inside(bbox1[0], tolerance) &&
+           other_bbox.point_inside(bbox1[1], tolerance)))
         return NeighborType::mergeable_neighbors;
 
       // Degenerate and mergeable cases have been found, it remains:
