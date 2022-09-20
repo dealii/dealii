@@ -272,6 +272,210 @@ private:
 };
 
 
+
+namespace internal
+{
+  namespace TensorProductMatrixSymmetricSum
+  {
+    template <typename Number>
+    struct MatrixPairComparator
+    {
+      using MatrixPairType = std::pair<Table<2, Number>, Table<2, Number>>;
+
+      bool
+      operator()(const MatrixPairType &left, const MatrixPairType &right) const
+      {
+        const auto &M_0 = left.first;
+        const auto &K_0 = left.second;
+        const auto &M_1 = right.first;
+        const auto &K_1 = right.second;
+
+        const unsigned int n_lanes = Number::size();
+
+        std::array<bool, n_lanes> mask;
+
+        using NumberScalar = typename Number::value_type;
+
+        for (unsigned int v = 0; v < n_lanes; ++v)
+          {
+            NumberScalar a = 0.0;
+            NumberScalar b = 0.0;
+
+            for (unsigned int i = 0; i < M_0.size(0); ++i)
+              for (unsigned int j = 0; j < M_0.size(1); ++j)
+                {
+                  a += std::abs(M_0[i][j][v]);
+                  b += std::abs(M_1[i][j][v]);
+                }
+
+            mask[v] = (a != 0.0) && (b != 0.0);
+          }
+
+        const auto eps = std::pow<NumberScalar>(
+          static_cast<NumberScalar>(10.0),
+          static_cast<NumberScalar>(
+            std::log10(std::numeric_limits<NumberScalar>::epsilon()) / 2.0));
+
+        const auto less = [eps](const auto a, const auto b) -> bool {
+          return (b - a) > std::max(eps, std::abs(a + b) * eps);
+        };
+
+        const auto greater = [eps](const auto a, const auto b) -> bool {
+          return (a - b) > std::max(eps, std::abs(a + b) * eps);
+        };
+
+        for (unsigned int v = 0; v < n_lanes; ++v)
+          if (mask[v])
+            for (unsigned int i = 0; i < M_0.size(0); ++i)
+              for (unsigned int j = 0; j < M_0.size(1); ++j)
+                {
+                  if (less(M_0[i][j][v], M_1[i][j][v]))
+                    return true;
+                  else if (greater(M_0[i][j][v], M_1[i][j][v]))
+                    return false;
+                }
+
+        for (unsigned int v = 0; v < n_lanes; ++v)
+          if (mask[v])
+            for (unsigned int i = 0; i < K_0.size(0); ++i)
+              for (unsigned int j = 0; j < K_0.size(1); ++j)
+                {
+                  if (less(K_0[i][j][v], K_1[i][j][v]))
+                    return true;
+                  else if (greater(K_0[i][j][v], K_1[i][j][v]))
+                    return false;
+                }
+
+        return false;
+      }
+    };
+  } // namespace TensorProductMatrixSymmetricSum
+} // namespace internal
+
+
+
+/**
+ * A class similar to TensorProductMatrixSymmetricSum.
+ *
+ * The class TensorProductMatrixSymmetricSum stores a
+ * 1D mass matrix, 1D stiffness matrix, eigenvalues and eigenvectors
+ * for each direction. If one uses one TensorProductMatrixSymmetricSum
+ * instance for, e.g., each cell, these quantities are stored
+ * for each cell. There is no possibility to reuse quantities between
+ * TensorProductMatrixSymmetricSum instances even if the values of the
+ * internal data structures might be the same. This class targets the case
+ * of many TensorProductMatrixSymmetricSum instances, where some of them might
+ * possibly share the underlying 1D matrices and hence re-use the same data.
+ *
+ * This class is flexible and allows to interpret the parameter
+ * @p index arbitrarily. In the case of an element-centric patch
+ * smoother, the index might correspond to the cell index and,
+ * in the case of a vertex patch smoother, the index might
+ * correspond to the vertex index defining the vertex patch. If
+ * @p n_rows_1d is set to -1, the sizes of the mass matrices and
+ * the stiffness matrices can differ between cells, which might be
+ * useful if the class is used in the context of hp-refinement to
+ * construct a smoother.
+ */
+template <int dim, typename Number, int n_rows_1d = -1>
+class TensorProductMatrixSymmetricSumCollection
+{
+  using MatrixPairType = std::pair<Table<2, Number>, Table<2, Number>>;
+
+public:
+  /**
+   * Allocate memory. The parameter @p specifies the maximum value
+   * of the index used in invert() and apply_inverse().
+   */
+  void
+  reserve(const unsigned int size);
+
+  /**
+   * For a given @p index, attach the mass matrices @p Ms and
+   * stiffness matrices @p Ks to the stored data, looking out for
+   * compression possibilities.
+   */
+  void
+  insert(const unsigned int                       index,
+         const std::array<Table<2, Number>, dim> &Ms,
+         const std::array<Table<2, Number>, dim> &Ks);
+
+  /**
+   * Finalize setup. This function computes, e.g., the
+   * eigenvalues and the eigenvectors.
+   */
+  void
+  finalize();
+
+  /**
+   * Apply the inverse matrix for a given @p index.
+   */
+  void
+  apply_inverse(const unsigned int             index,
+                const ArrayView<Number> &      dst_in,
+                const ArrayView<const Number> &src_in,
+                AlignedVector<Number> &        tmp_array) const;
+
+  /**
+   * Return the memory consumption of this class in bytes.
+   */
+  std::size_t
+  memory_consumption() const;
+
+  /**
+   * Return the number of 1D matrices of each type stored internally.
+   * In the case that no compression could be performed, its value
+   * is the parameter passed to the function reserve() times the
+   * number of dimension. If compression could be performed, the
+   * value returned is less. In the optimal case (uniform Cartesian
+   * mesh), the value is one.
+   */
+  std::size_t
+  storage_size() const;
+
+private:
+  /**
+   * Container used during setup to determine the unique 1D
+   * matrices. The memory is freed during finalize().
+   */
+  std::map<
+    MatrixPairType,
+    unsigned int,
+    internal::TensorProductMatrixSymmetricSum::MatrixPairComparator<Number>>
+    cache;
+
+  /**
+   * Map from index to the storage position within vector_mass_matrix,
+   * vector_derivative_matrix, vector_eigenvectors, and
+   * vector_eigenvalues. If compression was not successful, this
+   * vector is empty, since the vectors can be access directly
+   * with the given index.
+   */
+  std::vector<unsigned int> indices;
+
+  /**
+   * Vector of 1D mass matrices.
+   */
+  std::vector<Table<2, Number>> vector_mass_matrix;
+
+  /**
+   * Vector of 1D derivative matrices.
+   */
+  std::vector<Table<2, Number>> vector_derivative_matrix;
+
+  /**
+   * Vector of eigenvectors.
+   */
+  std::vector<Table<2, Number>> vector_eigenvectors;
+
+  /**
+   * Vector of eigenvalues.
+   */
+  std::vector<AlignedVector<Number>> vector_eigenvalues;
+};
+
+
+
 /*----------------------- Inline functions ----------------------------------*/
 
 #ifndef DOXYGEN
@@ -834,6 +1038,154 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit(
                                                    this->derivative_matrix,
                                                    this->eigenvectors,
                                                    this->eigenvalues);
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+void
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::reserve(
+  const unsigned int size)
+{
+  indices.assign(size * dim, numbers::invalid_unsigned_int);
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+void
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::insert(
+  const unsigned int                       index,
+  const std::array<Table<2, Number>, dim> &Ms,
+  const std::array<Table<2, Number>, dim> &Ks)
+{
+  for (unsigned int d = 0; d < dim; ++d)
+    {
+      const MatrixPairType matrix(Ms[d], Ks[d]);
+
+      const auto ptr = cache.find(matrix);
+
+      if (ptr != cache.end())
+        indices[index * dim + d] = ptr->second;
+      else
+        {
+          indices[index * dim + d] = cache.size();
+          cache[matrix]            = cache.size();
+        }
+    }
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+void
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
+{
+  vector_mass_matrix.resize(cache.size());
+  vector_derivative_matrix.resize(cache.size());
+  vector_eigenvectors.resize(cache.size());
+  vector_eigenvalues.resize(cache.size());
+
+  const auto store = [&](const unsigned int    index,
+                         const MatrixPairType &M_and_K) {
+    std::array<Table<2, Number>, 1> mass_matrices;
+    mass_matrices[0] = M_and_K.first;
+
+    std::array<Table<2, Number>, 1> derivative_matrices;
+    derivative_matrices[0] = M_and_K.second;
+
+    std::array<Table<2, Number>, 1>      eigenvectors;
+    std::array<AlignedVector<Number>, 1> eigenvalues;
+
+    internal::TensorProductMatrixSymmetricSum::setup(mass_matrices,
+                                                     derivative_matrices,
+                                                     eigenvectors,
+                                                     eigenvalues);
+
+    vector_mass_matrix[index]       = M_and_K.first;
+    vector_derivative_matrix[index] = M_and_K.second;
+    vector_eigenvectors[index]      = eigenvectors[0];
+    vector_eigenvalues[index]       = eigenvalues[0];
+  };
+
+  if (cache.size() == indices.size())
+    {
+      std::map<unsigned int, MatrixPairType> inverted_cache;
+
+      for (const auto &i : cache)
+        inverted_cache[i.second] = i.first;
+
+      for (unsigned int i = 0; i < indices.size(); ++i)
+        store(i, inverted_cache[indices[i]]);
+
+      indices.clear();
+    }
+  else
+    {
+      for (const auto &i : cache)
+        store(i.second, i.first);
+    }
+
+  cache.clear();
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+void
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
+  apply_inverse(const unsigned int             index,
+                const ArrayView<Number> &      dst_in,
+                const ArrayView<const Number> &src_in,
+                AlignedVector<Number> &        tmp_array) const
+{
+  Number *      dst = dst_in.begin();
+  const Number *src = src_in.begin();
+
+  std::array<const Number *, dim> eigenvectors, eigenvalues;
+  unsigned int                    n_rows_1d_non_templated = 0;
+
+  for (unsigned int d = 0; d < dim; ++d)
+    {
+      const unsigned int translated_index =
+        (indices.size() > 0) ? indices[dim * index + d] : (dim * index + d);
+
+      eigenvectors[d]         = &vector_eigenvectors[translated_index](0, 0);
+      eigenvalues[d]          = vector_eigenvalues[translated_index].data();
+      n_rows_1d_non_templated = vector_eigenvalues[translated_index].size();
+    }
+
+  if (n_rows_1d != -1)
+    internal::TensorProductMatrixSymmetricSum::apply_inverse<
+      n_rows_1d == -1 ? 0 : n_rows_1d>(
+      dst, src, tmp_array, n_rows_1d_non_templated, eigenvectors, eigenvalues);
+  else
+    internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
+      dst, src, tmp_array, n_rows_1d_non_templated, eigenvectors, eigenvalues);
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+std::size_t
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
+  memory_consumption() const
+{
+  return MemoryConsumption::memory_consumption(indices) +
+         MemoryConsumption::memory_consumption(vector_mass_matrix) +
+         MemoryConsumption::memory_consumption(vector_derivative_matrix) +
+         MemoryConsumption::memory_consumption(vector_eigenvectors) +
+         MemoryConsumption::memory_consumption(vector_eigenvalues);
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+std::size_t
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
+  storage_size() const
+{
+  return vector_mass_matrix.size();
 }
 
 
