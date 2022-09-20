@@ -222,11 +222,11 @@ Manifold<3, 3>::normal_vector(const Triangulation<3, 3>::face_iterator &face,
       t2     = get_tangent_vector(p, vertices[second_index]);
       normal = cross_product_3d(t1, t2);
 
-      // if normal is zero, try some other combination of veritices
+      // if normal is zero, try some other combination of vertices
       if (normal.norm_square() < 1e4 * std::numeric_limits<double>::epsilon() *
                                    t1.norm_square() * t2.norm_square())
         {
-          // See if we have tested already all vertices
+          // See if we have tested all vertices already
           auto first_false =
             std::find(tested_vertices.begin(), tested_vertices.end(), false);
           if (first_false == tested_vertices.end())
