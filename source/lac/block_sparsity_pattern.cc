@@ -21,16 +21,16 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <class SparsityPatternBase>
-BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase()
+template <class SparsityPatternType>
+BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase()
   : rows(0)
   , columns(0)
 {}
 
 
 
-template <class SparsityPatternBase>
-BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase(
+template <class SparsityPatternType>
+BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const size_type n_block_rows,
   const size_type n_block_columns)
   : rows(0)
@@ -41,8 +41,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase(
 
 
 
-template <class SparsityPatternBase>
-BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase(
+template <class SparsityPatternType>
+BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const BlockSparsityPatternBase &s)
   : Subscriptor()
   , rows(0)
@@ -58,8 +58,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase(
 
 
 
-template <class SparsityPatternBase>
-BlockSparsityPatternBase<SparsityPatternBase>::~BlockSparsityPatternBase()
+template <class SparsityPatternType>
+BlockSparsityPatternBase<SparsityPatternType>::~BlockSparsityPatternBase()
 {
   // clear all memory
   try
@@ -72,9 +72,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::~BlockSparsityPatternBase()
 
 
 
-template <class SparsityPatternBase>
+template <class SparsityPatternType>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::reinit(
+BlockSparsityPatternBase<SparsityPatternType>::reinit(
   const size_type n_block_rows,
   const size_type n_block_columns)
 {
@@ -84,7 +84,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::reinit(
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
       {
-        SparsityPatternBase *sp = sub_objects[i][j];
+        SparsityPatternType *sp = sub_objects[i][j];
         sub_objects[i][j]       = nullptr;
         delete sp;
       }
@@ -99,16 +99,16 @@ BlockSparsityPatternBase<SparsityPatternBase>::reinit(
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
       {
-        SparsityPatternBase *p = new SparsityPatternBase;
+        SparsityPatternType *p = new SparsityPatternType;
         sub_objects[i][j]      = p;
       }
 }
 
 
-template <class SparsityPatternBase>
-BlockSparsityPatternBase<SparsityPatternBase> &
-BlockSparsityPatternBase<SparsityPatternBase>::operator=(
-  const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
+template <class SparsityPatternType>
+BlockSparsityPatternBase<SparsityPatternType> &
+BlockSparsityPatternBase<SparsityPatternType>::operator=(
+  const BlockSparsityPatternBase<SparsityPatternType> &bsp)
 {
   Assert(rows == bsp.rows, ExcDimensionMismatch(rows, bsp.rows));
   Assert(columns == bsp.columns, ExcDimensionMismatch(columns, bsp.columns));
@@ -124,9 +124,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::operator=(
 
 
 
-template <class SparsityPatternBase>
+template <class SparsityPatternType>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes()
+BlockSparsityPatternBase<SparsityPatternType>::collect_sizes()
 {
   std::vector<size_type> row_sizes(rows);
   std::vector<size_type> col_sizes(columns);
@@ -163,9 +163,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes()
 
 
 
-template <class SparsityPatternBase>
+template <class SparsityPatternType>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::compress()
+BlockSparsityPatternBase<SparsityPatternType>::compress()
 {
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
@@ -174,9 +174,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::compress()
 
 
 
-template <class SparsityPatternBase>
+template <class SparsityPatternType>
 bool
-BlockSparsityPatternBase<SparsityPatternBase>::empty() const
+BlockSparsityPatternBase<SparsityPatternType>::empty() const
 {
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
@@ -187,9 +187,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::empty() const
 
 
 
-template <class SparsityPatternBase>
-typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
-BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row() const
+template <class SparsityPatternType>
+typename BlockSparsityPatternBase<SparsityPatternType>::size_type
+BlockSparsityPatternBase<SparsityPatternType>::max_entries_per_row() const
 {
   size_type max_entries = 0;
   for (size_type block_row = 0; block_row < rows; ++block_row)
@@ -206,9 +206,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row() const
 
 
 
-template <class SparsityPatternBase>
-typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
-BlockSparsityPatternBase<SparsityPatternBase>::n_rows() const
+template <class SparsityPatternType>
+typename BlockSparsityPatternBase<SparsityPatternType>::size_type
+BlockSparsityPatternBase<SparsityPatternType>::n_rows() const
 {
   // only count in first column, since
   // all rows should be equivalent
@@ -220,9 +220,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_rows() const
 
 
 
-template <class SparsityPatternBase>
-typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
-BlockSparsityPatternBase<SparsityPatternBase>::n_cols() const
+template <class SparsityPatternType>
+typename BlockSparsityPatternBase<SparsityPatternType>::size_type
+BlockSparsityPatternBase<SparsityPatternType>::n_cols() const
 {
   // only count in first row, since
   // all rows should be equivalent
@@ -234,9 +234,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_cols() const
 
 
 
-template <class SparsityPatternBase>
-typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
-BlockSparsityPatternBase<SparsityPatternBase>::n_nonzero_elements() const
+template <class SparsityPatternType>
+typename BlockSparsityPatternBase<SparsityPatternType>::size_type
+BlockSparsityPatternBase<SparsityPatternType>::n_nonzero_elements() const
 {
   size_type count = 0;
   for (size_type i = 0; i < rows; ++i)
@@ -247,9 +247,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_nonzero_elements() const
 
 
 
-template <class SparsityPatternBase>
+template <class SparsityPatternType>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream &out) const
+BlockSparsityPatternBase<SparsityPatternType>::print(std::ostream &out) const
 {
   size_type k = 0;
   for (size_type ib = 0; ib < n_block_rows(); ++ib)
@@ -260,7 +260,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream &out) const
           size_type l = 0;
           for (size_type jb = 0; jb < n_block_cols(); ++jb)
             {
-              const SparsityPatternBase &b = block(ib, jb);
+              const SparsityPatternType &b = block(ib, jb);
               for (size_type j = 0; j < b.n_cols(); ++j)
                 if (b.exists(i, j))
                   out << ',' << l + j;
@@ -304,9 +304,9 @@ BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
 
 
 
-template <class SparsityPatternBase>
+template <class SparsityPatternType>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(
+BlockSparsityPatternBase<SparsityPatternType>::print_gnuplot(
   std::ostream &out) const
 {
   size_type k = 0;
@@ -317,7 +317,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(
           size_type l = 0;
           for (size_type jb = 0; jb < n_block_cols(); ++jb)
             {
-              const SparsityPatternBase &b = block(ib, jb);
+              const SparsityPatternType &b = block(ib, jb);
               for (size_type j = 0; j < b.n_cols(); ++j)
                 if (b.exists(i, j))
                   out << l + j << " " << -static_cast<signed int>(i + k)
@@ -331,9 +331,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(
 
 
 
-template <class SparsityPatternBase>
+template <class SparsityPatternType>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::print_svg(
+BlockSparsityPatternBase<SparsityPatternType>::print_svg(
   std::ostream &out) const
 {
   const unsigned int m = this->n_rows();
