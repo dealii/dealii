@@ -347,12 +347,12 @@ namespace internal
       struct CompressedCellData
       {
         CompressedCellData(const double expected_size)
-          : data(FPArrayComparator<Number, VectorizedArrayType>(expected_size))
+          : data(FPArrayComparator<VectorizedArrayType>(expected_size))
         {}
 
         std::map<Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>,
                  unsigned int,
-                 FPArrayComparator<Number, VectorizedArrayType>>
+                 FPArrayComparator<VectorizedArrayType>>
           data;
       };
 
@@ -1077,10 +1077,11 @@ namespace internal
         // first quadrature point on the cell - we use a relatively coarse
         // tolerance to account for some inaccuracies in the manifold
         // evaluation
-        const FPArrayComparator<double> comparator(1e4 * jacobian_size);
+        const FPArrayComparator<VectorizedArray<double>> comparator(
+          1e4 * jacobian_size);
         std::map<std::array<Tensor<2, dim>, dim + 1>,
                  unsigned int,
-                 FPArrayComparator<double>>
+                 FPArrayComparator<VectorizedArray<double>>>
           compressed_jacobians(comparator);
 
         unsigned int n_data_buckets = 0;
@@ -1503,8 +1504,7 @@ namespace internal
         // CompressedCellData) and add another factor of 512 to account for
         // some roundoff effects.
         CompressedFaceData(const Number jacobian_size)
-          : data(FPArrayComparator<Number, VectorizedArrayType>(512. /
-                                                                jacobian_size))
+          : data(FPArrayComparator<VectorizedArrayType>(512. / jacobian_size))
           , jacobian_size(jacobian_size)
         {}
 
@@ -1518,7 +1518,7 @@ namespace internal
                         2 * dim * dim + dim + 1,
                         Tensor<1, VectorizedArrayType::size(), Number>>,
                  unsigned int,
-                 FPArrayComparator<Number, VectorizedArrayType>>
+                 FPArrayComparator<VectorizedArrayType>>
           data;
 
         // Store the scaling factor
@@ -3351,17 +3351,17 @@ namespace internal
 
     /* ------------------------------------------------------------------ */
 
-    template <typename Number, typename VectorizedArrayType>
-    FPArrayComparator<Number, VectorizedArrayType>::FPArrayComparator(
+    template <typename VectorizedArrayType>
+    FPArrayComparator<VectorizedArrayType>::FPArrayComparator(
       const Number scaling)
       : tolerance(scaling * std::numeric_limits<double>::epsilon() * 1024.)
     {}
 
 
 
-    template <typename Number, typename VectorizedArrayType>
+    template <typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+    FPArrayComparator<VectorizedArrayType>::operator()(
       const std::vector<Number> &v1,
       const std::vector<Number> &v2) const
     {
@@ -3381,13 +3381,13 @@ namespace internal
 
 
 
-    template <typename Number, typename VectorizedArrayType>
+    template <typename VectorizedArrayType>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::operator()(
-      const Tensor<1, VectorizedArrayType::size(), Number> &t1,
-      const Tensor<1, VectorizedArrayType::size(), Number> &t2) const
+    FPArrayComparator<VectorizedArrayType>::operator()(
+      const Tensor<1, width, Number> &t1,
+      const Tensor<1, width, Number> &t2) const
     {
-      for (unsigned int k = 0; k < VectorizedArrayType::size(); ++k)
+      for (unsigned int k = 0; k < width; ++k)
         if (t1[k] < t2[k] - tolerance)
           return true;
         else if (t1[k] > t2[k] + tolerance)
@@ -3397,16 +3397,15 @@ namespace internal
 
 
 
-    template <typename Number, typename VectorizedArrayType>
+    template <typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::operator()(
-      const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t1,
-      const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t2)
-      const
+    FPArrayComparator<VectorizedArrayType>::operator()(
+      const Tensor<1, dim, Tensor<1, width, Number>> &t1,
+      const Tensor<1, dim, Tensor<1, width, Number>> &t2) const
     {
       for (unsigned int d = 0; d < dim; ++d)
-        for (unsigned int k = 0; k < VectorizedArrayType::size(); ++k)
+        for (unsigned int k = 0; k < width; ++k)
           if (t1[d][k] < t2[d][k] - tolerance)
             return true;
           else if (t1[d][k] > t2[d][k] + tolerance)
@@ -3416,17 +3415,16 @@ namespace internal
 
 
 
-    template <typename Number, typename VectorizedArrayType>
+    template <typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::operator()(
-      const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t1,
-      const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>> &t2)
-      const
+    FPArrayComparator<VectorizedArrayType>::operator()(
+      const Tensor<2, dim, Tensor<1, width, Number>> &t1,
+      const Tensor<2, dim, Tensor<1, width, Number>> &t2) const
     {
       for (unsigned int d = 0; d < dim; ++d)
         for (unsigned int e = 0; e < dim; ++e)
-          for (unsigned int k = 0; k < VectorizedArrayType::size(); ++k)
+          for (unsigned int k = 0; k < width; ++k)
             if (t1[d][e][k] < t2[d][e][k] - tolerance)
               return true;
             else if (t1[d][e][k] > t2[d][e][k] + tolerance)
@@ -3436,10 +3434,10 @@ namespace internal
 
 
 
-    template <typename Number, typename VectorizedArrayType>
+    template <typename VectorizedArrayType>
     template <int dim>
     bool
-    FPArrayComparator<Number, VectorizedArrayType>::operator()(
+    FPArrayComparator<VectorizedArrayType>::operator()(
       const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
       const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const
     {

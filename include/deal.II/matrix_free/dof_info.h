@@ -44,7 +44,7 @@ namespace internal
     template <int dim>
     class HangingNodes;
 
-    template <typename, typename>
+    template <typename>
     struct FPArrayComparator;
 
     struct TaskInfo;
@@ -111,7 +111,7 @@ namespace internal
       std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
       std::map<std::vector<Number>,
                types::global_dof_index,
-               FPArrayComparator<Number, VectorizedArray<Number>>>
+               FPArrayComparator<VectorizedArray<Number>>>
         constraints;
     };
 
