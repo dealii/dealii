@@ -1,0 +1,3 @@
+Removed: The base class of SparsityPattern, SparsityPatternBase, has been removed.
+<br>
+(David Wells, 2022/09/22)
