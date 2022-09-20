@@ -1,0 +1,5 @@
+Fixed: On very coarse meshes, with very particular manifolds, e.g., polar manifolds, 
+cylindrical manifolds, Manifold<3, 3>::normal_vector may return a zero vector.
+This is fixed now. 
+<br>
+(Timo Heister, Luca Heltai, Jiaqi Zhang, 2022/09/20)
