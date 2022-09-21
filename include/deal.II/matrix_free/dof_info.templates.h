@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/floating_point_comparator.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
 
@@ -28,7 +29,6 @@
 
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
-#include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/matrix_free/task_info.h>
 
 #include <limits>
@@ -41,7 +41,7 @@ namespace internal
   {
     template <typename Number>
     ConstraintValues<Number>::ConstraintValues()
-      : constraints(FPArrayComparator<VectorizedArray<Number>>(1.))
+      : constraints(FloatingPointComparator<VectorizedArray<Number>>(1.))
     {}
 
 
