@@ -66,67 +66,6 @@ namespace internal
         const types::global_dof_index enumeration_dof_index =
           numbers::invalid_dof_index - 1;
 
-        /**
-         * Update the cache used for cell dof indices on all (non-artificial)
-         * active cells of the given DoFHandler.
-         */
-        template <int dim, int spacedim>
-        void
-        update_all_active_cell_dof_indices_caches(
-          const DoFHandler<dim, spacedim> &dof_handler)
-        {
-          const auto worker = [](const auto &cell, void *, void *) {
-            if (!cell->is_artificial())
-              cell->update_cell_dof_indices_cache();
-          };
-
-          // parallelize filling all of the cell caches. by using
-          // WorkStream, we make sure that we only run through the
-          // range of iterators once, whereas a parallel_for loop
-          // for example has to split the range multiple times,
-          // which is expensive because cell iterators are not
-          // random access iterators with a cheap operator-
-          WorkStream::run(dof_handler.begin_active(),
-                          dof_handler.end(),
-                          worker,
-                          /* copier */ std::function<void(void *)>(),
-                          /* scratch_data */ nullptr,
-                          /* copy_data */ nullptr,
-                          2 * MultithreadInfo::n_threads(),
-                          /* chunk_size = */ 32);
-        }
-
-
-        /**
-         * Update the cache used for cell dof indices on all (non-artificial)
-         * level (multigrid) cells of the given DoFHandler.
-         */
-        template <int dim, int spacedim>
-        void
-        update_all_level_cell_dof_indices_caches(
-          const DoFHandler<dim, spacedim> &dof_handler)
-        {
-          const auto worker = [](const auto &cell, void *, void *) {
-            if (cell->has_children() || !cell->is_artificial())
-              cell->update_cell_dof_indices_cache();
-          };
-
-          // parallelize filling all of the cell caches. by using
-          // WorkStream, we make sure that we only run through the
-          // range of iterators once, whereas a parallel_for loop
-          // for example has to split the range multiple times,
-          // which is expensive because cell iterators are not
-          // random access iterators with a cheap operator-
-          WorkStream::run(dof_handler.begin(),
-                          dof_handler.end(),
-                          worker,
-                          /* copier */ std::function<void(void *)>(),
-                          /* scratch_data */ nullptr,
-                          /* copy_data */ nullptr,
-                          2 * MultithreadInfo::n_threads(),
-                          /* chunk_size = */ 32);
-        }
-
 
         using DoFIdentities =
           std::vector<std::pair<unsigned int, unsigned int>>;
@@ -2390,8 +2329,7 @@ namespace internal
         renumber_dofs(const std::vector<types::global_dof_index> &new_numbers,
                       const IndexSet &                  indices_we_care_about,
                       const DoFHandler<dim, space_dim> &dof_handler,
-                      const bool                        check_validity,
-                      const bool                        update_cache = true)
+                      const bool                        check_validity)
         {
           if (dim == 1)
             Assert(indices_we_care_about == IndexSet(0), ExcNotImplemented());
@@ -2420,9 +2358,6 @@ namespace internal
                                  dof_handler));
           });
           tasks.join_all();
-
-          if (update_cache)
-            update_all_active_cell_dof_indices_caches(dof_handler);
         }
 
 
@@ -2718,8 +2653,6 @@ namespace internal
           Implementation::unify_dof_indices(*dof_handler,
                                             n_initial_dofs,
                                             /*check_validity=*/true);
-
-        update_all_active_cell_dof_indices_caches(*dof_handler);
 
         // return a sequential, complete index set
         return NumberCache(n_dofs);
@@ -3747,8 +3680,7 @@ namespace internal
         Implementation::renumber_dofs(renumbering,
                                       IndexSet(0),
                                       *dof_handler,
-                                      /*check_validity=*/false,
-                                      /*update_cache=*/false);
+                                      /*check_validity=*/false);
 
         // now a little bit of housekeeping
         const dealii::types::global_dof_index n_global_dofs =
@@ -3809,8 +3741,6 @@ namespace internal
                    ExcInternalError());
 #  endif
         }
-
-        update_all_active_cell_dof_indices_caches(*this->dof_handler);
 
 #  ifdef DEBUG
         // check that we are really done
@@ -4134,8 +4064,7 @@ namespace internal
           Implementation::renumber_dofs(new_numbers,
                                         owned_dofs,
                                         *dof_handler,
-                                        /*check_validity=*/false,
-                                        /*update_cache=*/false);
+                                        /*check_validity=*/false);
 
         // Communicate newly assigned DoF indices to other processors
         // and get the same information for our own ghost cells.
@@ -4167,8 +4096,6 @@ namespace internal
             *dof_handler);
 
           communicate_dof_indices_on_marked_cells(*dof_handler, cell_marked);
-
-          update_all_active_cell_dof_indices_caches(*this->dof_handler);
         }
 
         NumberCache number_cache;

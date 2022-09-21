@@ -2028,12 +2028,6 @@ public:
   set_mg_dof_indices(const std::vector<types::global_dof_index> &dof_indices);
 
   /**
-   * Update the cache in which we store the dof indices of this cell.
-   */
-  void
-  update_cell_dof_indices_cache() const;
-
-  /**
    * @name Dealing with refinement indicators
    */
   /**

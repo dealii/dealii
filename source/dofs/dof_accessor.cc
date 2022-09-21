@@ -103,22 +103,6 @@ DoFInvalidAccessor<structdim, dim, spacedim>::set_dof_index(
 
 template <int dim, int spacedim, bool lda>
 void
-DoFCellAccessor<dim, spacedim, lda>::update_cell_dof_indices_cache() const
-{
-  Assert(static_cast<unsigned int>(this->present_level) <
-           this->dof_handler->object_dof_indices.size(),
-         ExcMessage("DoFHandler not initialized"));
-
-  Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
-
-  internal::DoFCellAccessorImplementation::Implementation::
-    update_cell_dof_indices_cache(*this);
-}
-
-
-
-template <int dim, int spacedim, bool lda>
-void
 DoFCellAccessor<dim, spacedim, lda>::set_dof_indices(
   const std::vector<types::global_dof_index> &local_dof_indices)
 {
@@ -267,6 +251,74 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
     *this, level, dof_indices, fe_index);
 }
 
+
+
+namespace internal
+{
+  namespace DoFAccessorImplementation
+  {
+    template <int dim, int spacedim, bool level_dof_access>
+    void
+    get_cell_dof_indices(
+      const dealii::DoFCellAccessor<dim, spacedim, level_dof_access> &accessor,
+      boost::container::small_vector<types::global_dof_index, 27> &dof_indices,
+      const unsigned int                                           fe_index)
+    {
+      Implementation::process_dof_indices(
+        accessor,
+        dof_indices,
+        fe_index,
+        Implementation::DoFIndexProcessor<dim, spacedim>(),
+        [](auto stored_index, auto dof_ptr) { *dof_ptr = stored_index; },
+        false);
+    }
+  } // namespace DoFAccessorImplementation
+} // namespace internal
+
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline void
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  get_dof_indices(std::vector<types::global_dof_index> &dof_indices) const
+{
+  Assert(this->is_active(),
+         ExcMessage("get_dof_indices() only works on active cells."));
+  Assert(this->is_artificial() == false,
+         ExcMessage("Can't ask for DoF indices on artificial cells."));
+  AssertDimension(dof_indices.size(), this->get_fe().n_dofs_per_cell());
+
+  dealii::internal::DoFAccessorImplementation::Implementation::get_dof_indices(
+    *this, dof_indices, this->active_fe_index());
+}
+
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline void
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  get_mg_dof_indices(std::vector<types::global_dof_index> &dof_indices) const
+{
+  Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
+         ExcMessage("Multigrid DoF indices can only be accessed after "
+                    "DoFHandler::distribute_mg_dofs() has been called!"));
+  DoFAccessor<dimension_, dimension_, space_dimension_, level_dof_access>::
+    get_mg_dof_indices(this->level(), dof_indices);
+}
+
+
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+inline void
+DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
+  set_mg_dof_indices(const std::vector<types::global_dof_index> &dof_indices)
+{
+  Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
+         ExcMessage("Multigrid DoF indices can only be accessed after "
+                    "DoFHandler::distribute_mg_dofs() has been called!"));
+  DoFAccessor<dimension_, dimension_, space_dimension_, level_dof_access>::
+    set_mg_dof_indices(this->level(), dof_indices);
+}
 
 // --------------------------------------------------------------------------
 // explicit instantiations
