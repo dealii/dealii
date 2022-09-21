@@ -385,7 +385,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter()
     : flags(false, true)
     , node_dim(numbers::invalid_unsigned_int)
-    , num_cells(numbers::invalid_unsigned_int)
+    , num_cells(0)
   {}
 
 
@@ -393,7 +393,7 @@ namespace DataOutBase
   DataOutFilter::DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
     : flags(flags)
     , node_dim(numbers::invalid_unsigned_int)
-    , num_cells(numbers::invalid_unsigned_int)
+    , num_cells(0)
   {}
 
 
@@ -8250,7 +8250,8 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const double                      cur_time,
   const MPI_Comm &                  comm) const
 {
-  std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
+  AssertThrow(spacedim == 2 || spacedim == 3,
+              ExcMessage("XDMF only supports 2 or 3 space dimensions."));
 
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
@@ -8261,44 +8262,64 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   (void)cur_time;
   (void)comm;
   AssertThrow(false, ExcMessage("XDMF support requires HDF5 to be turned on."));
-#endif
-  AssertThrow(spacedim == 2 || spacedim == 3,
-              ExcMessage("XDMF only supports 2 or 3 space dimensions."));
+
+  return {};
+
+#else
+
+  std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
 
   local_node_cell_count[0] = data_filter.n_nodes();
   local_node_cell_count[1] = data_filter.n_cells();
 
-  // And compute the global total
-#ifdef DEAL_II_WITH_MPI
   const int myrank = Utilities::MPI::this_mpi_process(comm);
-  int       ierr   = MPI_Allreduce(local_node_cell_count,
+  // And compute the global total
+  int ierr = MPI_Allreduce(local_node_cell_count,
                            global_node_cell_count,
                            2,
                            MPI_UINT64_T,
                            MPI_SUM,
                            comm);
   AssertThrowMPI(ierr);
-#else
-  (void)comm;
-  const int myrank = 0;
-  global_node_cell_count[0] = local_node_cell_count[0];
-  global_node_cell_count[1] = local_node_cell_count[1];
-#endif
 
-  // Output the XDMF file only on the root process
-  if (myrank == 0)
+  // The implementation is a bit complicated because we are supposed to return
+  // the correct data on rank 0 and an empty object on all other ranks but all
+  // information (for example the attributes) are only available on ranks that
+  // have any cells.
+  // We will identify the smallest rank that has data and then communicate
+  // from this rank to rank 0 (if they are different ranks).
+
+  const bool have_data = (data_filter.n_nodes() > 0);
+  MPI_Comm split_comm;
+  {
+    const int key = myrank;
+    const int color = (have_data ? 1 : 0);
+    const int ierr = MPI_Comm_split(comm, color, key, &split_comm);
+    AssertThrowMPI(ierr);
+  }
+
+  const bool am_i_first_rank_with_data =
+    have_data && (Utilities::MPI::this_mpi_process(split_comm) == 0);
+
+  ierr = MPI_Comm_free(&split_comm);
+  AssertThrowMPI(ierr);
+
+  const int tag = 47381;
+
+  // Output the XDMF file only on the root process of all ranks with data:
+  if (am_i_first_rank_with_data)
     {
       const auto &patches = get_patches();
       Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
+
       // We currently don't support writing mixed meshes:
-#ifdef DEBUG
+#  ifdef DEBUG
       for (const auto &patch : patches)
         Assert(patch.reference_cell == patches[0].reference_cell,
                ExcNotImplemented());
-#endif
+#  endif
 
-
-      XDMFEntry    entry(h5_mesh_filename,
+      XDMFEntry entry(h5_mesh_filename,
                       h5_solution_filename,
                       cur_time,
                       global_node_cell_count[0],
@@ -8306,23 +8327,57 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                       dim,
                       spacedim,
                       patches[0].reference_cell);
-      unsigned int n_data_sets = data_filter.n_data_sets();
+      const unsigned int n_data_sets = data_filter.n_data_sets();
 
-      // The vector names generated here must match those generated in the HDF5
-      // file
-      unsigned int i;
-      for (i = 0; i < n_data_sets; ++i)
+      // The vector names generated here must match those generated in
+      // the HDF5 file
+      for (unsigned int i = 0; i < n_data_sets; ++i)
         {
           entry.add_attribute(data_filter.get_data_set_name(i),
                               data_filter.get_data_set_dim(i));
         }
 
+      if (myrank != 0)
+        {
+          // send to rank 0
+          const std::vector<char> buffer = Utilities::pack(entry, false);
+          ierr = MPI_Send(buffer.data(), buffer.size(), MPI_BYTE, 0, tag, comm);
+          AssertThrowMPI(ierr);
+
+          return {};
+        }
+
       return entry;
     }
-  else
+
+  if (myrank == 0 && !am_i_first_rank_with_data)
     {
-      return {};
+      // receive the XDMF data on rank 0 if we don't have it...
+
+      MPI_Status status;
+      int ierr = MPI_Probe(MPI_ANY_SOURCE, tag, comm, &status);
+      AssertThrowMPI(ierr);
+
+      int len;
+      ierr = MPI_Get_count(&status, MPI_BYTE, &len);
+      AssertThrowMPI(ierr);
+
+      std::vector<char> buffer(len);
+      ierr = MPI_Recv(buffer.data(),
+                      len,
+                      MPI_BYTE,
+                      status.MPI_SOURCE,
+                      tag,
+                      comm,
+                      MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
+
+      return Utilities::unpack<XDMFEntry>(buffer, false);
     }
+
+  // default case for any other rank is to return an empty object
+  return {};
+#endif
 }
 
 template <int dim, int spacedim>

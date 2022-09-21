@@ -1,5 +1,63 @@
 
+DEAL:0::n_cells on my rank: 4
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="16 2" NumberType="Float" Precision="8" Format="HDF">
+            out.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Quadrilateral" NumberOfElements="4">
+          <DataItem Dimensions="4 4" NumberType="UInt" Format="HDF">
+            out.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="bla" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="16 1" NumberType="Float" Precision="8" Format="HDF">
+            out.h5:/bla
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
 DEAL:0::ok
+DEAL:0::n_cells on my rank: 8
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XYZ">
+          <DataItem Dimensions="64 3" NumberType="Float" Precision="8" Format="HDF">
+            out.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Hexahedron" NumberOfElements="8">
+          <DataItem Dimensions="8 8" NumberType="UInt" Format="HDF">
+            out.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="bla" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="64 1" NumberType="Float" Precision="8" Format="HDF">
+            out.h5:/bla
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
 DEAL:0::ok
 
+DEAL:1::n_cells on my rank: 0
+DEAL:1::n_cells on my rank: 0
 

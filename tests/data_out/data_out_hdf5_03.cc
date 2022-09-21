@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// test parallel DataOut with HDF5
+// test parallel DataOut with HDF5 + xdmf
 //
 // When running with 3 MPI ranks, one of the ranks will have 0
 // cells. This tests a corner case that used to fail because the code
@@ -40,13 +40,7 @@ void
 test()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-  std::vector<unsigned int>                 repetitions(dim, 1);
-  repetitions[0] = 2; // 2x1x1 cells
-  Point<dim> p1;
-  Point<dim> p2;
-  for (int i = 0; i < dim; ++i)
-    p2[i] = 1.0;
-  GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
   FE_Q<dim> fe(1);
@@ -65,10 +59,19 @@ test()
   DataOutBase::DataOutFilter data_filter(
     DataOutBase::DataOutFilterFlags(false, false));
   data_out.write_filtered_data(data_filter);
+  deallog << "n_cells on my rank: " << data_filter.n_cells() << std::endl;
   data_out.write_hdf5_parallel(data_filter, "out.h5", MPI_COMM_WORLD);
+
+  std::vector<XDMFEntry> xdmf_entries;
+  xdmf_entries.push_back(
+    data_out.create_xdmf_entry(data_filter, "out.h5", 0, MPI_COMM_WORLD));
+
+  data_out.write_xdmf_file(xdmf_entries, "out.xdmf", MPI_COMM_WORLD);
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
+      cat_file("out.xdmf");
+
       // Sadly hdf5 is binary and we can not use hd5dump because it might
       // not be in the path.
       std::ifstream f("out.h5");
