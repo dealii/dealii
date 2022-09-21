@@ -8271,7 +8271,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
         {
           // send to rank 0
           const std::vector<char> buffer = Utilities::pack(entry, false);
-          ierr = MPI_Send(buffer.data(), buffer.size(), MPI_CHAR, 0, tag, comm);
+          ierr = MPI_Send(buffer.data(), buffer.size(), MPI_BYTE, 0, tag, comm);
           AssertThrowMPI(ierr);
 
           return {};
