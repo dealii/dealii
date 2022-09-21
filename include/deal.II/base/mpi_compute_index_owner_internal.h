@@ -291,17 +291,14 @@ namespace Utilities
           Dictionary dict;
 
           /**
-           * Array to collect the indices to look up, sorted by the rank in
+           * Array to collect the indices to look up (first vector) and their
+           * local index among indices (second vector), sorted by the rank in
            * the dictionary.
            */
-          std::map<unsigned int, std::vector<types::global_dof_index>>
+          std::map<unsigned int,
+                   std::pair<std::vector<types::global_dof_index>,
+                             std::vector<unsigned int>>>
             indices_to_look_up_by_dict_rank;
-
-          /**
-           * The field where the indices for incoming data from the process
-           * are stored.
-           */
-          std::map<unsigned int, std::vector<unsigned int>> recv_indices;
 
           /**
            * Implementation of
@@ -356,12 +353,12 @@ namespace Utilities
 
         private:
           /**
-           * Stores the index request in the `requesters` field. We first find
-           * out the owner of the index that was requested (using the guess in
-           * `owner_index`, as we typically might look up on the same rank
-           * several times in a row, which avoids the binary search in
-           * Dictionary::get_owning_rank_index()). Once we know the rank of
-           * the owner, we fill the vector entry with the rank of the
+           * Stores the index request in the `requesters` field. Given the
+           * rank of the owner, we start with a guess for the index at the
+           * owner's site. This is because we typically might look up on the
+           * same rank several times in a row, hence avoiding the binary
+           * search in Dictionary::get_owning_rank_index()). Once we know the
+           * index at the owner, we fill the vector entry with the rank of the
            * request. Here, we utilize the fact that requests are processed
            * rank-by-rank, so we can simply look at the end of the vector
            * whether there is already some data stored or not. Finally, we
@@ -369,9 +366,10 @@ namespace Utilities
            * therefore only need to append at the end.
            */
           void
-          append_index_origin(const types::global_dof_index index,
-                              unsigned int &                owner_index,
-                              const unsigned int            rank_of_request);
+          append_index_origin(const unsigned int index_within_dictionary,
+                              const unsigned int rank_of_request,
+                              const unsigned int rank_of_owner,
+                              unsigned int &     owner_index_guess);
         };
 
         /* ------------------------- inline functions ----------------------- */
