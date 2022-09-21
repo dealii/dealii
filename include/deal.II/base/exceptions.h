@@ -1107,6 +1107,15 @@ namespace StandardExceptions
     "find a valid LAPACK library.");
 
   /**
+   * This function requires support for the HDF5 library.
+   */
+  DeclExceptionMsg(
+    ExcNeedsHDF5,
+    "You are attempting to use functionality that requires that deal.II is configured "
+    "with HDF5 support. However, when you called 'cmake', HDF5 support "
+    "was not detected.");
+
+  /**
    * This function requires support for the MPI library.
    */
   DeclExceptionMsg(

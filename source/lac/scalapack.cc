@@ -2611,11 +2611,7 @@ ScaLAPACKMatrix<NumberType>::save(
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
   (void)chunk_size;
-  AssertThrow(false,
-              ExcMessage(
-                "This function requires that deal.II is configured "
-                "with HDF5 support, but when you called 'cmake', HDF5 support "
-                "was not detected."));
+  AssertThrow(false, ExcNeedsHDF5());
 #  else
 
   std::pair<unsigned int, unsigned int> chunks_size_ = chunk_size;
@@ -3047,11 +3043,7 @@ ScaLAPACKMatrix<NumberType>::load(const std::string &filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
-  AssertThrow(false,
-              ExcMessage(
-                "This function requires that deal.II is configured "
-                "with HDF5 support, but when you called 'cmake', HDF5 support "
-                "was not detected."));
+  AssertThrow(false, ExcNeedsHDF5());
 #  else
 #    ifdef H5_HAVE_PARALLEL
   // implementation for configurations equipped with a parallel file system
