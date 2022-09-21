@@ -310,10 +310,14 @@ namespace internal
      * satisfied). This is not a problem in the use cases for this class, but be
      * careful when using it in other contexts.
      */
-    template <typename Number,
-              typename VectorizedArrayType = VectorizedArray<Number>>
+    template <typename VectorizedArrayType>
     struct FPArrayComparator
     {
+      using Number = typename dealii::internal::VectorizedArrayTrait<
+        VectorizedArrayType>::value_type;
+      static constexpr std::size_t width =
+        dealii::internal::VectorizedArrayTrait<VectorizedArrayType>::width;
+
       FPArrayComparator(const Number scaling);
 
       /**
@@ -328,9 +332,8 @@ namespace internal
        * issues).
        */
       bool
-      operator()(
-        const Tensor<1, VectorizedArrayType::size(), Number> &t1,
-        const Tensor<1, VectorizedArrayType::size(), Number> &t2) const;
+      operator()(const Tensor<1, width, Number> &t1,
+                 const Tensor<1, width, Number> &t2) const;
 
       /**
        * Compare two rank-1 tensors of vectorized arrays (stored as tensors to
@@ -338,11 +341,8 @@ namespace internal
        */
       template <int dim>
       bool
-      operator()(
-        const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>>
-          &t1,
-        const Tensor<1, dim, Tensor<1, VectorizedArrayType::size(), Number>>
-          &t2) const;
+      operator()(const Tensor<1, dim, Tensor<1, width, Number>> &t1,
+                 const Tensor<1, dim, Tensor<1, width, Number>> &t2) const;
 
       /**
        * Compare two rank-2 tensors of vectorized arrays (stored as tensors to
@@ -350,11 +350,8 @@ namespace internal
        */
       template <int dim>
       bool
-      operator()(
-        const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>
-          &t1,
-        const Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>
-          &t2) const;
+      operator()(const Tensor<2, dim, Tensor<1, width, Number>> &t1,
+                 const Tensor<2, dim, Tensor<1, width, Number>> &t2) const;
 
       /**
        * Compare two arrays of tensors.

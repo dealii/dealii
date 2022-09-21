@@ -41,7 +41,7 @@ namespace internal
   {
     template <typename Number>
     ConstraintValues<Number>::ConstraintValues()
-      : constraints(FPArrayComparator<Number>(1.))
+      : constraints(FPArrayComparator<VectorizedArray<Number>>(1.))
     {}
 
 
