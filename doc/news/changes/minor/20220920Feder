@@ -1,0 +1,6 @@
+New: The new function CGALWrappers::compute_intersection_of_cells computes
+the intersection between two (affine) cells starting from the location of the
+vertices. The intersection is described by a vector of arrays, where each array 
+identifies a simplex of the sub-tassellation of the intersection.
+<br>
+(Marco Feder, Johannes Heinz, 2022/09/20)

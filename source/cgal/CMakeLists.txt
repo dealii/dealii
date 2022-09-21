@@ -18,13 +18,15 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 
 SET(_src
-surface_mesh.cc
+  surface_mesh.cc
+  intersections.cc
 )
 
 
 
 SET(_inst
 surface_mesh.inst.in
+intersections.inst.in
 )
 
 FILE(GLOB _header

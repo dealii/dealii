@@ -1,0 +1,31 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2022 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+
+for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS)
+  {
+#if dim0 <= spacedim && dim0 >= dim1
+
+    template std::vector<std::array<Point<spacedim>, dim1 + 1>>
+    compute_intersection_of_cells<dim0, dim1, spacedim>(
+      const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
+      const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
+      const Mapping<dim0, spacedim> &                              mapping0,
+      const Mapping<dim1, spacedim> &                              mapping1,
+      const double                                                 tol);
+
+#endif
+  }
