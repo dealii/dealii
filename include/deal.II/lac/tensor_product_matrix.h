@@ -445,9 +445,9 @@ private:
     cache;
 
   /**
-   * Map from index to the storage position within vector_mass_matrix,
-   * vector_derivative_matrix, vector_eigenvectors, and
-   * vector_eigenvalues. If compression was not successful, this
+   * Map from index to the storage position within mass_matrices,
+   * derivative_matrices, eigenvectors, and
+   * eigenvalues. If compression was not successful, this
    * vector is empty, since the vectors can be access directly
    * with the given index.
    */
@@ -456,22 +456,22 @@ private:
   /**
    * Vector of 1D mass matrices.
    */
-  std::vector<Table<2, Number>> vector_mass_matrix;
+  std::vector<Table<2, Number>> mass_matrices;
 
   /**
    * Vector of 1D derivative matrices.
    */
-  std::vector<Table<2, Number>> vector_derivative_matrix;
+  std::vector<Table<2, Number>> derivative_matrices;
 
   /**
    * Vector of eigenvectors.
    */
-  std::vector<Table<2, Number>> vector_eigenvectors;
+  std::vector<Table<2, Number>> eigenvectors;
 
   /**
    * Vector of eigenvalues.
    */
-  std::vector<AlignedVector<Number>> vector_eigenvalues;
+  std::vector<AlignedVector<Number>> eigenvalues;
 };
 
 
@@ -557,32 +557,31 @@ namespace internal
 
     template <std::size_t dim, typename Number>
     inline void
-    setup(const std::array<Table<2, Number>, dim> &mass_matrices,
-          const std::array<Table<2, Number>, dim> &derivative_matrices,
+    setup(const std::array<Table<2, Number>, dim> &mass_matrix,
+          const std::array<Table<2, Number>, dim> &derivative_matrix,
           std::array<Table<2, Number>, dim> &      eigenvectors,
           std::array<AlignedVector<Number>, dim> & eigenvalues)
     {
-      const unsigned int n_rows_1d = mass_matrices[0].n_cols();
+      const unsigned int n_rows_1d = mass_matrix[0].n_cols();
       (void)n_rows_1d;
 
       for (unsigned int dir = 0; dir < dim; ++dir)
         {
-          AssertDimension(n_rows_1d, mass_matrices[dir].n_cols());
-          AssertDimension(mass_matrices[dir].n_rows(),
-                          mass_matrices[dir].n_cols());
-          AssertDimension(mass_matrices[dir].n_rows(),
-                          derivative_matrices[dir].n_rows());
-          AssertDimension(mass_matrices[dir].n_rows(),
-                          derivative_matrices[dir].n_cols());
+          AssertDimension(n_rows_1d, mass_matrix[dir].n_cols());
+          AssertDimension(mass_matrix[dir].n_rows(), mass_matrix[dir].n_cols());
+          AssertDimension(mass_matrix[dir].n_rows(),
+                          derivative_matrix[dir].n_rows());
+          AssertDimension(mass_matrix[dir].n_rows(),
+                          derivative_matrix[dir].n_cols());
 
-          eigenvectors[dir].reinit(mass_matrices[dir].n_cols(),
-                                   mass_matrices[dir].n_rows());
-          eigenvalues[dir].resize(mass_matrices[dir].n_cols());
+          eigenvectors[dir].reinit(mass_matrix[dir].n_cols(),
+                                   mass_matrix[dir].n_rows());
+          eigenvalues[dir].resize(mass_matrix[dir].n_cols());
           internal::TensorProductMatrixSymmetricSum::spectral_assembly<Number>(
-            &(mass_matrices[dir](0, 0)),
-            &(derivative_matrices[dir](0, 0)),
-            mass_matrices[dir].n_rows(),
-            mass_matrices[dir].n_cols(),
+            &(mass_matrix[dir](0, 0)),
+            &(derivative_matrix[dir](0, 0)),
+            mass_matrix[dir].n_rows(),
+            mass_matrix[dir].n_cols(),
             eigenvalues[dir].begin(),
             &(eigenvectors[dir](0, 0)));
         }
@@ -698,13 +697,13 @@ namespace internal
 
     template <std::size_t dim, typename Number>
     inline std::array<Table<2, Number>, dim>
-    convert(const Table<2, Number> &mass_matrix)
+    convert(const Table<2, Number> &matrix)
     {
-      std::array<Table<2, Number>, dim> mass_matrices;
+      std::array<Table<2, Number>, dim> matrices;
 
-      std::fill(mass_matrices.begin(), mass_matrices.end(), mass_matrix);
+      std::fill(matrices.begin(), matrices.end(), matrix);
 
-      return mass_matrices;
+      return matrices;
     }
 
 
@@ -1081,31 +1080,31 @@ template <int dim, typename Number, int n_rows_1d>
 void
 TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
 {
-  vector_mass_matrix.resize(cache.size());
-  vector_derivative_matrix.resize(cache.size());
-  vector_eigenvectors.resize(cache.size());
-  vector_eigenvalues.resize(cache.size());
+  this->mass_matrices.resize(cache.size());
+  this->derivative_matrices.resize(cache.size());
+  this->eigenvectors.resize(cache.size());
+  this->eigenvalues.resize(cache.size());
 
   const auto store = [&](const unsigned int    index,
                          const MatrixPairType &M_and_K) {
-    std::array<Table<2, Number>, 1> mass_matrices;
-    mass_matrices[0] = M_and_K.first;
+    std::array<Table<2, Number>, 1> mass_matrix;
+    mass_matrix[0] = M_and_K.first;
 
-    std::array<Table<2, Number>, 1> derivative_matrices;
-    derivative_matrices[0] = M_and_K.second;
+    std::array<Table<2, Number>, 1> derivative_matrix;
+    derivative_matrix[0] = M_and_K.second;
 
     std::array<Table<2, Number>, 1>      eigenvectors;
     std::array<AlignedVector<Number>, 1> eigenvalues;
 
-    internal::TensorProductMatrixSymmetricSum::setup(mass_matrices,
-                                                     derivative_matrices,
+    internal::TensorProductMatrixSymmetricSum::setup(mass_matrix,
+                                                     derivative_matrix,
                                                      eigenvectors,
                                                      eigenvalues);
 
-    vector_mass_matrix[index]       = M_and_K.first;
-    vector_derivative_matrix[index] = M_and_K.second;
-    vector_eigenvectors[index]      = eigenvectors[0];
-    vector_eigenvalues[index]       = eigenvalues[0];
+    mass_matrices[index]       = M_and_K.first;
+    derivative_matrices[index] = M_and_K.second;
+    this->eigenvectors[index]  = eigenvectors[0];
+    this->eigenvalues[index]   = eigenvalues[0];
   };
 
   if (cache.size() == indices.size())
@@ -1150,9 +1149,9 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
       const unsigned int translated_index =
         (indices.size() > 0) ? indices[dim * index + d] : (dim * index + d);
 
-      eigenvectors[d]         = &vector_eigenvectors[translated_index](0, 0);
-      eigenvalues[d]          = vector_eigenvalues[translated_index].data();
-      n_rows_1d_non_templated = vector_eigenvalues[translated_index].size();
+      eigenvectors[d]         = &this->eigenvectors[translated_index](0, 0);
+      eigenvalues[d]          = this->eigenvalues[translated_index].data();
+      n_rows_1d_non_templated = this->eigenvalues[translated_index].size();
     }
 
   if (n_rows_1d != -1)
@@ -1172,10 +1171,10 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
   memory_consumption() const
 {
   return MemoryConsumption::memory_consumption(indices) +
-         MemoryConsumption::memory_consumption(vector_mass_matrix) +
-         MemoryConsumption::memory_consumption(vector_derivative_matrix) +
-         MemoryConsumption::memory_consumption(vector_eigenvectors) +
-         MemoryConsumption::memory_consumption(vector_eigenvalues);
+         MemoryConsumption::memory_consumption(mass_matrices) +
+         MemoryConsumption::memory_consumption(derivative_matrices) +
+         MemoryConsumption::memory_consumption(eigenvectors) +
+         MemoryConsumption::memory_consumption(eigenvalues);
 }
 
 
@@ -1185,7 +1184,7 @@ std::size_t
 TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
   storage_size() const
 {
-  return vector_mass_matrix.size();
+  return mass_matrices.size();
 }
 
 
