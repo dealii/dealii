@@ -41,7 +41,8 @@ namespace internal
   {
     template <typename Number>
     ConstraintValues<Number>::ConstraintValues()
-      : constraints(FloatingPointComparator<VectorizedArray<Number>>(1.))
+      : constraints(FloatingPointComparator<VectorizedArray<Number>>(
+          1. * std::numeric_limits<double>::epsilon() * 1024.))
     {}
 
 
