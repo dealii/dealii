@@ -3440,26 +3440,53 @@ namespace GridTools
     /**
      * Process all locally-owned cells and fill @p vertices and @p cells for all
      * cells that are cut.
+     *
+     * @note: This function is only implemented for dim>1. Use
+     * process(background_dof_handler, ls_vector, iso_level, vertices) for
+     * dim==1.
      */
     void
-    process(const DoFHandler<dim> &         background_dof_handler,
-            const VectorType &              ls_vector,
-            const double                    iso_level,
-            std::vector<Point<dim>> &       vertices,
-            std::vector<CellData<dim - 1>> &cells) const;
+    process(const DoFHandler<dim> &  background_dof_handler,
+            const VectorType &       ls_vector,
+            const double             iso_level,
+            std::vector<Point<dim>> &vertices,
+            std::vector<CellData<dim == 1 ? 1 : dim - 1>> &cells) const;
+
+    /**
+     * Process all locally-owned cells and fill @p vertices for all cells that
+     * are cut.
+     */
+    void
+    process(const DoFHandler<dim> &  background_dof_handler,
+            const VectorType &       ls_vector,
+            const double             iso_level,
+            std::vector<Point<dim>> &vertices) const;
 
     /**
      * Process the provided cell and fill @p vertices and @p cells for all cells
      * that are cut.
      *
      * @note The resulting vectors are empty if the cell is not cut.
+     *
+     * @note: This function is only implemented for dim>1. Use
+     * process_cell(cell, ls_vector, iso_level, vertices) for dim==1.
      */
     void
     process_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                 const VectorType &              ls_vector,
-                 const double                    iso_level,
-                 std::vector<Point<dim>> &       vertices,
-                 std::vector<CellData<dim - 1>> &cells) const;
+                 const VectorType &                             ls_vector,
+                 const double                                   iso_level,
+                 std::vector<Point<dim>> &                      vertices,
+                 std::vector<CellData<dim == 1 ? 1 : dim - 1>> &cells) const;
+    /**
+     * Process the provided cell and fill @p vertices for all cells that are cut.
+     *
+     * @note The resulting vector is empty if the cell is not cut.
+     */
+    void
+    process_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
+                 const VectorType &       ls_vector,
+                 const double             iso_level,
+                 std::vector<Point<dim>> &vertices) const;
 
   private:
     /**
@@ -3473,11 +3500,27 @@ namespace GridTools
      * Process a cell.
      */
     void
-    process_cell(std::vector<value_type> &       ls_values,
-                 const std::vector<Point<dim>> & points,
-                 const double                    iso_level,
-                 std::vector<Point<dim>> &       vertices,
-                 std::vector<CellData<dim - 1>> &cells) const;
+    process_cell(std::vector<value_type> &                      ls_values,
+                 const std::vector<Point<dim>> &                points,
+                 const double                                   iso_level,
+                 std::vector<Point<dim>> &                      vertices,
+                 std::vector<CellData<dim == 1 ? 1 : dim - 1>> &cells,
+                 const bool write_back_cell_data = true) const;
+
+    /**
+     * Dummy function for 1D processing a sub-cell.
+     */
+    void
+    process_sub_cell(const std::vector<value_type> &,
+                     const std::vector<Point<1>> &,
+                     const std::vector<unsigned int> &,
+                     const double,
+                     std::vector<Point<1>> &,
+                     std::vector<CellData<1>> &,
+                     const bool) const
+    {
+      AssertThrow(false, ExcNotImplemented());
+    }
 
     /**
      * Process a sub-cell (2D).
@@ -3486,23 +3529,25 @@ namespace GridTools
      *   of subdivisions in this case.
      */
     void
-    process_sub_cell(const std::vector<value_type> & ls_values,
-                     const std::vector<Point<2>> &   points,
-                     const std::vector<unsigned int> mask,
-                     const double                    iso_level,
-                     std::vector<Point<2>> &         vertices,
-                     std::vector<CellData<1>> &      cells) const;
+    process_sub_cell(const std::vector<value_type> &  ls_values,
+                     const std::vector<Point<2>> &    points,
+                     const std::vector<unsigned int> &mask,
+                     const double                     iso_level,
+                     std::vector<Point<2>> &          vertices,
+                     std::vector<CellData<1>> &       cells,
+                     const bool write_back_cell_data) const;
 
     /**
      * Process a sub-cell (3D).
      */
     void
-    process_sub_cell(const std::vector<value_type> & ls_values,
-                     const std::vector<Point<3>> &   points,
-                     const std::vector<unsigned int> mask,
-                     const double                    iso_level,
-                     std::vector<Point<3>> &         vertices,
-                     std::vector<CellData<2>> &      cells) const;
+    process_sub_cell(const std::vector<value_type> &  ls_values,
+                     const std::vector<Point<3>> &    points,
+                     const std::vector<unsigned int> &mask,
+                     const double                     iso_level,
+                     std::vector<Point<3>> &          vertices,
+                     std::vector<CellData<2>> &       cells,
+                     const bool write_back_cell_data) const;
 
     /**
      * Number of subdivisions each cell is subdivided into in each direction to
