@@ -9783,6 +9783,7 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
     return "";
 
   std::stringstream ss;
+  ss.precision(12);
   ss << indent(indent_level + 0)
      << "<Grid Name=\"mesh\" GridType=\"Uniform\">\n";
   ss << indent(indent_level + 1) << "<Time Value=\"" << entry_time << "\"/>\n";
