@@ -8950,7 +8950,7 @@ DataOutBase::write_hdf5_parallel(
   (void)mesh_filename;
   (void)solution_filename;
   (void)comm;
-  AssertThrow(false, ExcMessage("HDF5 support is disabled."));
+  AssertThrow(false, ExcNeedsHDF5());
 #else
 
   const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
