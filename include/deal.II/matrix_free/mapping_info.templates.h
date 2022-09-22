@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/floating_point_comparator.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/thread_management.h>
@@ -347,12 +348,12 @@ namespace internal
       struct CompressedCellData
       {
         CompressedCellData(const double expected_size)
-          : data(FPArrayComparator<VectorizedArrayType>(expected_size))
+          : data(FloatingPointComparator<VectorizedArrayType>(expected_size))
         {}
 
         std::map<Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>,
                  unsigned int,
-                 FPArrayComparator<VectorizedArrayType>>
+                 FloatingPointComparator<VectorizedArrayType>>
           data;
       };
 
@@ -1077,11 +1078,11 @@ namespace internal
         // first quadrature point on the cell - we use a relatively coarse
         // tolerance to account for some inaccuracies in the manifold
         // evaluation
-        const FPArrayComparator<VectorizedArray<double>> comparator(
+        const FloatingPointComparator<VectorizedArray<double>> comparator(
           1e4 * jacobian_size);
         std::map<std::array<Tensor<2, dim>, dim + 1>,
                  unsigned int,
-                 FPArrayComparator<VectorizedArray<double>>>
+                 FloatingPointComparator<VectorizedArray<double>>>
           compressed_jacobians(comparator);
 
         unsigned int n_data_buckets = 0;
@@ -1499,12 +1500,13 @@ namespace internal
       template <int dim, typename Number, typename VectorizedArrayType>
       struct CompressedFaceData
       {
-        // Constructor. As a scaling factor for the FPArrayComparator, we
+        // Constructor. As a scaling factor for the FloatingPointComparator, we
         // select the inverse of the Jacobian (not the Jacobian as in the
         // CompressedCellData) and add another factor of 512 to account for
         // some roundoff effects.
         CompressedFaceData(const Number jacobian_size)
-          : data(FPArrayComparator<VectorizedArrayType>(512. / jacobian_size))
+          : data(FloatingPointComparator<VectorizedArrayType>(512. /
+                                                              jacobian_size))
           , jacobian_size(jacobian_size)
         {}
 
@@ -1518,7 +1520,7 @@ namespace internal
                         2 * dim * dim + dim + 1,
                         Tensor<1, VectorizedArrayType::size(), Number>>,
                  unsigned int,
-                 FPArrayComparator<VectorizedArrayType>>
+                 FloatingPointComparator<VectorizedArrayType>>
           data;
 
         // Store the scaling factor
@@ -3345,110 +3347,6 @@ namespace internal
           cell_data[j].print_memory_consumption(out, task_info);
           face_data[j].print_memory_consumption(out, task_info);
         }
-    }
-
-
-
-    /* ------------------------------------------------------------------ */
-
-    template <typename VectorizedArrayType>
-    FPArrayComparator<VectorizedArrayType>::FPArrayComparator(
-      const Number scaling)
-      : tolerance(scaling * std::numeric_limits<double>::epsilon() * 1024.)
-    {}
-
-
-
-    template <typename VectorizedArrayType>
-    bool
-    FPArrayComparator<VectorizedArrayType>::operator()(
-      const std::vector<Number> &v1,
-      const std::vector<Number> &v2) const
-    {
-      const unsigned int s1 = v1.size(), s2 = v2.size();
-      if (s1 < s2)
-        return true;
-      else if (s1 > s2)
-        return false;
-      else
-        for (unsigned int i = 0; i < s1; ++i)
-          if (v1[i] < v2[i] - tolerance)
-            return true;
-          else if (v1[i] > v2[i] + tolerance)
-            return false;
-      return false;
-    }
-
-
-
-    template <typename VectorizedArrayType>
-    bool
-    FPArrayComparator<VectorizedArrayType>::operator()(
-      const Tensor<1, width, Number> &t1,
-      const Tensor<1, width, Number> &t2) const
-    {
-      for (unsigned int k = 0; k < width; ++k)
-        if (t1[k] < t2[k] - tolerance)
-          return true;
-        else if (t1[k] > t2[k] + tolerance)
-          return false;
-      return false;
-    }
-
-
-
-    template <typename VectorizedArrayType>
-    template <int dim>
-    bool
-    FPArrayComparator<VectorizedArrayType>::operator()(
-      const Tensor<1, dim, Tensor<1, width, Number>> &t1,
-      const Tensor<1, dim, Tensor<1, width, Number>> &t2) const
-    {
-      for (unsigned int d = 0; d < dim; ++d)
-        for (unsigned int k = 0; k < width; ++k)
-          if (t1[d][k] < t2[d][k] - tolerance)
-            return true;
-          else if (t1[d][k] > t2[d][k] + tolerance)
-            return false;
-      return false;
-    }
-
-
-
-    template <typename VectorizedArrayType>
-    template <int dim>
-    bool
-    FPArrayComparator<VectorizedArrayType>::operator()(
-      const Tensor<2, dim, Tensor<1, width, Number>> &t1,
-      const Tensor<2, dim, Tensor<1, width, Number>> &t2) const
-    {
-      for (unsigned int d = 0; d < dim; ++d)
-        for (unsigned int e = 0; e < dim; ++e)
-          for (unsigned int k = 0; k < width; ++k)
-            if (t1[d][e][k] < t2[d][e][k] - tolerance)
-              return true;
-            else if (t1[d][e][k] > t2[d][e][k] + tolerance)
-              return false;
-      return false;
-    }
-
-
-
-    template <typename VectorizedArrayType>
-    template <int dim>
-    bool
-    FPArrayComparator<VectorizedArrayType>::operator()(
-      const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
-      const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const
-    {
-      for (unsigned int i = 0; i < t1.size(); ++i)
-        for (unsigned int d = 0; d < dim; ++d)
-          for (unsigned int e = 0; e < dim; ++e)
-            if (t1[i][d][e] < t2[i][d][e] - tolerance)
-              return true;
-            else if (t1[i][d][e] > t2[i][d][e] + tolerance)
-              return false;
-      return false;
     }
 
   } // namespace MatrixFreeFunctions
