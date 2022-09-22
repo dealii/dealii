@@ -879,7 +879,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
     H_orig.reinit(n_tmp_vectors, n_tmp_vectors - 1);
 
   // matrix used for the orthogonalization process later
-  H.reinit(n_tmp_vectors, n_tmp_vectors - 1);
+  H.reinit(n_tmp_vectors, n_tmp_vectors - 1, /* omit_initialization */ true);
 
   // some additional vectors, also used in the orthogonalization
   gamma.reinit(n_tmp_vectors);
