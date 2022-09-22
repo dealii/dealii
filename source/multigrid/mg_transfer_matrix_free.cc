@@ -511,7 +511,7 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
           internal::weight_fe_q_dofs_by_entity<dim,
                                                degree != -1 ? 2 * degree + 1 :
                                                               -1,
-                                               Number>(
+                                               VectorizedArray<Number>>(
             &weights_on_refined[to_level - 1][(cell / vec_size) * three_to_dim],
             n_components,
             2 * fe_degree + 1,
@@ -592,14 +592,15 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
       // perform tensorized operation
       if (element_is_continuous)
         {
-          internal::weight_fe_q_dofs_by_entity<
-            dim,
-            degree != -1 ? 2 * degree + 1 : -1,
-            Number>(&weights_on_refined[from_level - 1]
-                                       [(cell / vec_size) * three_to_dim],
-                    n_components,
-                    2 * fe_degree + 1,
-                    evaluation_data.data());
+          internal::weight_fe_q_dofs_by_entity<dim,
+                                               degree != -1 ? 2 * degree + 1 :
+                                                              -1,
+                                               VectorizedArray<Number>>(
+            &weights_on_refined[from_level - 1]
+                               [(cell / vec_size) * three_to_dim],
+            n_components,
+            2 * fe_degree + 1,
+            evaluation_data.data());
           for (unsigned int c = 0; c < n_components; ++c)
             internal::FEEvaluationImplBasisChange<
               internal::evaluate_general,
