@@ -95,12 +95,6 @@ namespace VectorTools
       // store active fe indeX, face number, DoF index
       unsigned int indices[size];
 
-      FaceDoFInfo()
-      {
-        for (unsigned int i = 0; i < size; ++i)
-          indices[i] = numbers::invalid_unsigned_int;
-      }
-
       bool
       operator<(const FaceDoFInfo &other) const
       {
@@ -560,11 +554,9 @@ namespace VectorTools
                   if (level == numbers::invalid_unsigned_int ||
                       !refinement_edge_indices.is_element(face_dofs[i]))
                     {
-                      local_vector_indices[0] = i;
-                      internal::FaceDoFInfo local_face_dof_info;
-                      local_face_dof_info.indices[0] = cell->active_fe_index();
-                      local_face_dof_info.indices[1] = face_no;
-                      local_face_dof_info.indices[2] = i;
+                      local_vector_indices[0]                         = i;
+                      const internal::FaceDoFInfo local_face_dof_info = {
+                        {cell->active_fe_index(), face_no, i}};
                       for (unsigned int k = 0; k < fe.n_dofs_per_face(face_no);
                            ++k)
                         if ((k != i) &&
@@ -666,29 +658,21 @@ namespace VectorTools
                 if (level == numbers::invalid_unsigned_int ||
                     !refinement_edge_indices.is_element(face_dofs[i]))
                   {
-                    // find corresponding other components of vector
-                    internal::VectorDoFTuple<dim> vector_dofs;
-                    vector_dofs.dof_indices[0] = face_dofs[i];
-
-                    internal::FaceDoFInfo face_dof_info;
-                    face_dof_info.indices[0] = cell->active_fe_index();
-                    face_dof_info.indices[1] = face_no;
-                    face_dof_info.indices[2] = i;
-
-                    std::array<unsigned int, dim> local_vector_indices;
-                    for (unsigned int d = 0; d < dim; ++d)
-                      local_vector_indices[d] = numbers::invalid_unsigned_int;
-
+                    const internal::FaceDoFInfo face_dof_info = {
+                      {cell->active_fe_index(), face_no, i}};
                     const auto it = dof_to_vector_dof.find(face_dof_info);
-                    if (it != dof_to_vector_dof.end())
-                      local_vector_indices = it->second;
+                    Assert(it != dof_to_vector_dof.end(), ExcInternalError());
+                    const std::array<unsigned int, dim> local_vector_indices =
+                      it->second;
 
                     Assert(
                       first_vector_component + dim <= fe.n_components(),
                       ExcMessage(
                         "Error: the finite element does not have enough components "
                         "to define a normal direction."));
-                    for (unsigned int d = 1; d < dim; ++d)
+
+                    internal::VectorDoFTuple<dim> vector_dofs;
+                    for (unsigned int d = 0; d < dim; ++d)
                       {
                         vector_dofs.dof_indices[d] =
                           face_dofs[local_vector_indices[d]];
