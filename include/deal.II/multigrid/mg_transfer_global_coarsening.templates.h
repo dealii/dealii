@@ -2590,11 +2590,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           // weight and write into dst vector
           if (fine_element_is_continuous && this->weights_compressed.size() > 0)
             {
-              internal::weight_fe_q_dofs_by_entity<dim, -1, Number>(
-                weights_compressed,
-                n_components,
-                scheme.degree_fine + 1,
-                evaluation_data_fine.begin());
+              internal::
+                weight_fe_q_dofs_by_entity<dim, -1, VectorizedArray<Number>>(
+                  weights_compressed,
+                  n_components,
+                  scheme.degree_fine + 1,
+                  evaluation_data_fine.begin());
               weights_compressed += Utilities::pow(3, dim);
             }
 
@@ -2725,11 +2726,12 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
           if (fine_element_is_continuous && this->weights_compressed.size() > 0)
             {
-              internal::weight_fe_q_dofs_by_entity<dim, -1, Number>(
-                weights_compressed,
-                n_components,
-                scheme.degree_fine + 1,
-                evaluation_data_fine.begin());
+              internal::
+                weight_fe_q_dofs_by_entity<dim, -1, VectorizedArray<Number>>(
+                  weights_compressed,
+                  n_components,
+                  scheme.degree_fine + 1,
+                  evaluation_data_fine.begin());
               weights_compressed += Utilities::pow(3, dim);
             }
 

@@ -3324,36 +3324,39 @@ namespace internal
   }
 
 
-  template <int dim, int loop_length_template, typename Number>
+  template <int dim, int n_points_1d_template, typename Number>
   inline void
-  weight_fe_q_dofs_by_entity(const VectorizedArray<Number> *weights,
-                             const unsigned int             n_components,
-                             const int                loop_length_non_template,
-                             VectorizedArray<Number> *data)
+  weight_fe_q_dofs_by_entity(const Number *     weights,
+                             const unsigned int n_components,
+                             const int          n_points_1d_non_template,
+                             Number *           data)
   {
-    const int loop_length = loop_length_template != -1 ?
-                              loop_length_template :
-                              loop_length_non_template;
+    const int n_points_1d = n_points_1d_template != -1 ?
+                              n_points_1d_template :
+                              n_points_1d_non_template;
 
-    Assert(loop_length > 0, ExcNotImplemented());
-    Assert(loop_length < 100, ExcNotImplemented());
-    unsigned int degree_to_3[100];
-    degree_to_3[0] = 0;
-    for (int i = 1; i < loop_length - 1; ++i)
-      degree_to_3[i] = 1;
-    degree_to_3[loop_length - 1] = 2;
+    Assert(n_points_1d > 0, ExcNotImplemented());
+    Assert(n_points_1d < 100, ExcNotImplemented());
+
+    unsigned int compressed_index[100];
+    compressed_index[0] = 0;
+    for (int i = 1; i < n_points_1d - 1; ++i)
+      compressed_index[i] = 1;
+    compressed_index[n_points_1d - 1] = 2;
+
     for (unsigned int c = 0; c < n_components; ++c)
-      for (int k = 0; k < (dim > 2 ? loop_length : 1); ++k)
-        for (int j = 0; j < (dim > 1 ? loop_length : 1); ++j)
+      for (int k = 0; k < (dim > 2 ? n_points_1d : 1); ++k)
+        for (int j = 0; j < (dim > 1 ? n_points_1d : 1); ++j)
           {
-            const unsigned int shift = 9 * degree_to_3[k] + 3 * degree_to_3[j];
+            const unsigned int shift =
+              9 * compressed_index[k] + 3 * compressed_index[j];
             data[0] *= weights[shift];
-            // loop bound as int avoids compiler warnings in case loop_length
+            // loop bound as int avoids compiler warnings in case n_points_1d
             // == 1 (polynomial degree 0)
-            for (int i = 1; i < loop_length - 1; ++i)
+            for (int i = 1; i < n_points_1d - 1; ++i)
               data[i] *= weights[shift + 1];
-            data[loop_length - 1] *= weights[shift + 2];
-            data += loop_length;
+            data[n_points_1d - 1] *= weights[shift + 2];
+            data += n_points_1d;
           }
   }
 
