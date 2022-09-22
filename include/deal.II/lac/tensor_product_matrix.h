@@ -456,22 +456,32 @@ private:
   /**
    * Vector of 1D mass matrices.
    */
-  std::vector<Table<2, Number>> mass_matrices;
+  AlignedVector<Number> mass_matrices;
 
   /**
    * Vector of 1D derivative matrices.
    */
-  std::vector<Table<2, Number>> derivative_matrices;
+  AlignedVector<Number> derivative_matrices;
 
   /**
    * Vector of eigenvectors.
    */
-  std::vector<Table<2, Number>> eigenvectors;
+  AlignedVector<Number> eigenvectors;
 
   /**
    * Vector of eigenvalues.
    */
-  std::vector<AlignedVector<Number>> eigenvalues;
+  AlignedVector<Number> eigenvalues;
+
+  /**
+   * Pointer into mass_matrices, derivative_matrices, and eigenvalues.
+   */
+  std::vector<unsigned int> vector_ptr;
+
+  /**
+   * Pointer into mass_matrices, derivative_matrices, and eigenvalues.
+   */
+  std::vector<unsigned int> matrix_ptr;
 };
 
 
@@ -1080,10 +1090,8 @@ template <int dim, typename Number, int n_rows_1d>
 void
 TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
 {
-  this->mass_matrices.resize(cache.size());
-  this->derivative_matrices.resize(cache.size());
-  this->eigenvectors.resize(cache.size());
-  this->eigenvalues.resize(cache.size());
+  this->vector_ptr.resize(cache.size() + 1);
+  this->matrix_ptr.resize(cache.size() + 1);
 
   const auto store = [&](const unsigned int    index,
                          const MatrixPairType &M_and_K) {
@@ -1101,10 +1109,19 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
                                                      eigenvectors,
                                                      eigenvalues);
 
-    mass_matrices[index]       = M_and_K.first;
-    derivative_matrices[index] = M_and_K.second;
-    this->eigenvectors[index]  = eigenvectors[0];
-    this->eigenvalues[index]   = eigenvalues[0];
+    for (unsigned int i = 0, m = matrix_ptr[index], v = vector_ptr[index];
+         i < mass_matrix[0].n_rows();
+         ++i, ++v)
+      {
+        for (unsigned int j = 0; j < mass_matrix[0].n_cols(); ++j, ++m)
+          {
+            this->mass_matrices[m]       = mass_matrix[0][i][j];
+            this->derivative_matrices[m] = derivative_matrix[0][i][j];
+            this->eigenvectors[m]        = eigenvectors[0][i][j];
+          }
+
+        this->eigenvalues[v] = eigenvalues[0][i];
+      }
   };
 
   if (cache.size() == indices.size())
@@ -1115,12 +1132,50 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
         inverted_cache[i.second] = i.first;
 
       for (unsigned int i = 0; i < indices.size(); ++i)
+        {
+          const auto &M = inverted_cache[indices[i]].first;
+
+          this->vector_ptr[i + 1] = M.n_rows();
+          this->matrix_ptr[i + 1] = M.n_rows() * M.n_cols();
+        }
+
+      for (unsigned int i = 0; i < cache.size(); ++i)
+        {
+          this->vector_ptr[i + 1] += this->vector_ptr[i];
+          this->matrix_ptr[i + 1] += this->matrix_ptr[i];
+        }
+
+      this->mass_matrices.resize(matrix_ptr.back());
+      this->derivative_matrices.resize(matrix_ptr.back());
+      this->eigenvectors.resize(matrix_ptr.back());
+      this->eigenvalues.resize(vector_ptr.back());
+
+      for (unsigned int i = 0; i < indices.size(); ++i)
         store(i, inverted_cache[indices[i]]);
 
       indices.clear();
     }
   else
     {
+      for (const auto &i : cache)
+        {
+          const auto &M = i.first.first;
+
+          this->vector_ptr[i.second + 1] = M.n_rows();
+          this->matrix_ptr[i.second + 1] = M.n_rows() * M.n_cols();
+        }
+
+      for (unsigned int i = 0; i < cache.size(); ++i)
+        {
+          this->vector_ptr[i + 1] += this->vector_ptr[i];
+          this->matrix_ptr[i + 1] += this->matrix_ptr[i];
+        }
+
+      this->mass_matrices.resize(matrix_ptr.back());
+      this->derivative_matrices.resize(matrix_ptr.back());
+      this->eigenvectors.resize(matrix_ptr.back());
+      this->eigenvalues.resize(vector_ptr.back());
+
       for (const auto &i : cache)
         store(i.second, i.first);
     }
@@ -1149,9 +1204,11 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
       const unsigned int translated_index =
         (indices.size() > 0) ? indices[dim * index + d] : (dim * index + d);
 
-      eigenvectors[d]         = &this->eigenvectors[translated_index](0, 0);
-      eigenvalues[d]          = this->eigenvalues[translated_index].data();
-      n_rows_1d_non_templated = this->eigenvalues[translated_index].size();
+      eigenvectors[d] =
+        this->eigenvectors.data() + matrix_ptr[translated_index];
+      eigenvalues[d] = this->eigenvalues.data() + vector_ptr[translated_index];
+      n_rows_1d_non_templated =
+        vector_ptr[translated_index + 1] - vector_ptr[translated_index];
     }
 
   if (n_rows_1d != -1)
