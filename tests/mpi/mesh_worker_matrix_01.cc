@@ -258,7 +258,6 @@ test(const FiniteElement<dim> &fe)
           std::vector<types::global_dof_index> &renumbered =
             dofmap[cell->id().to_string()];
           cell->set_dof_indices(renumbered);
-          cell->update_cell_dof_indices_cache();
         }
     }
 
