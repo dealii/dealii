@@ -2111,10 +2111,6 @@ public:
    */
 
 private:
-  // Make the DoFHandler class a friend so that it can call the
-  // update_cell_dof_indices_cache() function
-  template <int, int>
-  friend class DoFHandler;
   friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 };
 
