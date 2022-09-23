@@ -6,7 +6,7 @@ DEAL::ok
   <Domain>
     <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
       <Grid Name="mesh" GridType="Uniform">
-        <Time Value="0"/>
+        <Time Value="1.0000000001"/>
         <Geometry GeometryType="XY">
           <DataItem Dimensions="36 2" NumberType="Float" Precision="8" Format="HDF">
             out.h5:/nodes
