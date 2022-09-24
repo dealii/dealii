@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/floating_point_comparator.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
@@ -153,20 +154,12 @@ namespace TriangulationDescription
 
           if (vertices_have_unique_ids == false) // need to compare points
             {
-              // comparator of points
-              const auto comp = [](const auto &a, const auto &b) {
-                const double tolerance = 1e-10;
-
-                for (unsigned int i = 0; i < spacedim; ++i)
-                  if (std::abs(a[i] - b[i]) > tolerance)
-                    return a[i] < b[i];
-
-                return false;
-              };
-
               // map point to local vertex index
-              std::map<Point<spacedim>, unsigned int, decltype(comp)>
-                map_point_to_local_vertex_index(comp);
+              std::map<Point<spacedim>,
+                       unsigned int,
+                       FloatingPointComparator<double>>
+                map_point_to_local_vertex_index(
+                  FloatingPointComparator<double>(1e-10));
 
               // ... initialize map with existing points
               for (unsigned int i = 0; i < this->coarse_cell_vertices.size();
