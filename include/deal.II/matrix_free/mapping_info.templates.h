@@ -348,7 +348,8 @@ namespace internal
       struct CompressedCellData
       {
         CompressedCellData(const double expected_size)
-          : data(FloatingPointComparator<VectorizedArrayType>(expected_size))
+          : data(FloatingPointComparator<VectorizedArrayType>(
+              expected_size * std::numeric_limits<double>::epsilon() * 1024.))
         {}
 
         std::map<Tensor<2, dim, Tensor<1, VectorizedArrayType::size(), Number>>,
@@ -1078,12 +1079,12 @@ namespace internal
         // first quadrature point on the cell - we use a relatively coarse
         // tolerance to account for some inaccuracies in the manifold
         // evaluation
-        const FloatingPointComparator<VectorizedArray<double>> comparator(
-          1e4 * jacobian_size);
         std::map<std::array<Tensor<2, dim>, dim + 1>,
                  unsigned int,
                  FloatingPointComparator<VectorizedArray<double>>>
-          compressed_jacobians(comparator);
+          compressed_jacobians(FloatingPointComparator<VectorizedArray<double>>(
+            1e4 * jacobian_size * std::numeric_limits<double>::epsilon() *
+            1024.));
 
         unsigned int n_data_buckets = 0;
         for (unsigned int cell = 0; cell < jacobians_on_stencil.size(); ++cell)
@@ -1505,8 +1506,9 @@ namespace internal
         // CompressedCellData) and add another factor of 512 to account for
         // some roundoff effects.
         CompressedFaceData(const Number jacobian_size)
-          : data(FloatingPointComparator<VectorizedArrayType>(512. /
-                                                              jacobian_size))
+          : data(FloatingPointComparator<VectorizedArrayType>(
+              512. / jacobian_size * std::numeric_limits<double>::epsilon() *
+              1024.))
           , jacobian_size(jacobian_size)
         {}
 

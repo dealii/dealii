@@ -18,9 +18,11 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>
 
+#include <bitset>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -38,79 +40,97 @@ DEAL_II_NAMESPACE_OPEN
  * satisfied). This is not a problem in the use cases for this class, but be
  * careful when using it in other contexts.
  */
-template <typename VectorizedArrayType>
+template <typename Number>
 struct FloatingPointComparator
 {
-  using Number = typename dealii::internal::VectorizedArrayTrait<
-    VectorizedArrayType>::value_type;
+  using ScalarNumber =
+    typename dealii::internal::VectorizedArrayTrait<Number>::value_type;
   static constexpr std::size_t width =
-    dealii::internal::VectorizedArrayTrait<VectorizedArrayType>::width;
+    dealii::internal::VectorizedArrayTrait<Number>::width;
 
-  FloatingPointComparator(const Number scaling);
+  /**
+   * Constructor.
+   */
+  FloatingPointComparator(
+    const ScalarNumber        tolerance,
+    const bool                use_absolute_tolerance = true,
+    const std::bitset<width> &mask = std::bitset<width>().flip());
+
+  FloatingPointComparator(const FloatingPointComparator &rhs) = default;
+
+  FloatingPointComparator(FloatingPointComparator &&rhs) noexcept = default;
 
   /**
    * Compare two vectors of numbers (not necessarily of the same length),
    * where vectors of different lengths are first sorted by their length and
    * then by the entries.
    */
+  template <typename T>
   bool
-  operator()(const std::vector<Number> &v1,
-             const std::vector<Number> &v2) const;
+  operator()(const std::vector<T> &v1, const std::vector<T> &v2) const;
 
   /**
-   * Compare two vectorized arrays (stored as tensors to avoid alignment
-   * issues).
+   * Compare two arrays.
    */
+  template <std::size_t dim, typename T>
   bool
-  operator()(const Tensor<1, width, Number> &t1,
-             const Tensor<1, width, Number> &t2) const;
+  operator()(const std::array<T, dim> &t1, const std::array<T, dim> &t2) const;
 
   /**
-   * Compare two rank-1 tensors of vectorized arrays (stored as tensors to
-   * avoid alignment issues).
+   * Compare two tensors.
    */
-  template <int dim>
+  template <int rank, int dim, typename T>
   bool
-  operator()(const Tensor<1, dim, Tensor<1, width, Number>> &t1,
-             const Tensor<1, dim, Tensor<1, width, Number>> &t2) const;
+  operator()(const Tensor<rank, dim, T> &t1,
+             const Tensor<rank, dim, T> &t2) const;
 
   /**
-   * Compare two rank-2 tensors of vectorized arrays (stored as tensors to
-   * avoid alignment issues).
+   * Compare two tables.
    */
-  template <int dim>
+  template <typename T>
   bool
-  operator()(const Tensor<2, dim, Tensor<1, width, Number>> &t1,
-             const Tensor<2, dim, Tensor<1, width, Number>> &t2) const;
+  operator()(const Table<2, T> &t1, const Table<2, T> &t2) const;
 
   /**
-   * Compare two arrays of tensors.
+   * Compare two scalar numbers.
    */
-  template <int dim>
   bool
-  operator()(const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
-             const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const;
+  operator()(const ScalarNumber &s1, const ScalarNumber &s2) const;
 
-  Number tolerance;
+  /**
+   * Compare two  VectorizedArray instances.
+   */
+  bool
+  operator()(const VectorizedArray<ScalarNumber, width> &v1,
+             const VectorizedArray<ScalarNumber, width> &v2) const;
+
+private:
+  const ScalarNumber       tolerance;
+  const bool               use_absolute_tolerance;
+  const std::bitset<width> mask;
 };
 
 
 /* ------------------------------------------------------------------ */
 
 
-template <typename VectorizedArrayType>
-FloatingPointComparator<VectorizedArrayType>::FloatingPointComparator(
-  const Number scaling)
-  : tolerance(scaling * std::numeric_limits<double>::epsilon() * 1024.)
+template <typename Number>
+FloatingPointComparator<Number>::FloatingPointComparator(
+  const ScalarNumber        tolerance,
+  const bool                use_absolute_tolerance,
+  const std::bitset<width> &mask)
+  : tolerance(tolerance)
+  , use_absolute_tolerance(use_absolute_tolerance)
+  , mask(mask)
 {}
 
 
 
-template <typename VectorizedArrayType>
+template <typename Number>
+template <typename T>
 bool
-FloatingPointComparator<VectorizedArrayType>::operator()(
-  const std::vector<Number> &v1,
-  const std::vector<Number> &v2) const
+FloatingPointComparator<Number>::operator()(const std::vector<T> &v1,
+                                            const std::vector<T> &v2) const
 {
   const unsigned int s1 = v1.size(), s2 = v2.size();
   if (s1 < s2)
@@ -119,82 +139,105 @@ FloatingPointComparator<VectorizedArrayType>::operator()(
     return false;
   else
     for (unsigned int i = 0; i < s1; ++i)
-      if (v1[i] < v2[i] - tolerance)
+      if (this->operator()(v1[i], v2[i]))
         return true;
-      else if (v1[i] > v2[i] + tolerance)
+      else if (this->operator()(v2[i], v1[i]))
         return false;
   return false;
 }
 
 
 
-template <typename VectorizedArrayType>
+template <typename Number>
+template <std::size_t dim, typename T>
 bool
-FloatingPointComparator<VectorizedArrayType>::operator()(
-  const Tensor<1, width, Number> &t1,
-  const Tensor<1, width, Number> &t2) const
+FloatingPointComparator<Number>::operator()(const std::array<T, dim> &t1,
+                                            const std::array<T, dim> &t2) const
 {
-  for (unsigned int k = 0; k < width; ++k)
-    if (t1[k] < t2[k] - tolerance)
+  for (unsigned int i = 0; i < t1.size(); ++i)
+    if (this->operator()(t1[i], t2[i]))
       return true;
-    else if (t1[k] > t2[k] + tolerance)
+    else if (this->operator()(t2[i], t1[i]))
       return false;
   return false;
 }
 
 
 
-template <typename VectorizedArrayType>
-template <int dim>
+template <typename Number>
+template <int rank, int dim, typename T>
 bool
-FloatingPointComparator<VectorizedArrayType>::operator()(
-  const Tensor<1, dim, Tensor<1, width, Number>> &t1,
-  const Tensor<1, dim, Tensor<1, width, Number>> &t2) const
+FloatingPointComparator<Number>::operator()(
+  const Tensor<rank, dim, T> &t1,
+  const Tensor<rank, dim, T> &t2) const
 {
-  for (unsigned int d = 0; d < dim; ++d)
-    for (unsigned int k = 0; k < width; ++k)
-      if (t1[d][k] < t2[d][k] - tolerance)
+  for (unsigned int k = 0; k < dim; ++k)
+    if (this->operator()(t1[k], t2[k]))
+      return true;
+    else if (this->operator()(t2[k], t1[k]))
+      return false;
+  return false;
+}
+
+
+
+template <typename Number>
+template <typename T>
+bool
+FloatingPointComparator<Number>::operator()(const Table<2, T> &t1,
+                                            const Table<2, T> &t2) const
+{
+  AssertDimension(t1.size(0), t2.size(0));
+  AssertDimension(t1.size(1), t2.size(1));
+
+  for (unsigned int i = 0; i < t1.size(0); ++i)
+    for (unsigned int j = 0; j < t1.size(1); ++j)
+      if (this->operator()(t1[i][j], t2[i][j]))
         return true;
-      else if (t1[d][k] > t2[d][k] + tolerance)
+      else if (this->operator()(t2[i][j], t1[i][j]))
         return false;
   return false;
 }
 
-
-
-template <typename VectorizedArrayType>
-template <int dim>
+template <typename Number>
 bool
-FloatingPointComparator<VectorizedArrayType>::operator()(
-  const Tensor<2, dim, Tensor<1, width, Number>> &t1,
-  const Tensor<2, dim, Tensor<1, width, Number>> &t2) const
+FloatingPointComparator<Number>::operator()(const ScalarNumber &s1,
+                                            const ScalarNumber &s2) const
 {
-  for (unsigned int d = 0; d < dim; ++d)
-    for (unsigned int e = 0; e < dim; ++e)
-      for (unsigned int k = 0; k < width; ++k)
-        if (t1[d][e][k] < t2[d][e][k] - tolerance)
-          return true;
-        else if (t1[d][e][k] > t2[d][e][k] + tolerance)
-          return false;
+  if (mask[0])
+    {
+      const ScalarNumber tolerance = use_absolute_tolerance ?
+                                       this->tolerance :
+                                       (std::abs(s1 + s2) * this->tolerance);
+
+      if ((s1 < s2 - tolerance))
+        return true;
+      else
+        return false;
+    }
+
   return false;
 }
 
-
-
-template <typename VectorizedArrayType>
-template <int dim>
+template <typename Number>
 bool
-FloatingPointComparator<VectorizedArrayType>::operator()(
-  const std::array<Tensor<2, dim, Number>, dim + 1> &t1,
-  const std::array<Tensor<2, dim, Number>, dim + 1> &t2) const
+FloatingPointComparator<Number>::operator()(
+  const VectorizedArray<ScalarNumber, width> &v1,
+  const VectorizedArray<ScalarNumber, width> &v2) const
 {
-  for (unsigned int i = 0; i < t1.size(); ++i)
-    for (unsigned int d = 0; d < dim; ++d)
-      for (unsigned int e = 0; e < dim; ++e)
-        if (t1[i][d][e] < t2[i][d][e] - tolerance)
+  for (unsigned int v = 0; v < width; ++v)
+    if (mask[v])
+      {
+        const ScalarNumber tolerance =
+          use_absolute_tolerance ? this->tolerance :
+                                   (std::abs(v1[v] + v2[v]) * this->tolerance);
+
+        if (v1[v] < v2[v] - tolerance)
           return true;
-        else if (t1[i][d][e] > t2[i][d][e] + tolerance)
+        if (v1[v] > v2[v] + tolerance)
           return false;
+      }
+
   return false;
 }
 
