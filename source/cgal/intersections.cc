@@ -552,7 +552,7 @@ namespace CGALWrappers
       {
         const auto &tet = tria.tetrahedron(c);
 
-        for (const auto f : tria_quad.finite_facets())
+        for (const auto &f : tria_quad.finite_facets())
           {
             if (CGAL::do_intersect(tet, tria_quad.triangle(f)))
               {
