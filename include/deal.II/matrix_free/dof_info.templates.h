@@ -118,7 +118,6 @@ namespace internal
       bool &                                      cell_at_subdomain_boundary)
     {
       Assert(vector_partitioner.get() != nullptr, ExcInternalError());
-      const unsigned int n_mpi_procs = vector_partitioner->n_mpi_processes();
       const types::global_dof_index first_owned =
         vector_partitioner->local_range().first;
       const types::global_dof_index last_owned =
@@ -136,12 +135,12 @@ namespace internal
         dofs_per_cell.size() == 1 ? 0 : cell_active_fe_index[cell_number];
       const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
       const unsigned int n_components   = start_components.back();
+      unsigned int       i              = 0;
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           std::pair<unsigned short, unsigned short> constraint_iterator(0, 0);
-          for (unsigned int i = component_dof_indices_offset[fe_index][comp];
-               i < component_dof_indices_offset[fe_index][comp + 1];
-               i++)
+          const auto next = component_dof_indices_offset[fe_index][comp + 1];
+          for (; i < next; ++i)
             {
               types::global_dof_index current_dof = local_indices_resolved[i];
               const auto *            entries_ptr =
@@ -190,9 +189,8 @@ namespace internal
                           constraint_values.constraint_indices;
                       for (unsigned int j = 0; j < n_entries; ++j)
                         {
-                          if (n_mpi_procs > 1 &&
-                              (constraint_indices[j] < first_owned ||
-                               constraint_indices[j] >= last_owned))
+                          if (constraint_indices[j] < first_owned ||
+                              constraint_indices[j] >= last_owned)
                             {
                               dof_indices.push_back(n_owned +
                                                     ghost_dofs.size());
@@ -217,8 +215,7 @@ namespace internal
                   // Not constrained, we simply have to add the local index to
                   // the indices_local_to_global list and increment constraint
                   // iterator. transform to local index space/mark as ghost
-                  if (n_mpi_procs > 1 &&
-                      (current_dof < first_owned || current_dof >= last_owned))
+                  if (current_dof < first_owned || current_dof >= last_owned)
                     {
                       ghost_dofs.push_back(current_dof);
                       current_dof = n_owned + ghost_dofs.size() - 1;
@@ -260,8 +257,7 @@ namespace internal
               for (unsigned int i = 0; i < dofs_this_cell; ++i)
                 {
                   types::global_dof_index current_dof = local_indices[i];
-                  if (n_mpi_procs > 1 &&
-                      (current_dof < first_owned || current_dof >= last_owned))
+                  if (current_dof < first_owned || current_dof >= last_owned)
                     {
                       ghost_dofs.push_back(current_dof);
                       current_dof = n_owned + ghost_dofs.size() - 1;
