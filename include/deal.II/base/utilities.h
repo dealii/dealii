@@ -1252,7 +1252,10 @@ namespace Utilities
       const std::vector<char>::const_iterator &cend,
       std::vector<T> &                         object)
     {
-      // First get the size of the vector, and resize the output object
+      // The size of the object vector can be found in cbegin of the buffer.
+      // The data starts at cbegin + sizeof(vector_size).
+
+      // Get the size of the vector
       typename std::vector<T>::size_type vector_size;
       memcpy(&vector_size, &*cbegin, sizeof(vector_size));
 
@@ -1262,13 +1265,15 @@ namespace Utilities
              ExcMessage("The given buffer has the wrong size."));
       (void)cend;
 
-      // Then copy the elements:
+      // Copy the elements:
       object.clear();
       if (vector_size > 0)
-        object.insert(object.end(),
-                      reinterpret_cast<const T *>(&*cbegin +
-                                                  sizeof(vector_size)),
-                      reinterpret_cast<const T *>(&*cend));
+        {
+          const auto buffer_data_begin =
+            reinterpret_cast<const T *>(&*cbegin + sizeof(vector_size));
+          const auto buffer_data_end = buffer_data_begin + vector_size;
+          object.insert(object.end(), buffer_data_begin, buffer_data_end);
+        }
     }
 
 
