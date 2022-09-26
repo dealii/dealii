@@ -552,7 +552,7 @@ namespace CGALWrappers
       {
         const auto &tet = tria.tetrahedron(c);
 
-        for (const auto f : tria_quad.finite_facets())
+        for (const auto &f : tria_quad.finite_facets())
           {
             if (CGAL::do_intersect(tet, tria_quad.triangle(f)))
               {
@@ -669,10 +669,10 @@ namespace CGALWrappers
                                      tet1.vertex(2),
                                      tet1.vertex(3),
                                      surf1);
+            namespace PMP = CGAL::Polygon_mesh_processing;
             const bool test_intersection =
-              CGAL::PMP::corefine_and_compute_intersection(surf0, surf1, sm);
-            if (CGAL::Polygon_mesh_processing::volume(sm) > tol &&
-                test_intersection)
+              PMP::corefine_and_compute_intersection(surf0, surf1, sm);
+            if (PMP::volume(sm) > tol && test_intersection)
               {
                 // Collect tetrahedrons
                 Triangulation3_inexact tria;
