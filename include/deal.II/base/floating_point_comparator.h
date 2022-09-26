@@ -116,7 +116,7 @@ struct FloatingPointComparator
    * Compare two scalar numbers.
    */
   ComparisonResult
-  compare(const ScalarNumber &s1, const ScalarNumber &s2) const;
+  compare(const ScalarNumber s1, const ScalarNumber s2) const;
 
   /**
    * Compare two VectorizedArray instances.
@@ -240,14 +240,15 @@ FloatingPointComparator<Number>::compare(const Table<2, T> &t1,
 
 template <typename Number>
 typename FloatingPointComparator<Number>::ComparisonResult
-FloatingPointComparator<Number>::compare(const ScalarNumber &s1,
-                                         const ScalarNumber &s2) const
+FloatingPointComparator<Number>::compare(const ScalarNumber s1,
+                                         const ScalarNumber s2) const
 {
   if (width == 1 || mask[0])
     {
-      const ScalarNumber tolerance = use_absolute_tolerance ?
-                                       this->tolerance :
-                                       (std::abs(s1 + s2) * this->tolerance);
+      const ScalarNumber tolerance =
+        use_absolute_tolerance ?
+          this->tolerance :
+          ((std::abs(s1) + std::abs(s2)) * this->tolerance);
 
       if (s1 < s2 - tolerance)
         return ComparisonResult::less;
