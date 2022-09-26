@@ -2196,6 +2196,9 @@ template <typename number>
 inline bool
 AffineConstraints<number>::is_constrained(const size_type index) const
 {
+  if (lines.empty())
+    return false;
+
   const size_type line_index = calculate_line_index(index);
   return ((line_index < lines_cache.size()) &&
           (lines_cache[line_index] != numbers::invalid_size_type));
@@ -2223,6 +2226,9 @@ template <typename number>
 inline const std::vector<std::pair<types::global_dof_index, number>> *
 AffineConstraints<number>::get_constraint_entries(const size_type line_n) const
 {
+  if (lines.empty())
+    return nullptr;
+
   // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line_n);
