@@ -49,6 +49,18 @@ struct FloatingPointComparator
     dealii::internal::VectorizedArrayTrait<Number>::width;
 
   /**
+   * An enum to decode whether a particular comparison returns less, larger,
+   * or equal. This is needed beyond the regular operator() because of
+   * efficiency reasons in nested checks as supported by this class.
+   */
+  enum class ComparisonResult
+  {
+    less,
+    equal,
+    greater
+  };
+
+  /**
    * Constructor.
    */
   FloatingPointComparator(
@@ -61,48 +73,57 @@ struct FloatingPointComparator
   FloatingPointComparator(FloatingPointComparator &&rhs) noexcept = default;
 
   /**
+   * Compare two objects of the same type and return `true` in case the first
+   * object is less than the second one. This function calls the compare()
+   * functions below, so only types supported by compare() will work with this
+   * function.
+   */
+  template <typename T>
+  bool
+  operator()(const T &object1, const T &object2) const;
+
+  /**
    * Compare two vectors of numbers (not necessarily of the same length),
    * where vectors of different lengths are first sorted by their length and
    * then by the entries.
    */
   template <typename T>
-  bool
-  operator()(const std::vector<T> &v1, const std::vector<T> &v2) const;
+  ComparisonResult
+  compare(const std::vector<T> &v1, const std::vector<T> &v2) const;
 
   /**
    * Compare two arrays.
    */
   template <std::size_t dim, typename T>
-  bool
-  operator()(const std::array<T, dim> &t1, const std::array<T, dim> &t2) const;
+  ComparisonResult
+  compare(const std::array<T, dim> &t1, const std::array<T, dim> &t2) const;
 
   /**
    * Compare two tensors.
    */
   template <int rank, int dim, typename T>
-  bool
-  operator()(const Tensor<rank, dim, T> &t1,
-             const Tensor<rank, dim, T> &t2) const;
+  ComparisonResult
+  compare(const Tensor<rank, dim, T> &t1, const Tensor<rank, dim, T> &t2) const;
 
   /**
    * Compare two tables.
    */
   template <typename T>
-  bool
-  operator()(const Table<2, T> &t1, const Table<2, T> &t2) const;
+  ComparisonResult
+  compare(const Table<2, T> &t1, const Table<2, T> &t2) const;
 
   /**
    * Compare two scalar numbers.
    */
-  bool
-  operator()(const ScalarNumber &s1, const ScalarNumber &s2) const;
+  ComparisonResult
+  compare(const ScalarNumber &s1, const ScalarNumber &s2) const;
 
   /**
-   * Compare two  VectorizedArray instances.
+   * Compare two VectorizedArray instances.
    */
-  bool
-  operator()(const VectorizedArray<ScalarNumber, width> &v1,
-             const VectorizedArray<ScalarNumber, width> &v2) const;
+  ComparisonResult
+  compare(const VectorizedArray<ScalarNumber, width> &v1,
+          const VectorizedArray<ScalarNumber, width> &v2) const;
 
 private:
   const ScalarNumber       tolerance;
@@ -122,123 +143,136 @@ FloatingPointComparator<Number>::FloatingPointComparator(
   : tolerance(tolerance)
   , use_absolute_tolerance(use_absolute_tolerance)
   , mask(mask)
-{}
+{
+  Assert(mask.count() > 0, ExcMessage("No component selected"));
+}
 
 
 
 template <typename Number>
 template <typename T>
 bool
-FloatingPointComparator<Number>::operator()(const std::vector<T> &v1,
-                                            const std::vector<T> &v2) const
+FloatingPointComparator<Number>::operator()(const T &object1,
+                                            const T &object2) const
+{
+  return compare(object1, object2) == ComparisonResult::less;
+}
+
+
+
+template <typename Number>
+template <typename T>
+typename FloatingPointComparator<Number>::ComparisonResult
+FloatingPointComparator<Number>::compare(const std::vector<T> &v1,
+                                         const std::vector<T> &v2) const
 {
   const unsigned int s1 = v1.size(), s2 = v2.size();
   if (s1 < s2)
-    return true;
+    return ComparisonResult::less;
   else if (s1 > s2)
-    return false;
+    return ComparisonResult::greater;
   else
     for (unsigned int i = 0; i < s1; ++i)
-      if (this->operator()(v1[i], v2[i]))
-        return true;
-      else if (this->operator()(v2[i], v1[i]))
-        return false;
-  return false;
+      {
+        const ComparisonResult result = compare(v1[i], v2[i]);
+        if (result != ComparisonResult::equal)
+          return result;
+      }
+  return ComparisonResult::equal;
 }
 
 
 
 template <typename Number>
 template <std::size_t dim, typename T>
-bool
-FloatingPointComparator<Number>::operator()(const std::array<T, dim> &t1,
-                                            const std::array<T, dim> &t2) const
+typename FloatingPointComparator<Number>::ComparisonResult
+FloatingPointComparator<Number>::compare(const std::array<T, dim> &t1,
+                                         const std::array<T, dim> &t2) const
 {
   for (unsigned int i = 0; i < t1.size(); ++i)
-    if (this->operator()(t1[i], t2[i]))
-      return true;
-    else if (this->operator()(t2[i], t1[i]))
-      return false;
-  return false;
+    {
+      const ComparisonResult result = compare(t1[i], t2[i]);
+      if (result != ComparisonResult::equal)
+        return result;
+    }
+  return ComparisonResult::equal;
 }
 
 
 
 template <typename Number>
 template <int rank, int dim, typename T>
-bool
-FloatingPointComparator<Number>::operator()(
-  const Tensor<rank, dim, T> &t1,
-  const Tensor<rank, dim, T> &t2) const
+typename FloatingPointComparator<Number>::ComparisonResult
+FloatingPointComparator<Number>::compare(const Tensor<rank, dim, T> &t1,
+                                         const Tensor<rank, dim, T> &t2) const
 {
-  for (unsigned int k = 0; k < dim; ++k)
-    if (this->operator()(t1[k], t2[k]))
-      return true;
-    else if (this->operator()(t2[k], t1[k]))
-      return false;
-  return false;
+  for (unsigned int i = 0; i < dim; ++i)
+    {
+      const ComparisonResult result = compare(t1[i], t2[i]);
+      if (result != ComparisonResult::equal)
+        return result;
+    }
+  return ComparisonResult::equal;
 }
 
 
 
 template <typename Number>
 template <typename T>
-bool
-FloatingPointComparator<Number>::operator()(const Table<2, T> &t1,
-                                            const Table<2, T> &t2) const
+typename FloatingPointComparator<Number>::ComparisonResult
+FloatingPointComparator<Number>::compare(const Table<2, T> &t1,
+                                         const Table<2, T> &t2) const
 {
   AssertDimension(t1.size(0), t2.size(0));
   AssertDimension(t1.size(1), t2.size(1));
 
   for (unsigned int i = 0; i < t1.size(0); ++i)
     for (unsigned int j = 0; j < t1.size(1); ++j)
-      if (this->operator()(t1[i][j], t2[i][j]))
-        return true;
-      else if (this->operator()(t2[i][j], t1[i][j]))
-        return false;
-  return false;
+      {
+        const ComparisonResult result = compare(t1[i][j], t2[i][j]);
+        if (result != ComparisonResult::equal)
+          return result;
+      }
+  return ComparisonResult::equal;
 }
 
+
+
 template <typename Number>
-bool
-FloatingPointComparator<Number>::operator()(const ScalarNumber &s1,
-                                            const ScalarNumber &s2) const
+typename FloatingPointComparator<Number>::ComparisonResult
+FloatingPointComparator<Number>::compare(const ScalarNumber &s1,
+                                         const ScalarNumber &s2) const
 {
-  if (mask[0])
+  if (width == 1 || mask[0])
     {
       const ScalarNumber tolerance = use_absolute_tolerance ?
                                        this->tolerance :
                                        (std::abs(s1 + s2) * this->tolerance);
 
-      if ((s1 < s2 - tolerance))
-        return true;
-      else
-        return false;
+      if (s1 < s2 - tolerance)
+        return ComparisonResult::less;
+      else if (s1 > s2 + tolerance)
+        return ComparisonResult::greater;
     }
 
-  return false;
+  return ComparisonResult::equal;
 }
 
 template <typename Number>
-bool
-FloatingPointComparator<Number>::operator()(
+typename FloatingPointComparator<Number>::ComparisonResult
+FloatingPointComparator<Number>::compare(
   const VectorizedArray<ScalarNumber, width> &v1,
   const VectorizedArray<ScalarNumber, width> &v2) const
 {
-  for (unsigned int v = 0; v < width; ++v)
-    if (mask[v])
+  for (unsigned int i = 0; i < width; ++i)
+    if (mask[i])
       {
-        const ScalarNumber tolerance =
-          use_absolute_tolerance ? this->tolerance :
-                                   (std::abs(v1[v] + v2[v]) * this->tolerance);
-
-        if (v1[v] < v2[v] - tolerance)
-          return true;
-        if (v1[v] > v2[v] + tolerance)
-          return false;
+        const ComparisonResult result = compare(v1[i], v2[i]);
+        if (result != ComparisonResult::equal)
+          return result;
       }
 
-  return false;
+  return ComparisonResult::equal;
 }
 
 
