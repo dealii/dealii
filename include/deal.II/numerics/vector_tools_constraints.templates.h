@@ -88,6 +88,46 @@ namespace VectorTools
 
 
     /**
+     * Copied from VectorDoFTuple but only stores
+     * active fe index, face number, DoF index.
+     */
+    struct FaceDoFInfo
+    {
+      static const unsigned int size = 3;
+      // store active fe indeX, face number, DoF index
+      unsigned int indices[size];
+
+      bool
+      operator<(const FaceDoFInfo &other) const
+      {
+        for (unsigned int i = 0; i < size; ++i)
+          if (indices[i] < other.indices[i])
+            return true;
+          else if (indices[i] > other.indices[i])
+            return false;
+        return false;
+      }
+
+      bool
+      operator==(const FaceDoFInfo &other) const
+      {
+        for (unsigned int i = 0; i < size; ++i)
+          if (indices[i] != other.indices[i])
+            return false;
+
+        return true;
+      }
+
+      bool
+      operator!=(const FaceDoFInfo &other) const
+      {
+        return !(*this == other);
+      }
+    };
+
+
+
+    /**
      * Add the constraint $\vec n \cdot \vec u = inhom$ to the list of
      * constraints.
      *
@@ -465,6 +505,87 @@ namespace VectorTools
     }
 
 
+
+    /**
+     * Map active fe index,  face number and
+     * local degrees of freedom index to the dim degrees of freedom indices that
+     * correspond to a vector-valued quantity at the same support point.
+     */
+    template <int dim, int spacedim>
+    void
+    map_face_dof_to_vector_dof(
+      const typename DoFHandler<dim, spacedim>::cell_iterator &cell,
+      const unsigned int                  first_vector_component,
+      const std::set<types::boundary_id> &boundary_ids,
+      hp::FEFaceValues<dim, spacedim> &   x_fe_face_values,
+      const IndexSet &                    refinement_edge_indices,
+      const unsigned int                  level,
+      std::map<internal::FaceDoFInfo, std::array<unsigned int, dim>>
+        &dof_to_vector_dof)
+    {
+      std::set<types::boundary_id>::iterator b_id;
+      for (const unsigned int face_no : cell->face_indices())
+        if ((b_id = boundary_ids.find(cell->face(face_no)->boundary_id())) !=
+            boundary_ids.end())
+          {
+            const FiniteElement<dim> &fe = cell->get_fe();
+            typename DoFHandler<dim, spacedim>::level_face_iterator face =
+              cell->face(face_no);
+
+            std::vector<types::global_dof_index> face_dofs;
+            // get the indices of the dofs on this cell...
+            face_dofs.resize(fe.n_dofs_per_face(face_no));
+
+            if (level != numbers::invalid_unsigned_int)
+              face->get_mg_dof_indices(level,
+                                       face_dofs,
+                                       cell->active_fe_index());
+            else
+              face->get_dof_indices(face_dofs, cell->active_fe_index());
+
+            x_fe_face_values.reinit(cell, face_no);
+
+            const auto &face_quadrature_collection =
+              x_fe_face_values.get_quadrature_collection();
+
+            std::array<unsigned int, dim> local_vector_indices;
+            for (unsigned int i = 0; i < face_dofs.size(); ++i)
+              {
+                if (fe.face_system_to_component_index(i, face_no).first ==
+                    first_vector_component)
+                  if (level == numbers::invalid_unsigned_int ||
+                      !refinement_edge_indices.is_element(face_dofs[i]))
+                    {
+                      local_vector_indices[0]                         = i;
+                      const internal::FaceDoFInfo local_face_dof_info = {
+                        {cell->active_fe_index(), face_no, i}};
+                      for (unsigned int k = 0; k < fe.n_dofs_per_face(face_no);
+                           ++k)
+                        if ((k != i) &&
+                            (face_quadrature_collection[cell->active_fe_index()]
+                               .point(k) ==
+                             face_quadrature_collection[cell->active_fe_index()]
+                               .point(i)) &&
+                            (fe.face_system_to_component_index(k, face_no)
+                               .first >= first_vector_component) &&
+                            (fe.face_system_to_component_index(k, face_no)
+                               .first < first_vector_component + dim))
+                          {
+                            local_vector_indices
+                              [fe.face_system_to_component_index(k, face_no)
+                                 .first -
+                               first_vector_component] = k;
+                          }
+                      dof_to_vector_dof.insert(
+                        std::make_pair(local_face_dof_info,
+                                       local_vector_indices));
+                    }
+              }
+          }
+    }
+
+
+
     /**
      * Compute the mappings from vector degrees of freedom to normal vectors @p dof_to_normals_map
      * and vector degrees of freedom to prescribed normal fluxes @p dof_vector_to_b_values.
@@ -489,6 +610,21 @@ namespace VectorTools
       std::map<internal::VectorDoFTuple<dim>, Vector<double>>
         &dof_vector_to_b_values)
     {
+      // mapping from (active_fe_index, face_no and local
+      // dof index) to dim vector indices of the same
+      // supporting point.
+      std::map<internal::FaceDoFInfo, std::array<unsigned int, dim>>
+        dof_to_vector_dof;
+      internal::map_face_dof_to_vector_dof<dim, spacedim>(
+        cell,
+        first_vector_component,
+        boundary_ids,
+        x_fe_face_values,
+        refinement_edge_indices,
+        level,
+        dof_to_vector_dof);
+
+
       std::set<types::boundary_id>::iterator b_id;
       for (const unsigned int face_no : cell->face_indices())
         if ((b_id = boundary_ids.find(cell->face(face_no)->boundary_id())) !=
@@ -513,9 +649,6 @@ namespace VectorTools
             const FEFaceValues<dim> &fe_values =
               x_fe_face_values.get_present_fe_values();
 
-            const auto &face_quadrature_collection =
-              x_fe_face_values.get_quadrature_collection();
-
             // then identify which of them correspond to the selected set of
             // vector components
             for (unsigned int i = 0; i < face_dofs.size(); ++i)
@@ -527,9 +660,12 @@ namespace VectorTools
                 if (level == numbers::invalid_unsigned_int ||
                     !refinement_edge_indices.is_element(face_dofs[i]))
                   {
-                    // find corresponding other components of vector
-                    internal::VectorDoFTuple<dim> vector_dofs;
-                    vector_dofs.dof_indices[0] = face_dofs[i];
+                    const internal::FaceDoFInfo face_dof_info = {
+                      {cell->active_fe_index(), face_no, i}};
+                    const auto it = dof_to_vector_dof.find(face_dof_info);
+                    Assert(it != dof_to_vector_dof.end(), ExcInternalError());
+                    const std::array<unsigned int, dim> local_vector_indices =
+                      it->second;
 
                     Assert(
                       first_vector_component + dim <= fe.n_components(),
@@ -537,20 +673,12 @@ namespace VectorTools
                         "Error: the finite element does not have enough components "
                         "to define a normal direction."));
 
-                    for (unsigned int k = 0; k < fe.n_dofs_per_face(face_no);
-                         ++k)
-                      if ((k != i) &&
-                          (face_quadrature_collection[cell->active_fe_index()]
-                             .point(k) ==
-                           face_quadrature_collection[cell->active_fe_index()]
-                             .point(i)) &&
-                          (fe.face_system_to_component_index(k, face_no)
-                             .first >= first_vector_component) &&
-                          (fe.face_system_to_component_index(k, face_no).first <
-                           first_vector_component + dim))
-                        vector_dofs.dof_indices
-                          [fe.face_system_to_component_index(k, face_no).first -
-                           first_vector_component] = face_dofs[k];
+                    internal::VectorDoFTuple<dim> vector_dofs;
+                    for (unsigned int d = 0; d < dim; ++d)
+                      {
+                        vector_dofs.dof_indices[d] =
+                          face_dofs[local_vector_indices[d]];
+                      }
 
                     for (unsigned int d = 0; d < dim; ++d)
                       Assert(vector_dofs.dof_indices[d] < n_dofs,
