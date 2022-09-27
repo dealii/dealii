@@ -3328,6 +3328,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     }
 
   Assert(this->dof_info != nullptr, ExcNotInitialized());
+  const internal::MatrixFreeFunctions::DoFInfo &dof_info = *this->dof_info;
   Assert(this->matrix_free->indices_initialized() == true, ExcNotInitialized());
   if (this->n_fe_components == 1)
     for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -3357,8 +3358,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       AssertIndexRange(
         this->cell,
-        this->dof_info->index_storage_variants[this->dof_access_index].size());
-      if (this->dof_info->index_storage_variants
+        dof_info.index_storage_variants[this->dof_access_index].size());
+      if (dof_info.index_storage_variants
             [is_face ? this->dof_access_index :
                        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
             [this->cell] >= internal::MatrixFreeFunctions::DoFInfo::
@@ -3386,16 +3387,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   if (is_face == false)
     {
-      for (unsigned int v = 0; v < n_lanes; ++v)
-        if (cells[v] != numbers::invalid_unsigned_int &&
-            this->dof_info->hanging_node_constraint_masks.size() > 0 &&
-            this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
-            this->dof_info->hanging_node_constraint_masks[cells[v]] !=
-              internal::MatrixFreeFunctions::
-                unconstrained_compressed_constraint_kind &&
-            this->dof_info->hanging_node_constraint_masks_comp
-              [this->active_fe_index][this->first_selected_component])
-          has_hn_constraints = true;
+      if (!dof_info.hanging_node_constraint_masks.empty() &&
+          !dof_info.hanging_node_constraint_masks_comp.empty() &&
+          dof_info
+            .hanging_node_constraint_masks_comp[this->active_fe_index]
+                                               [this->first_selected_component])
+        for (unsigned int v = 0; v < n_lanes; ++v)
+          if (cells[v] != numbers::invalid_unsigned_int &&
+              dof_info.hanging_node_constraint_masks[cells[v]] !=
+                internal::MatrixFreeFunctions::
+                  unconstrained_compressed_constraint_kind)
+            has_hn_constraints = true;
     }
 
   std::integral_constant<bool,
@@ -3403,8 +3405,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     vector_selector;
 
   const bool is_neighbor_cells = !is_face && !this->is_interior_face();
-  const bool use_non_vectorized_path =
-    masking_is_active || is_neighbor_cells || has_hn_constraints;
+  const bool use_vectorized_path =
+    !(masking_is_active || is_neighbor_cells || has_hn_constraints);
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
   std::array<VectorizedArrayType *, n_components> values_dofs;
@@ -3413,16 +3415,16 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                      c * dofs_per_component;
 
   if (this->cell != numbers::invalid_unsigned_int &&
-      this->dof_info->index_storage_variants
+      dof_info.index_storage_variants
           [is_face ? this->dof_access_index :
                      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
           [this->cell] == internal::MatrixFreeFunctions::DoFInfo::
                             IndexStorageVariants::interleaved &&
-      (use_non_vectorized_path == false))
+      use_vectorized_path)
     {
       const unsigned int *dof_indices =
-        this->dof_info->dof_indices_interleaved.data() +
-        this->dof_info->row_starts[this->cell * this->n_fe_components * n_lanes]
+        dof_info.dof_indices_interleaved.data() +
+        dof_info.row_starts[this->cell * this->n_fe_components * n_lanes]
           .first +
         this->dof_info
             ->component_dof_indices_offset[this->active_fe_index]
@@ -3465,11 +3467,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           if (cells[v] == numbers::invalid_unsigned_int)
             continue;
 
-          Assert(cells[v] < this->dof_info->row_starts.size() - 1,
-                 ExcInternalError());
+          Assert(cells[v] < dof_info.row_starts.size() - 1, ExcInternalError());
           const std::pair<unsigned int, unsigned int> *my_index_start =
-            &this->dof_info->row_starts[cells[v] * this->n_fe_components +
-                                        this->first_selected_component];
+            &dof_info.row_starts[cells[v] * this->n_fe_components +
+                                 this->first_selected_component];
 
           // check whether any of the SIMD lanes has constraints, i.e., the
           // constraint indicator which is the second entry of row_starts
@@ -3479,7 +3480,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             has_constraints = true;
 
           dof_indices[v] =
-            this->dof_info->dof_indices.data() + my_index_start[0].first;
+            dof_info.dof_indices.data() + my_index_start[0].first;
         }
     }
   else
@@ -3490,29 +3491,29 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             continue;
 
           const std::pair<unsigned int, unsigned int> *my_index_start =
-            &this->dof_info->row_starts[cells[v] * this->n_fe_components +
-                                        this->first_selected_component];
+            &dof_info.row_starts[cells[v] * this->n_fe_components +
+                                 this->first_selected_component];
           if (my_index_start[n_components_read].second !=
               my_index_start[0].second)
             has_constraints = true;
 
-          if (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
-              this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
-              this->dof_info->hanging_node_constraint_masks[cells[v]] !=
+          if (dof_info.hanging_node_constraint_masks.size() > 0 &&
+              dof_info.hanging_node_constraint_masks_comp.size() > 0 &&
+              dof_info.hanging_node_constraint_masks[cells[v]] !=
                 internal::MatrixFreeFunctions::
                   unconstrained_compressed_constraint_kind &&
-              this->dof_info->hanging_node_constraint_masks_comp
+              dof_info.hanging_node_constraint_masks_comp
                 [this->active_fe_index][this->first_selected_component])
             has_hn_constraints = true;
 
           Assert(my_index_start[n_components_read].first ==
                      my_index_start[0].first ||
-                   my_index_start[0].first < this->dof_info->dof_indices.size(),
+                   my_index_start[0].first < dof_info.dof_indices.size(),
                  ExcIndexRange(0,
                                my_index_start[0].first,
-                               this->dof_info->dof_indices.size()));
+                               dof_info.dof_indices.size()));
           dof_indices[v] =
-            this->dof_info->dof_indices.data() + my_index_start[0].first;
+            dof_info.dof_indices.data() + my_index_start[0].first;
         }
     }
 
@@ -3576,33 +3577,32 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       const unsigned int n_components_read =
         this->n_fe_components > 1 ? n_components : 1;
       unsigned int index_indicators =
-        this->dof_info->row_starts[cell_dof_index].second;
+        dof_info.row_starts[cell_dof_index].second;
       unsigned int next_index_indicators =
-        this->dof_info->row_starts[cell_dof_index + 1].second;
+        dof_info.row_starts[cell_dof_index + 1].second;
 
       // For read_dof_values_plain, redirect the dof_indices field to the
       // unconstrained indices
       if (apply_constraints == false &&
-          (this->dof_info->row_starts[cell_dof_index].second !=
-             this->dof_info->row_starts[cell_dof_index + n_components_read]
-               .second ||
-           ((this->dof_info->hanging_node_constraint_masks.size() > 0 &&
-             this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
-             this->dof_info->hanging_node_constraint_masks[cell_index] !=
+          (dof_info.row_starts[cell_dof_index].second !=
+             dof_info.row_starts[cell_dof_index + n_components_read].second ||
+           ((dof_info.hanging_node_constraint_masks.size() > 0 &&
+             dof_info.hanging_node_constraint_masks_comp.size() > 0 &&
+             dof_info.hanging_node_constraint_masks[cell_index] !=
                internal::MatrixFreeFunctions::
                  unconstrained_compressed_constraint_kind) &&
-            this->dof_info->hanging_node_constraint_masks_comp
+            dof_info.hanging_node_constraint_masks_comp
               [this->active_fe_index][this->first_selected_component])))
         {
-          Assert(this->dof_info->row_starts_plain_indices[cell_index] !=
+          Assert(dof_info.row_starts_plain_indices[cell_index] !=
                    numbers::invalid_unsigned_int,
                  ExcNotInitialized());
           dof_indices[v] =
-            this->dof_info->plain_dof_indices.data() +
+            dof_info.plain_dof_indices.data() +
             this->dof_info
               ->component_dof_indices_offset[this->active_fe_index]
                                             [this->first_selected_component] +
-            this->dof_info->row_starts_plain_indices[cell_index];
+            dof_info.row_starts_plain_indices[cell_index];
           next_index_indicators = index_indicators;
         }
 
@@ -3612,7 +3612,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           for (; index_indicators != next_index_indicators; ++index_indicators)
             {
               const std::pair<unsigned short, unsigned short> indicator =
-                this->dof_info->constraint_indicator[index_indicators];
+                dof_info.constraint_indicator[index_indicators];
               // run through values up to next constraint
               for (unsigned int j = 0; j < indicator.first; ++j)
                 for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -3671,7 +3671,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                    ++index_indicators)
                 {
                   const std::pair<unsigned short, unsigned short> indicator =
-                    this->dof_info->constraint_indicator[index_indicators];
+                    dof_info.constraint_indicator[index_indicators];
 
                   // run through values up to next constraint
                   for (unsigned int j = 0; j < indicator.first; ++j)
@@ -3717,7 +3717,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
               if (apply_constraints == true && comp + 1 < n_components)
                 next_index_indicators =
-                  this->dof_info->row_starts[cell_dof_index + comp + 2].second;
+                  dof_info.row_starts[cell_dof_index + comp + 2].second;
             }
         }
     }
@@ -3788,8 +3788,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
   const unsigned int n_lanes = mask.count();
 
-  const std::vector<unsigned int> &dof_indices_cont =
-    this->dof_info->dof_indices_contiguous[ind];
+  const internal::MatrixFreeFunctions::DoFInfo &dof_info = *this->dof_info;
+  const std::vector<unsigned int> &             dof_indices_cont =
+    dof_info.dof_indices_contiguous[ind];
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
   std::array<VectorizedArrayType *, n_components> values_dofs;
@@ -3801,7 +3802,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   // Simple case: We have contiguous storage, so we can simply copy out the
   // data
-  if ((this->dof_info->index_storage_variants[ind][this->cell] ==
+  if ((dof_info.index_storage_variants[ind][this->cell] ==
          internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
            interleaved_contiguous &&
        n_lanes == VectorizedArrayType::size()) &&
@@ -3839,7 +3840,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // More general case: Must go through the components one by one and apply
   // some transformations
   const unsigned int n_filled_lanes =
-    this->dof_info->n_vectorization_lanes_filled[ind][this->cell];
+    dof_info.n_vectorization_lanes_filled[ind][this->cell];
 
   const bool is_ecl =
     (this->dof_access_index ==
@@ -3864,23 +3865,23 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
             Assert(cells[v] != numbers::invalid_unsigned_int,
                    ExcNotImplemented());
-            Assert(ind < this->dof_info->dof_indices_contiguous_sm.size(),
-                   ExcIndexRange(
-                     ind, 0, this->dof_info->dof_indices_contiguous_sm.size()));
-            Assert(cells[v] <
-                     this->dof_info->dof_indices_contiguous_sm[ind].size(),
-                   ExcIndexRange(
-                     cells[v],
-                     0,
-                     this->dof_info->dof_indices_contiguous_sm[ind].size()));
+            Assert(ind < dof_info.dof_indices_contiguous_sm.size(),
+                   ExcIndexRange(ind,
+                                 0,
+                                 dof_info.dof_indices_contiguous_sm.size()));
+            Assert(
+              cells[v] < dof_info.dof_indices_contiguous_sm[ind].size(),
+              ExcIndexRange(cells[v],
+                            0,
+                            dof_info.dof_indices_contiguous_sm[ind].size()));
 
             const auto &temp =
-              this->dof_info->dof_indices_contiguous_sm[ind][cells[v]];
+              dof_info.dof_indices_contiguous_sm[ind][cells[v]];
 
             if (temp.first != numbers::invalid_unsigned_int)
               vector_ptrs[v] = const_cast<typename VectorType::value_type *>(
                 vectors_sm[comp]->operator[](temp.first).data() + temp.second +
-                this->dof_info->component_dof_indices_offset
+                dof_info.component_dof_indices_offset
                   [this->active_fe_index][this->first_selected_component]);
             else
               vector_ptrs[v] = nullptr;
@@ -3959,7 +3960,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           this->dof_info
               ->component_dof_indices_offset[this->active_fe_index]
                                             [this->first_selected_component] *
-            this->dof_info->dof_indices_interleave_strides[ind][cells[v]];
+            dof_info.dof_indices_interleave_strides[ind][cells[v]];
       else
         dof_indices[v] = numbers::invalid_unsigned_int;
     }
@@ -3972,7 +3973,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   if (n_filled_lanes == VectorizedArrayType::size() &&
       n_lanes == VectorizedArrayType::size() && !is_ecl)
     {
-      if (this->dof_info->index_storage_variants[ind][this->cell] ==
+      if (dof_info.index_storage_variants[ind][this->cell] ==
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
             contiguous)
         {
@@ -3991,7 +3992,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                                                         &values_dofs[0][0],
                                                         vector_selector);
         }
-      else if (this->dof_info->index_storage_variants[ind][this->cell] ==
+      else if (dof_info.index_storage_variants[ind][this->cell] ==
                internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                  interleaved_contiguous_strided)
         {
@@ -4019,12 +4020,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         }
       else
         {
-          Assert(this->dof_info->index_storage_variants[ind][this->cell] ==
+          Assert(dof_info.index_storage_variants[ind][this->cell] ==
                    internal::MatrixFreeFunctions::DoFInfo::
                      IndexStorageVariants::interleaved_contiguous_mixed_strides,
                  ExcNotImplemented());
           const unsigned int *offsets =
-            &this->dof_info->dof_indices_interleave_strides
+            &dof_info.dof_indices_interleave_strides
                [ind][VectorizedArrayType::size() * this->cell];
           if (n_components == 1 || this->n_fe_components == 1)
             for (unsigned int i = 0; i < dofs_per_component; ++i)
@@ -4059,7 +4060,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       {
         for (unsigned int i = 0; i < dofs_per_component; ++i)
           operation.process_empty(values_dofs[comp][i]);
-        if (this->dof_info->index_storage_variants[ind][this->cell] ==
+        if (dof_info.index_storage_variants[ind][this->cell] ==
             internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
               contiguous)
           {
@@ -4086,7 +4087,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         else
           {
             const unsigned int *offsets =
-              &this->dof_info->dof_indices_interleave_strides
+              &dof_info.dof_indices_interleave_strides
                  [ind][VectorizedArrayType::size() * this->cell];
             for (unsigned int v = 0; v < n_filled_lanes; ++v)
               AssertIndexRange(offsets[v], VectorizedArrayType::size() + 1);
@@ -7418,12 +7419,22 @@ FEEvaluation<dim,
         this->mapping_data->jacobian_gradients_non_inverse[0].data() + offsets;
     }
 
-  unsigned int i = 0;
-  for (; i < this->matrix_free->n_active_entries_per_cell_batch(this->cell);
-       ++i)
-    this->cell_ids[i] = cell_index * VectorizedArrayType::size() + i;
-  for (; i < VectorizedArrayType::size(); ++i)
-    this->cell_ids[i] = numbers::invalid_unsigned_int;
+  if (this->matrix_free->n_active_entries_per_cell_batch(this->cell) ==
+      VectorizedArrayType::size())
+    {
+      DEAL_II_OPENMP_SIMD_PRAGMA
+      for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+        this->cell_ids[i] = cell_index * VectorizedArrayType::size() + i;
+    }
+  else
+    {
+      unsigned int i = 0;
+      for (; i < this->matrix_free->n_active_entries_per_cell_batch(this->cell);
+           ++i)
+        this->cell_ids[i] = cell_index * VectorizedArrayType::size() + i;
+      for (; i < VectorizedArrayType::size(); ++i)
+        this->cell_ids[i] = numbers::invalid_unsigned_int;
+    }
 
   if (this->mapping_data->quadrature_points.empty() == false)
     this->quadrature_points =
