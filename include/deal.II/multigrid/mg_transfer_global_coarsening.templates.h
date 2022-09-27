@@ -1162,71 +1162,25 @@ namespace internal
       MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &transfer)
     {
-      const Number *weights = transfer.weights.data();
-
-      // Helper function that extracts the weight. Before doing so,
-      //  it checks the values already set.
-      const auto set = [](auto &mask, const auto &weight) {
-        if (mask == -1.0 || mask == weight)
-          {
-            mask = weight;
-            return true;
-          }
-
-        return false;
-      };
-
-      std::vector<std::array<Number, Utilities::pow(3, dim)>> masks;
-
-      // loop over all schemes
+      unsigned int n_cells = 0;
       for (const auto &scheme : transfer.schemes)
-        {
-          const int    loop_length = scheme.degree_fine + 1;
-          unsigned int degree_to_3[100];
-          degree_to_3[0] = 0;
-          for (int i = 1; i < loop_length - 1; ++i)
-            degree_to_3[i] = 1;
-          degree_to_3[loop_length - 1] = 2;
+        n_cells += scheme.n_coarse_cells;
 
-          // loop over all cells
-          for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
-            {
-              std::vector<std::array<Number, Utilities::pow(3, dim)>> mask(
-                transfer.n_components);
+      std::vector<std::array<Number, Utilities::pow(3, dim)>> masks(n_cells);
 
-              // loop over all components
-              for (unsigned int c = 0; c < transfer.n_components; ++c)
-                mask[c].fill(-1.0);
+      const Number *weight_ptr = transfer.weights.data();
+      std::array<Number, Utilities::pow(3, dim)> *mask_ptr = masks.data();
 
-              for (unsigned int c = 0; c < transfer.n_components; ++c)
-                for (int k = 0; k < (dim > 2 ? loop_length : 1); ++k)
-                  for (int j = 0; j < (dim > 1 ? loop_length : 1); ++j)
-                    {
-                      const unsigned int shift =
-                        9 * degree_to_3[k] + 3 * degree_to_3[j];
-
-                      if (!set(mask[c][shift], weights[0]))
-                        return; // early return, since the entry already
-                                // had a different weight
-
-                      for (int i = 1; i < loop_length - 1; ++i)
-                        if (!set(mask[c][shift + 1], weights[i]))
-                          return;
-
-                      if (!set(mask[c][shift + 2], weights[loop_length - 1]))
-                        return;
-
-                      weights += loop_length;
-                    }
-
-              if (std::find_if(mask.begin(), mask.end(), [&](const auto &a) {
-                    return a != mask[0];
-                  }) != mask.end())
-                return;
-
-              masks.push_back(mask[0]);
-            }
-        }
+      // (try to) compress weights for each cell
+      for (const auto &scheme : transfer.schemes)
+        for (unsigned int cell = 0; cell < scheme.n_coarse_cells;
+             ++cell, weight_ptr += scheme.n_dofs_per_cell_fine, ++mask_ptr)
+          if (!compute_weights_fe_q_dofs_by_entity<dim, -1, Number>(
+                weight_ptr,
+                transfer.n_components,
+                scheme.degree_fine + 1,
+                mask_ptr->data()))
+            return;
 
       // vectorize weights
       AlignedVector<VectorizedArray<Number>> masks_vectorized;
