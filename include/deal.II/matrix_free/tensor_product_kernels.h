@@ -3361,6 +3361,61 @@ namespace internal
   }
 
 
+  template <int dim, int n_points_1d_template, typename Number>
+  inline bool
+  compute_weights_fe_q_dofs_by_entity(const Number *     data,
+                                      const unsigned int n_components,
+                                      const int n_points_1d_non_template,
+                                      Number *  weights)
+  {
+    const int n_points_1d = n_points_1d_template != -1 ?
+                              n_points_1d_template :
+                              n_points_1d_non_template;
+
+    Assert(n_points_1d > 0, ExcNotImplemented());
+    Assert(n_points_1d < 100, ExcNotImplemented());
+
+    unsigned int compressed_index[100];
+    compressed_index[0] = 0;
+    for (int i = 1; i < n_points_1d - 1; ++i)
+      compressed_index[i] = 1;
+    compressed_index[n_points_1d - 1] = 2;
+
+    // Helper function that extracts the weight. Before doing so,
+    // it checks the values already set.
+    const auto set = [](Number &weight, const Number &data) {
+      if (weight == Number(-1.0) || weight == data)
+        {
+          weight = data;
+          return true; // failure for the entry
+        }
+
+      return false; // success for the entry
+    };
+
+    for (unsigned int c = 0; c < n_components; ++c)
+      for (int k = 0; k < (dim > 2 ? n_points_1d : 1); ++k)
+        for (int j = 0; j < (dim > 1 ? n_points_1d : 1);
+             ++j, data += n_points_1d)
+          {
+            const unsigned int shift =
+              9 * compressed_index[k] + 3 * compressed_index[j];
+
+            if (!set(weights[shift], data[0]))
+              return false; // failure
+
+            for (int i = 1; i < n_points_1d - 1; ++i)
+              if (!set(weights[shift + 1], data[i]))
+                return false; // failure
+
+            if (!set(weights[shift + 2], data[n_points_1d - 1]))
+              return false; // failure
+          }
+
+    return true; // success
+  }
+
+
 } // end of namespace internal
 
 
