@@ -3416,6 +3416,175 @@ namespace internal
   }
 
 
+  template <int dim,
+            int n_inner_1d_template,
+            int n_extra_1d_template,
+            typename Number>
+  inline void
+  weight_fe_q_dofs_by_entity(const Number *     weights,
+                             const unsigned int n_components,
+                             const int          n_inner_1d_non_template,
+                             const int          n_extra_1d_non_template,
+                             Number *           data)
+  {
+    const int n_inner_1d =
+      n_inner_1d_template != -1 ? n_inner_1d_template : n_inner_1d_non_template;
+
+    const int n_extra_1d =
+      n_extra_1d_template != -1 ? n_extra_1d_template : n_extra_1d_non_template;
+
+    const int n_points_1d = n_inner_1d + 2 * n_extra_1d;
+
+    Assert(n_points_1d > 0, ExcNotImplemented());
+    Assert(n_points_1d < 100, ExcNotImplemented());
+
+    unsigned int compressed_index[100];
+
+    int c = 0;
+    // left neigbor
+    for (int i = 0; i < n_extra_1d; ++i)
+      compressed_index[c++] = 0;
+
+    // left face
+    compressed_index[c++] = 1;
+
+    // inner part
+    for (int i = 0; i < n_inner_1d - 2; ++i)
+      compressed_index[c++] = 2;
+
+    // right face
+    compressed_index[c++] = 3;
+
+    // right neighbor
+    for (int i = 0; i < n_extra_1d; ++i)
+      compressed_index[c++] = 4;
+
+    AssertDimension(c, Utilities::pow(5, dim));
+
+    for (unsigned int c = 0; c < n_components; ++c)
+      for (int k = 0; k < (dim > 2 ? n_points_1d : 1); ++k)
+        for (int j = 0; j < (dim > 1 ? n_points_1d : 1);
+             ++j, data += n_points_1d)
+          {
+            const unsigned int shift =
+              25 * compressed_index[k] + 5 * compressed_index[j];
+
+            int c = 0;
+            // left neigbor
+            for (int i = 0; i < n_extra_1d; ++i)
+              data[c++] *= weights[shift + 0];
+
+            // left face
+            data[c++] *= weights[shift + 1];
+
+            // inner part
+            for (int i = 0; i < n_inner_1d - 2; ++i)
+              data[c++] *= weights[shift + 2];
+
+            // right face
+            data[c++] *= weights[shift + 3];
+
+            // right neighbor
+            for (int i = 0; i < n_extra_1d; ++i)
+              data[c++] *= weights[shift + 4];
+          }
+  }
+
+
+  template <int dim,
+            int n_inner_1d_template,
+            int n_extra_1d_template,
+            typename Number>
+  inline bool
+  compute_weights_fe_q_dofs_by_entity(const Number *     data,
+                                      const unsigned int n_components,
+                                      const int n_inner_1d_non_template,
+                                      const int n_extra_1d_non_template,
+                                      Number *  weights)
+  {
+    const int n_inner_1d =
+      n_inner_1d_template != -1 ? n_inner_1d_template : n_inner_1d_non_template;
+
+    const int n_extra_1d =
+      n_extra_1d_template != -1 ? n_extra_1d_template : n_extra_1d_non_template;
+
+    const int n_points_1d = n_inner_1d + 2 * n_extra_1d;
+
+    Assert(n_points_1d > 0, ExcNotImplemented());
+    Assert(n_points_1d < 100, ExcNotImplemented());
+
+    unsigned int compressed_index[100];
+
+    int c = 0;
+    // left neigbor
+    for (int i = 0; i < n_extra_1d; ++i)
+      compressed_index[c++] = 0;
+
+    // left face
+    compressed_index[c++] = 1;
+
+    // inner part
+    for (int i = 0; i < n_inner_1d - 2; ++i)
+      compressed_index[c++] = 2;
+
+    // right face
+    compressed_index[c++] = 3;
+
+    // right neighbor
+    for (int i = 0; i < n_extra_1d; ++i)
+      compressed_index[c++] = 4;
+
+    AssertDimension(c, Utilities::pow(5, dim));
+
+    // Helper function that extracts the weight. Before doing so,
+    // it checks the values already set.
+    const auto set = [](Number &weight, const Number &data) {
+      if (weight == Number(-1.0) || weight == data)
+        {
+          weight = data;
+          return true; // failure for the entry
+        }
+
+      return false; // success for the entry
+    };
+
+    for (unsigned int c = 0; c < n_components; ++c)
+      for (int k = 0; k < (dim > 2 ? n_points_1d : 1); ++k)
+        for (int j = 0; j < (dim > 1 ? n_points_1d : 1);
+             ++j, data += n_points_1d)
+          {
+            const unsigned int shift =
+              25 * compressed_index[k] + 5 * compressed_index[j];
+
+            int c = 0;
+            // left neigbor
+            for (int i = 0; i < n_extra_1d; ++i)
+              if (!set(weights[shift + 0], data[c++]))
+                return false;
+
+            // left face
+            if (!set(weights[shift + 1], data[c++]))
+              return false;
+
+            // inner part
+            for (int i = 0; i < n_inner_1d - 2; ++i)
+              if (!set(weights[shift + 2], data[c++]))
+                return false;
+
+            // right face
+            if (!set(weights[shift + 3], data[c++]))
+              return false;
+
+            // right neighbor
+            for (int i = 0; i < n_extra_1d; ++i)
+              if (!set(weights[shift + 4], data[c++]))
+                return false;
+          }
+
+    return true;
+  }
+
+
 } // end of namespace internal
 
 
