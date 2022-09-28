@@ -1,0 +1,5 @@
+Improved: The function GridTools::rotate()
+can now also handle Triangulation objects with
+dim=1 and spacedim=2.
+<br>
+(Peter Munch, 2022/12/08)
