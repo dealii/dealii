@@ -46,7 +46,7 @@ test(const bool adaptive_ref = true)
     dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
 
   parallel::distributed::Triangulation<dim> tria(mpi_communicator);
-  GridGenerator::hyper_cube(tria, 0, 1, true);
+  GridGenerator::hyper_cube(tria, 0, 1, /* colorize */ true);
   tria.refine_global(1);
   if (adaptive_ref)
     {

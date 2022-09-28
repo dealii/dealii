@@ -1281,11 +1281,12 @@ namespace MatrixFreeTools
                            static_cast<unsigned int>(n_components) :
                            1);
                  ++comp)
-              ::dealii::internal::vector_access_add(
-                *diagonal_global[n_fe_components == 1 ? comp : 0],
-                c_pools[v].row_lid_to_gid[j],
-                diagonals_local_constrained
-                  [v][j + comp * c_pools[v].row_lid_to_gid.size()]);
+              if (c_pools[v].row_lid_to_gid[j] != numbers::invalid_unsigned_int)
+                ::dealii::internal::vector_access_add(
+                  *diagonal_global[n_fe_components == 1 ? comp : 0],
+                  c_pools[v].row_lid_to_gid[j],
+                  diagonals_local_constrained
+                    [v][j + comp * c_pools[v].row_lid_to_gid.size()]);
       }
 
       bool
