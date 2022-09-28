@@ -4984,9 +4984,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       const VectorizedArrayType JxW =
         this->J_value[0] * this->quadrature_weights[q_point];
+      std::array<VectorizedArrayType, dim> jac;
+      for (unsigned int d = 0; d < dim; ++d)
+        jac[d] = this->jacobian[0][d][d];
       for (unsigned int d = 0; d < dim; ++d)
         {
-          const VectorizedArrayType factor = this->jacobian[0][d][d] * JxW;
+          const VectorizedArrayType factor = jac[d] * JxW;
           for (unsigned int comp = 0; comp < n_components; ++comp)
             this->gradients_quad[(comp * dim + d) * nqp + q_point] =
               grad_in[comp][d] * factor;
@@ -5037,30 +5040,34 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   const std::size_t nqp = this->n_quadrature_points;
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
-    for (unsigned int comp = 0; comp < n_components; ++comp)
-      {
-        for (unsigned int d = 0; d < dim - 1; ++d)
-          this->gradients_quad[(comp * dim + d) * nqp + q_point] =
-            VectorizedArrayType();
-        this->gradients_quad[(comp * dim + dim - 1) * nqp + q_point] =
-          grad_in[comp] *
-          (this->normal_x_jacobian[0][dim - 1] * this->J_value[0] *
-           this->quadrature_weights[q_point]);
-      }
+    {
+      const VectorizedArrayType JxW_jac = this->J_value[0] *
+                                          this->quadrature_weights[q_point] *
+                                          this->normal_x_jacobian[0][dim - 1];
+      for (unsigned int comp = 0; comp < n_components; ++comp)
+        {
+          for (unsigned int d = 0; d < dim - 1; ++d)
+            this->gradients_quad[(comp * dim + d) * nqp + q_point] =
+              VectorizedArrayType();
+          this->gradients_quad[(comp * dim + dim - 1) * nqp + q_point] =
+            grad_in[comp] * JxW_jac;
+        }
+    }
   else
     {
       const unsigned int index =
         this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
       const Tensor<1, dim, VectorizedArrayType> jac =
         this->normal_x_jacobian[index];
+      const VectorizedArrayType JxW =
+        (this->cell_type <= internal::MatrixFreeFunctions::affine) ?
+          this->J_value[index] * this->quadrature_weights[q_point] :
+          this->J_value[index];
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
-          VectorizedArrayType factor = grad_in[comp] * this->J_value[index];
-          if (this->cell_type <= internal::MatrixFreeFunctions::affine)
-            factor = factor * this->quadrature_weights[q_point];
           for (unsigned int d = 0; d < dim; ++d)
             this->gradients_quad[(comp * dim + d) * nqp + q_point] =
-              factor * jac[d];
+              (grad_in[comp] * JxW) * jac[d];
         }
     }
 }
@@ -5640,9 +5647,15 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
     {
       const VectorizedArrayType JxW =
         this->J_value[0] * this->quadrature_weights[q_point];
+
+      // Make sure the compiler does not think 'jacobian' is aliased with
+      // 'gradients_quad'
+      std::array<VectorizedArrayType, dim> jac;
       for (unsigned int d = 0; d < dim; ++d)
-        this->gradients_quad[d * nqp + q_point] =
-          (grad_in[d] * this->jacobian[0][d][d] * JxW);
+        jac[d] = this->jacobian[0][d][d];
+
+      for (unsigned int d = 0; d < dim; ++d)
+        this->gradients_quad[d * nqp + q_point] = grad_in[d] * jac[d] * JxW;
     }
   // general/affine cell type
   else
