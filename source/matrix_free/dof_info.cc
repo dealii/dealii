@@ -1543,16 +1543,6 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    template struct ConstraintValues<double>;
-
-    template unsigned short
-    ConstraintValues<double>::insert_entries(
-      const std::vector<std::pair<types::global_dof_index, float>> &);
-    template unsigned short
-    ConstraintValues<double>::insert_entries(
-      const std::vector<std::pair<types::global_dof_index, double>> &);
-
-
     template void
     DoFInfo::read_dof_indices<double>(
       const std::vector<types::global_dof_index> &,

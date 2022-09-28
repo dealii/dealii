@@ -27,6 +27,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 
+#include <deal.II/matrix_free/constraint_info.h>
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/task_info.h>
@@ -39,73 +40,6 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    template <typename Number>
-    ConstraintValues<Number>::ConstraintValues()
-      : constraints(FloatingPointComparator<VectorizedArray<Number>>(
-          1. * std::numeric_limits<double>::epsilon() * 1024.))
-    {}
-
-
-
-    template <typename Number>
-    template <typename number2>
-    unsigned short
-    ConstraintValues<Number>::insert_entries(
-      const std::vector<std::pair<types::global_dof_index, number2>> &entries)
-    {
-      next_constraint.first.resize(entries.size());
-      if (entries.size() > 0)
-        {
-          constraint_indices.resize(entries.size());
-          // Use assign so that values for nonmatching Number / number2 are
-          // converted:
-          constraint_entries.assign(entries.begin(), entries.end());
-          std::sort(constraint_entries.begin(),
-                    constraint_entries.end(),
-                    [](const std::pair<types::global_dof_index, double> &p1,
-                       const std::pair<types::global_dof_index, double> &p2) {
-                      return p1.second < p2.second;
-                    });
-          for (types::global_dof_index j = 0; j < constraint_entries.size();
-               j++)
-            {
-              // copy the indices of the constraint entries after sorting.
-              constraint_indices[j] = constraint_entries[j].first;
-
-              // one_constraint takes the weights of the constraint
-              next_constraint.first[j] = constraint_entries[j].second;
-            }
-        }
-
-      // check whether or not constraint is already in pool. the initial
-      // implementation computed a hash value based on the truncated array (to
-      // given accuracy around 1e-13) in order to easily detect different
-      // arrays and then made a fine-grained check when the hash values were
-      // equal. this was quite lengthy and now we use a std::map with a
-      // user-defined comparator to compare floating point arrays to a
-      // tolerance 1e-13.
-      types::global_dof_index insert_position = numbers::invalid_dof_index;
-      const auto position = constraints.find(next_constraint.first);
-      if (position != constraints.end())
-        insert_position = position->second;
-      else
-        {
-          next_constraint.second = constraints.size();
-          constraints.insert(next_constraint);
-          insert_position = next_constraint.second;
-        }
-
-      // we want to store the result as a short variable, so we have to make
-      // sure that the result does not exceed the limits when casting.
-      Assert(insert_position < (1 << (8 * sizeof(unsigned short))),
-             ExcInternalError());
-      return static_cast<unsigned short>(insert_position);
-    }
-
-
-
-    // ----------------- actual DoFInfo functions -----------------------------
-
     template <typename number>
     void
     DoFInfo::read_dof_indices(

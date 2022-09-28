@@ -1081,8 +1081,8 @@ namespace internal
         // evaluation
         std::map<std::array<Tensor<2, dim>, dim + 1>,
                  unsigned int,
-                 FloatingPointComparator<VectorizedArray<double>>>
-          compressed_jacobians(FloatingPointComparator<VectorizedArray<double>>(
+                 FloatingPointComparator<double>>
+          compressed_jacobians(FloatingPointComparator<double>(
             1e4 * jacobian_size * std::numeric_limits<double>::epsilon() *
             1024.));
 
