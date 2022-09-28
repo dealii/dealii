@@ -3409,10 +3409,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     !(masking_is_active || is_neighbor_cells || has_hn_constraints);
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
-  std::array<VectorizedArrayType *, n_components> values_dofs;
-  for (unsigned int c = 0; c < n_components; ++c)
-    values_dofs[c] = const_cast<VectorizedArrayType *>(this->values_dofs) +
-                     c * dofs_per_component;
 
   if (this->cell != numbers::invalid_unsigned_int &&
       dof_info.index_storage_variants
@@ -3430,23 +3426,44 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             ->component_dof_indices_offset[this->active_fe_index]
                                           [this->first_selected_component] *
           n_lanes;
-      if (n_components == 1 || this->n_fe_components == 1)
+      VectorizedArrayType *values = this->values_dofs;
+      if (n_components == 1)
+        {
+          VectorType &my_src = *src[0];
+          for (unsigned int i = 0; i < dofs_per_component;
+               ++i, dof_indices += n_lanes)
+            operation.process_dof_gather(
+              dof_indices, my_src, 0, values[i], vector_selector);
+        }
+      else if (this->n_fe_components == 1)
         for (unsigned int i = 0; i < dofs_per_component;
              ++i, dof_indices += n_lanes)
           for (unsigned int comp = 0; comp < n_components; ++comp)
             operation.process_dof_gather(dof_indices,
                                          *src[comp],
                                          0,
-                                         values_dofs[comp][i],
+                                         values[comp * dofs_per_component + i],
                                          vector_selector);
       else
-        for (unsigned int comp = 0; comp < n_components; ++comp)
-          for (unsigned int i = 0; i < dofs_per_component;
-               ++i, dof_indices += n_lanes)
-            operation.process_dof_gather(
-              dof_indices, *src[0], 0, values_dofs[comp][i], vector_selector);
+        {
+          VectorType &my_src = *src[0];
+          for (unsigned int comp = 0; comp < n_components; ++comp)
+            for (unsigned int i = 0; i < dofs_per_component;
+                 ++i, dof_indices += n_lanes)
+              operation.process_dof_gather(
+                dof_indices,
+                my_src,
+                0,
+                values[comp * dofs_per_component + i],
+                vector_selector);
+        }
       return;
     }
+
+  std::array<VectorizedArrayType *, n_components> values_dofs;
+  for (unsigned int c = 0; c < n_components; ++c)
+    values_dofs[c] = const_cast<VectorizedArrayType *>(this->values_dofs) +
+                     c * dofs_per_component;
 
   // Allocate pointers, then initialize all of them to nullptrs and
   // below overwrite the ones we actually use:
@@ -3517,12 +3534,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         }
     }
 
-  if (std::count_if(cells.begin(), cells.end(), [](const auto i) {
-        return i != numbers::invalid_unsigned_int;
-      }) < n_lanes)
-    for (unsigned int comp = 0; comp < n_components; ++comp)
-      for (unsigned int i = 0; i < dofs_per_component; ++i)
-        operation.process_empty(values_dofs[comp][i]);
+  for (unsigned int comp = 0; comp < n_components; ++comp)
+    for (unsigned int i = 0; i < dofs_per_component; ++i)
+      operation.process_empty(values_dofs[comp][i]);
 
   // Case where we have no constraints throughout the whole cell: Can go
   // through the list of DoFs directly
@@ -3536,10 +3550,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 continue;
 
               for (unsigned int i = 0; i < dofs_per_component; ++i)
-                for (unsigned int comp = 0; comp < n_components; ++comp)
-                  operation.process_dof(dof_indices[v][i],
-                                        *src[comp],
-                                        values_dofs[comp][i][v]);
+                if (dof_indices[v][i] != numbers::invalid_unsigned_int)
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    operation.process_dof(dof_indices[v][i],
+                                          *src[comp],
+                                          values_dofs[comp][i][v]);
             }
         }
       else
@@ -3551,10 +3566,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   continue;
 
                 for (unsigned int i = 0; i < dofs_per_component; ++i)
-                  operation.process_dof(
-                    dof_indices[v][comp * dofs_per_component + i],
-                    *src[0],
-                    values_dofs[comp][i][v]);
+                  if (dof_indices[v][comp * dofs_per_component + i] !=
+                      numbers::invalid_unsigned_int)
+                    operation.process_dof(
+                      dof_indices[v][comp * dofs_per_component + i],
+                      *src[0],
+                      values_dofs[comp][i][v]);
               }
         }
       return;
@@ -3616,9 +3633,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               // run through values up to next constraint
               for (unsigned int j = 0; j < indicator.first; ++j)
                 for (unsigned int comp = 0; comp < n_components; ++comp)
-                  operation.process_dof(dof_indices[v][j],
-                                        *src[comp],
-                                        values_dofs[comp][ind_local + j][v]);
+                  if (dof_indices[v][j] != numbers::invalid_unsigned_int)
+                    operation.process_dof(dof_indices[v][j],
+                                          *src[comp],
+                                          values_dofs[comp][ind_local + j][v]);
 
               ind_local += indicator.first;
               dof_indices[v] += indicator.first;
@@ -3635,11 +3653,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               const Number *end_pool =
                 this->matrix_free->constraint_pool_end(indicator.second);
               for (; data_val != end_pool; ++data_val, ++dof_indices[v])
-                for (unsigned int comp = 0; comp < n_components; ++comp)
-                  operation.process_constraint(*dof_indices[v],
-                                               *data_val,
-                                               *src[comp],
-                                               value[comp]);
+                if (*dof_indices[v] != numbers::invalid_unsigned_int)
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
+                    operation.process_constraint(*dof_indices[v],
+                                                 *data_val,
+                                                 *src[comp],
+                                                 value[comp]);
 
               for (unsigned int comp = 0; comp < n_components; ++comp)
                 operation.post_constraints(value[comp],
@@ -3650,10 +3669,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           AssertIndexRange(ind_local, dofs_per_component + 1);
 
           for (; ind_local < dofs_per_component; ++dof_indices[v], ++ind_local)
-            for (unsigned int comp = 0; comp < n_components; ++comp)
-              operation.process_dof(*dof_indices[v],
-                                    *src[comp],
-                                    values_dofs[comp][ind_local][v]);
+            if (*dof_indices[v] != numbers::invalid_unsigned_int)
+              for (unsigned int comp = 0; comp < n_components; ++comp)
+                operation.process_dof(*dof_indices[v],
+                                      *src[comp],
+                                      values_dofs[comp][ind_local][v]);
         }
       else
         {
@@ -3675,9 +3695,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
                   // run through values up to next constraint
                   for (unsigned int j = 0; j < indicator.first; ++j)
-                    operation.process_dof(dof_indices[v][j],
-                                          *src[0],
-                                          values_dofs[comp][ind_local + j][v]);
+                    if (dof_indices[v][j] != numbers::invalid_unsigned_int)
+                      operation.process_dof(
+                        dof_indices[v][j],
+                        *src[0],
+                        values_dofs[comp][ind_local + j][v]);
                   ind_local += indicator.first;
                   dof_indices[v] += indicator.first;
 
@@ -3693,10 +3715,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                     this->matrix_free->constraint_pool_end(indicator.second);
 
                   for (; data_val != end_pool; ++data_val, ++dof_indices[v])
-                    operation.process_constraint(*dof_indices[v],
-                                                 *data_val,
-                                                 *src[0],
-                                                 value);
+                    if (*dof_indices[v] != numbers::invalid_unsigned_int)
+                      operation.process_constraint(*dof_indices[v],
+                                                   *data_val,
+                                                   *src[0],
+                                                   value);
 
                   operation.post_constraints(value,
                                              values_dofs[comp][ind_local][v]);
@@ -3708,12 +3731,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               // get the dof values past the last constraint
               for (; ind_local < dofs_per_component;
                    ++dof_indices[v], ++ind_local)
-                {
-                  AssertIndexRange(*dof_indices[v], src[0]->size());
-                  operation.process_dof(*dof_indices[v],
-                                        *src[0],
-                                        values_dofs[comp][ind_local][v]);
-                }
+                if (*dof_indices[v] != numbers::invalid_unsigned_int)
+                  {
+                    AssertIndexRange(*dof_indices[v], src[0]->size());
+                    operation.process_dof(*dof_indices[v],
+                                          *src[0],
+                                          values_dofs[comp][ind_local][v]);
+                  }
 
               if (apply_constraints == true && comp + 1 < n_components)
                 next_index_indicators =

@@ -2404,9 +2404,14 @@ public:
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
     __m256d zero = _mm256_setzero_pd();
-    __m256d mask = _mm256_cmp_pd(zero, zero, _CMP_EQ_OQ);
+    __m256i invalid =
+      _mm256_set1_epi64x((long long)numbers::invalid_unsigned_int);
+    __m256i index64      = _mm256_cvtepu32_epi64(index);
+    __m256i inverse_mask = _mm256_cmpeq_epi64(index64, invalid);
+    __m256i mask = _mm256_xor_si256(_mm256_set1_epi64x(-1LL), inverse_mask);
 
-    data = _mm256_mask_i32gather_pd(zero, base_ptr, index, mask, 8);
+    data = _mm256_mask_i32gather_pd(
+      zero, base_ptr, index, *reinterpret_cast<__m256d *>(&mask), 8);
 #    else
     for (unsigned int i = 0; i < 4; ++i)
       *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
@@ -2430,8 +2435,10 @@ public:
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     // no scatter operation in AVX/AVX2
+    DEAL_II_OPENMP_SIMD_PRAGMA
     for (unsigned int i = 0; i < 4; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
 
   /**
@@ -2652,12 +2659,18 @@ vectorized_transpose_and_store(const bool                        add_into,
   // remainder loop of work that does not divide by 4
   if (add_into)
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-      for (unsigned int v = 0; v < 4; ++v)
-        out[offsets[v] + i] += in[i][v];
+      {
+        DEAL_II_OPENMP_SIMD_PRAGMA
+        for (unsigned int v = 0; v < 4; ++v)
+          out[offsets[v] + i] += in[i][v];
+      }
   else
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-      for (unsigned int v = 0; v < 4; ++v)
-        out[offsets[v] + i] = in[i][v];
+      {
+        DEAL_II_OPENMP_SIMD_PRAGMA
+        for (unsigned int v = 0; v < 4; ++v)
+          out[offsets[v] + i] = in[i][v];
+      }
 }
 
 
@@ -2720,12 +2733,18 @@ vectorized_transpose_and_store(const bool                        add_into,
   // remainder loop of work that does not divide by 4
   if (add_into)
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-      for (unsigned int v = 0; v < 4; ++v)
-        out[v][i] += in[i][v];
+      {
+        DEAL_II_OPENMP_SIMD_PRAGMA
+        for (unsigned int v = 0; v < 4; ++v)
+          out[v][i] += in[i][v];
+      }
   else
     for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-      for (unsigned int v = 0; v < 4; ++v)
-        out[v][i] = in[i][v];
+      {
+        DEAL_II_OPENMP_SIMD_PRAGMA
+        for (unsigned int v = 0; v < 4; ++v)
+          out[v][i] = in[i][v];
+      }
 }
 
 
@@ -2927,13 +2946,18 @@ public:
     // work around a warning with gcc-12 about an uninitialized initial state
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
-    __m256 zero = _mm256_setzero_ps();
-    __m256 mask = _mm256_cmp_ps(zero, zero, _CMP_EQ_OQ);
+    __m256  zero         = _mm256_setzero_ps();
+    __m256i invalid      = _mm256_set1_epi32(numbers::invalid_unsigned_int);
+    __m256i inverse_mask = _mm256_cmpeq_epi32(index, invalid);
+    __m256i mask         = _mm256_xor_si256(invalid, inverse_mask);
 
-    data = _mm256_mask_i32gather_ps(zero, base_ptr, index, mask, 4);
+    data = _mm256_mask_i32gather_ps(
+      zero, base_ptr, index, *reinterpret_cast<__m256 *>(&mask), 4);
 #    else
+    DEAL_II_OPENMP_SIMD_PRAGMA
     for (unsigned int i = 0; i < 8; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
 #    endif
   }
 
@@ -2954,8 +2978,10 @@ public:
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     // no scatter operation in AVX/AVX2
+    DEAL_II_OPENMP_SIMD_PRAGMA
     for (unsigned int i = 0; i < 8; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
 
   /**
