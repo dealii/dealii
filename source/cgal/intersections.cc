@@ -22,6 +22,7 @@
 #ifdef DEAL_II_WITH_CGAL
 
 #  include <deal.II/base/quadrature_lib.h>
+#  include <deal.II/base/utilities.h>
 
 #  include <deal.II/fe/mapping.h>
 
@@ -716,19 +717,19 @@ namespace CGALWrappers
            ExcNotImplemented());
 
     const auto vertices0 =
-      CGALWrappers::get_vertices_in_cgal_order<int(std::pow(2, dim0))>(
+      CGALWrappers::get_vertices_in_cgal_order<Utilities::pow(2, dim0)>(
         cell0, mapping0);
     const auto vertices1 =
-      CGALWrappers::get_vertices_in_cgal_order<int(std::pow(2, dim1))>(
+      CGALWrappers::get_vertices_in_cgal_order<Utilities::pow(2, dim1)>(
         cell1, mapping1);
 
     return compute_intersection_of_cells<dim0,
                                          dim1,
                                          spacedim,
-                                         int(std::pow(2, dim0)),
-                                         int(std::pow(2, dim1))>(vertices0,
-                                                                 vertices1,
-                                                                 tol);
+                                         Utilities::pow(2, dim0),
+                                         Utilities::pow(2, dim1)>(vertices0,
+                                                                  vertices1,
+                                                                  tol);
   }
 
 #  include "intersections.inst"
