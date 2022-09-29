@@ -868,6 +868,37 @@ namespace GridTools
 
 
 
+  template <int dim>
+  void
+  delete_duplicated_vertices(std::vector<Point<dim>> &vertices,
+                             const double             tol)
+  {
+    if (vertices.size() == 0)
+      return;
+
+    // 1) map point to local vertex index
+    std::map<Point<dim>, unsigned int, FloatingPointComparator<double>>
+      map_point_to_local_vertex_index{FloatingPointComparator<double>(tol)};
+
+    // 2) initialize map with existing points uniquely
+    for (unsigned int i = 0; i < vertices.size(); ++i)
+      map_point_to_local_vertex_index[vertices[i]] = i;
+
+    // no duplicate points are found
+    if (map_point_to_local_vertex_index.size() == vertices.size())
+      return;
+
+    // 3) remove duplicate entries from vertices
+    vertices.resize(map_point_to_local_vertex_index.size());
+    {
+      unsigned int j = 0;
+      for (const auto &p : map_point_to_local_vertex_index)
+        vertices[j++] = p.first;
+    }
+  }
+
+
+
   template <int dim, int spacedim>
   std::size_t
   invert_cells_with_negative_measure(
@@ -6744,51 +6775,6 @@ namespace GridTools
             }
         }
     }
-
-
-
-    template <int dim>
-    void
-    merge_duplicate_points(std::vector<Point<dim>> &vertices,
-                           std::vector<CellData<dim == 1 ? 1 : dim - 1>> &cells)
-    {
-      if (vertices.size() == 0)
-        return;
-
-      // 1) map point to local vertex index
-      std::map<Point<dim>, unsigned int, FloatingPointComparator<double>>
-        map_point_to_local_vertex_index(FloatingPointComparator<double>(1e-10));
-
-      // 2) initialize map with existing points uniquely
-      for (unsigned int i = 0; i < vertices.size(); ++i)
-        map_point_to_local_vertex_index[vertices[i]] = i;
-
-      // no duplicate points are found
-      if (map_point_to_local_vertex_index.size() == vertices.size())
-        return;
-
-      // 3) remove duplicate entries from vertices
-      vertices.resize(map_point_to_local_vertex_index.size());
-      {
-        unsigned int j = 0;
-        for (const auto &p : map_point_to_local_vertex_index)
-          vertices[j++] = p.first;
-      }
-
-      // 4) renumber vertices in CellData object
-      if (cells.size() > 0)
-        {
-          map_point_to_local_vertex_index.clear();
-          // initialize map with unique points
-          for (unsigned int i = 0; i < vertices.size(); ++i)
-            map_point_to_local_vertex_index[vertices[i]] = i;
-
-          // overwrite vertex indices in CellData object
-          for (auto &cell : cells)
-            for (auto &v : cell.vertices)
-              v = map_point_to_local_vertex_index[vertices[v]];
-        }
-    }
   } // namespace internal
 
 
@@ -6862,8 +6848,6 @@ namespace GridTools
     for (const auto &cell : background_dof_handler.active_cell_iterators() |
                               IteratorFilters::LocallyOwnedCell())
       process_cell(cell, ls_vector, iso_level, vertices, cells);
-
-    internal::merge_duplicate_points(vertices, cells);
   }
 
   template <int dim, typename VectorType>
@@ -6878,9 +6862,7 @@ namespace GridTools
                               IteratorFilters::LocallyOwnedCell())
       process_cell(cell, ls_vector, iso_level, vertices);
 
-    // This vector is just a placeholder to reuse the process_cell function.
-    std::vector<CellData<dim == 1 ? 1 : dim - 1>> dummy_cells;
-    internal::merge_duplicate_points(vertices, dummy_cells);
+    delete_duplicated_vertices(vertices, 1e-10 /*tol*/);
   }
 
 
