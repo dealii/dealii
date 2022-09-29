@@ -6736,7 +6736,7 @@ namespace GridTools
       for (const unsigned int v : cell->vertex_indices())
         vertex_of_own_cell[cell->vertex_index(v)] = true;
 
-    // 3) for each vertex belonging to a locally owned cell all ghost
+    // 3) for each vertex belonging to a locally owned cell, find all ghost
     //    neighbors (including the periodic own)
     std::map<unsigned int, std::set<types::subdomain_id>> result;
 

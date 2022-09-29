@@ -3375,8 +3375,21 @@ namespace GridTools
     std::map<unsigned int, unsigned int> &vertex_to_coinciding_vertex_group);
 
   /**
-   * Return a map that, for each vertex, lists all the processes whose
-   * subdomains are adjacent to that vertex.
+   * Return a map that, for each vertex of the given triangulation,
+   * provides a set of all the process subdomain ids whose subdomains
+   * are adjacent to that vertex. The set excludes the subdomain id
+   * of the current process. As a consequence, for a given vertex,
+   * the returned set consists of exactly those subdomain ids that
+   * correspond to the
+   * @ref GlossGhostCell "ghost cells"
+   * adjacent to that vertex, assuming there are any such ghost cells.
+   *
+   * For vertices that are not adjacent to a ghost cell, the map contains
+   * no entries, and this should be interpreted in the same way as if
+   * the map contained an entry for a given vertex index, but that the
+   * `std::set` associated with that map entry is simply empty.
+   * For non-parallel triangulations, the map is consequently empty
+   * since no vertex has adjacent ghost cells.
    *
    * @param[in] tria Triangulation.
    */
