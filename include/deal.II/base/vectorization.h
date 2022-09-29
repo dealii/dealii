@@ -1163,7 +1163,8 @@ public:
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
     __m512d  zero = {};
-    __mmask8 mask = 0xFF;
+    const __m256i invalid = _mm256_set1_epi32(numbers::invalid_unsigned_int);
+    __mmask8 mask = _mm256_cmpneq_epu32_mask(invalid, index);
 
     data = _mm512_mask_i32gather_pd(zero, mask, index, base_ptr, 8);
   }
@@ -1196,7 +1197,9 @@ public:
     const __m256 index_val =
       _mm256_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m256i index = *reinterpret_cast<const __m256i *>(&index_val);
-    _mm512_i32scatter_pd(base_ptr, index, data, 8);
+    const __m256i invalid = _mm256_set1_epi32(numbers::invalid_unsigned_int);
+    __mmask8 mask = _mm256_cmpneq_epu32_mask(invalid, index);
+    _mm512_mask_i32scatter_pd(base_ptr, mask, index, data, 8);
   }
 
   /**
@@ -1728,7 +1731,8 @@ public:
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
     __m512    zero = {};
-    __mmask16 mask = 0xFFFF;
+    const __m512i invalid = _mm512_set1_epi32(numbers::invalid_unsigned_int);
+    __mmask16 mask = _mm512_cmpneq_epu32_mask(invalid, index);
 
     data = _mm512_mask_i32gather_ps(zero, mask, index, base_ptr, 4);
   }
@@ -1761,7 +1765,9 @@ public:
     const __m512 index_val =
       _mm512_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m512i index = *reinterpret_cast<const __m512i *>(&index_val);
-    _mm512_i32scatter_ps(base_ptr, index, data, 4);
+    const __m512i invalid = _mm512_set1_epi32(numbers::invalid_unsigned_int);
+    __mmask16 mask = _mm512_cmpneq_epu32_mask(invalid, index);
+    _mm512_mask_i32scatter_ps(base_ptr, mask, index, data, 4);
   }
 
   /**
