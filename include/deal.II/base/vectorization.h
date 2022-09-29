@@ -1162,9 +1162,9 @@ public:
     // work around a warning with gcc-12 about an uninitialized initial state
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
-    __m512d  zero = {};
+    __m512d       zero    = {};
     const __m256i invalid = _mm256_set1_epi32(numbers::invalid_unsigned_int);
-    __mmask8 mask = _mm256_cmpneq_epu32_mask(invalid, index);
+    __mmask8      mask    = _mm256_cmpneq_epu32_mask(invalid, index);
 
     data = _mm512_mask_i32gather_pd(zero, mask, index, base_ptr, 8);
   }
@@ -1196,9 +1196,9 @@ public:
     // API allows aliasing between different vector types.
     const __m256 index_val =
       _mm256_loadu_ps(reinterpret_cast<const float *>(offsets));
-    const __m256i index = *reinterpret_cast<const __m256i *>(&index_val);
+    const __m256i index   = *reinterpret_cast<const __m256i *>(&index_val);
     const __m256i invalid = _mm256_set1_epi32(numbers::invalid_unsigned_int);
-    __mmask8 mask = _mm256_cmpneq_epu32_mask(invalid, index);
+    __mmask8      mask    = _mm256_cmpneq_epu32_mask(invalid, index);
     _mm512_mask_i32scatter_pd(base_ptr, mask, index, data, 8);
   }
 
@@ -1730,9 +1730,9 @@ public:
     // work around a warning with gcc-12 about an uninitialized initial state
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
-    __m512    zero = {};
+    __m512        zero    = {};
     const __m512i invalid = _mm512_set1_epi32(numbers::invalid_unsigned_int);
-    __mmask16 mask = _mm512_cmpneq_epu32_mask(invalid, index);
+    __mmask16     mask    = _mm512_cmpneq_epu32_mask(invalid, index);
 
     data = _mm512_mask_i32gather_ps(zero, mask, index, base_ptr, 4);
   }
@@ -1764,9 +1764,9 @@ public:
     // API allows aliasing between different vector types.
     const __m512 index_val =
       _mm512_loadu_ps(reinterpret_cast<const float *>(offsets));
-    const __m512i index = *reinterpret_cast<const __m512i *>(&index_val);
+    const __m512i index   = *reinterpret_cast<const __m512i *>(&index_val);
     const __m512i invalid = _mm512_set1_epi32(numbers::invalid_unsigned_int);
-    __mmask16 mask = _mm512_cmpneq_epu32_mask(invalid, index);
+    __mmask16     mask    = _mm512_cmpneq_epu32_mask(invalid, index);
     _mm512_mask_i32scatter_ps(base_ptr, mask, index, data, 4);
   }
 
@@ -3521,7 +3521,8 @@ public:
   gather(const double *base_ptr, const unsigned int *offsets)
   {
     for (unsigned int i = 0; i < 2; ++i)
-      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
@@ -3541,7 +3542,8 @@ public:
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     for (unsigned int i = 0; i < 2; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
 
   /**
@@ -3969,7 +3971,8 @@ public:
   gather(const float *base_ptr, const unsigned int *offsets)
   {
     for (unsigned int i = 0; i < 4; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
@@ -3989,7 +3992,8 @@ public:
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     for (unsigned int i = 0; i < 4; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
 
   /**
@@ -4427,7 +4431,8 @@ public:
   gather(const double *base_ptr, const unsigned int *offsets)
   {
     for (unsigned int i = 0; i < 2; ++i)
-      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
@@ -4438,7 +4443,8 @@ public:
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     for (unsigned int i = 0; i < 2; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
 
   /**
@@ -4674,7 +4680,8 @@ public:
   gather(const float *base_ptr, const unsigned int *offsets)
   {
     for (unsigned int i = 0; i < 4; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
@@ -4685,7 +4692,8 @@ public:
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     for (unsigned int i = 0; i < 4; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
 
   /**
