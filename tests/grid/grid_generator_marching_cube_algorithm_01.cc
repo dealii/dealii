@@ -145,13 +145,7 @@ template <int dim>
 void
 test(const unsigned int n_subdivisions, const double iso_level)
 {
-  const unsigned int spacedim = dim + 1;
-
-  const unsigned int fe_degree      = 3;
-  const unsigned int mapping_degree = fe_degree;
-  const unsigned int n_refinements  = 5;
-
-
+  const unsigned int spacedim             = dim + 1;
   const unsigned int background_fe_degree = 3;
 
   parallel::shared::Triangulation<spacedim> background_tria(
