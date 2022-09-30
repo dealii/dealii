@@ -51,7 +51,6 @@
 #  include <CGAL/make_mesh_3.h>
 #  include <CGAL/make_surface_mesh.h>
 #  include <deal.II/cgal/surface_mesh.h>
-//#  include <CGAL/tetrahedral_remeshing.h> REQUIRES CGAL_VERSION>=5.1.5
 
 #  include <fstream>
 #  include <limits>
