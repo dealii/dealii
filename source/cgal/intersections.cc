@@ -269,7 +269,7 @@ namespace CGALWrappers
     compute_intersection(const std::array<Point<3>, 2> &first_simplex,
                          const std::array<Point<3>, 4> &second_simplex)
     {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
+#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
       std::array<CGALPoint3, 4> pts0;
       std::array<CGALPoint3, 2> pts1;
       std::transform(
@@ -311,7 +311,7 @@ namespace CGALWrappers
     compute_intersection(const std::array<Point<3>, 3> &first_simplex,
                          const std::array<Point<3>, 4> &second_simplex)
     {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
+#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
       std::array<CGALPoint3, 4> pts0;
       std::array<CGALPoint3, 3> pts1;
       std::transform(
@@ -464,7 +464,7 @@ namespace CGALWrappers
     const std::array<Point<3>, 2> &vertices1,
     const double                   tol)
   {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
+#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
     std::array<CGALPoint3_exact, 8> pts;
     std::transform(
       vertices0.begin(), vertices0.end(), pts.begin(), [&](const Point<3> &p) {
@@ -521,7 +521,7 @@ namespace CGALWrappers
     const std::array<Point<3>, 4> &vertices1,
     const double                   tol)
   {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 1, 5)
+#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
     std::array<CGALPoint3_exact, 8> pts_hex;
     std::array<CGALPoint3_exact, 4> pts_quad;
     std::transform(
