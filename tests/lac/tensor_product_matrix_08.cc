@@ -53,11 +53,15 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
   const auto harmonic_patch_extent =
     GridTools::compute_harmonic_patch_extent(mapping, tria, quadrature_face);
 
-  FDM collection_0(typename FDM::AdditionalData(true));
-  FDM collection_1(typename FDM::AdditionalData(false));
+  FDM collection_0(typename FDM::AdditionalData(true, false));
+  FDM collection_1(typename FDM::AdditionalData(false, false));
+  FDM collection_2(typename FDM::AdditionalData(true, true));
+  FDM collection_3(typename FDM::AdditionalData(false, true));
 
   collection_0.reserve(tria.n_active_cells());
   collection_1.reserve(tria.n_active_cells());
+  collection_2.reserve(tria.n_active_cells());
+  collection_3.reserve(tria.n_active_cells());
 
   for (const auto &cell : tria.active_cell_iterators())
     {
@@ -80,10 +84,18 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
       collection_1.insert(cell->active_cell_index(),
                           M_and_K.first,
                           M_and_K.second);
+      collection_2.insert(cell->active_cell_index(),
+                          M_and_K.first,
+                          M_and_K.second);
+      collection_3.insert(cell->active_cell_index(),
+                          M_and_K.first,
+                          M_and_K.second);
     }
 
   collection_0.finalize();
   collection_1.finalize();
+  collection_2.finalize();
+  collection_3.finalize();
 
   deallog << "Storage sizes: " << collection_0.storage_size() << " "
           << collection_1.storage_size() << std::endl;
@@ -93,6 +105,8 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
   AlignedVector<Number> tmp;
   FullMatrix<Number>    matrix_0(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
   FullMatrix<Number>    matrix_1(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
+  FullMatrix<Number>    matrix_2(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
+  FullMatrix<Number>    matrix_3(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
 
   for (unsigned int cell = 0; cell < tria.n_active_cells(); ++cell)
     {
@@ -114,12 +128,32 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
                                      tmp);
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_1[j][i] = dst[j];
+
+          collection_2.apply_inverse(cell,
+                                     make_array_view(dst),
+                                     make_array_view(src),
+                                     tmp);
+          for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
+            matrix_2[j][i] = dst[j];
+
+          collection_3.apply_inverse(cell,
+                                     make_array_view(dst),
+                                     make_array_view(src),
+                                     tmp);
+          for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
+            matrix_3[j][i] = dst[j];
         }
 
 
-      FloatingPointComparator<Number> comp(1e-5, false);
+      FloatingPointComparator<Number> comp(1e-5, true);
 
       Assert((comp.compare(matrix_0, matrix_1) ==
+              FloatingPointComparator<Number>::ComparisonResult::equal),
+             ExcInternalError());
+      Assert((comp.compare(matrix_0, matrix_2) ==
+              FloatingPointComparator<Number>::ComparisonResult::equal),
+             ExcInternalError());
+      Assert((comp.compare(matrix_0, matrix_3) ==
               FloatingPointComparator<Number>::ComparisonResult::equal),
              ExcInternalError());
     }
