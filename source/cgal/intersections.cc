@@ -170,7 +170,7 @@ namespace CGALWrappers
     // identified by array of points. The return type is the one of
     // CGAL::intersection(), i.e. a boost::optional<boost::variant<>>.
     // Intersection between 2D and 3D objects and 1D/3D objects are available
-    // only with CGAL versions greater or equal than 5.1.5, hence the
+    // only with CGAL versions greater or equal than 5.5, hence the
     // corresponding functions are guarded by #ifdef directives. All the
     // signatures follow the convection that the first entity has an intrinsic
     // dimension higher than the second one.
@@ -296,7 +296,7 @@ namespace CGALWrappers
       Assert(
         false,
         ExcMessage(
-          "This function requires a version of CGAL greater or equal than 5.1.5."));
+          "This function requires a version of CGAL greater or equal than 5.5."));
       (void)first_simplex;
       (void)second_simplex;
       return {};
@@ -337,7 +337,7 @@ namespace CGALWrappers
       Assert(
         false,
         ExcMessage(
-          "This function requires a version of CGAL greater or equal than 5.1.5."));
+          "This function requires a version of CGAL greater or equal than 5.5."));
       (void)first_simplex;
       (void)second_simplex;
       return {};
@@ -506,7 +506,7 @@ namespace CGALWrappers
     Assert(
       false,
       ExcMessage(
-        "This function requires a version of CGAL greater or equal than 5.1.5."));
+        "This function requires a version of CGAL greater or equal than 5.5."));
     (void)vertices0;
     (void)vertices1;
     (void)tol;
@@ -607,7 +607,7 @@ namespace CGALWrappers
     Assert(
       false,
       ExcMessage(
-        "This function requires a version of CGAL greater or equal than 5.1.5."));
+        "This function requires a version of CGAL greater or equal than 5.5."));
     (void)vertices0;
     (void)vertices1;
     (void)tol;
