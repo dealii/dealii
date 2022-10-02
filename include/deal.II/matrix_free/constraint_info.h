@@ -57,6 +57,12 @@ namespace internal
         const std::vector<std::pair<types::global_dof_index, number2>>
           &entries);
 
+      /**
+       * Return the memory consumption of the allocated memory in this class.
+       */
+      std::size_t
+      memory_consumption() const;
+
       std::vector<std::pair<types::global_dof_index, double>>
                                            constraint_entries;
       std::vector<types::global_dof_index> constraint_indices;
@@ -128,6 +134,12 @@ namespace internal
         const unsigned int     n_lanes_filled,
         const bool             transpose,
         AlignedVector<Number> &evaluation_data_coarse) const;
+
+      /**
+       * Return the memory consumption of the allocated memory in this class.
+       */
+      std::size_t
+      memory_consumption() const;
 
     private:
       // for setup
@@ -716,6 +728,55 @@ namespace internal
                constraint_pool_data.data() + constraint_pool_row_index[row + 1];
     }
 
+
+
+    template <int dim, typename Number>
+    inline std::size_t
+    ConstraintInfo<dim, Number>::memory_consumption() const
+    {
+      std::size_t size = 0;
+
+      size += MemoryConsumption::memory_consumption(constraint_values);
+      size += MemoryConsumption::memory_consumption(dof_indices_per_cell);
+      size += MemoryConsumption::memory_consumption(plain_dof_indices_per_cell);
+      size +=
+        MemoryConsumption::memory_consumption(constraint_indicator_per_cell);
+
+      if (hanging_nodes)
+        size += MemoryConsumption::memory_consumption(*hanging_nodes);
+
+      size += MemoryConsumption::memory_consumption(lexicographic_numbering);
+      size += MemoryConsumption::memory_consumption(dof_indices);
+      size += MemoryConsumption::memory_consumption(constraint_indicator);
+      size += MemoryConsumption::memory_consumption(row_starts);
+      size += MemoryConsumption::memory_consumption(plain_dof_indices);
+      size += MemoryConsumption::memory_consumption(row_starts_plain_indices);
+      size += MemoryConsumption::memory_consumption(constraint_pool_data);
+      size += MemoryConsumption::memory_consumption(constraint_pool_row_index);
+      size += MemoryConsumption::memory_consumption(shape_infos);
+      size +=
+        MemoryConsumption::memory_consumption(hanging_node_constraint_masks);
+      size += MemoryConsumption::memory_consumption(active_fe_indices);
+
+      return size;
+    }
+
+
+
+    template <typename Number>
+    inline std::size_t
+    ConstraintValues<Number>::memory_consumption() const
+    {
+      std::size_t size = 0;
+
+      size += MemoryConsumption::memory_consumption(constraint_entries);
+      size += MemoryConsumption::memory_consumption(constraint_indices);
+
+      // TODO: map does not have memory_consumption()
+      // size += MemoryConsumption::memory_consumption(constraints);
+
+      return size;
+    }
 
   } // namespace MatrixFreeFunctions
 } // namespace internal

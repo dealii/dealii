@@ -3122,8 +3122,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   size += vec_coarse.memory_consumption();
   size += MemoryConsumption::memory_consumption(weights);
   size += MemoryConsumption::memory_consumption(level_dof_indices_fine);
-
-  // size += constraint_info.memory_consumption(); // TODO
+  size += constraint_info.memory_consumption();
 
   return size;
 }
