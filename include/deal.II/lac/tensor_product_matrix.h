@@ -301,8 +301,6 @@ namespace internal
 
         std::bitset<width> mask;
 
-        using ScalarNumber = typename Number::value_type;
-
         for (unsigned int v = 0; v < width; ++v)
           {
             ScalarNumber a = 0.0;
@@ -371,6 +369,28 @@ class TensorProductMatrixSymmetricSumCollection
 
 public:
   /**
+   * Struct to configure TensorProductMatrixSymmetricSumCollection.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Constructor.
+     */
+    AdditionalData(const bool compress_matrices = true);
+
+    /**
+     * Try to compress internal matrices. Default: true.
+     */
+    bool compress_matrices;
+  };
+
+  /**
+   * Consturctor.
+   */
+  TensorProductMatrixSymmetricSumCollection(
+    const AdditionalData &additional_data = AdditionalData());
+
+  /**
    * Allocate memory. The parameter @p specifies the maximum value
    * of the index used in invert() and apply_inverse().
    */
@@ -382,10 +402,9 @@ public:
    * stiffness matrices @p Ks to the stored data, looking out for
    * compression possibilities.
    */
+  template <typename T>
   void
-  insert(const unsigned int                       index,
-         const std::array<Table<2, Number>, dim> &Ms,
-         const std::array<Table<2, Number>, dim> &Ks);
+  insert(const unsigned int index, const T &Ms, const T &Ks);
 
   /**
    * Finalize setup. This function computes, e.g., the
@@ -421,6 +440,17 @@ public:
   storage_size() const;
 
 private:
+  /**
+   * Try to compress matrices.
+   */
+  const bool compress_matrices;
+
+  /**
+   * Container used to collect 1D matrices if no compression is
+   * requested. The memory is freed during finalize().
+   */
+  std::vector<MatrixPairType> mass_and_derivative_matrices;
+
   /**
    * Container used during setup to determine the unique 1D
    * matrices. The memory is freed during finalize().
@@ -1042,34 +1072,68 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit(
 
 
 template <int dim, typename Number, int n_rows_1d>
-void
-TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::reserve(
-  const unsigned int size)
-{
-  indices.assign(size * dim, numbers::invalid_unsigned_int);
-}
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
+  AdditionalData::AdditionalData(const bool compress_matrices)
+  : compress_matrices(compress_matrices)
+{}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
+  TensorProductMatrixSymmetricSumCollection(
+    const AdditionalData &additional_data)
+  : compress_matrices(additional_data.compress_matrices)
+{}
 
 
 
 template <int dim, typename Number, int n_rows_1d>
 void
-TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::insert(
-  const unsigned int                       index,
-  const std::array<Table<2, Number>, dim> &Ms,
-  const std::array<Table<2, Number>, dim> &Ks)
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::reserve(
+  const unsigned int size)
 {
+  if (compress_matrices == false)
+    mass_and_derivative_matrices.resize(size * dim);
+  else
+    indices.assign(size * dim, numbers::invalid_unsigned_int);
+}
+
+
+
+template <int dim, typename Number, int n_rows_1d>
+template <typename T>
+void
+TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::insert(
+  const unsigned int index,
+  const T &          Ms_in,
+  const T &          Ks_in)
+{
+  const auto Ms =
+    internal::TensorProductMatrixSymmetricSum::convert<dim>(Ms_in);
+  const auto Ks =
+    internal::TensorProductMatrixSymmetricSum::convert<dim>(Ks_in);
+
   for (unsigned int d = 0; d < dim; ++d)
     {
       const MatrixPairType matrix(Ms[d], Ks[d]);
 
-      const auto ptr = cache.find(matrix);
-
-      if (ptr != cache.end())
-        indices[index * dim + d] = ptr->second;
+      if (compress_matrices == false)
+        {
+          mass_and_derivative_matrices[index * dim + d] = matrix;
+        }
       else
         {
-          indices[index * dim + d] = cache.size();
-          cache[matrix]            = cache.size();
+          const auto ptr = cache.find(matrix);
+
+          if (ptr != cache.end())
+            indices[index * dim + d] = ptr->second;
+          else
+            {
+              const auto size          = cache.size();
+              indices[index * dim + d] = size;
+              cache[matrix]            = size;
+            }
         }
     }
 }
@@ -1080,9 +1144,6 @@ template <int dim, typename Number, int n_rows_1d>
 void
 TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
 {
-  this->vector_ptr.resize(cache.size() + 1);
-  this->matrix_ptr.resize(cache.size() + 1);
-
   const auto store = [&](const unsigned int    index,
                          const MatrixPairType &M_and_K) {
     std::array<Table<2, Number>, 1> mass_matrix;
@@ -1114,8 +1175,47 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
       }
   };
 
-  if (cache.size() == indices.size())
+  if (compress_matrices == false)
     {
+      // case 1) no compression requested
+
+      AssertDimension(cache.size(), 0);
+      AssertDimension(indices.size(), 0);
+
+      this->vector_ptr.resize(mass_and_derivative_matrices.size() + 1);
+      this->matrix_ptr.resize(mass_and_derivative_matrices.size() + 1);
+
+      for (unsigned int i = 0; i < mass_and_derivative_matrices.size(); ++i)
+        {
+          const auto &M = mass_and_derivative_matrices[i].first;
+
+          this->vector_ptr[i + 1] = M.n_rows();
+          this->matrix_ptr[i + 1] = M.n_rows() * M.n_cols();
+        }
+
+      for (unsigned int i = 0; i < mass_and_derivative_matrices.size(); ++i)
+        {
+          this->vector_ptr[i + 1] += this->vector_ptr[i];
+          this->matrix_ptr[i + 1] += this->matrix_ptr[i];
+        }
+
+      this->mass_matrices.resize_fast(matrix_ptr.back());
+      this->derivative_matrices.resize_fast(matrix_ptr.back());
+      this->eigenvectors.resize_fast(matrix_ptr.back());
+      this->eigenvalues.resize_fast(vector_ptr.back());
+
+      for (unsigned int i = 0; i < mass_and_derivative_matrices.size(); ++i)
+        store(i, mass_and_derivative_matrices[i]);
+
+      mass_and_derivative_matrices.clear();
+    }
+  else if (cache.size() == indices.size())
+    {
+      // case 2) compression requested but none possible
+
+      this->vector_ptr.resize(cache.size() + 1);
+      this->matrix_ptr.resize(cache.size() + 1);
+
       std::map<unsigned int, MatrixPairType> inverted_cache;
 
       for (const auto &i : cache)
@@ -1135,18 +1235,24 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
           this->matrix_ptr[i + 1] += this->matrix_ptr[i];
         }
 
-      this->mass_matrices.resize(matrix_ptr.back());
-      this->derivative_matrices.resize(matrix_ptr.back());
-      this->eigenvectors.resize(matrix_ptr.back());
-      this->eigenvalues.resize(vector_ptr.back());
+      this->mass_matrices.resize_fast(matrix_ptr.back());
+      this->derivative_matrices.resize_fast(matrix_ptr.back());
+      this->eigenvectors.resize_fast(matrix_ptr.back());
+      this->eigenvalues.resize_fast(vector_ptr.back());
 
       for (unsigned int i = 0; i < indices.size(); ++i)
         store(i, inverted_cache[indices[i]]);
 
       indices.clear();
+      cache.clear();
     }
   else
     {
+      // case 2) compression requested but none possible
+
+      this->vector_ptr.resize(cache.size() + 1);
+      this->matrix_ptr.resize(cache.size() + 1);
+
       for (const auto &i : cache)
         {
           const auto &M = i.first.first;
@@ -1161,16 +1267,16 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
           this->matrix_ptr[i + 1] += this->matrix_ptr[i];
         }
 
-      this->mass_matrices.resize(matrix_ptr.back());
-      this->derivative_matrices.resize(matrix_ptr.back());
-      this->eigenvectors.resize(matrix_ptr.back());
-      this->eigenvalues.resize(vector_ptr.back());
+      this->mass_matrices.resize_fast(matrix_ptr.back());
+      this->derivative_matrices.resize_fast(matrix_ptr.back());
+      this->eigenvectors.resize_fast(matrix_ptr.back());
+      this->eigenvalues.resize_fast(vector_ptr.back());
 
       for (const auto &i : cache)
         store(i.second, i.first);
-    }
 
-  cache.clear();
+      cache.clear();
+    }
 }
 
 
