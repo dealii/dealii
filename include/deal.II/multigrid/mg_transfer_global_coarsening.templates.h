@@ -1779,26 +1779,22 @@ namespace internal
       transfer.n_components =
         dof_handler_fine.get_fe_collection().n_components();
 
-      // TODO: replace with std::all_of once FECellection supports range-based
-      // iterations
-      const auto all_of = [](const auto &fe_collection, const auto &fu) {
-        for (unsigned int i = 0; i < fe_collection.size(); ++i)
-          if (fu(fe_collection[i]) == false)
-            return false;
-
-        return true;
-      };
-
       transfer.fine_element_is_continuous =
-        all_of(dof_handler_fine.get_fe_collection(), [](const auto &fe) {
-          return fe.n_dofs_per_cell() == 0 || fe.n_dofs_per_vertex() > 0;
-        });
+        std::all_of(dof_handler_fine.get_fe_collection().begin(),
+                    dof_handler_fine.get_fe_collection().end(),
+                    [](const auto &fe) {
+                      return fe.n_dofs_per_cell() == 0 ||
+                             fe.n_dofs_per_vertex() > 0;
+                    });
 
 #if DEBUG
       const bool fine_element_is_discontinuous =
-        all_of(dof_handler_fine.get_fe_collection(), [](const auto &fe) {
-          return fe.n_dofs_per_cell() == 0 || fe.n_dofs_per_vertex() == 0;
-        });
+        std::all_of(dof_handler_fine.get_fe_collection().begin(),
+                    dof_handler_fine.get_fe_collection().end(),
+                    [](const auto &fe) {
+                      return fe.n_dofs_per_cell() == 0 ||
+                             fe.n_dofs_per_vertex() == 0;
+                    });
 
       Assert(transfer.fine_element_is_continuous !=
                fine_element_is_discontinuous,
