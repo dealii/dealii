@@ -73,6 +73,7 @@ add_subdirectory(physics)
 add_subdirectory(optimization/rol)
 add_subdirectory(non_matching)
 add_subdirectory(sundials)
+add_subdirectory(trilinos)
 add_subdirectory(arborx)
 
 foreach(build ${DEAL_II_BUILD_TYPES})
