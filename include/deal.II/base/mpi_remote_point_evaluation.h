@@ -71,22 +71,6 @@ namespace Utilities
       ~RemotePointEvaluation();
 
       /**
-       * Set up internal data structures and communication pattern based on
-       * a list of points @p points and mesh description (@p tria and @p
-       * mapping).
-       *
-       * @warning This is a collective call that needs to be executed by all
-       *   processors in the communicator.
-       *
-       * @note If you want to be sure that all points have been found, call
-       *   all_points_found() after calling this function.
-       */
-      void
-      reinit(const std::vector<Point<spacedim>> &points,
-             const Triangulation<dim, spacedim> &tria,
-             const Mapping<dim, spacedim> &      mapping);
-
-      /**
        * Data of points positioned in a cell.
        */
       struct CellData
@@ -107,6 +91,79 @@ namespace Utilities
          */
         std::vector<Point<dim>> reference_point_values;
       };
+
+      /**
+       * Data needed for MPI communication.
+       */
+      struct CommunicationData
+      {
+        /**
+         * Since for each point multiple or no results can be available, the
+         * pointers in this vector indicate the first and last entry associated
+         * with a point in a CRS-like fashion.
+         */
+        std::vector<unsigned int> point_ptrs;
+
+        /**
+         * Permutation index within a recv buffer.
+         */
+        std::vector<unsigned int> recv_permutation;
+
+        /**
+         * Pointers of ranges within a receive buffer that are filled by ranks
+         * specified by recv_ranks.
+         */
+        std::vector<unsigned int> recv_ptrs;
+
+        /**
+         * Ranks from where data is received.
+         */
+        std::vector<unsigned int> recv_ranks;
+
+        /**
+         * Permutation index within a send buffer.
+         */
+        std::vector<unsigned int> send_permutation;
+
+        /**
+         * Ranks to send to.
+         */
+        std::vector<unsigned int> send_ranks;
+
+        /**
+         * Pointers of ranges within a send buffer to be sent to the ranks
+         * specified by send_ranks.
+         */
+        std::vector<unsigned int> send_ptrs;
+      };
+
+      /**
+       * Set up internal data structures and communication pattern based on
+       * a list of points @p points and mesh description (@p tria and @p
+       * mapping).
+       *
+       * @warning This is a collective call that needs to be executed by all
+       *   processors in the communicator.
+       *
+       * @note If you want to be sure that all points have been found, call
+       *   all_points_found() after calling this function.
+       */
+      void
+      reinit(const std::vector<Point<spacedim>> &points,
+             const Triangulation<dim, spacedim> &tria,
+             const Mapping<dim, spacedim> &      mapping);
+
+      /**
+       * Set up internal data structures and communication pattern if it is
+       * allready known where reference points are found.
+       *
+       * @warning This function transfers ownership of cell_data and communication_data.
+       */
+      void
+      reinit(CellData &&                         cell_data,
+             CommunicationData &&                communication_data,
+             const Triangulation<dim, spacedim> &tria,
+             const Mapping<dim, spacedim> &      mapping);
 
       /**
        * Evaluate function @p evaluation_function in the given  points and
@@ -251,51 +308,17 @@ namespace Utilities
       bool all_points_found_flag;
 
       /**
-       * Since for each point multiple or no results can be available, the
-       * pointers in this vector indicate the first and last entry associated
-       * with a point in a CRS-like fashion.
+       * Data needed for MPI communication.
        */
-      std::vector<unsigned int> point_ptrs;
+      CommunicationData communication_data;
 
       /**
-       * Permutation index within a recv buffer.
-       */
-      std::vector<unsigned int> recv_permutation;
-
-      /**
-       * Pointers of ranges within a receive buffer that are filled by ranks
-       * specified by recv_ranks.
-       */
-      std::vector<unsigned int> recv_ptrs;
-
-      /**
-       * Ranks from where data is received.
-       */
-      std::vector<unsigned int> recv_ranks;
-
-      /**
-       * Point data sorted according to cells so that evaluation (incl. reading
-       * of degrees of freedoms) needs to performed only once per cell.
+       * Point data sorted according to cells so that evaluation (incl.
+       * reading of degrees of freedoms) needs to performed only once per
+       * cell.
        */
       CellData cell_data;
-
-      /**
-       * Permutation index within a send buffer.
-       */
-      std::vector<unsigned int> send_permutation;
-
-      /**
-       * Ranks to send to.
-       */
-      std::vector<unsigned int> send_ranks;
-
-      /**
-       * Pointers of ranges within a send buffer to be sent to the ranks
-       * specified by send_ranks.
-       */
-      std::vector<unsigned int> send_ptrs;
     };
-
 
     template <int dim, int spacedim>
     template <typename T>
@@ -315,8 +338,8 @@ namespace Utilities
       static CollectiveMutex      mutex;
       CollectiveMutex::ScopedLock lock(mutex, tria->get_communicator());
 
-      output.resize(point_ptrs.back());
-      buffer.resize(send_permutation.size() * 2);
+      output.resize(communication_data.point_ptrs.back());
+      buffer.resize(communication_data.send_permutation.size() * 2);
       ArrayView<T> buffer_1(buffer.data(), buffer.size() / 2);
       ArrayView<T> buffer_2(buffer.data() + buffer.size() / 2,
                             buffer.size() / 2);
@@ -325,51 +348,53 @@ namespace Utilities
       evaluation_function(buffer_1, cell_data);
 
       // sort for communication
-      for (unsigned int i = 0; i < send_permutation.size(); ++i)
-        buffer_2[send_permutation[i]] = buffer_1[i];
+      for (unsigned int i = 0; i < communication_data.send_permutation.size();
+           ++i)
+        buffer_2[communication_data.send_permutation[i]] = buffer_1[i];
 
       // process remote quadrature points and send them away
       std::map<unsigned int, std::vector<char>> temp_map;
 
       std::vector<MPI_Request> requests;
-      requests.reserve(send_ranks.size());
+      requests.reserve(communication_data.send_ranks.size());
 
       const unsigned int my_rank =
         Utilities::MPI::this_mpi_process(tria->get_communicator());
 
       std::map<unsigned int, std::vector<T>> temp_recv_map;
 
-      for (unsigned int i = 0; i < send_ranks.size(); ++i)
+      for (unsigned int i = 0; i < communication_data.send_ranks.size(); ++i)
         {
-          if (send_ranks[i] == my_rank)
+          if (communication_data.send_ranks[i] == my_rank)
             {
               // process locally-owned values
-              temp_recv_map[my_rank] =
-                std::vector<T>(buffer_2.begin() + send_ptrs[i],
-                               buffer_2.begin() + send_ptrs[i + 1]);
+              temp_recv_map[my_rank] = std::vector<T>(
+                buffer_2.begin() + communication_data.send_ptrs[i],
+                buffer_2.begin() + communication_data.send_ptrs[i + 1]);
               continue;
             }
 
-          temp_map[send_ranks[i]] =
-            Utilities::pack(std::vector<T>(buffer_2.begin() + send_ptrs[i],
-                                           buffer_2.begin() + send_ptrs[i + 1]),
-                            false);
+          temp_map[communication_data.send_ranks[i]] = Utilities::pack(
+            std::vector<T>(buffer_2.begin() + communication_data.send_ptrs[i],
+                           buffer_2.begin() +
+                             communication_data.send_ptrs[i + 1]),
+            false);
 
-          auto &buffer = temp_map[send_ranks[i]];
+          auto &buffer = temp_map[communication_data.send_ranks[i]];
 
           requests.push_back(MPI_Request());
 
           const int ierr = MPI_Isend(buffer.data(),
                                      buffer.size(),
                                      MPI_CHAR,
-                                     send_ranks[i],
+                                     communication_data.send_ranks[i],
                                      internal::Tags::remote_point_evaluation,
                                      tria->get_communicator(),
                                      &requests.back());
           AssertThrowMPI(ierr);
         }
 
-      for (const auto recv_rank : recv_ranks)
+      for (const auto recv_rank : communication_data.recv_ranks)
         {
           if (recv_rank == my_rank)
             continue;
@@ -406,7 +431,7 @@ namespace Utilities
       AssertThrowMPI(ierr);
 
       // copy received data into output vector
-      auto it = recv_permutation.begin();
+      auto it = communication_data.recv_permutation.begin();
       for (const auto &j : temp_recv_map)
         for (const auto &i : j.second)
           {
@@ -415,7 +440,6 @@ namespace Utilities
           }
 #endif
     }
-
 
     template <int dim, int spacedim>
     template <typename T>
@@ -435,12 +459,14 @@ namespace Utilities
       static CollectiveMutex      mutex;
       CollectiveMutex::ScopedLock lock(mutex, tria->get_communicator());
 
-      const auto &ptr = this->get_point_ptrs();
+      const auto &ptr = this->communication_data.get_point_ptrs();
 
       std::map<unsigned int, std::vector<T>> temp_recv_map;
 
-      for (unsigned int i = 0; i < recv_ranks.size(); ++i)
-        temp_recv_map[recv_ranks[i]].resize(recv_ptrs[i + 1] - recv_ptrs[i]);
+      for (unsigned int i = 0; i < communication_data.recv_ranks.size(); ++i)
+        temp_recv_map[communication_data.recv_ranks[i]].resize(
+          communication_data.recv_ptrs[i + 1] -
+          communication_data.recv_ptrs[i]);
 
       const unsigned int my_rank =
         Utilities::MPI::this_mpi_process(tria->get_communicator());
@@ -452,7 +478,7 @@ namespace Utilities
         for (auto &j : temp_recv_map)
           i += j.second.size();
 
-        AssertDimension(recv_permutation.size(), i);
+        AssertDimension(communication_data.recv_permutation.size(), i);
       }
 #  endif
 
@@ -468,7 +494,7 @@ namespace Utilities
           }
 
         // sort data according to the ranks
-        auto it = recv_permutation.begin();
+        auto it = communication_data.recv_permutation.begin();
         for (auto &j : temp_recv_map)
           for (auto &i : j.second)
             {
@@ -477,8 +503,8 @@ namespace Utilities
             }
       }
 
-      // buffer.resize(point_ptrs.back());
-      buffer.resize(send_permutation.size() * 2);
+      // buffer.resize(communication_data.point_ptrs.back());
+      buffer.resize(communication_data.send_permutation.size() * 2);
       ArrayView<T> buffer_1(buffer.data(), buffer.size() / 2);
       ArrayView<T> buffer_2(buffer.data() + buffer.size() / 2,
                             buffer.size() / 2);
@@ -487,9 +513,9 @@ namespace Utilities
       std::map<unsigned int, std::vector<char>> temp_map;
 
       std::vector<MPI_Request> requests;
-      requests.reserve(recv_ranks.size());
+      requests.reserve(communication_data.recv_ranks.size());
 
-      for (const auto recv_rank : recv_ranks)
+      for (const auto recv_rank : communication_data.recv_ranks)
         {
           if (recv_rank == my_rank)
             continue;
@@ -511,21 +537,25 @@ namespace Utilities
           AssertThrowMPI(ierr);
         }
 
-      for (unsigned int i = 0; i < send_ranks.size(); ++i)
+      for (unsigned int i = 0; i < communication_data.send_ranks.size(); ++i)
         {
-          if (send_ranks[i] == my_rank)
+          if (communication_data.send_ranks[i] == my_rank)
             {
-              const auto &buffer_send = temp_recv_map[send_ranks[i]];
+              const auto &buffer_send =
+                temp_recv_map[communication_data.send_ranks[i]];
               // process locally-owned values
-              const unsigned int j = std::distance(send_ranks.begin(),
-                                                   std::find(send_ranks.begin(),
-                                                             send_ranks.end(),
-                                                             my_rank));
+              const unsigned int j =
+                std::distance(communication_data.send_ranks.begin(),
+                              std::find(communication_data.send_ranks.begin(),
+                                        communication_data.send_ranks.end(),
+                                        my_rank));
 
               AssertDimension(buffer_send.size(),
-                              send_ptrs[j + 1] - send_ptrs[j]);
+                              communication_data.send_ptrs[j + 1] -
+                                communication_data.send_ptrs[j]);
 
-              for (unsigned int i = send_ptrs[j], c = 0; i < send_ptrs[j + 1];
+              for (unsigned int i = communication_data.send_ptrs[j], c = 0;
+                   i < communication_data.send_ptrs[j + 1];
                    ++i, ++c)
                 buffer_1[i] = buffer_send[c];
 
@@ -557,17 +587,22 @@ namespace Utilities
           const auto recv_buffer_unpacked =
             Utilities::unpack<std::vector<T>>(recv_buffer, false);
 
-          auto ptr =
-            std::find(send_ranks.begin(), send_ranks.end(), status.MPI_SOURCE);
+          auto ptr = std::find(communication_data.send_ranks.begin(),
+                               communication_data.send_ranks.end(),
+                               status.MPI_SOURCE);
 
-          Assert(ptr != send_ranks.end(), ExcNotImplemented());
+          Assert(ptr != communication_data.send_ranks.end(),
+                 ExcNotImplemented());
 
-          const unsigned int j = std::distance(send_ranks.begin(), ptr);
+          const unsigned int j =
+            std::distance(communication_data.send_ranks.begin(), ptr);
 
           AssertDimension(recv_buffer_unpacked.size(),
-                          send_ptrs[j + 1] - send_ptrs[j]);
+                          communication_data.send_ptrs[j + 1] -
+                            communication_data.send_ptrs[j]);
 
-          for (unsigned int i = send_ptrs[j], c = 0; i < send_ptrs[j + 1];
+          for (unsigned int i = communication_data.send_ptrs[j], c = 0;
+               i < communication_data.send_ptrs[j + 1];
                ++i, ++c)
             {
               AssertIndexRange(i, buffer_1.size());
@@ -581,8 +616,9 @@ namespace Utilities
       AssertThrowMPI(ierr);
 
       // sort for easy access during function call
-      for (unsigned int i = 0; i < send_permutation.size(); ++i)
-        buffer_2[i] = buffer_1[send_permutation[i]];
+      for (unsigned int i = 0; i < communication_data.send_permutation.size();
+           ++i)
+        buffer_2[i] = buffer_1[communication_data.send_permutation[i]];
 
       // evaluate function at points
       evaluation_function(buffer_2, cell_data);

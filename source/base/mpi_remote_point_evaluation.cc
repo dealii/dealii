@@ -109,24 +109,27 @@ namespace Utilities
           true,
           enforce_unique_mapping);
 
-      this->recv_ranks = data.recv_ranks;
-      this->recv_ptrs  = data.recv_ptrs;
+      this->communication_data.recv_ranks = data.recv_ranks;
+      this->communication_data.recv_ptrs  = data.recv_ptrs;
 
-      this->send_ranks = data.send_ranks;
-      this->send_ptrs  = data.send_ptrs;
+      this->communication_data.send_ranks = data.send_ranks;
+      this->communication_data.send_ptrs  = data.send_ptrs;
 
-      this->recv_permutation = {};
-      this->recv_permutation.resize(data.recv_components.size());
-      this->point_ptrs.assign(points.size() + 1, 0);
+      this->communication_data.recv_permutation = {};
+      this->communication_data.recv_permutation.resize(
+        data.recv_components.size());
+      this->communication_data.point_ptrs.assign(points.size() + 1, 0);
       for (unsigned int i = 0; i < data.recv_components.size(); ++i)
         {
           AssertIndexRange(std::get<2>(data.recv_components[i]),
-                           this->recv_permutation.size());
-          this->recv_permutation[std::get<2>(data.recv_components[i])] = i;
+                           this->communication_data.recv_permutation.size());
+          this->communication_data
+            .recv_permutation[std::get<2>(data.recv_components[i])] = i;
 
           AssertIndexRange(std::get<1>(data.recv_components[i]) + 1,
-                           this->point_ptrs.size());
-          this->point_ptrs[std::get<1>(data.recv_components[i]) + 1]++;
+                           this->communication_data.point_ptrs.size());
+          this->communication_data
+            .point_ptrs[std::get<1>(data.recv_components[i]) + 1]++;
         }
 
       std::tuple<unsigned int, unsigned int> n_owning_processes_default{
@@ -138,12 +141,13 @@ namespace Utilities
         {
           std::get<0>(n_owning_processes_local) =
             std::min(std::get<0>(n_owning_processes_local),
-                     this->point_ptrs[i + 1]);
+                     this->communication_data.point_ptrs[i + 1]);
           std::get<1>(n_owning_processes_local) =
             std::max(std::get<1>(n_owning_processes_local),
-                     this->point_ptrs[i + 1]);
+                     this->communication_data.point_ptrs[i + 1]);
 
-          this->point_ptrs[i + 1] += this->point_ptrs[i];
+          this->communication_data.point_ptrs[i + 1] +=
+            this->communication_data.point_ptrs[i];
         }
 
       const auto n_owning_processes_global =
@@ -178,8 +182,8 @@ namespace Utilities
       Assert(enforce_unique_mapping == false || unique_mapping,
              ExcInternalError());
 
-      cell_data        = {};
-      send_permutation = {};
+      cell_data                           = {};
+      communication_data.send_permutation = {};
 
       std::pair<int, int> dummy{-1, -1};
       for (const auto &i : data.send_components)
@@ -193,7 +197,7 @@ namespace Utilities
             }
 
           cell_data.reference_point_values.emplace_back(std::get<3>(i));
-          send_permutation.emplace_back(std::get<5>(i));
+          communication_data.send_permutation.emplace_back(std::get<5>(i));
         }
 
       cell_data.reference_point_ptrs.emplace_back(
@@ -204,11 +208,58 @@ namespace Utilities
     }
 
 
+
+    template <int dim, int spacedim>
+    void
+    RemotePointEvaluation<dim, spacedim>::reinit(
+      CellData &&                         cell_data,
+      CommunicationData &&                communication_data,
+      const Triangulation<dim, spacedim> &tria,
+      const Mapping<dim, spacedim> &      mapping)
+    {
+#ifndef DEAL_II_WITH_MPI
+      Assert(false, ExcNeedsMPI());
+      (void)cell_data;
+      (void)communication_data;
+      (void)tria;
+      (void)mapping;
+#else
+      if (tria_signal.connected())
+        tria_signal.disconnect();
+
+      tria_signal =
+        tria.signals.any_change.connect([&]() { this->ready_flag = false; });
+
+      this->tria    = &tria;
+      this->mapping = &mapping;
+
+      for (unsigned int i = 0; i < communication_data.point_ptrs.size() - 1;
+           ++i)
+        if (communication_data.point_ptrs[i + 1] !=
+            communication_data.point_ptrs[i] + 1)
+          {
+            unique_mapping = false;
+            break;
+          }
+
+      Assert(unique_mapping || unique_mapping == enforce_unique_mapping,
+             ExcInternalError());
+
+      this->communication_data = std::move(communication_data);
+      this->cell_data          = std::move(cell_data);
+
+      this->all_points_found_flag = true;
+      this->ready_flag            = true;
+#endif
+    }
+
+
+
     template <int dim, int spacedim>
     const std::vector<unsigned int> &
     RemotePointEvaluation<dim, spacedim>::get_point_ptrs() const
     {
-      return point_ptrs;
+      return communication_data.point_ptrs;
     }
 
 
@@ -236,12 +287,13 @@ namespace Utilities
     RemotePointEvaluation<dim, spacedim>::point_found(
       const unsigned int i) const
     {
-      AssertIndexRange(i, point_ptrs.size() - 1);
+      AssertIndexRange(i, communication_data.point_ptrs.size() - 1);
 
       if (all_points_found_flag)
         return true;
       else
-        return (point_ptrs[i + 1] - point_ptrs[i]) > 0;
+        return (communication_data.point_ptrs[i + 1] -
+                communication_data.point_ptrs[i]) > 0;
     }
 
 
