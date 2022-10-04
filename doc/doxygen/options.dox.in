@@ -77,6 +77,7 @@ EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
 INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter.pl
 FILTER_SOURCE_FILES    = YES
+NUM_PROC_THREADS       = 0
 
 # Have some user defined commands that we can use in the documentation
 # and that expands to specific text. For some more transformations, see
@@ -290,6 +291,7 @@ DOT_TRANSPARENT        = NO
 GENERATE_LEGEND        = YES
 
 DOT_CLEANUP            = YES
+DOT_NUM_THREADS        = 0
 
 #---------------------------------------------------------------------------
 # Configuration::additions related to the search engine
