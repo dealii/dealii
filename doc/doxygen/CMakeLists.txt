@@ -34,6 +34,7 @@ IF(NOT DOXYGEN_FOUND)
     )
 ENDIF()
 
+
 ########################################################################
 #
 # Process the tutorial and code-gallery files into inputs for doxygen
@@ -271,6 +272,19 @@ FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
   IMAGE_PATH=${_doxygen_image_path_string}
   "
   )
+
+# If we use a reasonably modern doxygen version, make sure it is run in parallel
+IF(NOT (${DOXYGEN_VERSION} VERSION_LESS 1.9))
+  FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
+    "
+    NUM_PROC_THREADS       = 0
+    DOT_NUM_THREADS        = 0
+    "
+    )
+  MESSAGE(STATUS "Letting doxygen run with multiple threads")
+ENDIF()
+
+
 
 ########################################################################
 #
