@@ -1,0 +1,5 @@
+New: We now instruct doxygen to build the documentation with multiple
+threads, substantially reducing the amount of time it takes to
+complete this step.
+<br>
+(Wolfgang Bangerth, 2022/10/04)
