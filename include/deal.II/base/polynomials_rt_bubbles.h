@@ -39,16 +39,20 @@ DEAL_II_NAMESPACE_OPEN
  * polynomial space <i>Q<sub>k-1</sub></i>.
  *
  * This space is of the form <i>V<sub>k</sub> = RT<sub>k-1</sub> +
- * B<sub>k</sub></i>, where <i>B<sub>k</sub></i> is defined as follows: <dl>
- * <dt> In 2D:
+ * B<sub>k</sub></i>, where <i>B<sub>k</sub></i> is defined as follows:
+ * <dl>
+ * <dt> In 2D:</dt>
+ * <dd>
  * @f{align*}{
  *  B_k^1(E) = \text{span}\left\{x^{a_1-1} y^{a_2}\begin{pmatrix} (a_2+1) x \\
  *    -a_1 y \end{pmatrix}\text{ : } a_2=k \right\} \\
  *  B_k^2(E) = \text{span}\left\{x^{b_1} y^{b_2-1}\begin{pmatrix} -b_2 x \\
  *     (b_1+1) y \end{pmatrix}\text{ : } b_1=k \right\}
  * @f}
+ * </dd>
  *
- * <dt> In 3D:
+ * <dt> In 3D: </dt>
+ * <dd>
  *  @f{align*}{
  *   B_k^1(E) = \text{span}\left\{x^{a_1-1} y^{a_2} z^{a_3}\begin{pmatrix}
  * (a_2+a_3+2) x \\
@@ -62,6 +66,7 @@ DEAL_II_NAMESPACE_OPEN
  * \\ -c_3y \\ (c_1+c_2+2)z \end{pmatrix}\text{ : } c_1=k \text{ or } c_2=k
  * \right\},
  *  @f}
+ * </dd>
  * </dl>
  * where $0 \le a_1, a_2, a_3 \le k$.
  *
