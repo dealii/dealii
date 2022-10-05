@@ -2676,7 +2676,9 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-/** @} */
+/**
+ * @}
+ */
 /**
  * @name Special operations on tensors of rank 2
  * @{
@@ -3046,7 +3048,9 @@ linfty_norm(const Tensor<2, dim, Number> &t)
   return max;
 }
 
-/** @} */
+/**
+ * @}
+ */
 
 
 #ifndef DOXYGEN

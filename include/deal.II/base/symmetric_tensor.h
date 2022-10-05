@@ -3573,7 +3573,7 @@ operator*(const Number &factor, const SymmetricTensor<rank_, dim, Number> &t)
  * the type you would get if you multiplied an individual component of the
  * input tensor by the scalar factor.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
@@ -3603,7 +3603,7 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
  * See the discussion with the operator with switched arguments for more
  * information about template arguments and the return type.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
@@ -3624,7 +3624,7 @@ operator*(const Number &                                  factor,
 /**
  * Division of a symmetric tensor of general rank by a scalar.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 constexpr inline SymmetricTensor<
@@ -3647,7 +3647,7 @@ operator/(const SymmetricTensor<rank_, dim, Number> &t,
  * Multiplication of a symmetric tensor of general rank with a scalar from the
  * right.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int rank_, int dim>
 constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim>
@@ -3664,7 +3664,7 @@ operator*(const SymmetricTensor<rank_, dim> &t, const double factor)
  * Multiplication of a symmetric tensor of general rank with a scalar from the
  * left.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int rank_, int dim>
 constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim>
@@ -3680,7 +3680,7 @@ operator*(const double factor, const SymmetricTensor<rank_, dim> &t)
 /**
  * Division of a symmetric tensor of general rank by a scalar.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int rank_, int dim>
 constexpr inline SymmetricTensor<rank_, dim>
@@ -3698,7 +3698,7 @@ operator/(const SymmetricTensor<rank_, dim> &t, const double factor)
  * the expression <code>A*B</code> which uses
  * <code>SymmetricTensor::operator*()</code>.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
@@ -3720,7 +3720,7 @@ scalar_product(const SymmetricTensor<2, dim, Number> &     t1,
  * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
  * @relatesalso Tensor
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr inline DEAL_II_ALWAYS_INLINE
@@ -3748,7 +3748,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
  * @relatesalso Tensor
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
@@ -3771,7 +3771,7 @@ scalar_product(const Tensor<2, dim, Number> &              t1,
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general Tensor class.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <typename Number, typename OtherNumber>
 constexpr inline DEAL_II_ALWAYS_INLINE void
@@ -3797,7 +3797,7 @@ double_contract(
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general Tensor class.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <typename Number, typename OtherNumber>
 constexpr inline void
@@ -3823,7 +3823,7 @@ double_contract(
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general Tensor class.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <typename Number, typename OtherNumber>
 constexpr inline void
@@ -3854,7 +3854,7 @@ double_contract(
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general Tensor class.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <typename Number, typename OtherNumber>
 constexpr inline void
@@ -3885,7 +3885,7 @@ double_contract(
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general Tensor class.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <typename Number, typename OtherNumber>
 constexpr inline void
@@ -3917,7 +3917,7 @@ double_contract(
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general Tensor class.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <typename Number, typename OtherNumber>
 constexpr inline void
@@ -3941,7 +3941,7 @@ double_contract(
  * Multiply a symmetric rank-2 tensor (i.e., a matrix) by a rank-1 tensor
  * (i.e., a vector). The result is a rank-1 tensor (i.e., a vector).
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
@@ -3960,7 +3960,7 @@ operator*(const SymmetricTensor<2, dim, Number> &src1,
  * Multiply a rank-1 tensor (i.e., a vector) by a symmetric rank-2 tensor
  * (i.e., a matrix). The result is a rank-1 tensor (i.e., a vector).
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 constexpr Tensor<1, dim, typename ProductType<Number, OtherNumber>::type>
@@ -3990,7 +3990,7 @@ operator*(const Tensor<1, dim, Number> &              src1,
  * multiplication operator for SymmetricTensor, which does the double
  * contraction.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int rank_1,
           int rank_2,
@@ -4026,7 +4026,7 @@ constexpr DEAL_II_ALWAYS_INLINE
  * multiplication operator for SymmetricTensor, which does the double
  * contraction.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int rank_1,
           int rank_2,
@@ -4052,7 +4052,7 @@ constexpr DEAL_II_ALWAYS_INLINE
  * represents the symmetry in the output, for example by outputting only the
  * unique entries.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int dim, typename Number>
 inline std::ostream &
@@ -4079,7 +4079,7 @@ operator<<(std::ostream &out, const SymmetricTensor<2, dim, Number> &t)
  * represents the symmetry in the output, for example by outputting only the
  * unique entries.
  *
- * @relatesalso SymmetricTensor
+ * @relates SymmetricTensor
  */
 template <int dim, typename Number>
 inline std::ostream &
