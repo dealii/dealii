@@ -2619,7 +2619,7 @@ void
 DoFHandler<dim, spacedim>::get_active_fe_indices(
   std::vector<unsigned int> &active_fe_indices) const
 {
-  std::vector<types::fe_index> indices = get_active_fe_indices();
+  const std::vector<types::fe_index> indices = get_active_fe_indices();
 
   active_fe_indices.assign(indices.begin(), indices.end());
 }

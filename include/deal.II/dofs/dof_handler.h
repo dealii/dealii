@@ -581,15 +581,16 @@ public:
 
   /**
    * For each locally owned cell, set the active finite element index to the
-   * corresponding value given in @p active_fe_indices. Indices must be in the
-   * order how we iterate over active cells.
+   * corresponding value given in @p active_fe_indices.
+   *
+   * The vector @p active_fe_indices needs to have as many entries as there
+   * are active cells. The FE indices must be in the order in which we iterate
+   * over active cells. Vector entries corresponding to active cells that are
+   * not locally owned are ignored.
    *
    * Active FE indices will only be set for locally owned cells. Ghost and
    * artificial cells will be ignored; no active FE index will be assigned to
    * them.
-   *
-   * The vector @p active_fe_indices is assumed to have as many entries as
-   * there are active cells.
    */
   void
   set_active_fe_indices(const std::vector<types::fe_index> &active_fe_indices);
@@ -605,7 +606,7 @@ public:
 
   /**
    * For each locally relevant cell, extract the active finite element index and
-   * return them in the order how we iterate over active cells.
+   * return them in the order in which we iterate over active cells.
    *
    * As we do not know the active FE index on artificial cells, they are set to
    * the invalid value numbers::invalid_fe_index.
@@ -613,13 +614,15 @@ public:
    * For DoFHandler objects without hp-capabilities, the vector will consist of
    * zeros, indicating that all cells use the same finite element. In hp-mode,
    * the values may be different, though.
+   *
+   * The returned vector has as many entries as there are active cells.
    */
   std::vector<types::fe_index>
   get_active_fe_indices() const;
 
   /**
    * For each locally relevant cell, extract the active finite element index and
-   * fill the vector @p active_fe_indices in the order how we iterate over
+   * fill the vector @p active_fe_indices in the order in which we iterate over
    * active cells. This vector is resized, if necessary.
    *
    * As we do not know the active FE index on artificial cells, they are set to
@@ -629,6 +632,8 @@ public:
    * zeros, indicating that all cells use the same finite element. In hp-mode,
    * the values may be different, though.
    *
+   * The returned vector has as many entries as there are active cells.
+   *
    * @deprecated Use get_active_fe_indices() that returns the result vector.
    */
   DEAL_II_DEPRECATED_EARLY
@@ -637,26 +642,29 @@ public:
 
   /**
    * For each locally owned cell, set the future finite element index to the
-   * corresponding value given in @p future_fe_indices. Indices must be in the
-   * order how we iterate over active cells.
+   * corresponding value given in @p future_fe_indices.
+   *
+   * The vector @p future_fe_indices needs to have as many entries as there
+   * are active cells. The FE indices must be in the order in which we iterate
+   * over active cells. Vector entries corresponding to active cells that are
+   * not locally owned are ignored.
    *
    * Future FE indices will only be set for locally owned cells. Ghost and
    * artificial cells will be ignored; no future FE index will be assigned to
    * them.
-   *
-   * The vector @p future_fe_indices is assumed to have as many entries as
-   * there are active cells.
    */
   void
   set_future_fe_indices(const std::vector<types::fe_index> &future_fe_indices);
 
   /**
    * For each locally owned cell, extract the future finite element index and
-   * return them in the order how we iterate over active cells.
+   * return them in the order in which we iterate over active cells.
    *
    * As we do not know the future FE index on ghost and artificial cells, they
    * are set to the invalid value numbers::invalid_fe_index. The same applies to
    * locally owned cells that have no future FE index assigned.
+   *
+   * The returned vector has as many entries as there are active cells.
    */
   std::vector<types::fe_index>
   get_future_fe_indices() const;
