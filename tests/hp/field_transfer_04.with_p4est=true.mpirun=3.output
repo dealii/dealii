@@ -1,0 +1,35 @@
+
+DEAL:0::Process #0
+Local range: [0, 9), global size: 15
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+
+DEAL:0::Process #0
+Local range: [0, 9), global size: 25
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+
+
+DEAL:1::Process #1
+Local range: [9, 15), global size: 15
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+
+DEAL:1::Process #1
+Local range: [9, 21), global size: 25
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 2.000e+00 
+
+
+
+DEAL:2::Process #2
+Local range: [15, 15), global size: 15
+Vector data:
+
+
+DEAL:2::Process #2
+Local range: [21, 25), global size: 25
+Vector data:
+2.000e+00 2.000e+00 2.000e+00 2.000e+00 
+
+

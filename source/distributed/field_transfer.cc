@@ -120,7 +120,7 @@ namespace parallel
 
 
         // Communicate the results.
-        out.compress(dealii::VectorOperation::min);
+        out.compress(dealii::VectorOperation::insert);
 
         // Treat hanging nodes
         std::vector<types::global_dof_index> dof_indices;
