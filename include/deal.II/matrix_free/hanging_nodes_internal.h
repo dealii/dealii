@@ -271,6 +271,12 @@ namespace internal
       HangingNodes(const Triangulation<dim> &triangualtion);
 
       /**
+       * Return the memory consumption of the allocated memory in this class.
+       */
+      std::size_t
+      memory_consumption() const;
+
+      /**
        * Compute the value of the constraint mask for a given cell.
        */
       template <typename CellIterator>
@@ -357,6 +363,15 @@ namespace internal
       // for pure hex meshes)
       if (triangulation.all_reference_cells_are_hyper_cube())
         setup_line_to_cell(triangulation);
+    }
+
+
+
+    template <int dim>
+    inline std::size_t
+    HangingNodes<dim>::memory_consumption() const
+    {
+      return MemoryConsumption::memory_consumption(line_to_cells);
     }
 
 
