@@ -575,7 +575,8 @@ namespace internal
       std::vector<bool> ghost_vertex(triangulation.n_vertices(), false); // TODO
 
       for (const auto &cell : triangulation.active_cell_iterators())
-        if (cell->is_artificial() == false && cell->is_locally_owned() == false)
+        if (cell->is_artificial() == false &&
+            cell->subdomain_id() < triangulation.locally_owned_subdomain())
           for (const auto v : cell->vertex_indices())
             ghost_vertex[cell->vertex_index(v)] = true;
 
