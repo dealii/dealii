@@ -572,6 +572,13 @@ namespace internal
             }
         }
 
+      std::vector<bool> ghost_vertex(triangulation.n_vertices(), false); // TODO
+
+      for (const auto &cell : triangulation.active_cell_iterators())
+        if (cell->is_artificial() == false && cell->is_locally_owned() == false)
+          for (const auto v : cell->vertex_indices())
+            ghost_vertex[cell->vertex_index(v)] = true;
+
       // fill in the additional cells that we need access to via ghosting to
       // cell_levels
       std::set<std::pair<unsigned int, unsigned int>> ghost_cells;
@@ -646,6 +653,10 @@ namespace internal
                                       dcell->neighbor_face_no(f))
                              ->index()] =
                             FaceCategory::locally_active_done_here;
+
+                      for (const auto v : dcell->face(f)->vertex_indices())
+                        if (ghost_vertex[dcell->face(f)->vertex_index(v)])
+                          at_processor_boundary[i] = true;
 
                       // If neighbor is a ghost element (i.e.
                       // dcell->subdomain_id !
