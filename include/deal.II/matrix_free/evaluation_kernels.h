@@ -4207,14 +4207,10 @@ namespace internal
       if (fe_eval.get_dof_access_index() ==
             MatrixFreeFunctions::DoFInfo::dof_access_cell &&
           fe_eval.is_interior_face() == false) // exterior faces in the ECL loop
-        use_vectorization =
-          fe_eval.get_cell_ids()[0] != numbers::invalid_unsigned_int &&
-          std::all_of(fe_eval.get_cell_ids().begin() + 1,
-                      fe_eval.get_cell_ids().end(),
-                      [&](const auto &v) {
-                        return v == fe_eval.get_cell_ids()[0] ||
-                               v == numbers::invalid_unsigned_int;
-                      });
+        for (unsigned int v = 0; v < Number::size(); ++v)
+          if (fe_eval.get_cell_ids()[v] != numbers::invalid_unsigned_int &&
+              fe_eval.get_face_no(v) != fe_eval.get_face_no(0))
+            use_vectorization = false;
 
       if (use_vectorization == false)
         {
