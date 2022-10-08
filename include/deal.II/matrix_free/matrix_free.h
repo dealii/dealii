@@ -1246,6 +1246,223 @@ public:
          DataAccessOnFaces::unspecified) const;
 
   /**
+   * This function is similar to the loop method above, but adds two additional
+   * functors to execute some additional work before and after the cell, face
+   * and boundary integrals are computed.
+   *
+   * The two additional functors work on a range of degrees of freedom,
+   * expressed in terms of the degree-of-freedom numbering of the selected
+   * DoFHandler `dof_handler_index_pre_post` in MPI-local indices. The
+   * arguments to the functors represent a range of degrees of freedom at a
+   * granularity of
+   * internal::MatrixFreeFunctions::DoFInfo::chunk_size_zero_vector entries
+   * (except for the last chunk which is set to the number of locally owned
+   * entries) in the form `[first, last)`. The idea of these functors is to
+   * bring operations on vectors closer to the point where they accessed in a
+   * matrix-free loop, with the goal to increase cache hits by temporal
+   * locality. This loop guarantees that the `operation_before_loop` hits all
+   * relevant unknowns before they are first touched by any of the cell, face or
+   * boundary operations (including the MPI data exchange), allowing to execute
+   * some vector update that the `src` vector depends upon. The
+   * `operation_after_loop` is similar - it starts to execute on a range of DoFs
+   * once all DoFs in that range have been touched for the last time by the
+   * cell, face and boundary operations (including the MPI data exchange),
+   * allowing e.g. to compute some vector operations that depend on the result
+   * of the current cell loop in `dst` or want to modify `src`. The efficiency
+   * of caching depends on the numbering of the degrees of freedom because of
+   * the granularity of the ranges.
+   *
+   * @param cell_operation Pointer to member function of `CLASS` with the
+   * signature <tt>cell_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</tt> where the first
+   * argument passes the data of the calling class and the last argument
+   * defines the range of cells which should be worked on (typically more than
+   * one cell should be worked on in order to reduce overheads).
+   *
+   * @param face_operation Pointer to member function of `CLASS` with the
+   * signature <tt>face_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</tt> in analogy to
+   * `cell_operation`, but now the part associated to the work on interior
+   * faces. Note that the MatrixFree framework treats periodic faces as
+   * interior ones, so they will be assigned their correct neighbor after
+   * applying periodicity constraints within the face_operation calls.
+   *
+   * @param boundary_operation Pointer to member function of `CLASS` with the
+   * signature <tt>boundary_operation (const MatrixFree<dim,Number> &, OutVector
+   * &, InVector &, std::pair<unsigned int,unsigned int> &)</tt> in analogy to
+   * `cell_operation` and `face_operation`, but now the part associated to the
+   * work on boundary faces. Boundary faces are separated by their
+   * `boundary_id` and it is possible to query that id using
+   * MatrixFree::get_boundary_id(). Note that both interior and faces use the
+   * same numbering, and faces in the interior are assigned lower numbers than
+   * the boundary faces.
+   *
+   * @param owning_class The object which provides the `cell_operation`
+   * call. To be compatible with this interface, the class must allow to call
+   * `owning_class->cell_operation(...)`.
+   *
+   * @param dst Destination vector holding the result. If the vector is of
+   * type LinearAlgebra::distributed::Vector (or composite objects thereof
+   * such as LinearAlgebra::distributed::BlockVector), the loop calls
+   * LinearAlgebra::distributed::Vector::compress() at the end of the call
+   * internally. For other vectors, including parallel Trilinos or PETSc
+   * vectors, no such call is issued. Note that Trilinos/Epetra or PETSc
+   * vectors do currently not work in parallel because the present class uses
+   * MPI-local index addressing, as opposed to the global addressing implied
+   * by those external libraries.
+   *
+   * @param src Input vector. If the vector is of type
+   * LinearAlgebra::distributed::Vector (or composite objects thereof such as
+   * LinearAlgebra::distributed::BlockVector), the loop calls
+   * LinearAlgebra::distributed::Vector::update_ghost_values() at the start of
+   * the call internally to make sure all necessary data is locally
+   * available. Note, however, that the vector is reset to its original state
+   * at the end of the loop, i.e., if the vector was not ghosted upon entry of
+   * the loop, it will not be ghosted upon finishing the loop.
+   *
+   * @param operation_before_loop This functor can be used to perform an
+   * operation on entries of the `src` and `dst` vectors (or other vectors)
+   * before the operation on cells first touches a particular DoF according to
+   * the general description in the text above. This function is passed a
+   * range of the locally owned degrees of freedom on the selected
+   * `dof_handler_index_pre_post` (in MPI-local numbering).
+   *
+   * @param operation_after_loop This functor can be used to perform an
+   * operation on entries of the `src` and `dst` vectors (or other vectors)
+   * after the operation on cells last touches a particular DoF according to
+   * the general description in the text above. This function is passed a
+   * range of the locally owned degrees of freedom on the selected
+   * `dof_handler_index_pre_post` (in MPI-local numbering).
+   *
+   * @param dof_handler_index_pre_post Since MatrixFree can be initialized
+   * with a vector of DoFHandler objects, each of them will in general have
+   * different vector sizes and thus different ranges returned to
+   * `operation_before_loop` and `operation_after_loop`. Use this variable to
+   * specify which one of the DoFHandler objects the index range should be
+   * associated to. Defaults to the `dof_handler_index` 0.
+   *
+   * @param dst_vector_face_access Set the type of access into the vector
+   * `dst` that will happen inside the body of the @p face_operation
+   * function. As explained in the description of the DataAccessOnFaces
+   * struct, the purpose of this selection is to reduce the amount of data
+   * that must be exchanged over the MPI network (or via `memcpy` if within
+   * the shared memory region of a node) to gain performance. Note that there
+   * is no way to communicate this setting with the FEFaceEvaluation class,
+   * therefore this selection must be made at this site in addition to what is
+   * implemented inside the `face_operation` function. As a consequence, there
+   * is also no way to check that the setting passed to this call is
+   * consistent with what is later done by `FEFaceEvaluation`, and it is the
+   * user's responsibility to ensure correctness of data.
+   *
+   * @param src_vector_face_access Set the type of access into the vector
+   * `src` that will happen inside the body of the @p face_operation function,
+   * in analogy to `dst_vector_face_access`.
+   *
+   * @note The close locality of the `operation_before_loop` and
+   * `operation_after_loop` is currently only implemented for the MPI-only
+   * case. In case threading is enabled, the complete `operation_before_loop`
+   * is scheduled before the parallel loop, and `operation_after_loop` is
+   * scheduled strictly afterwards, due to the complicated dependencies.
+   */
+  template <typename CLASS, typename OutVector, typename InVector>
+  void
+  loop(
+    void (CLASS::*cell_operation)(const MatrixFree &,
+                                  OutVector &,
+                                  const InVector &,
+                                  const std::pair<unsigned int, unsigned int> &)
+      const,
+    void (CLASS::*face_operation)(const MatrixFree &,
+                                  OutVector &,
+                                  const InVector &,
+                                  const std::pair<unsigned int, unsigned int> &)
+      const,
+    void (CLASS::*boundary_operation)(
+      const MatrixFree &,
+      OutVector &,
+      const InVector &,
+      const std::pair<unsigned int, unsigned int> &) const,
+    const CLASS *   owning_class,
+    OutVector &     dst,
+    const InVector &src,
+    const std::function<void(const unsigned int, const unsigned int)>
+      &operation_before_loop,
+    const std::function<void(const unsigned int, const unsigned int)>
+      &                     operation_after_loop,
+    const unsigned int      dof_handler_index_pre_post = 0,
+    const DataAccessOnFaces dst_vector_face_access =
+      DataAccessOnFaces::unspecified,
+    const DataAccessOnFaces src_vector_face_access =
+      DataAccessOnFaces::unspecified) const;
+
+  /**
+   * Same as above, but for class member functions which are non-const.
+   */
+  template <typename CLASS, typename OutVector, typename InVector>
+  void
+  loop(void (CLASS::*cell_operation)(
+         const MatrixFree &,
+         OutVector &,
+         const InVector &,
+         const std::pair<unsigned int, unsigned int> &),
+       void (CLASS::*face_operation)(
+         const MatrixFree &,
+         OutVector &,
+         const InVector &,
+         const std::pair<unsigned int, unsigned int> &),
+       void (CLASS::*boundary_operation)(
+         const MatrixFree &,
+         OutVector &,
+         const InVector &,
+         const std::pair<unsigned int, unsigned int> &),
+       const CLASS *   owning_class,
+       OutVector &     dst,
+       const InVector &src,
+       const std::function<void(const unsigned int, const unsigned int)>
+         &operation_before_loop,
+       const std::function<void(const unsigned int, const unsigned int)>
+         &                     operation_after_loop,
+       const unsigned int      dof_handler_index_pre_post = 0,
+       const DataAccessOnFaces dst_vector_face_access =
+         DataAccessOnFaces::unspecified,
+       const DataAccessOnFaces src_vector_face_access =
+         DataAccessOnFaces::unspecified) const;
+
+  /**
+   * Same as above, but taking an `std::function` as the `cell_operation`,
+   * `face_operation` and `boundary_operation` rather than a class member
+   * function.
+   */
+  template <typename OutVector, typename InVector>
+  void
+  loop(const std::function<
+         void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+              OutVector &,
+              const InVector &,
+              const std::pair<unsigned int, unsigned int> &)> &cell_operation,
+       const std::function<
+         void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+              OutVector &,
+              const InVector &,
+              const std::pair<unsigned int, unsigned int> &)> &face_operation,
+       const std::function<void(
+         const MatrixFree<dim, Number, VectorizedArrayType> &,
+         OutVector &,
+         const InVector &,
+         const std::pair<unsigned int, unsigned int> &)> &boundary_operation,
+       OutVector &                                        dst,
+       const InVector &                                   src,
+       const std::function<void(const unsigned int, const unsigned int)>
+         &operation_before_loop,
+       const std::function<void(const unsigned int, const unsigned int)>
+         &                     operation_after_loop,
+       const unsigned int      dof_handler_index_pre_post = 0,
+       const DataAccessOnFaces dst_vector_face_access =
+         DataAccessOnFaces::unspecified,
+       const DataAccessOnFaces src_vector_face_access =
+         DataAccessOnFaces::unspecified) const;
+
+  /**
    * This method runs the loop over all cells (in parallel) similarly as
    * cell_loop() does. However, this function is intended to be used
    * for the case if face and boundary integrals should be also
@@ -5076,6 +5293,168 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop(
            boundary_operation,
            src_vector_face_access,
            dst_vector_face_access);
+  task_info.loop(worker);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename OutVector, typename InVector>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::loop(
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+                           OutVector &,
+                           const InVector &,
+                           const std::pair<unsigned int, unsigned int> &)>
+    &cell_operation,
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+                           OutVector &,
+                           const InVector &,
+                           const std::pair<unsigned int, unsigned int> &)>
+    &face_operation,
+  const std::function<void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+                           OutVector &,
+                           const InVector &,
+                           const std::pair<unsigned int, unsigned int> &)>
+    &             boundary_operation,
+  OutVector &     dst,
+  const InVector &src,
+  const std::function<void(const unsigned int, const unsigned int)>
+    &operation_before_loop,
+  const std::function<void(const unsigned int, const unsigned int)>
+    &                     operation_after_loop,
+  const unsigned int      dof_handler_index_pre_post,
+  const DataAccessOnFaces dst_vector_face_access,
+  const DataAccessOnFaces src_vector_face_access) const
+{
+  using Wrapper =
+    internal::MFClassWrapper<MatrixFree<dim, Number, VectorizedArrayType>,
+                             InVector,
+                             OutVector>;
+  Wrapper wrap(cell_operation, face_operation, boundary_operation);
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     Wrapper,
+                     true>
+    worker(*this,
+           src,
+           dst,
+           false,
+           wrap,
+           &Wrapper::cell_integrator,
+           &Wrapper::face_integrator,
+           &Wrapper::boundary_integrator,
+           src_vector_face_access,
+           dst_vector_face_access,
+           operation_before_loop,
+           operation_after_loop,
+           dof_handler_index_pre_post);
+
+  task_info.loop(worker);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename CLASS, typename OutVector, typename InVector>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::loop(
+  void (CLASS::*cell_operation)(const MatrixFree &,
+                                OutVector &,
+                                const InVector &,
+                                const std::pair<unsigned int, unsigned int> &)
+    const,
+  void (CLASS::*face_operation)(const MatrixFree &,
+                                OutVector &,
+                                const InVector &,
+                                const std::pair<unsigned int, unsigned int> &)
+    const,
+  void (CLASS::*boundary_operation)(
+    const MatrixFree &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &) const,
+  const CLASS *   owning_class,
+  OutVector &     dst,
+  const InVector &src,
+  const std::function<void(const unsigned int, const unsigned int)>
+    &operation_before_loop,
+  const std::function<void(const unsigned int, const unsigned int)>
+    &                     operation_after_loop,
+  const unsigned int      dof_handler_index_pre_post,
+  const DataAccessOnFaces dst_vector_face_access,
+  const DataAccessOnFaces src_vector_face_access) const
+{
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     true>
+    worker(*this,
+           src,
+           dst,
+           false,
+           *owning_class,
+           cell_operation,
+           face_operation,
+           boundary_operation,
+           src_vector_face_access,
+           dst_vector_face_access,
+           operation_before_loop,
+           operation_after_loop,
+           dof_handler_index_pre_post);
+  task_info.loop(worker);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename CLASS, typename OutVector, typename InVector>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::loop(
+  void (CLASS::*cell_operation)(const MatrixFree &,
+                                OutVector &,
+                                const InVector &,
+                                const std::pair<unsigned int, unsigned int> &),
+  void (CLASS::*face_operation)(const MatrixFree &,
+                                OutVector &,
+                                const InVector &,
+                                const std::pair<unsigned int, unsigned int> &),
+  void (CLASS::*boundary_operation)(
+    const MatrixFree &,
+    OutVector &,
+    const InVector &,
+    const std::pair<unsigned int, unsigned int> &),
+  const CLASS *   owning_class,
+  OutVector &     dst,
+  const InVector &src,
+  const std::function<void(const unsigned int, const unsigned int)>
+    &operation_before_loop,
+  const std::function<void(const unsigned int, const unsigned int)>
+    &                     operation_after_loop,
+  const unsigned int      dof_handler_index_pre_post,
+  const DataAccessOnFaces dst_vector_face_access,
+  const DataAccessOnFaces src_vector_face_access) const
+{
+  internal::MFWorker<MatrixFree<dim, Number, VectorizedArrayType>,
+                     InVector,
+                     OutVector,
+                     CLASS,
+                     false>
+    worker(*this,
+           src,
+           dst,
+           false,
+           *owning_class,
+           cell_operation,
+           face_operation,
+           boundary_operation,
+           src_vector_face_access,
+           dst_vector_face_access,
+           operation_before_loop,
+           operation_after_loop,
+           dof_handler_index_pre_post);
   task_info.loop(worker);
 }
 

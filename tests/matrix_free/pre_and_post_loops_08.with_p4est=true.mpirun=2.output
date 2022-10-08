@@ -1,0 +1,7 @@
+
+DEAL::Testing FE_Q<2>(3)
+DEAL::Error: 0.00
+DEAL::Testing FE_Q<2>(3)
+DEAL::Error: 0.00
+DEAL::Testing FE_Q<3>(3)
+DEAL::Error: 0.00
