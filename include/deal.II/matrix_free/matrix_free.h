@@ -3807,6 +3807,29 @@ namespace internal
 
 
 
+  template <typename VectorType,
+            std::enable_if_t<is_not_parallel_vector<VectorType>, VectorType> * =
+              nullptr>
+  bool
+  has_ghost_elements(const VectorType &vec)
+  {
+    (void)vec;
+    return false;
+  }
+
+
+
+  template <typename VectorType,
+            std::enable_if_t<!is_not_parallel_vector<VectorType>, VectorType>
+              * = nullptr>
+  bool
+  has_ghost_elements(const VectorType &vec)
+  {
+    return vec.has_ghost_elements();
+  }
+
+
+
   // --------------------------------------------------------------------------
   // below we have wrappers to distinguish between block and non-block vectors.
   // --------------------------------------------------------------------------
@@ -4435,7 +4458,11 @@ namespace internal
       , operation_before_loop(operation_before_loop)
       , operation_after_loop(operation_after_loop)
       , dof_handler_index_pre_post(dof_handler_index_pre_post)
-    {}
+    {
+      Assert(!has_ghost_elements(dst),
+             ExcMessage("The destination vector passed to the matrix-free "
+                        "loop is ghosted. This is not allowed."));
+    }
 
     // Runs the cell work. If no function is given, nothing is done
     virtual void
