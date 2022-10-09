@@ -518,7 +518,7 @@ namespace GridTools
    * predicate is either an object of a type that has an <tt>operator()</tt>,
    * or it is a pointer to a non-member function, or it is a lambda function
    * object. In either case, argument and return
-   * value have to be of type `Point@<spacedim@>`.
+   * value have to be of type Point<spacedim>.
    *
    * @note The transformations that make sense to use with this function
    *   should have a Jacobian with a positive determinant. For example,
