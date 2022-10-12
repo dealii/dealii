@@ -158,10 +158,7 @@ FiniteElement<dim, spacedim>::FiniteElement(
         {
           adjust_quad_dof_index_for_face_orientation_table[f] =
             Table<2, int>(this->n_dofs_per_quad(f),
-                          this->reference_cell().face_reference_cell(f) ==
-                              ReferenceCells::Quadrilateral ?
-                            8 :
-                            6);
+                          this->reference_cell().n_face_orientations(f));
           adjust_quad_dof_index_for_face_orientation_table[f].fill(0);
         }
     }
