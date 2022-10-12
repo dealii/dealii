@@ -419,28 +419,47 @@ namespace internal
                   }
               }
             if (faces.size() > 0)
-              for (unsigned int face = task_info.face_partition_data[chunk];
-                   face < task_info.face_partition_data[chunk + 1];
-                   ++face)
-                for (unsigned int v = 0;
-                     v < length && faces[face].cells_exterior[v] !=
-                                     numbers::invalid_unsigned_int;
-                     ++v)
-                  {
-                    const unsigned int cell = faces[face].cells_exterior[v];
-                    for (unsigned int it =
-                           row_starts[cell * n_components].first;
-                         it != row_starts[(cell + 1) * n_components].first;
-                         ++it)
+              {
+                const auto fill_touched_by_for_face =
+                  [&](const unsigned int face) {
+                    for (unsigned int v = 0; v < length; ++v)
                       {
-                        const unsigned int myindex =
-                          dof_indices[it] / chunk_size_zero_vector;
-                        if (touched_first_by[myindex] ==
-                            numbers::invalid_unsigned_int)
-                          touched_first_by[myindex] = chunk;
-                        touched_last_by[myindex] = chunk;
+                        const auto fill_touched_by_for_cell =
+                          [&](const unsigned cell) {
+                            if (cell == numbers::invalid_unsigned_int)
+                              return;
+                            for (unsigned int it =
+                                   row_starts[cell * n_components].first;
+                                 it !=
+                                 row_starts[(cell + 1) * n_components].first;
+                                 ++it)
+                              {
+                                const unsigned int myindex =
+                                  dof_indices[it] / chunk_size_zero_vector;
+                                if (touched_first_by[myindex] ==
+                                    numbers::invalid_unsigned_int)
+                                  touched_first_by[myindex] = chunk;
+                                touched_last_by[myindex] = chunk;
+                              }
+                          };
+
+                        fill_touched_by_for_cell(faces[face].cells_interior[v]);
+                        fill_touched_by_for_cell(faces[face].cells_exterior[v]);
                       }
-                  }
+                  };
+
+                for (unsigned int face = task_info.face_partition_data[chunk];
+                     face < task_info.face_partition_data[chunk + 1];
+                     ++face)
+                  fill_touched_by_for_face(face);
+
+
+                for (unsigned int face =
+                       task_info.boundary_partition_data[chunk];
+                     face < task_info.boundary_partition_data[chunk + 1];
+                     ++face)
+                  fill_touched_by_for_face(face);
+              }
           }
 
       // ensure that all indices are touched at least during the last round
