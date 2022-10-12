@@ -1367,7 +1367,7 @@ namespace FETools
                           {
                             const types::global_dof_index index =
                               indices[fe.face_to_cell_index(i, face)];
-                            ;
+
                             const bool index_stored =
                               (dofs_on_refined_neighbors.find(index) !=
                                dofs_on_refined_neighbors.end());
