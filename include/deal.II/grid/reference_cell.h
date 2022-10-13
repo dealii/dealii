@@ -555,6 +555,14 @@ public:
   unit_normal_vectors(const unsigned int face_no) const;
 
   /**
+   * Return the number of orientations for a face in the ReferenceCell. For
+   * example, for hexahedra this is 8 for every face since quadrilaterals have
+   * 8 possible orientations.
+   */
+  unsigned int
+  n_face_orientations(const unsigned int face_no) const;
+
+  /**
    * Determine the orientation of the current entity described by its
    * vertices @p var_1 relative to an entity described by @p var_0.
    */
@@ -2231,6 +2239,25 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
   Assert(false, ExcNotImplemented());
 
   return {};
+}
+
+
+
+inline unsigned int
+ReferenceCell::n_face_orientations(const unsigned int face_no) const
+{
+  AssertIndexRange(face_no, n_faces());
+  if (get_dimension() == 1)
+    return 1;
+  if (get_dimension() == 2)
+    return 2;
+  else if (face_reference_cell(face_no) == ReferenceCells::Quadrilateral)
+    return 8;
+  else if (face_reference_cell(face_no) == ReferenceCells::Triangle)
+    return 6;
+
+  Assert(false, ExcInternalError());
+  return numbers::invalid_unsigned_int;
 }
 
 

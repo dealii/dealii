@@ -2008,10 +2008,19 @@ FESystem<dim, spacedim>::initialize(
       for (unsigned int face_no = 0; face_no < this->n_unique_faces();
            ++face_no)
         {
+          // This logic isn't valid for higher-order wedges because the first
+          // two faces are triangles, so no table will be set up for
+          // quadrilateral faces
+          Assert(this->n_dofs_per_quad(face_no) == 0 ||
+                   this->reference_cell() != ReferenceCells::Wedge,
+                 ExcNotImplemented());
+
           // the array into which we want to write should have the correct size
           // already.
           Assert(this->adjust_quad_dof_index_for_face_orientation_table[face_no]
-                     .n_elements() == 8 * this->n_dofs_per_quad(face_no),
+                     .n_elements() ==
+                   this->reference_cell().n_face_orientations(face_no) *
+                     this->n_dofs_per_quad(face_no),
                  ExcInternalError());
 
           // to obtain the shifts for this composed element, copy the shift
@@ -2025,7 +2034,10 @@ FESystem<dim, spacedim>::initialize(
               for (unsigned int c = 0; c < this->element_multiplicity(b); ++c)
                 {
                   for (unsigned int i = 0; i < temp.size(0); ++i)
-                    for (unsigned int j = 0; j < 8; ++j)
+                    for (unsigned int j = 0;
+                         j <
+                         this->reference_cell().n_face_orientations(face_no);
+                         ++j)
                       this->adjust_quad_dof_index_for_face_orientation_table
                         [face_no](index + i, j) = temp(i, j);
                   index += temp.size(0);
