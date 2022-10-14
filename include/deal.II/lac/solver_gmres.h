@@ -418,7 +418,7 @@ protected:
    * Calls the signal re_orthogonalize_signal if it is connected.
    */
   static double
-  modified_gram_schmidt(
+  iterated_modified_gram_schmidt(
     const internal::SolverGMRESImplementation::TmpVectors<VectorType>
       &                                       orthogonal_vectors,
     const unsigned int                        dim,
@@ -712,7 +712,7 @@ SolverGMRES<VectorType>::givens_rotation(Vector<double> &h,
 
 template <class VectorType>
 inline double
-SolverGMRES<VectorType>::modified_gram_schmidt(
+SolverGMRES<VectorType>::iterated_modified_gram_schmidt(
   const internal::SolverGMRESImplementation::TmpVectors<VectorType>
     &                                       orthogonal_vectors,
   const unsigned int                        dim,
@@ -732,40 +732,12 @@ SolverGMRES<VectorType>::modified_gram_schmidt(
   if (consider_reorthogonalize)
     norm_vv_start = vv.l2_norm();
 
-  // Orthogonalization
-  h(0) = vv * orthogonal_vectors[0];
-  for (unsigned int i = 1; i < dim; ++i)
-    h(i) = vv.add_and_dot(-h(i - 1),
-                          orthogonal_vectors[i - 1],
-                          orthogonal_vectors[i]);
-  double norm_vv =
-    std::sqrt(vv.add_and_dot(-h(dim - 1), orthogonal_vectors[dim - 1], vv));
+  for (unsigned int i = 0; i < dim; ++i)
+    h[i] = 0;
 
-  // Re-orthogonalization if loss of orthogonality detected. For the test, use
-  // a strategy discussed in C. T. Kelley, Iterative Methods for Linear and
-  // Nonlinear Equations, SIAM, Philadelphia, 1995: Compare the norm of vv
-  // after orthogonalization with its norm when starting the
-  // orthogonalization. If vv became very small (here: less than the square
-  // root of the machine precision times 10), it is almost in the span of the
-  // previous vectors, which indicates loss of precision.
-  if (consider_reorthogonalize)
+  for (unsigned int c = 0; c < 2; ++c) // 0: orthogonalize, 1: reorthogonalize
     {
-      if (norm_vv >
-          10. * norm_vv_start *
-            std::sqrt(
-              std::numeric_limits<typename VectorType::value_type>::epsilon()))
-        return norm_vv;
-
-      else
-        {
-          reorthogonalize = true;
-          if (!reorthogonalize_signal.empty())
-            reorthogonalize_signal(accumulated_iterations);
-        }
-    }
-
-  if (reorthogonalize == true)
-    {
+      // Orthogonalization
       double htmp = vv * orthogonal_vectors[0];
       h(0) += htmp;
       for (unsigned int i = 1; i < dim; ++i)
@@ -775,11 +747,43 @@ SolverGMRES<VectorType>::modified_gram_schmidt(
                                 orthogonal_vectors[i]);
           h(i) += htmp;
         }
-      norm_vv =
+
+      double norm_vv =
         std::sqrt(vv.add_and_dot(-htmp, orthogonal_vectors[dim - 1], vv));
+
+      if (c == 1)
+        return norm_vv; // reorthogonalization already performed -> finished
+
+      // Re-orthogonalization if loss of orthogonality detected. For the test,
+      // use a strategy discussed in C. T. Kelley, Iterative Methods for Linear
+      // and Nonlinear Equations, SIAM, Philadelphia, 1995: Compare the norm of
+      // vv after orthogonalization with its norm when starting the
+      // orthogonalization. If vv became very small (here: less than the square
+      // root of the machine precision times 10), it is almost in the span of
+      // the previous vectors, which indicates loss of precision.
+      if (consider_reorthogonalize)
+        {
+          if (norm_vv >
+              10. * norm_vv_start *
+                std::sqrt(std::numeric_limits<
+                          typename VectorType::value_type>::epsilon()))
+            return norm_vv;
+
+          else
+            {
+              reorthogonalize = true;
+              if (!reorthogonalize_signal.empty())
+                reorthogonalize_signal(accumulated_iterations);
+            }
+        }
+
+      if (reorthogonalize == false)
+        return norm_vv; // no reorthogonalization needed -> finished
     }
 
-  return norm_vv;
+  AssertThrow(false, ExcInternalError());
+
+  return 0.0;
 }
 
 
@@ -1013,13 +1017,14 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
 
           dim = inner_iteration + 1;
 
-          const double s         = modified_gram_schmidt(tmp_vectors,
-                                                 dim,
-                                                 accumulated_iterations,
-                                                 vv,
-                                                 h,
-                                                 re_orthogonalize,
-                                                 re_orthogonalize_signal);
+          const double s =
+            iterated_modified_gram_schmidt(tmp_vectors,
+                                           dim,
+                                           accumulated_iterations,
+                                           vv,
+                                           h,
+                                           re_orthogonalize,
+                                           re_orthogonalize_signal);
           h(inner_iteration + 1) = s;
 
           // s=0 is a lucky breakdown, the solver will reach convergence,
