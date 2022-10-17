@@ -40,7 +40,6 @@ namespace Physics
      * Cartesian basis, where the metric tensor is the identity tensor.
      *
      * @relatesalso Tensor
-     * @relatesalso SymmetricTensor
      */
     template <int dim>
     class StandardTensors

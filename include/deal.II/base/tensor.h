@@ -1931,7 +1931,9 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
 }
 
 
-/** @} */
+/**
+ * @}
+ */
 /**
  * @name Vector space operations on Tensor objects:
  * @{
@@ -2271,7 +2273,9 @@ inline constexpr DEAL_II_ALWAYS_INLINE
   return tmp;
 }
 
-/** @} */
+/**
+ * @}
+ */
 /**
  * @name Contraction operations and the outer product for tensor objects
  * @{
@@ -2613,7 +2617,9 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-/** @} */
+/**
+ * @}
+ */
 /**
  * @name Special operations on tensors of rank 1
  * @{

@@ -645,7 +645,6 @@ Point<dim, Number>::serialize(Archive &ar, const unsigned int)
  * @note This function can also be used in CUDA device code.
  *
  * @relates Point
- * @relatesalso EnableIfScalar
  */
 template <int dim, typename Number, typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV

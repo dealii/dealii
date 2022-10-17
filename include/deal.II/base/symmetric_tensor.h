@@ -3574,7 +3574,6 @@ operator*(const Number &factor, const SymmetricTensor<rank_, dim, Number> &t)
  * input tensor by the scalar factor.
  *
  * @relates SymmetricTensor
- * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<
@@ -3604,7 +3603,6 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
  * information about template arguments and the return type.
  *
  * @relates SymmetricTensor
- * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<
@@ -3719,7 +3717,6 @@ scalar_product(const SymmetricTensor<2, dim, Number> &     t1,
  * <tt>A*B</tt> (instead of <tt>scalar_product(A,B)</tt>) provides
  * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
- * @relatesalso Tensor
  * @relates SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
@@ -3747,7 +3744,6 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  * <tt>A*B</tt> (instead of <tt>scalar_product(A,B)</tt>) provides
  * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
- * @relatesalso Tensor
  * @relates SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>

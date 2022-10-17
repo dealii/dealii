@@ -349,8 +349,8 @@ namespace MeshWorker
                const BlockInfo *                   block_info = nullptr);
     /**
      * @name FEValues setup
+     * @{
      */
-    /* @{ */
 
     /**
      * Call this function before initialize() in order to guess the update
@@ -470,8 +470,8 @@ namespace MeshWorker
 
     /**
      * @name Data vectors
+     * @{
      */
-    /* @{ */
 
     /**
      * Initialize the VectorSelector objects #cell_selector,
@@ -507,8 +507,8 @@ namespace MeshWorker
 
     /**
      * @name Interface for MeshWorker::loop()
+     * @{
      */
-    /* @{ */
     /**
      * A callback function which is called in the loop over all cells, after
      * the action on a cell has been performed and before the faces are dealt
