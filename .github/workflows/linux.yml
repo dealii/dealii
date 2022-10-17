@@ -120,27 +120,25 @@ jobs:
           build/tests/**/*stdout*
 
 
-  linux-debug-cuda-10:
-    # simple parallel debug build using cuda-10
+  linux-debug-cuda-11:
+    # simple parallel debug build using cuda-11
 
-    name: linux debug cuda-10
+    name: linux debug cuda-11
     runs-on: [ubuntu-20.04]
 
     steps:
     - uses: actions/checkout@v3
     - name: modules
       run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
-        sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
-        sudo dpkg -i cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
-        sudo apt-key add /var/cuda-repo-10-2-local-10.2.89-440.33.01/7fa2af80.pub
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+        sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+        sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
         sudo apt-get install -y software-properties-common
         sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
         sudo apt-get update
-        apt search cuda
         sudo apt-get install -yq --no-install-recommends \
-            cuda-toolkit-10-2 \
+            cuda-toolkit-11-0 \
             libp4est-dev \
             libopenmpi-dev \
             openmpi-bin
