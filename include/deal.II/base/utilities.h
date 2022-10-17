@@ -243,6 +243,23 @@ namespace Utilities
   truncate_to_n_digits(const Number number, const unsigned int n_digits);
 
   /**
+   * This function allows to round a floating point number @p number to n_digits
+   * @note This does not imply an exact rounding but it ensures two numbers that
+   * should be the same (if rounded analytically) have the same floating point
+   * representation.
+   */
+  template <typename Number>
+  Number
+  round(const Number number, const unsigned int n_digits);
+
+  /**
+   * Same function as above working directly on given @p Point objects.
+   */
+  template <int dim, typename Number>
+  void
+  round(Point<dim, Number> &point, const unsigned int n_digits);
+
+  /**
    * Given a string, convert it to an integer. Throw an assertion if that is
    * not possible.
    */
