@@ -124,7 +124,7 @@ jobs:
     # simple parallel debug build using cuda-10
 
     name: linux debug cuda-10
-    runs-on: [ubuntu-18.04]
+    runs-on: [ubuntu-20.04]
 
     steps:
     - uses: actions/checkout@v3
@@ -176,7 +176,7 @@ jobs:
     # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
 
     name: linux debug intel oneapi
-    runs-on: [ubuntu-18.04]
+    runs-on: [ubuntu-20.04]
 
     steps:
     - uses: actions/checkout@v3
