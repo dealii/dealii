@@ -1732,9 +1732,8 @@ namespace Utilities
               return false;
             else
               {
-                // OK, so we have gotten a reply to our answer from
-                // one rank. Let us process it, after double checking
-                // that it is indeed one we were still expecting:
+                // OK, so we have gotten a reply to our request from
+                // one rank. Let us process it.
                 const auto target = status.MPI_SOURCE;
 
                 // Then query the size of the message, allocate enough memory,
@@ -1899,7 +1898,7 @@ namespace Utilities
         int        all_ranks_reached_barrier;
         const auto ierr = MPI_Test(&barrier_request,
                                    &all_ranks_reached_barrier,
-                                   MPI_STATUSES_IGNORE);
+                                   MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
         return all_ranks_reached_barrier != 0;
 #  else
