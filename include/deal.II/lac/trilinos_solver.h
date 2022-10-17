@@ -26,10 +26,19 @@
 #  include <deal.II/lac/solver_control.h>
 #  include <deal.II/lac/vector.h>
 
+// for AztecOO solvers
 #  include <Amesos.h>
 #  include <AztecOO.h>
 #  include <Epetra_LinearProblem.h>
 #  include <Epetra_Operator.h>
+
+// for Belos solvers
+#  include <BelosBlockGmresSolMgr.hpp>
+#  include <BelosEpetraAdapter.hpp>
+#  include <BelosIteration.hpp>
+#  include <BelosMultiVec.hpp>
+#  include <BelosOperator.hpp>
+#  include <BelosSolverManager.hpp>
 
 #  include <memory>
 
@@ -718,7 +727,468 @@ namespace TrilinosWrappers
     const AdditionalData additional_data;
   };
 
+
+
+  template <typename VectorType>
+  class SolverBelos
+  {
+  public:
+    SolverBelos(const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters);
+
+    template <typename OperatorType, typename PreconditionerType>
+    void
+    solve(const OperatorType &      a,
+          VectorType &              x,
+          const VectorType &        b,
+          const PreconditionerType &p);
+
+  private:
+    const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters;
+  };
+
 } // namespace TrilinosWrappers
+
+
+
+#  ifndef DOXYGEN
+
+namespace TrilinosWrappers
+{
+  namespace internal
+  {
+    template <class VectorType>
+    class MultiVecWrapper
+      : public Belos::MultiVec<typename VectorType::value_type>
+    {
+    public:
+      using value_type = typename VectorType::value_type;
+
+      static bool
+      this_type_is_missing_a_specialization()
+      {
+        return false;
+      }
+
+      MultiVecWrapper(VectorType &vector)
+      {
+        this->vectors.resize(1);
+        this->vectors[0].reset(&vector, [](auto *) {});
+      }
+
+      MultiVecWrapper(const VectorType &vector)
+      {
+        this->vectors.resize(1);
+        this->vectors[0].reset(&const_cast<VectorType &>(vector),
+                               [](auto *) {});
+      }
+
+      virtual ~MultiVecWrapper() = default;
+
+      virtual Belos::MultiVec<value_type> *
+      Clone(const int numvecs) const
+      {
+        auto new_multi_vec = new MultiVecWrapper<VectorType>;
+
+        new_multi_vec->vectors.resize(numvecs);
+
+        for (auto &vec : new_multi_vec->vectors)
+          {
+            vec = std::make_shared<VectorType>();
+
+            AssertThrow(this->vectors.size() > 0, ExcInternalError());
+            vec->reinit(*this->vectors[0]);
+          }
+
+        return new_multi_vec;
+      }
+
+      virtual Belos::MultiVec<value_type> *
+      CloneCopy() const
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
+
+      virtual Belos::MultiVec<value_type> *
+      CloneCopy(const std::vector<int> &index) const
+      {
+        auto new_multi_vec = new MultiVecWrapper<VectorType>;
+
+        new_multi_vec->vectors.resize(index.size());
+
+        for (unsigned int i = 0; i < index.size(); ++i)
+          {
+            new_multi_vec->vectors[i]  = std::make_shared<VectorType>();
+            *new_multi_vec->vectors[i] = *this->vectors[i];
+          }
+
+        return new_multi_vec;
+      }
+
+      virtual Belos::MultiVec<value_type> *
+      CloneViewNonConst(const std::vector<int> &index)
+      {
+        auto new_multi_vec = new MultiVecWrapper<VectorType>;
+
+        new_multi_vec->vectors.resize(index.size());
+
+        for (unsigned int i = 0; i < index.size(); ++i)
+          new_multi_vec->vectors[i].reset(this->vectors[index[i]].get(),
+                                          [](auto *) {});
+
+        return new_multi_vec;
+      }
+
+      virtual const Belos::MultiVec<value_type> *
+      CloneView(const std::vector<int> &index) const
+      {
+        auto new_multi_vec = new MultiVecWrapper<VectorType>;
+
+        new_multi_vec->vectors.resize(index.size());
+
+        for (unsigned int i = 0; i < index.size(); ++i)
+          {
+            AssertThrow(static_cast<unsigned int>(index[i]) <
+                          this->vectors.size(),
+                        ExcInternalError());
+
+            new_multi_vec->vectors[i].reset(this->vectors[index[i]].get(),
+                                            [](auto *) {});
+          }
+
+        return new_multi_vec;
+      }
+
+      virtual ptrdiff_t
+      GetGlobalLength() const
+      {
+        AssertThrow(this->vectors.size() > 0, ExcInternalError());
+        return this->vectors[0]->size();
+      }
+
+      virtual int
+      GetNumberVecs() const
+      {
+        return vectors.size();
+      }
+
+      virtual void
+      MvTimesMatAddMv(const value_type                                   alpha,
+                      const Belos::MultiVec<value_type> &                A_,
+                      const Teuchos::SerialDenseMatrix<int, value_type> &B,
+                      const value_type                                   beta)
+      {
+        const auto &A = cast(A_);
+
+        const unsigned int n_rows = B.numRows();
+        const unsigned int n_cols = B.numCols();
+
+        AssertThrow(n_rows == static_cast<unsigned int>(A.GetNumberVecs()),
+                    ExcInternalError());
+        AssertThrow(n_cols == static_cast<unsigned int>(this->GetNumberVecs()),
+                    ExcInternalError());
+
+        for (unsigned int i = 0; i < n_cols; ++i)
+          (*this->vectors[i]) *= beta;
+
+        for (unsigned int i = 0; i < n_cols; ++i)
+          for (unsigned int j = 0; j < n_rows; ++j)
+            this->vectors[i]->add(alpha * B(j, i), *A.vectors[j]);
+      }
+
+
+      virtual void
+      MvAddMv(const value_type                   alpha,
+              const Belos::MultiVec<value_type> &A_,
+              const value_type                   beta,
+              const Belos::MultiVec<value_type> &B_)
+      {
+        const auto &A = cast(A_);
+        const auto &B = cast(B_);
+
+        AssertThrow(this->vectors.size() == A.vectors.size(),
+                    ExcInternalError());
+        AssertThrow(this->vectors.size() == B.vectors.size(),
+                    ExcInternalError());
+
+        for (unsigned int i = 0; i < this->vectors.size(); ++i)
+          {
+            this->vectors[i]->equ(alpha, *A.vectors[i]);
+            this->vectors[i]->add(beta, *B.vectors[i]);
+          }
+      }
+
+      virtual void
+      MvScale(const value_type alpha)
+      {
+        for (unsigned int i = 0; i < this->vectors.size(); ++i)
+          (*this->vectors[i]) *= alpha;
+      }
+
+      virtual void
+      MvScale(const std::vector<value_type> &alpha)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)alpha;
+      }
+
+      virtual void
+      MvTransMv(const value_type                             alpha,
+                const Belos::MultiVec<value_type> &          A_,
+                Teuchos::SerialDenseMatrix<int, value_type> &B) const
+      {
+        const auto &A = cast(A_);
+
+        const unsigned int n_rows = B.numRows();
+        const unsigned int n_cols = B.numCols();
+
+        AssertThrow(n_rows == static_cast<unsigned int>(A.GetNumberVecs()),
+                    ExcInternalError());
+        AssertThrow(n_cols == static_cast<unsigned int>(this->GetNumberVecs()),
+                    ExcInternalError());
+
+        for (unsigned int i = 0; i < n_rows; ++i)
+          {
+            for (unsigned int j = 0; j < n_cols; ++j)
+              {
+                AssertThrow(A.vectors[i], ExcNotImplemented());
+                AssertThrow(this->vectors[j], ExcNotImplemented());
+
+                B(i, j) = alpha * ((*A.vectors[i]) * (*this->vectors[j]));
+              }
+          }
+      }
+
+      virtual void
+      MvDot(const Belos::MultiVec<value_type> &A_,
+            std::vector<value_type> &          b) const
+      {
+        const auto &A = cast(A_);
+
+        AssertThrow(this->vectors.size() == A.vectors.size(),
+                    ExcInternalError());
+        AssertThrow(this->vectors.size() == b.size(), ExcInternalError());
+
+        for (unsigned int i = 0; i < this->vectors.size(); ++i)
+          b[i] = (*this->vectors[i]) * (*A.vectors[i]);
+      }
+
+      virtual void
+      MvNorm(
+        std::vector<typename Teuchos::ScalarTraits<value_type>::magnitudeType>
+          &             normvec,
+        Belos::NormType type = Belos::TwoNorm) const
+      {
+        AssertThrow(type == Belos::TwoNorm, ExcNotImplemented());
+        AssertThrow(this->vectors.size() == normvec.size(), ExcInternalError());
+
+        for (unsigned int i = 0; i < this->vectors.size(); ++i)
+          normvec[i] = this->vectors[i]->l2_norm();
+      }
+
+      virtual void
+      SetBlock(const Belos::MultiVec<value_type> &A,
+               const std::vector<int> &           index)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)A;
+        (void)index;
+      }
+
+      virtual void
+      MvRandom()
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
+
+      virtual void
+      MvInit(const value_type alpha)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)alpha;
+      }
+
+      virtual void
+      MvPrint(std::ostream &os) const
+      {
+        AssertThrow(false, ExcNotImplemented());
+        (void)os;
+      }
+
+      VectorType &
+      genericVector()
+      {
+        AssertThrow(GetNumberVecs() == 1, ExcNotImplemented());
+
+        return *vectors[0];
+      }
+
+      const VectorType &
+      genericVector() const
+      {
+        AssertThrow(GetNumberVecs() == 1, ExcNotImplemented());
+
+        return *vectors[0];
+      }
+
+      static MultiVecWrapper<VectorType> &
+      cast(Belos::MultiVec<value_type> &vec_in)
+      {
+        auto vec = dynamic_cast<MultiVecWrapper<VectorType> *>(&vec_in);
+
+        AssertThrow(vec, ExcInternalError());
+
+        return *vec;
+      }
+
+      const static MultiVecWrapper<VectorType> &
+      cast(const Belos::MultiVec<value_type> &vec_in)
+      {
+        auto vec = dynamic_cast<const MultiVecWrapper<VectorType> *>(&vec_in);
+
+        AssertThrow(vec, ExcInternalError());
+
+        return *vec;
+      }
+
+
+#    ifdef HAVE_BELOS_TSQR
+      virtual void
+      factorExplicit(Belos::MultiVec<value_type> &                Q,
+                     Teuchos::SerialDenseMatrix<int, value_type> &R,
+                     const bool forceNonnegativeDiagonal = false)
+      {
+        TEUCHOS_TEST_FOR_EXCEPTION(
+          true,
+          std::logic_error,
+          "The Belos::MultiVec<"
+            << Teuchos::TypeNameTraits<value_type>::name()
+            << "> subclass which you "
+               "are using does not implement the TSQR-related method factorExplicit().");
+      }
+
+      virtual int
+      revealRank(
+        Teuchos::SerialDenseMatrix<int, value_type> &                    R,
+        const typename Teuchos::ScalarTraits<value_type>::magnitudeType &tol)
+      {
+        TEUCHOS_TEST_FOR_EXCEPTION(
+          true,
+          std::logic_error,
+          "The Belos::MultiVec<"
+            << Teuchos::TypeNameTraits<value_type>::name()
+            << "> subclass which you "
+               "are using does not implement the TSQR-related method revealRank().");
+      }
+
+#    endif
+
+    private:
+      std::vector<std::shared_ptr<VectorType>> vectors;
+
+      MultiVecWrapper() = default;
+    };
+
+    template <class OperatorType, class VectorType>
+    class OperatorWrapper
+      : public Belos::Operator<typename VectorType::value_type>
+    {
+    public:
+      using value_type = typename VectorType::value_type;
+
+      static bool
+      this_type_is_missing_a_specialization()
+      {
+        return false;
+      }
+
+      OperatorWrapper(const OperatorType &op)
+        : op(op){};
+
+      virtual ~OperatorWrapper(){};
+
+      virtual void
+      Apply(const Belos::MultiVec<value_type> &x,
+            Belos::MultiVec<value_type> &      y,
+            Belos::ETrans                      trans = Belos::NOTRANS) const
+      {
+        AssertThrow(trans == Belos::NOTRANS, ExcNotImplemented());
+
+        op.vmult(MultiVecWrapper<VectorType>::cast(y).genericVector(),
+                 MultiVecWrapper<VectorType>::cast(x).genericVector());
+      }
+
+      virtual bool
+      HasApplyTranspose() const
+      {
+        return false;
+      }
+
+    private:
+      const OperatorType &op;
+    };
+
+  } // namespace internal
+
+
+
+  template <typename VectorType>
+  SolverBelos<VectorType>::SolverBelos(
+    const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters)
+    : belos_parameters(belos_parameters)
+  {}
+
+
+
+  template <typename VectorType>
+  template <typename OperatorType, typename PreconditionerType>
+  void
+  SolverBelos<VectorType>::solve(const OperatorType &      a,
+                                 VectorType &              x,
+                                 const VectorType &        b,
+                                 const PreconditionerType &p)
+  {
+    using value_type = typename VectorType::value_type;
+
+    using MV = Belos::MultiVec<value_type>;
+    using OP = Belos::Operator<value_type>;
+
+    Teuchos::RCP<OP> A =
+      Teuchos::rcp(new internal::OperatorWrapper<OperatorType, VectorType>(a));
+    Teuchos::RCP<OP> P = Teuchos::rcp(
+      new internal::OperatorWrapper<PreconditionerType, VectorType>(p));
+    Teuchos::RCP<MV> X =
+      Teuchos::rcp(new internal::MultiVecWrapper<VectorType>(x));
+    Teuchos::RCP<MV> B =
+      Teuchos::rcp(new internal::MultiVecWrapper<VectorType>(b));
+
+    Teuchos::RCP<Belos::LinearProblem<value_type, MV, OP>> problem =
+      Teuchos::rcp(new Belos::LinearProblem<value_type, MV, OP>(A, X, B));
+
+    if (true /*TODO*/)
+      problem->setLeftPrec(P);
+    else
+      problem->setRightPrec(P);
+
+    const bool problem_set = problem->setProblem();
+    AssertThrow(problem_set, ExcInternalError());
+
+    Teuchos::RCP<Belos::SolverManager<value_type, MV, OP>> solver =
+      Teuchos::rcp(
+        new Belos::BlockGmresSolMgr<value_type, MV, OP>(problem,
+                                                        belos_parameters));
+
+    const auto flag = solver->solve();
+
+    AssertThrow(flag == Belos::ReturnType::Converged, ExcInternalError());
+
+    unsigned int n_iterations = solver->getNumIters();
+
+    (void)n_iterations;
+  }
+
+} // namespace TrilinosWrappers
+
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 
