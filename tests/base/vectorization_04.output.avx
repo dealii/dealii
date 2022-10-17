@@ -1,0 +1,23 @@
+
+DEAL:double <-> VectorizedArray<double, 1>::load OK
+DEAL:double <-> VectorizedArray<double, 1>::store OK
+DEAL:float <-> VectorizedArray<float, 1>::load OK
+DEAL:float <-> VectorizedArray<float, 1>::store OK
+DEAL:float <-> VectorizedArray<double, 1>::load OK
+DEAL:float <-> VectorizedArray<double, 1>::store OK
+DEAL:double <-> VectorizedArray<double, 2>::load OK
+DEAL:double <-> VectorizedArray<double, 2>::store OK
+DEAL:float <-> VectorizedArray<float, 4>::load OK
+DEAL:float <-> VectorizedArray<float, 4>::store OK
+DEAL:float <-> VectorizedArray<double, 2>::load OK
+DEAL:float <-> VectorizedArray<double, 2>::store OK
+DEAL:double <-> VectorizedArray<double, 4>::load OK
+DEAL:double <-> VectorizedArray<double, 4>::store OK
+DEAL:float <-> VectorizedArray<float, 8>::load OK
+DEAL:float <-> VectorizedArray<float, 8>::store OK
+DEAL:float <-> VectorizedArray<double, 4>::load OK
+DEAL:float <-> VectorizedArray<double, 4>::store OK
+DEAL:long double::load OK
+DEAL:long double::store OK
+DEAL:unsigned int::load OK
+DEAL:unsigned int::store OK
