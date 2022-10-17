@@ -80,6 +80,16 @@ namespace PETScWrappers
   {}
 
 
+  MatrixBase::MatrixBase(const Mat &A)
+    : matrix(A)
+    , last_action(VectorOperation::unknown)
+  {
+    const PetscErrorCode ierr =
+      PetscObjectReference(reinterpret_cast<PetscObject>(matrix));
+    AssertNothrow(ierr == 0, ExcPETScError(ierr));
+    (void)ierr;
+  }
+
 
   MatrixBase::~MatrixBase()
   {

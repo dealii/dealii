@@ -305,6 +305,12 @@ namespace PETScWrappers
     MatrixBase();
 
     /**
+     * Initialize a Matrix from a PETSc Mat object. Note that we do not copy
+     * the matrix.
+     */
+    explicit MatrixBase(const Mat &);
+
+    /**
      * Copy constructor. It is deleted as copying this base class
      * without knowing the concrete kind of matrix stored may both
      * miss important details and be expensive if the matrix is large.
@@ -335,6 +341,7 @@ namespace PETScWrappers
      */
     MatrixBase &
     operator=(const value_type d);
+
     /**
      * Release all memory and return to a state just like after having called
      * the default constructor.
@@ -643,10 +650,11 @@ namespace PETScWrappers
 
     /**
      * Return a reference to the MPI communicator object in use with this
-     * matrix. This function has to be implemented in derived classes.
+     * matrix. If not implemented, it returns the communicator used by the
+     * PETSc Mat.
      */
     virtual const MPI_Comm &
-    get_mpi_communicator() const = 0;
+    get_mpi_communicator() const;
 
     /**
      * Return the number of nonzero elements of this matrix. Actually, it
@@ -1608,6 +1616,14 @@ namespace PETScWrappers
   MatrixBase::prepare_set()
   {
     prepare_action(VectorOperation::insert);
+  }
+
+  inline const MPI_Comm &
+  MatrixBase::get_mpi_communicator() const
+  {
+    static MPI_Comm comm;
+    PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
+    return comm;
   }
 
 #  endif // DOXYGEN
