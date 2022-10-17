@@ -21,15 +21,15 @@
 
 #include "../tests.h"
 
-template <typename Number>
+template <typename Number, typename VectorizedArrayType>
 void
 test()
 {
-  const unsigned int  n_vectors = VectorizedArray<Number>::size();
+  const unsigned int  n_vectors = VectorizedArrayType::size();
   std::vector<Number> values(n_vectors * 5);
   for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = i;
-  AlignedVector<VectorizedArray<Number>> copied(4);
+  AlignedVector<VectorizedArrayType> copied(4);
 
   // test load operation for all possible values of alignment
   for (unsigned int shift = 0; shift < n_vectors; ++shift)
@@ -49,7 +49,7 @@ test()
     {
       for (unsigned int i = 0; i < 4; ++i)
         {
-          VectorizedArray<Number> tmp;
+          VectorizedArrayType tmp;
           tmp.load(&values[i * n_vectors]);
           tmp.store(&stored[i * n_vectors + shift]);
         }
@@ -66,20 +66,59 @@ main()
 {
   initlog();
 
-  deallog.push("double");
-  test<double>();
+  deallog.push("double <-> VectorizedArray<double, 1>");
+  test<double, VectorizedArray<double, 1>>();
   deallog.pop();
-  deallog.push("float");
-  test<float>();
+  deallog.push("float <-> VectorizedArray<float, 1>");
+  test<float, VectorizedArray<float, 1>>();
   deallog.pop();
+  deallog.push("float <-> VectorizedArray<double, 1>");
+  test<float, VectorizedArray<double, 1>>();
+  deallog.pop();
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
+  deallog.push("double <-> VectorizedArray<double, 2>");
+  test<double, VectorizedArray<double, 2>>();
+  deallog.pop();
+  deallog.push("float <-> VectorizedArray<float, 4>");
+  test<float, VectorizedArray<float, 4>>();
+  deallog.pop();
+  deallog.push("float <-> VectorizedArray<double, 2>");
+  test<float, VectorizedArray<double, 2>>();
+  deallog.pop();
+#endif
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
+  deallog.push("double <-> VectorizedArray<double, 4>");
+  test<double, VectorizedArray<double, 4>>();
+  deallog.pop();
+  deallog.push("float <-> VectorizedArray<float, 8>");
+  test<float, VectorizedArray<float, 8>>();
+  deallog.pop();
+  deallog.push("float <-> VectorizedArray<double, 4>");
+  test<float, VectorizedArray<double, 4>>();
+  deallog.pop();
+#endif
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
+  deallog.push("double <-> VectorizedArray<double, 8>");
+  test<double, VectorizedArray<double, 8>>();
+  deallog.pop();
+  deallog.push("float <-> VectorizedArray<float, 16>");
+  test<float, VectorizedArray<float, 16>>();
+  deallog.pop();
+  deallog.push("float <-> VectorizedArray<double, 8>");
+  test<float, VectorizedArray<double, 8>>();
+  deallog.pop();
+#endif
 
   // test long double and unsigned int: in these cases, the default path of
   // VectorizedArray is taken no matter what was done for double or float
   deallog.push("long double");
-  test<long double>();
+  test<long double, VectorizedArray<long double>>();
   deallog.pop();
 
   deallog.push("unsigned int");
-  test<unsigned int>();
+  test<unsigned int, VectorizedArray<unsigned int>>();
   deallog.pop();
 }
