@@ -586,7 +586,7 @@ namespace MeshWorker
     , n_components(numbers::invalid_unsigned_int)
   {}
 
-
+#ifndef DOXYGEN
   template <int dim, int sdim>
   inline IntegrationInfo<dim, sdim>::IntegrationInfo(
     const IntegrationInfo<dim, sdim> &other)
@@ -631,6 +631,7 @@ namespace MeshWorker
           Assert(false, ExcInternalError());
       }
   }
+#endif
 
 
 
@@ -779,6 +780,7 @@ namespace MeshWorker
   }
 
 
+#ifndef DOXYGEN
   template <int dim, int sdim>
   inline void
   IntegrationInfoBox<dim, sdim>::initialize(const FiniteElement<dim, sdim> &el,
@@ -808,6 +810,7 @@ namespace MeshWorker
     neighbor.template initialize<FEFaceValues<dim, sdim>>(
       el, mapping, face_quadrature, neighbor_flags, block_info);
   }
+#endif
 
 
   template <int dim, int sdim>
