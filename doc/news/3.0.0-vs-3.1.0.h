@@ -379,8 +379,8 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Improved: <code>FullMatrix</code><code
-       class="member">::invert(...)</code> now inverts matrices of all
+       Improved: <code>FullMatrix::invert</code>
+       now inverts matrices of all
        sizes. If there is no hardcoded inversion, <code
        class="member">gauss_jordan()</code> is used implicitly.
        <br>

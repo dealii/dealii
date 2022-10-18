@@ -70,7 +70,8 @@ WARN_IF_DOC_ERROR      = YES
 
 INPUT                  =
 RECURSIVE              = YES
-EXCLUDE_PATTERNS       = *.templates.h
+EXCLUDE_PATTERNS       = *.templates.h \
+                         *.txt
 EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial \
                          @CMAKE_SOURCE_DIR@/examples/doxygen
 EXAMPLE_RECURSIVE      = NO
