@@ -30,12 +30,9 @@ BoundingBox<spacedim, Number>::point_inside(const Point<spacedim, Number> &p,
       // Bottom left-top right convention: the point is outside if it's smaller
       // than the first or bigger than the second boundary point The bounding
       // box is defined as a closed set
-      if ((p[i] < this->boundary_points.first[i] -
-                    tolerance * std::abs(this->boundary_points.second[i] -
-                                         this->boundary_points.first[i])) ||
-          (p[i] > this->boundary_points.second[i] +
-                    tolerance * std::abs(this->boundary_points.second[i] -
-                                         this->boundary_points.first[i])))
+      if ((p[i] <
+           this->boundary_points.first[i] - tolerance * side_length(i)) ||
+          (p[i] > this->boundary_points.second[i] + tolerance * side_length(i)))
         return false;
     }
   return true;
@@ -59,7 +56,23 @@ BoundingBox<spacedim, Number>::merge_with(
     }
 }
 
-
+template <int spacedim, typename Number>
+bool
+BoundingBox<spacedim, Number>::has_overlap_with(
+  const BoundingBox<spacedim, Number> &other_bbox,
+  const double                         tolerance) const
+{
+  for (unsigned int i = 0; i < spacedim; ++i)
+    {
+      // testing if the boxes are close enough to intersect
+      if ((other_bbox.boundary_points.second[i] <
+           this->boundary_points.first[i] - tolerance * side_length(i)) ||
+          (other_bbox.boundary_points.first[i] >
+           this->boundary_points.second[i] + tolerance * side_length(i)))
+        return false;
+    }
+  return true;
+}
 
 template <int spacedim, typename Number>
 NeighborType
@@ -67,14 +80,14 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
   const BoundingBox<spacedim, Number> &other_bbox,
   const double                         tolerance) const
 {
+  if (!has_overlap_with(other_bbox, tolerance))
+    return NeighborType::not_neighbors;
+
   if (spacedim == 1)
     {
       // In dimension 1 if the two bounding box are neighbors
       // we can merge them
-      if (this->point_inside(other_bbox.boundary_points.first, tolerance) ||
-          this->point_inside(other_bbox.boundary_points.second, tolerance))
-        return NeighborType::mergeable_neighbors;
-      return NeighborType::not_neighbors;
+      return NeighborType::mergeable_neighbors;
     }
   else
     {
@@ -84,12 +97,6 @@ BoundingBox<spacedim, Number>::get_neighbor_type(
       const std::array<Point<spacedim, Number>, 2> bbox2 = {
         {other_bbox.get_boundary_points().first,
          other_bbox.get_boundary_points().second}};
-
-      // Step 1: testing if the boxes are close enough to intersect
-      for (unsigned int d = 0; d < spacedim; ++d)
-        if (bbox1[0][d] * (1 - tolerance) > bbox2[1][d] ||
-            bbox2[0][d] * (1 - tolerance) > bbox1[1][d])
-          return NeighborType::not_neighbors;
 
       // The boxes intersect: we need to understand now how they intersect.
       // We begin by computing the intersection:

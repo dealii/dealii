@@ -187,8 +187,14 @@ public:
   /**
    * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
    * have dimension spacedim, check if their intersection is non empty.
-   *
-   * Return an enumerator of type NeighborType.
+   */
+  bool
+  has_overlap_with(
+    const BoundingBox<spacedim, Number> &other_bbox,
+    const double tolerance = std::numeric_limits<Number>::epsilon()) const;
+
+  /**
+   * Check which NeighborType @p other_bbox is to the current object.
    */
   NeighborType
   get_neighbor_type(

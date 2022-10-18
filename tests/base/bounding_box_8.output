@@ -1,0 +1,28 @@
+
+DEAL::Bounding box A: [1.00000, 2.00000]
+DEAL::Bounding box B: [2.00000, 3.00000]
+DEAL::Has overlap with: 1
+DEAL::Bounding box A: [1.00000, 2.00000]
+DEAL::Bounding box B: [2.00000, 3.00000]
+DEAL::Has overlap with: 0
+DEAL::Bounding box A: [1.00000, 2.00000]
+DEAL::Bounding box B: [2.00000, 3.00000]
+DEAL::Has overlap with: 1
+DEAL::Bounding box A: [-1.00000, 0.00000]
+DEAL::Bounding box B: [0.00000, 1.00000]
+DEAL::Has overlap with: 1
+DEAL::Bounding box A: [-1.00000, 0.00000]
+DEAL::Bounding box B: [1.00000e-11, 1.00000]
+DEAL::Has overlap with: 0
+DEAL::Bounding box A: [-1.00000, 0.00000]
+DEAL::Bounding box B: [1.00000e-11, 1.00000]
+DEAL::Has overlap with: 1
+DEAL::Bounding box A: [-2.00000, -1.00000]
+DEAL::Bounding box B: [-1.00000, 0.00000]
+DEAL::Has overlap with: 1
+DEAL::Bounding box A: [-2.00000, -1.00000]
+DEAL::Bounding box B: [-1.00000, 0.00000]
+DEAL::Has overlap with: 0
+DEAL::Bounding box A: [-2.00000, -1.00000]
+DEAL::Bounding box B: [-1.00000, 0.00000]
+DEAL::Has overlap with: 1
