@@ -148,7 +148,15 @@ main(int argc, char *argv[])
     {
       x = 0.0;
 
-      TrilinosWrappers::SolverBelos<VectorType> solver(belos_parameters);
+      SolverControl solver_control;
+      typename TrilinosWrappers::SolverBelos<VectorType>::AdditionalData
+        additional_data;
+
+      additional_data.right_preconditioning = false;
+
+      TrilinosWrappers::SolverBelos<VectorType> solver(solver_control,
+                                                       additional_data,
+                                                       belos_parameters);
       solver.solve(system_matrix, x, r, ilu);
 
       deallog << x.l2_norm() << std::endl;

@@ -729,12 +729,46 @@ namespace TrilinosWrappers
 
 
 
+  /**
+   * Wrapper around the iterate solver package from the Belos
+   * packge
+   * (https://docs.trilinos.org/latest-release/packages/belos/doc/html/index.html),
+   * targeting deal.II data structures.
+   */
   template <typename VectorType>
   class SolverBelos
   {
   public:
-    SolverBelos(const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters);
+    /**
+     * Struct that helps to configure SolverBelos. More advanced
+     * parameters are passed to the constructor SolverBelos
+     * directly via a Teuchos::ParameterList.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor.
+       */
+      AdditionalData(const bool right_preconditioning = false)
+        : right_preconditioning(right_preconditioning)
+      {}
 
+      /**
+       * Flag for right preconditioning.
+       */
+      bool right_preconditioning;
+    };
+
+    /**
+     * Constructor.
+     */
+    SolverBelos(SolverControl &                             solver_control,
+                const AdditionalData &                      additional_data,
+                const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters);
+
+    /**
+     * Solve the linear system <tt>Ax=b</tt> with a given preconditioner.
+     */
     template <typename OperatorType, typename PreconditionerType>
     void
     solve(const OperatorType &      a,
@@ -743,6 +777,8 @@ namespace TrilinosWrappers
           const PreconditionerType &p);
 
   private:
+    SolverControl &                             solver_control;
+    const AdditionalData                        additional_data;
     const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters;
   };
 
@@ -756,34 +792,61 @@ namespace TrilinosWrappers
 {
   namespace internal
   {
+    /**
+     * Implementation of the abstract interface
+     * Belos::MultiVec for deal.II vectors. For details,
+     * see
+     * https://docs.trilinos.org/latest-release/packages/belos/doc/html/classBelos_1_1MultiVec.html.
+     */
     template <class VectorType>
     class MultiVecWrapper
       : public Belos::MultiVec<typename VectorType::value_type>
     {
     public:
+      /**
+       * Underlying value type.
+       */
       using value_type = typename VectorType::value_type;
 
+      /**
+       * Indicate that specialization exists.
+       */
       static bool
       this_type_is_missing_a_specialization()
       {
         return false;
       }
 
+      /**
+       * Constructor that takes a mutable deal.II vector.
+       */
       MultiVecWrapper(VectorType &vector)
       {
         this->vectors.resize(1);
-        this->vectors[0].reset(&vector, [](auto *) {});
+        this->vectors[0].reset(
+          &vector,
+          [](auto *) { /*Nothing to do, since vector is owned outside.*/ });
       }
 
+      /**
+       * Constructor that takes a const deal.II vector.
+       */
       MultiVecWrapper(const VectorType &vector)
       {
         this->vectors.resize(1);
-        this->vectors[0].reset(&const_cast<VectorType &>(vector),
-                               [](auto *) {});
+        this->vectors[0].reset(
+          &const_cast<VectorType &>(vector),
+          [](auto *) { /*Nothing to do, since vector is owned outside.*/ });
       }
 
+      /**
+       * Destructor.
+       */
       virtual ~MultiVecWrapper() = default;
 
+      /**
+       * Create a new MultiVec with numvecs columns.
+       */
       virtual Belos::MultiVec<value_type> *
       Clone(const int numvecs) const
       {
@@ -802,12 +865,20 @@ namespace TrilinosWrappers
         return new_multi_vec;
       }
 
+      /**
+       * Create a new MultiVec and copy contents of *this into it (deep copy).
+       */
       virtual Belos::MultiVec<value_type> *
       CloneCopy() const
       {
         AssertThrow(false, ExcNotImplemented());
       }
 
+      /**
+       * Creates a new Belos::MultiVec and copies the selected contents of
+       * *this into the new multivector (deep copy). The copied vectors
+       * from *this are indicated by the index.size() indices in index.
+       */
       virtual Belos::MultiVec<value_type> *
       CloneCopy(const std::vector<int> &index) const
       {
@@ -824,6 +895,11 @@ namespace TrilinosWrappers
         return new_multi_vec;
       }
 
+      /**
+       * Creates a new Belos::MultiVec that shares the selected contents
+       * of *this. The index of the numvecs vectors copied from *this
+       * are indicated by the indices given in index.
+       */
       virtual Belos::MultiVec<value_type> *
       CloneViewNonConst(const std::vector<int> &index)
       {
@@ -832,12 +908,19 @@ namespace TrilinosWrappers
         new_multi_vec->vectors.resize(index.size());
 
         for (unsigned int i = 0; i < index.size(); ++i)
-          new_multi_vec->vectors[i].reset(this->vectors[index[i]].get(),
-                                          [](auto *) {});
+          new_multi_vec->vectors[i].reset(
+            this->vectors[index[i]].get(),
+            [](auto
+                 *) { /*Nothing to do, since we are creating only a view.*/ });
 
         return new_multi_vec;
       }
 
+      /**
+       * Creates a new Belos::MultiVec that shares the selected contents
+       * of *this. The index of the numvecs vectors copied from *this
+       * are indicated by the indices given in index.
+       */
       virtual const Belos::MultiVec<value_type> *
       CloneView(const std::vector<int> &index) const
       {
@@ -851,13 +934,19 @@ namespace TrilinosWrappers
                           this->vectors.size(),
                         ExcInternalError());
 
-            new_multi_vec->vectors[i].reset(this->vectors[index[i]].get(),
-                                            [](auto *) {});
+            new_multi_vec->vectors[i].reset(
+              this->vectors[index[i]].get(),
+              [](
+                auto
+                  *) { /*Nothing to do, since we are creating only a view.*/ });
           }
 
         return new_multi_vec;
       }
 
+      /**
+       * The number of rows in the multivector.
+       */
       virtual ptrdiff_t
       GetGlobalLength() const
       {
@@ -865,12 +954,18 @@ namespace TrilinosWrappers
         return this->vectors[0]->size();
       }
 
+      /**
+       * The number of vectors (i.e., columns) in the multivector.
+       */
       virtual int
       GetNumberVecs() const
       {
         return vectors.size();
       }
 
+      /**
+       * Update *this with alpha * A * B + beta * (*this).
+       */
       virtual void
       MvTimesMatAddMv(const value_type                                   alpha,
                       const Belos::MultiVec<value_type> &                A_,
@@ -895,7 +990,9 @@ namespace TrilinosWrappers
             this->vectors[i]->add(alpha * B(j, i), *A.vectors[j]);
       }
 
-
+      /**
+       * Replace *this with alpha * A + beta * B.
+       */
       virtual void
       MvAddMv(const value_type                   alpha,
               const Belos::MultiVec<value_type> &A_,
@@ -917,6 +1014,9 @@ namespace TrilinosWrappers
           }
       }
 
+      /**
+       * Scale each element of the vectors in *this with alpha.
+       */
       virtual void
       MvScale(const value_type alpha)
       {
@@ -924,6 +1024,9 @@ namespace TrilinosWrappers
           (*this->vectors[i]) *= alpha;
       }
 
+      /**
+       * Scale each element of the i-th vector in *this with alpha[i].
+       */
       virtual void
       MvScale(const std::vector<value_type> &alpha)
       {
@@ -931,6 +1034,10 @@ namespace TrilinosWrappers
         (void)alpha;
       }
 
+      /**
+       * Compute a dense matrix B through the matrix-matrix multiply
+       * alpha * A^T * (*this).
+       */
       virtual void
       MvTransMv(const value_type                             alpha,
                 const Belos::MultiVec<value_type> &          A_,
@@ -958,6 +1065,10 @@ namespace TrilinosWrappers
           }
       }
 
+      /**
+       * Compute the dot product of each column of *this with the
+       * corresponding column of A.
+       */
       virtual void
       MvDot(const Belos::MultiVec<value_type> &A_,
             std::vector<value_type> &          b) const
@@ -972,6 +1083,9 @@ namespace TrilinosWrappers
           b[i] = (*this->vectors[i]) * (*A.vectors[i]);
       }
 
+      /**
+       * Compute the norm of each vector in *this.
+       */
       virtual void
       MvNorm(
         std::vector<typename Teuchos::ScalarTraits<value_type>::magnitudeType>
@@ -985,6 +1099,9 @@ namespace TrilinosWrappers
           normvec[i] = this->vectors[i]->l2_norm();
       }
 
+      /**
+       * Copy the vectors in A to a set of vectors in *this.
+       */
       virtual void
       SetBlock(const Belos::MultiVec<value_type> &A,
                const std::vector<int> &           index)
@@ -994,12 +1111,18 @@ namespace TrilinosWrappers
         (void)index;
       }
 
+      /**
+       * Fill all the vectors in *this with random numbers.
+       */
       virtual void
       MvRandom()
       {
         AssertThrow(false, ExcNotImplemented());
       }
 
+      /**
+       * Replace each element of the vectors in *this with alpha.
+       */
       virtual void
       MvInit(const value_type alpha)
       {
@@ -1007,6 +1130,9 @@ namespace TrilinosWrappers
         (void)alpha;
       }
 
+      /**
+       * Print *this multivector to the os output stream.
+       */
       virtual void
       MvPrint(std::ostream &os) const
       {
@@ -1014,6 +1140,9 @@ namespace TrilinosWrappers
         (void)os;
       }
 
+      /**
+       * Get underlying vector.
+       */
       VectorType &
       genericVector()
       {
@@ -1022,6 +1151,9 @@ namespace TrilinosWrappers
         return *vectors[0];
       }
 
+      /**
+       * Get underlying vector (const version).
+       */
       const VectorType &
       genericVector() const
       {
@@ -1030,6 +1162,9 @@ namespace TrilinosWrappers
         return *vectors[0];
       }
 
+      /**
+       * Cast Belos::MultiVec to MultiVecWrapper.
+       */
       static MultiVecWrapper<VectorType> &
       cast(Belos::MultiVec<value_type> &vec_in)
       {
@@ -1040,6 +1175,9 @@ namespace TrilinosWrappers
         return *vec;
       }
 
+      /**
+       * Cast Belos::MultiVec to MultiVecWrapper (const version).
+       */
       const static MultiVecWrapper<VectorType> &
       cast(const Belos::MultiVec<value_type> &vec_in)
       {
@@ -1083,47 +1221,83 @@ namespace TrilinosWrappers
 #    endif
 
     private:
+      /**
+       * Underlying vectors.
+       */
       std::vector<std::shared_ptr<VectorType>> vectors;
 
+      /**
+       * Default constructor. Only used internally to create new MultiVecWrapper
+       * instances.
+       */
       MultiVecWrapper() = default;
     };
 
+    /**
+     * Implementation of the abstract interface
+     * Belos::Operator for deal.II vectors and deal.II
+     * operators/preconditioners. For details, see
+     * https://docs.trilinos.org/latest-release/packages/belos/doc/html/classBelos_1_1Operator.html.
+     */
     template <class OperatorType, class VectorType>
     class OperatorWrapper
       : public Belos::Operator<typename VectorType::value_type>
     {
     public:
+      /**
+       * Underlying value type.
+       */
       using value_type = typename VectorType::value_type;
 
+      /**
+       * Indicate that specialization exists.
+       */
       static bool
       this_type_is_missing_a_specialization()
       {
         return false;
       }
 
+      /**
+       * Constructor.
+       */
       OperatorWrapper(const OperatorType &op)
         : op(op){};
 
-      virtual ~OperatorWrapper(){};
+      /**
+       * Destructor.
+       */
+      virtual ~OperatorWrapper() = default;
 
+      /**
+       * Apply the operator to x, putting the result in y.
+       */
       virtual void
       Apply(const Belos::MultiVec<value_type> &x,
             Belos::MultiVec<value_type> &      y,
             Belos::ETrans                      trans = Belos::NOTRANS) const
       {
+        // TODO: check for Tvmult
         AssertThrow(trans == Belos::NOTRANS, ExcNotImplemented());
 
         op.vmult(MultiVecWrapper<VectorType>::cast(y).genericVector(),
                  MultiVecWrapper<VectorType>::cast(x).genericVector());
       }
 
+      /**
+       * Whether this operator implements applying the transpose.
+       */
       virtual bool
       HasApplyTranspose() const
       {
+        // TODO: check for Tvmult
         return false;
       }
 
     private:
+      /**
+       * Underlying operator.
+       */
       const OperatorType &op;
     };
 
@@ -1133,8 +1307,12 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   SolverBelos<VectorType>::SolverBelos(
+    SolverControl &                             solver_control,
+    const AdditionalData &                      additional_data,
     const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters)
-    : belos_parameters(belos_parameters)
+    : solver_control(solver_control)
+    , additional_data(additional_data)
+    , belos_parameters(belos_parameters)
   {}
 
 
@@ -1164,7 +1342,7 @@ namespace TrilinosWrappers
     Teuchos::RCP<Belos::LinearProblem<value_type, MV, OP>> problem =
       Teuchos::rcp(new Belos::LinearProblem<value_type, MV, OP>(A, X, B));
 
-    if (true /*TODO*/)
+    if (additional_data.right_preconditioning == false)
       problem->setLeftPrec(P);
     else
       problem->setRightPrec(P);
@@ -1172,18 +1350,48 @@ namespace TrilinosWrappers
     const bool problem_set = problem->setProblem();
     AssertThrow(problem_set, ExcInternalError());
 
+    // compute initial residal
+    VectorType r;
+    r.reinit(x, true);
+    a.vmult(r, x);
+    r.sadd(-1., 1., b);
+    const auto norm_0 = r.l2_norm();
+
+    if (solver_control.check(0, norm_0) != SolverControl::iterate)
+      return;
+
+    double relative_tolerance_to_be_achieved =
+      solver_control.tolerance() / norm_0;
+    const int max_steps = solver_control.max_steps();
+
+    if (const auto *reduction_control =
+          dynamic_cast<ReductionControl *>(&solver_control))
+      relative_tolerance_to_be_achieved =
+        std::max(relative_tolerance_to_be_achieved,
+                 reduction_control->reduction());
+
+    Teuchos::RCP<Teuchos::ParameterList> belos_parameters_copy(
+      Teuchos::rcp(new Teuchos::ParameterList(*belos_parameters)));
+
+    belos_parameters_copy->set("Convergence Tolerance",
+                               relative_tolerance_to_be_achieved);
+    belos_parameters_copy->set("Maximum Iterations", max_steps);
+
     Teuchos::RCP<Belos::SolverManager<value_type, MV, OP>> solver =
       Teuchos::rcp(
         new Belos::BlockGmresSolMgr<value_type, MV, OP>(problem,
-                                                        belos_parameters));
+                                                        belos_parameters_copy));
 
     const auto flag = solver->solve();
 
-    AssertThrow(flag == Belos::ReturnType::Converged, ExcInternalError());
+    solver_control.check(solver->getNumIters(), solver->achievedTol() * norm_0);
 
-    unsigned int n_iterations = solver->getNumIters();
-
-    (void)n_iterations;
+    AssertThrow(flag == Belos::ReturnType::Converged ||
+                  ((dynamic_cast<IterationNumberControl *>(&solver_control) !=
+                    nullptr) &&
+                   (solver_control.last_step() == max_steps)),
+                SolverControl::NoConvergence(solver_control.last_step(),
+                                             solver_control.last_value()));
   }
 
 } // namespace TrilinosWrappers
