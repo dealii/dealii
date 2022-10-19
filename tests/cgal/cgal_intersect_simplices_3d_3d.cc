@@ -36,11 +36,8 @@ test_intersection(Triangulation<3> &tria0, Triangulation<3> &tria1)
   const auto              cell0            = tria0.begin_active();
   const auto              cell1            = tria1.begin_active();
 
-  const auto vec_of_arrays =
-    CGALWrappers::compute_intersection_of_cells<3, 3, 3>(cell0,
-                                                         cell1,
-                                                         MappingQ1<3>(),
-                                                         MappingQ1<3>());
+  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
+    cell0, cell1, MappingQ1<3>(), MappingQ1<3>());
 
   const auto   quad = QGaussSimplex<3>(1).mapped_quadrature(vec_of_arrays);
   const double sum =
@@ -60,11 +57,8 @@ test_failing_intersection(Triangulation<3> &tria0, Triangulation<3> &tria1)
   const auto              cell0            = tria0.begin_active();
   const auto              cell1            = tria1.begin_active();
 
-  const auto vec_of_arrays =
-    CGALWrappers::compute_intersection_of_cells<3, 3, 3>(cell0,
-                                                         cell1,
-                                                         MappingQ1<3>(),
-                                                         MappingQ1<3>());
+  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
+    cell0, cell1, MappingQ1<3>(), MappingQ1<3>());
 
   const auto   quad = QGaussSimplex<3>(1).mapped_quadrature(vec_of_arrays);
   const double sum =
