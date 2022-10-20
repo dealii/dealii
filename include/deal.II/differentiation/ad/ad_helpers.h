@@ -2696,7 +2696,39 @@ namespace Differentiation
       /** @{ */
 
       /**
-       * @copydoc HelperBase::reset()
+       * Reset the state of the class.
+       *
+       * When an instance of the class is stored as a class member object
+       * with the intention to reuse its instance, it may be necessary to reset
+       * the state of the object before use. This is because, internally, there
+       * is error checking performed to ensure that the correct
+       * auto-differentiable data is being tracked and used only when
+       * appropriate. This function clears all member data and, therefore,
+       * allows the state of all internal flags to be safely reset to their
+       * initial state.
+       *
+       * In the rare case that the number of independent or dependent variables
+       * has changed, this can also be reconfigured by passing in the
+       * appropriate arguments to the function.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
+       * @param[in] n_dependent_variables The number of scalar functions to be
+       * defined that will have a sensitivity to the given independent
+       * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
+       * image space.
+       * @param[in] clear_registered_tapes A flag that indicates the that
+       * list of @p registered_tapes must be cleared.
+       * If set to <tt>true</tt> then the data structure that tracks which
+       * tapes have been recorded is cleared as well. It is then expected that
+       * any preexisting tapes be re-recorded.
+       *
+       * @note This also resets the active tape number to an invalid number, and
+       * deactivates the recording mode for taped variables.
        */
       virtual void
       reset(const unsigned int n_independent_variables =
