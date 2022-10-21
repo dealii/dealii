@@ -585,16 +585,20 @@ namespace internal
 
 
 
-    template <std::size_t dim, typename Number>
+    template <std::size_t dim, typename Number, std::size_t n_lanes>
     inline void
-    setup(const std::array<Table<2, VectorizedArray<Number>>, dim> &mass_matrix,
-          const std::array<Table<2, VectorizedArray<Number>>, dim>
-            &                                                 derivative_matrix,
-          std::array<Table<2, VectorizedArray<Number>>, dim> &eigenvectors,
-          std::array<AlignedVector<VectorizedArray<Number>>, dim> &eigenvalues)
+    setup(
+      const std::array<Table<2, VectorizedArray<Number, n_lanes>>, dim>
+        &mass_matrix,
+      const std::array<Table<2, VectorizedArray<Number, n_lanes>>, dim>
+        &derivative_matrix,
+      std::array<Table<2, VectorizedArray<Number, n_lanes>>, dim> &eigenvectors,
+      std::array<AlignedVector<VectorizedArray<Number, n_lanes>>, dim>
+        &eigenvalues)
     {
-      const unsigned int     n_rows_1d   = mass_matrix[0].n_cols();
-      constexpr unsigned int macro_size  = VectorizedArray<Number>::size();
+      const unsigned int     n_rows_1d = mass_matrix[0].n_cols();
+      constexpr unsigned int macro_size =
+        VectorizedArray<Number, n_lanes>::size();
       const std::size_t nm_flat_size_max = n_rows_1d * n_rows_1d * macro_size;
       const std::size_t n_flat_size_max  = n_rows_1d * macro_size;
 
