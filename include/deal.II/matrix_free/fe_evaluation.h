@@ -3434,16 +3434,16 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         for (unsigned int i = 0; i < dofs_per_component;
              ++i, dof_indices += n_lanes)
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            operation.process_dof_gather(dof_indices,
-                                         *src[comp],
-                                         0,
-                                         values_dofs[comp][i],
-                                         vector_selector);
+            operation.process_dofs(dof_indices,
+                                   *src[comp],
+                                   0,
+                                   values_dofs[comp][i],
+                                   vector_selector);
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           for (unsigned int i = 0; i < dofs_per_component;
                ++i, dof_indices += n_lanes)
-            operation.process_dof_gather(
+            operation.process_dofs(
               dof_indices, *src[0], 0, values_dofs[comp][i], vector_selector);
       return;
     }
@@ -4000,22 +4000,22 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int i = 0; i < dofs_per_component; ++i)
               {
                 for (unsigned int comp = 0; comp < n_components; ++comp)
-                  operation.process_dof_gather(dof_indices,
-                                               *src[comp],
-                                               i * VectorizedArrayType::size(),
-                                               values_dofs[comp][i],
-                                               vector_selector);
+                  operation.process_dofs(dof_indices,
+                                         *src[comp],
+                                         i * VectorizedArrayType::size(),
+                                         values_dofs[comp][i],
+                                         vector_selector);
               }
           else
             for (unsigned int comp = 0; comp < n_components; ++comp)
               for (unsigned int i = 0; i < dofs_per_component; ++i)
                 {
-                  operation.process_dof_gather(dof_indices,
-                                               *src[0],
-                                               (comp * dofs_per_component + i) *
-                                                 VectorizedArrayType::size(),
-                                               values_dofs[comp][i],
-                                               vector_selector);
+                  operation.process_dofs(dof_indices,
+                                         *src[0],
+                                         (comp * dofs_per_component + i) *
+                                           VectorizedArrayType::size(),
+                                         values_dofs[comp][i],
+                                         vector_selector);
                 }
         }
       else
@@ -4031,11 +4031,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int i = 0; i < dofs_per_component; ++i)
               {
                 for (unsigned int comp = 0; comp < n_components; ++comp)
-                  operation.process_dof_gather(dof_indices,
-                                               *src[comp],
-                                               0,
-                                               values_dofs[comp][i],
-                                               vector_selector);
+                  operation.process_dofs(dof_indices,
+                                         *src[comp],
+                                         0,
+                                         values_dofs[comp][i],
+                                         vector_selector);
                 DEAL_II_OPENMP_SIMD_PRAGMA
                 for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                   dof_indices[v] += offsets[v];
@@ -4044,11 +4044,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int comp = 0; comp < n_components; ++comp)
               for (unsigned int i = 0; i < dofs_per_component; ++i)
                 {
-                  operation.process_dof_gather(dof_indices,
-                                               *src[0],
-                                               0,
-                                               values_dofs[comp][i],
-                                               vector_selector);
+                  operation.process_dofs(dof_indices,
+                                         *src[0],
+                                         0,
+                                         values_dofs[comp][i],
+                                         vector_selector);
                   DEAL_II_OPENMP_SIMD_PRAGMA
                   for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                     dof_indices[v] += offsets[v];
