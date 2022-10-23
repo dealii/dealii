@@ -21,11 +21,17 @@
 
 #include <deal.II/lac/tensor_product_matrix.h>
 
-#ifndef FDM_DEGREE_MAX
-// We set this value 17, since this is the value needed for smoothers for
-// cell-centered patches with overlap for continuous elements with degrees up
-// to FE_EVAL_FACTORY_DEGREE_MAX.
-#  define FDM_DEGREE_MAX 17
+#ifndef FDM_N_ROWS_MAX
+// Maximum number of rows with pre-compiled TensorProductMatrixSymmetricSum
+// kernels. If no value is given by the user during
+// compilation, we choose its value so that all number of rows are pre-compiled
+// to support smoothers for cell-centered patches with overlap for continuous
+// elements with degrees up to FE_EVAL_FACTORY_DEGREE_MAX (default value 6).
+#  ifndef FE_EVAL_FACTORY_DEGREE_MAX
+#    define FDM_N_ROWS_MAX 17
+#  else
+#    define FDM_N_ROWS_MAX (FE_EVAL_FACTORY_DEGREE_MAX * 3 - 1)
+#  endif
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -47,8 +53,8 @@ namespace internal
       if (n_rows_1d_templated == n_rows_1d)
         vmult<n_rows_1d_templated>(
           dst, src, tmp, n_rows_1d, mass_matrix, derivative_matrix);
-      else if (n_rows_1d_templated < FDM_DEGREE_MAX)
-        select_vmult<std::min(n_rows_1d_templated + 1, FDM_DEGREE_MAX)>(
+      else if (n_rows_1d_templated < FDM_N_ROWS_MAX)
+        select_vmult<std::min(n_rows_1d_templated + 1, FDM_N_ROWS_MAX)>(
           dst, src, tmp, n_rows_1d, mass_matrix, derivative_matrix);
       else
         vmult<0>(dst, src, tmp, n_rows_1d, mass_matrix, derivative_matrix);
@@ -68,8 +74,8 @@ namespace internal
       if (n_rows_1d_templated == n_rows_1d)
         apply_inverse<n_rows_1d_templated>(
           dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
-      else if (n_rows_1d_templated < FDM_DEGREE_MAX)
-        select_apply_inverse<std::min(n_rows_1d_templated + 1, FDM_DEGREE_MAX)>(
+      else if (n_rows_1d_templated < FDM_N_ROWS_MAX)
+        select_apply_inverse<std::min(n_rows_1d_templated + 1, FDM_N_ROWS_MAX)>(
           dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
       else
         apply_inverse<0>(dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
