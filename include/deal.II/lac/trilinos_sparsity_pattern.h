@@ -951,15 +951,6 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclExceptionMsg(
-      ExcSourceEqualsDestination,
-      "You are attempting an operation on two sparsity patterns that "
-      "are the same object, but the operation requires that the "
-      "two objects are in fact different.");
-
-    /**
-     * Exception
-     */
     DeclException4(ExcAccessToNonLocalElement,
                    size_type,
                    size_type,
