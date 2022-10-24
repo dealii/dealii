@@ -1681,7 +1681,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             ; // do nothing
           else if (object_type == ReferenceCells::Line)
             {
-              if (spacedim == 1)
+              if (dim == 1)
                 {
                   cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
@@ -1696,7 +1696,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
           else if ((object_type == ReferenceCells::Triangle) ||
                    (object_type == ReferenceCells::Quadrilateral))
             {
-              if (spacedim == 2)
+              if (dim == 2)
                 {
                   cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
@@ -1711,7 +1711,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
           else if ((object_type == ReferenceCells::Tetrahedron) ||
                    (object_type == ReferenceCells::Wedge))
             {
-              if (spacedim == 3)
+              if (dim == 3)
                 {
                   cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
@@ -1748,7 +1748,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                 ; // do nothing
               else if (object_type == ReferenceCells::Line)
                 {
-                  if (spacedim == 1)
+                  if (dim == 1)
                     cells[cells.size() - n_elements + e].material_id =
                       geometric_entity_index;
                   else
@@ -1760,7 +1760,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               else if ((object_type == ReferenceCells::Triangle) ||
                        (object_type == ReferenceCells::Quadrilateral))
                 {
-                  if (spacedim == 2)
+                  if (dim == 2)
                     cells[cells.size() - n_elements + e].material_id =
                       geometric_entity_index;
                   else
@@ -1772,7 +1772,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               else if ((object_type == ReferenceCells::Tetrahedron) ||
                        (object_type == ReferenceCells::Wedge))
                 {
-                  if (spacedim == 3)
+                  if (dim == 3)
                     cells[cells.size() - n_elements + e].material_id =
                       geometric_entity_index;
                   else
