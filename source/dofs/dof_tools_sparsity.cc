@@ -187,8 +187,8 @@ namespace DoFTools
            (subdomain_id == cell->subdomain_id())) &&
           cell->is_locally_owned())
         {
-          const unsigned int fe_index = cell->active_fe_index();
-          const unsigned int dofs_per_cell =
+          const types::fe_index fe_index = cell->active_fe_index();
+          const unsigned int    dofs_per_cell =
             fe_collection[fe_index].n_dofs_per_cell();
 
           dofs_on_this_cell.resize(dofs_per_cell);

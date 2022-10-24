@@ -1264,17 +1264,21 @@ namespace internal
       loop_over_active_or_level_cells(
         dof_handler_fine, mg_level_fine, [&](const auto &cell) {
           min_active_fe_indices[0] =
-            std::min(min_active_fe_indices[0], cell->active_fe_index());
+            std::min<unsigned int>(min_active_fe_indices[0],
+                                   cell->active_fe_index());
           max_active_fe_indices[0] =
-            std::max(max_active_fe_indices[0], cell->active_fe_index());
+            std::max<unsigned int>(max_active_fe_indices[0],
+                                   cell->active_fe_index());
         });
 
       loop_over_active_or_level_cells(
         dof_handler_coarse, mg_level_coarse, [&](const auto &cell) {
           min_active_fe_indices[1] =
-            std::min(min_active_fe_indices[1], cell->active_fe_index());
+            std::min<unsigned int>(min_active_fe_indices[1],
+                                   cell->active_fe_index());
           max_active_fe_indices[1] =
-            std::max(max_active_fe_indices[1], cell->active_fe_index());
+            std::max<unsigned int>(max_active_fe_indices[1],
+                                   cell->active_fe_index());
         });
 
       const auto comm = dof_handler_fine.get_communicator();

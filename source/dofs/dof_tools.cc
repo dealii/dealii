@@ -222,8 +222,8 @@ namespace DoFTools
       for (const auto &c :
            dof.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
         {
-          const unsigned int fe_index      = c->active_fe_index();
-          const unsigned int dofs_per_cell = c->get_fe().n_dofs_per_cell();
+          const types::fe_index fe_index      = c->active_fe_index();
+          const unsigned int    dofs_per_cell = c->get_fe().n_dofs_per_cell();
           indices.resize(dofs_per_cell);
           c->get_dof_indices(indices);
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -282,7 +282,7 @@ namespace DoFTools
       for (const auto &cell : dof.active_cell_iterators())
         if (cell->is_locally_owned())
           {
-            const unsigned int fe_index      = cell->active_fe_index();
+            const types::fe_index fe_index   = cell->active_fe_index();
             const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
             indices.resize(dofs_per_cell);
             cell->get_dof_indices(indices);
@@ -1369,7 +1369,9 @@ namespace DoFTools
     AssertDimension(active_fe_indices.size(),
                     dof_handler.get_triangulation().n_active_cells());
 
-    active_fe_indices = dof_handler.get_active_fe_indices();
+    std::vector<types::fe_index> indices = dof_handler.get_active_fe_indices();
+
+    active_fe_indices.assign(indices.begin(), indices.end());
   }
 
   template <int dim, int spacedim>

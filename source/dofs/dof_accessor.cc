@@ -77,7 +77,7 @@ template <int structdim, int dim, int spacedim>
 types::global_dof_index
 DoFInvalidAccessor<structdim, dim, spacedim>::dof_index(
   const unsigned int,
-  const unsigned int) const
+  const types::fe_index) const
 {
   Assert(false, ExcInternalError());
   return 0;
@@ -90,7 +90,7 @@ void
 DoFInvalidAccessor<structdim, dim, spacedim>::set_dof_index(
   const unsigned int,
   const types::global_dof_index,
-  const unsigned int) const
+  const types::fe_index) const
 {
   Assert(false, ExcInternalError());
 }
@@ -179,7 +179,7 @@ template <int structdim, int dim, int spacedim, bool level_dof_access>
 inline void
 DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
   std::vector<types::global_dof_index> &dof_indices,
-  const unsigned int                    fe_index_) const
+  const types::fe_index                 fe_index_) const
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
 
@@ -217,7 +217,7 @@ inline void
 DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
   const int                             level,
   std::vector<types::global_dof_index> &dof_indices,
-  const unsigned int                    fe_index_) const
+  const types::fe_index                 fe_index_) const
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
   Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
@@ -239,7 +239,7 @@ inline void
 DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
   const int                                   level,
   const std::vector<types::global_dof_index> &dof_indices,
-  const unsigned int                          fe_index_)
+  const types::fe_index                       fe_index_)
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
 

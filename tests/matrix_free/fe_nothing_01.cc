@@ -41,8 +41,8 @@ test()
 
   DoFHandler<dim> dof(tria);
   {
-    std::vector<unsigned> active_indices(tria.n_active_cells());
-    for (unsigned i = 0; i < tria.n_active_cells() / 2; ++i)
+    std::vector<types::fe_index> active_indices(tria.n_active_cells());
+    for (unsigned int i = 0; i < tria.n_active_cells() / 2; ++i)
       active_indices[i] = 1;
     dof.set_active_fe_indices(active_indices);
 
