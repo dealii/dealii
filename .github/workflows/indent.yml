@@ -35,6 +35,9 @@ jobs:
         cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DDEAL_II_DOXYGEN_USE_MATHJAX=ON ..
         make -j 2 documentation
         cat doxygen.log
+        # Suppress:
+        # warning: Inheritance graph for 'SmartPointer' not generated, too many nodes (138), threshold is 50. Consider increasing DOT_GRAPH_MAX_NODES.
+        # warning: Inheritance graph for 'Subscriptor' not generated, too many nodes (209), threshold is 50. Consider increasing DOT_GRAPH_MAX_NODES.
         sed -i '/Inheritance graph/d' doxygen.log
         ! [ -s doxygen.log ] || exit 1
         tar -czf doxygen_documentation.tar.gz doc/doxygen
