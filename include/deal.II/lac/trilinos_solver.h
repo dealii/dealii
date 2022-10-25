@@ -33,6 +33,7 @@
 #  include <Epetra_Operator.h>
 
 // for Belos solvers
+#  include <BelosBlockCGSolMgr.hpp>
 #  include <BelosBlockGmresSolMgr.hpp>
 #  include <BelosEpetraAdapter.hpp>
 #  include <BelosIteration.hpp>
@@ -740,6 +741,22 @@ namespace TrilinosWrappers
   {
   public:
     /**
+     * Enumeration object that Trilinos which solver to use.
+     * Currently enabled options are:
+     */
+    enum SolverName
+    {
+      /**
+       * Use the conjugate gradient (CG) algorithm.
+       */
+      cg,
+      /**
+       * Use the generalized minimum residual (GMRES) algorithm.
+       */
+      gmres,
+    } solver_name;
+
+    /**
      * Struct that helps to configure SolverBelos. More advanced
      * parameters are passed to the constructor SolverBelos
      * directly via a Teuchos::ParameterList.
@@ -749,9 +766,15 @@ namespace TrilinosWrappers
       /**
        * Constructor.
        */
-      AdditionalData(const bool right_preconditioning = false)
+      AdditionalData(const SolverName &solver_name           = SolverName::cg,
+                     const bool        right_preconditioning = false)
         : right_preconditioning(right_preconditioning)
       {}
+
+      /**
+       * Solver type;
+       */
+      SolverName solver_name;
 
       /**
        * Flag for right preconditioning.
@@ -888,8 +911,14 @@ namespace TrilinosWrappers
 
         for (unsigned int i = 0; i < index.size(); ++i)
           {
-            new_multi_vec->vectors[i]  = std::make_shared<VectorType>();
-            *new_multi_vec->vectors[i] = *this->vectors[i];
+            AssertThrow(static_cast<unsigned int>(index[i]) <
+                          this->vectors.size(),
+                        ExcInternalError());
+
+            new_multi_vec->vectors[i] = std::make_shared<VectorType>();
+
+            AssertIndexRange(index[i], this->vectors.size());
+            *new_multi_vec->vectors[i] = *this->vectors[index[i]];
           }
 
         return new_multi_vec;
@@ -908,10 +937,17 @@ namespace TrilinosWrappers
         new_multi_vec->vectors.resize(index.size());
 
         for (unsigned int i = 0; i < index.size(); ++i)
-          new_multi_vec->vectors[i].reset(
-            this->vectors[index[i]].get(),
-            [](auto
-                 *) { /*Nothing to do, since we are creating only a view.*/ });
+          {
+            AssertThrow(static_cast<unsigned int>(index[i]) <
+                          this->vectors.size(),
+                        ExcInternalError());
+
+            new_multi_vec->vectors[i].reset(
+              this->vectors[index[i]].get(),
+              [](
+                auto
+                  *) { /*Nothing to do, since we are creating only a view.*/ });
+          }
 
         return new_multi_vec;
       }
@@ -951,6 +987,10 @@ namespace TrilinosWrappers
       GetGlobalLength() const
       {
         AssertThrow(this->vectors.size() > 0, ExcInternalError());
+
+        for (unsigned int i = 1; i < this->vectors.size(); ++i)
+          AssertDimension(this->vectors[0]->size(), this->vectors[i]->size());
+
         return this->vectors[0]->size();
       }
 
@@ -972,7 +1012,7 @@ namespace TrilinosWrappers
                       const Teuchos::SerialDenseMatrix<int, value_type> &B,
                       const value_type                                   beta)
       {
-        const auto &A = cast(A_);
+        const auto &A = try_to_get_underlying_vector(A_);
 
         const unsigned int n_rows = B.numRows();
         const unsigned int n_cols = B.numCols();
@@ -999,8 +1039,8 @@ namespace TrilinosWrappers
               const value_type                   beta,
               const Belos::MultiVec<value_type> &B_)
       {
-        const auto &A = cast(A_);
-        const auto &B = cast(B_);
+        const auto &A = try_to_get_underlying_vector(A_);
+        const auto &B = try_to_get_underlying_vector(B_);
 
         AssertThrow(this->vectors.size() == A.vectors.size(),
                     ExcInternalError());
@@ -1043,7 +1083,7 @@ namespace TrilinosWrappers
                 const Belos::MultiVec<value_type> &          A_,
                 Teuchos::SerialDenseMatrix<int, value_type> &B) const
       {
-        const auto &A = cast(A_);
+        const auto &A = try_to_get_underlying_vector(A_);
 
         const unsigned int n_rows = B.numRows();
         const unsigned int n_cols = B.numCols();
@@ -1054,15 +1094,8 @@ namespace TrilinosWrappers
                     ExcInternalError());
 
         for (unsigned int i = 0; i < n_rows; ++i)
-          {
-            for (unsigned int j = 0; j < n_cols; ++j)
-              {
-                AssertThrow(A.vectors[i], ExcNotImplemented());
-                AssertThrow(this->vectors[j], ExcNotImplemented());
-
-                B(i, j) = alpha * ((*A.vectors[i]) * (*this->vectors[j]));
-              }
-          }
+          for (unsigned int j = 0; j < n_cols; ++j)
+            B(i, j) = alpha * ((*A.vectors[i]) * (*this->vectors[j]));
       }
 
       /**
@@ -1073,7 +1106,7 @@ namespace TrilinosWrappers
       MvDot(const Belos::MultiVec<value_type> &A_,
             std::vector<value_type> &          b) const
       {
-        const auto &A = cast(A_);
+        const auto &A = try_to_get_underlying_vector(A_);
 
         AssertThrow(this->vectors.size() == A.vectors.size(),
                     ExcInternalError());
@@ -1166,7 +1199,7 @@ namespace TrilinosWrappers
        * Cast Belos::MultiVec to MultiVecWrapper.
        */
       static MultiVecWrapper<VectorType> &
-      cast(Belos::MultiVec<value_type> &vec_in)
+      try_to_get_underlying_vector(Belos::MultiVec<value_type> &vec_in)
       {
         auto vec = dynamic_cast<MultiVecWrapper<VectorType> *>(&vec_in);
 
@@ -1179,7 +1212,7 @@ namespace TrilinosWrappers
        * Cast Belos::MultiVec to MultiVecWrapper (const version).
        */
       const static MultiVecWrapper<VectorType> &
-      cast(const Belos::MultiVec<value_type> &vec_in)
+      try_to_get_underlying_vector(const Belos::MultiVec<value_type> &vec_in)
       {
         auto vec = dynamic_cast<const MultiVecWrapper<VectorType> *>(&vec_in);
 
@@ -1191,31 +1224,19 @@ namespace TrilinosWrappers
 
 #    ifdef HAVE_BELOS_TSQR
       virtual void
-      factorExplicit(Belos::MultiVec<value_type> &                Q,
-                     Teuchos::SerialDenseMatrix<int, value_type> &R,
-                     const bool forceNonnegativeDiagonal = false)
+      factorExplicit(Belos::MultiVec<value_type> &,
+                     Teuchos::SerialDenseMatrix<int, value_type> &,
+                     const bool = false)
       {
-        TEUCHOS_TEST_FOR_EXCEPTION(
-          true,
-          std::logic_error,
-          "The Belos::MultiVec<"
-            << Teuchos::TypeNameTraits<value_type>::name()
-            << "> subclass which you "
-               "are using does not implement the TSQR-related method factorExplicit().");
+        Asser(false, ExcNotImplemented());
       }
 
       virtual int
       revealRank(
-        Teuchos::SerialDenseMatrix<int, value_type> &                    R,
-        const typename Teuchos::ScalarTraits<value_type>::magnitudeType &tol)
+        Teuchos::SerialDenseMatrix<int, value_type> &,
+        const typename Teuchos::ScalarTraits<value_type>::magnitudeType &)
       {
-        TEUCHOS_TEST_FOR_EXCEPTION(
-          true,
-          std::logic_error,
-          "The Belos::MultiVec<"
-            << Teuchos::TypeNameTraits<value_type>::name()
-            << "> subclass which you "
-               "are using does not implement the TSQR-related method revealRank().");
+        Asser(false, ExcNotImplemented());
       }
 
 #    endif
@@ -1262,7 +1283,8 @@ namespace TrilinosWrappers
        * Constructor.
        */
       OperatorWrapper(const OperatorType &op)
-        : op(op){};
+        : op(op)
+      {}
 
       /**
        * Destructor.
@@ -1280,8 +1302,10 @@ namespace TrilinosWrappers
         // TODO: check for Tvmult
         AssertThrow(trans == Belos::NOTRANS, ExcNotImplemented());
 
-        op.vmult(MultiVecWrapper<VectorType>::cast(y).genericVector(),
-                 MultiVecWrapper<VectorType>::cast(x).genericVector());
+        op.vmult(MultiVecWrapper<VectorType>::try_to_get_underlying_vector(y)
+                   .genericVector(),
+                 MultiVecWrapper<VectorType>::try_to_get_underlying_vector(x)
+                   .genericVector());
       }
 
       /**
@@ -1320,24 +1344,24 @@ namespace TrilinosWrappers
   template <typename VectorType>
   template <typename OperatorType, typename PreconditionerType>
   void
-  SolverBelos<VectorType>::solve(const OperatorType &      a,
-                                 VectorType &              x,
-                                 const VectorType &        b,
-                                 const PreconditionerType &p)
+  SolverBelos<VectorType>::solve(const OperatorType &      A_dealii,
+                                 VectorType &              x_dealii,
+                                 const VectorType &        b_dealii,
+                                 const PreconditionerType &P_dealii)
   {
     using value_type = typename VectorType::value_type;
 
     using MV = Belos::MultiVec<value_type>;
     using OP = Belos::Operator<value_type>;
 
-    Teuchos::RCP<OP> A =
-      Teuchos::rcp(new internal::OperatorWrapper<OperatorType, VectorType>(a));
+    Teuchos::RCP<OP> A = Teuchos::rcp(
+      new internal::OperatorWrapper<OperatorType, VectorType>(A_dealii));
     Teuchos::RCP<OP> P = Teuchos::rcp(
-      new internal::OperatorWrapper<PreconditionerType, VectorType>(p));
+      new internal::OperatorWrapper<PreconditionerType, VectorType>(P_dealii));
     Teuchos::RCP<MV> X =
-      Teuchos::rcp(new internal::MultiVecWrapper<VectorType>(x));
+      Teuchos::rcp(new internal::MultiVecWrapper<VectorType>(x_dealii));
     Teuchos::RCP<MV> B =
-      Teuchos::rcp(new internal::MultiVecWrapper<VectorType>(b));
+      Teuchos::rcp(new internal::MultiVecWrapper<VectorType>(b_dealii));
 
     Teuchos::RCP<Belos::LinearProblem<value_type, MV, OP>> problem =
       Teuchos::rcp(new Belos::LinearProblem<value_type, MV, OP>(A, X, B));
@@ -1352,9 +1376,9 @@ namespace TrilinosWrappers
 
     // compute initial residal
     VectorType r;
-    r.reinit(x, true);
-    a.vmult(r, x);
-    r.sadd(-1., 1., b);
+    r.reinit(x_dealii, true);
+    A_dealii.vmult(r, x_dealii);
+    r.sadd(-1., 1., b_dealii);
     const auto norm_0 = r.l2_norm();
 
     if (solver_control.check(0, norm_0) != SolverControl::iterate)
@@ -1362,7 +1386,7 @@ namespace TrilinosWrappers
 
     double relative_tolerance_to_be_achieved =
       solver_control.tolerance() / norm_0;
-    const int max_steps = solver_control.max_steps();
+    const unsigned int max_steps = solver_control.max_steps();
 
     if (const auto *reduction_control =
           dynamic_cast<ReductionControl *>(&solver_control))
@@ -1375,12 +1399,21 @@ namespace TrilinosWrappers
 
     belos_parameters_copy->set("Convergence Tolerance",
                                relative_tolerance_to_be_achieved);
-    belos_parameters_copy->set("Maximum Iterations", max_steps);
+    belos_parameters_copy->set("Maximum Iterations",
+                               static_cast<int>(max_steps));
 
-    Teuchos::RCP<Belos::SolverManager<value_type, MV, OP>> solver =
-      Teuchos::rcp(
+    Teuchos::RCP<Belos::SolverManager<value_type, MV, OP>> solver;
+
+    if (additional_data.solver_name == SolverName::cg)
+      solver = Teuchos::rcp(
+        new Belos::BlockCGSolMgr<value_type, MV, OP>(problem,
+                                                     belos_parameters_copy));
+    else if (additional_data.solver_name == SolverName::gmres)
+      solver = Teuchos::rcp(
         new Belos::BlockGmresSolMgr<value_type, MV, OP>(problem,
                                                         belos_parameters_copy));
+    else
+      AssertThrow(false, ExcNotImplemented());
 
     const auto flag = solver->solve();
 

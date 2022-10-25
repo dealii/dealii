@@ -152,6 +152,8 @@ main(int argc, char *argv[])
       typename TrilinosWrappers::SolverBelos<VectorType>::AdditionalData
         additional_data;
 
+      additional_data.solver_name =
+        TrilinosWrappers::SolverBelos<VectorType>::SolverName::gmres;
       additional_data.right_preconditioning = false;
 
       TrilinosWrappers::SolverBelos<VectorType> solver(solver_control,
