@@ -150,11 +150,6 @@ SET(DEAL_II_MPIEXEC_PREFLAGS "@MPIEXEC_PREFLAGS@")
 SET(DEAL_II_MPIEXEC_POSTFLAGS "@MPIEXEC_POSTFLAGS@")
 
 #
-# CUDA specific setup:
-#
-SET(CMAKE_CUDA_ARCHITECTURES "@CMAKE_CUDA_ARCHITECTURES@")
-
-#
 # Build a static executable:
 #
 
@@ -176,23 +171,6 @@ SET(DEAL_II_LIBRARIES_RELEASE "@CONFIG_LIBRARIES_RELEASE@")
 
 # Full list of libraries with "debug" and "optimized" keywords for easy use with TARGET_LINK_LIBRARIES:
 SET(DEAL_II_LIBRARIES "@CONFIG_LIBRARIES@")
-
-
-#
-# Information about CUDA configuration
-#
-
-SET(DEAL_II_CUDA_TOOLKIT_ROOT_DIR "@CUDA_TOOLKIT_ROOT_DIR@")
-SET(DEAL_II_CUDA_COMPILER "@CMAKE_CUDA_COMPILER@")
-
-# used for all cuda targets:
-SET(DEAL_II_CUDA_FLAGS "@DEAL_II_CUDA_FLAGS@")
-
-# _additionally_ used for debug targets:
-SET(DEAL_II_CUDA_FLAGS_DEBUG "@DEAL_II_CUDA_FLAGS_DEBUG@")
-
-# _additionally_ used for release targets:
-SET(DEAL_II_CUDA_FLAGS_RELEASE "@DEAL_II_CUDA_FLAGS_RELEASE@")
 
 
 #

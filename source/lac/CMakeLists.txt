@@ -67,6 +67,8 @@ IF(DEAL_II_WITH_CUDA)
     vector_memory.cu
     affine_constraints.cu
     )
+  set_source_files_properties(vector_memory.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(affine_constraints.cu PROPERTIES LANGUAGE CXX)
 ENDIF()
 
 SET(_inst
@@ -171,6 +173,13 @@ IF(DEAL_II_WITH_CUDA)
     la_parallel_vector.cu
     read_write_vector.cu
   )
+  set_source_files_properties(cuda_kernels.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(cuda_precondition.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(cuda_solver_direct.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(cuda_sparse_matrix.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(cuda_vector.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(la_parallel_vector.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(read_write_vector.cu PROPERTIES LANGUAGE CXX)
 ENDIF()
 
 # determined by profiling

@@ -1328,7 +1328,10 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 Tensor<rank_, dim, Number>::Tensor(
   const ArrayView<ElementType, MemorySpace> &initializer)
 {
+  // We cannot use Assert in a CUDA kernel
+#  ifndef __CUDA_ARCH__
   AssertDimension(initializer.size(), n_independent_components);
+#  endif
 
   for (unsigned int i = 0; i < n_independent_components; ++i)
     (*this)[unrolled_to_component_indices(i)] = initializer[i];
@@ -1385,7 +1388,6 @@ Tensor<rank_, dim, Number>::Tensor(Tensor<rank_, dim, Number> &&other) noexcept
 }
 #  endif
 
-
 namespace internal
 {
   namespace TensorSubscriptor
@@ -1404,24 +1406,10 @@ namespace internal
       return values[i];
     }
 
-    // The variables within this struct will be referenced in the next function.
-    // It is a workaround that allows returning a reference to a static variable
-    // while allowing constexpr evaluation of the function.
-    // It has to be defined outside the function because constexpr functions
-    // cannot define static variables
-    template <typename ArrayElementType>
-    struct Uninitialized
-    {
-      static ArrayElementType value;
-    };
-
-    template <typename Type>
-    Type Uninitialized<Type>::value;
-
     template <typename ArrayElementType>
     constexpr inline DEAL_II_ALWAYS_INLINE
       DEAL_II_CUDA_HOST_DEV ArrayElementType &
-                            subscript(ArrayElementType *,
+                            subscript(ArrayElementType *dummy,
                                       const unsigned int,
                                       std::integral_constant<int, 0>)
     {
@@ -1432,7 +1420,7 @@ namespace internal
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
 #  endif
-      return Uninitialized<ArrayElementType>::value;
+      return *dummy;
     }
   } // namespace TensorSubscriptor
 } // namespace internal

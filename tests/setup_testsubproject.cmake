@@ -12,9 +12,7 @@ FOREACH(_var
   SET(${_var} "${${_var}}" CACHE STRING "" FORCE)
 ENDFOREACH()
 
-IF(DEAL_II_WITH_CUDA)
-  PROJECT(TESTSUITE CXX CUDA)
-ENDIF()
+PROJECT(TESTSUITE CXX)
 
 #
 # A custom target that does absolutely nothing. It is used in the main

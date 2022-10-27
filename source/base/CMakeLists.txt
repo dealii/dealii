@@ -117,6 +117,8 @@ IF(DEAL_II_WITH_CUDA)
     cuda.cu
     partitioner.cu
   )
+  set_source_files_properties(cuda.cu PROPERTIES LANGUAGE CXX)
+  set_source_files_properties(partitioner.cu PROPERTIES LANGUAGE CXX)
 ENDIF()
 
 # determined by profiling

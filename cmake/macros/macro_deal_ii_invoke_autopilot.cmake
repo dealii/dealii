@@ -44,14 +44,6 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     SET(_make_command " $ make")
   ENDIF()
 
-  # Make sure we can treat CUDA targets if available
-  IF(DEAL_II_WITH_CUDA)
-    IF(NOT CMAKE_CUDA_HOST_COMPILER)
-      SET(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}")
-    ENDIF()
-    ENABLE_LANGUAGE(CUDA)
-  ENDIF()
-
   # Define and setup a compilation target:
   ADD_EXECUTABLE(${TARGET} ${TARGET_SRC})
   DEAL_II_SETUP_TARGET(${TARGET})
