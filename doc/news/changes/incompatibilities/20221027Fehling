@@ -1,0 +1,16 @@
+Changed: We introduced a stronger datatype for FE indices:
+<ul>
+  <li> Instead of unsigned int, we now use types::fe_index for FE indices throughout the library.
+  <li> For invalid FE indices, we no longer use numbers::invalid_unsigned_int, but numbers::invalid_fe_index.
+</ul>
+This affects interfaces to a lot of functions. Most of them are backwards compatible via implicit conversion.
+Functions that do not fall in that category are listed below and might need your attention.
+Some of them have been deprecated, some are replaced because we imagine them only being used internally.
+<ul>
+  <li> DoFHandler::set_active_fe_indices() (deprecated)
+  <li> DoFHandler::get_active_fe_indices() (deprecated)
+</ul>
+Further, the serialization of parallel::distributed::Triangulation objects is also affected by this change
+as we write FE indices to disk. Thus, the version in the serialization metafile has been bumped to `5`.
+<br>
+(Marc Fehling, 10/27/2022)
