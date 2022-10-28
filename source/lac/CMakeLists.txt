@@ -64,11 +64,9 @@ SET(_separate_src
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
-    vector_memory.cu
-    affine_constraints.cu
+    vector_memory_cuda.cc
+    affine_constraints_cuda.cc
     )
-  set_source_files_properties(vector_memory.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(affine_constraints.cu PROPERTIES LANGUAGE CXX)
 ENDIF()
 
 SET(_inst
@@ -165,21 +163,14 @@ ENDIF()
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
-    cuda_kernels.cu
-    cuda_precondition.cu
-    cuda_solver_direct.cu
-    cuda_sparse_matrix.cu
-    cuda_vector.cu
-    la_parallel_vector.cu
-    read_write_vector.cu
+    cuda_kernels.cc
+    cuda_precondition.cc
+    cuda_solver_direct.cc
+    cuda_sparse_matrix.cc
+    cuda_vector.cc
+    la_parallel_vector_cuda.cc
+    read_write_vector_cuda.cc
   )
-  set_source_files_properties(cuda_kernels.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(cuda_precondition.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(cuda_solver_direct.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(cuda_sparse_matrix.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(cuda_vector.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(la_parallel_vector.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(read_write_vector.cu PROPERTIES LANGUAGE CXX)
 ENDIF()
 
 # determined by profiling

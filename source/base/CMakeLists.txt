@@ -114,11 +114,9 @@ SET(_separate_src
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
-    cuda.cu
-    partitioner.cu
+    cuda.cc
+    partitioner_cuda.cc
   )
-  set_source_files_properties(cuda.cu PROPERTIES LANGUAGE CXX)
-  set_source_files_properties(partitioner.cu PROPERTIES LANGUAGE CXX)
 ENDIF()
 
 # determined by profiling

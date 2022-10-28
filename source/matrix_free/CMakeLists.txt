@@ -56,14 +56,12 @@ FILE(GLOB _header
 
 IF(DEAL_II_WITH_CUDA)
   SET(_src
-    cuda_matrix_free.cu
+    cuda_matrix_free.cc
     ${_src}
     )
   SET(_inst
     ${_inst}
     )
-
-  set_source_files_properties(cuda_matrix_free.cu PROPERTIES LANGUAGE CXX)
 ENDIF()
 
 DEAL_II_ADD_LIBRARY(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})
