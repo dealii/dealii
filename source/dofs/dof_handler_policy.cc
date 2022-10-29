@@ -3661,7 +3661,7 @@ namespace internal
         // be assigned.
         types::global_dof_index n_identity_constrained_indices = 0;
         for (const auto &constrained_indices : all_constrained_indices)
-          for (const auto index : constrained_indices)
+          for (const auto &index : constrained_indices)
             if (renumbering[index.first] != numbers::invalid_dof_index)
               ++n_identity_constrained_indices;
 

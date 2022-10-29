@@ -384,7 +384,7 @@ namespace CGALWrappers
             internal::mark_domains(cdt);
             std::array<Point<2>, 3> vertices;
 
-            for (const Face_handle &f : cdt.finite_face_handles())
+            for (const Face_handle f : cdt.finite_face_handles())
               {
                 if (f->info().in_domain() &&
                     CGAL::to_double(cdt.triangle(f).area()) > tol)
