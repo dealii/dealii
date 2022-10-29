@@ -33,8 +33,7 @@ template <class SparsityPatternType>
 BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const size_type n_block_rows,
   const size_type n_block_columns)
-  : rows(0)
-  , columns(0)
+  : BlockSparsityPatternBase()
 {
   reinit(n_block_rows, n_block_columns);
 }
@@ -44,9 +43,7 @@ BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
 template <class SparsityPatternType>
 BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const BlockSparsityPatternBase &s)
-  : Subscriptor()
-  , rows(0)
-  , columns(0)
+  : BlockSparsityPatternBase()
 {
   (void)s;
   Assert(s.rows == 0 && s.columns == 0,
@@ -59,49 +56,20 @@ BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
 
 
 template <class SparsityPatternType>
-BlockSparsityPatternBase<SparsityPatternType>::~BlockSparsityPatternBase()
-{
-  // clear all memory
-  try
-    {
-      reinit(0, 0);
-    }
-  catch (...)
-    {}
-}
-
-
-
-template <class SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::reinit(
   const size_type n_block_rows,
   const size_type n_block_columns)
 {
-  // delete previous content and
-  // clean the sub_objects array
-  // completely
-  for (size_type i = 0; i < rows; ++i)
-    for (size_type j = 0; j < columns; ++j)
-      {
-        SparsityPatternType *sp = sub_objects[i][j];
-        sub_objects[i][j]       = nullptr;
-        delete sp;
-      }
   sub_objects.reinit(0, 0);
 
-  // then set new sizes
   rows    = n_block_rows;
   columns = n_block_columns;
-  sub_objects.reinit(rows, columns);
 
-  // allocate new objects
+  sub_objects.reinit(rows, columns);
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
-      {
-        SparsityPatternType *p = new SparsityPatternType;
-        sub_objects[i][j]      = p;
-      }
+      sub_objects[i][j] = std::make_unique<SparsityPatternType>();
 }
 
 

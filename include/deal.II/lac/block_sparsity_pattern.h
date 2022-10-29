@@ -118,11 +118,6 @@ public:
   BlockSparsityPatternBase(const BlockSparsityPatternBase &bsp);
 
   /**
-   * Destructor.
-   */
-  ~BlockSparsityPatternBase() override;
-
-  /**
    * Resize the matrix, by setting the number of block rows and columns. This
    * deletes all blocks and replaces them with uninitialized ones, i.e. ones
    * for which also the sizes are not yet set. You have to do that by calling
@@ -160,7 +155,6 @@ public:
    */
   SparsityPatternType &
   block(const size_type row, const size_type column);
-
 
   /**
    * Access the block with the given coordinates. Version for constant
@@ -357,10 +351,7 @@ protected:
   /**
    * Array of sparsity patterns.
    */
-  Table<2,
-        SmartPointer<SparsityPatternType,
-                     BlockSparsityPatternBase<SparsityPatternType>>>
-    sub_objects;
+  Table<2, std::unique_ptr<SparsityPatternType>> sub_objects;
 
   /**
    * Object storing and managing the transformation of row indices to indices
