@@ -1771,6 +1771,170 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_subface_values(
 }
 
 
+
+template <int dim, int spacedim, typename VectorType>
+void
+MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  AssertDimension(dim, spacedim);
+  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+         ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(internal_data);
+
+  const unsigned int n_q_points = quadrature.size();
+
+  update_internal_dofs(cell, data);
+
+  internal::MappingFEFieldImplementation::
+    maybe_compute_q_points<dim, spacedim, VectorType>(
+      QProjector<dim>::DataSetDescriptor::cell(),
+      data,
+      euler_dof_handler->get_fe(),
+      fe_mask,
+      fe_to_real,
+      output_data.quadrature_points);
+
+  internal::MappingFEFieldImplementation::
+    maybe_update_Jacobians<dim, spacedim, VectorType>(
+      QProjector<dim>::DataSetDescriptor::cell(),
+      data,
+      euler_dof_handler->get_fe(),
+      fe_mask,
+      fe_to_real);
+
+  const UpdateFlags          update_flags = data.update_each;
+  const std::vector<double> &weights      = quadrature.get_weights();
+
+  if (update_flags & (update_normal_vectors | update_JxW_values))
+    {
+      AssertDimension(output_data.JxW_values.size(), n_q_points);
+
+      Assert(!(update_flags & update_normal_vectors) ||
+               (output_data.normal_vectors.size() == n_q_points),
+             ExcDimensionMismatch(output_data.normal_vectors.size(),
+                                  n_q_points));
+
+
+      for (unsigned int point = 0; point < n_q_points; ++point)
+        {
+          const double det = data.contravariant[point].determinant();
+
+          // check for distorted cells.
+
+          // TODO: this allows for anisotropies of up to 1e6 in 3D and
+          // 1e12 in 2D. might want to find a finer
+          // (dimension-independent) criterion
+          Assert(det > 1e-12 * Utilities::fixed_power<dim>(
+                                 cell->diameter() / std::sqrt(double(dim))),
+                 (typename Mapping<dim, spacedim>::ExcDistortedMappedCell(
+                   cell->center(), det, point)));
+
+          // The normals are n = J^{-T} * \hat{n} before normalizing.
+          Tensor<1, spacedim> normal;
+          for (unsigned int d = 0; d < spacedim; d++)
+            normal[d] =
+              data.covariant[point][d] * quadrature.normal_vector(point);
+
+          output_data.JxW_values[point] = weights[point] * det * normal.norm();
+
+          if ((update_flags & update_normal_vectors) != 0u)
+            {
+              normal /= normal.norm();
+              output_data.normal_vectors[point] = normal;
+            }
+        }
+
+      // copy values from InternalData to vector given by reference
+      if (update_flags & update_jacobians)
+        {
+          AssertDimension(output_data.jacobians.size(), n_q_points);
+          for (unsigned int point = 0; point < n_q_points; ++point)
+            output_data.jacobians[point] = data.contravariant[point];
+        }
+
+      // copy values from InternalData to vector given by reference
+      if (update_flags & update_inverse_jacobians)
+        {
+          AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
+          for (unsigned int point = 0; point < n_q_points; ++point)
+            output_data.inverse_jacobians[point] =
+              data.covariant[point].transpose();
+        }
+
+      // calculate derivatives of the Jacobians
+      internal::MappingFEFieldImplementation::
+        maybe_update_jacobian_grads<dim, spacedim, VectorType>(
+          QProjector<dim>::DataSetDescriptor::cell(),
+          data,
+          euler_dof_handler->get_fe(),
+          fe_mask,
+          fe_to_real,
+          output_data.jacobian_grads);
+
+      // calculate derivatives of the Jacobians pushed forward to real cell
+      // coordinates
+      internal::MappingFEFieldImplementation::
+        maybe_update_jacobian_pushed_forward_grads<dim, spacedim, VectorType>(
+          QProjector<dim>::DataSetDescriptor::cell(),
+          data,
+          euler_dof_handler->get_fe(),
+          fe_mask,
+          fe_to_real,
+          output_data.jacobian_pushed_forward_grads);
+
+      // calculate hessians of the Jacobians
+      internal::MappingFEFieldImplementation::
+        maybe_update_jacobian_2nd_derivatives<dim, spacedim, VectorType>(
+          QProjector<dim>::DataSetDescriptor::cell(),
+          data,
+          euler_dof_handler->get_fe(),
+          fe_mask,
+          fe_to_real,
+          output_data.jacobian_2nd_derivatives);
+
+      // calculate hessians of the Jacobians pushed forward to real cell
+      // coordinates
+      internal::MappingFEFieldImplementation::
+        maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,
+                                                             spacedim,
+                                                             VectorType>(
+          QProjector<dim>::DataSetDescriptor::cell(),
+          data,
+          euler_dof_handler->get_fe(),
+          fe_mask,
+          fe_to_real,
+          output_data.jacobian_pushed_forward_2nd_derivatives);
+
+      // calculate gradients of the hessians of the Jacobians
+      internal::MappingFEFieldImplementation::
+        maybe_update_jacobian_3rd_derivatives<dim, spacedim, VectorType>(
+          QProjector<dim>::DataSetDescriptor::cell(),
+          data,
+          euler_dof_handler->get_fe(),
+          fe_mask,
+          fe_to_real,
+          output_data.jacobian_3rd_derivatives);
+
+      // calculate gradients of the hessians of the Jacobians pushed forward to
+      // real cell coordinates
+      internal::MappingFEFieldImplementation::
+        maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,
+                                                             spacedim,
+                                                             VectorType>(
+          QProjector<dim>::DataSetDescriptor::cell(),
+          data,
+          euler_dof_handler->get_fe(),
+          fe_mask,
+          fe_to_real,
+          output_data.jacobian_pushed_forward_3rd_derivatives);
+    }
+}
+
 namespace internal
 {
   namespace MappingFEFieldImplementation
