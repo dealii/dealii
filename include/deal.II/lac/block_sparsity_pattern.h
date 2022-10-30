@@ -27,6 +27,7 @@
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -76,7 +77,7 @@ class BlockDynamicSparsityPattern;
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename SparsityPatternType>
-class BlockSparsityPatternBase : public Subscriptor
+class BlockSparsityPatternBase : public SparsityPatternBase
 {
 public:
   /**
@@ -243,19 +244,31 @@ public:
               const bool      indices_are_sorted = false);
 
   /**
+   * Add several nonzero entries to the specified matrix row. This function may
+   * only be called for non-compressed sparsity patterns and works the same way
+   * as the overload which takes iterators.
+   */
+  virtual void
+  add_row_entries(const size_type &                 row,
+                  const ArrayView<const size_type> &columns,
+                  const bool indices_are_sorted = false) override;
+
+  virtual void
+  add_entries(const ArrayView<const size_type> &rows,
+              const ArrayView<const size_type> &columns) override;
+
+  /**
    * Return number of rows of this matrix, which equals the dimension of the
    * image space. It is the sum of rows of the (block-)rows of sub-matrices.
    */
-  size_type
-  n_rows() const;
+  using SparsityPatternBase::n_rows;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
    * the range space. It is the sum of columns of the (block-)columns of sub-
    * matrices.
    */
-  size_type
-  n_cols() const;
+  using SparsityPatternBase::n_cols;
 
   /**
    * Check if a value at a certain position may be non-zero.
@@ -916,6 +929,31 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
           counter_within_block[block_col],
         indices_are_sorted);
     }
+}
+
+
+
+template <typename SparsityPatternType>
+void
+BlockSparsityPatternBase<SparsityPatternType>::add_row_entries(
+  const size_type &                 row,
+  const ArrayView<const size_type> &columns,
+  const bool                        indices_are_sorted)
+{
+  add_entries(row, columns.begin(), columns.end(), indices_are_sorted);
+}
+
+
+
+template <typename SparsityPatternType>
+inline void
+BlockSparsityPatternBase<SparsityPatternType>::add_entries(
+  const ArrayView<const size_type> &rows,
+  const ArrayView<const size_type> &columns)
+{
+  AssertDimension(rows.size(), columns.size());
+  for (std::size_t i = 0; i < rows.size(); ++i)
+    add(rows[i], columns[i]);
 }
 
 
