@@ -362,6 +362,25 @@ BlockSparsityPatternBase<SparsityPatternType>::print_svg(
 
 
 
+template <class SparsityPatternType>
+std::size_t
+BlockSparsityPatternBase<SparsityPatternType>::memory_consumption() const
+{
+  std::size_t mem = 0;
+  mem += (MemoryConsumption::memory_consumption(n_block_rows()) +
+          MemoryConsumption::memory_consumption(n_block_cols()) +
+          MemoryConsumption::memory_consumption(sub_objects) +
+          MemoryConsumption::memory_consumption(row_indices) +
+          MemoryConsumption::memory_consumption(column_indices));
+  for (size_type r = 0; r < n_block_rows(); ++r)
+    for (size_type c = 0; c < n_block_cols(); ++c)
+      mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
+
+  return mem;
+}
+
+
+
 BlockSparsityPattern::BlockSparsityPattern(const size_type n_rows,
                                            const size_type n_columns)
   : BlockSparsityPatternBase<SparsityPattern>(n_rows, n_columns)
@@ -414,23 +433,6 @@ BlockSparsityPattern::is_compressed() const
       if (sub_objects[i][j]->is_compressed() == false)
         return false;
   return true;
-}
-
-
-std::size_t
-BlockSparsityPattern::memory_consumption() const
-{
-  std::size_t mem = 0;
-  mem += (MemoryConsumption::memory_consumption(n_block_rows()) +
-          MemoryConsumption::memory_consumption(n_block_cols()) +
-          MemoryConsumption::memory_consumption(sub_objects) +
-          MemoryConsumption::memory_consumption(row_indices) +
-          MemoryConsumption::memory_consumption(column_indices));
-  for (size_type r = 0; r < n_block_rows(); ++r)
-    for (size_type c = 0; c < n_block_cols(); ++c)
-      mem += MemoryConsumption::memory_consumption(*sub_objects[r][c]);
-
-  return mem;
 }
 
 

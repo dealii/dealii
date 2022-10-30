@@ -311,6 +311,13 @@ public:
   print_svg(std::ostream &out) const;
 
   /**
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
+   */
+  std::size_t
+  memory_consumption() const;
+
+  /**
    * @addtogroup Exceptions
    * @{
    */
@@ -463,13 +470,6 @@ public:
    */
   bool
   is_compressed() const;
-
-  /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object.
-   */
-  std::size_t
-  memory_consumption() const;
 
   /**
    * Copy data from an object of type BlockDynamicSparsityPattern, i.e. resize
