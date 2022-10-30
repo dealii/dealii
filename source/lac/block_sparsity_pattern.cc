@@ -93,6 +93,34 @@ BlockSparsityPatternBase<SparsityPatternType>::operator=(
 
 
 template <class SparsityPatternType>
+typename BlockSparsityPatternBase<SparsityPatternType>::size_type
+BlockSparsityPatternBase<SparsityPatternType>::compute_n_rows() const
+{
+  // only count in first column, since
+  // all rows should be equivalent
+  size_type count = 0;
+  for (size_type r = 0; r < rows; ++r)
+    count += sub_objects[r][0]->n_rows();
+  return count;
+}
+
+
+
+template <class SparsityPatternType>
+typename BlockSparsityPatternBase<SparsityPatternType>::size_type
+BlockSparsityPatternBase<SparsityPatternType>::compute_n_cols() const
+{
+  // only count in first row, since
+  // all rows should be equivalent
+  size_type count = 0;
+  for (size_type c = 0; c < columns; ++c)
+    count += sub_objects[0][c]->n_cols();
+  return count;
+}
+
+
+
+template <class SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::collect_sizes()
 {
@@ -178,12 +206,9 @@ template <class SparsityPatternType>
 typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::n_rows() const
 {
-  // only count in first column, since
-  // all rows should be equivalent
-  size_type count = 0;
-  for (size_type r = 0; r < rows; ++r)
-    count += sub_objects[r][0]->n_rows();
-  return count;
+  // While trivial for the moment, this will be replaced by a base class
+  // function in a future patch
+  return compute_n_rows();
 }
 
 
@@ -192,12 +217,9 @@ template <class SparsityPatternType>
 typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::n_cols() const
 {
-  // only count in first row, since
-  // all rows should be equivalent
-  size_type count = 0;
-  for (size_type c = 0; c < columns; ++c)
-    count += sub_objects[0][c]->n_cols();
-  return count;
+  // While trivial for the moment, this will be replaced by a base class
+  // function in a future patch
+  return compute_n_cols();
 }
 
 

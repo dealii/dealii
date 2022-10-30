@@ -318,6 +318,15 @@ public:
   /**
    * Exception
    */
+  DeclExceptionMsg(
+    ExcNeedsCollectSizes,
+    "The number of rows and columns (returned by n_rows() and n_cols()) does "
+    "not match their directly computed values. This typically means that a "
+    "call to collect_sizes() is missing.");
+
+  /**
+   * Exception
+   */
   DeclException4(ExcIncompatibleRowNumbers,
                  int,
                  int,
@@ -366,6 +375,18 @@ protected:
   BlockIndices column_indices;
 
 private:
+  /**
+   * Internal utility function for computing the number of rows.
+   */
+  size_type
+  compute_n_rows() const;
+
+  /**
+   * Internal utility function for computing the number of columns.
+   */
+  size_type
+  compute_n_cols() const;
+
   /**
    * Temporary vector for counting the elements written into the individual
    * blocks when doing a collective add or set.
@@ -814,6 +835,11 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   ForwardIterator end,
   const bool      indices_are_sorted)
 {
+  // In debug mode, verify that collect_sizes() was called by redoing the
+  // calculation
+  Assert(n_rows() == compute_n_rows(), ExcNeedsCollectSizes());
+  Assert(n_cols() == compute_n_cols(), ExcNeedsCollectSizes());
+
   // Resize scratch arrays
   if (block_column_indices.size() < this->n_block_cols())
     {
