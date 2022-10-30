@@ -350,12 +350,12 @@ protected:
   /**
    * Number of block rows.
    */
-  size_type rows;
+  size_type block_rows;
 
   /**
    * Number of block columns.
    */
-  size_type columns;
+  size_type block_columns;
 
   /**
    * Array of sparsity patterns.
@@ -770,9 +770,9 @@ inline SparsityPatternType &
 BlockSparsityPatternBase<SparsityPatternType>::block(const size_type row,
                                                      const size_type column)
 {
-  AssertIndexRange(row, rows);
-  AssertIndexRange(column, columns);
-  return *sub_objects[row][column];
+  AssertIndexRange(row, n_block_rows());
+  AssertIndexRange(column, n_block_cols());
+  return *sub_objects(row, column);
 }
 
 
@@ -783,9 +783,9 @@ BlockSparsityPatternBase<SparsityPatternType>::block(
   const size_type row,
   const size_type column) const
 {
-  AssertIndexRange(row, rows);
-  AssertIndexRange(column, columns);
-  return *sub_objects[row][column];
+  AssertIndexRange(row, n_block_rows());
+  AssertIndexRange(column, n_block_cols());
+  return *sub_objects(row, column);
 }
 
 
@@ -841,15 +841,15 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   Assert(n_cols() == compute_n_cols(), ExcNeedsCollectSizes());
 
   // Resize scratch arrays
-  if (block_column_indices.size() < this->n_block_cols())
+  if (block_column_indices.size() < n_block_cols())
     {
-      block_column_indices.resize(this->n_block_cols());
-      counter_within_block.resize(this->n_block_cols());
+      block_column_indices.resize(n_block_cols());
+      counter_within_block.resize(n_block_cols());
     }
 
-  const size_type n_cols = static_cast<size_type>(end - begin);
+  const size_type n_added_cols = static_cast<size_type>(end - begin);
 
-  // Resize sub-arrays to n_cols. This
+  // Resize sub-arrays to n_added_cols. This
   // is a bit wasteful, but we resize
   // only a few times (then the maximum
   // row length won't increase that
@@ -859,9 +859,9 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   // whether the size of one is large
   // enough before actually going
   // through all of them.
-  if (block_column_indices[0].size() < n_cols)
+  if (block_column_indices[0].size() < n_added_cols)
     for (size_type i = 0; i < this->n_block_cols(); ++i)
-      block_column_indices[i].resize(n_cols);
+      block_column_indices[i].resize(n_added_cols);
 
   // Reset the number of added elements
   // in each block to zero.
@@ -893,9 +893,9 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   // If in debug mode, do a check whether
   // the right length has been obtained.
   size_type length = 0;
-  for (size_type i = 0; i < this->n_block_cols(); ++i)
+  for (size_type i = 0; i < n_block_cols(); ++i)
     length += counter_within_block[i];
-  Assert(length == n_cols, ExcInternalError());
+  Assert(length == n_added_cols, ExcInternalError());
 #endif
 
   // Now we found out about where the
@@ -948,7 +948,7 @@ BlockSparsityPatternBase<SparsityPatternType>::row_length(
 
   unsigned int c = 0;
 
-  for (size_type b = 0; b < rows; ++b)
+  for (size_type b = 0; b < n_block_rows(); ++b)
     c += sub_objects[row_index.first][b]->row_length(row_index.second);
 
   return c;
@@ -960,7 +960,7 @@ template <typename SparsityPatternType>
 inline typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::n_block_cols() const
 {
-  return columns;
+  return block_columns;
 }
 
 
@@ -969,7 +969,7 @@ template <typename SparsityPatternType>
 inline typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::n_block_rows() const
 {
-  return rows;
+  return block_rows;
 }
 
 
@@ -985,7 +985,7 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
 
   size_type c             = 0;
   size_type block_columns = 0; // sum of n_cols for all blocks to the left
-  for (unsigned int b = 0; b < columns; ++b)
+  for (unsigned int b = 0; b < this->n_block_cols(); ++b)
     {
       unsigned int rowlen =
         sub_objects[row_index.first][b]->row_length(row_index.second);
@@ -1003,11 +1003,11 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
 
 
 inline void
-BlockSparsityPattern::reinit(const size_type n_block_rows,
-                             const size_type n_block_columns)
+BlockSparsityPattern::reinit(const size_type new_block_rows,
+                             const size_type new_block_columns)
 {
-  BlockSparsityPatternBase<SparsityPattern>::reinit(n_block_rows,
-                                                    n_block_columns);
+  BlockSparsityPatternBase<SparsityPattern>::reinit(new_block_rows,
+                                                    new_block_columns);
 }
 
 
