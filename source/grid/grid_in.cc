@@ -819,10 +819,10 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       while (tmp != -1) // we do until reach end of 2467 or 2477
         {
-          int n_entities; // number of entities in group
-          int id;         // id is either material or bc
-          int no;         // unv
-          int dummy;
+          int  n_entities; // number of entities in group
+          long id;         // id is either material or bc
+          int  no;         // unv
+          int  dummy;
 
           AssertThrow(in.fail() == false, ExcIO());
           in >> dummy;
@@ -835,7 +835,37 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
             n_entities;
 
           AssertThrow(in.fail() == false, ExcIO());
-          in >> id;
+          // Occasionally we encounter IDs that are not integers - we don't
+          // support that case since there is no sane way for us to determine
+          // integer IDs from, e.g., strings.
+          std::string line;
+          // The next character in the input buffer is a newline character so
+          // we need a call to std::getline() to retrieve it (it is logically
+          // a line):
+          std::getline(in, line);
+          AssertThrow(line.size() == 0,
+                      ExcMessage(
+                        "The line before the line containing an ID has too "
+                        "many entries. This is not a valid UNV file."));
+          // now get the line containing the id:
+          std::getline(in, line);
+          AssertThrow(in.fail() == false, ExcIO());
+          std::istringstream id_stream(line);
+          id_stream >> id;
+          AssertThrow(
+            !id_stream.fail() && id_stream.eof(),
+            ExcMessage(
+              "The given UNV file contains a boundary or material id set to '" +
+              line +
+              "', which cannot be parsed as a fixed-width integer, whereas "
+              "deal.II only supports integer boundary and material ids. To fix "
+              "this, ensure that all such ids are given integer values."));
+          AssertThrow(
+            0 <= id &&
+              id <= long(std::numeric_limits<types::material_id>::max()),
+            ExcMessage("The provided integer id '" + std::to_string(id) +
+                       "' is not convertible to either types::material_id nor "
+                       "types::boundary_id."));
 
           const unsigned int n_lines =
             (n_entities % 2 == 0) ? (n_entities / 2) : ((n_entities + 1) / 2);
@@ -859,11 +889,11 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
                     cells[cell_indices[no]].material_id = id;
 
                   if (line_indices.count(no) > 0) // boundary line - bc
-                    subcelldata.boundary_lines[line_indices[no]].material_id =
+                    subcelldata.boundary_lines[line_indices[no]].boundary_id =
                       id;
 
                   if (quad_indices.count(no) > 0) // boundary quad - bc
-                    subcelldata.boundary_quads[quad_indices[no]].material_id =
+                    subcelldata.boundary_quads[quad_indices[no]].boundary_id =
                       id;
                 }
             }
