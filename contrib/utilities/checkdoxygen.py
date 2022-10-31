@@ -121,12 +121,8 @@ if 'intro.dox' in filename:
     # get results.dox
     resultsname = filename.split('intro.dox',1)[0] + 'results.dox'
     
-    # try to open the '.cc' file, otherwise try to open a '.cu' file
-    try:
-        fstep = open(stepname)
-    except IOError:
-        stepname = stepname[:-2] + 'cu'
-        fstep = open(stepname)
+    # open the '.cc' file:
+    fstep = open(stepname)
 
     lines += fstep.readlines()
     fstep.close()

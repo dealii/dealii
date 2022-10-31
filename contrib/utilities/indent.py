@@ -97,7 +97,7 @@ def parse_arguments():
     parser.add_argument("-b", "--clang-format-binary", metavar="PATH",
                         default=distutils.spawn.find_executable("clang-format"))
 
-    parser.add_argument("--regex", default="*.cc,*.h,*.cu,*.cuh",
+    parser.add_argument("--regex", default="*.cc,*.h",
                         help="Regular expression (regex) to filter files on "
                         "which clang-format is applied.")
 

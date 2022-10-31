@@ -49,10 +49,10 @@
 #
 # The output of this file consists of three numbers per line, showing
 #   date source-lines test-lines
-# displaying the number of lines of code in .h and .cc files (and .cu and
-# .cuh files for CUDA), but excluding files in contributed libraries. The
-# resulting output can be piped into a data file and then be visualized
-# by importing into a spreadsheet, or using the following GNUPLOT script:
+# displaying the number of lines of code in .h and .cc files, but excluding
+# files in contributed libraries. The resulting output can be piped into a data
+# file and then be visualized by importing into a spreadsheet, or using the
+# following GNUPLOT script:
 #
 #  set xdata time
 #  set timefmt "%Y-%m-%d"
@@ -106,7 +106,7 @@ for commit in $commits ; do
   
   date=$(git log --date=short --format="%ad" -n 1)
 
-  files_source=$(find . -name '*.h' -or -name '*.cc' -or -name '*.cu' -or -name '*.cuh' -type f | \
+  files_source=$(find . -name '*.h' -or -name '*.cc' -type f | \
                  grep -E -i -v '(tests|boost|umfpack|bundled)/')
   lines_source=$(cat $files_source | wc -l)
 
