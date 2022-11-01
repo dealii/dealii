@@ -748,8 +748,13 @@ namespace internal
 
           for (unsigned int i = 0; i < quad.size(); ++i)
             {
-              quadrature_data_on_face[0][i] = poly_coll[i].value(0.0);
-              quadrature_data_on_face[1][i] = poly_coll[i].value(1.0);
+              std::array<double, 3> values;
+              poly_coll[i].value(0.0, 2, values.data());
+              for (unsigned int d = 0; d < 3; ++d)
+                quadrature_data_on_face[0][i + d * quad.size()] = values[d];
+              poly_coll[i].value(1.0, 2, values.data());
+              for (unsigned int d = 0; d < 3; ++d)
+                quadrature_data_on_face[1][i + d * quad.size()] = values[d];
             }
         }
 

@@ -247,8 +247,8 @@ namespace internal
 
       /**
        * Collects all data of 1D shape values evaluated at the point 0 and 1
-       * (the vertices) in one data structure. Sorting is first the values,
-       * then gradients, then second derivatives.
+       * (the vertices) in one data structure. The sorting of data is to
+       * start with the values, then gradients, then second derivatives.
        */
       std::array<AlignedVector<Number>, 2> shape_data_on_face;
 
@@ -258,9 +258,8 @@ namespace internal
        * point 0 and 1 (the vertices) in one data structure.
        *
        * This data structure can be used to interpolate from the cell to the
-       * face quadrature points.
-       *
-       * @note In contrast to shape_data_on_face, only the vales are evaluated.
+       * face quadrature points. The sorting of data is to start with the
+       * values, then gradients, then second derivatives.
        */
       std::array<AlignedVector<Number>, 2> quadrature_data_on_face;
 
