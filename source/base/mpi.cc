@@ -1078,6 +1078,46 @@ namespace Utilities
 
 
 
+    namespace internal
+    {
+      namespace CollectiveMutexImplementation
+      {
+        /**
+         * Abort, should there be an exception being processed (see the error
+         * message).
+         */
+        void
+        check_exception()
+        {
+#ifdef DEAL_II_WITH_MPI
+#  if __cpp_lib_uncaught_exceptions >= 201411
+          // std::uncaught_exception() is deprecated in c++17
+          if (std::uncaught_exceptions() != 0)
+#  else
+          if (std::uncaught_exception() == true)
+#  endif
+            {
+              std::cerr
+                << "---------------------------------------------------------\n"
+                << "An exception was thrown inside a section of the program\n"
+                << "guarded by a CollectiveMutex.\n"
+                << "Because a CollectiveMutex guards critical communication\n"
+                << "handling the exception would likely\n"
+                << "deadlock because only the current process is aware of the\n"
+                << "exception. To prevent this deadlock, the program will be\n"
+                << "aborted.\n"
+                << "---------------------------------------------------------"
+                << std::endl;
+
+              MPI_Abort(MPI_COMM_WORLD, 1);
+            }
+#endif
+        }
+      } // namespace CollectiveMutexImplementation
+    }   // namespace internal
+
+
+
     CollectiveMutex::CollectiveMutex()
       : locked(false)
       , request(MPI_REQUEST_NULL)
@@ -1089,6 +1129,10 @@ namespace Utilities
 
     CollectiveMutex::~CollectiveMutex()
     {
+      // First check if this destructor is called during exception handling
+      // if so, abort.
+      internal::CollectiveMutexImplementation::check_exception();
+
       Assert(
         !locked,
         ExcMessage(
@@ -1137,6 +1181,10 @@ namespace Utilities
     CollectiveMutex::unlock(const MPI_Comm &comm)
     {
       (void)comm;
+
+      // First check if this function is called during exception handling
+      // if so, abort. This can happen if a ScopedLock is destroyed.
+      internal::CollectiveMutexImplementation::check_exception();
 
       Assert(
         locked,
