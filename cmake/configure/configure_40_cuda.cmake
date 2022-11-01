@@ -26,7 +26,7 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
   IF(NOT Kokkos_ENABLE_CUDA)
     SET(CUDA_ADDITIONAL_ERROR_STRING
       ${CUDA_ADDITIONAL_ERROR_STRING}
-      "deal.II can only compiled with Cuda support if Kokkos was built with Cuda support!"
+      "deal.II can only be compiled with Cuda support if Kokkos was built with Cuda support!"
       )
     SET(${var} FALSE)
   ELSE()
