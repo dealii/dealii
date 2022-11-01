@@ -21,7 +21,8 @@
 // setup of unknowns, explicit Runge-Kutta time stepping with face-centric
 // loop through MatrixFree::loop() (step-67 style) as well as cell-centric
 // loop through MatrixFree::loop_cell_centric() (step-76 style). We use a
-// problem with periodic boundary conditions to avoid
+// problem with periodic boundary conditions to avoid defining complicated
+// definitions of boundary data and inflow/outflow treatment.
 //
 // Status: experimental
 //
