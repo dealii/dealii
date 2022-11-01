@@ -30,6 +30,9 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
       )
     SET(${var} FALSE)
   ELSE()
+    # FIXME We need to also find and link with cuSolver and cuSparse even though
+    # relying on Kokkos for linking with Cuda. That's why we keep the code below for now.
+
     # We need to set CUDA_USE_STATIC_CUDA_RUNTIME before FIND_PACKAGE(CUDA) and to
     # force the value otherwise it is overwritten by FIND_PACKAGE(CUDA)
     IF(BUILD_SHARED_LIBS)
