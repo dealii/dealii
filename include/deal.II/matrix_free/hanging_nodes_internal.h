@@ -24,6 +24,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/hp/fe_collection.h>
@@ -491,9 +492,13 @@ namespace internal
             for (unsigned int c = 0;
                  c < fe_collection[i].element_multiplicity(base_element_index);
                  ++c, ++comp)
-              if (dim == 1 || dynamic_cast<const FE_Q<dim> *>(
-                                &fe_collection[i].base_element(
-                                  base_element_index)) == nullptr)
+              if (dim == 1 ||
+                  (dynamic_cast<const FE_Q<dim> *>(
+                     &fe_collection[i].base_element(base_element_index)) ==
+                     nullptr &&
+                   dynamic_cast<const FE_Q_iso_Q1<dim> *>(
+                     &fe_collection[i].base_element(base_element_index)) ==
+                     nullptr))
                 supported_components[i][comp] = false;
               else
                 supported_components[i][comp] = true;
