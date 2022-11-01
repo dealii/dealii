@@ -28,7 +28,7 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
       ${CUDA_ADDITIONAL_ERROR_STRING}
       "deal.II can only compiled with Cuda support if Kokkos was built with Cuda support!"
       )
-    SET(${var} TRUE)
+    SET(${var} FALSE)
   ELSE()
     # We need to set CUDA_USE_STATIC_CUDA_RUNTIME before FIND_PACKAGE(CUDA) and to
     # force the value otherwise it is overwritten by FIND_PACKAGE(CUDA)
