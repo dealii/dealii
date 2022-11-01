@@ -1,0 +1,28 @@
+
+DEAL::dim = 1
+DEAL::n_quadrature_points = 1
+DEAL::(point, weight, normal) = ([0.500000], 0.500000, [1.00000])
+DEAL::point = 1.00000
+DEAL::normal = 1.00000
+DEAL::JxW = 0.500000
+DEAL::shape_surface_grad = 0.00000
+DEAL::shape_surface_grad_component = 0.00000
+DEAL::
+DEAL::dim = 2
+DEAL::n_quadrature_points = 1
+DEAL::(point, weight, normal) = ([0.500000 0.500000], 0.500000, [0.447214 0.894427])
+DEAL::point = 1.00000 1.50000
+DEAL::normal = 0.600000 0.800000
+DEAL::JxW = 1.11803
+DEAL::shape_surface_grad = -0.0800000 0.0600000
+DEAL::shape_surface_grad_component = -0.0800000 0.0600000
+DEAL::
+DEAL::dim = 3
+DEAL::n_quadrature_points = 1
+DEAL::(point, weight, normal) = ([0.500000 0.500000 0.500000], 0.500000, [0.267261 0.534522 0.801784])
+DEAL::point = 1.00000 1.50000 2.00000
+DEAL::normal = 0.445976 0.594635 0.668965
+DEAL::JxW = 3.59563
+DEAL::shape_surface_grad = -0.0593923 0.00414365 0.0359116
+DEAL::shape_surface_grad_component = -0.0593923 0.00414365 0.0359116
+DEAL::
