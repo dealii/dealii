@@ -877,7 +877,10 @@ namespace Utilities
        *   the caller of the consensus algorithm wants to do with the
        *   received answer.
        * @param[in] comm The MPI communicator on which the whole algorithm
-       *   is to be performed.
+       *   is to be performed. Since this function is supposed to be run
+       *   only for serial cases, the function throws an exception if
+       *   the provided communicator denotes an MPI universe with more
+       *   than one process.
        *
        * @tparam RequestType The type of the object to be sent.
        * @tparam AnswerType The type of the object to be received.
@@ -915,7 +918,10 @@ namespace Utilities
        *   rank of the process that has sent a request to us, along with
        *   the message of the request, and processes that message.
        * @param[in] comm The MPI communicator on which the whole algorithm
-       *   is to be performed.
+       *   is to be performed. Since this function is supposed to be run
+       *   only for serial cases, the function throws an exception if
+       *   the provided communicator denotes an MPI universe with more
+       *   than one process.
        *
        * @tparam RequestType The type of the object to be sent.
        */
