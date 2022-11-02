@@ -983,8 +983,9 @@ namespace MatrixFreeOperators
                                       fe_degree,
                                       n_q_points_1d,
                                       n_components_compute,
-                                      value_type> &phi,
-                         const unsigned int        cell) const;
+                                      value_type,
+                                      VectorizedArrayType> &phi,
+                         const unsigned int                 cell) const;
 
     /**
      * User-provided heterogeneity coefficient.
@@ -2273,8 +2274,9 @@ namespace MatrixFreeOperators
         fe_degree,
         n_q_points_1d,
         n_components_compute,
-        typename Base<dim, VectorType, VectorizedArrayType>::value_type> &phi,
-      const unsigned int cell) const
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+        VectorizedArrayType> &phi,
+      const unsigned int      cell) const
   {
     phi.evaluate(EvaluationFlags::gradients);
     if (scalar_coefficient.get())
@@ -2342,8 +2344,13 @@ namespace MatrixFreeOperators
   {
     using Number =
       typename Base<dim, VectorType, VectorizedArrayType>::value_type;
-    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> phi(
-      data, this->selected_rows[0]);
+    FEEvaluation<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 n_components,
+                 Number,
+                 VectorizedArrayType>
+      phi(data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
@@ -2379,9 +2386,14 @@ namespace MatrixFreeOperators
     using Number =
       typename Base<dim, VectorType, VectorizedArrayType>::value_type;
 
-    FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> eval(
-      data, this->selected_rows[0]);
-    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
+    FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number, VectorizedArrayType>
+      eval(data, this->selected_rows[0]);
+    FEEvaluation<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 n_components,
+                 Number,
+                 VectorizedArrayType>
       eval_vector(data, this->selected_rows[0]);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
