@@ -70,7 +70,6 @@ namespace NavierStokes_DG
 {
   using namespace dealii;
 
-  constexpr unsigned int testcase      = 2;
   constexpr unsigned int dimension     = 3;
   constexpr unsigned int fe_degree     = 4;
   constexpr unsigned int n_q_points_1d = fe_degree + 2;
@@ -91,44 +90,16 @@ namespace NavierStokes_DG
 
   const double courant_number = 0.07 / std::pow(fe_degree, 1.5);
 
-  enum LowStorageRungeKuttaScheme
-  {
-    stage_3_order_3,
-    stage_5_order_4,
-    stage_7_order_4,
-    stage_9_order_5,
-  };
-  constexpr LowStorageRungeKuttaScheme lsrk_scheme = stage_3_order_3;
-
 
 
   class LowStorageRungeKuttaIntegrator
   {
   public:
-    LowStorageRungeKuttaIntegrator(const LowStorageRungeKuttaScheme scheme)
+    LowStorageRungeKuttaIntegrator()
     {
-      TimeStepping::runge_kutta_method lsrk;
-      switch (scheme)
-        {
-          case stage_3_order_3:
-            lsrk = TimeStepping::LOW_STORAGE_RK_STAGE3_ORDER3;
-            break;
-          case stage_5_order_4:
-            lsrk = TimeStepping::LOW_STORAGE_RK_STAGE5_ORDER4;
-            break;
-          case stage_7_order_4:
-            lsrk = TimeStepping::LOW_STORAGE_RK_STAGE7_ORDER4;
-            break;
-          case stage_9_order_5:
-            lsrk = TimeStepping::LOW_STORAGE_RK_STAGE9_ORDER5;
-            break;
-
-          default:
-            AssertThrow(false, ExcNotImplemented());
-        }
       TimeStepping::LowStorageRungeKutta<
         LinearAlgebra::distributed::Vector<Number>>
-                          rk_integrator(lsrk);
+        rk_integrator(TimeStepping::LOW_STORAGE_RK_STAGE3_ORDER3);
       std::vector<double> ci; // not used
       rk_integrator.get_coefficients(ai, bi, ci);
     }
@@ -178,14 +149,6 @@ namespace NavierStokes_DG
   };
 
 
-  enum EulerNumericalFlux
-  {
-    lax_friedrichs_modified,
-    harten_lax_vanleer,
-  };
-  constexpr EulerNumericalFlux numerical_flux_type = harten_lax_vanleer;
-
-
 
   template <int dim>
   class ExactSolution : public Function<dim>
@@ -206,82 +169,24 @@ namespace NavierStokes_DG
   ExactSolution<dim>::value(const Point<dim> & x,
                             const unsigned int component) const
   {
-    const double t = this->get_time();
-
-    switch (testcase)
-      {
-        case 0:
-          {
-            Assert(dim == 2, ExcNotImplemented());
-            const double beta = 5;
-
-            Point<dim> x0;
-            x0[0] = 5.;
-            const double radius_sqr =
-              (x - x0).norm_square() - 2. * (x[0] - x0[0]) * t + t * t;
-            const double factor =
-              beta / (numbers::PI * 2) * std::exp(1. - radius_sqr);
-            const double density_log = std::log2(
-              std::abs(1. - (gamma - 1.) / gamma * 0.25 * factor * factor));
-            const double density = std::exp2(density_log * (1. / (gamma - 1.)));
-            const double u       = 1. - factor * (x[1] - x0[1]);
-            const double v       = factor * (x[0] - t - x0[0]);
-
-            if (component == 0)
-              return density;
-            else if (component == 1)
-              return density * u;
-            else if (component == 2)
-              return density * v;
-            else
-              {
-                const double pressure =
-                  std::exp2(density_log * (gamma / (gamma - 1.)));
-                return pressure / (gamma - 1.) +
-                       0.5 * (density * u * u + density * v * v);
-              }
-          }
-
-        case 1:
-          {
-            if (component == 0)
-              return 1.;
-            else if (component == 1)
-              return 0.4;
-            else if (component == dim + 1)
-              return 3.097857142857143;
-            else
-              return 0.;
-          }
-
-        case 2:
-          {
-            AssertThrow(dim == 3, ExcNotImplemented());
-            const double c0 = 1. / Ma;
-            const double T0 = c0 * c0 / (gamma * R);
-            if (component == 0)
-              return 1 + 1. / (R * T0) * 1. / 16. *
-                           (std::cos(2 * x[0]) + std::cos(2 * x[1])) *
-                           (std::cos(2 * x[2]) + 2.);
-            else if (component == 1)
-              return std::sin(x[0]) * std::cos(x[1]) * std::cos(x[2]);
-            else if (component == 2)
-              return -std::cos(x[0]) * std::sin(x[1]) * std::cos(x[2]);
-            else if (component == 3)
-              return 0.;
-            else
-              return c_v * T0 +
-                     0.5 *
-                       (Utilities::fixed_power<2>(
-                          std::sin(x[0]) * std::cos(x[1]) * std::cos(x[2])) +
-                        Utilities::fixed_power<2>(
-                          std::cos(x[0]) * std::sin(x[1]) * std::cos(x[2])));
-          }
-
-        default:
-          Assert(false, ExcNotImplemented());
-          return 0.;
-      }
+    const double c0 = 1. / Ma;
+    const double T0 = c0 * c0 / (gamma * R);
+    if (component == 0)
+      return 1 + 1. / (R * T0) * 1. / 16. *
+                   (std::cos(2 * x[0]) + std::cos(2 * x[1])) *
+                   (std::cos(2 * x[2]) + 2.);
+    else if (component == 1)
+      return std::sin(x[0]) * std::cos(x[1]) * std::cos(x[2]);
+    else if (component == 2)
+      return -std::cos(x[0]) * std::sin(x[1]) * std::cos(x[2]);
+    else if (component == dim + 1)
+      return c_v * T0 +
+             0.5 * (Utilities::fixed_power<2>(std::sin(x[0]) * std::cos(x[1]) *
+                                              std::cos(x[2])) +
+                    Utilities::fixed_power<2>(std::cos(x[0]) * std::sin(x[1]) *
+                                              std::cos(x[2])));
+    else
+      return 0.;
   }
 
 
@@ -366,44 +271,16 @@ namespace NavierStokes_DG
     const auto flux_m = euler_flux<dim>(u_m);
     const auto flux_p = euler_flux<dim>(u_p);
 
-    switch (numerical_flux_type)
-      {
-        case lax_friedrichs_modified:
-          {
-            const auto Lambda =
-              0.5 * std::sqrt(std::max(velocity_p.norm_square() +
-                                         gamma * pressure_p * (1. / u_p[0]),
-                                       velocity_m.norm_square() +
-                                         gamma * pressure_m * (1. / u_m[0])));
+    const auto avg_velocity_normal = 0.5 * ((velocity_m + velocity_p) * normal);
+    const auto avg_c               = std::sqrt(std::abs(
+      0.5 * gamma * (pressure_p * (1. / u_p[0]) + pressure_m * (1. / u_m[0]))));
+    const Number s_pos     = std::max(Number(), avg_velocity_normal + avg_c);
+    const Number s_neg     = std::min(Number(), avg_velocity_normal - avg_c);
+    const Number inverse_s = Number(1.) / (s_pos - s_neg);
 
-            return 0.5 * (flux_m * normal + flux_p * normal) +
-                   0.5 * Lambda * (u_m - u_p);
-          }
-
-        case harten_lax_vanleer:
-          {
-            const auto avg_velocity_normal =
-              0.5 * ((velocity_m + velocity_p) * normal);
-            const auto   avg_c = std::sqrt(std::abs(
-              0.5 * gamma *
-              (pressure_p * (1. / u_p[0]) + pressure_m * (1. / u_m[0]))));
-            const Number s_pos =
-              std::max(Number(), avg_velocity_normal + avg_c);
-            const Number s_neg =
-              std::min(Number(), avg_velocity_normal - avg_c);
-            const Number inverse_s = Number(1.) / (s_pos - s_neg);
-
-            return inverse_s *
-                   ((s_pos * (flux_m * normal) - s_neg * (flux_p * normal)) -
-                    s_pos * s_neg * (u_m - u_p));
-          }
-
-        default:
-          {
-            Assert(false, ExcNotImplemented());
-            return {};
-          }
-      }
+    return inverse_s *
+           ((s_pos * (flux_m * normal) - s_neg * (flux_p * normal)) -
+            s_pos * s_neg * (u_m - u_p));
   }
 
   template <int dim, typename Number>
@@ -2001,83 +1878,27 @@ namespace NavierStokes_DG
   void
   FlowProblem<dim>::make_grid()
   {
-    switch (testcase)
-      {
-        case 0:
-          {
-            Point<dim> lower_left;
-            for (unsigned int d = 1; d < dim; ++d)
-              lower_left[d] = -5;
+    Point<dim> lower_left, upper_right;
+    for (unsigned int d = 0; d < dim; ++d)
+      lower_left[d] = -numbers::PI;
 
-            Point<dim> upper_right;
-            upper_right[0] = 10;
-            for (unsigned int d = 1; d < dim; ++d)
-              upper_right[d] = 5;
+    for (unsigned int d = 0; d < dim; ++d)
+      upper_right[d] = numbers::PI;
 
-            GridGenerator::hyper_rectangle(triangulation,
-                                           lower_left,
-                                           upper_right);
-            triangulation.refine_global(2);
+    GridGenerator::hyper_rectangle(triangulation, lower_left, upper_right);
+    for (const auto &cell : triangulation.cell_iterators())
+      for (unsigned int face : cell->face_indices())
+        if (cell->at_boundary(face))
+          cell->face(face)->set_boundary_id(face);
+    std::vector<
+      GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+      periodic_faces;
+    for (unsigned int d = 0; d < dim; ++d)
+      GridTools::collect_periodic_faces(
+        triangulation, 2 * d, 2 * d + 1, d, periodic_faces);
+    triangulation.add_periodicity(periodic_faces);
 
-            flow_operator.set_inflow_boundary(
-              0, std::make_unique<ExactSolution<dim>>(0));
-
-            break;
-          }
-
-        case 1:
-          {
-            GridGenerator::channel_with_cylinder(
-              triangulation, 0.03, 1, 0, true);
-
-            flow_operator.set_inflow_boundary(
-              0, std::make_unique<ExactSolution<dim>>(0));
-            flow_operator.set_subsonic_outflow_boundary(
-              1, std::make_unique<ExactSolution<dim>>(0));
-
-            flow_operator.set_wall_boundary(2);
-            flow_operator.set_wall_boundary(3);
-
-            if (dim == 3)
-              flow_operator.set_body_force(
-                std::make_unique<Functions::ConstantFunction<dim>>(
-                  std::vector<double>({0., 0., -0.2})));
-
-            break;
-          }
-
-        case 2:
-          {
-            Point<dim> lower_left, upper_right;
-            for (unsigned int d = 0; d < dim; ++d)
-              lower_left[d] = -numbers::PI;
-
-            for (unsigned int d = 0; d < dim; ++d)
-              upper_right[d] = numbers::PI;
-
-            GridGenerator::hyper_rectangle(triangulation,
-                                           lower_left,
-                                           upper_right);
-            for (const auto &cell : triangulation.cell_iterators())
-              for (unsigned int face : cell->face_indices())
-                if (cell->at_boundary(face))
-                  cell->face(face)->set_boundary_id(face);
-            std::vector<GridTools::PeriodicFacePair<
-              typename Triangulation<dim>::cell_iterator>>
-              periodic_faces;
-            for (unsigned int d = 0; d < dim; ++d)
-              GridTools::collect_periodic_faces(
-                triangulation, 2 * d, 2 * d + 1, d, periodic_faces);
-            triangulation.add_periodicity(periodic_faces);
-
-            triangulation.refine_global(2);
-
-            break;
-          }
-
-        default:
-          Assert(false, ExcNotImplemented());
-      }
+    triangulation.refine_global(2);
 
     switch (get_testing_environment())
       {
@@ -2128,31 +1949,6 @@ namespace NavierStokes_DG
     }
     data_out.add_data_vector(solution, postprocessor);
 
-    LinearAlgebra::distributed::Vector<Number> reference;
-    if (testcase == 0 && dim == 2)
-      {
-        reference.reinit(solution);
-        flow_operator.project(ExactSolution<dim>(time), reference);
-        reference.sadd(-1., 1, solution);
-        std::vector<std::string> names;
-        names.emplace_back("error_density");
-        for (unsigned int d = 0; d < dim; ++d)
-          names.emplace_back("error_momentum");
-        names.emplace_back("error_energy");
-
-        std::vector<DataComponentInterpretation::DataComponentInterpretation>
-          interpretation;
-        interpretation.push_back(
-          DataComponentInterpretation::component_is_scalar);
-        for (unsigned int d = 0; d < dim; ++d)
-          interpretation.push_back(
-            DataComponentInterpretation::component_is_part_of_vector);
-        interpretation.push_back(
-          DataComponentInterpretation::component_is_scalar);
-
-        data_out.add_data_vector(dof_handler, reference, names, interpretation);
-      }
-
     Vector<double> mpi_owner(triangulation.n_active_cells());
     mpi_owner = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
     data_out.add_data_vector(mpi_owner, "owner");
@@ -2189,7 +1985,7 @@ namespace NavierStokes_DG
     rk_register_2.reinit(solution);
     timer["setup_matrix_free"].stop();
 
-    const LowStorageRungeKuttaIntegrator integrator(lsrk_scheme);
+    const LowStorageRungeKuttaIntegrator integrator;
 
     timer["project_initial"].start();
     flow_operator.project(ExactSolution<dim>(time), solution);
