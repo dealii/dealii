@@ -358,6 +358,11 @@ namespace internal
       bool in_use;
 
       /**
+       * Temporary array for row indices
+       */
+      std::vector<size_type> rows;
+
+      /**
        * Temporary array for column indices
        */
       std::vector<size_type> columns;

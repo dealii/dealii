@@ -3684,10 +3684,10 @@ namespace internal
 
     // similar function as the one above for setting matrix diagonals, but now
     // doing that for sparsity patterns when setting them up using
-    // add_entries_local_to_global. In case we keep constrained entries, add all
-    // the rows and columns related to the constrained dof, otherwise just add
-    // the diagonal
-    template <typename number, typename SparsityPatternType>
+    // add_entries_local_to_global(). In case we keep constrained entries, add
+    // all the rows and columns related to the constrained dof, otherwise just
+    // add the diagonal
+    template <typename number>
     inline void
     set_sparsity_diagonals(
       const internal::AffineConstraints::GlobalRowsFromLocal<number>
@@ -3695,13 +3695,20 @@ namespace internal
       const std::vector<size_type> &local_dof_indices,
       const Table<2, bool> &        dof_mask,
       const bool                    keep_constrained_entries,
-      SparsityPatternType &         sparsity_pattern)
+      ScratchData<number> &         scratch_data,
+      SparsityPatternBase &         sparsity_pattern)
     {
       // if we got constraints, need to add the diagonal element and, if the
       // user requested so, also the rest of the entries in rows and columns
       // that have been left out above
       if (global_rows.n_constraints() > 0)
         {
+          scratch_data.rows.resize(0);
+          scratch_data.rows.reserve(global_rows.n_constraints() *
+                                    local_dof_indices.size());
+          scratch_data.columns.resize(0);
+          scratch_data.columns.reserve(global_rows.n_constraints() *
+                                       local_dof_indices.size());
           for (size_type i = 0; i < global_rows.n_constraints(); ++i)
             {
               const size_type local_row  = global_rows.constraint_origin(i);
@@ -3711,15 +3718,26 @@ namespace internal
                   for (size_type j = 0; j < local_dof_indices.size(); ++j)
                     {
                       if (dof_mask(local_row, j) == true)
-                        sparsity_pattern.add(global_row, local_dof_indices[j]);
+                        {
+                          scratch_data.rows.push_back(global_row);
+                          scratch_data.columns.push_back(local_dof_indices[j]);
+                        }
                       if (dof_mask(j, local_row) == true)
-                        sparsity_pattern.add(local_dof_indices[j], global_row);
+                        {
+                          scratch_data.rows.push_back(local_dof_indices[j]);
+                          scratch_data.columns.push_back(global_row);
+                        }
                     }
                 }
               else
-                // don't keep constrained entries - just add the diagonal.
-                sparsity_pattern.add(global_row, global_row);
+                {
+                  // don't keep constrained entries - just add the diagonal.
+                  scratch_data.rows.push_back(global_row);
+                  scratch_data.columns.push_back(global_row);
+                }
             }
+          sparsity_pattern.add_entries(make_array_view(scratch_data.rows),
+                                       make_array_view(scratch_data.columns));
         }
     }
 
@@ -4365,6 +4383,7 @@ AffineConstraints<number>::add_entries_local_to_global(
                                                       local_dof_indices,
                                                       dof_mask,
                                                       keep_constrained_entries,
+                                                      *scratch_data,
                                                       sparsity_pattern);
 }
 
