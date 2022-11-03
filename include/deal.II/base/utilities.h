@@ -1252,6 +1252,12 @@ namespace Utilities
       const std::vector<char>::const_iterator &cend,
       std::vector<T> &                         object)
     {
+      // return early if nothing to copy. this avoids
+      // dereferencing iterators if the std::vector<char> is empty,
+      // which would not be allowed.
+      if (cbegin == cend)
+        return;
+
       // The size of the object vector can be found in cbegin of the buffer.
       // The data starts at cbegin + sizeof(vector_size).
 
@@ -1287,6 +1293,12 @@ namespace Utilities
       const std::vector<char>::const_iterator &cend,
       std::vector<std::vector<T>> &            object)
     {
+      // return early if nothing to copy. this avoids
+      // dereferencing iterators if the std::vector<char> is empty,
+      // which would not be allowed.
+      if (cbegin == cend)
+        return;
+
       // First get the size of the vector, and resize the output object
       using size_type = typename std::vector<T>::size_type;
       std::vector<char>::const_iterator iterator = cbegin;
@@ -1425,9 +1437,16 @@ namespace Utilities
          const std::vector<char>::const_iterator &cend,
          const bool                               allow_compression)
   {
-    // see if the object is small and copyable via memcpy. if so, use
-    // this fast path. otherwise, we have to go through the BOOST
-    // serialization machinery
+    // see if the object is empty. if so, shortcut the whole
+    // operation and return an empty object.  this avoids
+    // dereferencing iterators if the std::vector<char> is empty,
+    // which would not be allowed.
+    if (cbegin == cend)
+      return T();
+
+      // see if the object is small and copyable via memcpy. if so, use
+      // this fast path. otherwise, we have to go through the BOOST
+      // serialization machinery
 #ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #else
@@ -1498,6 +1517,11 @@ namespace Utilities
   T
   unpack(const std::vector<char> &buffer, const bool allow_compression)
   {
+    // see if the object is empty. if so, shortcut the whole
+    // operation and return an empty object.
+    if (buffer.size() == 0)
+      return T();
+
     return unpack<T>(buffer.cbegin(), buffer.cend(), allow_compression);
   }
 
@@ -1509,6 +1533,15 @@ namespace Utilities
          T (&unpacked_object)[N],
          const bool allow_compression)
   {
+    // empty arrays are not allowed and so unpacking requires to
+    // have a non-zero amount of input data
+    Assert(
+      cbegin != cend,
+      ExcMessage(
+        "Utilities::unpack was asked to unpack "
+        "an array, but no input data to unpack was provided. Empty arrays are "
+        "not allowed."));
+
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
@@ -1546,6 +1579,15 @@ namespace Utilities
          T (&unpacked_object)[N],
          const bool allow_compression)
   {
+    // empty arrays are not allowed and so unpacking requires to
+    // have a non-zero amount of input data
+    Assert(
+      buffer.size() != 0,
+      ExcMessage(
+        "Utilities::unpack was asked to unpack "
+        "an array, but no input data to unpack was provided. Empty arrays are "
+        "not allowed."));
+
     unpack<T, N>(buffer.cbegin(),
                  buffer.cend(),
                  unpacked_object,
