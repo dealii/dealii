@@ -4293,11 +4293,10 @@ AffineConstraints<number>::distribute_local_to_global(
 
 
 template <typename number>
-template <typename SparsityPatternType>
 void
 AffineConstraints<number>::add_entries_local_to_global(
   const std::vector<size_type> &local_dof_indices,
-  SparsityPatternType &         sparsity_pattern,
+  SparsityPatternBase &         sparsity_pattern,
   const bool                    keep_constrained_entries,
   const Table<2, bool> &        dof_mask) const
 {
@@ -4327,28 +4326,37 @@ AffineConstraints<number>::add_entries_local_to_global(
       // now add the indices we collected above to the sparsity pattern. Very
       // easy here - just add the same array to all the rows...
       for (size_type i = 0; i < n_actual_dofs; ++i)
-        sparsity_pattern.add_entries(actual_dof_indices[i],
-                                     actual_dof_indices.begin(),
-                                     actual_dof_indices.end(),
-                                     true);
+        sparsity_pattern.add_row_entries(actual_dof_indices[i],
+                                         make_array_view(actual_dof_indices),
+                                         true);
 
       // need to add the whole row and column structure in case we keep
       // constrained entries. Unfortunately, we can't use the nice matrix
-      // structure we use elsewhere, so manually add those indices one by one.
+      // structure we use elsewhere, so use the more general update function
+      actual_dof_indices.resize(0);
+      actual_dof_indices.reserve(n_local_dofs * n_local_dofs);
+      std::vector<size_type> &rows = scratch_data->rows;
+      rows.resize(0);
+      rows.reserve(n_local_dofs * n_local_dofs);
       for (size_type i = 0; i < n_local_dofs; ++i)
         if (is_constrained(local_dof_indices[i]))
           {
             if (keep_constrained_entries == true)
               for (size_type j = 0; j < n_local_dofs; ++j)
                 {
-                  sparsity_pattern.add(local_dof_indices[i],
-                                       local_dof_indices[j]);
-                  sparsity_pattern.add(local_dof_indices[j],
-                                       local_dof_indices[i]);
+                  rows.push_back(local_dof_indices[i]);
+                  actual_dof_indices.push_back(local_dof_indices[j]);
+                  rows.push_back(local_dof_indices[j]);
+                  actual_dof_indices.push_back(local_dof_indices[i]);
                 }
             else
-              sparsity_pattern.add(local_dof_indices[i], local_dof_indices[i]);
+              {
+                rows.push_back(local_dof_indices[i]);
+                actual_dof_indices.push_back(local_dof_indices[i]);
+              }
           }
+      sparsity_pattern.add_entries(make_array_view(rows),
+                                   make_array_view(actual_dof_indices));
 
       return;
     }
@@ -4377,7 +4385,9 @@ AffineConstraints<number>::add_entries_local_to_global(
       // finally, write all the information that accumulated under the given
       // process into the global matrix row and into the vector
       if (col_ptr != cols.begin())
-        sparsity_pattern.add_entries(row, cols.begin(), col_ptr, true);
+        sparsity_pattern.add_row_entries(row,
+                                         make_array_view(cols.begin(), col_ptr),
+                                         true);
     }
   internal::AffineConstraints::set_sparsity_diagonals(global_rows,
                                                       local_dof_indices,

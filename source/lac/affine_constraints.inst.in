@@ -261,12 +261,6 @@ for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP)
   {
     template void AffineConstraints<S>::add_entries_local_to_global<SP>(
       const std::vector<AffineConstraints<S>::size_type> &,
-      SP &,
-      const bool,
-      const Table<2, bool> &) const;
-
-    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
-      const std::vector<AffineConstraints<S>::size_type> &,
       const std::vector<AffineConstraints<S>::size_type> &,
       SP &,
       const bool,
@@ -283,12 +277,6 @@ for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP)
 
 for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP_BLOCK)
   {
-    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
-      const std::vector<AffineConstraints<S>::size_type> &,
-      SP &,
-      const bool,
-      const Table<2, bool> &) const;
-
     template void AffineConstraints<S>::add_entries_local_to_global<SP>(
       const std::vector<AffineConstraints<S>::size_type> &,
       const std::vector<AffineConstraints<S>::size_type> &,
