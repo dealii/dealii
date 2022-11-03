@@ -4400,18 +4400,26 @@ AffineConstraints<number>::add_entries_local_to_global(
 
 
 template <typename number>
-template <typename SparsityPatternType>
 void
 AffineConstraints<number>::add_entries_local_to_global(
   const std::vector<size_type> &   row_indices,
   const AffineConstraints<number> &col_constraints,
   const std::vector<size_type> &   col_indices,
-  SparsityPatternType &            sparsity_pattern,
+  SparsityPatternBase &            sparsity_pattern,
   const bool                       keep_constrained_entries,
   const Table<2, bool> &           dof_mask) const
 {
   const size_type n_local_rows = row_indices.size();
   const size_type n_local_cols = col_indices.size();
+
+  typename internal::AffineConstraints::ScratchDataAccessor<number>
+                          scratch_data(this->scratch_data);
+  std::vector<size_type> &rows = scratch_data->rows;
+  std::vector<size_type> &cols = scratch_data->columns;
+  rows.resize(0);
+  rows.reserve(row_indices.size() * col_indices.size());
+  cols.resize(0);
+  cols.reserve(row_indices.size() * col_indices.size());
 
   // if constrained entries should be kept, need to add rows and columns of
   // those to the sparsity pattern
@@ -4420,11 +4428,19 @@ AffineConstraints<number>::add_entries_local_to_global(
       for (const size_type row_index : row_indices)
         if (is_constrained(row_index))
           for (const size_type col_index : col_indices)
-            sparsity_pattern.add(row_index, col_index);
+            {
+              rows.push_back(row_index);
+              cols.push_back(col_index);
+            }
       for (const size_type col_index : col_indices)
         if (col_constraints.is_constrained(col_index))
           for (const size_type row_index : row_indices)
-            sparsity_pattern.add(row_index, col_index);
+            {
+              rows.push_back(row_index);
+              cols.push_back(col_index);
+            }
+      sparsity_pattern.add_entries(make_array_view(rows),
+                                   make_array_view(cols));
     }
 
   // if the dof mask is not active, all we have to do is to add some indices
@@ -4435,19 +4451,24 @@ AffineConstraints<number>::add_entries_local_to_global(
     dof_mask.n_rows() == n_local_rows && dof_mask.n_cols() == n_local_cols;
   if (dof_mask_is_active == false)
     {
-      std::vector<size_type> actual_row_indices(n_local_rows);
-      std::vector<size_type> actual_col_indices(n_local_cols);
-      make_sorted_row_list(row_indices, actual_row_indices);
-      col_constraints.make_sorted_row_list(col_indices, actual_col_indices);
-      const size_type n_actual_rows = actual_row_indices.size();
+      rows.resize(n_local_rows);
+      cols.resize(n_local_cols);
+      // TODO these fills may not be necessary: previously we assumed all zeros
+      // which seems incorrect. At least this way things will crash
+      std::fill(rows.begin(),
+                rows.end(),
+                std::numeric_limits<size_type>::max());
+      std::fill(cols.begin(),
+                cols.end(),
+                std::numeric_limits<size_type>::max());
+      make_sorted_row_list(row_indices, rows);
+      col_constraints.make_sorted_row_list(col_indices, cols);
+      const size_type n_actual_rows = rows.size();
 
       // now add the indices we collected above to the sparsity pattern. Very
       // easy here - just add the same array to all the rows...
       for (size_type i = 0; i < n_actual_rows; ++i)
-        sparsity_pattern.add_entries(actual_row_indices[i],
-                                     actual_col_indices.begin(),
-                                     actual_col_indices.end(),
-                                     true);
+        sparsity_pattern.add_row_entries(rows[i], make_array_view(cols), true);
       return;
     }
 
@@ -4458,12 +4479,11 @@ AffineConstraints<number>::add_entries_local_to_global(
 
 
 template <typename number>
-template <typename SparsityPatternType>
 void
 AffineConstraints<number>::add_entries_local_to_global(
   const std::vector<size_type> &row_indices,
   const std::vector<size_type> &col_indices,
-  SparsityPatternType &         sparsity_pattern,
+  SparsityPatternBase &         sparsity_pattern,
   const bool                    keep_constrained_entries,
   const Table<2, bool> &        dof_mask) const
 {
