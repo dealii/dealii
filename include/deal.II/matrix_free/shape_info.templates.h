@@ -758,7 +758,8 @@ namespace internal
             }
         }
 
-      if (dim > 1 && dynamic_cast<const FE_Q<dim> *>(&fe))
+      if (dim > 1 && (dynamic_cast<const FE_Q<dim> *>(&fe) ||
+                      dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe)))
         {
           auto &subface_interpolation_matrix_0 =
             univariate_shape_data.subface_interpolation_matrices[0];
@@ -775,19 +776,33 @@ namespace internal
           subface_interpolation_matrix_scalar_0.resize(nn * nn);
           subface_interpolation_matrix_scalar_1.resize(nn * nn);
 
-          std::vector<Point<1>> fe_q_points = QGaussLobatto<1>(nn).get_points();
-          const std::vector<Polynomials::Polynomial<double>> poly =
+          const bool is_feq = dynamic_cast<const FE_Q<dim> *>(&fe) != nullptr;
+
+          std::vector<Point<1>> fe_q_points =
+            is_feq ? QGaussLobatto<1>(nn).get_points() :
+                     QIterated<1>(QTrapezoid<1>(), nn - 1).get_points();
+
+          const std::vector<Polynomials::Polynomial<double>> poly_feq =
             Polynomials::generate_complete_Lagrange_basis(fe_q_points);
+
+          const std::vector<Polynomials::PiecewisePolynomial<double>>
+            poly_feq_iso_q1 =
+              Polynomials::generate_complete_Lagrange_basis_on_subdivisions(nn -
+                                                                              1,
+                                                                            1);
 
           for (unsigned int i = 0, c = 0; i < nn; ++i)
             for (unsigned int j = 0; j < nn; ++j, ++c)
               {
                 subface_interpolation_matrix_scalar_0[c] =
-                  poly[j].value(0.5 * fe_q_points[i][0]);
+                  is_feq ? poly_feq[j].value(0.5 * fe_q_points[i][0]) :
+                           poly_feq_iso_q1[j].value(0.5 * fe_q_points[i][0]);
                 subface_interpolation_matrix_0[c] =
                   subface_interpolation_matrix_scalar_0[c];
                 subface_interpolation_matrix_scalar_1[c] =
-                  poly[j].value(0.5 + 0.5 * fe_q_points[i][0]);
+                  is_feq ?
+                    poly_feq[j].value(0.5 + 0.5 * fe_q_points[i][0]) :
+                    poly_feq_iso_q1[j].value(0.5 + 0.5 * fe_q_points[i][0]);
                 subface_interpolation_matrix_1[c] =
                   subface_interpolation_matrix_scalar_1[c];
               }
