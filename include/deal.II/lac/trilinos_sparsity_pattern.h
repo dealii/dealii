@@ -271,7 +271,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @ingroup Sparsity
    */
-  class SparsityPattern : public Subscriptor
+  class SparsityPattern : public SparsityPatternBase
   {
   public:
     /**
@@ -668,18 +668,6 @@ namespace TrilinosWrappers
     max_entries_per_row() const;
 
     /**
-     * Return the number of rows in this sparsity pattern.
-     */
-    size_type
-    n_rows() const;
-
-    /**
-     * Return the number of columns in this sparsity pattern.
-     */
-    size_type
-    n_cols() const;
-
-    /**
      * Return the local dimension of the sparsity pattern, i.e. the number of
      * rows stored on the present MPI process. In the sequential case, this
      * number is the same as n_rows(), but for parallel matrices it may be
@@ -784,6 +772,16 @@ namespace TrilinosWrappers
                 ForwardIterator begin,
                 ForwardIterator end,
                 const bool      indices_are_sorted = false);
+
+    virtual void
+    add_row_entries(const size_type &                 row,
+                    const ArrayView<const size_type> &columns,
+                    const bool indices_are_sorted = false) override;
+
+    virtual void
+    add_entries(const ArrayView<const size_type> &rows,
+                const ArrayView<const size_type> &columns) override;
+
     /** @} */
     /**
      * @name Access of underlying Trilinos data
