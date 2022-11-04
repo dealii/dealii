@@ -22,6 +22,8 @@
 #ifdef DEAL_II_WITH_CGAL
 
 #  include <deal.II/base/quadrature_lib.h>
+#  include <deal.II/base/std_cxx17/optional.h>
+#  include <deal.II/base/std_cxx17/variant.h>
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/fe/mapping.h>
@@ -108,6 +110,54 @@ namespace CGALWrappers
 
   namespace internal
   {
+    namespace
+    {
+      /**
+       * Take a boost::variant object and convert it to a std::variant
+       * object by applying the visitor pattern.
+       */
+      template <typename TargetVariant>
+      struct Repackage : boost::static_visitor<TargetVariant>
+      {
+        template <typename T>
+        TargetVariant
+        operator()(const T &t) const
+        {
+          return TargetVariant(t);
+        }
+      };
+
+      /**
+       * Convert a boost::optional<std::variant<...>> to the
+       * corresponding C++ type using std::optional and
+       * std::variant. The former is what CGAL gives us, the latter is
+       * what we want to use because we like to use std data types.
+       */
+      template <typename... Types>
+      std_cxx17::optional<std_cxx17::variant<Types...>>
+      convert_boost_to_std(const boost::optional<boost::variant<Types...>> &x)
+      {
+        if (x)
+          {
+            // The boost::optional object contains an object of type
+            // boost::variant. We need to unpack which type the
+            // variant contains, and re-package that into a
+            // std::variant. This is easily done using a visitor
+            // object.
+            using std_variant = std::variant<Types...>;
+            return boost::apply_visitor(Repackage<std_variant>(), *x);
+          }
+        else
+          {
+            // The boost::optional object was empty. Return an empty
+            // std::optional object.
+            return {};
+          }
+      }
+    } // namespace
+
+
+
     void
     mark_domains(CDT &                 ct,
                  Face_handle           start,
@@ -168,17 +218,17 @@ namespace CGALWrappers
 
     // Collection of utilities that compute intersection between simplices
     // identified by array of points. The return type is the one of
-    // CGAL::intersection(), i.e. a boost::optional<boost::variant<>>.
+    // CGAL::intersection(), i.e. a std_cxx17::optional<std_cxx17::variant<>>.
     // Intersection between 2D and 3D objects and 1D/3D objects are available
     // only with CGAL versions greater or equal than 5.5, hence the
     // corresponding functions are guarded by #ifdef directives. All the
     // signatures follow the convection that the first entity has an intrinsic
     // dimension higher than the second one.
 
-    boost::optional<boost::variant<CGALPoint2,
-                                   CGALSegment2,
-                                   CGALTriangle2,
-                                   std::vector<CGALPoint2>>>
+    std_cxx17::optional<std_cxx17::variant<CGALPoint2,
+                                           CGALSegment2,
+                                           CGALTriangle2,
+                                           std::vector<CGALPoint2>>>
     compute_intersection(const std::array<Point<2>, 3> &first_simplex,
                          const std::array<Point<2>, 3> &second_simplex)
     {
@@ -201,12 +251,12 @@ namespace CGALWrappers
 
       CGALTriangle2 triangle1{pts0[0], pts0[1], pts0[2]};
       CGALTriangle2 triangle2{pts1[0], pts1[1], pts1[2]};
-      return CGAL::intersection(triangle1, triangle2);
+      return convert_boost_to_std(CGAL::intersection(triangle1, triangle2));
     }
 
 
 
-    boost::optional<boost::variant<CGALPoint2, CGALSegment2>>
+    std_cxx17::optional<std_cxx17::variant<CGALPoint2, CGALSegment2>>
     compute_intersection(const std::array<Point<2>, 3> &first_simplex,
                          const std::array<Point<2>, 2> &second_simplex)
     {
@@ -230,7 +280,7 @@ namespace CGALWrappers
 
       CGALTriangle2 triangle{pts0[0], pts0[1], pts0[2]};
       CGALSegment2  segm{pts1[0], pts1[1]};
-      return CGAL::intersection(segm, triangle);
+      return convert_boost_to_std(CGAL::intersection(segm, triangle));
     }
 
 
@@ -265,7 +315,7 @@ namespace CGALWrappers
 
 
 
-    boost::optional<boost::variant<CGALPoint3, CGALSegment3>>
+    std_cxx17::optional<std_cxx17::variant<CGALPoint3, CGALSegment3>>
     compute_intersection(const std::array<Point<3>, 2> &first_simplex,
                          const std::array<Point<3>, 4> &second_simplex)
     {
@@ -291,7 +341,7 @@ namespace CGALWrappers
 
       CGALTetra    tetra{pts0[0], pts0[1], pts0[2], pts0[3]};
       CGALSegment3 segm{pts1[0], pts1[1]};
-      return CGAL::intersection(segm, tetra);
+      return convert_boost_to_std(CGAL::intersection(segm, tetra));
 #  else
       Assert(
         false,
@@ -303,11 +353,12 @@ namespace CGALWrappers
 #  endif
     }
 
+
     // tetra, triangle
-    boost::optional<boost::variant<CGALPoint3,
-                                   CGALSegment3,
-                                   CGALTriangle3,
-                                   std::vector<CGALPoint3>>>
+    std_cxx17::optional<std_cxx17::variant<CGALPoint3,
+                                           CGALSegment3,
+                                           CGALTriangle3,
+                                           std::vector<CGALPoint3>>>
     compute_intersection(const std::array<Point<3>, 3> &first_simplex,
                          const std::array<Point<3>, 4> &second_simplex)
     {
@@ -331,7 +382,7 @@ namespace CGALWrappers
         });
       CGALTetra     tetra{pts0[0], pts0[1], pts0[2], pts0[3]};
       CGALTriangle3 triangle{pts1[0], pts1[1], pts1[2]};
-      return CGAL::intersection(triangle, tetra);
+      return convert_boost_to_std(CGAL::intersection(triangle, tetra));
 #  else
 
       Assert(
