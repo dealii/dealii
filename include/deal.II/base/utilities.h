@@ -1289,7 +1289,10 @@ namespace Utilities
       // dereferencing iterators if the std::vector<char> is empty,
       // which would not be allowed.
       if (cbegin == cend)
-        return;
+        {
+          object.clear();
+          return;
+        }
 
       // The size of the object vector can be found in cbegin of the buffer.
       // The data starts at cbegin + sizeof(vector_size).
@@ -1344,7 +1347,10 @@ namespace Utilities
       // dereferencing iterators if the std::vector<char> is empty,
       // which would not be allowed.
       if (cbegin == cend)
-        return;
+        {
+          object.clear();
+          return;
+        }
 
       // First get the size of the vector, and resize the output object
       using size_type = typename std::vector<T>::size_type;
@@ -1490,7 +1496,6 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
       {
         // Determine the size. There are places where we would like to use a
