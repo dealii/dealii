@@ -199,7 +199,7 @@ namespace hp
  * accurately describe Neumann values, then this is rarely an issue: if you
  * don't say anything in the map about a particular part of the boundary then
  * the Kelly indicator will simply assume that the solution is correct on that
- * part of the boundary and not touch it. Of course, if you have a have a
+ * part of the boundary and not touch it. Of course, if you have a
  * Neumann or Robin boundary, that isn't quite true, there is going to be a
  * difference between the normal derivative of the numerical solution and the
  * Neumann values these normal derivatives should equal. So if we simply
@@ -219,7 +219,7 @@ namespace hp
  * documentation for the FESubFaceValues class for more information about
  * technical issues regarding this topic.
  *
- * In praxi, since we integrate over each face only once, we do this when we
+ * In practice, since we integrate over each face only once, we do this when we
  * are on the coarser one of the two cells adjacent to a subface (a subface is
  * defined to be the child of a face; seen from the coarse cell, it is a
  * subface, while seen from the refined cell it is one of its faces). The
@@ -238,12 +238,12 @@ namespace hp
  *
  * <h3>Multiple solution vectors</h3>
  *
- * In some cases, for example in time-dependent problems, one would like to
+ * In some cases, one would like to
  * compute the error estimates for several solution vectors on the same grid
- * at once, with the same coefficients, boundary condition object, etc, e.g.
- * for the solutions on several successive time steps. One could then call the
- * functions of this class several times for each solution. However, the
- * largest factor in the computation of the error estimates (in terms of
+ * at once, with the same coefficients, boundary condition object, etc, for
+ * example for the solutions on several successive time steps. One could then
+ * call the functions of this class several times for each solution. However,
+ * the largest factor in the computation of the error estimates (in terms of
  * computing time) is initialization of FEFaceValues and FESubFaceValues
  * objects, and iterating through all faces and subfaces. If the solution
  * vectors live on the same grid, this effort can be reduced significantly by
