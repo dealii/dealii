@@ -1256,7 +1256,10 @@ namespace Utilities
       // dereferencing iterators if the std::vector<char> is empty,
       // which would not be allowed.
       if (cbegin == cend)
-        return;
+        {
+          object.clear();
+          return;
+        }
 
       // The size of the object vector can be found in cbegin of the buffer.
       // The data starts at cbegin + sizeof(vector_size).
@@ -1297,7 +1300,10 @@ namespace Utilities
       // dereferencing iterators if the std::vector<char> is empty,
       // which would not be allowed.
       if (cbegin == cend)
-        return;
+        {
+          object.clear();
+          return;
+        }
 
       // First get the size of the vector, and resize the output object
       using size_type = typename std::vector<T>::size_type;
