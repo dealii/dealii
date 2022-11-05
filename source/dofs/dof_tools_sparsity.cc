@@ -54,13 +54,10 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace DoFTools
 {
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof,
-                        SparsityPatternType &            sparsity,
+                        SparsityPatternBase &            sparsity,
                         const AffineConstraints<number> &constraints,
                         const bool                       keep_constrained_dofs,
                         const types::subdomain_id        subdomain_id)
@@ -114,14 +111,11 @@ namespace DoFTools
 
 
 
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof,
                         const Table<2, Coupling> &       couplings,
-                        SparsityPatternType &            sparsity,
+                        SparsityPatternBase &            sparsity,
                         const AffineConstraints<number> &constraints,
                         const bool                       keep_constrained_dofs,
                         const types::subdomain_id        subdomain_id)
@@ -207,11 +201,11 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_row,
                         const DoFHandler<dim, spacedim> &dof_col,
-                        SparsityPatternType &            sparsity)
+                        SparsityPatternBase &            sparsity)
   {
     const types::global_dof_index n_dofs_row = dof_row.n_dofs();
     const types::global_dof_index n_dofs_col = dof_col.n_dofs();
@@ -288,9 +282,8 @@ namespace DoFTools
             cell_row->get_dof_indices(local_dof_indices_row);
             cell_col->get_dof_indices(local_dof_indices_col);
             for (unsigned int i = 0; i < dofs_per_cell_row; ++i)
-              sparsity.add_entries(local_dof_indices_row[i],
-                                   local_dof_indices_col.begin(),
-                                   local_dof_indices_col.end());
+              sparsity.add_row_entries(local_dof_indices_row[i],
+                                       make_array_view(local_dof_indices_col));
           }
         else if (cell_row->has_children())
           {
@@ -314,9 +307,9 @@ namespace DoFTools
                 cell_row_child->get_dof_indices(local_dof_indices_row);
                 cell_col->get_dof_indices(local_dof_indices_col);
                 for (unsigned int r = 0; r < dofs_per_cell_row; ++r)
-                  sparsity.add_entries(local_dof_indices_row[r],
-                                       local_dof_indices_col.begin(),
-                                       local_dof_indices_col.end());
+                  sparsity.add_row_entries(local_dof_indices_row[r],
+                                           make_array_view(
+                                             local_dof_indices_col));
               }
           }
         else
@@ -341,9 +334,9 @@ namespace DoFTools
                 cell_row->get_dof_indices(local_dof_indices_row);
                 cell_col_child->get_dof_indices(local_dof_indices_col);
                 for (unsigned int r = 0; r < dofs_per_cell_row; ++r)
-                  sparsity.add_entries(local_dof_indices_row[r],
-                                       local_dof_indices_col.begin(),
-                                       local_dof_indices_col.end());
+                  sparsity.add_row_entries(local_dof_indices_row[r],
+                                           make_array_view(
+                                             local_dof_indices_col));
               }
           }
       }
@@ -351,12 +344,12 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_boundary_sparsity_pattern(
     const DoFHandler<dim, spacedim> &           dof,
     const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-    SparsityPatternType &                       sparsity)
+    SparsityPatternBase &                       sparsity)
   {
     if (dim == 1)
       {
@@ -366,8 +359,10 @@ namespace DoFTools
           boundary_ids;
         boundary_ids[0] = nullptr;
         boundary_ids[1] = nullptr;
-        make_boundary_sparsity_pattern<dim, spacedim, SparsityPatternType>(
-          dof, boundary_ids, dof_to_boundary_mapping, sparsity);
+        make_boundary_sparsity_pattern<dim, spacedim>(dof,
+                                                      boundary_ids,
+                                                      dof_to_boundary_mapping,
+                                                      sparsity);
         return;
       }
 
@@ -391,6 +386,15 @@ namespace DoFTools
     std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
 
+    std::vector<types::global_dof_index> rows;
+    std::vector<types::global_dof_index> cols;
+
+    auto append_pair = [&](const types::global_dof_index i,
+                           const types::global_dof_index j) {
+      rows.push_back(i);
+      cols.push_back(j);
+    };
+
     // loop over all faces to check whether they are at a boundary. note
     // that we need not take special care of single lines (using
     // @p{cell->has_boundary_lines}), since we do not support boundaries of
@@ -409,24 +413,25 @@ namespace DoFTools
             // make sparsity pattern for this cell
             for (unsigned int i = 0; i < dofs_per_face; ++i)
               for (unsigned int j = 0; j < dofs_per_face; ++j)
-                sparsity.add(dof_to_boundary_mapping[dofs_on_this_face[i]],
-                             dof_to_boundary_mapping[dofs_on_this_face[j]]);
+                append_pair(dof_to_boundary_mapping[dofs_on_this_face[i]],
+                            dof_to_boundary_mapping[dofs_on_this_face[j]]);
+
+            sparsity.add_entries(make_array_view(rows), make_array_view(cols));
+            rows.clear();
+            cols.clear();
           }
   }
 
 
 
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_boundary_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                         boundary_ids,
     const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-    SparsityPatternType &                       sparsity)
+    SparsityPatternBase &                       sparsity)
   {
     if (dim == 1)
       {
@@ -457,9 +462,9 @@ namespace DoFTools
                 dof_to_boundary_mapping[cell->vertex_dof_index(direction, i)];
 
             for (unsigned int i = 0; i < dofs_per_vertex; ++i)
-              sparsity.add_entries(boundary_dof_boundary_indices[i],
-                                   boundary_dof_boundary_indices.begin(),
-                                   boundary_dof_boundary_indices.end());
+              sparsity.add_row_entries(boundary_dof_boundary_indices[i],
+                                       make_array_view(
+                                         boundary_dof_boundary_indices));
           }
         return;
       }
@@ -490,6 +495,16 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
+
+    std::vector<types::global_dof_index> rows;
+    std::vector<types::global_dof_index> cols;
+
+    auto append_pair = [&](const types::global_dof_index i,
+                           const types::global_dof_index j) {
+      rows.push_back(i);
+      cols.push_back(j);
+    };
+
     for (const auto &cell : dof.active_cell_iterators())
       for (const unsigned int f : cell->face_indices())
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
@@ -504,20 +519,21 @@ namespace DoFTools
             // make sparsity pattern for this cell
             for (unsigned int i = 0; i < dofs_per_face; ++i)
               for (unsigned int j = 0; j < dofs_per_face; ++j)
-                sparsity.add(dof_to_boundary_mapping[dofs_on_this_face[i]],
-                             dof_to_boundary_mapping[dofs_on_this_face[j]]);
+                append_pair(dof_to_boundary_mapping[dofs_on_this_face[i]],
+                            dof_to_boundary_mapping[dofs_on_this_face[j]]);
+
+            sparsity.add_entries(make_array_view(rows), make_array_view(cols));
+            rows.clear();
+            cols.clear();
           }
   }
 
 
 
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &dof,
-                             SparsityPatternType &            sparsity,
+                             SparsityPatternBase &            sparsity,
                              const AffineConstraints<number> &constraints,
                              const bool                keep_constrained_dofs,
                              const types::subdomain_id subdomain_id)
@@ -683,10 +699,10 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &dof,
-                             SparsityPatternType &            sparsity)
+                             SparsityPatternBase &            sparsity)
   {
     AffineConstraints<double> dummy;
     make_flux_sparsity_pattern(dof, sparsity, dummy);
@@ -755,14 +771,11 @@ namespace DoFTools
     {
       // implementation of the same function in namespace DoFTools for
       // non-hp-DoFHandlers
-      template <int dim,
-                int spacedim,
-                typename SparsityPatternType,
-                typename number>
+      template <int dim, int spacedim, typename number>
       void
       make_flux_sparsity_pattern(
         const DoFHandler<dim, spacedim> &dof,
-        SparsityPatternType &            sparsity,
+        SparsityPatternBase &            sparsity,
         const AffineConstraints<number> &constraints,
         const bool                       keep_constrained_dofs,
         const Table<2, Coupling> &       int_mask,
@@ -772,6 +785,15 @@ namespace DoFTools
           bool(const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
                const unsigned int)> &face_has_flux_coupling)
       {
+        std::vector<types::global_dof_index> rows;
+        std::vector<types::global_dof_index> cols;
+
+        auto append_pair = [&](const types::global_dof_index i,
+                               const types::global_dof_index j) {
+          rows.push_back(i);
+          cols.push_back(j);
+        };
+
         if (dof.has_hp_capabilities() == false)
           {
             const FiniteElement<dim, spacedim> &fe = dof.get_fe();
@@ -839,10 +861,14 @@ namespace DoFTools
                                   if (flux_dof_mask(i, j) == always ||
                                       (flux_dof_mask(i, j) == nonzero &&
                                        i_non_zero_i && j_non_zero_i))
-                                    sparsity.add(dofs_on_this_cell[i],
-                                                 dofs_on_this_cell[j]);
+                                    append_pair(dofs_on_this_cell[i],
+                                                dofs_on_this_cell[j]);
                                 }
                             }
+                          sparsity.add_entries(make_array_view(rows),
+                                               make_array_view(cols));
+                          rows.clear();
+                          cols.clear();
                         }
                       else
                         {
@@ -934,16 +960,14 @@ namespace DoFTools
 
                                           if (flux_dof_mask(i, j) == always)
                                             {
-                                              sparsity.add(
+                                              append_pair(
                                                 dofs_on_this_cell[i],
                                                 dofs_on_other_cell[j]);
-                                              sparsity.add(
-                                                dofs_on_other_cell[i],
-                                                dofs_on_this_cell[j]);
-                                              sparsity.add(
-                                                dofs_on_this_cell[i],
-                                                dofs_on_this_cell[j]);
-                                              sparsity.add(
+                                              append_pair(dofs_on_other_cell[i],
+                                                          dofs_on_this_cell[j]);
+                                              append_pair(dofs_on_this_cell[i],
+                                                          dofs_on_this_cell[j]);
+                                              append_pair(
                                                 dofs_on_other_cell[i],
                                                 dofs_on_other_cell[j]);
                                             }
@@ -951,35 +975,33 @@ namespace DoFTools
                                                    nonzero)
                                             {
                                               if (i_non_zero_i && j_non_zero_e)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_this_cell[i],
                                                   dofs_on_other_cell[j]);
                                               if (i_non_zero_e && j_non_zero_i)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_other_cell[i],
                                                   dofs_on_this_cell[j]);
                                               if (i_non_zero_i && j_non_zero_i)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_this_cell[i],
                                                   dofs_on_this_cell[j]);
                                               if (i_non_zero_e && j_non_zero_e)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_other_cell[i],
                                                   dofs_on_other_cell[j]);
                                             }
 
                                           if (flux_dof_mask(j, i) == always)
                                             {
-                                              sparsity.add(
+                                              append_pair(
                                                 dofs_on_this_cell[j],
                                                 dofs_on_other_cell[i]);
-                                              sparsity.add(
-                                                dofs_on_other_cell[j],
-                                                dofs_on_this_cell[i]);
-                                              sparsity.add(
-                                                dofs_on_this_cell[j],
-                                                dofs_on_this_cell[i]);
-                                              sparsity.add(
+                                              append_pair(dofs_on_other_cell[j],
+                                                          dofs_on_this_cell[i]);
+                                              append_pair(dofs_on_this_cell[j],
+                                                          dofs_on_this_cell[i]);
+                                              append_pair(
                                                 dofs_on_other_cell[j],
                                                 dofs_on_other_cell[i]);
                                             }
@@ -987,25 +1009,29 @@ namespace DoFTools
                                                    nonzero)
                                             {
                                               if (j_non_zero_i && i_non_zero_e)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_this_cell[j],
                                                   dofs_on_other_cell[i]);
                                               if (j_non_zero_e && i_non_zero_i)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_other_cell[j],
                                                   dofs_on_this_cell[i]);
                                               if (j_non_zero_i && i_non_zero_i)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_this_cell[j],
                                                   dofs_on_this_cell[i]);
                                               if (j_non_zero_e && i_non_zero_e)
-                                                sparsity.add(
+                                                append_pair(
                                                   dofs_on_other_cell[j],
                                                   dofs_on_other_cell[i]);
                                             }
                                         }
                                     }
                                 }
+                              sparsity.add_entries(make_array_view(rows),
+                                                   make_array_view(cols));
+                              rows.clear();
+                              cols.clear();
                             }
                           else
                             {
@@ -1027,59 +1053,63 @@ namespace DoFTools
                                         support_on_face(j, neighbor_face_n);
                                       if (flux_dof_mask(i, j) == always)
                                         {
-                                          sparsity.add(dofs_on_this_cell[i],
-                                                       dofs_on_other_cell[j]);
-                                          sparsity.add(dofs_on_other_cell[i],
-                                                       dofs_on_this_cell[j]);
-                                          sparsity.add(dofs_on_this_cell[i],
-                                                       dofs_on_this_cell[j]);
-                                          sparsity.add(dofs_on_other_cell[i],
-                                                       dofs_on_other_cell[j]);
+                                          append_pair(dofs_on_this_cell[i],
+                                                      dofs_on_other_cell[j]);
+                                          append_pair(dofs_on_other_cell[i],
+                                                      dofs_on_this_cell[j]);
+                                          append_pair(dofs_on_this_cell[i],
+                                                      dofs_on_this_cell[j]);
+                                          append_pair(dofs_on_other_cell[i],
+                                                      dofs_on_other_cell[j]);
                                         }
                                       if (flux_dof_mask(i, j) == nonzero)
                                         {
                                           if (i_non_zero_i && j_non_zero_e)
-                                            sparsity.add(dofs_on_this_cell[i],
-                                                         dofs_on_other_cell[j]);
+                                            append_pair(dofs_on_this_cell[i],
+                                                        dofs_on_other_cell[j]);
                                           if (i_non_zero_e && j_non_zero_i)
-                                            sparsity.add(dofs_on_other_cell[i],
-                                                         dofs_on_this_cell[j]);
+                                            append_pair(dofs_on_other_cell[i],
+                                                        dofs_on_this_cell[j]);
                                           if (i_non_zero_i && j_non_zero_i)
-                                            sparsity.add(dofs_on_this_cell[i],
-                                                         dofs_on_this_cell[j]);
+                                            append_pair(dofs_on_this_cell[i],
+                                                        dofs_on_this_cell[j]);
                                           if (i_non_zero_e && j_non_zero_e)
-                                            sparsity.add(dofs_on_other_cell[i],
-                                                         dofs_on_other_cell[j]);
+                                            append_pair(dofs_on_other_cell[i],
+                                                        dofs_on_other_cell[j]);
                                         }
 
                                       if (flux_dof_mask(j, i) == always)
                                         {
-                                          sparsity.add(dofs_on_this_cell[j],
-                                                       dofs_on_other_cell[i]);
-                                          sparsity.add(dofs_on_other_cell[j],
-                                                       dofs_on_this_cell[i]);
-                                          sparsity.add(dofs_on_this_cell[j],
-                                                       dofs_on_this_cell[i]);
-                                          sparsity.add(dofs_on_other_cell[j],
-                                                       dofs_on_other_cell[i]);
+                                          append_pair(dofs_on_this_cell[j],
+                                                      dofs_on_other_cell[i]);
+                                          append_pair(dofs_on_other_cell[j],
+                                                      dofs_on_this_cell[i]);
+                                          append_pair(dofs_on_this_cell[j],
+                                                      dofs_on_this_cell[i]);
+                                          append_pair(dofs_on_other_cell[j],
+                                                      dofs_on_other_cell[i]);
                                         }
                                       if (flux_dof_mask(j, i) == nonzero)
                                         {
                                           if (j_non_zero_i && i_non_zero_e)
-                                            sparsity.add(dofs_on_this_cell[j],
-                                                         dofs_on_other_cell[i]);
+                                            append_pair(dofs_on_this_cell[j],
+                                                        dofs_on_other_cell[i]);
                                           if (j_non_zero_e && i_non_zero_i)
-                                            sparsity.add(dofs_on_other_cell[j],
-                                                         dofs_on_this_cell[i]);
+                                            append_pair(dofs_on_other_cell[j],
+                                                        dofs_on_this_cell[i]);
                                           if (j_non_zero_i && i_non_zero_i)
-                                            sparsity.add(dofs_on_this_cell[j],
-                                                         dofs_on_this_cell[i]);
+                                            append_pair(dofs_on_this_cell[j],
+                                                        dofs_on_this_cell[i]);
                                           if (j_non_zero_e && i_non_zero_e)
-                                            sparsity.add(dofs_on_other_cell[j],
-                                                         dofs_on_other_cell[i]);
+                                            append_pair(dofs_on_other_cell[j],
+                                                        dofs_on_other_cell[i]);
                                         }
                                     }
                                 }
+                              sparsity.add_entries(make_array_view(rows),
+                                                   make_array_view(cols));
+                              rows.clear();
+                              cols.clear();
                             }
                         }
                     }
@@ -1269,7 +1299,7 @@ namespace DoFTools
                                           if ((flux_mask(ii, jj) == always) ||
                                               (flux_mask(ii, jj) == nonzero))
                                             {
-                                              sparsity.add(
+                                              append_pair(
                                                 dofs_on_this_cell[i],
                                                 dofs_on_other_cell[j]);
                                             }
@@ -1277,9 +1307,8 @@ namespace DoFTools
                                           if ((flux_mask(jj, ii) == always) ||
                                               (flux_mask(jj, ii) == nonzero))
                                             {
-                                              sparsity.add(
-                                                dofs_on_other_cell[j],
-                                                dofs_on_this_cell[i]);
+                                              append_pair(dofs_on_other_cell[j],
+                                                          dofs_on_this_cell[i]);
                                             }
                                         }
                                     }
@@ -1326,21 +1355,25 @@ namespace DoFTools
                                       if ((flux_mask(ii, jj) == always) ||
                                           (flux_mask(ii, jj) == nonzero))
                                         {
-                                          sparsity.add(dofs_on_this_cell[i],
-                                                       dofs_on_other_cell[j]);
+                                          append_pair(dofs_on_this_cell[i],
+                                                      dofs_on_other_cell[j]);
                                         }
 
                                       if ((flux_mask(jj, ii) == always) ||
                                           (flux_mask(jj, ii) == nonzero))
                                         {
-                                          sparsity.add(dofs_on_other_cell[j],
-                                                       dofs_on_this_cell[i]);
+                                          append_pair(dofs_on_other_cell[j],
+                                                      dofs_on_this_cell[i]);
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                  sparsity.add_entries(make_array_view(rows),
+                                       make_array_view(cols));
+                  rows.clear();
+                  cols.clear();
                 }
           }
       }
@@ -1350,10 +1383,10 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &dof,
-                             SparsityPatternType &            sparsity,
+                             SparsityPatternBase &            sparsity,
                              const Table<2, Coupling> &       int_mask,
                              const Table<2, Coupling> &       flux_mask,
                              const types::subdomain_id        subdomain_id)
@@ -1374,14 +1407,11 @@ namespace DoFTools
 
 
 
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_flux_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof,
-    SparsityPatternType &            sparsity,
+    SparsityPatternBase &            sparsity,
     const AffineConstraints<number> &constraints,
     const bool                       keep_constrained_dofs,
     const Table<2, Coupling> &       int_mask,
