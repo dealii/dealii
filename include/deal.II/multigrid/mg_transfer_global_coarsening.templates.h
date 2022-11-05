@@ -2224,6 +2224,158 @@ namespace internal
     }
   };
 
+
+
+  template <typename Number>
+  struct SimpleVectorDataExchange
+  {
+    SimpleVectorDataExchange(
+      const std::shared_ptr<const Utilities::MPI::Partitioner>
+        &                    embedded_partitioner,
+      AlignedVector<Number> &buffer)
+      : embedded_partitioner(embedded_partitioner)
+      , buffer(buffer)
+    {}
+
+    template <typename VectorType>
+    void
+    update_ghost_values(const VectorType &vec) const
+    {
+      update_ghost_values_start(vec);
+      update_ghost_values_finish(vec);
+    }
+
+    template <typename VectorType>
+    void
+    update_ghost_values_start(const VectorType &vec) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      Assert(false, ExcNeedsMPI());
+      (void)vec;
+#else
+      const auto &vector_partitioner = vec.get_partitioner();
+
+      buffer.resize_fast(embedded_partitioner->n_import_indices());
+
+      embedded_partitioner
+        ->template export_to_ghosted_array_start<Number, MemorySpace::Host>(
+          0,
+          dealii::ArrayView<const Number>(
+            vec.begin(), embedded_partitioner->locally_owned_size()),
+          dealii::ArrayView<Number>(buffer.begin(), buffer.size()),
+          dealii::ArrayView<Number>(
+            const_cast<Number *>(vec.begin()) +
+              embedded_partitioner->locally_owned_size(),
+            vector_partitioner->n_ghost_indices()),
+          requests);
+#endif
+    }
+
+    template <typename VectorType>
+    void
+    update_ghost_values_finish(const VectorType &vec) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      Assert(false, ExcNeedsMPI());
+      (void)vec;
+#else
+      const auto &vector_partitioner = vec.get_partitioner();
+
+      embedded_partitioner
+        ->template export_to_ghosted_array_finish<Number, MemorySpace::Host>(
+          dealii::ArrayView<Number>(
+            const_cast<Number *>(vec.begin()) +
+              embedded_partitioner->locally_owned_size(),
+            vector_partitioner->n_ghost_indices()),
+          requests);
+
+      vec.set_ghost_state(true);
+#endif
+    }
+
+    template <typename VectorType>
+    void
+    compress(VectorType &vec) const
+    {
+      compress_start(vec);
+      compress_finish(vec);
+    }
+
+    template <typename VectorType>
+    void
+    compress_start(VectorType &vec) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      Assert(false, ExcNeedsMPI());
+      (void)vec;
+#else
+      const auto &vector_partitioner = vec.get_partitioner();
+
+      buffer.resize_fast(embedded_partitioner->n_import_indices());
+
+      embedded_partitioner
+        ->template import_from_ghosted_array_start<Number, MemorySpace::Host>(
+          dealii::VectorOperation::add,
+          0,
+          dealii::ArrayView<Number>(
+            const_cast<Number *>(vec.begin()) +
+              embedded_partitioner->locally_owned_size(),
+            vector_partitioner->n_ghost_indices()),
+          dealii::ArrayView<Number>(buffer.begin(), buffer.size()),
+          requests);
+#endif
+    }
+
+    template <typename VectorType>
+    void
+    compress_finish(VectorType &vec) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      Assert(false, ExcNeedsMPI());
+      (void)vec;
+#else
+      const auto &vector_partitioner = vec.get_partitioner();
+
+      embedded_partitioner
+        ->template import_from_ghosted_array_finish<Number, MemorySpace::Host>(
+          dealii::VectorOperation::add,
+          dealii::ArrayView<const Number>(buffer.begin(), buffer.size()),
+          dealii::ArrayView<Number>(vec.begin(),
+                                    embedded_partitioner->locally_owned_size()),
+          dealii::ArrayView<Number>(
+            const_cast<Number *>(vec.begin()) +
+              embedded_partitioner->locally_owned_size(),
+            vector_partitioner->n_ghost_indices()),
+          requests);
+#endif
+    }
+
+    template <typename VectorType>
+    void
+    zero_out_ghost_values(const VectorType &vec) const
+    {
+      const auto &vector_partitioner = vec.get_partitioner();
+
+      ArrayView<Number> ghost_array(
+        const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec).begin() +
+          vector_partitioner->locally_owned_size(),
+        vector_partitioner->n_ghost_indices());
+
+      for (const auto &my_ghosts :
+           embedded_partitioner->ghost_indices_within_larger_ghost_set())
+        for (unsigned int j = my_ghosts.first; j < my_ghosts.second; ++j)
+          ghost_array[j] = 0.;
+
+      vec.set_ghost_state(false);
+    }
+
+  private:
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+                                     embedded_partitioner;
+    dealii::AlignedVector<Number> &  buffer;
+    mutable std::vector<MPI_Request> requests;
+  };
+
 } // namespace internal
 
 
@@ -2460,7 +2612,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   if (use_src_inplace == false)
     vec_coarse.copy_locally_owned_data_from(src);
 
-  vec_coarse_ptr->update_ghost_values();
+  update_ghost_values(*vec_coarse_ptr);
 
   if (fine_element_is_continuous && (use_dst_inplace == false))
     *vec_fine_ptr = Number(0.);
@@ -2574,13 +2726,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
     }
 
   if (fine_element_is_continuous || use_dst_inplace == false)
-    vec_fine_ptr->compress(VectorOperation::add);
+    compress(*vec_fine_ptr, VectorOperation::add);
 
   if (use_dst_inplace == false)
     dst += this->vec_fine;
 
   if (use_src_inplace)
-    vec_coarse_ptr->zero_out_ghost_values();
+    zero_out_ghost_values(*vec_coarse_ptr);
 }
 
 
@@ -2609,13 +2761,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
     this->vec_fine.copy_locally_owned_data_from(src);
 
   if (fine_element_is_continuous || use_src_inplace == false)
-    vec_fine_ptr->update_ghost_values();
+    update_ghost_values(*vec_fine_ptr);
 
   if (use_dst_inplace == false)
     *vec_coarse_ptr = 0.0;
 
-  vec_coarse_ptr->zero_out_ghost_values(); // since we might add into the
-                                           // ghost values and call compress
+  zero_out_ghost_values(*vec_coarse_ptr); // since we might add into the
+                                          // ghost values and call compress
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
@@ -2729,13 +2881,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   // clean up related to update_ghost_values()
   if (fine_element_is_continuous == false && use_src_inplace == false)
-    vec_fine_ptr->zero_out_ghost_values(); // internal vector (DG)
+    zero_out_ghost_values(*vec_fine_ptr); // internal vector (DG)
   else if (fine_element_is_continuous && use_src_inplace == false)
     vec_fine_ptr->set_ghost_state(false); // internal vector (CG)
   else if (fine_element_is_continuous)
-    vec_fine_ptr->zero_out_ghost_values(); // external vector
+    zero_out_ghost_values(*vec_fine_ptr); // external vector
 
-  vec_coarse_ptr->compress(VectorOperation::add);
+  compress(*vec_coarse_ptr, VectorOperation::add);
 
   if (use_dst_inplace == false)
     dst += this->vec_coarse;
@@ -2767,7 +2919,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
     this->vec_fine.copy_locally_owned_data_from(src);
 
   if (fine_element_is_continuous || use_src_inplace == false)
-    vec_fine_ptr->update_ghost_values();
+    update_ghost_values(*vec_fine_ptr);
 
   *vec_coarse_ptr = 0.0;
 
@@ -2864,7 +3016,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   if (use_src_inplace == false)
     vec_fine_ptr->set_ghost_state(false); // internal vector
   else if (fine_element_is_continuous)
-    vec_fine_ptr->zero_out_ghost_values(); // external vector
+    zero_out_ghost_values(*vec_fine_ptr); // external vector
 
   if (use_dst_inplace == false)
     dst.copy_locally_owned_data_from(this->vec_coarse);
@@ -2906,6 +3058,18 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                                partitioner->get_mpi_communicator()) == 1;
   };
 
+  const auto create_embedded_partitioner = [&](const auto &partitioner,
+                                               const auto &larger_partitioner) {
+    auto embedded_partitioner = std::make_shared<Utilities::MPI::Partitioner>(
+      larger_partitioner->locally_owned_range(),
+      larger_partitioner->get_mpi_communicator());
+
+    embedded_partitioner->set_ghost_indices(
+      partitioner->ghost_indices(), larger_partitioner->ghost_indices());
+
+    return embedded_partitioner;
+  };
+
   if (this->partitioner_coarse->is_globally_compatible(
         *external_partitioner_coarse))
     {
@@ -2925,6 +3089,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         i = external_partitioner_coarse->global_to_local(
           this->partitioner_coarse->local_to_global(i));
 
+      this->partitioner_coarse_embedded =
+        create_embedded_partitioner(this->partitioner_coarse,
+                                    external_partitioner_coarse);
+
       this->partitioner_coarse = external_partitioner_coarse;
     }
 
@@ -2942,6 +3110,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
       for (auto &i : level_dof_indices_fine)
         i = external_partitioner_fine->global_to_local(
           this->partitioner_fine->local_to_global(i));
+
+      this->partitioner_fine_embedded =
+        create_embedded_partitioner(this->partitioner_fine,
+                                    external_partitioner_fine);
 
       this->partitioner_fine = external_partitioner_fine;
     }
@@ -3125,6 +3297,74 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   size += constraint_info.memory_consumption();
 
   return size;
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
+  update_ghost_values(
+    const LinearAlgebra::distributed::Vector<Number> &vec) const
+{
+  if ((vec.get_partitioner().get() == partitioner_coarse.get()) &&
+      (partitioner_coarse_embedded != nullptr))
+    internal::SimpleVectorDataExchange<Number>(partitioner_coarse_embedded,
+                                               buffer_coarse_embedded)
+      .update_ghost_values(vec);
+  else if ((vec.get_partitioner().get() == partitioner_fine.get()) &&
+           (partitioner_fine_embedded != nullptr))
+    internal::SimpleVectorDataExchange<Number>(partitioner_fine_embedded,
+                                               buffer_fine_embedded)
+      .update_ghost_values(vec);
+  else
+    vec.update_ghost_values();
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::compress(
+  LinearAlgebra::distributed::Vector<Number> &vec,
+  const VectorOperation::values               op) const
+{
+  Assert(op == VectorOperation::add, ExcNotImplemented());
+
+  if ((vec.get_partitioner().get() == partitioner_coarse.get()) &&
+      (partitioner_coarse_embedded != nullptr))
+    internal::SimpleVectorDataExchange<Number>(partitioner_coarse_embedded,
+                                               buffer_coarse_embedded)
+      .compress(vec);
+  else if ((vec.get_partitioner().get() == partitioner_fine.get()) &&
+           (partitioner_fine_embedded != nullptr))
+    internal::SimpleVectorDataExchange<Number>(partitioner_fine_embedded,
+                                               buffer_fine_embedded)
+      .compress(vec);
+  else
+    vec.compress(op);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
+  zero_out_ghost_values(
+    const LinearAlgebra::distributed::Vector<Number> &vec) const
+{
+  if ((vec.get_partitioner().get() == partitioner_coarse.get()) &&
+      (partitioner_coarse_embedded != nullptr))
+    internal::SimpleVectorDataExchange<Number>(partitioner_coarse_embedded,
+                                               buffer_coarse_embedded)
+      .zero_out_ghost_values(vec);
+  else if ((vec.get_partitioner().get() == (partitioner_fine.get()) &&
+            partitioner_fine_embedded != nullptr))
+    internal::SimpleVectorDataExchange<Number>(partitioner_fine_embedded,
+                                               buffer_fine_embedded)
+      .zero_out_ghost_values(vec);
+  else
+    vec.zero_out_ghost_values();
 }
 
 

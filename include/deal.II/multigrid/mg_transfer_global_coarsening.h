@@ -325,6 +325,17 @@ public:
   memory_consumption() const;
 
 private:
+  void
+  update_ghost_values(const LinearAlgebra::distributed::Vector<Number> &) const;
+
+  void
+  compress(LinearAlgebra::distributed::Vector<Number> &,
+           const VectorOperation::values) const;
+
+  void
+  zero_out_ghost_values(
+    const LinearAlgebra::distributed::Vector<Number> &) const;
+
   /**
    * A multigrid transfer scheme. A multrigrid transfer class can have different
    * transfer schemes to enable p-adaptivity (one transfer scheme per
@@ -413,9 +424,34 @@ private:
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine;
 
   /**
+   * Embedded partitioner for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine_embedded;
+
+  /**
+   * Buffer for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  mutable AlignedVector<Number> buffer_fine_embedded;
+
+  /**
    * Partitioner needed by the intermediate vector.
    */
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
+
+  /**
+   * Embedded partitioner for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner>
+    partitioner_coarse_embedded;
+
+  /**
+   * Buffer for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  mutable AlignedVector<Number> buffer_coarse_embedded;
 
   /**
    * Internal vector needed for collecting all degrees of freedom of the fine
