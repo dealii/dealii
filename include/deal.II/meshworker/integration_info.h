@@ -349,8 +349,8 @@ namespace MeshWorker
                const BlockInfo *                   block_info = nullptr);
     /**
      * @name FEValues setup
+     * @{
      */
-    /* @{ */
 
     /**
      * Call this function before initialize() in order to guess the update
@@ -470,8 +470,8 @@ namespace MeshWorker
 
     /**
      * @name Data vectors
+     * @{
      */
-    /* @{ */
 
     /**
      * Initialize the VectorSelector objects #cell_selector,
@@ -507,8 +507,8 @@ namespace MeshWorker
 
     /**
      * @name Interface for MeshWorker::loop()
+     * @{
      */
-    /* @{ */
     /**
      * A callback function which is called in the loop over all cells, after
      * the action on a cell has been performed and before the faces are dealt
@@ -586,7 +586,7 @@ namespace MeshWorker
     , n_components(numbers::invalid_unsigned_int)
   {}
 
-
+#ifndef DOXYGEN
   template <int dim, int sdim>
   inline IntegrationInfo<dim, sdim>::IntegrationInfo(
     const IntegrationInfo<dim, sdim> &other)
@@ -631,6 +631,7 @@ namespace MeshWorker
           Assert(false, ExcInternalError());
       }
   }
+#endif
 
 
 
@@ -779,6 +780,7 @@ namespace MeshWorker
   }
 
 
+#ifndef DOXYGEN
   template <int dim, int sdim>
   inline void
   IntegrationInfoBox<dim, sdim>::initialize(const FiniteElement<dim, sdim> &el,
@@ -808,6 +810,7 @@ namespace MeshWorker
     neighbor.template initialize<FEFaceValues<dim, sdim>>(
       el, mapping, face_quadrature, neighbor_flags, block_info);
   }
+#endif
 
 
   template <int dim, int sdim>

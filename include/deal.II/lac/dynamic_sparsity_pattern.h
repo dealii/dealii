@@ -549,8 +549,8 @@ public:
 
   /**
    * @name Iterators
+   * @{
    */
-  // @{
 
   /**
    * Iterator starting at the first entry of the matrix. The resulting
@@ -604,7 +604,9 @@ public:
   iterator
   end(const size_type r) const;
 
-  /** @} */
+  /**
+   * @}
+   */
 
   /**
    * Compute the bandwidth of the matrix represented by this structure. The
