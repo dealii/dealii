@@ -52,6 +52,9 @@ namespace hp
    * selected dynamically. This namespace collects tools to decide which type
    * of adaptive methods to apply.
    *
+   * @note A formal description of the algorithms provided in this namespace
+   * can be found in @cite fehling2020 . See in particular Section 3.2.
+   *
    * <h3>Usage</h3>
    *
    * To successfully apply hp-adaptive methods, we recommend the following
