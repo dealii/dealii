@@ -27,12 +27,12 @@ namespace Particles
 {
   namespace Utilities
   {
-    template <int dim, int spacedim, typename SparsityType, typename number>
+    template <int dim, int spacedim, typename number>
     void
     create_interpolation_sparsity_pattern(
       const DoFHandler<dim, spacedim> &                space_dh,
       const Particles::ParticleHandler<dim, spacedim> &particle_handler,
-      SparsityType &                                   sparsity,
+      SparsityPatternBase &                            sparsity,
       const AffineConstraints<number> &                constraints,
       const ComponentMask &                            space_comps)
     {
