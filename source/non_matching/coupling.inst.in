@@ -15,7 +15,6 @@
 
 
 for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
-     Sparsity : SPARSITY_PATTERNS;
      S : REAL_AND_COMPLEX_SCALARS)
   {
 #if dim1 <= spacedim && dim0 <= spacedim
@@ -23,7 +22,7 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const DoFHandler<dim0, spacedim> &space_dh,
       const DoFHandler<dim1, spacedim> &immersed_dh,
       const Quadrature<dim1> &          quad,
-      Sparsity &                        sparsity,
+      SparsityPatternBase &             sparsity,
       const AffineConstraints<S> &      constraints,
       const ComponentMask &             space_comps,
       const ComponentMask &             immersed_comps,
@@ -36,7 +35,7 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const DoFHandler<dim0, spacedim> &      space_dh,
       const DoFHandler<dim1, spacedim> &      immersed_dh,
       const Quadrature<dim1> &                quad,
-      Sparsity &                              sparsity,
+      SparsityPatternBase &                   sparsity,
       const AffineConstraints<S> &            constraints,
       const ComponentMask &                   space_comps,
       const ComponentMask &                   immersed_comps,
@@ -50,7 +49,7 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const DoFHandler<dim0, spacedim> &      dh0,
       const DoFHandler<dim1, spacedim> &      dh1,
       const Quadrature<dim1> &                quad,
-      Sparsity &                              sparsity,
+      SparsityPatternBase &                   sparsity,
       const AffineConstraints<S> &            constraints0,
       const ComponentMask &                   comps0,
       const ComponentMask &                   comps1);
