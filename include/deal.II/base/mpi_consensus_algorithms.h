@@ -526,6 +526,17 @@ namespace Utilities
        *
        * @tparam RequestType The type of the object to be sent.
        * @tparam AnswerType The type of the object to be received.
+       *
+       * @note Nothing good will generally happen if any of the function
+       *   objects passed as arguments throws an exception when called.
+       *   This is because when that happens, one MPI process will stop
+       *   participating in MPI communications, deadlocking the other
+       *   processes. As a consequence, the `create_request()`,
+       *   `answer_request()`, and `process_answer()` functions should
+       *   not throw any exceptions; if they encounter error
+       *   conditions, they should instead call `MPI_Abort()` or use
+       *   another way to reliably print an error message and then
+       *   bring the MPI universe down.
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
@@ -562,6 +573,17 @@ namespace Utilities
        *   is to be performed.
        *
        * @tparam RequestType The type of the object to be sent.
+       *
+       * @note Nothing good will generally happen if any of the function
+       *   objects passed as arguments throws an exception when called.
+       *   This is because when that happens, one MPI process will stop
+       *   participating in MPI communications, deadlocking the other
+       *   processes. As a consequence, the `create_request()` and
+       *   `process_request()` functions should
+       *   not throw any exceptions; if they encounter error
+       *   conditions, they should instead call `MPI_Abort()` or use
+       *   another way to reliably print an error message and then
+       *   bring the MPI universe down.
        */
       template <typename RequestType>
       std::vector<unsigned int>
@@ -760,6 +782,17 @@ namespace Utilities
        *
        * @tparam RequestType The type of the object to be sent.
        * @tparam AnswerType The type of the object to be received.
+       *
+       * @note Nothing good will generally happen if any of the function
+       *   objects passed as arguments throws an exception when called.
+       *   This is because when that happens, one MPI process will stop
+       *   participating in MPI communications, deadlocking the other
+       *   processes. As a consequence, the `create_request()`,
+       *   `answer_request()`, and `process_answer()` functions should
+       *   not throw any exceptions; if they encounter error
+       *   conditions, they should instead call `MPI_Abort()` or use
+       *   another way to reliably print an error message and then
+       *   bring the MPI universe down.
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
@@ -796,6 +829,17 @@ namespace Utilities
        *   is to be performed.
        *
        * @tparam RequestType The type of the object to be sent.
+       *
+       * @note Nothing good will generally happen if any of the function
+       *   objects passed as arguments throws an exception when called.
+       *   This is because when that happens, one MPI process will stop
+       *   participating in MPI communications, deadlocking the other
+       *   processes. As a consequence, the `create_request()` and
+       *   `process_request()` functions should
+       *   not throw any exceptions; if they encounter error
+       *   conditions, they should instead call `MPI_Abort()` or use
+       *   another way to reliably print an error message and then
+       *   bring the MPI universe down.
        */
       template <typename RequestType>
       std::vector<unsigned int>
@@ -1035,6 +1079,17 @@ namespace Utilities
        *
        * @tparam RequestType The type of the object to be sent.
        * @tparam AnswerType The type of the object to be received.
+       *
+       * @note Nothing good will generally happen if any of the function
+       *   objects passed as arguments throws an exception when called.
+       *   This is because when that happens, one MPI process will stop
+       *   participating in MPI communications, deadlocking the other
+       *   processes. As a consequence, the `create_request()`,
+       *   `answer_request()`, and `process_answer()` functions should
+       *   not throw any exceptions; if they encounter error
+       *   conditions, they should instead call `MPI_Abort()` or use
+       *   another way to reliably print an error message and then
+       *   bring the MPI universe down.
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
@@ -1072,6 +1127,17 @@ namespace Utilities
        *   is to be performed.
        *
        * @tparam RequestType The type of the object to be sent.
+       *
+       * @note Nothing good will generally happen if any of the function
+       *   objects passed as arguments throws an exception when called.
+       *   This is because when that happens, one MPI process will stop
+       *   participating in MPI communications, deadlocking the other
+       *   processes. As a consequence, the `create_request()`
+       *   and `process_request()` functions should
+       *   not throw any exceptions; if they encounter error
+       *   conditions, they should instead call `MPI_Abort()` or use
+       *   another way to reliably print an error message and then
+       *   bring the MPI universe down.
        */
       template <typename RequestType>
       std::vector<unsigned int>
