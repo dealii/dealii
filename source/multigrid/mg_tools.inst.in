@@ -15,31 +15,24 @@
 
 
 
-for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace MGTools
     \{
 
 #if deal_II_dimension <= deal_II_space_dimension
       template void
-      make_sparsity_pattern<deal_II_dimension,
-                            deal_II_space_dimension,
-                            PATTERN,
-                            double>(
+      make_sparsity_pattern<deal_II_dimension, deal_II_space_dimension, double>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        PATTERN &,
+        SparsityPatternBase &,
         const unsigned int,
         const AffineConstraints<double> &,
         const bool);
 
       template void
-      make_sparsity_pattern<deal_II_dimension,
-                            deal_II_space_dimension,
-                            PATTERN,
-                            float>(
+      make_sparsity_pattern<deal_II_dimension, deal_II_space_dimension, float>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        PATTERN &,
+        SparsityPatternBase &,
         const unsigned int,
         const AffineConstraints<float> &,
         const bool);
@@ -49,8 +42,7 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
   }
 
 
-for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace MGTools
     \{
@@ -58,11 +50,10 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
 #if deal_II_dimension <= deal_II_space_dimension
       template void
       make_interface_sparsity_pattern<deal_II_dimension,
-                                      deal_II_space_dimension,
-                                      PATTERN>(
+                                      deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const MGConstrainedDoFs &,
-        PATTERN &,
+        SparsityPatternBase &,
         const unsigned int);
 #endif
 
@@ -70,9 +61,8 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
       make_flux_sparsity_pattern<deal_II_dimension,
                                  deal_II_space_dimension,
-                                 PATTERN,
                                  double>(const DoFHandler<deal_II_dimension> &,
-                                         PATTERN &,
+                                         SparsityPatternBase &,
                                          const unsigned int,
                                          const AffineConstraints<double> &,
                                          const bool);
@@ -80,9 +70,8 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
       make_flux_sparsity_pattern<deal_II_dimension,
                                  deal_II_space_dimension,
-                                 PATTERN,
                                  float>(const DoFHandler<deal_II_dimension> &,
-                                        PATTERN &,
+                                        SparsityPatternBase &,
                                         const unsigned int,
                                         const AffineConstraints<float> &,
                                         const bool);
@@ -90,7 +79,7 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
       make_flux_sparsity_pattern_edge<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
-        PATTERN &,
+        SparsityPatternBase &,
         const unsigned int);
 
 #  if deal_II_dimension > 1
@@ -98,7 +87,7 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
       make_flux_sparsity_pattern<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
-        PATTERN &,
+        SparsityPatternBase &,
         const unsigned int,
         const Table<2, DoFTools::Coupling> &,
         const Table<2, DoFTools::Coupling> &);
@@ -106,7 +95,7 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
       make_flux_sparsity_pattern_edge<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
-        PATTERN &,
+        SparsityPatternBase &,
         const unsigned int,
         const Table<2, DoFTools::Coupling> &);
 #  endif
