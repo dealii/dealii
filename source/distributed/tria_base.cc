@@ -29,8 +29,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <algorithm>

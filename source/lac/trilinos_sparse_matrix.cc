@@ -25,7 +25,6 @@
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/sparse_matrix.h>
 #  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/sparsity_tools.h>
 #  include <deal.II/lac/trilinos_precondition.h>
 #  include <deal.II/lac/trilinos_sparsity_pattern.h>
 

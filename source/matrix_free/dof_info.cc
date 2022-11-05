@@ -18,6 +18,9 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
+
 #include <deal.II/matrix_free/dof_info.templates.h>
 
 #include <iostream>
