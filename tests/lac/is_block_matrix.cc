@@ -58,20 +58,6 @@ test()
           << internal::AffineConstraints::IsBlockMatrix<
                BlockSparseMatrixEZ<float>>::value
           << std::endl;
-
-  deallog << internal::AffineConstraints::IsBlockSparsityPattern<
-               SparsityPattern>::value
-          << ' '
-          << internal::AffineConstraints::IsBlockSparsityPattern<
-               DynamicSparsityPattern>::value
-          << std::endl;
-
-  deallog << internal::AffineConstraints::IsBlockSparsityPattern<
-               BlockSparsityPattern>::value
-          << ' '
-          << internal::AffineConstraints::IsBlockSparsityPattern<
-               BlockDynamicSparsityPattern>::value
-          << std::endl;
 }
 
 
