@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/floating_point_comparator.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
@@ -863,6 +864,37 @@ namespace GridTools
         vertex_index = new_vertex_numbers[vertex_index];
 
     delete_unused_vertices(vertices, cells, subcelldata);
+  }
+
+
+
+  template <int dim>
+  void
+  delete_duplicated_vertices(std::vector<Point<dim>> &vertices,
+                             const double             tol)
+  {
+    if (vertices.size() == 0)
+      return;
+
+    // 1) map point to local vertex index
+    std::map<Point<dim>, unsigned int, FloatingPointComparator<double>>
+      map_point_to_local_vertex_index{FloatingPointComparator<double>(tol)};
+
+    // 2) initialize map with existing points uniquely
+    for (unsigned int i = 0; i < vertices.size(); ++i)
+      map_point_to_local_vertex_index[vertices[i]] = i;
+
+    // no duplicate points are found
+    if (map_point_to_local_vertex_index.size() == vertices.size())
+      return;
+
+    // 3) remove duplicate entries from vertices
+    vertices.resize(map_point_to_local_vertex_index.size());
+    {
+      unsigned int j = 0;
+      for (const auto &p : map_point_to_local_vertex_index)
+        vertices[j++] = p.first;
+    }
   }
 
 
@@ -6647,6 +6679,106 @@ namespace GridTools
 
 
 
+  namespace internal
+  {
+    template <int          dim,
+              unsigned int n_vertices,
+              unsigned int n_sub_vertices,
+              unsigned int n_configurations,
+              unsigned int n_lines,
+              unsigned int n_cols,
+              typename value_type>
+    void
+    process_sub_cell(
+      const std::array<unsigned int, n_configurations> &     cut_line_table,
+      const ndarray<unsigned int, n_configurations, n_cols> &new_line_table,
+      const ndarray<unsigned int, n_lines, 2> &      line_to_vertex_table,
+      const std::vector<value_type> &                ls_values,
+      const std::vector<Point<dim>> &                points,
+      const std::vector<unsigned int> &              mask,
+      const double                                   iso_level,
+      const double                                   tolerance,
+      std::vector<Point<dim>> &                      vertices,
+      std::vector<CellData<dim == 1 ? 1 : dim - 1>> &cells,
+      const bool                                     write_back_cell_data)
+    {
+      // inspired by https://graphics.stanford.edu/~mdfisher/MarchingCubes.html
+
+      constexpr unsigned int X = static_cast<unsigned int>(-1);
+
+      // determine configuration
+      unsigned int configuration = 0;
+      for (unsigned int v = 0; v < n_vertices; ++v)
+        if (ls_values[mask[v]] < iso_level)
+          configuration |= (1 << v);
+
+      // cell is not cut (nothing to do)
+      if (cut_line_table[configuration] == 0)
+        return;
+
+      // helper function to determine where an edge (between index i and j) is
+      // cut - see also: http://paulbourke.net/geometry/polygonise/
+      const auto interpolate = [&](const unsigned int i, const unsigned int j) {
+        if (std::abs(iso_level - ls_values[mask[i]]) < tolerance)
+          return points[mask[i]];
+        if (std::abs(iso_level - ls_values[mask[j]]) < tolerance)
+          return points[mask[j]];
+        if (std::abs(ls_values[mask[i]] - ls_values[mask[j]]) < tolerance)
+          return points[mask[i]];
+
+        const double mu = (iso_level - ls_values[mask[i]]) /
+                          (ls_values[mask[j]] - ls_values[mask[i]]);
+
+        return Point<dim>(points[mask[i]] +
+                          mu * (points[mask[j]] - points[mask[i]]));
+      };
+
+      // determine the position where edges are cut (if they are cut)
+      std::array<Point<dim>, n_lines> vertex_list_all;
+      for (unsigned int l = 0; l < n_lines; ++l)
+        if (cut_line_table[configuration] & (1 << l))
+          vertex_list_all[l] =
+            interpolate(line_to_vertex_table[l][0], line_to_vertex_table[l][1]);
+
+      // merge duplicate vertices if possible
+      unsigned int                      local_vertex_count = 0;
+      std::array<Point<dim>, n_lines>   vertex_list_reduced;
+      std::array<unsigned int, n_lines> local_remap;
+      std::fill(local_remap.begin(), local_remap.end(), X);
+      for (int i = 0; new_line_table[configuration][i] != X; ++i)
+        if (local_remap[new_line_table[configuration][i]] == X)
+          {
+            vertex_list_reduced[local_vertex_count] =
+              vertex_list_all[new_line_table[configuration][i]];
+            local_remap[new_line_table[configuration][i]] = local_vertex_count;
+            local_vertex_count++;
+          }
+
+      // write back vertices
+      const unsigned int n_vertices_old = vertices.size();
+      for (unsigned int i = 0; i < local_vertex_count; ++i)
+        vertices.push_back(vertex_list_reduced[i]);
+
+      // write back cells
+      if (write_back_cell_data && dim > 1)
+        {
+          for (unsigned int i = 0; new_line_table[configuration][i] != X;
+               i += n_sub_vertices)
+            {
+              cells.resize(cells.size() + 1);
+              cells.back().vertices.resize(n_sub_vertices);
+
+              for (unsigned int v = 0; v < n_sub_vertices; ++v)
+                cells.back().vertices[v] =
+                  local_remap[new_line_table[configuration][i + v]] +
+                  n_vertices_old;
+            }
+        }
+    }
+  } // namespace internal
+
+
+
   template <int dim, typename VectorType>
   MarchingCubeAlgorithm<dim, VectorType>::MarchingCubeAlgorithm(
     const Mapping<dim, dim> &      mapping,
@@ -6729,6 +6861,8 @@ namespace GridTools
     for (const auto &cell : background_dof_handler.active_cell_iterators() |
                               IteratorFilters::LocallyOwnedCell())
       process_cell(cell, ls_vector, iso_level, vertices);
+
+    delete_duplicated_vertices(vertices, 1e-10 /*tol*/);
   }
 
 
@@ -6875,106 +7009,6 @@ namespace GridTools
               }
       }
   }
-
-
-
-  namespace internal
-  {
-    template <int          dim,
-              unsigned int n_vertices,
-              unsigned int n_sub_vertices,
-              unsigned int n_configurations,
-              unsigned int n_lines,
-              unsigned int n_cols,
-              typename value_type>
-    void
-    process_sub_cell(
-      const std::array<unsigned int, n_configurations> &     cut_line_table,
-      const ndarray<unsigned int, n_configurations, n_cols> &new_line_table,
-      const ndarray<unsigned int, n_lines, 2> &      line_to_vertex_table,
-      const std::vector<value_type> &                ls_values,
-      const std::vector<Point<dim>> &                points,
-      const std::vector<unsigned int> &              mask,
-      const double                                   iso_level,
-      const double                                   tolerance,
-      std::vector<Point<dim>> &                      vertices,
-      std::vector<CellData<dim == 1 ? 1 : dim - 1>> &cells,
-      const bool                                     write_back_cell_data)
-    {
-      // inspired by https://graphics.stanford.edu/~mdfisher/MarchingCubes.html
-
-      constexpr unsigned int X = static_cast<unsigned int>(-1);
-
-      // determine configuration
-      unsigned int configuration = 0;
-      for (unsigned int v = 0; v < n_vertices; ++v)
-        if (ls_values[mask[v]] < iso_level)
-          configuration |= (1 << v);
-
-      // cell is not cut (nothing to do)
-      if (cut_line_table[configuration] == 0)
-        return;
-
-      // helper function to determine where an edge (between index i and j) is
-      // cut - see also: http://paulbourke.net/geometry/polygonise/
-      const auto interpolate = [&](const unsigned int i, const unsigned int j) {
-        if (std::abs(iso_level - ls_values[mask[i]]) < tolerance)
-          return points[mask[i]];
-        if (std::abs(iso_level - ls_values[mask[j]]) < tolerance)
-          return points[mask[j]];
-        if (std::abs(ls_values[mask[i]] - ls_values[mask[j]]) < tolerance)
-          return points[mask[i]];
-
-        const double mu = (iso_level - ls_values[mask[i]]) /
-                          (ls_values[mask[j]] - ls_values[mask[i]]);
-
-        return Point<dim>(points[mask[i]] +
-                          mu * (points[mask[j]] - points[mask[i]]));
-      };
-
-      // determine the position where edges are cut (if they are cut)
-      std::array<Point<dim>, n_lines> vertex_list_all;
-      for (unsigned int l = 0; l < n_lines; ++l)
-        if (cut_line_table[configuration] & (1 << l))
-          vertex_list_all[l] =
-            interpolate(line_to_vertex_table[l][0], line_to_vertex_table[l][1]);
-
-      // merge duplicate vertices if possible
-      unsigned int                      local_vertex_count = 0;
-      std::array<Point<dim>, n_lines>   vertex_list_reduced;
-      std::array<unsigned int, n_lines> local_remap;
-      std::fill(local_remap.begin(), local_remap.end(), X);
-      for (int i = 0; new_line_table[configuration][i] != X; ++i)
-        if (local_remap[new_line_table[configuration][i]] == X)
-          {
-            vertex_list_reduced[local_vertex_count] =
-              vertex_list_all[new_line_table[configuration][i]];
-            local_remap[new_line_table[configuration][i]] = local_vertex_count;
-            local_vertex_count++;
-          }
-
-      // write back vertices
-      const unsigned int n_vertices_old = vertices.size();
-      for (unsigned int i = 0; i < local_vertex_count; ++i)
-        vertices.push_back(vertex_list_reduced[i]);
-
-      // write back cells
-      if (write_back_cell_data && dim > 1)
-        {
-          for (unsigned int i = 0; new_line_table[configuration][i] != X;
-               i += n_sub_vertices)
-            {
-              cells.resize(cells.size() + 1);
-              cells.back().vertices.resize(n_sub_vertices);
-
-              for (unsigned int v = 0; v < n_sub_vertices; ++v)
-                cells.back().vertices[v] =
-                  local_remap[new_line_table[configuration][i + v]] +
-                  n_vertices_old;
-            }
-        }
-    }
-  } // namespace internal
 
 
 
