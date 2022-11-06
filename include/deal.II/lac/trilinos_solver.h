@@ -766,9 +766,10 @@ namespace TrilinosWrappers
       /**
        * Constructor.
        */
-      AdditionalData(const SolverName &solver_name           = SolverName::cg,
-                     const bool        right_preconditioning = false)
-        : right_preconditioning(right_preconditioning)
+      AdditionalData(const SolverName solver_name           = SolverName::cg,
+                     const bool       right_preconditioning = false)
+        : solver_name(solver_name)
+        , right_preconditioning(right_preconditioning)
       {}
 
       /**
