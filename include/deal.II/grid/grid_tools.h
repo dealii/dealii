@@ -2206,7 +2206,7 @@ namespace GridTools
    *
    * If deal.II was not installed with ZOLTAN or METIS, this function will
    * generate an error
-   * when corresponding partition method is chosen, unless @p n_partitions is one.
+   * when the respective partition method is chosen, unless @p n_partitions is one.
    * I.e., you can write a program so that it runs in the single-processor
    * single-partition case without packages installed, and only requires them
    * installed when multiple partitions are required.
