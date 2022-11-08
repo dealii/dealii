@@ -198,7 +198,44 @@ namespace
     else
       return {};
   }
+
 #endif
+
+
+
+  /**
+   * Convert an array of data objects into a string that will form part of
+   * what we then output as data into VTU objects.
+   *
+   * If libz was found during configuration, this function compresses and
+   * encodes the entire data block. Otherwise, it simply writes it element by
+   * element.
+   */
+  template <typename T>
+  std::string
+  vtu_stringize_array(const std::vector<T> &              data,
+                      const DataOutBase::CompressionLevel compression_level,
+                      const int                           precision)
+  {
+    (void)compression_level;
+    (void)precision;
+
+#ifdef DEAL_II_WITH_ZLIB
+    if (compression_level != DataOutBase::CompressionLevel::plain_text)
+      {
+        // compress the data we have in memory
+        return compress_array(data, compression_level);
+      }
+    else
+#endif
+      {
+        std::ostringstream stream;
+        stream.precision(precision);
+        for (unsigned int i = 0; i < data.size(); ++i)
+          stream << data[i] << ' ';
+        return stream.str();
+      }
+  }
 
 
   /**
@@ -1519,21 +1556,6 @@ namespace
     void
     flush_cells();
 
-    template <typename T>
-    std::ostream &
-    operator<<(const T &);
-
-    /**
-     * Forwarding of output stream.
-     *
-     * If libz was found during configuration, this operator compresses and
-     * encodes the entire data block. Otherwise, it simply writes it element by
-     * element.
-     */
-    template <typename T>
-    std::ostream &
-    operator<<(const std::vector<T> &);
-
   private:
     /**
      * A list of vertices and cells, to be used in case we want to compress the
@@ -1966,7 +1988,10 @@ namespace
       {
         // compress the data we have in memory and write them to the stream.
         // then release the data
-        *this << vertices << '\n';
+        *this << vtu_stringize_array(vertices,
+                                     flags.compression_level,
+                                     stream.precision())
+              << '\n';
         vertices.clear();
       }
 #endif
@@ -2082,32 +2107,13 @@ namespace
       {
         // compress the data we have in memory and write them to the stream.
         // then release the data
-        *this << cells << '\n';
+        *this << vtu_stringize_array(cells,
+                                     flags.compression_level,
+                                     stream.precision())
+              << '\n';
         cells.clear();
       }
 #endif
-  }
-
-
-  template <typename T>
-  std::ostream &
-  VtuStream::operator<<(const std::vector<T> &data)
-  {
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
-      {
-        // compress the data we have in memory and write them to the stream.
-        // then release the data
-        stream << compress_array(data, flags.compression_level);
-      }
-    else
-#endif
-      {
-        for (unsigned int i = 0; i < data.size(); ++i)
-          stream << data[i] << ' ';
-      }
-
-    return stream;
   }
 } // namespace
 
@@ -6130,7 +6136,9 @@ namespace DataOutBase
           }
       }
 
-    vtu_out << offsets;
+    out << vtu_stringize_array(offsets,
+                               flags.compression_level,
+                               out.precision());
     out << '\n';
     out << "    </DataArray>\n";
 
@@ -6147,12 +6155,16 @@ namespace DataOutBase
         for (unsigned int i = 0; i < cell_types.size(); ++i)
           cell_types_uint8_t[i] = static_cast<std::uint8_t>(cell_types[i]);
 
-        vtu_out << cell_types_uint8_t;
+        vtu_out << vtu_stringize_array(cell_types_uint8_t,
+                                       flags.compression_level,
+                                       out.precision());
       }
     else
 #endif
       {
-        vtu_out << cell_types;
+        vtu_out << vtu_stringize_array(cell_types,
+                                       flags.compression_level,
+                                       out.precision());
       }
 
     out << '\n';
@@ -6320,7 +6332,9 @@ namespace DataOutBase
               }
           } // loop over nodes
 
-        vtu_out << data;
+        out << vtu_stringize_array(data,
+                                   flags.compression_level,
+                                   out.precision());
         out << '\n';
         out << "    </DataArray>\n";
 
@@ -6341,9 +6355,11 @@ namespace DataOutBase
 
           out << ">\n";
 
-          std::vector<float> data(data_vectors[data_set].begin(),
-                                  data_vectors[data_set].end());
-          vtu_out << data;
+          const std::vector<float> data(data_vectors[data_set].begin(),
+                                        data_vectors[data_set].end());
+          out << vtu_stringize_array(data,
+                                     flags.compression_level,
+                                     out.precision());
           out << '\n';
           out << "    </DataArray>\n";
         }
