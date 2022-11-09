@@ -1508,13 +1508,6 @@ namespace
   public:
     VtuStream(std::ostream &stream, const DataOutBase::VtkFlags &flags);
 
-    template <int dim>
-    void
-    write_point(const unsigned int index, const Point<dim> &);
-
-    void
-    flush_points();
-
     /**
      * The order of vertices for these cells in different dimensions is
      * <ol>
@@ -1949,53 +1942,12 @@ namespace
     stream << '\n';
   }
 
+
+
   VtuStream::VtuStream(std::ostream &out, const DataOutBase::VtkFlags &f)
     : StreamBase<DataOutBase::VtkFlags>(out, f)
   {}
 
-
-  template <int dim>
-  void
-  VtuStream::write_point(const unsigned int, const Point<dim> &p)
-  {
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
-      {
-        // if we want to compress, then first collect all the data in an array
-        for (unsigned int i = 0; i < dim; ++i)
-          vertices.push_back(p[i]);
-        for (unsigned int i = dim; i < 3; ++i)
-          vertices.push_back(0);
-      }
-    else
-#endif
-      {
-        // write out coordinates
-        stream << p;
-        // fill with zeroes
-        for (unsigned int i = dim; i < 3; ++i)
-          stream << " 0";
-        stream << '\n';
-      }
-  }
-
-
-  void
-  VtuStream::flush_points()
-  {
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
-      {
-        // compress the data we have in memory and write them to the stream.
-        // then release the data
-        *this << vtu_stringize_array(vertices,
-                                     flags.compression_level,
-                                     stream.precision())
-              << '\n';
-        vertices.clear();
-      }
-#endif
-  }
 
 
   template <int dim>
@@ -2900,15 +2852,19 @@ namespace DataOutBase
 
   //----------------------------------------------------------------------//
 
-  template <int dim, int spacedim, typename StreamType>
-  void
-  write_nodes(const std::vector<Patch<dim, spacedim>> &patches, StreamType &out)
+
+  /**
+   * Obtain the positions of all nodes referenced in the patches given as
+   * argument.
+   */
+  template <int dim, int spacedim>
+  std::vector<Point<spacedim>>
+  get_node_positions(const std::vector<Patch<dim, spacedim>> &patches)
   {
     Assert(dim <= 3, ExcNotImplemented());
-    unsigned int count = 0;
-
     static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
 
+    std::vector<Point<spacedim>> node_positions;
     for (const auto &patch : patches)
       {
         // special treatment of non-hypercube cells
@@ -2916,12 +2872,11 @@ namespace DataOutBase
           {
             for (unsigned int point_no = 0; point_no < patch.data.n_cols();
                  ++point_no)
-              out.write_point(count++,
-                              get_node_location(patch,
-                                                (patch.reference_cell ==
-                                                     ReferenceCells::Pyramid ?
-                                                   table[point_no] :
-                                                   point_no)));
+              node_positions.emplace_back(get_node_location(
+                patch,
+                (patch.reference_cell == ReferenceCells::Pyramid ?
+                   table[point_no] :
+                   point_no)));
           }
         else
           {
@@ -2931,33 +2886,26 @@ namespace DataOutBase
             switch (dim)
               {
                 case 0:
-                  out.write_point(count++,
-                                  get_equispaced_location(patch,
-                                                          {},
-                                                          n_subdivisions));
+                  node_positions.emplace_back(
+                    get_equispaced_location(patch, {}, n_subdivisions));
                   break;
                 case 1:
                   for (unsigned int i1 = 0; i1 < n; ++i1)
-                    out.write_point(count++,
-                                    get_equispaced_location(patch,
-                                                            {i1},
-                                                            n_subdivisions));
+                    node_positions.emplace_back(
+                      get_equispaced_location(patch, {i1}, n_subdivisions));
                   break;
                 case 2:
                   for (unsigned int i2 = 0; i2 < n; ++i2)
                     for (unsigned int i1 = 0; i1 < n; ++i1)
-                      out.write_point(count++,
-                                      get_equispaced_location(patch,
-                                                              {i1, i2},
-                                                              n_subdivisions));
+                      node_positions.emplace_back(get_equispaced_location(
+                        patch, {i1, i2}, n_subdivisions));
                   break;
                 case 3:
                   for (unsigned int i3 = 0; i3 < n; ++i3)
                     for (unsigned int i2 = 0; i2 < n; ++i2)
                       for (unsigned int i1 = 0; i1 < n; ++i1)
-                        out.write_point(count++,
-                                        get_equispaced_location(
-                                          patch, {i1, i2, i3}, n_subdivisions));
+                        node_positions.emplace_back(get_equispaced_location(
+                          patch, {i1, i2, i3}, n_subdivisions));
                   break;
 
                 default:
@@ -2965,8 +2913,27 @@ namespace DataOutBase
               }
           }
       }
+
+    return node_positions;
+  }
+
+
+  template <int dim, int spacedim, typename StreamType>
+  void
+  write_nodes(const std::vector<Patch<dim, spacedim>> &patches, StreamType &out)
+  {
+    // Obtain the node locations, and then output them via the given stream
+    // object
+    const std::vector<Point<spacedim>> node_positions =
+      get_node_positions(patches);
+
+    int count = 0;
+    for (const auto &node : node_positions)
+      out.write_point(count++, node);
     out.flush_points();
   }
+
+
 
   template <int dim, int spacedim, typename StreamType>
   void
@@ -6094,7 +6061,28 @@ namespace DataOutBase
     out << "  <Points>\n";
     out << "    <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\""
         << ascii_or_binary << "\">\n";
-    write_nodes(patches, vtu_out);
+    const std::vector<Point<spacedim>> node_positions =
+      get_node_positions(patches);
+    std::vector<float> node_coordinates_3d;
+    node_coordinates_3d.reserve(node_positions.size() * 3);
+    for (const auto &node_position : node_positions)
+      {
+        node_coordinates_3d.emplace_back(node_position[0]);
+
+        if (spacedim >= 2)
+          node_coordinates_3d.emplace_back(node_position[1]);
+        else
+          node_coordinates_3d.emplace_back(0.0f);
+
+        if (spacedim >= 3)
+          node_coordinates_3d.emplace_back(node_position[2]);
+        else
+          node_coordinates_3d.emplace_back(0.0f);
+      }
+    out << vtu_stringize_array(node_coordinates_3d,
+                               flags.compression_level,
+                               out.precision())
+        << '\n';
     out << "    </DataArray>\n";
     out << "  </Points>\n\n";
     //-------------------------------
