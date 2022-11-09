@@ -140,13 +140,12 @@ namespace
 
   /**
    * Do a zlib compression followed by a base64 encoding of the given data. The
-   * result is then written to the given stream.
+   * result is then returned as a string object.
    */
   template <typename T>
-  void
-  write_compressed_block(const std::vector<T> &       data,
-                         const DataOutBase::VtkFlags &flags,
-                         std::ostream &               output_stream)
+  std::string
+  compress_array(const std::vector<T> &              data,
+                 const DataOutBase::CompressionLevel compression_level)
   {
     if (data.size() != 0)
       {
@@ -169,12 +168,11 @@ namespace
 
         std::vector<unsigned char> compressed_data(compressed_data_length);
 
-        int err =
-          compress2(&compressed_data[0],
-                    &compressed_data_length,
-                    reinterpret_cast<const Bytef *>(data.data()),
-                    uncompressed_size,
-                    get_zlib_compression_level(flags.compression_level));
+        int err = compress2(&compressed_data[0],
+                            &compressed_data_length,
+                            reinterpret_cast<const Bytef *>(data.data()),
+                            uncompressed_size,
+                            get_zlib_compression_level(compression_level));
         (void)err;
         Assert(err == Z_OK, ExcInternalError());
 
@@ -193,11 +191,12 @@ namespace
         const auto header_start =
           reinterpret_cast<const unsigned char *>(&compression_header[0]);
 
-        output_stream << Utilities::encode_base64(
-                           {header_start,
-                            header_start + 4 * sizeof(std::uint32_t)})
-                      << Utilities::encode_base64(compressed_data);
+        return (Utilities::encode_base64(
+                  {header_start, header_start + 4 * sizeof(std::uint32_t)}) +
+                Utilities::encode_base64(compressed_data));
       }
+    else
+      return {};
   }
 #endif
 
@@ -2099,7 +2098,7 @@ namespace
       {
         // compress the data we have in memory and write them to the stream.
         // then release the data
-        write_compressed_block(data, flags, stream);
+        stream << compress_array(data, flags.compression_level);
       }
     else
 #endif
