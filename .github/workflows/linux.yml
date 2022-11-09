@@ -61,7 +61,7 @@ jobs:
     - name: modules
       run: |
         sudo apt-get install -y software-properties-common
-        sudo add-apt-repository -y ppa:ginggs/deal.ii-9.3.0-backports
+        sudo add-apt-repository -y ppa:ginggs/deal.ii-9.4.0-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
             numdiff \
@@ -135,7 +135,7 @@ jobs:
         sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
         sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
         sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.4.0-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
             cuda-toolkit-11-0 \
