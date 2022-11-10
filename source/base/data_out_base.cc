@@ -1076,7 +1076,7 @@ namespace
 
 
   template <int dim, int spacedim>
-  static void
+  void
   compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
                 unsigned int &                                        n_nodes,
                 unsigned int &                                        n_cells)
@@ -1108,7 +1108,7 @@ namespace
 
 
   template <int dim, int spacedim>
-  static void
+  void
   compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
                 const bool    write_higher_order_cells,
                 unsigned int &n_nodes,
