@@ -1143,6 +1143,7 @@ namespace
           }
         else
           {
+            Assert(patch.n_subdivisions == 1, ExcNotImplemented());
             n_nodes += patch.data.n_cols();
             n_cells += 1;
             n_points_and_n_cells += patch.data.n_cols() + 1;
