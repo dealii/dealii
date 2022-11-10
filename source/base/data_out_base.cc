@@ -363,13 +363,12 @@ namespace DataOutBase
      * data one data set at a time, rather than one cell at a time.
      */
     template <int dim, int spacedim, typename Number = double>
-    void
-    create_global_data_table(const std::vector<Patch<dim, spacedim>> &patches,
-                             Table<2, Number> &data_vectors)
+    std::unique_ptr<Table<2, Number>>
+    create_global_data_table(const std::vector<Patch<dim, spacedim>> &patches)
     {
       // If there is nothing to write, just return
       if (patches.size() == 0)
-        return;
+        return std::make_unique<Table<2, Number>>();
 
       // unlike in the main function, we don't have here the data_names field,
       // so we initialize it with the number of data sets in the first patch.
@@ -381,8 +380,17 @@ namespace DataOutBase
       const unsigned int n_data_sets = patches[0].points_are_available ?
                                          (patches[0].data.n_rows() - spacedim) :
                                          patches[0].data.n_rows();
+      const unsigned int n_data_points =
+        std::accumulate(patches.begin(),
+                        patches.end(),
+                        0U,
+                        [](const unsigned int          count,
+                           const Patch<dim, spacedim> &patch) {
+                          return count + patch.data.n_cols();
+                        });
 
-      Assert(data_vectors.size()[0] == n_data_sets, ExcInternalError());
+      std::unique_ptr<Table<2, Number>> global_data_table =
+        std::make_unique<Table<2, Number>>(n_data_sets, n_data_points);
 
       // loop over all patches
       unsigned int next_value = 0;
@@ -408,11 +416,12 @@ namespace DataOutBase
 
           for (unsigned int i = 0; i < patch.data.n_cols(); ++i, ++next_value)
             for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-              data_vectors[data_set][next_value] = patch.data(data_set, i);
+              (*global_data_table)[data_set][next_value] =
+                patch.data(data_set, i);
         }
+      Assert(next_value == n_data_points, ExcInternalError());
 
-      for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-        Assert(data_vectors[data_set].size() == next_value, ExcInternalError());
+      return global_data_table;
     }
   } // namespace
 
@@ -4949,11 +4958,9 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  create_global_data_table_task =
-      Threads::new_task([&patches, &data_vectors]() mutable {
-        create_global_data_table(patches, data_vectors);
-      });
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -4984,9 +4991,9 @@ namespace DataOutBase
     // data output.
     out << "variable" << '\n';
 
-    // now write the data vectors to @p{out} first make sure that all data is in
-    // place
-    create_global_data_table_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data. the '1' means: node data (as opposed to cell data, which
     // we do not support explicitly here)
@@ -5128,11 +5135,9 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
 
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  create_global_data_table_task =
-      Threads::new_task([&patches, &data_vectors]() mutable {
-        create_global_data_table(patches, data_vectors);
-      });
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5149,9 +5154,9 @@ namespace DataOutBase
     //-------------------------------------
     // data output.
     //
-    // now write the data vectors to @p{out} first make sure that all data is in
-    // place
-    create_global_data_table_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5365,11 +5370,9 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  create_global_data_table_task =
-      Threads::new_task([&patches, &data_vectors]() mutable {
-        create_global_data_table(patches, data_vectors);
-      });
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5442,9 +5445,9 @@ namespace DataOutBase
 
 
     //-------------------------------------
-    // data output.
-    //
-    create_global_data_table_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5668,11 +5671,9 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  create_global_data_table_task =
-      Threads::new_task([&patches, &data_vectors]() mutable {
-        create_global_data_table(patches, data_vectors);
-      });
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5708,9 +5709,9 @@ namespace DataOutBase
     //-------------------------------------
     // data output.
 
-    // now write the data vectors to @p{out} first make sure that all data is in
-    // place
-    create_global_data_table_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
@@ -6050,11 +6051,9 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, float> data_vectors(n_data_sets, n_nodes);
-
-    Threads::Task<> create_global_data_table_task =
-      Threads::new_task([&patches, &data_vectors]() mutable {
-        create_global_data_table(patches, data_vectors);
+    Threads::Task<std::unique_ptr<Table<2, float>>>
+      create_global_data_table_task = Threads::new_task([&patches]() {
+        return create_global_data_table<dim, spacedim, float>(patches);
       });
 
     //-----------------------------
@@ -6171,7 +6170,8 @@ namespace DataOutBase
 
     // now write the data vectors to @p{out} first make sure that all data is in
     // place
-    create_global_data_table_task.join();
+    const Table<2, float> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
@@ -8789,7 +8789,6 @@ DataOutBase::write_filtered_data(
   DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
-  Table<2, double>   data_vectors;
 
 #ifndef DEAL_II_WITH_MPI
   // verify that there are indeed patches to be written out. most of the times,
@@ -8807,18 +8806,17 @@ DataOutBase::write_filtered_data(
   unsigned int n_nodes;
   std::tie(n_nodes, std::ignore) = count_nodes_and_cells(patches);
 
-  data_vectors = Table<2, double>(n_data_sets, n_nodes);
-  Threads::Task<> create_global_data_table_task =
-    Threads::new_task([&patches, &data_vectors]() mutable {
-      create_global_data_table(patches, data_vectors);
-    });
+  Threads::Task<std::unique_ptr<Table<2, double>>>
+    create_global_data_table_task = Threads::new_task(
+      [&patches]() { return create_global_data_table(patches); });
 
   // Write the nodes/cells to the DataOutFilter object.
   write_nodes(patches, filtered_data);
   write_cells(patches, filtered_data);
 
-  // Ensure reordering is done before we output data set values
-  create_global_data_table_task.join();
+  // Wait for the reordering to be done and retrieve the reordered data:
+  const Table<2, double> data_vectors =
+    std::move(*create_global_data_table_task.return_value());
 
   // when writing, first write out all vector data, then handle the scalar data
   // sets that have been left over
