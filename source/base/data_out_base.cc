@@ -231,8 +231,8 @@ namespace
       {
         std::ostringstream stream;
         stream.precision(precision);
-        for (unsigned int i = 0; i < data.size(); ++i)
-          stream << data[i] << ' ';
+        for (const T &el : data)
+          stream << el << ' ';
         return stream.str();
       }
   }
