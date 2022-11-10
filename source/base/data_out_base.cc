@@ -1149,17 +1149,20 @@ namespace
 
 
 
+  /**
+   * Count the number of nodes and cells referenced by the given
+   * argument, and return these numbers (in order nodes, then cells, then cells
+   * plus points) as a tuple.
+   */
   template <int dim, int spacedim>
-  void
-  compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
-                const bool    write_higher_order_cells,
-                unsigned int &n_nodes,
-                unsigned int &n_cells,
-                unsigned int &n_points_and_n_cells)
+  std::tuple<unsigned int, unsigned int, unsigned int>
+  count_nodes_and_cells_and_points(
+    const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
+    const bool write_higher_order_cells)
   {
-    n_nodes              = 0;
-    n_cells              = 0;
-    n_points_and_n_cells = 0;
+    unsigned int n_nodes              = 0;
+    unsigned int n_cells              = 0;
+    unsigned int n_points_and_n_cells = 0;
 
     for (const auto &patch : patches)
       {
@@ -1169,16 +1172,24 @@ namespace
 
             if (write_higher_order_cells)
               {
+                // Write all of these nodes as a single higher-order cell. So
+                // add one to the number of cells, and update the number of
+                // points appropriately.
                 n_cells += 1;
                 n_points_and_n_cells +=
                   1 + Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
               }
             else
               {
-                n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+                // Write all of these nodes as a collection of d-linear
+                // cells. Add the number of sub-cells to the total number of
+                // cells, and then add one for each cell plus the number of
+                // vertices per cell for each subcell to the number of points.
+                const unsigned int n_subcells =
+                  Utilities::fixed_power<dim>(patch.n_subdivisions);
+                n_cells += n_subcells;
                 n_points_and_n_cells +=
-                  Utilities::fixed_power<dim>(patch.n_subdivisions) *
-                  (1 + GeometryInfo<dim>::vertices_per_cell);
+                  n_subcells * (1 + GeometryInfo<dim>::vertices_per_cell);
               }
           }
         else
@@ -1188,6 +1199,8 @@ namespace
             n_points_and_n_cells += patch.data.n_cols() + 1;
           }
       }
+
+    return {n_nodes, n_cells, n_points_and_n_cells};
   }
 
   /**
@@ -5642,12 +5655,11 @@ namespace DataOutBase
     }
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes, n_cells, n_points_and_n_cells;
-    compute_sizes(patches,
-                  flags.write_higher_order_cells,
-                  n_nodes,
-                  n_cells,
-                  n_points_and_n_cells);
+    unsigned int n_nodes;
+    unsigned int n_cells;
+    unsigned int n_points_and_n_cells;
+    std::tie(n_nodes, n_cells, n_points_and_n_cells) =
+      count_nodes_and_cells_and_points(patches, flags.write_higher_order_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -6028,12 +6040,10 @@ namespace DataOutBase
 
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes, n_cells, n_points_and_n_cells;
-    compute_sizes(patches,
-                  flags.write_higher_order_cells,
-                  n_nodes,
-                  n_cells,
-                  n_points_and_n_cells);
+    unsigned int n_nodes;
+    unsigned int n_cells;
+    std::tie(n_nodes, n_cells, std::ignore) =
+      count_nodes_and_cells_and_points(patches, flags.write_higher_order_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
