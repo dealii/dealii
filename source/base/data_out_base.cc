@@ -4950,11 +4950,10 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<>  reorder_task =
+      Threads::new_task([&patches, &data_vectors]() mutable {
+        write_gmv_reorder_data_vectors(patches, data_vectors);
+      });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5130,12 +5129,10 @@ namespace DataOutBase
     // data, we wait for that task to finish
 
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<>  reorder_task =
+      Threads::new_task([&patches, &data_vectors]() mutable {
+        write_gmv_reorder_data_vectors(patches, data_vectors);
+      });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5369,12 +5366,10 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<>  reorder_task =
+      Threads::new_task([&patches, &data_vectors]() mutable {
+        write_gmv_reorder_data_vectors(patches, data_vectors);
+      });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5674,12 +5669,10 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<>  reorder_task =
+      Threads::new_task([&patches, &data_vectors]() mutable {
+        write_gmv_reorder_data_vectors(patches, data_vectors);
+      });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -6059,11 +6052,10 @@ namespace DataOutBase
     // data, we wait for that task to finish
     Table<2, float> data_vectors(n_data_sets, n_nodes);
 
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, float> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim, float>;
     Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+      Threads::new_task([&patches, &data_vectors]() mutable {
+        write_gmv_reorder_data_vectors(patches, data_vectors);
+      });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -8781,6 +8773,8 @@ namespace
 #endif
 } // namespace
 
+
+
 template <int dim, int spacedim>
 void
 DataOutBase::write_filtered_data(
@@ -8796,7 +8790,6 @@ DataOutBase::write_filtered_data(
 {
   const unsigned int n_data_sets = data_names.size();
   Table<2, double>   data_vectors;
-  Threads::Task<>    reorder_task;
 
 #ifndef DEAL_II_WITH_MPI
   // verify that there are indeed patches to be written out. most of the times,
@@ -8815,10 +8808,10 @@ DataOutBase::write_filtered_data(
   std::tie(n_nodes, std::ignore) = count_nodes_and_cells(patches);
 
   data_vectors = Table<2, double>(n_data_sets, n_nodes);
-  void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                  Table<2, double> &) =
-    &DataOutBase::template write_gmv_reorder_data_vectors<dim, spacedim>;
-  reorder_task = Threads::new_task(fun_ptr, patches, data_vectors);
+  Threads::Task<> reorder_task =
+    Threads::new_task([&patches, &data_vectors]() mutable {
+      write_gmv_reorder_data_vectors(patches, data_vectors);
+    });
 
   // Write the nodes/cells to the DataOutFilter object.
   write_nodes(patches, filtered_data);
