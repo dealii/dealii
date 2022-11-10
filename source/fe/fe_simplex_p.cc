@@ -733,7 +733,7 @@ FE_SimplexP<dim, spacedim>::hp_vertex_dof_identities(
     }
   else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {
-      // if the other element has no elements on faces at all,
+      // if the other element has no DoFs on faces at all,
       // then it would be impossible to enforce any kind of
       // continuity even if we knew exactly what kind of element
       // we have -- simply because the other element declares
