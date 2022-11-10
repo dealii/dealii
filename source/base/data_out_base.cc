@@ -3441,7 +3441,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells<dim, spacedim>(patches);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
     //---------------------
     // preamble
     if (flags.write_preamble)
@@ -3534,7 +3534,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells<dim, spacedim>(patches);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
 
     // start with vertices order is lexicographical, x varying fastest
     out << "object \"vertices\" class array type float rank 1 shape "
@@ -4923,7 +4923,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells<dim, spacedim>(patches);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -5055,7 +5055,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells<dim, spacedim>(patches);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
 
     //---------
     // preamble
@@ -5317,7 +5317,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells<dim, spacedim>(patches);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
     // local variables only needed to write Tecplot binary output files
     const unsigned int vars_per_node  = (spacedim + n_data_sets),
                        nodes_per_cell = GeometryInfo<dim>::vertices_per_cell;
@@ -8786,7 +8786,6 @@ DataOutBase::write_filtered_data(
   DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
-  unsigned int       n_node, n_cell;
   Table<2, double>   data_vectors;
   Threads::Task<>    reorder_task;
 
@@ -8804,8 +8803,7 @@ DataOutBase::write_filtered_data(
 #endif
 
   unsigned int n_nodes;
-  std::tie(n_nodes, std::ignore) =
-    count_nodes_and_cells<dim, spacedim>(patches);
+  std::tie(n_nodes, std::ignore) = count_nodes_and_cells(patches);
 
   data_vectors = Table<2, double>(n_data_sets, n_nodes);
   void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
