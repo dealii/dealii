@@ -1120,7 +1120,7 @@ private:
  *                               data_component_interpretation);
  *     data_out.add_data_vector (solution, grad_u);
  *     data_out.build_patches ();
- *     data_out.write_vtk (output);
+ *     data_out.write_vtu (output);
  * @endcode
  *
  * This leads to the following output for the displacement field (i.e., the
@@ -1186,6 +1186,16 @@ private:
  * in the solution field as the stress is easily computed from the
  * strain by multiplication with either the strain-stress tensor or,
  * in simple cases, the Lam&eacute; constants.
+ *
+ * @note Not all graphical output formats support writing tensor data. For
+ *   example, the VTU file format used above when calling `data_out.write_vtu()`
+ *   does, but the original VTK file format does not (or at least
+ *   deal.II's output function does not support writing tensors at
+ *   the time of writing). If the file format you want to output does not
+ *   support writing tensor data, you will get an error. Since most
+ *   visualization programs today support VTU format, and since the
+ *   VTU writer supports writing tensor data, there should always be
+ *   a way for you to output tensor data that you can visualize.
  *
  * @ingroup output
  */
