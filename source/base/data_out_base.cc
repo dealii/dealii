@@ -1091,7 +1091,6 @@ namespace
                  "but that is clearly not a valid choice. Did you forget "
                  "to set the reference cell for the patch?"));
 
-        // The following formula doesn't hold for non-tensor products.
         if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
@@ -1122,7 +1121,6 @@ namespace
 
     for (const auto &patch : patches)
       {
-        // The following formulas don't hold for non-tensor products.
         if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
