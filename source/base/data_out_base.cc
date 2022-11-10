@@ -8803,9 +8803,11 @@ DataOutBase::write_filtered_data(
     return;
 #endif
 
-  std::tie(n_node, n_cell) = count_nodes_and_cells<dim, spacedim>(patches);
+  unsigned int n_nodes;
+  std::tie(n_nodes, std::ignore) =
+    count_nodes_and_cells<dim, spacedim>(patches);
 
-  data_vectors = Table<2, double>(n_data_sets, n_node);
+  data_vectors = Table<2, double>(n_data_sets, n_nodes);
   void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
                   Table<2, double> &) =
     &DataOutBase::template write_gmv_reorder_data_vectors<dim, spacedim>;
