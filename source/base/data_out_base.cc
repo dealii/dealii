@@ -352,20 +352,20 @@ namespace DataOutBase
 
 
     /**
-     * This is a helper function for the write_gmv() function. There, the data
-     * in the patches needs to be copied around as output is one variable
-     * globally at a time, rather than all data on each vertex at a time. This
-     * copying around can be done detached from the main thread, and is thus
-     * moved into this separate function.
+     * This is a helper function that converts all of the data stored
+     * in the `patches` array into one global data table. That data
+     * table has as many rows as there are data sets in the patches,
+     * and as many columns as there data points at which to output
+     * data. In the end, each data set is then stored in one row of
+     * this table, rather than scattered throughout the various patches.
      *
-     * Note that because of the similarity of the formats, this function is also
-     * used by the Vtk and Tecplot output functions.
+     * This function is used by all those output formats that write
+     * data one data set at a time, rather than one cell at a time.
      */
     template <int dim, int spacedim, typename Number = double>
     void
-    write_gmv_reorder_data_vectors(
-      const std::vector<Patch<dim, spacedim>> &patches,
-      Table<2, Number> &                       data_vectors)
+    create_global_data_table(const std::vector<Patch<dim, spacedim>> &patches,
+                             Table<2, Number> &data_vectors)
     {
       // If there is nothing to write, just return
       if (patches.size() == 0)
@@ -4950,9 +4950,9 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  reorder_task =
+    Threads::Task<>  create_global_data_table_task =
       Threads::new_task([&patches, &data_vectors]() mutable {
-        write_gmv_reorder_data_vectors(patches, data_vectors);
+        create_global_data_table(patches, data_vectors);
       });
 
     //-----------------------------
@@ -4986,7 +4986,7 @@ namespace DataOutBase
 
     // now write the data vectors to @p{out} first make sure that all data is in
     // place
-    reorder_task.join();
+    create_global_data_table_task.join();
 
     // then write data. the '1' means: node data (as opposed to cell data, which
     // we do not support explicitly here)
@@ -5129,9 +5129,9 @@ namespace DataOutBase
     // data, we wait for that task to finish
 
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  reorder_task =
+    Threads::Task<>  create_global_data_table_task =
       Threads::new_task([&patches, &data_vectors]() mutable {
-        write_gmv_reorder_data_vectors(patches, data_vectors);
+        create_global_data_table(patches, data_vectors);
       });
 
     //-----------------------------
@@ -5151,7 +5151,7 @@ namespace DataOutBase
     //
     // now write the data vectors to @p{out} first make sure that all data is in
     // place
-    reorder_task.join();
+    create_global_data_table_task.join();
 
     // then write data.
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5366,9 +5366,9 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  reorder_task =
+    Threads::Task<>  create_global_data_table_task =
       Threads::new_task([&patches, &data_vectors]() mutable {
-        write_gmv_reorder_data_vectors(patches, data_vectors);
+        create_global_data_table(patches, data_vectors);
       });
 
     //-----------------------------
@@ -5444,7 +5444,7 @@ namespace DataOutBase
     //-------------------------------------
     // data output.
     //
-    reorder_task.join();
+    create_global_data_table_task.join();
 
     // then write data.
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5669,9 +5669,9 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
     Table<2, double> data_vectors(n_data_sets, n_nodes);
-    Threads::Task<>  reorder_task =
+    Threads::Task<>  create_global_data_table_task =
       Threads::new_task([&patches, &data_vectors]() mutable {
-        write_gmv_reorder_data_vectors(patches, data_vectors);
+        create_global_data_table(patches, data_vectors);
       });
 
     //-----------------------------
@@ -5710,7 +5710,7 @@ namespace DataOutBase
 
     // now write the data vectors to @p{out} first make sure that all data is in
     // place
-    reorder_task.join();
+    create_global_data_table_task.join();
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
@@ -6052,9 +6052,9 @@ namespace DataOutBase
     // data, we wait for that task to finish
     Table<2, float> data_vectors(n_data_sets, n_nodes);
 
-    Threads::Task<> reorder_task =
+    Threads::Task<> create_global_data_table_task =
       Threads::new_task([&patches, &data_vectors]() mutable {
-        write_gmv_reorder_data_vectors(patches, data_vectors);
+        create_global_data_table(patches, data_vectors);
       });
 
     //-----------------------------
@@ -6171,7 +6171,7 @@ namespace DataOutBase
 
     // now write the data vectors to @p{out} first make sure that all data is in
     // place
-    reorder_task.join();
+    create_global_data_table_task.join();
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
@@ -8808,9 +8808,9 @@ DataOutBase::write_filtered_data(
   std::tie(n_nodes, std::ignore) = count_nodes_and_cells(patches);
 
   data_vectors = Table<2, double>(n_data_sets, n_nodes);
-  Threads::Task<> reorder_task =
+  Threads::Task<> create_global_data_table_task =
     Threads::new_task([&patches, &data_vectors]() mutable {
-      write_gmv_reorder_data_vectors(patches, data_vectors);
+      create_global_data_table(patches, data_vectors);
     });
 
   // Write the nodes/cells to the DataOutFilter object.
@@ -8818,7 +8818,7 @@ DataOutBase::write_filtered_data(
   write_cells(patches, filtered_data);
 
   // Ensure reordering is done before we output data set values
-  reorder_task.join();
+  create_global_data_table_task.join();
 
   // when writing, first write out all vector data, then handle the scalar data
   // sets that have been left over
