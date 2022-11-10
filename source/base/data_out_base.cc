@@ -725,7 +725,7 @@ namespace
 
     if (write_higher_order_cells)
       {
-        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (patch.reference_cell.is_hyper_cube())
           {
             const std::array<unsigned int, 4> cell_type_by_dim{
               {VTK_VERTEX,
@@ -781,7 +781,7 @@ namespace
         vtk_cell_id[0] = VTK_PYRAMID;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+    else if (patch.reference_cell.is_hyper_cube())
       {
         const std::array<unsigned int, 4> cell_type_by_dim{
           {VTK_VERTEX, VTK_LINE, VTK_QUAD, VTK_HEXAHEDRON}};
@@ -819,8 +819,7 @@ namespace
     const unsigned int                         n_subdivisions)
   {
     // This function only makes sense when called on hypercube cells
-    Assert(patch.reference_cell == ReferenceCells::get_hypercube<dim>(),
-           ExcInternalError());
+    Assert(patch.reference_cell.is_hyper_cube(), ExcInternalError());
 
     Assert(lattice_location.size() == dim, ExcInternalError());
 
@@ -1132,7 +1131,7 @@ namespace
                  "but that is clearly not a valid choice. Did you forget "
                  "to set the reference cell for the patch?"));
 
-        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (patch.reference_cell.is_hyper_cube())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
             n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
@@ -1164,7 +1163,7 @@ namespace
 
     for (const auto &patch : patches)
       {
-        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (patch.reference_cell.is_hyper_cube())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
 
