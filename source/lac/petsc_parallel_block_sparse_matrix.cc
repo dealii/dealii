@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/lac/petsc_block_sparse_matrix.h>
+#include <deal.II/lac/petsc_compatibility.h>
 
 #ifdef DEAL_II_WITH_PETSC
 
@@ -31,6 +32,11 @@ namespace PETScWrappers
       return *this;
     }
 
+    BlockSparseMatrix::~BlockSparseMatrix()
+    {
+      PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+    }
 
 #  ifndef DOXYGEN
     void
@@ -111,6 +117,24 @@ namespace PETScWrappers
     BlockSparseMatrix::collect_sizes()
     {
       BaseClass::collect_sizes();
+
+      auto m = this->n_block_cols();
+      auto n = this->n_block_cols();
+
+      PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      std::vector<Mat> psub_objects(m * n);
+      for (unsigned int r = 0; r < m; r++)
+        for (unsigned int c = 0; c < n; c++)
+          psub_objects[r * n + c] = this->sub_objects[r][c]->petsc_matrix();
+      ierr = MatCreateNest(get_mpi_communicator(),
+                           m,
+                           NULL,
+                           n,
+                           NULL,
+                           psub_objects.data(),
+                           &petsc_nest_matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
     std::vector<IndexSet>
@@ -150,6 +174,17 @@ namespace PETScWrappers
     BlockSparseMatrix::get_mpi_communicator() const
     {
       return block(0, 0).get_mpi_communicator();
+    }
+
+    BlockSparseMatrix::operator Mat() const
+    {
+      return petsc_nest_matrix;
+    }
+
+    Mat &
+    BlockSparseMatrix::petsc_matrix()
+    {
+      return petsc_nest_matrix;
     }
 
   } // namespace MPI

@@ -1,3 +1,12 @@
 
 DEAL::nonzeros BlockSparsityPattern: 9
 DEAL::nonzeros BlockSparseMatrix: 9
+(0,0) 0.00000
+(1,0) 0.00000
+(1,1) 0.00000
+(2,2) 0.00000
+(3,2) 0.00000
+(3,3) 0.00000
+(4,2) 0.00000
+(4,3) 0.00000
+(4,4) 0.00000

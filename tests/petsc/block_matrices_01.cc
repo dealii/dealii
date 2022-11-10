@@ -67,6 +67,10 @@ test()
   pbsm.reinit(rows, cols, bdsp, MPI_COMM_WORLD);
   deallog << "nonzeros BlockSparseMatrix: " << pbsm.n_nonzero_elements()
           << std::endl;
+
+  // Extract the PETSc MATNEST and use print from PETScWrappers::MatrixBase
+  PETScWrappers::MatrixBase tmp(pbsm.petsc_matrix());
+  tmp.print(deallog.get_file_stream());
 }
 
 
