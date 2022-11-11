@@ -51,6 +51,8 @@ unset(GINKGO_CXX_COMPILER)
 #
 SET(_libraries "")
 FOREACH(_library ginkgo ${GINKGO_INTERFACE_LINK_LIBRARIES})
+  # Make sure to only pick up Ginkgo's own libraries here, skipping
+  # the MPI libraries that are listed here as of Ginkgo 1.5.0.
   IF(_library MATCHES "ginkgo.*")
     LIST(APPEND _libraries GINKGO_LIBRARY_${_library})
     DEAL_II_FIND_LIBRARY(GINKGO_LIBRARY_${_library}
