@@ -6096,159 +6096,220 @@ namespace DataOutBase
         return create_global_data_table<dim, spacedim, float>(patches);
       });
 
-    //-----------------------------
-    // first make up a list of used vertices along with their coordinates
-    //
-    // note that according to the standard, we have to print d=1..3 dimensions,
-    // even if we are in reality in 2d, for example
     out << "<Piece NumberOfPoints=\"" << n_nodes << "\" NumberOfCells=\""
         << n_cells << "\" >\n";
-    out << "  <Points>\n";
-    out << "    <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\""
-        << ascii_or_binary << "\">\n";
-    const std::vector<Point<spacedim>> node_positions =
-      get_node_positions(patches);
-    std::vector<float> node_coordinates_3d;
-    node_coordinates_3d.reserve(node_positions.size() * 3);
-    for (const auto &node_position : node_positions)
-      {
-        node_coordinates_3d.emplace_back(node_position[0]);
 
-        if (spacedim >= 2)
-          node_coordinates_3d.emplace_back(node_position[1]);
-        else
-          node_coordinates_3d.emplace_back(0.0f);
-
-        if (spacedim >= 3)
-          node_coordinates_3d.emplace_back(node_position[2]);
-        else
-          node_coordinates_3d.emplace_back(0.0f);
-      }
-    out << vtu_stringize_array(node_coordinates_3d,
-                               flags.compression_level,
-                               out.precision())
-        << '\n';
-    out << "    </DataArray>\n";
-    out << "  </Points>\n\n";
-    //-------------------------------
-    // now for the cells
-    out << "  <Cells>\n";
-    out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
+    //-----------------------------
+    // first make up a list of used vertices along with their coordinates
+    const auto stringize_vertex_information = [&patches,
+                                               &flags,
+                                               output_precision =
+                                                 out.precision(),
+                                               ascii_or_binary]() {
+      std::ostringstream o;
+      o << "  <Points>\n";
+      o << "    <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\""
         << ascii_or_binary << "\">\n";
-    if (flags.write_higher_order_cells)
-      {
-        std::ostringstream o;
+      const std::vector<Point<spacedim>> node_positions =
+        get_node_positions(patches);
+
+      // note that according to the standard, we have to print d=1..3
+      // dimensions, even if we are in reality in 2d, for example
+      std::vector<float> node_coordinates_3d;
+      node_coordinates_3d.reserve(node_positions.size() * 3);
+      for (const auto &node_position : node_positions)
         {
-          VtuStream vtu_out(o, flags);
+          node_coordinates_3d.emplace_back(node_position[0]);
 
-          write_high_order_cells(patches, vtu_out, /* legacy_format = */ false);
-          vtu_out.flush_cells();
+          if (spacedim >= 2)
+            node_coordinates_3d.emplace_back(node_position[1]);
+          else
+            node_coordinates_3d.emplace_back(0.0f);
+
+          if (spacedim >= 3)
+            node_coordinates_3d.emplace_back(node_position[2]);
+          else
+            node_coordinates_3d.emplace_back(0.0f);
         }
-        out << o.str() << '\n';
-      }
-    else
-      {
-        Assert(dim <= 3, ExcNotImplemented());
+      o << vtu_stringize_array(node_coordinates_3d,
+                               flags.compression_level,
+                               output_precision)
+        << '\n';
+      o << "    </DataArray>\n";
+      o << "  </Points>\n\n";
 
-        std::vector<int32_t> cells;
-        unsigned int         first_vertex_of_patch = 0;
+      return o.str();
+    };
+    out << stringize_vertex_information();
 
-        for (const auto &patch : patches)
+    //-------------------------------
+    // Now for the cells. The first part of this is how vertices
+    // build cells.
+    const auto stringize_cell_to_vertex_information = [&patches,
+                                                       &flags,
+                                                       ascii_or_binary,
+                                                       output_precision =
+                                                         out.precision()]() {
+      std::ostringstream o;
+
+      o << "  <Cells>\n";
+      o << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
+        << ascii_or_binary << "\">\n";
+      if (flags.write_higher_order_cells)
+        {
+          std::ostringstream oo;
           {
-            // special treatment of simplices since they are not subdivided
-            if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
-              {
-                const unsigned int n_points = patch.data.n_cols();
-                static const std::array<unsigned int, 5>
-                  pyramid_index_translation_table = {{0, 1, 3, 2, 4}};
+            VtuStream vtu_out(oo, flags);
 
-                if (deal_ii_with_zlib &&
-                    (flags.compression_level !=
-                     DataOutBase::CompressionLevel::plain_text))
-                  {
-                    for (unsigned int i = 0; i < n_points; ++i)
-                      cells.push_back(
-                        first_vertex_of_patch +
-                        (patch.reference_cell == ReferenceCells::Pyramid ?
-                           pyramid_index_translation_table[i] :
-                           i));
-                  }
-                else
-                  {
-                    for (unsigned int i = 0; i < n_points; ++i)
-                      out << '\t'
+            write_high_order_cells(patches,
+                                   vtu_out,
+                                   /* legacy_format = */ false);
+            vtu_out.flush_cells();
+          }
+          o << oo.str() << '\n';
+        }
+      else
+        {
+          Assert(dim <= 3, ExcNotImplemented());
+
+          std::vector<int32_t> cells;
+          unsigned int         first_vertex_of_patch = 0;
+
+          for (const auto &patch : patches)
+            {
+              // special treatment of simplices since they are not subdivided
+              if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
+                {
+                  const unsigned int n_points = patch.data.n_cols();
+                  static const std::array<unsigned int, 5>
+                    pyramid_index_translation_table = {{0, 1, 3, 2, 4}};
+
+                  if (deal_ii_with_zlib &&
+                      (flags.compression_level !=
+                       DataOutBase::CompressionLevel::plain_text))
+                    {
+                      for (unsigned int i = 0; i < n_points; ++i)
+                        cells.push_back(
+                          first_vertex_of_patch +
+                          (patch.reference_cell == ReferenceCells::Pyramid ?
+                             pyramid_index_translation_table[i] :
+                             i));
+                    }
+                  else
+                    {
+                      for (unsigned int i = 0; i < n_points; ++i)
+                        o << '\t'
                           << first_vertex_of_patch +
                                (patch.reference_cell ==
                                     ReferenceCells::Pyramid ?
                                   pyramid_index_translation_table[i] :
                                   i);
-                    out << '\n';
-                  }
+                      o << '\n';
+                    }
 
-                first_vertex_of_patch += n_points;
-              }
-            else
-              {
-                const unsigned int n_subdivisions = patch.n_subdivisions;
-                const unsigned int n_points_per_direction = n_subdivisions + 1;
+                  first_vertex_of_patch += n_points;
+                }
+              else
+                {
+                  const unsigned int n_subdivisions = patch.n_subdivisions;
+                  const unsigned int n_points_per_direction =
+                    n_subdivisions + 1;
 
-                switch (dim)
-                  {
-                    case 0:
-                      {
-                        auto write_cell =
-                          [&flags, &out, &cells](const unsigned int start) {
-                            if (deal_ii_with_zlib &&
-                                (flags.compression_level !=
-                                 DataOutBase::CompressionLevel::plain_text))
+                  switch (dim)
+                    {
+                      case 0:
+                        {
+                          auto write_cell =
+                            [&flags, &o, &cells](const unsigned int start) {
+                              if (deal_ii_with_zlib &&
+                                  (flags.compression_level !=
+                                   DataOutBase::CompressionLevel::plain_text))
+                                {
+                                  cells.push_back(start);
+                                }
+                              else
+                                {
+                                  o << start;
+                                  o << '\n';
+                                }
+                            };
+
+                          const unsigned int starting_offset =
+                            first_vertex_of_patch;
+                          write_cell(starting_offset);
+                          break;
+                        }
+
+                      case 1:
+                        {
+                          auto write_cell =
+                            [&flags, &o, &cells](const unsigned int start) {
+                              if (deal_ii_with_zlib &&
+                                  (flags.compression_level !=
+                                   DataOutBase::CompressionLevel::plain_text))
+                                {
+                                  cells.push_back(start);
+                                  cells.push_back(start + 1);
+                                }
+                              else
+                                {
+                                  o << start << '\t' << start + 1;
+                                  o << '\n';
+                                }
+                            };
+
+                          for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+                            {
+                              const unsigned int starting_offset =
+                                first_vertex_of_patch + i1;
+                              write_cell(starting_offset);
+                            }
+                          break;
+                        }
+
+                      case 2:
+                        {
+                          auto write_cell =
+                            [&flags, &o, &cells, n_points_per_direction](
+                              const unsigned int start) {
+                              if (deal_ii_with_zlib &&
+                                  (flags.compression_level !=
+                                   DataOutBase::CompressionLevel::plain_text))
+                                {
+                                  cells.push_back(start);
+                                  cells.push_back(start + 1);
+                                  cells.push_back(start +
+                                                  n_points_per_direction + 1);
+                                  cells.push_back(start +
+                                                  n_points_per_direction);
+                                }
+                              else
+                                {
+                                  o << start << '\t' << start + 1 << '\t'
+                                    << start + n_points_per_direction + 1
+                                    << '\t' << start + n_points_per_direction;
+                                  o << '\n';
+                                }
+                            };
+
+                          for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+                            for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                               {
-                                cells.push_back(start);
+                                const unsigned int starting_offset =
+                                  first_vertex_of_patch +
+                                  i2 * n_points_per_direction + i1;
+                                write_cell(starting_offset);
                               }
-                            else
-                              {
-                                out << start;
-                                out << '\n';
-                              }
-                          };
+                          break;
+                        }
 
-                        const unsigned int starting_offset =
-                          first_vertex_of_patch;
-                        write_cell(starting_offset);
-                        break;
-                      }
-
-                    case 1:
-                      {
-                        auto write_cell =
-                          [&flags, &out, &cells](const unsigned int start) {
-                            if (deal_ii_with_zlib &&
-                                (flags.compression_level !=
-                                 DataOutBase::CompressionLevel::plain_text))
-                              {
-                                cells.push_back(start);
-                                cells.push_back(start + 1);
-                              }
-                            else
-                              {
-                                out << start << '\t' << start + 1;
-                                out << '\n';
-                              }
-                          };
-
-                        for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-                          {
-                            const unsigned int starting_offset =
-                              first_vertex_of_patch + i1;
-                            write_cell(starting_offset);
-                          }
-                        break;
-                      }
-
-                    case 2:
-                      {
-                        auto write_cell =
-                          [&flags, &out, &cells, n_points_per_direction](
-                            const unsigned int start) {
+                      case 3:
+                        {
+                          auto write_cell = [&flags,
+                                             &o,
+                                             &cells,
+                                             n_points_per_direction](
+                                              const unsigned int start) {
                             if (deal_ii_with_zlib &&
                                 (flags.compression_level !=
                                  DataOutBase::CompressionLevel::plain_text))
@@ -6258,61 +6319,25 @@ namespace DataOutBase
                                 cells.push_back(start + n_points_per_direction +
                                                 1);
                                 cells.push_back(start + n_points_per_direction);
+                                cells.push_back(start +
+                                                n_points_per_direction *
+                                                  n_points_per_direction);
+                                cells.push_back(start +
+                                                n_points_per_direction *
+                                                  n_points_per_direction +
+                                                1);
+                                cells.push_back(start +
+                                                n_points_per_direction *
+                                                  n_points_per_direction +
+                                                n_points_per_direction + 1);
+                                cells.push_back(start +
+                                                n_points_per_direction *
+                                                  n_points_per_direction +
+                                                n_points_per_direction);
                               }
                             else
                               {
-                                out << start << '\t' << start + 1 << '\t'
-                                    << start + n_points_per_direction + 1
-                                    << '\t' << start + n_points_per_direction;
-                                out << '\n';
-                              }
-                          };
-
-                        for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
-                          for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-                            {
-                              const unsigned int starting_offset =
-                                first_vertex_of_patch +
-                                i2 * n_points_per_direction + i1;
-                              write_cell(starting_offset);
-                            }
-                        break;
-                      }
-
-                    case 3:
-                      {
-                        auto write_cell = [&flags,
-                                           &out,
-                                           &cells,
-                                           n_points_per_direction](
-                                            const unsigned int start) {
-                          if (deal_ii_with_zlib &&
-                              (flags.compression_level !=
-                               DataOutBase::CompressionLevel::plain_text))
-                            {
-                              cells.push_back(start);
-                              cells.push_back(start + 1);
-                              cells.push_back(start + n_points_per_direction +
-                                              1);
-                              cells.push_back(start + n_points_per_direction);
-                              cells.push_back(start + n_points_per_direction *
-                                                        n_points_per_direction);
-                              cells.push_back(start +
-                                              n_points_per_direction *
-                                                n_points_per_direction +
-                                              1);
-                              cells.push_back(start +
-                                              n_points_per_direction *
-                                                n_points_per_direction +
-                                              n_points_per_direction + 1);
-                              cells.push_back(start +
-                                              n_points_per_direction *
-                                                n_points_per_direction +
-                                              n_points_per_direction);
-                            }
-                          else
-                            {
-                              out << start << '\t' << start + 1 << '\t'
+                                o << start << '\t' << start + 1 << '\t'
                                   << start + n_points_per_direction + 1 << '\t'
                                   << start + n_points_per_direction << '\t'
                                   << start + n_points_per_direction *
@@ -6332,107 +6357,134 @@ namespace DataOutBase
                                        n_points_per_direction *
                                          n_points_per_direction +
                                        n_points_per_direction;
-                              out << '\n';
-                            }
-                        };
-
-                        for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
-                          for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
-                            for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-                              {
-                                const unsigned int starting_offset =
-                                  first_vertex_of_patch +
-                                  i3 * n_points_per_direction *
-                                    n_points_per_direction +
-                                  i2 * n_points_per_direction + i1;
-                                write_cell(starting_offset);
+                                o << '\n';
                               }
-                        break;
-                      }
+                          };
 
-                    default:
-                      Assert(false, ExcNotImplemented());
-                  }
+                          for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
+                            for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+                              for (unsigned int i1 = 0; i1 < n_subdivisions;
+                                   ++i1)
+                                {
+                                  const unsigned int starting_offset =
+                                    first_vertex_of_patch +
+                                    i3 * n_points_per_direction *
+                                      n_points_per_direction +
+                                    i2 * n_points_per_direction + i1;
+                                  write_cell(starting_offset);
+                                }
+                          break;
+                        }
 
-                // Finally update the number of the first vertex of this patch
-                first_vertex_of_patch +=
-                  Utilities::fixed_power<dim>(n_subdivisions + 1);
+                      default:
+                        Assert(false, ExcNotImplemented());
+                    }
+
+                  // Finally update the number of the first vertex of this patch
+                  first_vertex_of_patch +=
+                    Utilities::fixed_power<dim>(n_subdivisions + 1);
+                }
+            }
+
+          // Flush the 'cells' object we created herein.
+          if (deal_ii_with_zlib && (flags.compression_level !=
+                                    DataOutBase::CompressionLevel::plain_text))
+            {
+              o << vtu_stringize_array(cells,
+                                       flags.compression_level,
+                                       output_precision)
+                << '\n';
+            }
+        }
+      o << "    </DataArray>\n";
+
+      return o.str();
+    };
+    out << stringize_cell_to_vertex_information();
+
+
+    //-------------------------------
+    // The second part of cell information is the offsets in
+    // the array built by the previous lambda function that indicate
+    // individual cells.
+    //
+    // Note that this separates XML VTU format from the VTK format; the latter
+    // puts the number of nodes per cell in front of the connectivity list for
+    // each cell, whereas the VTU format uses one large list of vertex indices
+    // and a separate array of offsets.
+    //
+    // The third piece to cell information is that we need to
+    // output the types of the cells.
+    //
+    // The following function does both of these pieces.
+    const auto stringize_cell_offset_and_type_information =
+      [&patches,
+       &flags,
+       ascii_or_binary,
+       n_cells,
+       output_precision = out.precision()]() {
+        std::ostringstream o;
+
+        o << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\""
+          << ascii_or_binary << "\">\n";
+
+        std::vector<int32_t> offsets;
+        offsets.reserve(n_cells);
+
+        // std::uint8_t might be an alias to unsigned char which is then not
+        // printed as ascii integers
+        std::vector<unsigned int> cell_types;
+        cell_types.reserve(n_cells);
+
+        unsigned int first_vertex_of_patch = 0;
+
+        for (const auto &patch : patches)
+          {
+            const auto vtk_cell_id =
+              extract_vtk_patch_info(patch, flags.write_higher_order_cells);
+
+            for (unsigned int i = 0; i < vtk_cell_id[1]; ++i)
+              {
+                cell_types.push_back(vtk_cell_id[0]);
+                first_vertex_of_patch += vtk_cell_id[2];
+                offsets.push_back(first_vertex_of_patch);
               }
           }
 
-        // Flush the 'cells' object we created herein.
-        if (deal_ii_with_zlib && (flags.compression_level !=
-                                  DataOutBase::CompressionLevel::plain_text))
+        o << vtu_stringize_array(offsets,
+                                 flags.compression_level,
+                                 output_precision);
+        o << '\n';
+        o << "    </DataArray>\n";
+
+        o << "    <DataArray type=\"UInt8\" Name=\"types\" format=\""
+          << ascii_or_binary << "\">\n";
+
+        if (deal_ii_with_zlib &&
+            (flags.compression_level != CompressionLevel::plain_text))
           {
-            out << vtu_stringize_array(cells,
-                                       flags.compression_level,
-                                       out.precision())
-                << '\n';
+            std::vector<uint8_t> cell_types_uint8_t(cell_types.size());
+            for (unsigned int i = 0; i < cell_types.size(); ++i)
+              cell_types_uint8_t[i] = static_cast<std::uint8_t>(cell_types[i]);
+
+            o << vtu_stringize_array(cell_types_uint8_t,
+                                     flags.compression_level,
+                                     output_precision);
           }
-      }
-    out << "    </DataArray>\n";
-
-    // XML VTU format uses offsets; this is different than the VTK format, which
-    // puts the number of nodes per cell in front of the connectivity list.
-    out << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\""
-        << ascii_or_binary << "\">\n";
-
-    std::vector<int32_t> offsets;
-    offsets.reserve(n_cells);
-
-    // std::uint8_t might be an alias to unsigned char which is then not printed
-    // as ascii integers
-    std::vector<unsigned int> cell_types;
-    cell_types.reserve(n_cells);
-
-    unsigned int first_vertex_of_patch = 0;
-
-    for (const auto &patch : patches)
-      {
-        const auto vtk_cell_id =
-          extract_vtk_patch_info(patch, flags.write_higher_order_cells);
-
-        for (unsigned int i = 0; i < vtk_cell_id[1]; ++i)
+        else
           {
-            cell_types.push_back(vtk_cell_id[0]);
-            first_vertex_of_patch += vtk_cell_id[2];
-            offsets.push_back(first_vertex_of_patch);
+            o << vtu_stringize_array(cell_types,
+                                     flags.compression_level,
+                                     output_precision);
           }
-      }
 
-    out << vtu_stringize_array(offsets,
-                               flags.compression_level,
-                               out.precision());
-    out << '\n';
-    out << "    </DataArray>\n";
+        o << '\n';
+        o << "    </DataArray>\n";
+        o << "  </Cells>\n";
 
-    // next output the types of the cells. since all cells are the same, this is
-    // simple
-    out << "    <DataArray type=\"UInt8\" Name=\"types\" format=\""
-        << ascii_or_binary << "\">\n";
-
-    // this should compress well :-)
-    if (deal_ii_with_zlib &&
-        (flags.compression_level != CompressionLevel::plain_text))
-      {
-        std::vector<uint8_t> cell_types_uint8_t(cell_types.size());
-        for (unsigned int i = 0; i < cell_types.size(); ++i)
-          cell_types_uint8_t[i] = static_cast<std::uint8_t>(cell_types[i]);
-
-        out << vtu_stringize_array(cell_types_uint8_t,
-                                   flags.compression_level,
-                                   out.precision());
-      }
-    else
-      {
-        out << vtu_stringize_array(cell_types,
-                                   flags.compression_level,
-                                   out.precision());
-      }
-
-    out << '\n';
-    out << "    </DataArray>\n";
-    out << "  </Cells>\n";
+        return o.str();
+      };
+    out << stringize_cell_offset_and_type_information();
 
 
     //-------------------------------------
@@ -6442,190 +6494,213 @@ namespace DataOutBase
     // place
     const Table<2, float> data_vectors =
       std::move(*create_global_data_table_task.return_value());
+    std::vector<bool> data_set_written(n_data_sets, false);
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
     // are point data
     out << "  <PointData Scalars=\"scalars\">\n";
 
-    // when writing, first write out all vector data, then handle the scalar
-    // data sets that have been left over
-    std::vector<bool> data_set_written(n_data_sets, false);
+    const auto stringize_nonscalar_data_range = [&flags,
+                                                 &data_set_written,
+                                                 &data_names,
+                                                 &data_vectors,
+                                                 ascii_or_binary,
+                                                 n_data_sets,
+                                                 n_nodes,
+                                                 output_precision =
+                                                   out.precision()](
+                                                  const auto &range) {
+      std::ostringstream o;
+
+      const auto  first_component = std::get<0>(range);
+      const auto  last_component  = std::get<1>(range);
+      const auto &name            = std::get<2>(range);
+      const bool  is_tensor =
+        (std::get<3>(range) ==
+         DataComponentInterpretation::component_is_part_of_tensor);
+      const unsigned int n_components = (is_tensor ? 9 : 3);
+      AssertThrow(last_component >= first_component,
+                  ExcLowerRange(last_component, first_component));
+      AssertThrow(last_component < n_data_sets,
+                  ExcIndexRange(last_component, 0, n_data_sets));
+      if (is_tensor)
+        {
+          AssertThrow((last_component + 1 - first_component <= 9),
+                      ExcMessage(
+                        "Can't declare a tensor with more than 9 components "
+                        "in VTK/VTU format."));
+        }
+      else
+        {
+          AssertThrow((last_component + 1 - first_component <= 3),
+                      ExcMessage(
+                        "Can't declare a vector with more than 3 components "
+                        "in VTK/VTU format."));
+        }
+
+      // mark these components as already written:
+      for (unsigned int i = first_component; i <= last_component; ++i)
+        data_set_written[i] = true;
+
+      // write the header. concatenate all the component names with double
+      // underscores unless a vector name has been specified
+      o << "    <DataArray type=\"Float32\" Name=\"";
+
+      if (!name.empty())
+        o << name;
+      else
+        {
+          for (unsigned int i = first_component; i < last_component; ++i)
+            o << data_names[i] << "__";
+          o << data_names[last_component];
+        }
+
+      o << "\" NumberOfComponents=\"" << n_components << "\" format=\""
+        << ascii_or_binary << "\"";
+      // If present, also list the physical units for this quantity. Look
+      // this up for either the name of the whole vector/tensor, or if that
+      // isn't listed, via its first component.
+      if (!name.empty())
+        {
+          if (flags.physical_units.find(name) != flags.physical_units.end())
+            o << " units=\"" << flags.physical_units.at(name) << "\"";
+        }
+      else
+        {
+          if (flags.physical_units.find(data_names[first_component]) !=
+              flags.physical_units.end())
+            o << " units=\""
+              << flags.physical_units.at(data_names[first_component]) << "\"";
+        }
+      o << ">\n";
+
+      // now write data. pad all vectors to have three components
+      std::vector<float> data;
+      data.reserve(n_nodes * n_components);
+
+      for (unsigned int n = 0; n < n_nodes; ++n)
+        {
+          if (!is_tensor)
+            {
+              switch (last_component - first_component)
+                {
+                  case 0:
+                    data.push_back(data_vectors(first_component, n));
+                    data.push_back(0);
+                    data.push_back(0);
+                    break;
+
+                  case 1:
+                    data.push_back(data_vectors(first_component, n));
+                    data.push_back(data_vectors(first_component + 1, n));
+                    data.push_back(0);
+                    break;
+
+                  case 2:
+                    data.push_back(data_vectors(first_component, n));
+                    data.push_back(data_vectors(first_component + 1, n));
+                    data.push_back(data_vectors(first_component + 2, n));
+                    break;
+
+                  default:
+                    // Anything else is not yet implemented
+                    Assert(false, ExcInternalError());
+                }
+            }
+          else
+            {
+              Tensor<2, 3> vtk_data;
+              vtk_data = 0.;
+
+              const unsigned int size = last_component - first_component + 1;
+              if (size == 1)
+                // 1D, 1 element
+                {
+                  vtk_data[0][0] = data_vectors(first_component, n);
+                }
+              else if (size == 4)
+                // 2D, 4 elements
+                {
+                  for (unsigned int c = 0; c < size; ++c)
+                    {
+                      const auto ind =
+                        Tensor<2, 2>::unrolled_to_component_indices(c);
+                      vtk_data[ind[0]][ind[1]] =
+                        data_vectors(first_component + c, n);
+                    }
+                }
+              else if (size == 9)
+                // 3D 9 elements
+                {
+                  for (unsigned int c = 0; c < size; ++c)
+                    {
+                      const auto ind =
+                        Tensor<2, 3>::unrolled_to_component_indices(c);
+                      vtk_data[ind[0]][ind[1]] =
+                        data_vectors(first_component + c, n);
+                    }
+                }
+              else
+                {
+                  Assert(false, ExcInternalError());
+                }
+
+              // now put the tensor into data
+              // note we padd with zeros because VTK format always wants to
+              // see a 3x3 tensor, regardless of dimension
+              for (unsigned int i = 0; i < 3; ++i)
+                for (unsigned int j = 0; j < 3; ++j)
+                  data.push_back(vtk_data[i][j]);
+            }
+        } // loop over nodes
+
+      o << vtu_stringize_array(data, flags.compression_level, output_precision);
+      o << '\n';
+      o << "    </DataArray>\n";
+
+      return o.str();
+    };
+
+    const auto stringize_scalar_data_set = [&flags,
+                                            &data_names,
+                                            &data_vectors,
+                                            ascii_or_binary,
+                                            output_precision = out.precision()](
+                                             const unsigned int data_set) {
+      std::ostringstream o;
+
+      o << "    <DataArray type=\"Float32\" Name=\"" << data_names[data_set]
+        << "\" format=\"" << ascii_or_binary << "\"";
+      // If present, also list the physical units for this quantity.
+      if (flags.physical_units.find(data_names[data_set]) !=
+          flags.physical_units.end())
+        o << " units=\"" << flags.physical_units.at(data_names[data_set])
+          << "\"";
+
+      o << ">\n";
+
+      const std::vector<float> data(data_vectors[data_set].begin(),
+                                    data_vectors[data_set].end());
+      o << vtu_stringize_array(data, flags.compression_level, output_precision);
+      o << '\n';
+      o << "    </DataArray>\n";
+
+      return o.str();
+    };
+
+
+    // When writing, first write out all vector and tensor data
     for (const auto &range : nonscalar_data_ranges)
       {
-        const auto  first_component = std::get<0>(range);
-        const auto  last_component  = std::get<1>(range);
-        const auto &name            = std::get<2>(range);
-        const bool  is_tensor =
-          (std::get<3>(range) ==
-           DataComponentInterpretation::component_is_part_of_tensor);
-        const unsigned int n_components = (is_tensor ? 9 : 3);
-        AssertThrow(last_component >= first_component,
-                    ExcLowerRange(last_component, first_component));
-        AssertThrow(last_component < n_data_sets,
-                    ExcIndexRange(last_component, 0, n_data_sets));
-        if (is_tensor)
-          {
-            AssertThrow((last_component + 1 - first_component <= 9),
-                        ExcMessage(
-                          "Can't declare a tensor with more than 9 components "
-                          "in VTK/VTU format."));
-          }
-        else
-          {
-            AssertThrow((last_component + 1 - first_component <= 3),
-                        ExcMessage(
-                          "Can't declare a vector with more than 3 components "
-                          "in VTK/VTU format."));
-          }
+        out << stringize_nonscalar_data_range(range);
+      }
 
-        // mark these components as already written:
-        for (unsigned int i = first_component; i <= last_component; ++i)
-          data_set_written[i] = true;
-
-        // write the header. concatenate all the component names with double
-        // underscores unless a vector name has been specified
-        out << "    <DataArray type=\"Float32\" Name=\"";
-
-        if (!name.empty())
-          out << name;
-        else
-          {
-            for (unsigned int i = first_component; i < last_component; ++i)
-              out << data_names[i] << "__";
-            out << data_names[last_component];
-          }
-
-        out << "\" NumberOfComponents=\"" << n_components << "\" format=\""
-            << ascii_or_binary << "\"";
-        // If present, also list the physical units for this quantity. Look this
-        // up for either the name of the whole vector/tensor, or if that isn't
-        // listed, via its first component.
-        if (!name.empty())
-          {
-            if (flags.physical_units.find(name) != flags.physical_units.end())
-              out << " units=\"" << flags.physical_units.at(name) << "\"";
-          }
-        else
-          {
-            if (flags.physical_units.find(data_names[first_component]) !=
-                flags.physical_units.end())
-              out << " units=\""
-                  << flags.physical_units.at(data_names[first_component])
-                  << "\"";
-          }
-        out << ">\n";
-
-        // now write data. pad all vectors to have three components
-        std::vector<float> data;
-        data.reserve(n_nodes * n_components);
-
-        for (unsigned int n = 0; n < n_nodes; ++n)
-          {
-            if (!is_tensor)
-              {
-                switch (last_component - first_component)
-                  {
-                    case 0:
-                      data.push_back(data_vectors(first_component, n));
-                      data.push_back(0);
-                      data.push_back(0);
-                      break;
-
-                    case 1:
-                      data.push_back(data_vectors(first_component, n));
-                      data.push_back(data_vectors(first_component + 1, n));
-                      data.push_back(0);
-                      break;
-
-                    case 2:
-                      data.push_back(data_vectors(first_component, n));
-                      data.push_back(data_vectors(first_component + 1, n));
-                      data.push_back(data_vectors(first_component + 2, n));
-                      break;
-
-                    default:
-                      // Anything else is not yet implemented
-                      Assert(false, ExcInternalError());
-                  }
-              }
-            else
-              {
-                Tensor<2, 3> vtk_data;
-                vtk_data = 0.;
-
-                const unsigned int size = last_component - first_component + 1;
-                if (size == 1)
-                  // 1D, 1 element
-                  {
-                    vtk_data[0][0] = data_vectors(first_component, n);
-                  }
-                else if (size == 4)
-                  // 2D, 4 elements
-                  {
-                    for (unsigned int c = 0; c < size; ++c)
-                      {
-                        const auto ind =
-                          Tensor<2, 2>::unrolled_to_component_indices(c);
-                        vtk_data[ind[0]][ind[1]] =
-                          data_vectors(first_component + c, n);
-                      }
-                  }
-                else if (size == 9)
-                  // 3D 9 elements
-                  {
-                    for (unsigned int c = 0; c < size; ++c)
-                      {
-                        const auto ind =
-                          Tensor<2, 3>::unrolled_to_component_indices(c);
-                        vtk_data[ind[0]][ind[1]] =
-                          data_vectors(first_component + c, n);
-                      }
-                  }
-                else
-                  {
-                    Assert(false, ExcInternalError());
-                  }
-
-                // now put the tensor into data
-                // note we padd with zeros because VTK format always wants to
-                // see a 3x3 tensor, regardless of dimension
-                for (unsigned int i = 0; i < 3; ++i)
-                  for (unsigned int j = 0; j < 3; ++j)
-                    data.push_back(vtk_data[i][j]);
-              }
-          } // loop over nodes
-
-        out << vtu_stringize_array(data,
-                                   flags.compression_level,
-                                   out.precision());
-        out << '\n';
-        out << "    </DataArray>\n";
-
-      } // loop over ranges
-
-    // now do the left over scalar data sets
+    // Now do the left over scalar data sets
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
       if (data_set_written[data_set] == false)
         {
-          out << "    <DataArray type=\"Float32\" Name=\""
-              << data_names[data_set] << "\" format=\"" << ascii_or_binary
-              << "\"";
-          // If present, also list the physical units for this quantity.
-          if (flags.physical_units.find(data_names[data_set]) !=
-              flags.physical_units.end())
-            out << " units=\"" << flags.physical_units.at(data_names[data_set])
-                << "\"";
-
-          out << ">\n";
-
-          const std::vector<float> data(data_vectors[data_set].begin(),
-                                        data_vectors[data_set].end());
-          out << vtu_stringize_array(data,
-                                     flags.compression_level,
-                                     out.precision());
-          out << '\n';
-          out << "    </DataArray>\n";
+          out << stringize_scalar_data_set(data_set);
         }
 
     out << "  </PointData>\n";
