@@ -220,19 +220,16 @@ DynamicSparsityPattern::Line::memory_consumption() const
 
 
 DynamicSparsityPattern::DynamicSparsityPattern()
-  : have_entries(false)
-  , rows(0)
-  , cols(0)
+  : SparsityPatternBase()
+  , have_entries(false)
   , rowset(0)
 {}
 
 
 
 DynamicSparsityPattern::DynamicSparsityPattern(const DynamicSparsityPattern &s)
-  : Subscriptor()
+  : SparsityPatternBase()
   , have_entries(false)
-  , rows(0)
-  , cols(0)
   , rowset(0)
 {
   (void)s;
@@ -248,9 +245,8 @@ DynamicSparsityPattern::DynamicSparsityPattern(const DynamicSparsityPattern &s)
 DynamicSparsityPattern::DynamicSparsityPattern(const size_type m,
                                                const size_type n,
                                                const IndexSet &rowset_)
-  : have_entries(false)
-  , rows(0)
-  , cols(0)
+  : SparsityPatternBase()
+  , have_entries(false)
   , rowset(0)
 {
   reinit(m, n, rowset_);
@@ -258,9 +254,8 @@ DynamicSparsityPattern::DynamicSparsityPattern(const size_type m,
 
 
 DynamicSparsityPattern::DynamicSparsityPattern(const IndexSet &rowset_)
-  : have_entries(false)
-  , rows(0)
-  , cols(0)
+  : SparsityPatternBase()
+  , have_entries(false)
   , rowset(0)
 {
   reinit(rowset_.size(), rowset_.size(), rowset_);
@@ -268,9 +263,8 @@ DynamicSparsityPattern::DynamicSparsityPattern(const IndexSet &rowset_)
 
 
 DynamicSparsityPattern::DynamicSparsityPattern(const size_type n)
-  : have_entries(false)
-  , rows(0)
-  , cols(0)
+  : SparsityPatternBase()
+  , have_entries(false)
   , rowset(0)
 {
   reinit(n, n);
@@ -282,13 +276,13 @@ DynamicSparsityPattern &
 DynamicSparsityPattern::operator=(const DynamicSparsityPattern &s)
 {
   (void)s;
-  Assert(s.rows == 0 && s.cols == 0,
+  Assert(s.n_rows() == 0 && s.n_cols() == 0,
          ExcMessage(
            "This operator can only be called if the provided argument "
            "is the sparsity pattern for an empty matrix. This operator can "
            "not be used to copy a non-empty sparsity pattern."));
 
-  Assert(rows == 0 && cols == 0,
+  Assert(n_rows() == 0 && n_cols() == 0,
          ExcMessage("This operator can only be called if the current object is "
                     "empty."));
 
@@ -302,9 +296,8 @@ DynamicSparsityPattern::reinit(const size_type m,
                                const size_type n,
                                const IndexSet &rowset_)
 {
+  resize(m, n);
   have_entries = false;
-  rows         = m;
-  cols         = n;
   rowset       = rowset_;
 
   Assert(rowset.size() == 0 || rowset.size() == m,
@@ -316,7 +309,8 @@ DynamicSparsityPattern::reinit(const size_type m,
            "of indices in this IndexSet may be less than the number "
            "of rows, but the *size* of the IndexSet must be equal.)"));
 
-  std::vector<Line> new_lines(rowset.size() == 0 ? rows : rowset.n_elements());
+  std::vector<Line> new_lines(rowset.size() == 0 ? n_rows() :
+                                                   rowset.n_elements());
   lines.swap(new_lines);
 }
 
@@ -349,6 +343,28 @@ DynamicSparsityPattern::max_entries_per_row() const
     }
 
   return m;
+}
+
+
+
+void
+DynamicSparsityPattern::add_row_entries(
+  const size_type &                 row,
+  const ArrayView<const size_type> &columns,
+  const bool                        indices_are_sorted)
+{
+  add_entries(row, columns.begin(), columns.end(), indices_are_sorted);
+}
+
+
+
+void
+DynamicSparsityPattern::add_entries(const ArrayView<const size_type> &rows,
+                                    const ArrayView<const size_type> &columns)
+{
+  AssertDimension(rows.size(), columns.size());
+  for (std::size_t i = 0; i < rows.size(); ++i)
+    add(rows[i], columns[i]);
 }
 
 

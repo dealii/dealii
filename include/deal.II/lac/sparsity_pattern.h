@@ -24,6 +24,8 @@
 #include <deal.II/base/linear_index_iterator.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/lac/sparsity_pattern_base.h>
+
 // boost::serialization::make_array used to be in array.hpp, but was
 // moved to a different file in BOOST 1.64
 #include <boost/version.hpp>
@@ -338,7 +340,7 @@ namespace SparsityPatternIterators
  * SparsityPatternIterators::Accessor, like <tt>it->column()</tt> and
  * <tt>it->row()</tt>.
  */
-class SparsityPattern : public Subscriptor
+class SparsityPattern : public SparsityPatternBase
 {
 public:
   /**
@@ -728,6 +730,16 @@ public:
               ForwardIterator end,
               const bool      indices_are_sorted = false);
 
+  virtual void
+  add_row_entries(const size_type &                 row,
+                  const ArrayView<const size_type> &columns,
+                  const bool indices_are_sorted = false) override;
+
+  virtual void
+  add_entries(const ArrayView<const size_type> &rows,
+              const ArrayView<const size_type> &columns) override;
+
+
   /**
    * Make the sparsity pattern symmetric by adding the sparsity pattern of the
    * transpose object.
@@ -760,20 +772,6 @@ public:
    */
   std::size_t
   n_nonzero_elements() const;
-
-  /**
-   * Return number of rows of this matrix, which equals the dimension of the
-   * image space.
-   */
-  size_type
-  n_rows() const;
-
-  /**
-   * Return number of columns of this matrix, which equals the dimension of
-   * the range space.
-   */
-  size_type
-  n_cols() const;
 
   /**
    * Return whether the object is empty. It is empty if no memory is
@@ -1097,16 +1095,6 @@ private:
   size_type max_dim;
 
   /**
-   * Number of rows that this sparsity structure shall represent.
-   */
-  size_type rows;
-
-  /**
-   * Number of columns that this sparsity structure shall represent.
-   */
-  size_type cols;
-
-  /**
    * Size of the actually allocated array #colnums. Here, the same applies as
    * for the #rowstart array, i.e. it may be larger than the actually used
    * part of the array.
@@ -1327,22 +1315,6 @@ SparsityPattern::n_nonzero_elements() const
   else
     // the object is empty or has zero size
     return 0;
-}
-
-
-
-inline SparsityPattern::size_type
-SparsityPattern::n_rows() const
-{
-  return rows;
-}
-
-
-
-inline SparsityPattern::size_type
-SparsityPattern::n_cols() const
-{
-  return cols;
 }
 
 
