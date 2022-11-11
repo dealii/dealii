@@ -155,6 +155,7 @@ namespace PETScWrappers
     , ghosted(false)
     , last_action(::dealii::VectorOperation::unknown)
   {
+    /* TODO GHOSTED */
     Assert(MultithreadInfo::is_running_single_threaded(),
            ExcMessage("PETSc does not support multi-threaded access, set "
                       "the thread limit to 1 in MPI_InitFinalize()."));
@@ -175,6 +176,20 @@ namespace PETScWrappers
   }
 
 
+
+  void
+  VectorBase::assign_petsc_vector(Vec v)
+  {
+    /* TODO GHOSTED */
+    AssertThrow(last_action == ::dealii::VectorOperation::unknown,
+                ExcMessage("Cannot assign a new Vec"));
+    PetscErrorCode ierr =
+      PetscObjectReference(reinterpret_cast<PetscObject>(v));
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = VecDestroy(&vector);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    vector = v;
+  }
 
   void
   VectorBase::clear()

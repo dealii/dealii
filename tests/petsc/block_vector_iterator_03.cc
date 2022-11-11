@@ -70,6 +70,13 @@ test()
 
       // check that the two vectors are equal
       deallog << "Check 1: " << (v1 == v2 ? "true" : "false") << std::endl;
+
+      // print vectors
+      v1.print(deallog.get_file_stream(), 10, true, false);
+
+      // Extract the PETSc VECNEST and use print from PETScWrappers::VectorBase
+      PETScWrappers::VectorBase v1b(v1.petsc_vector());
+      v1b.print(deallog.get_file_stream(), 10, true, false);
     };
 
   // Check 2: loop forward and back

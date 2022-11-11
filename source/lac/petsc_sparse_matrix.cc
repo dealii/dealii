@@ -122,18 +122,6 @@ namespace PETScWrappers
 
 
 
-  const MPI_Comm &
-  SparseMatrix::get_mpi_communicator() const
-  {
-    static MPI_Comm      comm;
-    const PetscErrorCode ierr =
-      PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-    return comm;
-  }
-
-
-
   void
   SparseMatrix::do_reinit(const size_type m,
                           const size_type n,

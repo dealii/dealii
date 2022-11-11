@@ -328,6 +328,15 @@ namespace PETScWrappers
     operator=(const PetscScalar s);
 
     /**
+     * This method assignes the PETSc Vec to the instance of the class.
+     * This is particularly useful when performing PETSc to Deal.II operations
+     * since it allows to reuse the Deal.II VectorBase and the PETSc Vec
+     * without incurring in memory copies.
+     */
+    void
+    assign_petsc_vector(Vec v);
+
+    /**
      * Test for equality. This function assumes that the present vector and
      * the one to compare with have the same size already, since comparing
      * vectors of different sizes makes not much sense anyway.
@@ -795,7 +804,7 @@ namespace PETScWrappers
      * Return a reference to the MPI communicator object in use with this
      * object.
      */
-    virtual const MPI_Comm &
+    const MPI_Comm &
     get_mpi_communicator() const;
 
   protected:
@@ -1148,8 +1157,10 @@ namespace PETScWrappers
   inline const MPI_Comm &
   VectorBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm;
-    PetscObjectGetComm(reinterpret_cast<PetscObject>(vector), &comm);
+    static MPI_Comm comm = PETSC_COMM_SELF;
+    MPI_Comm pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(vector));
+    if (pcomm != MPI_COMM_NULL)
+      comm = pcomm;
     return comm;
   }
 
