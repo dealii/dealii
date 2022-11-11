@@ -130,7 +130,7 @@ use of the member functions FEValuesBase::get_function_values() and
 FEValuesBase::get_function_gradients(). This is how step-15, for
 example, does things.
 The <code>assemble_system()</code>
-function would then looks like:
+function would then look like:
 @code
 template <int dim>
 void GelfandProblem<dim>::assemble_system()
@@ -185,7 +185,7 @@ void GelfandProblem<dim>::assemble_system()
                 }
 
               cell_rhs(i) += (-grad_phi_i * newton_step_gradients[q] +
-                              phi_i * newton_step_values[q]) *
+                              phi_i * nonlinearity) *
                              dx;
             }
         }
