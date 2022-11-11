@@ -105,6 +105,10 @@
 
 FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
+  IF(NOT TARGET compile_test_executables)
+    ADD_CUSTOM_TARGET(compile_test_executables)
+  ENDIF()
+
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
       "\nDEAL_II_ADD_TEST can only be called in external (test sub-) projects after "
@@ -413,6 +417,8 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           ${_source_file}
           ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
+
+        ADD_DEPENDENCIES(compile_test_executables ${_target})
 
         SET_TARGET_PROPERTIES(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
