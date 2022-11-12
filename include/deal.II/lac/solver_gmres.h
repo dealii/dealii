@@ -818,10 +818,10 @@ namespace internal
     {
       Assert(dim > 0, ExcInternalError());
 
-      for (unsigned int i = 0; i < dim - 1; ++i)
+      for (unsigned int i = 0; i < dim; ++i)
         vv.add(-h(i), orthogonal_vectors[i]);
 
-      return vv.add_and_dot(-h(dim - 1), orthogonal_vectors[dim - 1], vv);
+      return std::sqrt(vv.add_and_dot(-h(dim), orthogonal_vectors[dim], vv));
     }
 
 
@@ -891,10 +891,10 @@ namespace internal
 
       for (; j < vv.locally_owned_size(); ++j)
         {
-          double temp = vv(j);
+          double temp = vv.local_element(j);
           for (unsigned int i = 0; i < dim; ++i)
-            temp -= h(i) * orthogonal_vectors[i](j);
-          vv(j) = temp;
+            temp -= h(i) * orthogonal_vectors[i].local_element(j);
+          vv.local_element(j) = temp;
 
           norm_vv_temp += temp * temp;
         }
