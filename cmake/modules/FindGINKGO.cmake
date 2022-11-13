@@ -51,17 +51,21 @@ unset(GINKGO_CXX_COMPILER)
 #
 SET(_libraries "")
 FOREACH(_library ginkgo ${GINKGO_INTERFACE_LINK_LIBRARIES})
-  LIST(APPEND _libraries GINKGO_LIBRARY_${_library})
-  DEAL_II_FIND_LIBRARY(GINKGO_LIBRARY_${_library}
-    NAMES ${_library}
-    HINTS ${GINKGO_INSTALL_LIBRARY_DIR}
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
-    )
+  # Make sure to only pick up Ginkgo's own libraries here, skipping
+  # the MPI libraries that are listed here as of Ginkgo 1.5.0.
+  IF(_library MATCHES "ginkgo.*")
+    LIST(APPEND _libraries GINKGO_LIBRARY_${_library})
+    DEAL_II_FIND_LIBRARY(GINKGO_LIBRARY_${_library}
+      NAMES ${_library}
+      HINTS ${GINKGO_INSTALL_LIBRARY_DIR}
+      NO_DEFAULT_PATH
+      NO_CMAKE_ENVIRONMENT_PATH
+      NO_CMAKE_PATH
+      NO_SYSTEM_ENVIRONMENT_PATH
+      NO_CMAKE_SYSTEM_PATH
+      NO_CMAKE_FIND_ROOT_PATH
+      )
+  ENDIF()
 ENDFOREACH()
 
 #
