@@ -155,6 +155,10 @@ BlockSparsityPatternBase<SparsityPatternType>::collect_sizes()
   // finally initialize the row
   // indices with this array
   column_indices.reinit(col_sizes);
+
+  // Resize scratch arrays
+  block_column_indices.resize(n_block_cols());
+  counter_within_block.resize(n_block_cols());
 }
 
 
