@@ -345,6 +345,13 @@ namespace PETScWrappers
     virtual ~MatrixBase() override;
 
     /**
+     * This method assignes the PETSc Mat to the instance of the class.
+     *
+     */
+    void
+    assign_petsc_matrix(Mat A);
+
+    /**
      * This operator assigns a scalar to a matrix. Since this does usually not
      * make much sense (should we set all matrix entries to this value? Only
      * the nonzero entries of the sparsity pattern?), this operation is only
