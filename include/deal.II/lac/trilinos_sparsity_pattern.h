@@ -14,32 +14,32 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_trilinos_sparsity_pattern_h
-#  define dealii_trilinos_sparsity_pattern_h
+#define dealii_trilinos_sparsity_pattern_h
 
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/config.h>
+#ifdef DEAL_II_WITH_TRILINOS
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/base/mpi_stub.h>
+#  include <deal.II/base/subscriptor.h>
 
-#    include <deal.II/base/index_set.h>
-#    include <deal.II/base/mpi_stub.h>
-#    include <deal.II/base/subscriptor.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/sparsity_pattern_base.h>
 
-#    include <deal.II/lac/exceptions.h>
+#  include <Epetra_FECrsGraph.h>
+#  include <Epetra_Map.h>
+#  include <Epetra_MpiComm.h>
 
-#    include <Epetra_FECrsGraph.h>
-#    include <Epetra_Map.h>
-#    include <Epetra_MpiComm.h>
-
-#    include <cmath>
-#    include <memory>
-#    include <vector>
+#  include <cmath>
+#  include <memory>
+#  include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 class SparsityPattern;
 class DynamicSparsityPattern;
 
@@ -53,7 +53,7 @@ namespace TrilinosWrappers
     class Iterator;
   }
 } // namespace TrilinosWrappers
-#    endif
+#  endif
 
 namespace TrilinosWrappers
 {
@@ -271,7 +271,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @ingroup Sparsity
    */
-  class SparsityPattern : public Subscriptor
+  class SparsityPattern : public SparsityPatternBase
   {
   public:
     /**
@@ -668,18 +668,6 @@ namespace TrilinosWrappers
     max_entries_per_row() const;
 
     /**
-     * Return the number of rows in this sparsity pattern.
-     */
-    size_type
-    n_rows() const;
-
-    /**
-     * Return the number of columns in this sparsity pattern.
-     */
-    size_type
-    n_cols() const;
-
-    /**
      * Return the local dimension of the sparsity pattern, i.e. the number of
      * rows stored on the present MPI process. In the sequential case, this
      * number is the same as n_rows(), but for parallel matrices it may be
@@ -784,6 +772,16 @@ namespace TrilinosWrappers
                 ForwardIterator begin,
                 ForwardIterator end,
                 const bool      indices_are_sorted = false);
+
+    virtual void
+    add_row_entries(const size_type &                 row,
+                    const ArrayView<const size_type> &columns,
+                    const bool indices_are_sorted = false) override;
+
+    virtual void
+    add_entries(const ArrayView<const size_type> &rows,
+                const ArrayView<const size_type> &columns) override;
+
     /** @} */
     /**
      * @name Access of underlying Trilinos data
@@ -1004,7 +1002,7 @@ namespace TrilinosWrappers
   // ----------------------- inline and template functions --------------------
 
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 
   namespace SparsityPatternIterators
   {
@@ -1203,13 +1201,13 @@ namespace TrilinosWrappers
   SparsityPattern::in_local_range(const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#      ifndef DEAL_II_WITH_64BIT_INDICES
+#    ifndef DEAL_II_WITH_64BIT_INDICES
     begin = graph->RowMap().MinMyGID();
     end   = graph->RowMap().MaxMyGID() + 1;
-#      else
+#    else
     begin = graph->RowMap().MinMyGID64();
     end   = graph->RowMap().MaxMyGID64() + 1;
-#      endif
+#    endif
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -1321,17 +1319,13 @@ namespace TrilinosWrappers
     return IndexSet(graph->RangeMap());
   }
 
-#    endif // DOXYGEN
+#  endif // DOXYGEN
 } // namespace TrilinosWrappers
 
 
 DEAL_II_NAMESPACE_CLOSE
 
 
-#  endif // DEAL_II_WITH_TRILINOS
-
-
-/*--------------------   trilinos_sparsity_pattern.h     --------------------*/
+#endif // DEAL_II_WITH_TRILINOS
 
 #endif
-/*--------------------   trilinos_sparsity_pattern.h     --------------------*/
