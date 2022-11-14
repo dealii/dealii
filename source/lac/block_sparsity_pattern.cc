@@ -124,6 +124,8 @@ template <class SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::collect_sizes()
 {
+  SparsityPatternBase::resize(compute_n_rows(), compute_n_cols());
+
   std::vector<size_type> row_sizes(n_block_rows());
   std::vector<size_type> col_sizes(n_block_cols());
 
@@ -198,28 +200,6 @@ BlockSparsityPatternBase<SparsityPatternType>::max_entries_per_row() const
         max_entries = this_row;
     }
   return max_entries;
-}
-
-
-
-template <class SparsityPatternType>
-typename BlockSparsityPatternBase<SparsityPatternType>::size_type
-BlockSparsityPatternBase<SparsityPatternType>::n_rows() const
-{
-  // While trivial for the moment, this will be replaced by a base class
-  // function in a future patch
-  return compute_n_rows();
-}
-
-
-
-template <class SparsityPatternType>
-typename BlockSparsityPatternBase<SparsityPatternType>::size_type
-BlockSparsityPatternBase<SparsityPatternType>::n_cols() const
-{
-  // While trivial for the moment, this will be replaced by a base class
-  // function in a future patch
-  return compute_n_cols();
 }
 
 
