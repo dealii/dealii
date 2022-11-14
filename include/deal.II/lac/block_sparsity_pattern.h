@@ -853,81 +853,132 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   Assert(n_rows() == compute_n_rows(), ExcNeedsCollectSizes());
   Assert(n_cols() == compute_n_cols(), ExcNeedsCollectSizes());
 
-  // Resize scratch arrays
-  if (block_column_indices.size() < n_block_cols())
+  const size_type n_cols = static_cast<size_type>(end - begin);
+
+  if (indices_are_sorted && n_cols > 0)
     {
-      block_column_indices.resize(n_block_cols());
-      counter_within_block.resize(n_block_cols());
-    }
+      block_column_indices[0].resize(0);
 
-  const size_type n_added_cols = static_cast<size_type>(end - begin);
+      const std::pair<size_type, size_type> row_index =
+        this->row_indices.global_to_local(row);
+      const auto n_blocks = column_indices.size();
 
-  // Resize sub-arrays to n_added_cols. This
-  // is a bit wasteful, but we resize
-  // only a few times (then the maximum
-  // row length won't increase that
-  // much any more). At least we know
-  // that all arrays are going to be of
-  // the same size, so we can check
-  // whether the size of one is large
-  // enough before actually going
-  // through all of them.
-  if (block_column_indices[0].size() < n_added_cols)
-    for (size_type i = 0; i < this->n_block_cols(); ++i)
-      block_column_indices[i].resize(n_added_cols);
+      // Assume we start with the first block: since we assemble sparsity
+      // patterns one cell at a time this should always be true
+      size_type current_block       = 0;
+      size_type current_start_index = column_indices.block_start(current_block);
+      size_type next_start_index =
+        current_block == n_blocks - 1 ?
+          numbers::invalid_dof_index :
+          column_indices.block_start(current_block + 1);
 
-  // Reset the number of added elements
-  // in each block to zero.
-  for (size_type i = 0; i < this->n_block_cols(); ++i)
-    counter_within_block[i] = 0;
+      for (auto it = begin; it < end; ++it)
+        {
+          // BlockIndices::global_to_local() is a bit slow so instead we just
+          // keep track of which block we are in - as the indices are sorted we
+          // know that the block number can only increase.
+          if (*it >= next_start_index)
+            {
+              // we found a column outside the present block: write the present
+              // block entries and continue to the next block
+              sub_objects[row_index.first][current_block]->add_entries(
+                row_index.second,
+                block_column_indices[0].begin(),
+                block_column_indices[0].end(),
+                true);
+              block_column_indices[0].clear();
 
-  // Go through the column indices to
-  // find out which portions of the
-  // values should be set in which
-  // block of the matrix. We need to
-  // touch all the data, since we can't
-  // be sure that the data of one block
-  // is stored contiguously (in fact,
-  // indices will be intermixed when it
-  // comes from an element matrix).
-  for (ForwardIterator it = begin; it != end; ++it)
-    {
-      const size_type col = *it;
+              auto block_and_col  = column_indices.global_to_local(*it);
+              current_block       = block_and_col.first;
+              current_start_index = column_indices.block_start(current_block);
+              next_start_index =
+                current_block == n_blocks - 1 ?
+                  numbers::invalid_dof_index :
+                  column_indices.block_start(current_block + 1);
+            }
+          const size_type local_index = *it - current_start_index;
+          block_column_indices[0].push_back(local_index);
 
-      const std::pair<size_type, size_type> col_index =
-        this->column_indices.global_to_local(col);
-
-      const size_type local_index = counter_within_block[col_index.first]++;
-
-      block_column_indices[col_index.first][local_index] = col_index.second;
-    }
-
+          // Check that calculation:
 #ifdef DEBUG
-  // If in debug mode, do a check whether
-  // the right length has been obtained.
-  size_type length = 0;
-  for (size_type i = 0; i < n_block_cols(); ++i)
-    length += counter_within_block[i];
-  Assert(length == n_added_cols, ExcInternalError());
+          {
+            auto check_block_and_col = column_indices.global_to_local(*it);
+            Assert(current_block == check_block_and_col.first,
+                   ExcInternalError());
+            Assert(local_index == check_block_and_col.second,
+                   ExcInternalError());
+          }
 #endif
-
-  // Now we found out about where the
-  // individual columns should start and
-  // where we should start reading out
-  // data. Now let's write the data into
-  // the individual blocks!
-  const std::pair<size_type, size_type> row_index =
-    this->row_indices.global_to_local(row);
-  for (size_type block_col = 0; block_col < n_block_cols(); ++block_col)
-    {
-      if (counter_within_block[block_col] == 0)
-        continue;
-      sub_objects[row_index.first][block_col]->add_entries(
+        }
+      // add whatever is left over:
+      sub_objects[row_index.first][current_block]->add_entries(
         row_index.second,
-        block_column_indices[block_col].begin(),
-        block_column_indices[block_col].begin() +
-          counter_within_block[block_col],
-        indices_are_sorted);
+        block_column_indices[0].begin(),
+        block_column_indices[0].end(),
+        true);
+
+      return;
+    }
+  else
+    {
+      // Resize sub-arrays to n_cols. This
+      // is a bit wasteful, but we resize
+      // only a few times (then the maximum
+      // row length won't increase that
+      // much any more). At least we know
+      // that all arrays are going to be of
+      // the same size, so we can check
+      // whether the size of one is large
+      // enough before actually going
+      // through all of them.
+      if (block_column_indices[0].size() < n_cols)
+        for (size_type i = 0; i < this->n_block_cols(); ++i)
+          block_column_indices[i].resize(n_cols);
+
+      // Reset the number of added elements
+      // in each block to zero.
+      for (size_type i = 0; i < this->n_block_cols(); ++i)
+        counter_within_block[i] = 0;
+
+      // Go through the column indices to
+      // find out which portions of the
+      // values should be set in which
+      // block of the matrix. We need to
+      // touch all the data, since we can't
+      // be sure that the data of one block
+      // is stored contiguously (in fact,
+      // indices will be intermixed when it
+      // comes from an element matrix).
+      for (ForwardIterator it = begin; it != end; ++it)
+        {
+          const size_type col = *it;
+
+          const std::pair<size_type, size_type> col_index =
+            this->column_indices.global_to_local(col);
+
+          const size_type local_index = counter_within_block[col_index.first]++;
+
+          block_column_indices[col_index.first][local_index] = col_index.second;
+        }
+
+      // Now we found out about where the
+      // individual columns should start and
+      // where we should start reading out
+      // data. Now let's write the data into
+      // the individual blocks!
+      const std::pair<size_type, size_type> row_index =
+        this->row_indices.global_to_local(row);
+      for (size_type block_col = 0; block_col < n_block_cols(); ++block_col)
+        {
+          if (counter_within_block[block_col] == 0)
+            continue;
+          sub_objects[row_index.first][block_col]->add_entries(
+            row_index.second,
+            block_column_indices[block_col].begin(),
+            block_column_indices[block_col].begin() +
+              counter_within_block[block_col],
+            indices_are_sorted);
+        }
     }
 }
 

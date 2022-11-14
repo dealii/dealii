@@ -1973,30 +1973,6 @@ private:
                              const std::integral_constant<bool, true>) const;
 
   /**
-   * This function actually implements the local_to_global function for
-   * standard (non-block) sparsity types.
-   */
-  template <typename SparsityPatternType>
-  void
-  add_entries_local_to_global(const std::vector<size_type> &local_dof_indices,
-                              SparsityPatternType &         sparsity_pattern,
-                              const bool            keep_constrained_entries,
-                              const Table<2, bool> &dof_mask,
-                              const std::integral_constant<bool, false>) const;
-
-  /**
-   * This function actually implements the local_to_global function for block
-   * sparsity types.
-   */
-  template <typename SparsityPatternType>
-  void
-  add_entries_local_to_global(const std::vector<size_type> &local_dof_indices,
-                              SparsityPatternType &         sparsity_pattern,
-                              const bool            keep_constrained_entries,
-                              const Table<2, bool> &dof_mask,
-                              const std::integral_constant<bool, true>) const;
-
-  /**
    * Internal helper function for distribute_local_to_global function.
    *
    * Creates a list of affected global rows for distribution, including the
@@ -2454,49 +2430,6 @@ namespace internal
     template <typename MatrixType>
     const bool IsBlockMatrix<MatrixType>::value;
 
-
-    /**
-     * A class that can be used to determine whether a given type is a block
-     * sparsity pattern type or not. In this, it matches the IsBlockMatrix
-     * class.
-     *
-     * @see
-     * @ref GlossBlockLA "Block (linear algebra)"
-     */
-    template <typename MatrixType>
-    struct IsBlockSparsityPattern
-    {
-    private:
-      /**
-       * Overload returning true if the class is derived from
-       * BlockSparsityPatternBase, which is what block sparsity patterns do.
-       */
-      template <typename T>
-      static std::true_type
-      check(const BlockSparsityPatternBase<T> *);
-
-      /**
-       * Catch all for all other potential types that are then apparently not
-       * block sparsity patterns.
-       */
-      static std::false_type
-      check(...);
-
-    public:
-      /**
-       * A statically computable value that indicates whether the template
-       * argument to this class is a block sparsity pattern (in fact whether the
-       * type is derived from BlockSparsityPatternBase<T>).
-       */
-      static const bool value =
-        std::is_same<decltype(check(std::declval<MatrixType *>())),
-                     std::true_type>::value;
-    };
-
-    // instantiation of the static member
-    template <typename MatrixType>
-    const bool IsBlockSparsityPattern<MatrixType>::value;
-
   } // namespace AffineConstraints
 } // namespace internal
 #endif
@@ -2566,29 +2499,6 @@ AffineConstraints<number>::distribute_local_to_global(
     std::integral_constant<
       bool,
       internal::AffineConstraints::IsBlockMatrix<MatrixType>::value>());
-}
-
-
-
-template <typename number>
-template <typename SparsityPatternType>
-inline void
-AffineConstraints<number>::add_entries_local_to_global(
-  const std::vector<size_type> &local_dof_indices,
-  SparsityPatternType &         sparsity_pattern,
-  const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask) const
-{
-  // enter the internal function with the respective block information set,
-  // the actual implementation follows in the cm.templates.h file.
-  add_entries_local_to_global(
-    local_dof_indices,
-    sparsity_pattern,
-    keep_constrained_entries,
-    dof_mask,
-    std::integral_constant<bool,
-                           internal::AffineConstraints::IsBlockSparsityPattern<
-                             SparsityPatternType>::value>());
 }
 
 
