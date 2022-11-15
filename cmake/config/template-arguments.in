@@ -248,16 +248,6 @@ SPARSITY_PATTERNS := { SparsityPattern;
                        BlockDynamicSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
 
-// Special lists for AffineConstraints:
-AFFINE_CONSTRAINTS_SP := { SparsityPattern;
-                           DynamicSparsityPattern;
-                           @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
-                         }
-AFFINE_CONSTRAINTS_SP_BLOCK := { BlockSparsityPattern;
-                                 BlockDynamicSparsityPattern;
-                                 @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@;
-                               }
-
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }
 

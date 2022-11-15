@@ -25,6 +25,7 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/thread_local_storage.h>
 
+#include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_element_access.h>
 
@@ -356,6 +357,11 @@ namespace internal
        * Stores whether the data is currently in use.
        */
       bool in_use;
+
+      /**
+       * Temporary array for row indices
+       */
+      std::vector<size_type> rows;
 
       /**
        * Temporary array for column indices
@@ -1517,23 +1523,21 @@ public:
    * caller's site. There is no locking mechanism inside this method to
    * prevent data races.
    */
-  template <typename SparsityPatternType>
   void
   add_entries_local_to_global(
     const std::vector<size_type> &local_dof_indices,
-    SparsityPatternType &         sparsity_pattern,
+    SparsityPatternBase &         sparsity_pattern,
     const bool                    keep_constrained_entries = true,
     const Table<2, bool> &        dof_mask = Table<2, bool>()) const;
 
   /**
    * Similar to the other function, but for non-quadratic sparsity patterns.
    */
-  template <typename SparsityPatternType>
   void
   add_entries_local_to_global(
     const std::vector<size_type> &row_indices,
     const std::vector<size_type> &col_indices,
-    SparsityPatternType &         sparsity_pattern,
+    SparsityPatternBase &         sparsity_pattern,
     const bool                    keep_constrained_entries = true,
     const Table<2, bool> &        dof_mask = Table<2, bool>()) const;
 
@@ -1541,13 +1545,12 @@ public:
    * Similar to the other function, but for non-quadratic sparsity patterns, and
    * for different constraints in the column space.
    */
-  template <typename SparsityPatternType>
   void
   add_entries_local_to_global(
     const std::vector<size_type> &   row_indices,
     const AffineConstraints<number> &col_constraints,
     const std::vector<size_type> &   col_indices,
-    SparsityPatternType &            sparsity_pattern,
+    SparsityPatternBase &            sparsity_pattern,
     const bool                       keep_constrained_entries = true,
     const Table<2, bool> &           dof_mask = Table<2, bool>()) const;
 
