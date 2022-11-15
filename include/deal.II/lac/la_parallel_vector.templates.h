@@ -694,16 +694,7 @@ namespace LinearAlgebra
 
       thread_loop_partitioner = v.thread_loop_partitioner;
 
-      const size_type this_size = locally_owned_size();
-      if (this_size > 0)
-        {
-          dealii::internal::VectorOperations::
-            functions<Number, Number, MemorySpaceType>::copy(
-              thread_loop_partitioner,
-              partitioner->locally_owned_size(),
-              v.data,
-              data);
-        }
+      copy_locally_owned_data_from(v);
     }
 
 
@@ -848,13 +839,7 @@ namespace LinearAlgebra
 
       thread_loop_partitioner = c.thread_loop_partitioner;
 
-      const size_type this_size = partitioner->locally_owned_size();
-      if (this_size > 0)
-        {
-          dealii::internal::VectorOperations::
-            functions<Number, Number2, MemorySpaceType>::copy(
-              thread_loop_partitioner, this_size, c.data, data);
-        }
+      copy_locally_owned_data_from(c);
 
       if (must_update_ghost_values)
         update_ghost_values();
