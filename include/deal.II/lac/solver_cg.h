@@ -204,6 +204,13 @@ public:
   SolverCG(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   /**
+   * Constructor for compatibility to PETSc interface.
+   */
+  SolverCG(SolverControl &       cn,
+           const MPI_Comm &      mpi_communicator,
+           const AdditionalData &data = AdditionalData());
+
+  /**
    * Virtual destructor.
    */
   virtual ~SolverCG() override = default;
@@ -408,6 +415,17 @@ SolverCG<VectorType>::SolverCG(SolverControl &cn, const AdditionalData &data)
   , additional_data(data)
   , determine_beta_by_flexible_formula(false)
 {}
+
+
+
+template <typename VectorType>
+SolverCG<VectorType>::SolverCG(SolverControl &       cn,
+                               const MPI_Comm &      mpi_communicator,
+                               const AdditionalData &data)
+  : SolverCG<VectorType>(cn, data)
+{
+  (void)mpi_communicator; // unused, for compatibility with PETSc
+}
 
 
 

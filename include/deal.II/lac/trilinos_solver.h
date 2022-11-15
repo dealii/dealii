@@ -393,6 +393,13 @@ namespace TrilinosWrappers
      */
     SolverCG(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
+    /**
+     * Constructor for compatibility to PETSc interface.
+     */
+    SolverCG(SolverControl &       cn,
+             const MPI_Comm &      mpi_communicator,
+             const AdditionalData &data = AdditionalData());
+
   protected:
     /**
      * Store a copy of the flags for this particular solver.

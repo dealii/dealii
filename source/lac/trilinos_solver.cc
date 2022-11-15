@@ -605,6 +605,16 @@ namespace TrilinosWrappers
   }
 
 
+
+  SolverCG::SolverCG(SolverControl &       cn,
+                     const MPI_Comm &      mpi_communicator,
+                     const AdditionalData &data)
+    : SolverCG(cn, data)
+  {
+    (void)mpi_communicator; // unused, for compatibility with PETSc
+  }
+
+
   /* ---------------------- SolverGMRES ------------------------ */
 
   SolverGMRES::AdditionalData::AdditionalData(
