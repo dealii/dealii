@@ -63,6 +63,6 @@ namespace Utilities
 } // namespace Utilities
 
 // explicit instantiations from .templates.h file
-#include "partitioner.cuda.inst"
+#include "partitioner_cuda.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -142,7 +142,7 @@ SET(_inst
   mpi_noncontiguous_partitioner.inst.in
   mpi_remote_point_evaluation.inst.in
   partitioner.inst.in
-  partitioner.cuda.inst.in
+  partitioner_cuda.inst.in
   polynomials_rannacher_turek.inst.in
   symmetric_tensor.inst.in
   symbolic_function.inst.in
