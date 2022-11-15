@@ -33,6 +33,7 @@
 #  include <Epetra_Operator.h>
 
 // for Belos solvers
+#ifdef DEAL_II_TRILINOS_WITH_BELOS
 #  include <BelosBlockCGSolMgr.hpp>
 #  include <BelosBlockGmresSolMgr.hpp>
 #  include <BelosEpetraAdapter.hpp>
@@ -40,6 +41,7 @@
 #  include <BelosMultiVec.hpp>
 #  include <BelosOperator.hpp>
 #  include <BelosSolverManager.hpp>
+#endif
 
 #  include <memory>
 
@@ -730,6 +732,7 @@ namespace TrilinosWrappers
 
 
 
+#ifdef DEAL_II_TRILINOS_WITH_BELOS
   /**
    * Wrapper around the iterate solver package from the Belos
    * packge
@@ -805,6 +808,7 @@ namespace TrilinosWrappers
     const AdditionalData                        additional_data;
     const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters;
   };
+#endif
 
 } // namespace TrilinosWrappers
 
@@ -812,6 +816,7 @@ namespace TrilinosWrappers
 
 #  ifndef DOXYGEN
 
+#ifdef DEAL_II_TRILINOS_WITH_BELOS
 namespace TrilinosWrappers
 {
   namespace internal
@@ -1429,6 +1434,7 @@ namespace TrilinosWrappers
   }
 
 } // namespace TrilinosWrappers
+#endif
 
 #  endif
 

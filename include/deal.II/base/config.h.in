@@ -239,6 +239,7 @@
 
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
+#cmakedefine DEAL_II_TRILINOS_WITH_BELOS
 #cmakedefine DEAL_II_TRILINOS_WITH_EPETRAEXT
 #cmakedefine DEAL_II_TRILINOS_WITH_MUELU
 #cmakedefine DEAL_II_TRILINOS_WITH_ROL
