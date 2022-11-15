@@ -1153,7 +1153,7 @@ namespace
           }
       }
 
-    return {n_nodes, n_cells};
+    return std::tuple<unsigned int, unsigned int>(n_nodes, n_cells);
   }
 
 
@@ -1209,7 +1209,8 @@ namespace
           }
       }
 
-    return {n_nodes, n_cells, n_points_and_n_cells};
+    return std::tuple<unsigned int, unsigned int, unsigned int>(
+      n_nodes, n_cells, n_points_and_n_cells);
   }
 
   /**
