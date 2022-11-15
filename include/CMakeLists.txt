@@ -34,14 +34,6 @@ INSTALL(DIRECTORY deal.II
   FILES_MATCHING PATTERN "*.h"
   )
 
-IF(DEAL_II_WITH_CUDA)
-  INSTALL(DIRECTORY deal.II
-    DESTINATION ${DEAL_II_INCLUDE_RELDIR}
-    COMPONENT library
-    FILES_MATCHING PATTERN "*.cuh"
-    )
-ENDIF()
-
 #
 # and don't forget to install all generated header files, too:
 #

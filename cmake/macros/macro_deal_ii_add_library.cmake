@@ -59,32 +59,6 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
         PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
         )
 
-      IF(DEAL_II_WITH_CUDA)
-        #
-        # Add cxx compiler and cuda compilation flags to cuda source files:
-        #
-
-        SET(_cuda_flags "${DEAL_II_CUDA_FLAGS} ${DEAL_II_CUDA_FLAGS_${_build}}")
-        SEPARATE_ARGUMENTS(_cuda_flags)
-
-        #
-        # Workaround: cuda will split every compiler option with a comma
-        # (','), so remove all compiler flags that contain a comma:
-        #
-        STRING(REGEX REPLACE "[^ ]*,[^ ]*" "" _cxx_flags
-          "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-          )
-
-        TARGET_COMPILE_OPTIONS(${_library}_${_build_lowercase} PUBLIC
-          $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler ${_cxx_flags}>
-          $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_flags}>
-          )
-
-        SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
-          CUDA_SEPARABLE_COMPILATION FALSE
-          )
-      ENDIF()
-
     ENDIF()
 
     SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}

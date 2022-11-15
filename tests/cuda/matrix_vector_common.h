@@ -49,7 +49,7 @@
 #include "matrix_vector_mf.h"
 
 
-// forward declare this function. will be implemented in .cu files
+// forward declare this function. will be implemented in .cc files
 template <int dim, int fe_degree, typename Number>
 void
 test();

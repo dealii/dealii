@@ -54,10 +54,8 @@ ELSE()
       # we don't know if CUDA support is enabled in Kokkos
       IF(Kokkos_ENABLE_CUDA)
         SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
-        IF(DEAL_II_WITH_KOKKOS_BACKEND)
-          # Require lambda support to use Kokkos as a backend
-          KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
-        ENDIF()
+        # Require lambda support to use Kokkos as a backend
+        KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
       ENDIF()
 
       DEAL_II_FIND_LIBRARY(KOKKOS_CORE_LIBRARY

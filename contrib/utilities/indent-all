@@ -65,7 +65,7 @@ checks
 # Process all source and header files:
 #
 
-process "tests include source examples contrib/python-bindings" ".*\.(cc|h|cu|cuh)" format_file
+process "tests include source examples contrib/python-bindings" ".*\.(cc|h" format_file
 process "source" ".*\.inst.in" format_inst
 
 #
@@ -73,21 +73,21 @@ process "source" ".*\.inst.in" format_inst
 #
 
 process "tests include source examples cmake/scripts contrib/python-bindings" \
-  ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
+  ".*\.(cc|h|inst.in|output.*|cmake)" fix_permissions
 
 process "tests include source examples cmake/scripts contrib/python-bindings" \
-  ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix
+  ".*\.(cc|h|inst.in|cmake)" dos_to_unix
 
 #
 # Removing trailing whitespace
 #
 
 process "tests include source examples cmake/scripts contrib/python-bindings doc" \
-  ".*\.(cc|h|cu|cuh|html|dox|txt)" remove_trailing_whitespace
+  ".*\.(cc|h|html|dox|txt)" remove_trailing_whitespace
 
 #
 # Ensure only a single newline at end of files
 #
 
 process "tests include source examples cmake/scripts contrib/python-bindings doc" \
-  ".*\.(cc|h|cu|cuh|html|dox|txt)" ensure_single_trailing_newline
+  ".*\.(cc|h|html|dox|txt)" ensure_single_trailing_newline

@@ -56,7 +56,7 @@ FILE(GLOB _header
 
 IF(DEAL_II_WITH_CUDA)
   SET(_src
-    cuda_matrix_free.cu
+    cuda_matrix_free.cc
     ${_src}
     )
   SET(_inst

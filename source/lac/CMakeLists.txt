@@ -64,8 +64,8 @@ SET(_separate_src
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
-    vector_memory.cu
-    affine_constraints.cu
+    vector_memory_cuda.cc
+    affine_constraints_cuda.cc
     )
 ENDIF()
 
@@ -163,13 +163,13 @@ ENDIF()
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
-    cuda_kernels.cu
-    cuda_precondition.cu
-    cuda_solver_direct.cu
-    cuda_sparse_matrix.cu
-    cuda_vector.cu
-    la_parallel_vector.cu
-    read_write_vector.cu
+    cuda_kernels.cc
+    cuda_precondition.cc
+    cuda_solver_direct.cc
+    cuda_sparse_matrix.cc
+    cuda_vector.cc
+    la_parallel_vector_cuda.cc
+    read_write_vector_cuda.cc
   )
 ENDIF()
 

@@ -18,6 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 
 namespace LinearAlgebra
 {
@@ -43,5 +44,7 @@ namespace LinearAlgebra
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 } // namespace LinearAlgebra
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

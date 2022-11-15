@@ -18,6 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 
 namespace LinearAlgebra
 {
@@ -60,5 +61,6 @@ namespace LinearAlgebra
   } // namespace distributed
 } // namespace LinearAlgebra
 
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

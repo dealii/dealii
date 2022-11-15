@@ -15,7 +15,7 @@
 
 
 # Skip header lines at the top of the file, such as copyright notices and
-# license information, if the file is a step-xx.cc or .cu tutorial. Here, xx
+# license information, if the file is a step-xx.cc tutorial. Here, xx
 # is either a number like step-32 or a number plus a letter like step-12b.
 # Don't skip for other files such as code-gallery files
 if ($ARGV[0] =~ /step-\d+[a-z]?.[cc|cu]/)

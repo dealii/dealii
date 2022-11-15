@@ -113,22 +113,16 @@ ADD_DEPENDENCIES(tutorial build_tutorial_h)
 FOREACH(_step ${_deal_ii_steps})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
 
-  IF(EXISTS "${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cu")
-    SET(_FILE_EXTENSION "cu")
-  ELSE()
-    SET(_FILE_EXTENSION "cc")
-  ENDIF()
-
   ADD_CUSTOM_COMMAND(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     COMMAND ${PERL_EXECUTABLE}
     ARGS
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
-      > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
+      < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
+      > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     DEPENDS
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
+      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
     VERBATIM
     )
 
@@ -146,7 +140,7 @@ FOREACH(_step ${_deal_ii_steps})
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.${_FILE_EXTENSION}
+      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
     )
@@ -154,7 +148,7 @@ FOREACH(_step ${_deal_ii_steps})
   ADD_CUSTOM_TARGET(tutorial_${_step}
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-      ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
+      ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     COMMENT
       "Building doxygen input file for tutorial program <${_step}>"
     )

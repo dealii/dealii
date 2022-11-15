@@ -17,6 +17,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 
 namespace internal
 {
@@ -43,5 +44,7 @@ template void
 AffineConstraints<double>::set_zero<
   LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>(
   LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &) const;
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

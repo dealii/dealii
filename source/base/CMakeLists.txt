@@ -114,8 +114,8 @@ SET(_separate_src
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
-    cuda.cu
-    partitioner.cu
+    cuda.cc
+    partitioner_cuda.cc
   )
 ENDIF()
 
@@ -154,7 +154,6 @@ SET(_inst
 
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
-  ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.cuh
   )
 
 DEAL_II_ADD_LIBRARY(obj_base OBJECT ${_src} ${_header} ${_inst}

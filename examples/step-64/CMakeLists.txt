@@ -16,7 +16,7 @@ SET(TARGET "step-64")
 # in the "CMake in user projects" page accessible from the "User info"
 # page of the documentation.
 SET(TARGET_SRC
-  ${TARGET}.cu
+  ${TARGET}.cc
   )
 
 # Usually, you will not need to modify anything beyond this point...
