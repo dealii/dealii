@@ -385,15 +385,7 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
-
-    std::vector<types::global_dof_index> rows;
     std::vector<types::global_dof_index> cols;
-
-    auto append_pair = [&](const types::global_dof_index i,
-                           const types::global_dof_index j) {
-      rows.push_back(i);
-      cols.push_back(j);
-    };
 
     // loop over all faces to check whether they are at a boundary. note
     // that we need not take special care of single lines (using
@@ -411,14 +403,18 @@ namespace DoFTools
                                            cell->active_fe_index());
 
             // make sparsity pattern for this cell
-            for (unsigned int i = 0; i < dofs_per_face; ++i)
-              for (unsigned int j = 0; j < dofs_per_face; ++j)
-                append_pair(dof_to_boundary_mapping[dofs_on_this_face[i]],
-                            dof_to_boundary_mapping[dofs_on_this_face[j]]);
-
-            sparsity.add_entries(make_array_view(rows), make_array_view(cols));
-            rows.clear();
             cols.clear();
+            for (unsigned int j = 0; j < dofs_per_face; ++j)
+              cols.push_back(dof_to_boundary_mapping[dofs_on_this_face[j]]);
+            // We are not guaranteed that the mapping to a second index space
+            // is increasing so sort here to use the faster add_row_entries()
+            // path
+            std::sort(cols.begin(), cols.end());
+            for (unsigned int i = 0; i < dofs_per_face; ++i)
+              sparsity.add_row_entries(
+                dof_to_boundary_mapping[dofs_on_this_face[i]],
+                make_array_view(cols),
+                true);
           }
   }
 
@@ -461,10 +457,13 @@ namespace DoFTools
               boundary_dof_boundary_indices[i] =
                 dof_to_boundary_mapping[cell->vertex_dof_index(direction, i)];
 
+            std::sort(boundary_dof_boundary_indices.begin(),
+                      boundary_dof_boundary_indices.end());
             for (unsigned int i = 0; i < dofs_per_vertex; ++i)
               sparsity.add_row_entries(boundary_dof_boundary_indices[i],
                                        make_array_view(
-                                         boundary_dof_boundary_indices));
+                                         boundary_dof_boundary_indices),
+                                       true);
           }
         return;
       }
@@ -495,15 +494,7 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
-
-    std::vector<types::global_dof_index> rows;
     std::vector<types::global_dof_index> cols;
-
-    auto append_pair = [&](const types::global_dof_index i,
-                           const types::global_dof_index j) {
-      rows.push_back(i);
-      cols.push_back(j);
-    };
 
     for (const auto &cell : dof.active_cell_iterators())
       for (const unsigned int f : cell->face_indices())
@@ -517,14 +508,17 @@ namespace DoFTools
                                            cell->active_fe_index());
 
             // make sparsity pattern for this cell
-            for (unsigned int i = 0; i < dofs_per_face; ++i)
-              for (unsigned int j = 0; j < dofs_per_face; ++j)
-                append_pair(dof_to_boundary_mapping[dofs_on_this_face[i]],
-                            dof_to_boundary_mapping[dofs_on_this_face[j]]);
-
-            sparsity.add_entries(make_array_view(rows), make_array_view(cols));
-            rows.clear();
             cols.clear();
+            for (unsigned int j = 0; j < dofs_per_face; ++j)
+              cols.push_back(dof_to_boundary_mapping[dofs_on_this_face[j]]);
+            // Like the other one: sort once.
+            std::sort(cols.begin(), cols.end());
+
+            for (unsigned int i = 0; i < dofs_per_face; ++i)
+              sparsity.add_row_entries(
+                dof_to_boundary_mapping[dofs_on_this_face[i]],
+                make_array_view(cols),
+                true);
           }
   }
 
