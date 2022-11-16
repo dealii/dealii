@@ -217,7 +217,7 @@ test(std::string solver_name, std::string preconditioner_name)
 
   // test SLEPc by
   {
-    PETScWrappers::PreconditionBase *preconditioner;
+    PETScWrappers::PreconditionBase *preconditioner = nullptr;
 
     dealii::deallog << preconditioner_name << std::endl;
     if (preconditioner_name == "Jacobi")
@@ -240,11 +240,7 @@ test(std::string solver_name, std::string preconditioner_name)
       }
     else
       {
-        AssertThrow(false, ExcMessage("not supported preconditioner"));
-
-        // make compiler happy
-        preconditioner =
-          new PETScWrappers::PreconditionJacobi(mpi_communicator);
+        AssertThrow(false, ExcMessage("Unsupported preconditioner"));
       }
 
     dealii::SolverControl   linear_solver_control(dof_handler.n_dofs(),
