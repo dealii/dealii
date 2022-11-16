@@ -30,6 +30,7 @@
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/sparsity_pattern_base.h>
 
 #include <deal.II/particles/particle_handler.h>
 
@@ -90,15 +91,12 @@ namespace Particles
      * AffineConstraints::add_entries_local_to_global() is used to fill the
      * final sparsity pattern.
      */
-    template <int dim,
-              int spacedim,
-              typename SparsityType,
-              typename number = double>
+    template <int dim, int spacedim, typename number = double>
     void
     create_interpolation_sparsity_pattern(
       const DoFHandler<dim, spacedim> &                space_dh,
       const Particles::ParticleHandler<dim, spacedim> &particle_handler,
-      SparsityType &                                   sparsity,
+      SparsityPatternBase &                            sparsity,
       const AffineConstraints<number> &                constraints =
         AffineConstraints<number>(),
       const ComponentMask &space_comps = ComponentMask());

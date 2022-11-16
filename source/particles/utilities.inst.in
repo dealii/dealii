@@ -14,19 +14,17 @@
 // ---------------------------------------------------------------------
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
-     Sparsity : SPARSITY_PATTERNS;
      scalar : REAL_SCALARS)
   {
 #if deal_II_dimension <= deal_II_space_dimension && deal_II_dimension > 1
     template void create_interpolation_sparsity_pattern<deal_II_dimension,
                                                         deal_II_space_dimension,
-                                                        Sparsity,
                                                         scalar>(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &space_dh,
       const Particles::ParticleHandler<deal_II_dimension,
                                        deal_II_space_dimension>
         &                              particle_handler,
-      Sparsity &                       sparsity,
+      SparsityPatternBase &            sparsity,
       const AffineConstraints<scalar> &constraints,
       const ComponentMask &            space_comps);
 #endif
