@@ -62,7 +62,7 @@ namespace PETScWrappers
     /**
      * Constructor.
      */
-    PreconditionBase();
+    PreconditionBase(const MPI_Comm &mpi_communicator = MPI_COMM_NULL);
 
     /**
      * Destructor.
@@ -95,9 +95,20 @@ namespace PETScWrappers
     const PC &
     get_pc() const;
 
+    /**
+     * Return the MPI communicator object used by this preconditioner.
+     */
+    MPI_Comm
+    get_mpi_communicator() const;
+
   protected:
     /**
-     * the PETSc preconditioner object
+     * The communicator to be used for this preconditioner.
+     */
+    MPI_Comm mpi_communicator;
+
+    /**
+     * The PETSc preconditioner object
      */
     PC pc;
 
