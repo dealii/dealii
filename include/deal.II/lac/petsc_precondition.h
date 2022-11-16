@@ -164,7 +164,6 @@ namespace PETScWrappers
      */
     PreconditionJacobi() = default;
 
-
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
      * and additional flags if there are any.

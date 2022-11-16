@@ -83,45 +83,15 @@ namespace PETScWrappers
    * object. This is done for performance reasons. The solver and
    * preconditioner can be reset by calling reset().
    *
-   * One of the gotchas of PETSc is that -- in particular in MPI mode -- it
-   * often does not produce very helpful error messages. In order to save
-   * other users some time in searching a hard to track down error, here is
-   * one situation and the error message one gets there: when you don't
-   * specify an MPI communicator to your solver's constructor. In this case,
-   * you will get an error of the following form from each of your parallel
-   * processes:
-   * @verbatim
-   *   [1]PETSC ERROR: PCSetVector() line 1173 in src/ksp/pc/interface/precon.c
-   *   [1]PETSC ERROR:   Arguments must have same communicators!
-   *   [1]PETSC ERROR:   Different communicators in the two objects: Argument #
-   * 1 and 2! [1]PETSC ERROR: KSPSetUp() line 195 in
-   * src/ksp/ksp/interface/itfunc.c
-   * @endverbatim
-   *
-   * This error, on which one can spend a very long time figuring out what
-   * exactly goes wrong, results from not specifying an MPI communicator. Note
-   * that the communicator @em must match that of the matrix and all vectors
-   * in the linear system which we want to solve. Aggravating the situation is
-   * the fact that the default argument to the solver classes, @p
-   * PETSC_COMM_SELF, is the appropriate argument for the sequential case
-   * (which is why it is the default argument), so this error only shows up in
-   * parallel mode.
-   *
    * @ingroup PETScWrappers
    */
   class SolverBase
   {
   public:
     /**
-     * Constructor. Takes the solver control object and the MPI communicator
-     * over which parallel computations are to happen.
-     *
-     * Note that the communicator used here must match the communicator used
-     * in the system matrix, solution, and right hand side object of the solve
-     * to be done with this solver. Otherwise, PETSc will generate hard to
-     * track down errors, see the documentation of the SolverBase class.
+     * Constructor.
      */
-    SolverBase(SolverControl &cn, const MPI_Comm &mpi_communicator);
+    SolverBase(SolverControl &cn);
 
     /**
      * Destructor.
@@ -179,11 +149,6 @@ namespace PETScWrappers
      * and copy the data back into it afterwards.
      */
     SolverControl &solver_control;
-
-    /**
-     * Copy of the MPI communicator object to be used for the solver.
-     */
-    const MPI_Comm mpi_communicator;
 
     /**
      * %Function that takes a Krylov Subspace Solver context object, and sets
