@@ -281,8 +281,8 @@ namespace DoFTools
               dofs_per_cell_col);
             cell_row->get_dof_indices(local_dof_indices_row);
             cell_col->get_dof_indices(local_dof_indices_col);
-            for (unsigned int i = 0; i < dofs_per_cell_row; ++i)
-              sparsity.add_row_entries(local_dof_indices_row[i],
+            for (const auto &dof : local_dof_indices_row)
+              sparsity.add_row_entries(dof,
                                        make_array_view(local_dof_indices_col));
           }
         else if (cell_row->has_children())
@@ -306,10 +306,9 @@ namespace DoFTools
                   dofs_per_cell_col);
                 cell_row_child->get_dof_indices(local_dof_indices_row);
                 cell_col->get_dof_indices(local_dof_indices_col);
-                for (unsigned int r = 0; r < dofs_per_cell_row; ++r)
-                  sparsity.add_row_entries(local_dof_indices_row[r],
-                                           make_array_view(
-                                             local_dof_indices_col));
+                for (const auto &dof : local_dof_indices_row)
+                  sparsity.add_row_entries(
+                    dof, make_array_view(local_dof_indices_col));
               }
           }
         else
@@ -333,10 +332,9 @@ namespace DoFTools
                   dofs_per_cell_col);
                 cell_row->get_dof_indices(local_dof_indices_row);
                 cell_col_child->get_dof_indices(local_dof_indices_col);
-                for (unsigned int r = 0; r < dofs_per_cell_row; ++r)
-                  sparsity.add_row_entries(local_dof_indices_row[r],
-                                           make_array_view(
-                                             local_dof_indices_col));
+                for (const auto &dof : local_dof_indices_row)
+                  sparsity.add_row_entries(
+                    dof, make_array_view(local_dof_indices_col));
               }
           }
       }
@@ -404,17 +402,16 @@ namespace DoFTools
 
             // make sparsity pattern for this cell
             cols.clear();
-            for (unsigned int j = 0; j < dofs_per_face; ++j)
-              cols.push_back(dof_to_boundary_mapping[dofs_on_this_face[j]]);
+            for (const auto &dof : dofs_on_this_face)
+              cols.push_back(dof_to_boundary_mapping[dof]);
             // We are not guaranteed that the mapping to a second index space
             // is increasing so sort here to use the faster add_row_entries()
             // path
             std::sort(cols.begin(), cols.end());
-            for (unsigned int i = 0; i < dofs_per_face; ++i)
-              sparsity.add_row_entries(
-                dof_to_boundary_mapping[dofs_on_this_face[i]],
-                make_array_view(cols),
-                true);
+            for (const auto &dof : dofs_on_this_face)
+              sparsity.add_row_entries(dof_to_boundary_mapping[dof],
+                                       make_array_view(cols),
+                                       true);
           }
   }
 
@@ -459,11 +456,9 @@ namespace DoFTools
 
             std::sort(boundary_dof_boundary_indices.begin(),
                       boundary_dof_boundary_indices.end());
-            for (unsigned int i = 0; i < dofs_per_vertex; ++i)
-              sparsity.add_row_entries(boundary_dof_boundary_indices[i],
-                                       make_array_view(
-                                         boundary_dof_boundary_indices),
-                                       true);
+            for (const auto &dof : boundary_dof_boundary_indices)
+              sparsity.add_row_entries(
+                dof, make_array_view(boundary_dof_boundary_indices), true);
           }
         return;
       }
@@ -509,16 +504,15 @@ namespace DoFTools
 
             // make sparsity pattern for this cell
             cols.clear();
-            for (unsigned int j = 0; j < dofs_per_face; ++j)
-              cols.push_back(dof_to_boundary_mapping[dofs_on_this_face[j]]);
+            for (const auto &dof : dofs_on_this_face)
+              cols.push_back(dof_to_boundary_mapping[dof]);
+
             // Like the other one: sort once.
             std::sort(cols.begin(), cols.end());
-
-            for (unsigned int i = 0; i < dofs_per_face; ++i)
-              sparsity.add_row_entries(
-                dof_to_boundary_mapping[dofs_on_this_face[i]],
-                make_array_view(cols),
-                true);
+            for (const auto &dof : dofs_on_this_face)
+              sparsity.add_row_entries(dof_to_boundary_mapping[dof],
+                                       make_array_view(cols),
+                                       true);
           }
   }
 
