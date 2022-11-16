@@ -407,6 +407,19 @@ namespace TrilinosWrappers
 
 
 
+    void
+    Vector::reinit(
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      const bool                                                vector_writable)
+    {
+      this->reinit(partitioner->locally_owned_range(),
+                   partitioner->ghost_indices(),
+                   partitioner->get_mpi_communicator(),
+                   vector_writable);
+    }
+
+
+
     Vector &
     Vector::operator=(const Vector &v)
     {

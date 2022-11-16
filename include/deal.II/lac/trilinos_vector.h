@@ -22,6 +22,7 @@
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
+#  include <deal.II/base/partitioner.h>
 #  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
@@ -599,6 +600,15 @@ namespace TrilinosWrappers
              const IndexSet &ghost_entries,
              const MPI_Comm &communicator    = MPI_COMM_WORLD,
              const bool      vector_writable = false);
+
+      /**
+       * Initialize the vector given to the parallel partitioning described in
+       * @p partitioner using the function above.
+       */
+      void
+      reinit(
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const bool vector_writable = false);
 
       /**
        * Create vector by merging components from a block vector.
