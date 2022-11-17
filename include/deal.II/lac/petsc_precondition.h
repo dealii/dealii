@@ -62,7 +62,15 @@ namespace PETScWrappers
     /**
      * Constructor.
      */
-    PreconditionBase(const MPI_Comm &mpi_communicator = MPI_COMM_NULL);
+    explicit PreconditionBase(const MPI_Comm &mpi_communicator);
+
+    /**
+     * Constructor. This constructor is deprecated.
+     *
+     * @deprecated
+     */
+    DEAL_II_DEPRECATED
+    PreconditionBase();
 
     /**
      * Destructor.
