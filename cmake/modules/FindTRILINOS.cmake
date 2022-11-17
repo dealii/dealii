@@ -129,6 +129,12 @@ STRING(REGEX REPLACE
 REMOVE_DUPLICATES(Trilinos_TPL_INCLUDE_DIRS)
 
 #
+# Remove optimization flags like -03 and -DNDEBUG, we handle those elsewhere.
+#
+STRING(REGEX REPLACE "-O[^ ]*" "" TRILINOS_CXX_FLAGS_SANITIZED "${Trilinos_CXX_COMPILER_FLAGS}")
+STRING(REGEX REPLACE "-DNDEBUG" "" TRILINOS_CXX_FLAGS_SANITIZED "${TRILINOS_CXX_FLAGS_SANITIZED}")
+
+#
 # We'd like to have the full library names but the Trilinos package only
 # exports a list with short names...
 # So we check again for every lib and store the full path:
@@ -160,7 +166,7 @@ DEAL_II_PACKAGE_HANDLE(TRILINOS
     REQUIRED Trilinos_INCLUDE_DIRS
     OPTIONAL Trilinos_TPL_INCLUDE_DIRS
   CXX_FLAGS
-    OPTIONAL Trilinos_CXX_COMPILER_FLAGS
+    OPTIONAL TRILINOS_CXX_FLAGS_SANITIZED
   LINKER_FLAGS
     OPTIONAL Trilinos_EXTRA_LD_FLAGS
   CLEAR
