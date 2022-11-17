@@ -85,6 +85,12 @@ namespace GridTools
     update_vertex_to_neighbor_subdomain = 0x100,
 
     /**
+     * Update the coinciding vertex groups as well as the
+     * vertex_to_coinciding_vertex_group
+     */
+    update_collection_of_coinciding_vertices = 0x200,
+
+    /**
      * Update all objects.
      */
     update_all = 0xFFF,

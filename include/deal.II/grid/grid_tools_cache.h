@@ -75,7 +75,7 @@ namespace GridTools
      * @param mapping The mapping to use when computing cached objects
      */
     Cache(const Triangulation<dim, spacedim> &tria,
-          const Mapping<dim, spacedim> &      mapping =
+          const Mapping<dim, spacedim>       &mapping =
             (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
                .template get_default_linear_mapping<dim, spacedim>()
@@ -167,6 +167,15 @@ namespace GridTools
      */
     const std::vector<std::set<unsigned int>> &
     get_vertex_to_neighbor_subdomain() const;
+
+    /**
+     * TODO
+     */
+    const std::map<unsigned int, std::vector<unsigned int>> &
+    get_coinciding_vertex_groups() const;
+
+    const std::map<unsigned int, unsigned int> &
+    get_vertex_to_coinciding_vertex_group() const;
 
     /**
      * Return a reference to the stored triangulation.
@@ -291,6 +300,20 @@ namespace GridTools
      * subdomain to which a vertex is connected to.
      */
     mutable std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain;
+
+    /**
+     * Store an std::map of std::vector of unsigned integer containing
+     * coinciding vertices labeled by an arbitrary element from them
+     */
+    mutable std::map<unsigned int, std::vector<unsigned int>>
+      coinciding_vertex_groups;
+
+    /**
+     * Store an std::map of unsigned integer containing
+     * the label of a group of coinciding vertices
+     */
+    mutable std::map<unsigned int, unsigned int>
+      vertex_to_coinciding_vertex_group;
 
     /**
      * Storage for the status of the triangulation signal.

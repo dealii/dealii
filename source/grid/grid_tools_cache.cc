@@ -26,7 +26,7 @@ namespace GridTools
 {
   template <int dim, int spacedim>
   Cache<dim, spacedim>::Cache(const Triangulation<dim, spacedim> &tria,
-                              const Mapping<dim, spacedim> &      mapping)
+                              const Mapping<dim, spacedim>       &mapping)
     : update_flags(update_all)
     , tria(&tria)
     , mapping(&mapping)
@@ -216,6 +216,36 @@ namespace GridTools
         update_flags = update_flags & ~update_vertex_to_neighbor_subdomain;
       }
     return vertex_to_neighbor_subdomain;
+  }
+
+  template <int dim, int spacedim>
+  const std::map<unsigned int, std::vector<unsigned int>> &
+  Cache<dim, spacedim>::get_coinciding_vertex_groups() const
+  {
+    if (update_flags & update_collection_of_coinciding_vertices)
+      {
+        GridTools::collect_coinciding_vertices(
+          *tria, coinciding_vertex_groups, vertex_to_coinciding_vertex_group);
+
+        update_flags = update_flags & ~update_collection_of_coinciding_vertices;
+      }
+
+    return coinciding_vertex_groups;
+  }
+
+  template <int dim, int spacedim>
+  const std::map<unsigned int, unsigned int> &
+  Cache<dim, spacedim>::get_vertex_to_coinciding_vertex_group() const
+  {
+    if (update_flags & update_collection_of_coinciding_vertices)
+      {
+        GridTools::collect_coinciding_vertices(
+          *tria, coinciding_vertex_groups, vertex_to_coinciding_vertex_group);
+
+        update_flags = update_flags & ~update_collection_of_coinciding_vertices;
+      }
+
+    return vertex_to_coinciding_vertex_group;
   }
 
 #include "grid_tools_cache.inst"
