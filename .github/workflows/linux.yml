@@ -144,7 +144,8 @@ jobs:
             cuda-toolkit-11-8 \
             libp4est-dev \
             libopenmpi-dev \
-            openmpi-bin
+            openmpi-bin \
+            libboost-all-dev
     - name: info
       run: |
         mpicc -v
