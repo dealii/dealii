@@ -437,7 +437,7 @@ namespace Threads
 
     {
       // Take a unique ("writer") lock for manipulating the std::map. This
-      // lock ensures that no other threat does a lookup at the same time.
+      // lock ensures that no other thread does a lookup at the same time.
       std::unique_lock<decltype(insertion_mutex)> lock(insertion_mutex);
 
       return internal::construct_element(data, my_id, exemplar);
