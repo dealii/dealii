@@ -1122,7 +1122,7 @@ namespace Step18
     SolverControl solver_control(dof_handler.n_dofs(),
                                  1e-16 * system_rhs.l2_norm());
 
-    PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
+    PETScWrappers::SolverCG cg(solver_control);
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 

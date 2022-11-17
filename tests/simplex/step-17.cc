@@ -327,7 +327,7 @@ namespace Step17
   ElasticProblem<dim>::solve()
   {
     SolverControl solver_control(solution.size(), 1e-8 * system_rhs.l2_norm());
-    PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
+    PETScWrappers::SolverCG cg(solver_control);
 
     // PreconditionBlockJacobi depends on the processor count
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);

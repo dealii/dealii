@@ -498,7 +498,7 @@ namespace Step18
                                  1e-16 * system_rhs.l2_norm(),
                                  false,
                                  false);
-    PETScWrappers::SolverCG                cg(solver_control, mpi_communicator);
+    PETScWrappers::SolverCG                cg(solver_control);
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
     cg.solve(system_matrix,
              distributed_incremental_displacement,

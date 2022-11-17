@@ -701,7 +701,7 @@ namespace Step18
                                  1e-16 * system_rhs.l2_norm());
 
 #ifdef DEAL_II_WITH_PETSC
-    PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
+    PETScWrappers::SolverCG cg(solver_control);
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 

@@ -1576,7 +1576,7 @@ LaplaceProblem<dim>::solve()
 {
   pcout << "...solving" << std::endl;
   SolverControl solver_control(prm.max_iterations, prm.tolerance, false, false);
-  PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
+  PETScWrappers::SolverCG cg(solver_control);
 
   PETScWrappers::PreconditionSOR preconditioner(system_matrix);
 
