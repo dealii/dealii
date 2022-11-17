@@ -783,6 +783,7 @@ SparsityPattern::add_entries(const size_type row,
                              ForwardIterator end,
                              const bool      indices_are_sorted)
 {
+  AssertIndexRange(row, n_rows());
   if (indices_are_sorted == true)
     {
       if (begin != end)
@@ -802,6 +803,7 @@ SparsityPattern::add_entries(const size_type row,
           if (has_larger_entries == false)
             for (; it != end; ++it)
               {
+                AssertIndexRange(*it, n_cols());
                 if (store_diagonal_first_in_row && *it == row)
                   continue;
                 Assert(k <= rowstart[row + 1],

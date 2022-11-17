@@ -28,6 +28,7 @@
 #include <deal.II/fe/component_mask.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/sparsity_pattern_base.h>
 
 #include <map>
 #include <ostream>
@@ -55,7 +56,6 @@ template <class MeshType>
 class InterGridMap;
 template <int dim, int spacedim>
 class Mapping;
-class SparsityPattern;
 template <int dim, class T>
 class Table;
 template <typename Number>
@@ -405,14 +405,11 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number = double>
+  template <int dim, int spacedim, typename number = double>
   void
   make_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof_handler,
-    SparsityPatternType &            sparsity_pattern,
+    SparsityPatternBase &            sparsity_pattern,
     const AffineConstraints<number> &constraints = AffineConstraints<number>(),
     const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
@@ -482,15 +479,12 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number = double>
+  template <int dim, int spacedim, typename number = double>
   void
   make_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof_handler,
     const Table<2, Coupling> &       coupling,
-    SparsityPatternType &            sparsity_pattern,
+    SparsityPatternBase &            sparsity_pattern,
     const AffineConstraints<number> &constraints = AffineConstraints<number>(),
     const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
@@ -515,11 +509,11 @@ namespace DoFTools
    * whereas the ones that correspond to columns come from the second
    * DoFHandler.
    */
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_row,
                         const DoFHandler<dim, spacedim> &dof_col,
-                        SparsityPatternType &            sparsity);
+                        SparsityPatternBase &            sparsity);
 
   /**
    * Compute which entries of a matrix built on the given @p dof_handler may
@@ -566,10 +560,10 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
-                             SparsityPatternType &            sparsity_pattern);
+                             SparsityPatternBase &            sparsity_pattern);
 
   /**
    * This function does essentially the same as the other
@@ -579,14 +573,11 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_flux_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof_handler,
-    SparsityPatternType &            sparsity_pattern,
+    SparsityPatternBase &            sparsity_pattern,
     const AffineConstraints<number> &constraints,
     const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
@@ -611,11 +602,11 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_flux_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof,
-    SparsityPatternType &            sparsity,
+    SparsityPatternBase &            sparsity,
     const Table<2, Coupling> &       cell_integrals_mask,
     const Table<2, Coupling> &       face_integrals_mask,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
@@ -647,14 +638,11 @@ namespace DoFTools
    *    };
    * @endcode
    */
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_flux_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof,
-    SparsityPatternType &            sparsity,
+    SparsityPatternBase &            sparsity,
     const AffineConstraints<number> &constraints,
     const bool                       keep_constrained_dofs,
     const Table<2, Coupling> &       couplings,
@@ -674,12 +662,12 @@ namespace DoFTools
    * the matrix does not consist of domain integrals, but only of integrals
    * over the boundary of the domain.
    */
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_boundary_sparsity_pattern(
     const DoFHandler<dim, spacedim> &           dof,
     const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-    SparsityPatternType &                       sparsity_pattern);
+    SparsityPatternBase &                       sparsity_pattern);
 
   /**
    * This function is a variation of the previous
@@ -698,17 +686,14 @@ namespace DoFTools
    * map with the boundary indicators you want and set the function pointers to
    * null pointers).
    */
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number>
+  template <int dim, int spacedim, typename number>
   void
   make_boundary_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof,
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                         boundary_ids,
     const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-    SparsityPatternType &                       sparsity);
+    SparsityPatternBase &                       sparsity);
 
   /**
    * @}
