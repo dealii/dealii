@@ -309,7 +309,7 @@ namespace Step40
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
-    PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
+    PETScWrappers::SolverCG solver(solver_control);
 
 #ifndef PETSC_USE_COMPLEX
     PETScWrappers::PreconditionBoomerAMG preconditioner(

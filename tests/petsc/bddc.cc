@@ -156,8 +156,8 @@ main(int argc, char *argv[])
 
   SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
-  PETScWrappers::SolverCG            solver(solver_control, MPI_COMM_WORLD);
-  PETScWrappers::PreconditionBDDC<2> preconditioner;
+  PETScWrappers::SolverCG                            solver(solver_control);
+  PETScWrappers::PreconditionBDDC<2>                 preconditioner;
   PETScWrappers::PreconditionBDDC<2>::AdditionalData data;
 
   // Now we setup the dof coordinates if a sufficiently new PETSc is used

@@ -1,0 +1,8 @@
+Changed: The constructors of the various solver classes in the PETScWrappers namespace
+used to take an `MPI_Comm` argument. This has now been changed: There
+is a new set of constructors that no longer take this argument, and
+the old constructors have been deprecated. In practice, the solvers
+now use the same MPI communicator as the matrix give to the `solve()`
+function.
+<br>
+(Wolfgang Bangerth, 2022/11/16)

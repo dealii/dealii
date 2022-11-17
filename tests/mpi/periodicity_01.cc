@@ -277,7 +277,7 @@ namespace Step40
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12, false, false);
 
-    PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
+    PETScWrappers::SolverCG solver(solver_control);
 
 #ifndef PETSC_USE_COMPLEX
     // Ask for a symmetric preconditioner by setting the first parameter in

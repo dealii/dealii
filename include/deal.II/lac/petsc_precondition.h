@@ -62,6 +62,14 @@ namespace PETScWrappers
     /**
      * Constructor.
      */
+    explicit PreconditionBase(const MPI_Comm &mpi_communicator);
+
+    /**
+     * Constructor. This constructor is deprecated.
+     *
+     * @deprecated
+     */
+    DEAL_II_DEPRECATED
     PreconditionBase();
 
     /**
@@ -95,9 +103,20 @@ namespace PETScWrappers
     const PC &
     get_pc() const;
 
+    /**
+     * Return the MPI communicator object used by this preconditioner.
+     */
+    MPI_Comm
+    get_mpi_communicator() const;
+
   protected:
     /**
-     * the PETSc preconditioner object
+     * The communicator to be used for this preconditioner.
+     */
+    MPI_Comm mpi_communicator;
+
+    /**
+     * The PETSc preconditioner object
      */
     PC pc;
 
@@ -152,7 +171,6 @@ namespace PETScWrappers
      * object.
      */
     PreconditionJacobi() = default;
-
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,

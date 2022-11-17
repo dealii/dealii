@@ -616,7 +616,7 @@ namespace Step17
   unsigned int ElasticProblem<dim>::solve()
   {
     SolverControl solver_control(solution.size(), 1e-8 * system_rhs.l2_norm());
-    PETScWrappers::SolverCG cg(solver_control, mpi_communicator);
+    PETScWrappers::SolverCG cg(solver_control);
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 

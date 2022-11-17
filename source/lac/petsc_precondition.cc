@@ -33,10 +33,19 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  PreconditionBase::PreconditionBase()
-    : pc(nullptr)
+  PreconditionBase::PreconditionBase(const MPI_Comm &comm)
+    : mpi_communicator(comm)
+    , pc(nullptr)
     , matrix(nullptr)
   {}
+
+
+
+  PreconditionBase::PreconditionBase()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
 
   PreconditionBase::~PreconditionBase()
   {
@@ -48,9 +57,12 @@ namespace PETScWrappers
       {}
   }
 
+
   void
   PreconditionBase::clear()
   {
+    mpi_communicator = MPI_COMM_NULL;
+
     matrix = nullptr;
 
     if (pc != nullptr)
@@ -72,6 +84,7 @@ namespace PETScWrappers
   }
 
 
+
   void
   PreconditionBase::Tvmult(VectorBase &dst, const VectorBase &src) const
   {
@@ -82,6 +95,15 @@ namespace PETScWrappers
   }
 
 
+
+  MPI_Comm
+  PreconditionBase::get_mpi_communicator() const
+  {
+    return mpi_communicator;
+  }
+
+
+
   void
   PreconditionBase::create_pc()
   {
@@ -89,15 +111,9 @@ namespace PETScWrappers
     // preconditioner once
     AssertThrow(pc == nullptr, StandardExceptions::ExcInvalidState());
 
-    MPI_Comm comm;
-    // this ugly cast is necessary because the
-    // type Mat and PETScObject are
-    // unrelated.
-    PetscErrorCode ierr =
-      PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    MPI_Comm comm = get_mpi_communicator();
 
-    ierr = PCCreate(comm, &pc);
+    PetscErrorCode ierr = PCCreate(comm, &pc);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
 #  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
@@ -125,6 +141,7 @@ namespace PETScWrappers
   /* ----------------- PreconditionJacobi -------------------- */
   PreconditionJacobi::PreconditionJacobi(const MPI_Comm &      comm,
                                          const AdditionalData &additional_data_)
+    : PreconditionBase(comm)
   {
     additional_data = additional_data_;
 
@@ -138,9 +155,12 @@ namespace PETScWrappers
 
   PreconditionJacobi::PreconditionJacobi(const MatrixBase &    matrix,
                                          const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
+
+
 
   void
   PreconditionJacobi::initialize()
@@ -154,11 +174,15 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
+
+
   void
   PreconditionJacobi::initialize(const MatrixBase &    matrix_,
                                  const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -172,9 +196,12 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionBlockJacobi -------------------- */
+
+
   PreconditionBlockJacobi::PreconditionBlockJacobi(
     const MPI_Comm &      comm,
     const AdditionalData &additional_data_)
+    : PreconditionBase(comm)
   {
     additional_data = additional_data_;
 
@@ -189,9 +216,12 @@ namespace PETScWrappers
   PreconditionBlockJacobi::PreconditionBlockJacobi(
     const MatrixBase &    matrix,
     const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
+
+
 
   void
   PreconditionBlockJacobi::initialize()
@@ -204,11 +234,14 @@ namespace PETScWrappers
   }
 
 
+
   void
   PreconditionBlockJacobi::initialize(const MatrixBase &    matrix_,
                                       const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -231,6 +264,7 @@ namespace PETScWrappers
 
   PreconditionSOR::PreconditionSOR(const MatrixBase &    matrix,
                                    const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
@@ -241,6 +275,8 @@ namespace PETScWrappers
                               const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -272,6 +308,7 @@ namespace PETScWrappers
 
   PreconditionSSOR::PreconditionSSOR(const MatrixBase &    matrix,
                                      const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
@@ -282,6 +319,8 @@ namespace PETScWrappers
                                const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -318,6 +357,7 @@ namespace PETScWrappers
 
   PreconditionICC::PreconditionICC(const MatrixBase &    matrix,
                                    const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
@@ -328,6 +368,8 @@ namespace PETScWrappers
                               const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -359,6 +401,7 @@ namespace PETScWrappers
 
   PreconditionILU::PreconditionILU(const MatrixBase &    matrix,
                                    const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
@@ -369,6 +412,8 @@ namespace PETScWrappers
                               const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -501,6 +546,7 @@ namespace PETScWrappers
   PreconditionBoomerAMG::PreconditionBoomerAMG(
     const MPI_Comm &      comm,
     const AdditionalData &additional_data_)
+    : PreconditionBase(comm)
   {
     additional_data = additional_data_;
 
@@ -518,12 +564,16 @@ namespace PETScWrappers
   }
 
 
+
   PreconditionBoomerAMG::PreconditionBoomerAMG(
     const MatrixBase &    matrix,
     const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
+
+
 
   void
   PreconditionBoomerAMG::initialize()
@@ -633,12 +683,16 @@ namespace PETScWrappers
 #  endif
   }
 
+
+
   void
   PreconditionBoomerAMG::initialize(const MatrixBase &    matrix_,
                                     const AdditionalData &additional_data_)
   {
 #  ifdef DEAL_II_PETSC_WITH_HYPRE
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -679,6 +733,7 @@ namespace PETScWrappers
   PreconditionParaSails::PreconditionParaSails(
     const MatrixBase &    matrix,
     const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
@@ -689,6 +744,8 @@ namespace PETScWrappers
                                     const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -773,6 +830,7 @@ namespace PETScWrappers
 
   PreconditionNone::PreconditionNone(const MatrixBase &    matrix,
                                      const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
@@ -783,6 +841,8 @@ namespace PETScWrappers
                                const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -814,6 +874,7 @@ namespace PETScWrappers
 
   PreconditionLU::PreconditionLU(const MatrixBase &    matrix,
                                  const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
@@ -824,6 +885,8 @@ namespace PETScWrappers
                              const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
@@ -866,10 +929,13 @@ namespace PETScWrappers
     , coords(coords)
   {}
 
+
+
   template <int dim>
   PreconditionBDDC<dim>::PreconditionBDDC(
     const MPI_Comm        comm,
     const AdditionalData &additional_data_)
+    : PreconditionBase(comm)
   {
     additional_data = additional_data_;
 
@@ -879,12 +945,16 @@ namespace PETScWrappers
     initialize();
   }
 
+
+
   template <int dim>
   PreconditionBDDC<dim>::PreconditionBDDC(const MatrixBase &    matrix,
                                           const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
   {
     initialize(matrix, additional_data);
   }
+
 
 
   template <int dim>
@@ -960,12 +1030,16 @@ namespace PETScWrappers
 #  endif
   }
 
+
+
   template <int dim>
   void
   PreconditionBDDC<dim>::initialize(const MatrixBase &    matrix_,
                                     const AdditionalData &additional_data_)
   {
     clear();
+
+    mpi_communicator = matrix_.get_mpi_communicator();
 
     matrix          = static_cast<Mat>(matrix_);
     additional_data = additional_data_;
