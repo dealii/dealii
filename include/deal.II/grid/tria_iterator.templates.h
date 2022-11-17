@@ -256,6 +256,26 @@ TriaIterator<Accessor>::operator=(const TriaRawIterator<OtherAccessor> &i)
 
 
 template <typename Accessor>
+template <typename OtherAccessor>
+inline std::enable_if_t<std::is_convertible<OtherAccessor, Accessor>::value,
+                        bool>
+TriaIterator<Accessor>::operator==(
+  const TriaRawIterator<OtherAccessor> &other) const
+{
+  return TriaRawIterator<Accessor>::operator==(other);
+}
+
+
+template <typename Accessor>
+inline bool
+TriaIterator<Accessor>::operator!=(const TriaRawIterator<Accessor> &other) const
+{
+  return TriaRawIterator<Accessor>::operator!=(other);
+}
+
+
+
+template <typename Accessor>
 inline TriaIterator<Accessor> &
 TriaIterator<Accessor>::operator++()
 {
@@ -499,6 +519,27 @@ TriaActiveIterator<Accessor>::operator=(const TriaIterator<Accessor> &i)
 #endif
   return *this;
 }
+
+
+template <typename Accessor>
+template <typename OtherAccessor>
+inline std::enable_if_t<std::is_convertible<OtherAccessor, Accessor>::value,
+                        bool>
+TriaActiveIterator<Accessor>::operator==(
+  const TriaRawIterator<OtherAccessor> &other) const
+{
+  return TriaIterator<Accessor>::operator==(other);
+}
+
+
+template <typename Accessor>
+inline bool
+TriaActiveIterator<Accessor>::operator!=(
+  const TriaRawIterator<Accessor> &other) const
+{
+  return TriaIterator<Accessor>::operator!=(other);
+}
+
 
 
 template <typename Accessor>

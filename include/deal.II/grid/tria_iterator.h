@@ -689,6 +689,19 @@ public:
   operator=(const TriaRawIterator<OtherAccessor> &);
 
   /**
+   * Compare for equality.
+   */
+  template <typename OtherAccessor = Accessor>
+  std::enable_if_t<std::is_convertible<OtherAccessor, Accessor>::value, bool>
+  operator==(const TriaRawIterator<OtherAccessor> &) const;
+
+  /**
+   * Compare for inequality.
+   */
+  bool
+  operator!=(const TriaRawIterator<Accessor> &) const;
+
+  /**
    * @name Advancement of iterators
    */
   /** @{ */
@@ -888,6 +901,19 @@ public:
   template <class OtherAccessor>
   TriaActiveIterator<Accessor> &
   operator=(const TriaIterator<OtherAccessor> &);
+
+  /**
+   * Compare for equality.
+   */
+  template <typename OtherAccessor = Accessor>
+  std::enable_if_t<std::is_convertible<OtherAccessor, Accessor>::value, bool>
+  operator==(const TriaRawIterator<OtherAccessor> &) const;
+
+  /**
+   * Compare for inequality.
+   */
+  bool
+  operator!=(const TriaRawIterator<Accessor> &) const;
 
   /**
    * Prefix <tt>++</tt> operator: <tt>++i</tt>. This operator advances the
