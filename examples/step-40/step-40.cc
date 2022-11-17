@@ -469,22 +469,16 @@ namespace Step40
                                                     mpi_communicator);
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
+    LA::SolverCG  solver(solver_control);
 
-#ifdef USE_PETSC_LA
-    LA::SolverCG solver(solver_control, mpi_communicator);
-#else
-    LA::SolverCG solver(solver_control);
-#endif
-
-    LA::MPI::PreconditionAMG preconditioner;
 
     LA::MPI::PreconditionAMG::AdditionalData data;
-
 #ifdef USE_PETSC_LA
     data.symmetric_operator = true;
 #else
     /* Trilinos defaults are good */
 #endif
+    LA::MPI::PreconditionAMG preconditioner;
     preconditioner.initialize(system_matrix, data);
 
     solver.solve(system_matrix,
