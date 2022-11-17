@@ -352,24 +352,23 @@ namespace DataOutBase
 
 
     /**
-     * This is a helper function for the write_gmv() function. There, the data
-     * in the patches needs to be copied around as output is one variable
-     * globally at a time, rather than all data on each vertex at a time. This
-     * copying around can be done detached from the main thread, and is thus
-     * moved into this separate function.
+     * This is a helper function that converts all of the data stored
+     * in the `patches` array into one global data table. That data
+     * table has as many rows as there are data sets in the patches,
+     * and as many columns as there data points at which to output
+     * data. In the end, each data set is then stored in one row of
+     * this table, rather than scattered throughout the various patches.
      *
-     * Note that because of the similarity of the formats, this function is also
-     * used by the Vtk and Tecplot output functions.
+     * This function is used by all those output formats that write
+     * data one data set at a time, rather than one cell at a time.
      */
     template <int dim, int spacedim, typename Number = double>
-    void
-    write_gmv_reorder_data_vectors(
-      const std::vector<Patch<dim, spacedim>> &patches,
-      Table<2, Number> &                       data_vectors)
+    std::unique_ptr<Table<2, Number>>
+    create_global_data_table(const std::vector<Patch<dim, spacedim>> &patches)
     {
       // If there is nothing to write, just return
       if (patches.size() == 0)
-        return;
+        return std::make_unique<Table<2, Number>>();
 
       // unlike in the main function, we don't have here the data_names field,
       // so we initialize it with the number of data sets in the first patch.
@@ -381,8 +380,17 @@ namespace DataOutBase
       const unsigned int n_data_sets = patches[0].points_are_available ?
                                          (patches[0].data.n_rows() - spacedim) :
                                          patches[0].data.n_rows();
+      const unsigned int n_data_points =
+        std::accumulate(patches.begin(),
+                        patches.end(),
+                        0U,
+                        [](const unsigned int          count,
+                           const Patch<dim, spacedim> &patch) {
+                          return count + patch.data.n_cols();
+                        });
 
-      Assert(data_vectors.size()[0] == n_data_sets, ExcInternalError());
+      std::unique_ptr<Table<2, Number>> global_data_table =
+        std::make_unique<Table<2, Number>>(n_data_sets, n_data_points);
 
       // loop over all patches
       unsigned int next_value = 0;
@@ -408,11 +416,12 @@ namespace DataOutBase
 
           for (unsigned int i = 0; i < patch.data.n_cols(); ++i, ++next_value)
             for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-              data_vectors[data_set][next_value] = patch.data(data_set, i);
+              (*global_data_table)[data_set][next_value] =
+                patch.data(data_set, i);
         }
+      Assert(next_value == n_data_points, ExcInternalError());
 
-      for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-        Assert(data_vectors[data_set].size() == next_value, ExcInternalError());
+      return global_data_table;
     }
   } // namespace
 
@@ -725,7 +734,7 @@ namespace
 
     if (write_higher_order_cells)
       {
-        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (patch.reference_cell.is_hyper_cube())
           {
             const std::array<unsigned int, 4> cell_type_by_dim{
               {VTK_VERTEX,
@@ -781,7 +790,7 @@ namespace
         vtk_cell_id[0] = VTK_PYRAMID;
         vtk_cell_id[1] = 1;
       }
-    else if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+    else if (patch.reference_cell.is_hyper_cube())
       {
         const std::array<unsigned int, 4> cell_type_by_dim{
           {VTK_VERTEX, VTK_LINE, VTK_QUAD, VTK_HEXAHEDRON}};
@@ -819,8 +828,7 @@ namespace
     const unsigned int                         n_subdivisions)
   {
     // This function only makes sense when called on hypercube cells
-    Assert(patch.reference_cell == ReferenceCells::get_hypercube<dim>(),
-           ExcInternalError());
+    Assert(patch.reference_cell.is_hyper_cube(), ExcInternalError());
 
     Assert(lattice_location.size() == dim, ExcInternalError());
 
@@ -1112,14 +1120,18 @@ namespace
 
 
 
+  /**
+   * Count the number of nodes and cells referenced by the given
+   * argument, and return these numbers (in order nodes, then cells)
+   * as a tuple.
+   */
   template <int dim, int spacedim>
-  void
-  compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
-                unsigned int &                                        n_nodes,
-                unsigned int &                                        n_cells)
+  std::tuple<unsigned int, unsigned int>
+  count_nodes_and_cells(
+    const std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
   {
-    n_nodes = 0;
-    n_cells = 0;
+    unsigned int n_nodes = 0;
+    unsigned int n_cells = 0;
     for (const auto &patch : patches)
       {
         Assert(patch.reference_cell != ReferenceCells::Invalid,
@@ -1128,7 +1140,7 @@ namespace
                  "but that is clearly not a valid choice. Did you forget "
                  "to set the reference cell for the patch?"));
 
-        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (patch.reference_cell.is_hyper_cube())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
             n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
@@ -1140,40 +1152,53 @@ namespace
             n_cells += 1;
           }
       }
+
+    return std::make_tuple(n_nodes, n_cells);
   }
 
 
 
+  /**
+   * Count the number of nodes and cells referenced by the given
+   * argument, and return these numbers (in order nodes, then cells, then cells
+   * plus points) as a tuple.
+   */
   template <int dim, int spacedim>
-  void
-  compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
-                const bool    write_higher_order_cells,
-                unsigned int &n_nodes,
-                unsigned int &n_cells,
-                unsigned int &n_points_and_n_cells)
+  std::tuple<unsigned int, unsigned int, unsigned int>
+  count_nodes_and_cells_and_points(
+    const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
+    const bool write_higher_order_cells)
   {
-    n_nodes              = 0;
-    n_cells              = 0;
-    n_points_and_n_cells = 0;
+    unsigned int n_nodes              = 0;
+    unsigned int n_cells              = 0;
+    unsigned int n_points_and_n_cells = 0;
 
     for (const auto &patch : patches)
       {
-        if (patch.reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (patch.reference_cell.is_hyper_cube())
           {
             n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
 
             if (write_higher_order_cells)
               {
+                // Write all of these nodes as a single higher-order cell. So
+                // add one to the number of cells, and update the number of
+                // points appropriately.
                 n_cells += 1;
                 n_points_and_n_cells +=
                   1 + Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
               }
             else
               {
-                n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
+                // Write all of these nodes as a collection of d-linear
+                // cells. Add the number of sub-cells to the total number of
+                // cells, and then add one for each cell plus the number of
+                // vertices per cell for each subcell to the number of points.
+                const unsigned int n_subcells =
+                  Utilities::fixed_power<dim>(patch.n_subdivisions);
+                n_cells += n_subcells;
                 n_points_and_n_cells +=
-                  Utilities::fixed_power<dim>(patch.n_subdivisions) *
-                  (1 + GeometryInfo<dim>::vertices_per_cell);
+                  n_subcells * (1 + GeometryInfo<dim>::vertices_per_cell);
               }
           }
         else
@@ -1183,6 +1208,8 @@ namespace
             n_points_and_n_cells += patch.data.n_cols() + 1;
           }
       }
+
+    return std::make_tuple(n_nodes, n_cells, n_points_and_n_cells);
   }
 
   /**
@@ -3435,7 +3462,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
     //---------------------
     // preamble
     if (flags.write_preamble)
@@ -3528,7 +3555,8 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
+
     // start with vertices order is lexicographical, x varying fastest
     out << "object \"vertices\" class array type float rank 1 shape "
         << spacedim << " items " << n_nodes;
@@ -4916,7 +4944,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -4930,12 +4958,9 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -4966,9 +4991,9 @@ namespace DataOutBase
     // data output.
     out << "variable" << '\n';
 
-    // now write the data vectors to @p{out} first make sure that all data is in
-    // place
-    reorder_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data. the '1' means: node data (as opposed to cell data, which
     // we do not support explicitly here)
@@ -5048,7 +5073,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
 
     //---------
     // preamble
@@ -5110,13 +5135,9 @@ namespace DataOutBase
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
 
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5133,9 +5154,9 @@ namespace DataOutBase
     //-------------------------------------
     // data output.
     //
-    // now write the data vectors to @p{out} first make sure that all data is in
-    // place
-    reorder_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5310,7 +5331,7 @@ namespace DataOutBase
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
     unsigned int n_cells;
-    compute_sizes<dim, spacedim>(patches, n_nodes, n_cells);
+    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
     // local variables only needed to write Tecplot binary output files
     const unsigned int vars_per_node  = (spacedim + n_data_sets),
                        nodes_per_cell = GeometryInfo<dim>::vertices_per_cell;
@@ -5349,13 +5370,9 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5428,9 +5445,9 @@ namespace DataOutBase
 
 
     //-------------------------------------
-    // data output.
-    //
-    reorder_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5636,12 +5653,11 @@ namespace DataOutBase
     }
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes, n_cells, n_points_and_n_cells;
-    compute_sizes(patches,
-                  flags.write_higher_order_cells,
-                  n_nodes,
-                  n_cells,
-                  n_points_and_n_cells);
+    unsigned int n_nodes;
+    unsigned int n_cells;
+    unsigned int n_points_and_n_cells;
+    std::tie(n_nodes, n_cells, n_points_and_n_cells) =
+      count_nodes_and_cells_and_points(patches, flags.write_higher_order_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -5655,13 +5671,9 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, double> data_vectors(n_data_sets, n_nodes);
-
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, double> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<std::unique_ptr<Table<2, double>>>
+      create_global_data_table_task = Threads::new_task(
+        [&patches]() { return create_global_data_table(patches); });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -5697,9 +5709,9 @@ namespace DataOutBase
     //-------------------------------------
     // data output.
 
-    // now write the data vectors to @p{out} first make sure that all data is in
-    // place
-    reorder_task.join();
+    // Wait for the reordering to be done and retrieve the reordered data:
+    const Table<2, double> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
@@ -6022,12 +6034,10 @@ namespace DataOutBase
 
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes, n_cells, n_points_and_n_cells;
-    compute_sizes(patches,
-                  flags.write_higher_order_cells,
-                  n_nodes,
-                  n_cells,
-                  n_points_and_n_cells);
+    unsigned int n_nodes;
+    unsigned int n_cells;
+    std::tie(n_nodes, n_cells, std::ignore) =
+      count_nodes_and_cells_and_points(patches, flags.write_higher_order_cells);
 
     // in gmv format the vertex coordinates and the data have an order that is a
     // bit unpleasant (first all x coordinates, then all y coordinate, ...;
@@ -6041,13 +6051,10 @@ namespace DataOutBase
     // this copying of data vectors can be done while we already output the
     // vertices, so do this on a separate task and when wanting to write out the
     // data, we wait for that task to finish
-    Table<2, float> data_vectors(n_data_sets, n_nodes);
-
-    void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                    Table<2, float> &) =
-      &write_gmv_reorder_data_vectors<dim, spacedim, float>;
-    Threads::Task<> reorder_task =
-      Threads::new_task(fun_ptr, patches, data_vectors);
+    Threads::Task<std::unique_ptr<Table<2, float>>>
+      create_global_data_table_task = Threads::new_task([&patches]() {
+        return create_global_data_table<dim, spacedim, float>(patches);
+      });
 
     //-----------------------------
     // first make up a list of used vertices along with their coordinates
@@ -6163,7 +6170,8 @@ namespace DataOutBase
 
     // now write the data vectors to @p{out} first make sure that all data is in
     // place
-    reorder_task.join();
+    const Table<2, float> data_vectors =
+      std::move(*create_global_data_table_task.return_value());
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
@@ -8765,6 +8773,8 @@ namespace
 #endif
 } // namespace
 
+
+
 template <int dim, int spacedim>
 void
 DataOutBase::write_filtered_data(
@@ -8779,9 +8789,6 @@ DataOutBase::write_filtered_data(
   DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
-  unsigned int       n_node, n_cell;
-  Table<2, double>   data_vectors;
-  Threads::Task<>    reorder_task;
 
 #ifndef DEAL_II_WITH_MPI
   // verify that there are indeed patches to be written out. most of the times,
@@ -8796,20 +8803,20 @@ DataOutBase::write_filtered_data(
     return;
 #endif
 
-  compute_sizes<dim, spacedim>(patches, n_node, n_cell);
+  unsigned int n_nodes;
+  std::tie(n_nodes, std::ignore) = count_nodes_and_cells(patches);
 
-  data_vectors = Table<2, double>(n_data_sets, n_node);
-  void (*fun_ptr)(const std::vector<Patch<dim, spacedim>> &,
-                  Table<2, double> &) =
-    &DataOutBase::template write_gmv_reorder_data_vectors<dim, spacedim>;
-  reorder_task = Threads::new_task(fun_ptr, patches, data_vectors);
+  Threads::Task<std::unique_ptr<Table<2, double>>>
+    create_global_data_table_task = Threads::new_task(
+      [&patches]() { return create_global_data_table(patches); });
 
   // Write the nodes/cells to the DataOutFilter object.
   write_nodes(patches, filtered_data);
   write_cells(patches, filtered_data);
 
-  // Ensure reordering is done before we output data set values
-  reorder_task.join();
+  // Wait for the reordering to be done and retrieve the reordered data:
+  const Table<2, double> data_vectors =
+    std::move(*create_global_data_table_task.return_value());
 
   // when writing, first write out all vector data, then handle the scalar data
   // sets that have been left over
