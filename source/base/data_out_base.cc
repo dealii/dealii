@@ -589,22 +589,37 @@ namespace DataOutBase
     const unsigned int base_entry =
       index * GeometryInfo<dim>::vertices_per_cell;
 
-    internal_add_cell(base_entry + 0, start);
-    if (dim >= 1)
+    switch (dim)
       {
-        internal_add_cell(base_entry + 1, start + d1);
-        if (dim >= 2)
-          {
-            internal_add_cell(base_entry + 2, start + d2 + d1);
-            internal_add_cell(base_entry + 3, start + d2);
-            if (dim >= 3)
-              {
-                internal_add_cell(base_entry + 4, start + d3);
-                internal_add_cell(base_entry + 5, start + d3 + d1);
-                internal_add_cell(base_entry + 6, start + d3 + d2 + d1);
-                internal_add_cell(base_entry + 7, start + d3 + d2);
-              }
-          }
+        case 0:
+          internal_add_cell(base_entry + 0, start);
+          break;
+
+        case 1:
+          internal_add_cell(base_entry + 0, start);
+          internal_add_cell(base_entry + 1, start + d1);
+          break;
+
+        case 2:
+          internal_add_cell(base_entry + 0, start);
+          internal_add_cell(base_entry + 1, start + d1);
+          internal_add_cell(base_entry + 2, start + d2 + d1);
+          internal_add_cell(base_entry + 3, start + d2);
+          break;
+
+        case 3:
+          internal_add_cell(base_entry + 0, start);
+          internal_add_cell(base_entry + 1, start + d1);
+          internal_add_cell(base_entry + 2, start + d2 + d1);
+          internal_add_cell(base_entry + 3, start + d2);
+          internal_add_cell(base_entry + 4, start + d3);
+          internal_add_cell(base_entry + 5, start + d3 + d1);
+          internal_add_cell(base_entry + 6, start + d3 + d2 + d1);
+          internal_add_cell(base_entry + 7, start + d3 + d2);
+          break;
+
+        default:
+          Assert(false, ExcNotImplemented());
       }
   }
 
@@ -3076,6 +3091,8 @@ namespace DataOutBase
 
     out.flush_cells();
   }
+
+
 
   template <int dim, int spacedim, typename StreamType>
   void
