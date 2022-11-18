@@ -3007,24 +3007,68 @@ namespace DataOutBase
           {
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
-            // Length of loops in all dimensions
-            const unsigned int n1 = (dim > 0) ? n_subdivisions : 1;
-            const unsigned int n2 = (dim > 1) ? n_subdivisions : 1;
-            const unsigned int n3 = (dim > 2) ? n_subdivisions : 1;
-            // Offsets of outer loops
-            const unsigned int d1 = 1;
-            const unsigned int d2 = n;
-            const unsigned int d3 = n * n;
-            for (unsigned int i3 = 0; i3 < n3; ++i3)
-              for (unsigned int i2 = 0; i2 < n2; ++i2)
-                for (unsigned int i1 = 0; i1 < n1; ++i1)
+
+            switch (dim)
+              {
+                case 0:
                   {
-                    const unsigned int offset =
-                      first_vertex_of_patch + i3 * d3 + i2 * d2 + i1 * d1;
-                    // First write line in x direction
-                    out.template write_cell<dim>(count++, offset, d1, d2, d3);
+                    const unsigned int offset = first_vertex_of_patch;
+                    out.template write_cell<dim>(count++, offset, 0, 0, 0);
+                    break;
                   }
-            // finally update the number of the first vertex of this patch
+                case 1:
+                  {
+                    const unsigned int d1 = 1;
+
+                    for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+                      {
+                        const unsigned int offset =
+                          first_vertex_of_patch + i1 * d1;
+                        out.template write_cell<dim>(count++, offset, d1, 0, 0);
+                      }
+
+                    break;
+                  }
+                case 2:
+                  {
+                    const unsigned int d1 = 1;
+                    const unsigned int d2 = n;
+
+                    for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+                      for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+                        {
+                          const unsigned int offset =
+                            first_vertex_of_patch + i2 * d2 + i1 * d1;
+                          out.template write_cell<dim>(
+                            count++, offset, d1, d2, 0);
+                        }
+
+                    break;
+                  }
+                case 3:
+                  {
+                    const unsigned int d1 = 1;
+                    const unsigned int d2 = n;
+                    const unsigned int d3 = n * n;
+
+                    for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
+                      for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+                        for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+                          {
+                            const unsigned int offset = first_vertex_of_patch +
+                                                        i3 * d3 + i2 * d2 +
+                                                        i1 * d1;
+                            out.template write_cell<dim>(
+                              count++, offset, d1, d2, d3);
+                          }
+
+                    break;
+                  }
+                default:
+                  Assert(false, ExcNotImplemented());
+              }
+
+            // Update the number of the first vertex of this patch
             first_vertex_of_patch +=
               Utilities::fixed_power<dim>(n_subdivisions + 1);
           }
