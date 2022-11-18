@@ -593,8 +593,8 @@ namespace Euler_DG
   }
 
 
-  // The following function does an entire stage of a Runge--Kutta update and is
-  // - alongside the slightly modified setup - the heart of this tutorial
+  // The following function does an entire stage of a Runge--Kutta update
+  // and is, alongside the slightly modified setup, the heart of this tutorial
   // compared to step-67.
   //
   // In contrast to step-67, we are not executing the advection step
