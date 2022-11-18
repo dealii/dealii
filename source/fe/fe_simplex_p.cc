@@ -757,7 +757,6 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
   AssertDimension(dim, 2);
-  Assert(this->degree <= 2, ExcNotImplemented());
 
   if (const FE_SimplexP<dim, spacedim> *fe_p_other =
         dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
@@ -769,8 +768,6 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
       // hard-coded and we iterate over points on the first line which begin
       // after the 3 vertex points in the complete list of unit support points
 
-      Assert(fe_p_other->degree <= 2, ExcNotImplemented());
-
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
@@ -778,6 +775,15 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
           if (std::fabs(this->unit_support_points[i + 3][0] -
                         fe_p_other->unit_support_points[i + 3][0]) < 1e-14)
             identities.emplace_back(i, j);
+          else
+            {
+              // If nodes are not located in the same place, we have to
+              // interpolate. This is then not handled through the
+              // current function, but via interpolation matrices that
+              // result in constraints, rather than identities. Since
+              // that happens in a different function, there is nothing
+              // for us to do here.
+            }
 
       return identities;
     }
@@ -807,13 +813,26 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
                         fe_q_other->get_unit_support_points()
                           [index_map_inverse_q_other[j + 1]][0]) < 1e-14)
             identities.emplace_back(i, j);
+          else
+            {
+              // If nodes are not located in the same place, we have to
+              // interpolate. This will then also
+              // capture the case where the FE_Q has a different polynomial
+              // degree than the current element. In either case, the resulting
+              // constraints are computed elsewhere, rather than via the
+              // identities this function returns: Since
+              // that happens in a different function, there is nothing
+              // for us to do here.
+            }
 
       return identities;
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
     {
-      // the FE_Nothing has no degrees of freedom, so there are no
-      // equivalencies to be recorded
+      // The FE_Nothing has no degrees of freedom, so there are no
+      // equivalencies to be recorded. (If the FE_Nothing is dominating,
+      // then this will also leads to constraints, but we are not concerned
+      // with this here.)
       return {};
     }
   else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
