@@ -1545,8 +1545,8 @@ namespace Particles
     // In the case of a parallel simulation with periodic boundary conditions
     // the vertices associated with periodic boundaries are not directly
     // connected to the ghost cells but they are connected to the ghost cells
-    // through their coinciding vertices. We loop over the coinciding vertices
-    // to identify cells in which ghost particles must be generated
+    // through their coinciding vertices. We gather the information about
+    // the coinciding vertices through the grid cache.
     const std::map<unsigned int, std::vector<unsigned int>>
       coinciding_vertex_groups =
         triangulation_cache->get_coinciding_vertex_groups();
@@ -1579,7 +1579,8 @@ namespace Particles
                 // looped over are contained inside the
                 // vertex_to_coinciding_vertex_group Consequently, we loop over
                 // the full content of the coinciding vertex group which will
-                // include the current vertex and we skip the current vertex.
+                // include the current vertex. When we reach the current vertex,
+                // we skip it to avoid repetition.
                 if (vertex_to_coinciding_vertex_group.find(cell->vertex_index(
                       v)) != vertex_to_coinciding_vertex_group.end())
                   {

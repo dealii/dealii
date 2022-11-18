@@ -169,11 +169,20 @@ namespace GridTools
     get_vertex_to_neighbor_subdomain() const;
 
     /**
-     * TODO
+     * Returns the std::map of std::vector of unsigned integer containing
+     * coinciding vertices labeled by an arbitrary element from them. This
+     * feature is used to identify cells which are connected by periodic
+     * boundaries.
      */
     const std::map<unsigned int, std::vector<unsigned int>> &
     get_coinciding_vertex_groups() const;
 
+    /**
+     * Returns the std::map of unsigned integer containing
+     * the label of a group of coinciding vertices. This
+     * feature is used to identify cells which are connected by periodic
+     * boundaries.
+     */
     const std::map<unsigned int, unsigned int> &
     get_vertex_to_coinciding_vertex_group() const;
 
@@ -303,14 +312,16 @@ namespace GridTools
 
     /**
      * Store an std::map of std::vector of unsigned integer containing
-     * coinciding vertices labeled by an arbitrary element from them
+     * coinciding vertices labeled by an arbitrary element from them.
      */
     mutable std::map<unsigned int, std::vector<unsigned int>>
       coinciding_vertex_groups;
 
     /**
      * Store an std::map of unsigned integer containing
-     * the label of a group of coinciding vertices
+     * the label of a group of coinciding vertices.
+     * This std::map is generally used in combination
+     * with the above std::map coinciding_vertex_groups.
      */
     mutable std::map<unsigned int, unsigned int>
       vertex_to_coinciding_vertex_group;
