@@ -569,7 +569,7 @@ namespace Step85
 
 
 
-  // @sect3{$L^2$-Error}
+  // @sect3{L2-Error}
   // To test that the implementation works as expected, we want to compute the
   // error in the solution in the $L^2$-norm. The analytical solution to the
   // Poisson problem stated in the introduction reads
