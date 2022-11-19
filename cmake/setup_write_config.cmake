@@ -225,6 +225,10 @@ FOREACH(_feature ${_deal_ii_features_sorted})
       _detailed("#            TBB_VERSION = ${TBB_VERSION}\n")
     ENDIF()
 
+    IF(_feature MATCHES "KOKKOS")
+      _detailed("#            KOKKOS_BACKENDS = ${Kokkos_DEVICES}\n")
+      _detailed("#            KOKKOS_ARCHITECTURES = ${Kokkos_ARCH}\n")
+    ENDIF()
 
     #
     # Print out ${_feature}_DIR:
