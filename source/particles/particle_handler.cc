@@ -1577,7 +1577,7 @@ namespace Particles
                 // If the vertex has one or more coinciding vertices, then
                 // all of these vertices, including the current vertex being
                 // looped over are contained inside the
-                // vertex_to_coinciding_vertex_group Consequently, we loop over
+                // vertex_to_coinciding_vertex_group. Consequently, we loop over
                 // the full content of the coinciding vertex group which will
                 // include the current vertex. When we reach the current vertex,
                 // we skip it to avoid repetition.
