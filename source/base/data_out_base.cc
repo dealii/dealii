@@ -1786,19 +1786,41 @@ namespace
     const unsigned int start = s + 1;
     stream << gmv_cell_type[dim] << '\n';
 
-    stream << start;
-    if (dim >= 1)
+    switch (dim)
       {
-        stream << '\t' << start + d1;
-        if (dim >= 2)
+        case 0:
           {
-            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
-            if (dim >= 3)
-              {
-                stream << '\t' << start + d3 << '\t' << start + d3 + d1 << '\t'
-                       << start + d3 + d2 + d1 << '\t' << start + d3 + d2;
-              }
+            stream << start;
+            break;
           }
+
+        case 1:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            break;
+          }
+
+        case 2:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
+            break;
+          }
+
+        case 3:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
+            stream << '\t' << start + d3 << '\t' << start + d3 + d1 << '\t'
+                   << start + d3 + d2 + d1 << '\t' << start + d3 + d2;
+            break;
+          }
+
+        default:
+          Assert(false, ExcNotImplemented());
       }
     stream << '\n';
   }
@@ -1832,19 +1854,41 @@ namespace
   {
     const unsigned int start = s + 1;
 
-    stream << start;
-    if (dim >= 1)
+    switch (dim)
       {
-        stream << '\t' << start + d1;
-        if (dim >= 2)
+        case 0:
           {
-            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
-            if (dim >= 3)
-              {
-                stream << '\t' << start + d3 << '\t' << start + d3 + d1 << '\t'
-                       << start + d3 + d2 + d1 << '\t' << start + d3 + d2;
-              }
+            stream << start;
+            break;
           }
+
+        case 1:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            break;
+          }
+
+        case 2:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
+            break;
+          }
+
+        case 3:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
+            stream << '\t' << start + d3 << '\t' << start + d3 + d1 << '\t'
+                   << start + d3 + d2 + d1 << '\t' << start + d3 + d2;
+            break;
+          }
+
+        default:
+          Assert(false, ExcNotImplemented());
       }
     stream << '\n';
   }
@@ -1934,23 +1978,48 @@ namespace
                         unsigned int d2,
                         unsigned int d3)
   {
-    stream << GeometryInfo<dim>::vertices_per_cell << '\t' << start;
+    stream << GeometryInfo<dim>::vertices_per_cell << '\t';
 
-    if (dim >= 1)
-      stream << '\t' << start + d1;
-    {
-      if (dim >= 2)
-        {
-          stream << '\t' << start + d2 + d1 << '\t' << start + d2;
-          if (dim >= 3)
-            {
-              stream << '\t' << start + d3 << '\t' << start + d3 + d1 << '\t'
-                     << start + d3 + d2 + d1 << '\t' << start + d3 + d2;
-            }
-        }
-    }
+    switch (dim)
+      {
+        case 0:
+          {
+            stream << start;
+            break;
+          }
+
+        case 1:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            break;
+          }
+
+        case 2:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
+            break;
+          }
+
+        case 3:
+          {
+            stream << start;
+            stream << '\t' << start + d1;
+            stream << '\t' << start + d2 + d1 << '\t' << start + d2;
+            stream << '\t' << start + d3 << '\t' << start + d3 + d1 << '\t'
+                   << start + d3 + d2 + d1 << '\t' << start + d3 + d2;
+            break;
+          }
+
+        default:
+          Assert(false, ExcNotImplemented());
+      }
     stream << '\n';
   }
+
+
 
   void
   VtkStream::write_cell_single(const unsigned int   index,
