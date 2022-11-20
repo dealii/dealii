@@ -1548,10 +1548,10 @@ namespace Particles
     // through their coinciding vertices. We gather the information about
     // the coinciding vertices through the grid cache.
     const std::map<unsigned int, std::vector<unsigned int>>
-      coinciding_vertex_groups =
+      &coinciding_vertex_groups =
         triangulation_cache->get_coinciding_vertex_groups();
     const std::map<unsigned int, unsigned int>
-      vertex_to_coinciding_vertex_group =
+      &vertex_to_coinciding_vertex_group =
         triangulation_cache->get_vertex_to_coinciding_vertex_group();
 
     const std::set<types::subdomain_id> ghost_owners =
