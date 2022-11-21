@@ -150,7 +150,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         repository: kokkos/kokkos
         ref: 3.7.00
