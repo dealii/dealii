@@ -65,7 +65,7 @@ checks
 # Process all source and header files:
 #
 
-process "tests include source examples contrib/python-bindings" ".*\.(cc|h" format_file
+process "tests include source examples contrib/python-bindings" ".*\.(cc|h)" format_file
 process "source" ".*\.inst.in" format_inst
 
 #

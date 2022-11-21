@@ -33,15 +33,15 @@
 #  include <Epetra_Operator.h>
 
 // for Belos solvers
-#ifdef DEAL_II_TRILINOS_WITH_BELOS
-#  include <BelosBlockCGSolMgr.hpp>
-#  include <BelosBlockGmresSolMgr.hpp>
-#  include <BelosEpetraAdapter.hpp>
-#  include <BelosIteration.hpp>
-#  include <BelosMultiVec.hpp>
-#  include <BelosOperator.hpp>
-#  include <BelosSolverManager.hpp>
-#endif
+#  ifdef DEAL_II_TRILINOS_WITH_BELOS
+#    include <BelosBlockCGSolMgr.hpp>
+#    include <BelosBlockGmresSolMgr.hpp>
+#    include <BelosEpetraAdapter.hpp>
+#    include <BelosIteration.hpp>
+#    include <BelosMultiVec.hpp>
+#    include <BelosOperator.hpp>
+#    include <BelosSolverManager.hpp>
+#  endif
 
 #  include <memory>
 
@@ -732,7 +732,7 @@ namespace TrilinosWrappers
 
 
 
-#ifdef DEAL_II_TRILINOS_WITH_BELOS
+#  ifdef DEAL_II_TRILINOS_WITH_BELOS
   /**
    * Wrapper around the iterate solver package from the Belos
    * packge
@@ -808,7 +808,7 @@ namespace TrilinosWrappers
     const AdditionalData                        additional_data;
     const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters;
   };
-#endif
+#  endif
 
 } // namespace TrilinosWrappers
 
@@ -816,7 +816,7 @@ namespace TrilinosWrappers
 
 #  ifndef DOXYGEN
 
-#ifdef DEAL_II_TRILINOS_WITH_BELOS
+#    ifdef DEAL_II_TRILINOS_WITH_BELOS
 namespace TrilinosWrappers
 {
   namespace internal
@@ -1228,7 +1228,7 @@ namespace TrilinosWrappers
       }
 
 
-#    ifdef HAVE_BELOS_TSQR
+#      ifdef HAVE_BELOS_TSQR
       virtual void
       factorExplicit(Belos::MultiVec<value_type> &,
                      Teuchos::SerialDenseMatrix<int, value_type> &,
@@ -1245,7 +1245,7 @@ namespace TrilinosWrappers
         Asser(false, ExcNotImplemented());
       }
 
-#    endif
+#      endif
 
     private:
       /**
@@ -1434,7 +1434,7 @@ namespace TrilinosWrappers
   }
 
 } // namespace TrilinosWrappers
-#endif
+#    endif
 
 #  endif
 
