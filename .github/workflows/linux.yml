@@ -144,6 +144,7 @@ jobs:
             cuda-toolkit-11-8 \
             libp4est-dev \
             libopenmpi-dev \
+            numdiff \
             openmpi-bin \
             libboost-all-dev
     - name: info
@@ -187,9 +188,14 @@ jobs:
       with:
         name: linux-cuda-detailed.log
         path: detailed.log
-    - name: build
+    - name: build deal.II
       run: |
         make -j 2
+    - name: build CUDA tests
+      run: |
+        make -j 2 setup_tests_cuda
+        cd tests/cuda
+        make -j2 compile_test_executables
 
 
   linux-debug-intel-oneapi:
