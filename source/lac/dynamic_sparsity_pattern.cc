@@ -358,17 +358,6 @@ DynamicSparsityPattern::add_row_entries(
 
 
 
-void
-DynamicSparsityPattern::add_entries(const ArrayView<const size_type> &rows,
-                                    const ArrayView<const size_type> &columns)
-{
-  AssertDimension(rows.size(), columns.size());
-  for (std::size_t i = 0; i < rows.size(); ++i)
-    add(rows[i], columns[i]);
-}
-
-
-
 bool
 DynamicSparsityPattern::exists(const size_type i, const size_type j) const
 {

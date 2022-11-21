@@ -735,10 +735,7 @@ public:
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) override;
 
-  virtual void
-  add_entries(const ArrayView<const size_type> &rows,
-              const ArrayView<const size_type> &columns) override;
-
+  using SparsityPatternBase::add_entries;
 
   /**
    * Make the sparsity pattern symmetric by adding the sparsity pattern of the

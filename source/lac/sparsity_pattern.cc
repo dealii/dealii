@@ -839,17 +839,6 @@ SparsityPattern::add_row_entries(const size_type &                 row,
 
 
 void
-SparsityPattern::add_entries(const ArrayView<const size_type> &rows,
-                             const ArrayView<const size_type> &columns)
-{
-  AssertDimension(rows.size(), columns.size());
-  for (std::size_t i = 0; i < rows.size(); ++i)
-    add(rows[i], columns[i]);
-}
-
-
-
-void
 SparsityPattern::symmetrize()
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());

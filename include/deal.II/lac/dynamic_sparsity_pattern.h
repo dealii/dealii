@@ -445,9 +445,7 @@ public:
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) override;
 
-  virtual void
-  add_entries(const ArrayView<const size_type> &rows,
-              const ArrayView<const size_type> &columns) override;
+  using SparsityPatternBase::add_entries;
 
   /**
    * Check if a value at a certain position may be non-zero.

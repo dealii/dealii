@@ -359,6 +359,11 @@ namespace internal
       bool in_use;
 
       /**
+       * Temporary array for pairs of indices
+       */
+      std::vector<std::pair<size_type, size_type>> new_entries;
+
+      /**
        * Temporary array for row indices
        */
       std::vector<size_type> rows;
