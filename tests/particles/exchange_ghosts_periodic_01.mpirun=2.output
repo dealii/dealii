@@ -1,0 +1,15 @@
+
+DEAL:0:2d/2d::Number of ghost particles before exchange ghost: 0
+DEAL:0:2d/2d::Number of ghost particles after exchange ghost: 1
+DEAL:0:2d/2d::OK
+DEAL:0:3d/3d::Number of ghost particles before exchange ghost: 0
+DEAL:0:3d/3d::Number of ghost particles after exchange ghost: 1
+DEAL:0:3d/3d::OK
+
+DEAL:1:2d/2d::Number of ghost particles before exchange ghost: 0
+DEAL:1:2d/2d::Number of ghost particles after exchange ghost: 1
+DEAL:1:2d/2d::OK
+DEAL:1:3d/3d::Number of ghost particles before exchange ghost: 0
+DEAL:1:3d/3d::Number of ghost particles after exchange ghost: 1
+DEAL:1:3d/3d::OK
+
