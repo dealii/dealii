@@ -45,14 +45,13 @@ individual components of the solution look as follows:
 
 
 These pictures show that what we find here is in accordance with what one
-typically sees in other publications on the topic @cite Bendse2004. Maybe more interestingly, the
+typically sees in other publications on the topic @cite Bendse2004.
+Maybe more interestingly, the
 result looks like a truss bridge (except that we apply the load at the top of
 the trusses, rather than the bottom as in real truss bridges, akin to a "deck
-truss" bridge), suggesting that the designs that have been used in bridge-
-building for centuries are indeed based on ideas we can now show to be optimal
+truss" bridge), suggesting that the designs that have been used in bridge-building
+for centuries are indeed based on ideas we can now show to be optimal
 in some sense.
-
-
 <h4>Possibilities for extensions</h4>
 
 The results shown above took around 75 iterations to find, which is quite

@@ -92,7 +92,7 @@ problems. In particular, they are aimed at the following goals:
   infrastructure code supporting AMR.
 
   Supporting this point is the fact that although there are
-  <a href="https://www.dealii.org/publications.html">more than 1,000
+  <a href="https://www.dealii.org/publications.html">more than 2,000
   publications</a> presenting results obtained with deal.II, we are aware of
   only a relatively small number of applications that have been built with deal.II from
   scratch; all others have started as modifications of one of the tutorial
