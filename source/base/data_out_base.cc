@@ -6311,9 +6311,12 @@ namespace DataOutBase
                   {
                     case 0:
                       {
-                        const unsigned int offset = first_vertex_of_patch;
+                        const unsigned int starting_offset =
+                          first_vertex_of_patch;
                         // First write line in x direction
-                        vtu_out.template write_cell<0>(count++, offset, {});
+                        vtu_out.template write_cell<0>(count++,
+                                                       starting_offset,
+                                                       {});
                         break;
                       }
 
@@ -6322,11 +6325,11 @@ namespace DataOutBase
                         const unsigned int d1 = 1;
                         for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                           {
-                            const unsigned int offset =
+                            const unsigned int starting_offset =
                               first_vertex_of_patch + i1 * d1;
                             // First write line in x direction
                             vtu_out.template write_cell<1>(count++,
-                                                           offset,
+                                                           starting_offset,
                                                            {{d1}});
                           }
                         break;
@@ -6339,11 +6342,11 @@ namespace DataOutBase
                         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                             {
-                              const unsigned int offset =
+                              const unsigned int starting_offset =
                                 first_vertex_of_patch + i2 * d2 + i1 * d1;
                               // First write line in x direction
                               vtu_out.template write_cell<2>(count++,
-                                                             offset,
+                                                             starting_offset,
                                                              {{d1, d2}});
                             }
                         break;
@@ -6358,12 +6361,12 @@ namespace DataOutBase
                           for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                               {
-                                const unsigned int offset =
+                                const unsigned int starting_offset =
                                   first_vertex_of_patch + i3 * d3 + i2 * d2 +
                                   i1 * d1;
                                 // First write line in x direction
                                 vtu_out.template write_cell<3>(count++,
-                                                               offset,
+                                                               starting_offset,
                                                                {{d1, d2, d3}});
                               }
                         break;
