@@ -13,10 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-
-
-// like particle_handler_06, but tests that the particle handlers function
-// n_locally_owned_particles only counts locally owned particles.
+// This test a triangulation which has a periodic boundary along the x axis.
+// Particles are generated close to the x- and x+ limit of the domain
+// and ghost particles are exchanged. Because the domain is periodic,
+// ghost particles should be generated on both processors even if the cells
+// do not share vertices because they are connected by the periodicity.
+// This test verifies that ghost particles are indeed generated on both cores.
 
 #include <deal.II/distributed/tria.h>
 
@@ -59,7 +61,7 @@ test()
     GridTools::collect_periodic_faces(tr, 0, 1, 0, periodicity_vector);
     tr.add_periodicity(periodicity_vector);
 
-    // both processes create a particle handler with a particle in a
+    // Both processes create a particle handler with a particle in a
     // position that is in a ghost cell to the other process connected by a
     // periodic boundary
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
@@ -88,6 +90,8 @@ test()
 
     particle_handler.sort_particles_into_subdomains_and_cells();
 
+    // We count the number of ghost particles before they are exchanged
+    // The expected result is zero
 
     unsigned int n_ghost_particles = 0;
     for (auto ghost_particle = particle_handler.begin_ghost();
@@ -109,6 +113,9 @@ test()
       {
         ++n_ghost_particles;
       }
+
+    // We count the number of ghost particles after they are exchanged
+    // The expected result is one
 
     deallog << "Number of ghost particles after exchange ghost: "
             << std::to_string(n_ghost_particles) << std::endl;
