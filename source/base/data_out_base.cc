@@ -6167,8 +6167,6 @@ namespace DataOutBase
     }
 
 
-    VtuStream vtu_out(out, flags);
-
     const unsigned int n_data_sets = data_names.size();
     // check against # of data sets in first patch. checks against all other
     // patches are made in write_gmv_reorder_data_vectors
@@ -6247,6 +6245,8 @@ namespace DataOutBase
     out << "  </Points>\n\n";
     //-------------------------------
     // now for the cells
+    VtuStream vtu_out(out, flags);
+
     out << "  <Cells>\n";
     out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
         << ascii_or_binary << "\">\n";
@@ -6347,16 +6347,16 @@ namespace DataOutBase
         for (unsigned int i = 0; i < cell_types.size(); ++i)
           cell_types_uint8_t[i] = static_cast<std::uint8_t>(cell_types[i]);
 
-        vtu_out << vtu_stringize_array(cell_types_uint8_t,
-                                       flags.compression_level,
-                                       out.precision());
+        out << vtu_stringize_array(cell_types_uint8_t,
+                                   flags.compression_level,
+                                   out.precision());
       }
     else
 #endif
       {
-        vtu_out << vtu_stringize_array(cell_types,
-                                       flags.compression_level,
-                                       out.precision());
+        out << vtu_stringize_array(cell_types,
+                                   flags.compression_level,
+                                   out.precision());
       }
 
     out << '\n';
