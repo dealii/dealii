@@ -77,7 +77,7 @@ namespace Particles
   template <int dim, int spacedim>
   ParticleHandler<dim, spacedim>::ParticleHandler(
     const Triangulation<dim, spacedim> &triangulation,
-    const Mapping<dim, spacedim> &      mapping,
+    const Mapping<dim, spacedim>       &mapping,
     const unsigned int                  n_properties)
     : triangulation(&triangulation, typeid(*this).name())
     , mapping(&mapping, typeid(*this).name())
@@ -117,7 +117,7 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::initialize(
     const Triangulation<dim, spacedim> &new_triangulation,
-    const Mapping<dim, spacedim> &      new_mapping,
+    const Mapping<dim, spacedim>       &new_mapping,
     const unsigned int                  n_properties)
   {
     clear();
@@ -577,7 +577,7 @@ namespace Particles
   template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
-    const Particle<dim, spacedim> &                                    particle,
+    const Particle<dim, spacedim>                                     &particle,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     return insert_particle(particle.get_location(),
@@ -623,7 +623,7 @@ namespace Particles
   template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
-    const void *&                                                      data,
+    const void                                                       *&data,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     Assert(triangulation != nullptr, ExcInternalError());
@@ -648,8 +648,8 @@ namespace Particles
   template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
-    const Point<spacedim> &     position,
-    const Point<dim> &          reference_position,
+    const Point<spacedim>      &position,
+    const Point<dim>           &reference_position,
     const types::particle_index particle_index,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
     const ArrayView<const double> &properties)
@@ -764,8 +764,8 @@ namespace Particles
   ParticleHandler<dim, spacedim>::insert_global_particles(
     const std::vector<Point<spacedim>> &positions,
     const std::vector<std::vector<BoundingBox<spacedim>>>
-      &                                       global_bounding_boxes,
-    const std::vector<std::vector<double>> &  properties,
+                                             &global_bounding_boxes,
+    const std::vector<std::vector<double>>   &properties,
     const std::vector<types::particle_index> &ids)
   {
     if (!properties.empty())
@@ -1190,7 +1190,7 @@ namespace Particles
     compare_particle_association(
       const unsigned int                 a,
       const unsigned int                 b,
-      const Tensor<1, dim> &             particle_direction,
+      const Tensor<1, dim>              &particle_direction,
       const std::vector<Tensor<1, dim>> &center_directions)
     {
       const double scalar_product_a = center_directions[a] * particle_direction;
@@ -1545,14 +1545,11 @@ namespace Particles
     // In the case of a parallel simulation with periodic boundary conditions
     // the vertices associated with periodic boundaries are not directly
     // connected to the ghost cells but they are connected to the ghost cells
-    // through their coinciding vertices. We gather the information about
-    // the coinciding vertices through the grid cache.
-    const std::map<unsigned int, std::vector<unsigned int>>
-      &coinciding_vertex_groups =
-        triangulation_cache->get_coinciding_vertex_groups();
-    const std::map<unsigned int, unsigned int>
-      &vertex_to_coinciding_vertex_group =
-        triangulation_cache->get_vertex_to_coinciding_vertex_group();
+    // through their coinciding vertices. We gather this information using the
+    // vertices_with_ghost_neighbors map
+    const std::map<unsigned int, std::set<types::subdomain_id>>
+      &vertices_with_ghost_neighbors =
+        triangulation_cache->get_vertices_with_ghost_neighbors();
 
     const std::set<types::subdomain_id> ghost_owners =
       parallel_triangulation->ghost_owners();
@@ -1570,29 +1567,14 @@ namespace Particles
             std::set<unsigned int> cell_to_neighbor_subdomain;
             for (const unsigned int v : cell->vertex_indices())
               {
-                cell_to_neighbor_subdomain.insert(
-                  vertex_to_neighbor_subdomain[cell->vertex_index(v)].begin(),
-                  vertex_to_neighbor_subdomain[cell->vertex_index(v)].end());
-
-                // If the vertex has one or more coinciding vertices, then
-                // all of these vertices, including the current vertex being
-                // looped over are contained inside the
-                // vertex_to_coinciding_vertex_group. Consequently, we loop over
-                // the full content of the coinciding vertex group which will
-                // include the current vertex. When we reach the current vertex,
-                // we skip it to avoid repetition.
-                if (vertex_to_coinciding_vertex_group.find(cell->vertex_index(
-                      v)) != vertex_to_coinciding_vertex_group.end())
+                if (vertices_with_ghost_neighbors.find(cell->vertex_index(v)) !=
+                    vertices_with_ghost_neighbors.end())
                   {
-                    for (const unsigned int cv : coinciding_vertex_groups.at(
-                           vertex_to_coinciding_vertex_group.at(
-                             cell->vertex_index(v))))
-                      {
-                        if (cv != cell->vertex_index(v))
-                          cell_to_neighbor_subdomain.insert(
-                            vertex_to_neighbor_subdomain[cv].begin(),
-                            vertex_to_neighbor_subdomain[cv].end());
-                      }
+                    cell_to_neighbor_subdomain.insert(
+                      vertices_with_ghost_neighbors.at(cell->vertex_index(v))
+                        .begin(),
+                      vertices_with_ghost_neighbors.at(cell->vertex_index(v))
+                        .end());
                   }
               }
 
@@ -1669,7 +1651,7 @@ namespace Particles
     const std::map<
       types::subdomain_id,
       std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      &        send_cells,
+              &send_cells,
     const bool build_cache)
   {
     Assert(triangulation != nullptr, ExcInternalError());
@@ -2073,7 +2055,7 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::register_additional_store_load_functions(
-    const std::function<std::size_t()> &                            size_callb,
+    const std::function<std::size_t()>                             &size_callb,
     const std::function<void *(const particle_iterator &, void *)> &store_callb,
     const std::function<const void *(const particle_iterator &, const void *)>
       &load_callb)
@@ -2203,7 +2185,7 @@ namespace Particles
     const auto callback_function =
       [this](
         const typename Triangulation<dim, spacedim>::cell_iterator
-          &                                                     cell_iterator,
+                                                               &cell_iterator,
         const typename Triangulation<dim, spacedim>::CellStatus cell_status) {
         return this->pack_callback(cell_iterator, cell_status);
       };
@@ -2360,7 +2342,7 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::unpack_callback(
-    const typename Triangulation<dim, spacedim>::cell_iterator &    cell,
+    const typename Triangulation<dim, spacedim>::cell_iterator     &cell,
     const typename Triangulation<dim, spacedim>::CellStatus         status,
     const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
   {
@@ -2394,14 +2376,12 @@ namespace Particles
     // now update particle storage location and properties if necessary
     switch (status)
       {
-        case parallel::TriangulationBase<dim, spacedim>::CELL_PERSIST:
-          {
+          case parallel::TriangulationBase<dim, spacedim>::CELL_PERSIST: {
             // all particles are correctly inserted
           }
           break;
 
-        case parallel::TriangulationBase<dim, spacedim>::CELL_COARSEN:
-          {
+          case parallel::TriangulationBase<dim, spacedim>::CELL_COARSEN: {
             // all particles are in correct cell, but their reference location
             // has changed
             for (auto &particle : loaded_particles_on_cell)
@@ -2414,8 +2394,7 @@ namespace Particles
           }
           break;
 
-        case parallel::TriangulationBase<dim, spacedim>::CELL_REFINE:
-          {
+          case parallel::TriangulationBase<dim, spacedim>::CELL_REFINE: {
             // we need to find the correct child to store the particles and
             // their reference location has changed
             typename particle_container::iterator &cache =

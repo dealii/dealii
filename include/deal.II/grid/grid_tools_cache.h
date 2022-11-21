@@ -75,7 +75,7 @@ namespace GridTools
      * @param mapping The mapping to use when computing cached objects
      */
     Cache(const Triangulation<dim, spacedim> &tria,
-          const Mapping<dim, spacedim> &      mapping =
+          const Mapping<dim, spacedim>       &mapping =
             (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
                .template get_default_linear_mapping<dim, spacedim>()
@@ -169,22 +169,11 @@ namespace GridTools
     get_vertex_to_neighbor_subdomain() const;
 
     /**
-     * Returns the std::map of std::vector of unsigned integer containing
-     * coinciding vertices labeled by an arbitrary element from them. This
-     * feature is used to identify cells which are connected by periodic
-     * boundaries.
+     * Return a map that, for each vertex, lists all the processes whose
+     * subdomains are adjacent to that vertex.
      */
-    const std::map<unsigned int, std::vector<unsigned int>> &
-    get_coinciding_vertex_groups() const;
-
-    /**
-     * Returns the std::map of unsigned integer containing
-     * the label of a group of coinciding vertices. This
-     * feature is used to identify cells which are connected by periodic
-     * boundaries.
-     */
-    const std::map<unsigned int, unsigned int> &
-    get_vertex_to_coinciding_vertex_group() const;
+    const std::map<unsigned int, std::set<types::subdomain_id>> &
+    get_vertices_with_ghost_neighbors() const;
 
     /**
      * Return a reference to the stored triangulation.
@@ -311,20 +300,11 @@ namespace GridTools
     mutable std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain;
 
     /**
-     * Store an std::map of std::vector of unsigned integer containing
-     * coinciding vertices labeled by an arbitrary element from them.
-     */
-    mutable std::map<unsigned int, std::vector<unsigned int>>
-      coinciding_vertex_groups;
-
-    /**
      * Store an std::map of unsigned integer containing
-     * the label of a group of coinciding vertices.
-     * This std::map is generally used in combination
-     * with the above std::map coinciding_vertex_groups.
+     * the set of subdomains connected to each vertices
      */
-    mutable std::map<unsigned int, unsigned int>
-      vertex_to_coinciding_vertex_group;
+    mutable std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+      vertices_with_ghost_neighbors;
 
     /**
      * Storage for the status of the triangulation signal.

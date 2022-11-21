@@ -88,7 +88,7 @@ namespace GridTools
      * Update the coinciding vertex groups as well as the
      * vertex_to_coinciding_vertex_group
      */
-    update_collection_of_coinciding_vertices = 0x200,
+    update_vertex_with_ghost_neighbors = 0x200,
 
     /**
      * Update all objects.
