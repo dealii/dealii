@@ -15,10 +15,14 @@
 
  *
  * Author: Martin Kronbichler, 2020
+ * Author: Stefano Zampini, King Abdullah University of Science and Technology,
+ 2022
  */
 
 // The include files are similar to the previous matrix-free tutorial programs
-// step-37, step-48, and step-59
+// step-37, step-48, and step-59. This tutorial will use the PETSc ODE solver
+// interface if available. We thus include the relevant headers.
+
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
@@ -44,6 +48,11 @@
 #include <deal.II/matrix_free/matrix_free.h>
 
 #include <deal.II/numerics/data_out.h>
+
+#ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_ts.h>
+#  include <deal.II/lac/petsc_vector.h>
+#endif
 
 #include <fstream>
 #include <iomanip>
@@ -2248,6 +2257,105 @@ namespace Euler_DG
     // mostly done by the TimerOutput::print_wall_time_statistics() function.
     unsigned int timestep_number = 0;
 
+#ifdef DEAL_II_WITH_PETSC
+    // This is a preliminary use of PETSc TS explicit solve with Runge Kutta.
+    //
+    // A few things need to be discussed before improving this dummy
+    // implementation:
+    // - Make PETSc Vector classes inherit from VectorSpaceVector
+    // - Decide on predefined PETScWrappers::TimeStepper constructors that also
+    //   select subtype
+    //   For example in this case we are only allowed to select Runge Kutta from
+    //   the code, but we need to use the command line to switch among the
+    //   various rk implementations in PETSc. The default RK solver in PETSc is
+    //   third order Bogacki-Shampine, with adaptive time step.
+    // - The deal.II monitor adapts the time step with the CFL estimate. PETSc
+    //   has a very similar API that requires downcasting (TSSetCFLTimeLocal).
+    //   How do you prefer to support this?
+    //   Note that the default adaptors for Runge Kutta with
+    //   embedded formulas produce steps very similar to the one with the CFL.
+    using VectorType = PETScWrappers::MPI::Vector;
+
+    // We won't need those ugly copy from/to operations once we derive PETSc
+    // vector classes from VectorSpaceVectors
+    auto copy_from_petsc = [](const VectorType &                          src,
+                              LinearAlgebra::distributed::Vector<Number> &dst) {
+      auto lr = src.local_range();
+      for (unsigned int i = lr.first; i < lr.second; i++)
+        dst[i] = src[i];
+    };
+
+    auto copy_to_petsc =
+      [](const LinearAlgebra::distributed::Vector<Number> &src,
+         VectorType &                                      dst) {
+        auto lr = dst.local_range();
+        for (unsigned int i = lr.first; i < lr.second; i++)
+          dst[i] = src[i];
+        dst.compress(VectorOperation::insert);
+      };
+
+    // Solver parameters. Here we specify initial time step and final time,
+    // together with the solver type for Runge-Kutta.
+    // We also set adaptive tolerances to -1 to use adaptive time stepping
+    // with default tolerances from PETSc
+    PETScWrappers::TimeStepperData tsdata;
+    tsdata.final_time         = final_time;
+    tsdata.initial_step_size  = time_step;
+    tsdata.tstype             = "rk";
+    tsdata.absolute_tolerance = -1.0;
+    tsdata.relative_tolerance = -1.0;
+
+    // Solver constructor
+    PETScWrappers::TimeStepper<VectorType> petsc_time_stepper(tsdata);
+
+    // PETScWrappers::TimeStepper can solve ODE/DAE problems in explicit form
+    // i.e., u_dot = G(u,t), or in fully implicit form F(u_dot,u,t) = 0.
+    // This function implements the explicit interface for G.
+    petsc_time_stepper.explicit_function =
+      [&](const double t, const VectorType &y, VectorType &f) {
+        // we need to set "time" of the Euler instance for boundary conditions
+        // evaluation
+        time = t;
+        copy_from_petsc(y, rk_register_1);
+        euler_operator.apply(t, rk_register_1, rk_register_2);
+        copy_to_petsc(rk_register_2, f);
+        return 0;
+      };
+
+    // Solution monitoring
+    petsc_time_stepper.monitor = [&](const double       t,
+                                     const VectorType & y,
+                                     const unsigned int step) {
+      // Update Euler class for exact solution checks
+      time      = t;
+      time_step = petsc_time_stepper.get_time_step();
+      copy_from_petsc(y, solution);
+
+      // Remove warning: unused parameter ‘step’
+      (void)step;
+
+      // Same monitor as below, except that we rely on a static variable for
+      // tick counting
+      static int prev_tick = 0;
+      int        curr_tick = static_cast<int>(t / output_tick);
+      if (curr_tick != prev_tick)
+        output_results(static_cast<unsigned int>(std::round(t / output_tick)));
+      prev_tick = curr_tick;
+      return 0;
+    };
+
+    VectorType psolution(solution.locally_owned_elements(),
+                         solution.get_mpi_communicator());
+    copy_to_petsc(solution, psolution);
+
+    // Integrate the ODE. Returns the number of steps taken
+    timestep_number = petsc_time_stepper.solve(psolution);
+    (void)timestep_number;
+
+    copy_from_petsc(psolution, solution);
+
+#else
+
     while (time < final_time - 1e-12)
       {
         ++timestep_number;
@@ -2275,7 +2383,7 @@ namespace Euler_DG
           output_results(
             static_cast<unsigned int>(std::round(time / output_tick)));
       }
-
+#endif
     timer.print_wall_time_statistics(MPI_COMM_WORLD);
     pcout << std::endl;
   }
