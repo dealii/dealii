@@ -1596,8 +1596,6 @@ namespace Particles
           }
       }
 
-
-
     send_recv_particles(
       ghost_particles_cache.ghost_particles_by_domain,
       std::map<
