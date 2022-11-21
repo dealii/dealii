@@ -3,7 +3,7 @@
 <h3>Program output</h3>
 
 Running the program with the default settings on a machine with 40 processes
-produces the following output:
+produces the following output if PETSc is not installed:
 @code
 Running with 40 MPI processes
 Vectorization over 8 doubles = 512 bits (AVX512)
@@ -703,7 +703,8 @@ efficiency in terms of step size per stage before they violate the CFL
 condition. An interesting extension would be to compare the low-storage
 variants proposed here with standard Runge--Kutta integrators or to use vector
 operations that are run separate from the mass matrix operation and compare
-performance.
+performance. This could be done using the PETSc TimeStepper solver, as already
+implemented in this tutorial.
 
 
 <h4>More advanced numerical flux functions and skew-symmetric formulations</h4>
