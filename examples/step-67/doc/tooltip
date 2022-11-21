@@ -1,1 +1,2 @@
 An explicit time integrator for the Euler equations with matrix-free implementation.
+The tutorial takes advantage of PETSc's ODE integrators if available.
