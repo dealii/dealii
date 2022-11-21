@@ -1567,14 +1567,13 @@ namespace Particles
             std::set<unsigned int> cell_to_neighbor_subdomain;
             for (const unsigned int v : cell->vertex_indices())
               {
-                if (vertices_with_ghost_neighbors.find(cell->vertex_index(v)) !=
+                const auto vertex_ghost_neighbors = vertices_with_ghost_neighbors.find(cell->vertex_index(v));
+                if (vertex_ghost_neighbors !=
                     vertices_with_ghost_neighbors.end())
                   {
                     cell_to_neighbor_subdomain.insert(
-                      vertices_with_ghost_neighbors.at(cell->vertex_index(v))
-                        .begin(),
-                      vertices_with_ghost_neighbors.at(cell->vertex_index(v))
-                        .end());
+                      vertex_ghost_neighbors->second.begin(),
+                      vertex_ghost_neighbors->second.end());
                   }
               }
 

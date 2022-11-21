@@ -68,7 +68,7 @@ test()
     Point<dim>      reference_position;
 
     if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
-      position(0) = 0.001;
+      position[0] = 0.001;
     else
       position[0] = 0.999;
 
