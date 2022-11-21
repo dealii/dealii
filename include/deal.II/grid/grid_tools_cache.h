@@ -301,7 +301,7 @@ namespace GridTools
 
     /**
      * Store an std::map of unsigned integer containing
-     * the set of subdomains connected to each vertices
+     * the set of subdomains connected to each vertex.
      */
     mutable std::map<unsigned int, std::set<dealii::types::subdomain_id>>
       vertices_with_ghost_neighbors;
