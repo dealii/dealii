@@ -1408,11 +1408,9 @@ namespace DataOutBase
      */
     template <int dim>
     void
-    write_cell(const unsigned int index,
-               const unsigned int start,
-               const unsigned int d1,
-               const unsigned int d2,
-               const unsigned int d3);
+    write_cell(const unsigned int                   index,
+               const unsigned int                   start,
+               const std::array<unsigned int, dim> &offsets);
 
     /**
      * Record a single deal.II cell without subdivisions (e.g. simplex) in the
