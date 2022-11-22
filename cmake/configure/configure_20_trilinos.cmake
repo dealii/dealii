@@ -177,12 +177,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     IF(DEAL_II_TRILINOS_WITH_KOKKOS)
-      CHECK_SYMBOL_EXISTS(
-        "KOKKOS_ENABLE_CUDA"
-        "Kokkos_Macros.hpp"
-        DEAL_II_KOKKOS_CUDA_EXISTS
-        )
-      IF(DEAL_II_KOKKOS_CUDA_EXISTS)
+      IF(Kokkos_ENABLE_CUDA)
         # We need to disable SIMD vectorization for CUDA device code.
         # Otherwise, nvcc compilers from version 9 on will emit an error message like:
         # "[...] contains a vector, which is not supported in device code". We
@@ -191,25 +186,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
       ENDIF()
 
-      CHECK_SYMBOL_EXISTS(
-        "KOKKOS_ENABLE_CUDA_LAMBDA"
-        "Kokkos_Macros.hpp"
-        DEAL_II_KOKKOS_LAMBDA_EXISTS
-        )
-      IF(DEAL_II_KOKKOS_LAMBDA_EXISTS)
-        ADD_FLAGS(CMAKE_REQUIRED_FLAGS "--expt-extended-lambda")
-      ENDIF()
-
       # We need a recent version of Trilinos to use kokkos_check. We want to use
       # VERSION_GREATER_EQUAL 13.0 but this requires CMake 3.7
-      IF(TRILINOS_VERSION VERSION_GREATER 12.99)
-        SET(KOKKOS_WITH_OPENMP "")
-        kokkos_check(DEVICES OpenMP RETURN_VALUE KOKKOS_WITH_OPENMP)
-        IF(KOKKOS_WITH_OPENMP)
-          FIND_PACKAGE(OpenMP REQUIRED)
-          ADD_FLAGS(DEAL_II_CXX_FLAGS "${OpenMP_CXX_FLAGS}")
-          ADD_FLAGS(DEAL_II_LINKER_FLAGS "${OpenMP_CXX_FLAGS}")
-        ENDIF()
+      IF(TRILINOS_VERSION VERSION_GREATER 12.99 AND Kokkos_ENABLE_CUDA)
+        KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
       ENDIF()
     ENDIF()
 
