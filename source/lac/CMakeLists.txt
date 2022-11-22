@@ -42,6 +42,7 @@ SET(_unity_include_src
   sparse_matrix_ez.cc
   sparse_mic.cc
   sparse_vanka.cc
+  sparsity_pattern_base.cc
   sparsity_pattern.cc
   sparsity_tools.cc
   tensor_product_matrix.cc

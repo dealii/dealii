@@ -23,6 +23,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <utility>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -98,13 +100,14 @@ public:
                   const bool indices_are_sorted = false) = 0;
 
   /**
-   * General function for adding new entries. By default this function calls
-   * add_row_entries() for each new entry: inheriting classes may want to add a
-   * more optimized implementation.
+   * General function for adding new entries from an unsorted list of pairs.
+   *
+   * This function is useful when multiple entries need to be added which do
+   * not correspond to a particular row, e.g., when assembling a flux sparsity
+   * pattern.
    */
   virtual void
-  add_entries(const ArrayView<const size_type> &rows,
-              const ArrayView<const size_type> &columns);
+  add_entries(const ArrayView<const std::pair<size_type, size_type>> &entries);
 
 protected:
   /**
@@ -160,19 +163,6 @@ inline SparsityPatternBase::size_type
 SparsityPatternBase::n_cols() const
 {
   return cols;
-}
-
-
-
-inline void
-SparsityPatternBase::add_entries(const ArrayView<const size_type> &rows,
-                                 const ArrayView<const size_type> &columns)
-{
-  AssertDimension(rows.size(), columns.size());
-  for (std::size_t i = 0; i < rows.size(); ++i)
-    add_row_entries(rows[i],
-                    make_array_view(columns.begin() + i,
-                                    columns.begin() + i + 1));
 }
 
 

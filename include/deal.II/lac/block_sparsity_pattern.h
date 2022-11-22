@@ -253,9 +253,7 @@ public:
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) override;
 
-  virtual void
-  add_entries(const ArrayView<const size_type> &rows,
-              const ArrayView<const size_type> &columns) override;
+  using SparsityPatternBase::add_entries;
 
   /**
    * Return number of rows of this matrix, which equals the dimension of the
@@ -992,19 +990,6 @@ BlockSparsityPatternBase<SparsityPatternType>::add_row_entries(
   const bool                        indices_are_sorted)
 {
   add_entries(row, columns.begin(), columns.end(), indices_are_sorted);
-}
-
-
-
-template <typename SparsityPatternType>
-inline void
-BlockSparsityPatternBase<SparsityPatternType>::add_entries(
-  const ArrayView<const size_type> &rows,
-  const ArrayView<const size_type> &columns)
-{
-  AssertDimension(rows.size(), columns.size());
-  for (std::size_t i = 0; i < rows.size(); ++i)
-    add(rows[i], columns[i]);
 }
 
 

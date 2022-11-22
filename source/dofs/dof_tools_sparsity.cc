@@ -774,13 +774,9 @@ namespace DoFTools
                const unsigned int)> &face_has_flux_coupling)
       {
         std::vector<types::global_dof_index> rows;
-        std::vector<types::global_dof_index> cols;
-
-        auto append_pair = [&](const types::global_dof_index i,
-                               const types::global_dof_index j) {
-          rows.push_back(i);
-          cols.push_back(j);
-        };
+        std::vector<std::pair<SparsityPatternBase::size_type,
+                              SparsityPatternBase::size_type>>
+          cell_entries;
 
         if (dof.has_hp_capabilities() == false)
           {
@@ -849,14 +845,13 @@ namespace DoFTools
                                   if (flux_dof_mask(i, j) == always ||
                                       (flux_dof_mask(i, j) == nonzero &&
                                        i_non_zero_i && j_non_zero_i))
-                                    append_pair(dofs_on_this_cell[i],
-                                                dofs_on_this_cell[j]);
+                                    cell_entries.emplace_back(
+                                      dofs_on_this_cell[i],
+                                      dofs_on_this_cell[j]);
                                 }
                             }
-                          sparsity.add_entries(make_array_view(rows),
-                                               make_array_view(cols));
-                          rows.clear();
-                          cols.clear();
+                          sparsity.add_entries(make_array_view(cell_entries));
+                          cell_entries.clear();
                         }
                       else
                         {
@@ -948,14 +943,16 @@ namespace DoFTools
 
                                           if (flux_dof_mask(i, j) == always)
                                             {
-                                              append_pair(
+                                              cell_entries.emplace_back(
                                                 dofs_on_this_cell[i],
                                                 dofs_on_other_cell[j]);
-                                              append_pair(dofs_on_other_cell[i],
-                                                          dofs_on_this_cell[j]);
-                                              append_pair(dofs_on_this_cell[i],
-                                                          dofs_on_this_cell[j]);
-                                              append_pair(
+                                              cell_entries.emplace_back(
+                                                dofs_on_other_cell[i],
+                                                dofs_on_this_cell[j]);
+                                              cell_entries.emplace_back(
+                                                dofs_on_this_cell[i],
+                                                dofs_on_this_cell[j]);
+                                              cell_entries.emplace_back(
                                                 dofs_on_other_cell[i],
                                                 dofs_on_other_cell[j]);
                                             }
@@ -963,33 +960,35 @@ namespace DoFTools
                                                    nonzero)
                                             {
                                               if (i_non_zero_i && j_non_zero_e)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_this_cell[i],
                                                   dofs_on_other_cell[j]);
                                               if (i_non_zero_e && j_non_zero_i)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_other_cell[i],
                                                   dofs_on_this_cell[j]);
                                               if (i_non_zero_i && j_non_zero_i)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_this_cell[i],
                                                   dofs_on_this_cell[j]);
                                               if (i_non_zero_e && j_non_zero_e)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_other_cell[i],
                                                   dofs_on_other_cell[j]);
                                             }
 
                                           if (flux_dof_mask(j, i) == always)
                                             {
-                                              append_pair(
+                                              cell_entries.emplace_back(
                                                 dofs_on_this_cell[j],
                                                 dofs_on_other_cell[i]);
-                                              append_pair(dofs_on_other_cell[j],
-                                                          dofs_on_this_cell[i]);
-                                              append_pair(dofs_on_this_cell[j],
-                                                          dofs_on_this_cell[i]);
-                                              append_pair(
+                                              cell_entries.emplace_back(
+                                                dofs_on_other_cell[j],
+                                                dofs_on_this_cell[i]);
+                                              cell_entries.emplace_back(
+                                                dofs_on_this_cell[j],
+                                                dofs_on_this_cell[i]);
+                                              cell_entries.emplace_back(
                                                 dofs_on_other_cell[j],
                                                 dofs_on_other_cell[i]);
                                             }
@@ -997,29 +996,28 @@ namespace DoFTools
                                                    nonzero)
                                             {
                                               if (j_non_zero_i && i_non_zero_e)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_this_cell[j],
                                                   dofs_on_other_cell[i]);
                                               if (j_non_zero_e && i_non_zero_i)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_other_cell[j],
                                                   dofs_on_this_cell[i]);
                                               if (j_non_zero_i && i_non_zero_i)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_this_cell[j],
                                                   dofs_on_this_cell[i]);
                                               if (j_non_zero_e && i_non_zero_e)
-                                                append_pair(
+                                                cell_entries.emplace_back(
                                                   dofs_on_other_cell[j],
                                                   dofs_on_other_cell[i]);
                                             }
                                         }
                                     }
                                 }
-                              sparsity.add_entries(make_array_view(rows),
-                                                   make_array_view(cols));
-                              rows.clear();
-                              cols.clear();
+                              sparsity.add_entries(
+                                make_array_view(cell_entries));
+                              cell_entries.clear();
                             }
                           else
                             {
@@ -1041,63 +1039,78 @@ namespace DoFTools
                                         support_on_face(j, neighbor_face_n);
                                       if (flux_dof_mask(i, j) == always)
                                         {
-                                          append_pair(dofs_on_this_cell[i],
-                                                      dofs_on_other_cell[j]);
-                                          append_pair(dofs_on_other_cell[i],
-                                                      dofs_on_this_cell[j]);
-                                          append_pair(dofs_on_this_cell[i],
-                                                      dofs_on_this_cell[j]);
-                                          append_pair(dofs_on_other_cell[i],
-                                                      dofs_on_other_cell[j]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_this_cell[i],
+                                            dofs_on_other_cell[j]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_other_cell[i],
+                                            dofs_on_this_cell[j]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_this_cell[i],
+                                            dofs_on_this_cell[j]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_other_cell[i],
+                                            dofs_on_other_cell[j]);
                                         }
                                       if (flux_dof_mask(i, j) == nonzero)
                                         {
                                           if (i_non_zero_i && j_non_zero_e)
-                                            append_pair(dofs_on_this_cell[i],
-                                                        dofs_on_other_cell[j]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_this_cell[i],
+                                              dofs_on_other_cell[j]);
                                           if (i_non_zero_e && j_non_zero_i)
-                                            append_pair(dofs_on_other_cell[i],
-                                                        dofs_on_this_cell[j]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_other_cell[i],
+                                              dofs_on_this_cell[j]);
                                           if (i_non_zero_i && j_non_zero_i)
-                                            append_pair(dofs_on_this_cell[i],
-                                                        dofs_on_this_cell[j]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_this_cell[i],
+                                              dofs_on_this_cell[j]);
                                           if (i_non_zero_e && j_non_zero_e)
-                                            append_pair(dofs_on_other_cell[i],
-                                                        dofs_on_other_cell[j]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_other_cell[i],
+                                              dofs_on_other_cell[j]);
                                         }
 
                                       if (flux_dof_mask(j, i) == always)
                                         {
-                                          append_pair(dofs_on_this_cell[j],
-                                                      dofs_on_other_cell[i]);
-                                          append_pair(dofs_on_other_cell[j],
-                                                      dofs_on_this_cell[i]);
-                                          append_pair(dofs_on_this_cell[j],
-                                                      dofs_on_this_cell[i]);
-                                          append_pair(dofs_on_other_cell[j],
-                                                      dofs_on_other_cell[i]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_this_cell[j],
+                                            dofs_on_other_cell[i]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_other_cell[j],
+                                            dofs_on_this_cell[i]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_this_cell[j],
+                                            dofs_on_this_cell[i]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_other_cell[j],
+                                            dofs_on_other_cell[i]);
                                         }
                                       if (flux_dof_mask(j, i) == nonzero)
                                         {
                                           if (j_non_zero_i && i_non_zero_e)
-                                            append_pair(dofs_on_this_cell[j],
-                                                        dofs_on_other_cell[i]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_this_cell[j],
+                                              dofs_on_other_cell[i]);
                                           if (j_non_zero_e && i_non_zero_i)
-                                            append_pair(dofs_on_other_cell[j],
-                                                        dofs_on_this_cell[i]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_other_cell[j],
+                                              dofs_on_this_cell[i]);
                                           if (j_non_zero_i && i_non_zero_i)
-                                            append_pair(dofs_on_this_cell[j],
-                                                        dofs_on_this_cell[i]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_this_cell[j],
+                                              dofs_on_this_cell[i]);
                                           if (j_non_zero_e && i_non_zero_e)
-                                            append_pair(dofs_on_other_cell[j],
-                                                        dofs_on_other_cell[i]);
+                                            cell_entries.emplace_back(
+                                              dofs_on_other_cell[j],
+                                              dofs_on_other_cell[i]);
                                         }
                                     }
                                 }
-                              sparsity.add_entries(make_array_view(rows),
-                                                   make_array_view(cols));
-                              rows.clear();
-                              cols.clear();
+                              sparsity.add_entries(
+                                make_array_view(cell_entries));
+                              cell_entries.clear();
                             }
                         }
                     }
@@ -1287,7 +1300,7 @@ namespace DoFTools
                                           if ((flux_mask(ii, jj) == always) ||
                                               (flux_mask(ii, jj) == nonzero))
                                             {
-                                              append_pair(
+                                              cell_entries.emplace_back(
                                                 dofs_on_this_cell[i],
                                                 dofs_on_other_cell[j]);
                                             }
@@ -1295,8 +1308,9 @@ namespace DoFTools
                                           if ((flux_mask(jj, ii) == always) ||
                                               (flux_mask(jj, ii) == nonzero))
                                             {
-                                              append_pair(dofs_on_other_cell[j],
-                                                          dofs_on_this_cell[i]);
+                                              cell_entries.emplace_back(
+                                                dofs_on_other_cell[j],
+                                                dofs_on_this_cell[i]);
                                             }
                                         }
                                     }
@@ -1343,25 +1357,25 @@ namespace DoFTools
                                       if ((flux_mask(ii, jj) == always) ||
                                           (flux_mask(ii, jj) == nonzero))
                                         {
-                                          append_pair(dofs_on_this_cell[i],
-                                                      dofs_on_other_cell[j]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_this_cell[i],
+                                            dofs_on_other_cell[j]);
                                         }
 
                                       if ((flux_mask(jj, ii) == always) ||
                                           (flux_mask(jj, ii) == nonzero))
                                         {
-                                          append_pair(dofs_on_other_cell[j],
-                                                      dofs_on_this_cell[i]);
+                                          cell_entries.emplace_back(
+                                            dofs_on_other_cell[j],
+                                            dofs_on_this_cell[i]);
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                  sparsity.add_entries(make_array_view(rows),
-                                       make_array_view(cols));
-                  rows.clear();
-                  cols.clear();
+                  sparsity.add_entries(make_array_view(cell_entries));
+                  cell_entries.clear();
                 }
           }
       }
