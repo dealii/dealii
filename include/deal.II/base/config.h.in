@@ -481,6 +481,7 @@ _Pragma("GCC diagnostic ignored \"-Wdeprecated-copy\"")                 \
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")         \
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-volatile\"")             \
 _Pragma("GCC diagnostic ignored \"-Wexpansion-to-defined\"")            \
+_Pragma("GCC diagnostic ignored \"-Wfloat-conversion\"")                \
 _Pragma("GCC diagnostic ignored \"-Wignored-attributes\"")              \
 _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")              \
 _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"")            \

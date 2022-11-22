@@ -31,6 +31,18 @@ OPTION(DEAL_II_FORCE_BUNDLED_BOOST
 SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
 
 #
+# Kokkos
+#
+
+SET(FEATURE_KOKKOS_HAVE_BUNDLED TRUE)
+
+OPTION(DEAL_II_FORCE_BUNDLED_KOKKOS
+  "Always use the bundled Kokkos library instead of an external one."
+  OFF)
+
+SET(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
+
+#
 # Taskflow
 #
 

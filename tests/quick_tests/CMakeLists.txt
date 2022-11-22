@@ -196,6 +196,9 @@ IF (DEAL_II_WITH_SYMENGINE)
   make_quicktest("symengine" ${_mybuild} "")
 ENDIF()
 
+# Test Kokkos
+make_quicktest("kokkos" ${_mybuild} "")
+
 # A custom test target:
 ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -DCMAKE_BUILD_TYPE=${_mybuild} -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2021 by the deal.II authors
+## Copyright (C) 2021 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,9 +32,12 @@ IF(DEAL_II_TRILINOS_WITH_KOKKOS)
   # Let deal.II know that we have found Kokkos
   SET(KOKKOS_FOUND ON)
 ELSE()
-  FIND_PACKAGE(Kokkos
+  # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
+  LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  FIND_PACKAGE(Kokkos 3.7.0
     HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
     )
+  LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
   IF(Kokkos_FOUND)
     # We are only interested in Kokkos if it is not part of Trilinos
