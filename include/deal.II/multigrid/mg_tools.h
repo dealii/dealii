@@ -76,8 +76,8 @@ namespace MGTools
   /**
    * Write the sparsity structure of the matrix belonging to the specified @p
    * level. The sparsity pattern is not compressed, so before creating the
-   * actual matrix you have to compress the matrix yourself, using
-   * <tt>SparsityPatternType::compress()</tt>.
+   * actual matrix you have to compress the matrix yourself, either using
+   * SparsityPattern::compress() or by copying to a SparsityPattern.
    *
    * The optional AffineConstraints argument allows to define constraints of
    * the level matrices like Dirichlet boundary conditions. Note that there is
@@ -85,14 +85,11 @@ namespace MGTools
    * one level is considered. See DoFTools::make_sparsity_pattern() for more
    * details about the arguments.
    */
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number = double>
+  template <int dim, int spacedim, typename number = double>
   void
   make_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof_handler,
-    SparsityPatternType &            sparsity,
+    SparsityPatternBase &            sparsity,
     const unsigned int               level,
     const AffineConstraints<number> &constraints = AffineConstraints<number>(),
     const bool                       keep_constrained_dofs = true);
@@ -105,14 +102,11 @@ namespace MGTools
    * and
    * @ref DoFTools
    */
-  template <int dim,
-            int spacedim,
-            typename SparsityPatternType,
-            typename number = double>
+  template <int dim, int spacedim, typename number = double>
   void
   make_flux_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof_handler,
-    SparsityPatternType &            sparsity,
+    SparsityPatternBase &            sparsity,
     const unsigned int               level,
     const AffineConstraints<number> &constraints = AffineConstraints<number>(),
     const bool                       keep_constrained_dofs = true);
@@ -124,10 +118,10 @@ namespace MGTools
    *
    * make_flux_sparsity_pattern()
    */
-  template <int dim, typename SparsityPatternType, int spacedim>
+  template <int dim, int spacedim>
   void
   make_flux_sparsity_pattern_edge(const DoFHandler<dim, spacedim> &dof_handler,
-                                  SparsityPatternType &            sparsity,
+                                  SparsityPatternBase &            sparsity,
                                   const unsigned int               level);
   /**
    * This function does the same as the other with the same name, but it gets
@@ -138,10 +132,10 @@ namespace MGTools
    * There is one matrix for couplings in a cell and one for the couplings
    * occurring in fluxes.
    */
-  template <int dim, typename SparsityPatternType, int spacedim>
+  template <int dim, int spacedim>
   void
   make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &   dof,
-                             SparsityPatternType &               sparsity,
+                             SparsityPatternBase &               sparsity,
                              const unsigned int                  level,
                              const Table<2, DoFTools::Coupling> &int_mask,
                              const Table<2, DoFTools::Coupling> &flux_mask);
@@ -154,11 +148,11 @@ namespace MGTools
    *
    * make_flux_sparsity_pattern()
    */
-  template <int dim, typename SparsityPatternType, int spacedim>
+  template <int dim, int spacedim>
   void
   make_flux_sparsity_pattern_edge(
     const DoFHandler<dim, spacedim> &   dof_handler,
-    SparsityPatternType &               sparsity,
+    SparsityPatternBase &               sparsity,
     const unsigned int                  level,
     const Table<2, DoFTools::Coupling> &flux_mask);
 
@@ -169,11 +163,11 @@ namespace MGTools
    * degrees of freedom on a refinement edge to those not on the refinement edge
    * of a certain level.
    */
-  template <int dim, int spacedim, typename SparsityPatternType>
+  template <int dim, int spacedim>
   void
   make_interface_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
                                   const MGConstrainedDoFs &mg_constrained_dofs,
-                                  SparsityPatternType &    sparsity,
+                                  SparsityPatternBase &    sparsity,
                                   const unsigned int       level);
 
 
