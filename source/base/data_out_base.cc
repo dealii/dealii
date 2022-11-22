@@ -578,11 +578,9 @@ namespace DataOutBase
 
   template <int dim>
   void
-  DataOutFilter::write_cell(const unsigned int index,
-                            const unsigned int start,
-                            const unsigned int d1,
-                            const unsigned int d2,
-                            const unsigned int d3)
+  DataOutFilter::write_cell(const unsigned int                   index,
+                            const unsigned int                   start,
+                            const std::array<unsigned int, dim> &offsets)
   {
     ++num_cells;
 
@@ -592,31 +590,48 @@ namespace DataOutBase
     switch (dim)
       {
         case 0:
-          internal_add_cell(base_entry + 0, start);
-          break;
+          {
+            internal_add_cell(base_entry + 0, start);
+            break;
+          }
 
         case 1:
-          internal_add_cell(base_entry + 0, start);
-          internal_add_cell(base_entry + 1, start + d1);
-          break;
+          {
+            const unsigned int d1 = offsets[0];
+
+            internal_add_cell(base_entry + 0, start);
+            internal_add_cell(base_entry + 1, start + d1);
+            break;
+          }
 
         case 2:
-          internal_add_cell(base_entry + 0, start);
-          internal_add_cell(base_entry + 1, start + d1);
-          internal_add_cell(base_entry + 2, start + d2 + d1);
-          internal_add_cell(base_entry + 3, start + d2);
-          break;
+          {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
+
+            internal_add_cell(base_entry + 0, start);
+            internal_add_cell(base_entry + 1, start + d1);
+            internal_add_cell(base_entry + 2, start + d2 + d1);
+            internal_add_cell(base_entry + 3, start + d2);
+            break;
+          }
 
         case 3:
-          internal_add_cell(base_entry + 0, start);
-          internal_add_cell(base_entry + 1, start + d1);
-          internal_add_cell(base_entry + 2, start + d2 + d1);
-          internal_add_cell(base_entry + 3, start + d2);
-          internal_add_cell(base_entry + 4, start + d3);
-          internal_add_cell(base_entry + 5, start + d3 + d1);
-          internal_add_cell(base_entry + 6, start + d3 + d2 + d1);
-          internal_add_cell(base_entry + 7, start + d3 + d2);
-          break;
+          {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
+            const unsigned int d3 = offsets[2];
+
+            internal_add_cell(base_entry + 0, start);
+            internal_add_cell(base_entry + 1, start + d1);
+            internal_add_cell(base_entry + 2, start + d2 + d1);
+            internal_add_cell(base_entry + 3, start + d2);
+            internal_add_cell(base_entry + 4, start + d3);
+            internal_add_cell(base_entry + 5, start + d3 + d1);
+            internal_add_cell(base_entry + 6, start + d3 + d2 + d1);
+            internal_add_cell(base_entry + 7, start + d3 + d2);
+            break;
+          }
 
         default:
           Assert(false, ExcNotImplemented());
@@ -1277,9 +1292,7 @@ namespace
     void
     write_cell(const unsigned int /*index*/,
                const unsigned int /*start*/,
-               const unsigned int /*x_offset*/,
-               const unsigned int /*y_offset*/,
-               const unsigned int /*z_offset*/)
+               std::array<unsigned int, dim> & /*offsets*/)
     {
       Assert(false,
              ExcMessage("The derived class you are using needs to "
@@ -1375,11 +1388,9 @@ namespace
      */
     template <int dim>
     void
-    write_cell(const unsigned int index,
-               const unsigned int start,
-               const unsigned int x_offset,
-               const unsigned int y_offset,
-               const unsigned int z_offset);
+    write_cell(const unsigned int                   index,
+               const unsigned int                   start,
+               const std::array<unsigned int, dim> &offsets);
 
     /**
      * Write a complete set of data for a single node.
@@ -1414,11 +1425,9 @@ namespace
      */
     template <int dim>
     void
-    write_cell(const unsigned int index,
-               const unsigned int start,
-               const unsigned int x_offset,
-               const unsigned int y_offset,
-               const unsigned int z_offset);
+    write_cell(const unsigned int                   index,
+               const unsigned int                   start,
+               const std::array<unsigned int, dim> &offsets);
   };
 
   /**
@@ -1443,11 +1452,9 @@ namespace
      */
     template <int dim>
     void
-    write_cell(const unsigned int index,
-               const unsigned int start,
-               const unsigned int x_offset,
-               const unsigned int y_offset,
-               const unsigned int z_offset);
+    write_cell(const unsigned int                   index,
+               const unsigned int                   start,
+               const std::array<unsigned int, dim> &offsets);
   };
 
   /**
@@ -1474,11 +1481,9 @@ namespace
      */
     template <int dim>
     void
-    write_cell(const unsigned int index,
-               const unsigned int start,
-               const unsigned int x_offset,
-               const unsigned int y_offset,
-               const unsigned int z_offset);
+    write_cell(const unsigned int                   index,
+               const unsigned int                   start,
+               const std::array<unsigned int, dim> &offsets);
 
     /**
      * Write a complete set of data for a single node.
@@ -1513,11 +1518,9 @@ namespace
      */
     template <int dim>
     void
-    write_cell(const unsigned int index,
-               const unsigned int start,
-               const unsigned int x_offset,
-               const unsigned int y_offset,
-               const unsigned int z_offset);
+    write_cell(const unsigned int                   index,
+               const unsigned int                   start,
+               const std::array<unsigned int, dim> &offsets);
 
     /**
      * Print vertices [start, start+n_points[
@@ -1558,11 +1561,9 @@ namespace
      */
     template <int dim>
     void
-    write_cell(const unsigned int index,
-               const unsigned int start,
-               const unsigned int x_offset,
-               const unsigned int y_offset,
-               const unsigned int z_offset);
+    write_cell(const unsigned int                   index,
+               const unsigned int                   start,
+               const std::array<unsigned int, dim> &offsets);
 
     /**
      * Print vertices [start, start+n_points[
@@ -1638,12 +1639,9 @@ namespace
      * Set up the node numbers for a given cell being written to an output
      * stream.
      */
-    template <int dim>
-    std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
+    std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
     set_node_numbers(const unsigned int /*start*/,
-                     const unsigned int /*d1*/,
-                     const unsigned int /*d2*/,
-                     const unsigned int /*d3*/)
+                     const std::array<unsigned int, 0> & /*d1*/)
     {
       Assert(false, ExcInternalError());
       return {};
@@ -1651,30 +1649,26 @@ namespace
 
 
 
-    template <>
     std::array<unsigned int, GeometryInfo<1>::vertices_per_cell>
-    set_node_numbers<1>(const unsigned int start,
-                        const unsigned int d1,
-                        const unsigned int /*d2*/,
-                        const unsigned int /*d3*/)
-
+    set_node_numbers(const unsigned int                 start,
+                     const std::array<unsigned int, 1> &offsets)
     {
       std::array<unsigned int, GeometryInfo<1>::vertices_per_cell> nodes;
       nodes[0] = start;
-      nodes[1] = start + d1;
+      nodes[1] = start + offsets[0];
       return nodes;
     }
 
 
 
-    template <>
     std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>
-    set_node_numbers<2>(const unsigned int start,
-                        const unsigned int d1,
-                        const unsigned int d2,
-                        const unsigned int /*d3*/)
+    set_node_numbers(const unsigned int                 start,
+                     const std::array<unsigned int, 2> &offsets)
 
     {
+      const unsigned int d1 = offsets[0];
+      const unsigned int d2 = offsets[1];
+
       std::array<unsigned int, GeometryInfo<2>::vertices_per_cell> nodes;
       nodes[0] = start;
       nodes[1] = start + d1;
@@ -1685,13 +1679,14 @@ namespace
 
 
 
-    template <>
     std::array<unsigned int, GeometryInfo<3>::vertices_per_cell>
-    set_node_numbers<3>(const unsigned int start,
-                        const unsigned int d1,
-                        const unsigned int d2,
-                        const unsigned int d3)
+    set_node_numbers(const unsigned int                 start,
+                     const std::array<unsigned int, 3> &offsets)
     {
+      const unsigned int d1 = offsets[0];
+      const unsigned int d2 = offsets[1];
+      const unsigned int d3 = offsets[2];
+
       std::array<unsigned int, GeometryInfo<3>::vertices_per_cell> nodes;
       nodes[0] = start;
       nodes[1] = start + d1;
@@ -1709,14 +1704,12 @@ namespace
 
   template <int dim>
   void
-  DXStream::write_cell(unsigned int,
-                       unsigned int start,
-                       unsigned int d1,
-                       unsigned int d2,
-                       unsigned int d3)
+  DXStream::write_cell(const unsigned int,
+                       const unsigned int                   start,
+                       const std::array<unsigned int, dim> &offsets)
   {
     const auto nodes =
-      DataOutBaseImplementation::set_node_numbers<dim>(start, d1, d2, d3);
+      DataOutBaseImplementation::set_node_numbers(start, offsets);
 
     if (flags.int_binary)
       {
@@ -1776,11 +1769,9 @@ namespace
 
   template <int dim>
   void
-  GmvStream::write_cell(unsigned int,
-                        unsigned int s,
-                        unsigned int d1,
-                        unsigned int d2,
-                        unsigned int d3)
+  GmvStream::write_cell(const unsigned int,
+                        const unsigned int                   s,
+                        const std::array<unsigned int, dim> &offsets)
   {
     // Vertices are numbered starting with one.
     const unsigned int start = s + 1;
@@ -1796,6 +1787,7 @@ namespace
 
         case 1:
           {
+            const unsigned int d1 = offsets[0];
             stream << start;
             stream << '\t' << start + d1;
             break;
@@ -1803,6 +1795,8 @@ namespace
 
         case 2:
           {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
             stream << start;
             stream << '\t' << start + d1;
             stream << '\t' << start + d2 + d1 << '\t' << start + d2;
@@ -1811,6 +1805,9 @@ namespace
 
         case 3:
           {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
+            const unsigned int d3 = offsets[2];
             stream << start;
             stream << '\t' << start + d1;
             stream << '\t' << start + d2 + d1 << '\t' << start + d2;
@@ -1846,11 +1843,9 @@ namespace
 
   template <int dim>
   void
-  TecplotStream::write_cell(unsigned int,
-                            unsigned int s,
-                            unsigned int d1,
-                            unsigned int d2,
-                            unsigned int d3)
+  TecplotStream::write_cell(const unsigned int,
+                            const unsigned int                   s,
+                            const std::array<unsigned int, dim> &offsets)
   {
     const unsigned int start = s + 1;
 
@@ -1864,6 +1859,7 @@ namespace
 
         case 1:
           {
+            const unsigned int d1 = offsets[0];
             stream << start;
             stream << '\t' << start + d1;
             break;
@@ -1871,6 +1867,8 @@ namespace
 
         case 2:
           {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
             stream << start;
             stream << '\t' << start + d1;
             stream << '\t' << start + d2 + d1 << '\t' << start + d2;
@@ -1879,6 +1877,9 @@ namespace
 
         case 3:
           {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
+            const unsigned int d3 = offsets[2];
             stream << start;
             stream << '\t' << start + d1;
             stream << '\t' << start + d2 + d1 << '\t' << start + d2;
@@ -1918,14 +1919,12 @@ namespace
 
   template <int dim>
   void
-  UcdStream::write_cell(unsigned int index,
-                        unsigned int start,
-                        unsigned int d1,
-                        unsigned int d2,
-                        unsigned int d3)
+  UcdStream::write_cell(const unsigned int                   index,
+                        const unsigned int                   start,
+                        const std::array<unsigned int, dim> &offsets)
   {
     const auto nodes =
-      DataOutBaseImplementation::set_node_numbers<dim>(start, d1, d2, d3);
+      DataOutBaseImplementation::set_node_numbers(start, offsets);
 
     // Write out all cells and remember that all indices must be shifted by one.
     stream << index + 1 << "\t0 " << ucd_cell_type[dim];
@@ -1972,11 +1971,9 @@ namespace
 
   template <int dim>
   void
-  VtkStream::write_cell(unsigned int,
-                        unsigned int start,
-                        unsigned int d1,
-                        unsigned int d2,
-                        unsigned int d3)
+  VtkStream::write_cell(const unsigned int,
+                        const unsigned int                   start,
+                        const std::array<unsigned int, dim> &offsets)
   {
     stream << GeometryInfo<dim>::vertices_per_cell << '\t';
 
@@ -1990,6 +1987,7 @@ namespace
 
         case 1:
           {
+            const unsigned int d1 = offsets[0];
             stream << start;
             stream << '\t' << start + d1;
             break;
@@ -1997,6 +1995,8 @@ namespace
 
         case 2:
           {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
             stream << start;
             stream << '\t' << start + d1;
             stream << '\t' << start + d2 + d1 << '\t' << start + d2;
@@ -2005,6 +2005,9 @@ namespace
 
         case 3:
           {
+            const unsigned int d1 = offsets[0];
+            const unsigned int d2 = offsets[1];
+            const unsigned int d3 = offsets[2];
             stream << start;
             stream << '\t' << start + d1;
             stream << '\t' << start + d2 + d1 << '\t' << start + d2;
@@ -2061,11 +2064,9 @@ namespace
 
   template <int dim>
   void
-  VtuStream::write_cell(unsigned int,
-                        unsigned int start,
-                        unsigned int d1,
-                        unsigned int d2,
-                        unsigned int d3)
+  VtuStream::write_cell(const unsigned int,
+                        const unsigned int                   start,
+                        const std::array<unsigned int, dim> &offsets)
   {
 #ifdef DEAL_II_WITH_ZLIB
     if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
@@ -2073,31 +2074,45 @@ namespace
         switch (dim)
           {
             case 0:
-              cells.push_back(start);
-              break;
+              {
+                cells.push_back(start);
+                break;
+              }
 
             case 1:
-              cells.push_back(start);
-              cells.push_back(start + d1);
-              break;
+              {
+                const unsigned int d1 = offsets[0];
+                cells.push_back(start);
+                cells.push_back(start + d1);
+                break;
+              }
 
             case 2:
-              cells.push_back(start);
-              cells.push_back(start + d1);
-              cells.push_back(start + d2 + d1);
-              cells.push_back(start + d2);
-              break;
+              {
+                const unsigned int d1 = offsets[0];
+                const unsigned int d2 = offsets[1];
+                cells.push_back(start);
+                cells.push_back(start + d1);
+                cells.push_back(start + d2 + d1);
+                cells.push_back(start + d2);
+                break;
+              }
 
             case 3:
-              cells.push_back(start);
-              cells.push_back(start + d1);
-              cells.push_back(start + d2 + d1);
-              cells.push_back(start + d2);
-              cells.push_back(start + d3);
-              cells.push_back(start + d3 + d1);
-              cells.push_back(start + d3 + d2 + d1);
-              cells.push_back(start + d3 + d2);
-              break;
+              {
+                const unsigned int d1 = offsets[0];
+                const unsigned int d2 = offsets[1];
+                const unsigned int d3 = offsets[2];
+                cells.push_back(start);
+                cells.push_back(start + d1);
+                cells.push_back(start + d2 + d1);
+                cells.push_back(start + d2);
+                cells.push_back(start + d3);
+                cells.push_back(start + d3 + d1);
+                cells.push_back(start + d3 + d2 + d1);
+                cells.push_back(start + d3 + d2);
+                break;
+              }
 
             default:
               Assert(false, ExcNotImplemented());
@@ -2109,24 +2124,38 @@ namespace
         switch (dim)
           {
             case 0:
-              stream << start;
-              break;
+              {
+                stream << start;
+                break;
+              }
 
             case 1:
-              stream << start << '\t' << start + d1;
-              break;
+              {
+                const unsigned int d1 = offsets[0];
+                stream << start << '\t' << start + d1;
+                break;
+              }
 
             case 2:
-              stream << start << '\t' << start + d1 << '\t' << start + d2 + d1
-                     << '\t' << start + d2;
-              break;
+              {
+                const unsigned int d1 = offsets[0];
+                const unsigned int d2 = offsets[1];
+                stream << start << '\t' << start + d1 << '\t' << start + d2 + d1
+                       << '\t' << start + d2;
+                break;
+              }
 
             case 3:
-              stream << start << '\t' << start + d1 << '\t' << start + d2 + d1
-                     << '\t' << start + d2 << '\t' << start + d3 << '\t'
-                     << start + d3 + d1 << '\t' << start + d3 + d2 + d1 << '\t'
-                     << start + d3 + d2;
-              break;
+              {
+                const unsigned int d1 = offsets[0];
+                const unsigned int d2 = offsets[1];
+                const unsigned int d3 = offsets[2];
+                stream << start << '\t' << start + d1 << '\t' << start + d2 + d1
+                       << '\t' << start + d2 << '\t' << start + d3 << '\t'
+                       << start + d3 + d1 << '\t' << start + d3 + d2 + d1
+                       << '\t' << start + d3 + d2;
+                break;
+              }
 
             default:
               Assert(false, ExcNotImplemented());
@@ -3097,9 +3126,10 @@ namespace DataOutBase
                 case 0:
                   {
                     const unsigned int offset = first_vertex_of_patch;
-                    out.template write_cell<dim>(count++, offset, 0, 0, 0);
+                    out.template write_cell<0>(count++, offset, {});
                     break;
                   }
+
                 case 1:
                   {
                     const unsigned int d1 = 1;
@@ -3108,11 +3138,12 @@ namespace DataOutBase
                       {
                         const unsigned int offset =
                           first_vertex_of_patch + i1 * d1;
-                        out.template write_cell<dim>(count++, offset, d1, 0, 0);
+                        out.template write_cell<1>(count++, offset, {{d1}});
                       }
 
                     break;
                   }
+
                 case 2:
                   {
                     const unsigned int d1 = 1;
@@ -3123,12 +3154,14 @@ namespace DataOutBase
                         {
                           const unsigned int offset =
                             first_vertex_of_patch + i2 * d2 + i1 * d1;
-                          out.template write_cell<dim>(
-                            count++, offset, d1, d2, 0);
+                          out.template write_cell<2>(count++,
+                                                     offset,
+                                                     {{d1, d2}});
                         }
 
                     break;
                   }
+
                 case 3:
                   {
                     const unsigned int d1 = 1;
@@ -3142,8 +3175,9 @@ namespace DataOutBase
                             const unsigned int offset = first_vertex_of_patch +
                                                         i3 * d3 + i2 * d2 +
                                                         i1 * d1;
-                            out.template write_cell<dim>(
-                              count++, offset, d1, d2, d3);
+                            out.template write_cell<3>(count++,
+                                                       offset,
+                                                       {{d1, d2, d3}});
                           }
 
                     break;
@@ -6272,25 +6306,74 @@ namespace DataOutBase
               {
                 const unsigned int n_subdivisions = patch.n_subdivisions;
                 const unsigned int n              = n_subdivisions + 1;
-                // Length of loops in all dimensions
-                const unsigned int n1 = (dim > 0) ? n_subdivisions : 1;
-                const unsigned int n2 = (dim > 1) ? n_subdivisions : 1;
-                const unsigned int n3 = (dim > 2) ? n_subdivisions : 1;
-                // Offsets of outer loops
-                const unsigned int d1 = 1;
-                const unsigned int d2 = n;
-                const unsigned int d3 = n * n;
-                for (unsigned int i3 = 0; i3 < n3; ++i3)
-                  for (unsigned int i2 = 0; i2 < n2; ++i2)
-                    for (unsigned int i1 = 0; i1 < n1; ++i1)
+
+                switch (dim)
+                  {
+                    case 0:
                       {
-                        const unsigned int offset =
-                          first_vertex_of_patch + i3 * d3 + i2 * d2 + i1 * d1;
+                        const unsigned int offset = first_vertex_of_patch;
                         // First write line in x direction
-                        vtu_out.template write_cell<dim>(
-                          count++, offset, d1, d2, d3);
+                        vtu_out.template write_cell<0>(count++, offset, {});
+                        break;
                       }
-                // finally update the number of the first vertex of this patch
+
+                    case 1:
+                      {
+                        const unsigned int d1 = 1;
+                        for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+                          {
+                            const unsigned int offset =
+                              first_vertex_of_patch + i1 * d1;
+                            // First write line in x direction
+                            vtu_out.template write_cell<1>(count++,
+                                                           offset,
+                                                           {{d1}});
+                          }
+                        break;
+                      }
+
+                    case 2:
+                      {
+                        const unsigned int d1 = 1;
+                        const unsigned int d2 = n;
+                        for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+                          for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+                            {
+                              const unsigned int offset =
+                                first_vertex_of_patch + i2 * d2 + i1 * d1;
+                              // First write line in x direction
+                              vtu_out.template write_cell<2>(count++,
+                                                             offset,
+                                                             {{d1, d2}});
+                            }
+                        break;
+                      }
+
+                    case 3:
+                      {
+                        const unsigned int d1 = 1;
+                        const unsigned int d2 = n;
+                        const unsigned int d3 = n * n;
+                        for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
+                          for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+                            for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+                              {
+                                const unsigned int offset =
+                                  first_vertex_of_patch + i3 * d3 + i2 * d2 +
+                                  i1 * d1;
+                                // First write line in x direction
+                                vtu_out.template write_cell<3>(count++,
+                                                               offset,
+                                                               {{d1, d2, d3}});
+                              }
+                        break;
+                      }
+
+                    default:
+                      Assert(false, ExcNotImplemented());
+                  }
+
+                // Finally update the number of the first vertex of this patch
                 first_vertex_of_patch +=
                   Utilities::fixed_power<dim>(n_subdivisions + 1);
               }
