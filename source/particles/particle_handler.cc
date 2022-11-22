@@ -1542,6 +1542,15 @@ namespace Particles
     ghost_particles_cache.ghost_particles_by_domain.clear();
     ghost_particles_cache.valid = false;
 
+    // In the case of a parallel simulation with periodic boundary conditions
+    // the vertices associated with periodic boundaries are not directly
+    // connected to the ghost cells but they are connected to the ghost cells
+    // through their coinciding vertices. We gather this information using the
+    // vertices_with_ghost_neighbors map
+    const std::map<unsigned int, std::set<types::subdomain_id>>
+      &vertices_with_ghost_neighbors =
+        triangulation_cache->get_vertices_with_ghost_neighbors();
+
     const std::set<types::subdomain_id> ghost_owners =
       parallel_triangulation->ghost_owners();
     for (const auto ghost_owner : ghost_owners)
@@ -1558,9 +1567,15 @@ namespace Particles
             std::set<unsigned int> cell_to_neighbor_subdomain;
             for (const unsigned int v : cell->vertex_indices())
               {
-                cell_to_neighbor_subdomain.insert(
-                  vertex_to_neighbor_subdomain[cell->vertex_index(v)].begin(),
-                  vertex_to_neighbor_subdomain[cell->vertex_index(v)].end());
+                const auto vertex_ghost_neighbors =
+                  vertices_with_ghost_neighbors.find(cell->vertex_index(v));
+                if (vertex_ghost_neighbors !=
+                    vertices_with_ghost_neighbors.end())
+                  {
+                    cell_to_neighbor_subdomain.insert(
+                      vertex_ghost_neighbors->second.begin(),
+                      vertex_ghost_neighbors->second.end());
+                  }
               }
 
             if (cell_to_neighbor_subdomain.size() > 0)
