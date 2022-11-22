@@ -42,7 +42,7 @@ IF(NOT DEAL_II_WITH_KOKKOS)
   ELSE()
     MESSAGE(FATAL_ERROR "\n"
       "Unmet configuration requirements: "
-      "DEAL_II_WITH_KOKKOS required, but set to OFF!.\n\n"
+      "DEAL_II_WITH_KOKKOS required, but set to OFF!\n\n"
       )
   ENDIF()
 ENDIF()
