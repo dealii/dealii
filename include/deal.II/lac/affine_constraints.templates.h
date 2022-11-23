@@ -709,19 +709,21 @@ AffineConstraints<number>::close()
       largest_idx = std::max(largest_idx, entry.first);
 #endif
 
-  // replace references to dofs that are themselves constrained. note that
-  // because we may replace references to other dofs that may themselves be
-  // constrained to third ones, we have to iterate over all this until we
-  // replace no chains of constraints any more
-  //
-  // the iteration replaces references to constrained degrees of freedom by
-  // second-order references. for example if x3=x0/2+x2/2 and x2=x0/2+x1/2,
-  // then the new list will be x3=x0/2+x0/4+x1/4. note that x0 appear
-  // twice. we will throw this duplicate out in the following step, where
-  // we sort the list so that throwing out duplicates becomes much more
-  // efficient. also, we have to do it only once, rather than in each
-  // iteration
+      // replace references to dofs that are themselves constrained. note that
+      // because we may replace references to other dofs that may themselves be
+      // constrained to third ones, we have to iterate over all this until we
+      // replace no chains of constraints any more
+      //
+      // the iteration replaces references to constrained degrees of freedom by
+      // second-order references. for example if x3=x0/2+x2/2 and x2=x0/2+x1/2,
+      // then the new list will be x3=x0/2+x0/4+x1/4. note that x0 appear
+      // twice. we will throw this duplicate out in the following step, where
+      // we sort the list so that throwing out duplicates becomes much more
+      // efficient. also, we have to do it only once, rather than in each
+      // iteration
+#ifdef DEBUG
   size_type iteration = 0;
+#endif
   while (true)
     {
       bool chained_constraint_replaced = false;
@@ -824,11 +826,13 @@ AffineConstraints<number>::close()
       if (chained_constraint_replaced == false)
         break;
 
+#ifdef DEBUG
       // increase iteration count. note that we should not iterate more
       // times than there are constraints, since this puts a natural upper
       // bound on the length of constraint chains
       ++iteration;
       Assert(iteration <= lines.size(), ExcInternalError());
+#endif
     }
 
   // finally sort the entries and re-scale them if necessary. in this step,

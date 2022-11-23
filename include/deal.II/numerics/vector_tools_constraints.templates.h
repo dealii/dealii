@@ -1537,6 +1537,7 @@ namespace VectorTools
       }
     AssertDimension(n_total_constraints_found,
                     no_normal_flux_constraints.n_constraints());
+    (void)n_total_constraints_found;
   }
 
 
