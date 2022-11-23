@@ -27,7 +27,7 @@ class polymorphic_derived2 :
 
 // we use this because we want to assign a key to this type
 // but we don't want to explicitly instantiate code every time
-// we do so!!!.  If we don't do this, we end up with the same
+// we do so!!! If we don't do this, we end up with the same
 // code in BOTH the DLL which implements polymorphic_derived2
 // as well as the main program.
 BOOST_CLASS_EXPORT_KEY(polymorphic_derived2)

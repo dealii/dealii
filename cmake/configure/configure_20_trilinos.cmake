@@ -177,6 +177,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     IF(DEAL_II_TRILINOS_WITH_KOKKOS)
+      IF(DEAL_II_FORCE_BUNDLED_KOKKOS)
+        SET(TRILINOS_ADDITIONAL_ERROR_STRING
+          ${TRILINOS_ADDITIONAL_ERROR_STRING}
+          "The Trilinos installation (found at \"${TRILINOS_DIR}\")"
+          "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
+        SET(${var} FALSE)
+      ENDIF()
+
       IF(Kokkos_ENABLE_CUDA)
         # We need to disable SIMD vectorization for CUDA device code.
         # Otherwise, nvcc compilers from version 9 on will emit an error message like:

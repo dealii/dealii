@@ -19,6 +19,15 @@ and licensed under the Boost Software License Version 1.0. See
 A full version of the library can be downloaded at http://www.boost.org/.
 
 
+kokkos-*
+--------
+
+Contains the Kokkos project licensed under the 3-clause BSD license.
+
+A full version of the Kokkos project can be downloaded at
+https://github.com/kokkos/kokkos.
+
+
 taskflow-*
 --------------
 

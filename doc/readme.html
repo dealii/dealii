@@ -545,6 +545,9 @@
                 <p>
                     <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a> implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms.
                     To use a self compiled version, pass <code>-DKOKKOS_DIR=/path/to/kokkos</code> to the deal.II CMake call.
+                    The compiler must be able to compile code for all enabled backends. In case Cuda is enabled in Kokkos and nvcc should be used as device compiler,
+                    it is recommended to use the nvcc_wrapper script that comes with Kokkos as C++ compiler. clang++ or nvc++ (for Kokkos >= 4.0) could be used directly as C++ compiler.
+                    Also, Kokkos must be built with support for device lambdas, e.g., Kokkos_ENABLE_CUDA_LAMBDA=ON when configuring Kokkos with Cuda. For Kokkos >= 4.0 this is the default.
                 </p>
             </dd>
 
@@ -786,7 +789,8 @@
             <a href="http://faculty.cse.tamu.edu/davis/suitesparse.html">
           UMFPACK</a>,
             <a href="http://threadingbuildingblocks.org/" target="_top">Threading Building Blocks</a>,
-            <a href="http://www.boost.org/" target="_top">BOOST</a> and
+            <a href="http://www.boost.org/" target="_top">BOOST</a>,
+            <a href="http://github.com/kokkos/kokkos" target="_top">Kokkos</a>, and
             <a href="http://muparser.beltoforion.de/" target="_top">muparser</a>, courtesy of their authors. These are also covered by their own licenses; please refer to their webpages for more information.
         </li>
     </ul>
