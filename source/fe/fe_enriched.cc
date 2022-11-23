@@ -17,6 +17,7 @@
 #include <deal.II/fe/fe_enriched.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
 
 #include <memory>

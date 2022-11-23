@@ -31,10 +31,9 @@
 #include <deal.II/lac/petsc_block_sparse_matrix.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_sparsity_pattern.h>
 
 #include <deal.II/non_matching/coupling.h>
 

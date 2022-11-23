@@ -239,15 +239,6 @@ TRIANGULATIONS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
                     parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension>;
                     parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>;}
 
-// serial and parallel sparsity pattern types
-SPARSITY_PATTERNS := { SparsityPattern;
-                       DynamicSparsityPattern;
-                       @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
-
-                       BlockSparsityPattern;
-                       BlockDynamicSparsityPattern;
-                       @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
-
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }
 

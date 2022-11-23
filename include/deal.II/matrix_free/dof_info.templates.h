@@ -24,8 +24,6 @@
 #include <deal.II/base/parallel.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/sparsity_pattern.h>
 
 #include <deal.II/matrix_free/constraint_info.h>
 #include <deal.II/matrix_free/dof_info.h>
