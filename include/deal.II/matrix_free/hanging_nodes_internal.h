@@ -199,7 +199,7 @@ namespace internal
      * would be an integer which would in turn trigger a compiler warning when
      * we tried to assign it to an object of type UpdateFlags.
      */
-    DEAL_II_CUDA_HOST_DEV inline ConstraintKinds
+    DEAL_II_HOST_DEV inline ConstraintKinds
     operator|(const ConstraintKinds f1, const ConstraintKinds f2)
     {
       return static_cast<ConstraintKinds>(static_cast<std::uint16_t>(f1) |
@@ -212,7 +212,7 @@ namespace internal
      * Global operator which sets the bits from the second argument also in the
      * first one.
      */
-    DEAL_II_CUDA_HOST_DEV inline ConstraintKinds &
+    DEAL_II_HOST_DEV inline ConstraintKinds &
     operator|=(ConstraintKinds &f1, const ConstraintKinds f2)
     {
       f1 = f1 | f2;
@@ -224,7 +224,7 @@ namespace internal
     /**
      * Global operator which checks inequality.
      */
-    DEAL_II_CUDA_HOST_DEV inline bool
+    DEAL_II_HOST_DEV inline bool
     operator!=(const ConstraintKinds f1, const ConstraintKinds f2)
     {
       return static_cast<std::uint16_t>(f1) != static_cast<std::uint16_t>(f2);
@@ -236,7 +236,7 @@ namespace internal
      * Global operator which checks if the first argument is less than the
      * second.
      */
-    DEAL_II_CUDA_HOST_DEV inline bool
+    DEAL_II_HOST_DEV inline bool
     operator<(const ConstraintKinds f1, const ConstraintKinds f2)
     {
       return static_cast<std::uint16_t>(f1) < static_cast<std::uint16_t>(f2);
@@ -247,7 +247,7 @@ namespace internal
     /**
      * Global operator which performs a binary and for the provided arguments.
      */
-    DEAL_II_CUDA_HOST_DEV inline ConstraintKinds
+    DEAL_II_HOST_DEV inline ConstraintKinds
     operator&(const ConstraintKinds f1, const ConstraintKinds f2)
     {
       return static_cast<ConstraintKinds>(static_cast<std::uint16_t>(f1) &
