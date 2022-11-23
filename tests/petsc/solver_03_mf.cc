@@ -62,5 +62,12 @@ main(int argc, char **argv)
                               control.last_step(),
                               42,
                               44);
+
+    u = 0.;
+    PETScWrappers::PreconditionShell preconditioner_user(A);
+    check_solver_within_range(solver.solve(A, u, f, preconditioner_user),
+                              control.last_step(),
+                              42,
+                              44);
   }
 }

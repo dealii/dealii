@@ -28,6 +28,8 @@
 
 #  include <petscpc.h>
 
+#  include <functional>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -38,7 +40,6 @@ namespace PETScWrappers
 #  ifndef DOXYGEN
   class MatrixBase;
   class VectorBase;
-  class SolverBase;
 #  endif
 
   /**
@@ -65,11 +66,9 @@ namespace PETScWrappers
     explicit PreconditionBase(const MPI_Comm &mpi_communicator);
 
     /**
-     * Constructor. This constructor is deprecated.
+     * Constructor.
      *
-     * @deprecated
      */
-    DEAL_II_DEPRECATED
     PreconditionBase();
 
     /**
@@ -79,7 +78,7 @@ namespace PETScWrappers
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
-     * called the constructor.
+     * called the default constructor.
      */
     void
     clear();
@@ -96,6 +95,12 @@ namespace PETScWrappers
     void
     Tvmult(VectorBase &dst, const VectorBase &src) const;
 
+    /**
+     * Explictly call setup. This is usually not needed since PETSc will
+     * automatically call the setup function when needed.
+     */
+    void
+    setup();
 
     /**
      * Give access to the underlying PETSc object.
@@ -106,42 +111,27 @@ namespace PETScWrappers
     /**
      * Return the MPI communicator object used by this preconditioner.
      */
-    MPI_Comm
+    const MPI_Comm &
     get_mpi_communicator() const;
 
   protected:
-    /**
-     * The communicator to be used for this preconditioner.
-     */
-    MPI_Comm mpi_communicator;
-
     /**
      * The PETSc preconditioner object
      */
     PC pc;
 
     /**
-     * A pointer to the matrix that acts as a preconditioner.
-     */
-    Mat matrix;
-
-    /**
      * Internal function to create the PETSc preconditioner object. Fails if
      * called twice.
      */
     void
-    create_pc();
+    create_pc_with_mat(const MatrixBase &);
 
     /**
-     * Conversion operator to get a representation of the matrix that
-     * represents this preconditioner. We use this inside the actual solver,
-     * where we need to pass this matrix to the PETSc solvers.
+     * Internal function to create the PETSc preconditioner object.
      */
-    operator Mat() const;
-
-    // Make the solver class a friend, since it needs to call the conversion
-    // operator.
-    friend class SolverBase;
+    void
+    create_pc_with_comm(const MPI_Comm &);
   };
 
 
@@ -1088,6 +1078,67 @@ namespace PETScWrappers
      */
     void
     initialize();
+  };
+
+  class PreconditionShell : public PreconditionBase
+  {
+  public:
+    /**
+     * Empty Constructor. You need to call initialize() before using this
+     * object.
+     */
+    PreconditionShell() = default;
+
+    /**
+     * Constructor. Take the matrix which is used to form the preconditioner.
+     */
+    PreconditionShell(const MatrixBase &matrix);
+
+    /**
+     * Same as above but without setting a matrix to form the preconditioner.
+     */
+    PreconditionShell(const MPI_Comm &communicator);
+
+
+    /**
+     * The callback for the application of the preconditioner. Defaults to
+     * a copy operation if not provided.
+     */
+    std::function<int(VectorBase &dst, const VectorBase &src)> apply;
+
+    /**
+     * The callback for the application of the transposed preconditioner.
+     * Defaults to the non-transpose operation if not provided.
+     */
+    std::function<int(VectorBase &dst, const VectorBase &src)> applyT;
+
+  protected:
+    /**
+     * Initialize the preconditioner object without knowing a particular
+     * matrix. This function sets up the PCSHELL preconditioner
+     */
+    void
+    initialize(const MPI_Comm &comm);
+
+    /**
+     * Initialize the preconditioner object with a particular
+     * matrix. This function sets up the PCSHELL preconditioner
+     */
+    void
+    initialize(const MatrixBase &matrix);
+
+  private:
+    /**
+     * Callback-function invoked by PCApply
+     */
+    static int
+    pcapply(PC pc, Vec src, Vec dst);
+
+    /**
+     * Callback-function invoked by PCApplyTranspose
+     */
+    static int
+    pcapply_transpose(PC pc, Vec src, Vec dst);
   };
 
   /**
