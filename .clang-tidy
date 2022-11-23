@@ -12,7 +12,7 @@
 #   We don't care about "a"+to_string(5)+...
 #
 # - performance-no-automatic-move:
-#   All modern compiler perform the return value optimization and we prefer
+#   All modern compilers perform the return value optimization and we prefer
 #   to keep things const.
 #
 
