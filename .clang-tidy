@@ -31,7 +31,6 @@ Checks: >
   -modernize-use-override,
   -modernize-use-trailing-return-type,
   -modernize-use-transparent-functors,
-  use-emplace,
   mpi-*,
   performance-*,
   -performance-inefficient-string-concatenation,
