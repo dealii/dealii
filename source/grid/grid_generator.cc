@@ -1422,9 +1422,7 @@ namespace GridGenerator
 #  ifdef DEBUG
           unsigned int count = 0;
 #  endif
-          for (Triangulation<3>::cell_iterator cell = tria.begin();
-               cell != tria.end();
-               ++cell)
+          for (const auto &cell : tria.cell_iterators())
             if (cell->face(5)->at_boundary())
               {
                 cell->face(5)->set_all_boundary_ids(1);
