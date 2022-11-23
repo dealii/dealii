@@ -41,12 +41,6 @@ namespace PETScWrappers
 
 
 
-  PreconditionBase::PreconditionBase()
-    : PreconditionBase(MPI_COMM_NULL)
-  {}
-
-
-
   PreconditionBase::~PreconditionBase()
   {
     try
