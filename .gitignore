@@ -12,6 +12,10 @@ qtcreator/
 # qt creator
 CMakeLists.txt.user
 
+# clangd
+/.cache
+/.clangd
+
 # misc
 /compile_commands.json
 /.clang_complete
