@@ -2,12 +2,39 @@
 #
 # See ./contrib/utilities/run_clang_tidy.sh for details
 
+#
 # Rationale for disabling warnings:
 #
-# - modernize-concat-nested-namespaces: This is c++17 only.
-# - performance-inefficient-string-concatenation: We don't care about "a"+to_string(5)+...
-# - performance-no-automatic-move: All modern compiler perform the return value optimization and we prefer to keep things const.
+# - selected modernize-* warnings:
+#   Some of these produce a lot of noise for limited utility.
+#
+# - performance-inefficient-string-concatenation:
+#   We don't care about "a"+to_string(5)+...
+#
+# - performance-no-automatic-move:
+#   All modern compiler perform the return value optimization and we prefer
+#   to keep things const.
+#
 
-Checks: "-*,cppcoreguidelines-pro-type-static-cast-downcast,google-readability-casting,modernize-*,-modernize-pass-by-value,-modernize-raw-string-literal,-modernize-use-auto,-modernize-use-override,-modernize-use-default-member-init,-modernize-use-transparent-functors,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-modernize-avoid-c-arrays,-modernize-concat-nested-namespaces,use-emplace,mpi-*,performance-*,-performance-inefficient-string-concatenation,-performance-no-automatic-move"
+Checks: >
+  -*,
+  cppcoreguidelines-pro-type-static-cast-downcast,
+  google-readability-casting,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  -modernize-concat-nested-namespaces,
+  -modernize-pass-by-value,
+  -modernize-raw-string-literal,
+  -modernize-use-auto,
+  -modernize-use-default-member-init,
+  -modernize-use-nodiscard,
+  -modernize-use-override,
+  -modernize-use-trailing-return-type,
+  -modernize-use-transparent-functors,
+  use-emplace,
+  mpi-*,
+  performance-*,
+  -performance-inefficient-string-concatenation,
+  -performance-no-automatic-move
 
 WarningsAsErrors: '*'
