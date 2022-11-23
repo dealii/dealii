@@ -1414,25 +1414,23 @@ namespace GridGenerator
         }
       else if (tria.n_cells() == 96)
         {
-          // the 96-cell hypershell is
-          // based on a once refined
-          // 12-cell mesh. consequently,
-          // since the outer faces all
-          // are face_no==5 above, so
-          // they are here (unless they
-          // are in the interior). Use
-          // this to assign boundary
-          // indicators, but also make
-          // sure that we encounter
-          // exactly 48 such faces
+          // the 96-cell hypershell is based on a once refined 12-cell
+          // mesh. consequently, since the outer faces all are face_no==5
+          // above, so they are here (unless they are in the interior). Use
+          // this to assign boundary indicators, but also make sure that we
+          // encounter exactly 48 such faces
+#  ifdef DEBUG
           unsigned int count = 0;
+#  endif
           for (Triangulation<3>::cell_iterator cell = tria.begin();
                cell != tria.end();
                ++cell)
             if (cell->face(5)->at_boundary())
               {
                 cell->face(5)->set_all_boundary_ids(1);
+#  ifdef DEBUG
                 ++count;
+#  endif
               }
           Assert(count == 48, ExcInternalError());
         }
