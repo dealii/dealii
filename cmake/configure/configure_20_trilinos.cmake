@@ -229,7 +229,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         main()
         {
           using LO       = int;
-          using GO       = unsigned int;
           using GO       = ${_global_index_type};
           using map_type = Tpetra::Map<LO, GO>;
           Teuchos::RCP<const map_type>   dummy_map = Teuchos::rcp(new map_type());
