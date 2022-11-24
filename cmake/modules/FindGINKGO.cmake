@@ -23,19 +23,19 @@
 #   GINKGO_VERSION
 #
 
-SET(GINKGO_DIR "" CACHE PATH "An optional hint to a GINKGO installation")
-SET_IF_EMPTY(GINKGO_DIR "$ENV{GINKGO_DIR}")
+set(GINKGO_DIR "" CACHE PATH "An optional hint to a GINKGO installation")
+set_if_empty(GINKGO_DIR "$ENV{GINKGO_DIR}")
 
 #
 # Save and restore the ${CMAKE_MODULE_PATH} variable. The Ginkgo project
 # configuration unfortunately overrides the variable which causes
 # subsequent configuration to fail.
 #
-SET(_cmake_module_path ${CMAKE_MODULE_PATH})
-FIND_PACKAGE(Ginkgo
+set(_cmake_module_path ${CMAKE_MODULE_PATH})
+find_package(Ginkgo
   HINTS ${GINKGO_DIR} ${Ginkgo_DIR} $ENV{Ginkgo_DIR}
   )
-SET(CMAKE_MODULE_PATH ${_cmake_module_path})
+set(CMAKE_MODULE_PATH ${_cmake_module_path})
 
 #
 # Cosmetic clean up: Let's remove all variables beginning with "GINKGO_"
@@ -49,13 +49,13 @@ unset(GINKGO_CXX_COMPILER)
 # exports a list with short names. So check again for every lib and store
 # the full path:
 #
-SET(_libraries "")
-FOREACH(_library ginkgo ${GINKGO_INTERFACE_LINK_LIBRARIES})
+set(_libraries "")
+foreach(_library ginkgo ${GINKGO_INTERFACE_LINK_LIBRARIES})
   # Make sure to only pick up Ginkgo's own libraries here, skipping
   # the MPI libraries that are listed here as of Ginkgo 1.5.0.
-  IF(_library MATCHES "ginkgo.*")
-    LIST(APPEND _libraries GINKGO_LIBRARY_${_library})
-    DEAL_II_FIND_LIBRARY(GINKGO_LIBRARY_${_library}
+  if(_library MATCHES "ginkgo.*")
+    list(APPEND _libraries GINKGO_LIBRARY_${_library})
+    deal_ii_find_library(GINKGO_LIBRARY_${_library}
       NAMES ${_library}
       HINTS ${GINKGO_INSTALL_LIBRARY_DIR}
       NO_DEFAULT_PATH
@@ -65,17 +65,17 @@ FOREACH(_library ginkgo ${GINKGO_INTERFACE_LINK_LIBRARIES})
       NO_CMAKE_SYSTEM_PATH
       NO_CMAKE_FIND_ROOT_PATH
       )
-  ENDIF()
-ENDFOREACH()
+  endif()
+endforeach()
 
 #
 # Get ginkgo version number
 #
-IF(Ginkgo_FOUND)
-  SET(GINKGO_VERSION "${GINKGO_PROJECT_VERSION}")
-ENDIF()
+if(Ginkgo_FOUND)
+  set(GINKGO_VERSION "${GINKGO_PROJECT_VERSION}")
+endif()
 
-DEAL_II_PACKAGE_HANDLE(GINKGO
+deal_ii_package_handle(GINKGO
   LIBRARIES REQUIRED ${_libraries}
   INCLUDE_DIRS REQUIRED GINKGO_INSTALL_INCLUDE_DIR
   USER_INCLUDE_DIRS REQUIRED GINKGO_INSTALL_INCLUDE_DIR

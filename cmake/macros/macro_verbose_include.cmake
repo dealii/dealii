@@ -13,8 +13,8 @@
 ##
 ## ---------------------------------------------------------------------
 
-MACRO(VERBOSE_INCLUDE _file)
-  MESSAGE(STATUS "")
-  MESSAGE(STATUS "Include ${_file}")
-  INCLUDE(${_file})
-ENDMACRO()
+macro(VERBOSE_INCLUDE _file)
+  message(STATUS "")
+  message(STATUS "Include ${_file}")
+  include(${_file})
+endmacro()

@@ -88,7 +88,7 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # - Matthias Maier, rewritten 2012
 #
-CHECK_CXX_COMPILER_BUG(
+check_cxx_compiler_bug(
   "
   #include <vector>
   template <typename T> void f(T) {}
@@ -111,14 +111,14 @@ CHECK_CXX_COMPILER_BUG(
 #
 # - Matthias Maier, rewritten 2012
 #
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel")
   CHECK_CXX_SOURCE_COMPILES(
     "
     bool f() { return true; }
     int main(){ if (__builtin_expect(f(),false)) {} }
     "
     DEAL_II_HAVE_BUILTIN_EXPECT)
-ENDIF()
+endif()
 
 
 #
@@ -141,9 +141,9 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_HAVE_GLIBC_STACKTRACE)
 
-IF(DEAL_II_HAVE_GLIBC_STACKTRACE AND NOT DEAL_II_STATIC_EXECUTABLE)
-  ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-rdynamic")
-ENDIF()
+if(DEAL_II_HAVE_GLIBC_STACKTRACE AND NOT DEAL_II_STATIC_EXECUTABLE)
+  enable_if_links(DEAL_II_LINKER_FLAGS "-rdynamic")
+endif()
 
 
 #
@@ -220,7 +220,7 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
 
-IF(NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
+if(NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <iostream>
@@ -232,12 +232,12 @@ IF(NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
     "
     DEAL_II_COMPILER_HAS_ATTRIBUTE_FUNC)
 
-  IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_FUNC)
-    SET(__PRETTY_FUNCTION__ "__func__")
-  ELSE()
-    SET(__PRETTY_FUNCTION__ "\"(not available)\"")
-  ENDIF()
-ENDIF()
+  if(DEAL_II_COMPILER_HAS_ATTRIBUTE_FUNC)
+    set(__PRETTY_FUNCTION__ "__func__")
+  else()
+    set(__PRETTY_FUNCTION__ "\"(not available)\"")
+  endif()
+endif()
 
 
 #
@@ -262,13 +262,13 @@ ENDIF()
 #
 # - Matthias Maier, rewritten 2012, 2013
 #
-IF( (NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN") AND
+if( (NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN") AND
     (NOT CMAKE_SYSTEM_NAME MATCHES "Windows") AND
     (NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel") )
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
-  RESET_CMAKE_REQUIRED()
-ENDIF()
+  add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}")
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+  reset_cmake_required()
+endif()
 
 
 #
@@ -282,11 +282,11 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE
   )
 
-IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE)
-  SET(DEAL_II_ALWAYS_INLINE "__attribute__((always_inline))")
-ELSE()
-  SET(DEAL_II_ALWAYS_INLINE " ")
-ENDIF()
+if(DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE)
+  set(DEAL_II_ALWAYS_INLINE "__attribute__((always_inline))")
+else()
+  set(DEAL_II_ALWAYS_INLINE " ")
+endif()
 
 
 #
@@ -300,11 +300,11 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_COMPILER_HAS_RESTRICT_KEYWORD
   )
 
-IF(DEAL_II_COMPILER_HAS_RESTRICT_KEYWORD)
-  SET(DEAL_II_RESTRICT "__restrict")
-ELSE()
-  SET(DEAL_II_RESTRICT " ")
-ENDIF()
+if(DEAL_II_COMPILER_HAS_RESTRICT_KEYWORD)
+  set(DEAL_II_RESTRICT "__restrict")
+else()
+  set(DEAL_II_RESTRICT " ")
+endif()
 
 
 #
@@ -315,7 +315,7 @@ ENDIF()
 #
 # - Matthias Maier, 2015
 #
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
+add_flags(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
 CHECK_CXX_SOURCE_COMPILES(
   "
   _Pragma(\"GCC diagnostic push\")
@@ -326,7 +326,7 @@ CHECK_CXX_SOURCE_COMPILES(
   _Pragma(\"GCC diagnostic pop\")
   "
   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA)
-RESET_CMAKE_REQUIRED()
+reset_cmake_required()
 
 
 #
@@ -356,21 +356,21 @@ RESET_CMAKE_REQUIRED()
 # Wolfgang Bangerth, Matthias Maier, Daniel Arndt, Binrui Dong, 2015, 2018-2020
 #
 
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-  ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
-  ENDIF()
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-shared")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fPIC")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_flags(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    add_flags(CMAKE_REQUIRED_FLAGS "-diag-error warn")
+  endif()
+  add_flags(CMAKE_REQUIRED_FLAGS "-Werror")
+  add_flags(CMAKE_REQUIRED_FLAGS "-shared")
+  add_flags(CMAKE_REQUIRED_FLAGS "-fPIC")
 
   #
   # Check for ld.lld and ld.gold support:
   #
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
+  add_flags(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <iostream>
@@ -378,8 +378,8 @@ IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     "
     DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
 
-  STRIP_FLAG(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=gold")
+  strip_flag(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
+  add_flags(CMAKE_REQUIRED_FLAGS "-fuse-ld=gold")
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <iostream>
@@ -387,11 +387,11 @@ IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     "
     DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
 
-  IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
-    ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
-  ELSEIF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-    ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
-  ENDIF()
+  if(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+    add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
+  elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+    add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
+  endif()
 
-  RESET_CMAKE_REQUIRED()
-ENDIF()
+  reset_cmake_required()
+endif()

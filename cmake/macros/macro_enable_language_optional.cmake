@@ -16,43 +16,43 @@
 
 #
 # Test whether a usable language compiler is available and if yes, call
-# ENABLE_LANGUAGE(language)
+# enable_language(language)
 #
 # This works around a severe bug [1] in
 #
-#   ENABLE_LANGUAGE(Fortran OPTIONAL)
+#   enable_language(Fortran OPTIONAL)
 #
 # [1] http://public.kitware.com/Bug/view.php?id=9220
 #
 # Usage:
-#     ENABLE_LANGUAGE_OPTIONAL(language)
+#     enable_language_optional(language)
 #
 # where language is either C or Fortran
 #
 
-MACRO(ENABLE_LANGUAGE_OPTIONAL _language)
-  IF(NOT ${_language}_CHECKED)
+macro(ENABLE_LANGUAGE_OPTIONAL _language)
+  if(NOT ${_language}_CHECKED)
     #
     # Run this check exactly once:
     #
-    SET(${_language}_CHECKED TRUE CACHE INTERNAL "" FORCE)
+    set(${_language}_CHECKED TRUE CACHE INTERNAL "" FORCE)
 
-    SET(_tmp ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${_language}_test)
+    set(_tmp ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${_language}_test)
     file(REMOVE ${_tmp})
 
-    IF(DEFINED CMAKE_${_language}_COMPILER)
-      SET(_hint "-DCMAKE_${_language}_COMPILER=${CMAKE_${_language}_COMPILER}")
-    ENDIF()
+    if(DEFINED CMAKE_${_language}_COMPILER)
+      set(_hint "-DCMAKE_${_language}_COMPILER=${CMAKE_${_language}_COMPILER}")
+    endif()
 
-    FILE(WRITE ${_tmp}/CMakeLists.txt
-      "PROJECT(foobar ${_language})"
+    file(WRITE ${_tmp}/CMakeLists.txt
+      "project(foobar ${_language})"
       )
 
-    IF(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
-      LIST(APPEND _hint "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-    ENDIF()
+    if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
+      list(APPEND _hint "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+    endif()
 
-    EXECUTE_PROCESS(
+    execute_process(
       COMMAND ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_hint} .
       WORKING_DIRECTORY ${_tmp}
       RESULT_VARIABLE _result
@@ -60,19 +60,19 @@ MACRO(ENABLE_LANGUAGE_OPTIONAL _language)
       ERROR_QUIET
       )
 
-    IF("${_result}" STREQUAL "0")
-      SET(DEAL_II_${_language}_COMPILER_WORKS TRUE CACHE INTERNAL "" FORCE)
-      ENABLE_LANGUAGE(${_language})
-    ELSE()
-      MESSAGE(STATUS "No working ${_language} compiler found, disabling ${_language}")
-      SET(DEAL_II_${_language}_COMPILER_WORKS FALSE CACHE INTERNAL "" FORCE)
-    ENDIF()
-  ELSE()
+    if("${_result}" STREQUAL "0")
+      set(DEAL_II_${_language}_COMPILER_WORKS TRUE CACHE INTERNAL "" FORCE)
+      enable_language(${_language})
+    else()
+      message(STATUS "No working ${_language} compiler found, disabling ${_language}")
+      set(DEAL_II_${_language}_COMPILER_WORKS FALSE CACHE INTERNAL "" FORCE)
+    endif()
+  else()
     #
     # Enable the language depending on the cached result from a former run:
     #
-    IF(${DEAL_II_${_language}_COMPILER_WORKS})
-      ENABLE_LANGUAGE(${_language})
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+    if(${DEAL_II_${_language}_COMPILER_WORKS})
+      enable_language(${_language})
+    endif()
+  endif()
+endmacro()

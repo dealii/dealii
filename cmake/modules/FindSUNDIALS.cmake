@@ -36,93 +36,93 @@
 # Here SUNDIALS_INCLUDE_DIR is just '/prefix/include/', not
 # '/prefix/include/sundials/'.
 
-SET(SUNDIALS_DIR "" CACHE PATH "An optional hint to a SUNDIALS_DIR installation")
-SET_IF_EMPTY(SUNDIALS_DIR "$ENV{SUNDIALS_DIR}")
+set(SUNDIALS_DIR "" CACHE PATH "An optional hint to a SUNDIALS_DIR installation")
+set_if_empty(SUNDIALS_DIR "$ENV{SUNDIALS_DIR}")
 
-DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_IDAS NAMES sundials_idas
+deal_ii_find_library(SUNDIALS_LIB_IDAS NAMES sundials_idas
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_IDA NAMES sundials_ida
+deal_ii_find_library(SUNDIALS_LIB_IDA NAMES sundials_ida
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_ARKODE NAMES sundials_arkode
+deal_ii_find_library(SUNDIALS_LIB_ARKODE NAMES sundials_arkode
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_KINSOL NAMES sundials_kinsol
+deal_ii_find_library(SUNDIALS_LIB_KINSOL NAMES sundials_kinsol
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_SER NAMES sundials_nvecserial
+deal_ii_find_library(SUNDIALS_LIB_SER NAMES sundials_nvecserial
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_PATH(SUNDIALS_INCLUDE_DIR sundials/sundials_version.h
+deal_ii_find_path(SUNDIALS_INCLUDE_DIR sundials/sundials_version.h
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES include
 )
 
-SET(_sundials_lib_par)
-IF(DEAL_II_WITH_MPI)
-  DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_PAR NAMES sundials_nvecparallel
+set(_sundials_lib_par)
+if(DEAL_II_WITH_MPI)
+  deal_ii_find_library(SUNDIALS_LIB_PAR NAMES sundials_nvecparallel
     HINTS ${SUNDIALS_DIR}
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
     )
-  SET(_sundials_lib_par "SUNDIALS_LIB_PAR")
-ENDIF()
+  set(_sundials_lib_par "SUNDIALS_LIB_PAR")
+endif()
 
 #
 # If IDAS is available, we prefer said library over IDA. We have to make
 # sure to only link one of the two library variants:
 #
-IF(NOT SUNDIALS_LIB_IDAS MATCHES "-NOTFOUND")
-  SET(_sundials_lib_ida "SUNDIALS_LIB_IDAS")
-  SET(SUNDIALS_WITH_IDAS TRUE)
-ELSE()
-  SET(_sundials_lib_ida "SUNDIALS_LIB_IDA")
-  SET(SUNDIALS_WITH_IDAS FALSE)
-ENDIF()
+if(NOT SUNDIALS_LIB_IDAS MATCHES "-NOTFOUND")
+  set(_sundials_lib_ida "SUNDIALS_LIB_IDAS")
+  set(SUNDIALS_WITH_IDAS TRUE)
+else()
+  set(_sundials_lib_ida "SUNDIALS_LIB_IDA")
+  set(SUNDIALS_WITH_IDAS FALSE)
+endif()
 
 #
 # Extract SUNDIALS version.
 #
-DEAL_II_FIND_FILE(SUNDIALS_CONFIG_H
+deal_ii_find_file(SUNDIALS_CONFIG_H
   NAMES sundials_config.h
   HINTS ${SUNDIALS_INCLUDE_DIR}/sundials
   )
-IF(NOT SUNDIALS_CONFIG_H MATCHES "-NOTFOUND")
-  FILE(STRINGS "${SUNDIALS_CONFIG_H}" SUNDIALS_VERSION_MAJOR_STRING
+if(NOT SUNDIALS_CONFIG_H MATCHES "-NOTFOUND")
+  file(STRINGS "${SUNDIALS_CONFIG_H}" SUNDIALS_VERSION_MAJOR_STRING
     REGEX "#define.*SUNDIALS_VERSION_MAJOR"
     )
-  STRING(REGEX REPLACE "^.*SUNDIALS_VERSION_MAJOR.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*SUNDIALS_VERSION_MAJOR.*([0-9]+).*" "\\1"
     SUNDIALS_VERSION_MAJOR "${SUNDIALS_VERSION_MAJOR_STRING}"
     )
-  FILE(STRINGS "${SUNDIALS_CONFIG_H}" SUNDIALS_VERSION_MINOR_STRING
+  file(STRINGS "${SUNDIALS_CONFIG_H}" SUNDIALS_VERSION_MINOR_STRING
     REGEX "#define.*SUNDIALS_VERSION_MINOR"
     )
-  STRING(REGEX REPLACE "^.*SUNDIALS_VERSION_MINOR.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*SUNDIALS_VERSION_MINOR.*([0-9]+).*" "\\1"
     SUNDIALS_VERSION_MINOR "${SUNDIALS_VERSION_MINOR_STRING}"
     )
-  FILE(STRINGS "${SUNDIALS_CONFIG_H}" SUNDIALS_VERSION_PATCH_STRING
+  file(STRINGS "${SUNDIALS_CONFIG_H}" SUNDIALS_VERSION_PATCH_STRING
     REGEX "#define.*SUNDIALS_VERSION_PATCH"
     )
-  STRING(REGEX REPLACE "^.*SUNDIALS_VERSION_PATCH.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*SUNDIALS_VERSION_PATCH.*([0-9]+).*" "\\1"
     SUNDIALS_VERSION_PATCH "${SUNDIALS_VERSION_PATCH_STRING}"
     )
 
-  SET(SUNDIALS_VERSION
+  set(SUNDIALS_VERSION
     "${SUNDIALS_VERSION_MAJOR}.${SUNDIALS_VERSION_MINOR}.${SUNDIALS_VERSION_PATCH}"
     )
-ENDIF()
+endif()
 
-DEAL_II_PACKAGE_HANDLE(SUNDIALS
+deal_ii_package_handle(SUNDIALS
   LIBRARIES REQUIRED
     ${_sundials_lib_ida}
     SUNDIALS_LIB_ARKODE

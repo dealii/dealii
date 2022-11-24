@@ -1,15 +1,15 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
-PROJECT(TestBoost)
+cmake_minimum_required(VERSION 3.1.0)
+project(TestBoost)
 
-INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
+include_directories(${BOOST_INCLUDE_DIRS})
 
-ADD_LIBRARY(derived SHARED polymorphic_derived2.cpp)
-ADD_EXECUTABLE(test_boost test_dll_exported.cpp)
+add_library(derived SHARED polymorphic_derived2.cpp)
+add_executable(test_boost test_dll_exported.cpp)
 
-TARGET_LINK_LIBRARIES(derived ${BOOST_LIBRARIES})
-TARGET_LINK_LIBRARIES(test_boost derived ${BOOST_LIBRARIES})
+target_link_libraries(derived ${BOOST_LIBRARIES})
+target_link_libraries(test_boost derived ${BOOST_LIBRARIES})
 
-ADD_CUSTOM_TARGET(run
+add_custom_target(run
                   COMMAND test_boost
                   DEPENDS test_boost
                   WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})

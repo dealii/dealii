@@ -22,77 +22,77 @@
 # Boost C++ libraries
 #
 
-SET(FEATURE_BOOST_HAVE_BUNDLED TRUE)
+set(FEATURE_BOOST_HAVE_BUNDLED TRUE)
 
-OPTION(DEAL_II_FORCE_BUNDLED_BOOST
+option(DEAL_II_FORCE_BUNDLED_BOOST
   "Always use the bundled boost library instead of an external one."
   OFF)
 
-SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
+set(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
 
 #
 # Kokkos
 #
 
-SET(FEATURE_KOKKOS_HAVE_BUNDLED TRUE)
+set(FEATURE_KOKKOS_HAVE_BUNDLED TRUE)
 
-OPTION(DEAL_II_FORCE_BUNDLED_KOKKOS
+option(DEAL_II_FORCE_BUNDLED_KOKKOS
   "Always use the bundled Kokkos library instead of an external one."
   OFF)
 
-SET(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
+set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
 
 #
 # Taskflow
 #
 
-SET(FEATURE_TASKFLOW_HAVE_BUNDLED TRUE)
+set(FEATURE_TASKFLOW_HAVE_BUNDLED TRUE)
 
-OPTION(DEAL_II_FORCE_BUNDLED_TASKFLOW
+option(DEAL_II_FORCE_BUNDLED_TASKFLOW
   "Always use the bundled taskflow header library instead of an external one."
   OFF)
 
-SET(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-2.5.0")
+set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-2.5.0")
 
 
 #
 # Threading Building Blocks library
 #
 
-IF( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
+if( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     AND NOT CMAKE_SYSTEM_NAME MATCHES "Windows" )
   #
   # Cygwin is unsupported by tbb, Windows due to the way we compile tbb...
   #
-  SET(FEATURE_TBB_HAVE_BUNDLED TRUE)
+  set(FEATURE_TBB_HAVE_BUNDLED TRUE)
 
-  OPTION(DEAL_II_FORCE_BUNDLED_TBB
+  option(DEAL_II_FORCE_BUNDLED_TBB
     "Always use the bundled tbb library instead of an external one."
     OFF)
 
-  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
-ENDIF()
+  set(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
+endif()
 
 #
 # UMFPACK, AMD and UFCONFIG:
 #
 
-SET(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
+set(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
 
-OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
+option(DEAL_II_FORCE_BUNDLED_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
 
-SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+set(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
 
 
 #
 # muparser
 #
-SET(FEATURE_MUPARSER_HAVE_BUNDLED TRUE)
+set(FEATURE_MUPARSER_HAVE_BUNDLED TRUE)
 
-OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
+option(DEAL_II_FORCE_BUNDLED_MUPARSER
   "Always use the bundled functionparser library instead of an external one."
   OFF)
 
-SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_3_3/")
+set(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_3_3/")

@@ -13,5 +13,5 @@
 ##
 ## ---------------------------------------------------------------------
 
-ADD_SUBDIRECTORY(ad)
-ADD_SUBDIRECTORY(sd)
+add_subdirectory(ad)
+add_subdirectory(sd)

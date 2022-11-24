@@ -17,41 +17,41 @@
 # Configuration for the SLEPC library:
 #
 
-SET(FEATURE_SLEPC_DEPENDS PETSC)
+set(FEATURE_SLEPC_DEPENDS PETSC)
 
 
-MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
-  FIND_PACKAGE(SLEPC)
+macro(FEATURE_SLEPC_FIND_EXTERNAL var)
+  find_package(SLEPC)
 
-  IF(SLEPC_FOUND)
+  if(SLEPC_FOUND)
     #
     # Check whether SLEPc and PETSc are compatible according to
     # SLEPc's rules: This is equivalent to asking if the VERSION_MAJOR
     # and VERSION_MINOR of PETSc and SLEPc are
     # equivalent; and where VERSION_SUBMINORs are allowed to differ.
     #
-    IF( ("${SLEPC_VERSION_MAJOR}" STREQUAL "${PETSC_VERSION_MAJOR}")
+    if( ("${SLEPC_VERSION_MAJOR}" STREQUAL "${PETSC_VERSION_MAJOR}")
        AND
        ("${SLEPC_VERSION_MINOR}" STREQUAL "${PETSC_VERSION_MINOR}"))
-      SET(${var} TRUE)
-    ELSE()
+      set(${var} TRUE)
+    else()
 
-      MESSAGE(STATUS "Could not find a sufficient SLEPc installation: "
+      message(STATUS "Could not find a sufficient SLEPc installation: "
         "The SLEPc library must have the same version as the PETSc library."
         )
-      SET(SLEPC_ADDITIONAL_ERROR_STRING
+      set(SLEPC_ADDITIONAL_ERROR_STRING
         "Could not find a sufficient SLEPc installation: "
         "The SLEPc library must have the same version as the PETSc library.\n"
         )
 
-      SET(${var} FALSE)
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+      set(${var} FALSE)
+    endif()
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_SLEPC_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
+macro(FEATURE_SLEPC_ERROR_MESSAGE)
+  message(FATAL_ERROR "\n"
     "Could not find the SLEPc library!\n"
     ${SLEPC_ADDITIONAL_ERROR_STRING}
     "Please ensure that the SLEPc library version 3.0.0 or newer is installed on your computer\n"
@@ -66,7 +66,7 @@ MACRO(FEATURE_SLEPC_ERROR_MESSAGE)
     "    $ cmake -DSLEPC_DIR=\"...\"\n"
     "or set the relevant variables by hand in ccmake.\n\n"
     )
-ENDMACRO()
+endmacro()
 
 
-CONFIGURE_FEATURE(SLEPC)
+configure_feature(SLEPC)

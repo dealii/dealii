@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# DEAL_II_PACKAGE_HANDLE(<feature>
+# deal_ii_package_handle(<feature>
 #  {<conf. variable> {(REQUIRED|OPTIONAL) <variables>}}
 #  [CLEAR <variables>]
 #  )
@@ -25,7 +25,7 @@
 #
 # Its usage is best explained with an example:
 #
-#   DEAL_II_PACKAGE_HANDLE(PETSC
+#   deal_ii_package_handle(PETSC
 #     LIBRARIES
 #       REQUIRED PETSC_LIBRARY
 #       OPTIONAL _petsc_libraries
@@ -45,27 +45,27 @@
 # search.
 #
 
-MACRO(DEAL_II_PACKAGE_HANDLE _feature)
+macro(DEAL_II_PACKAGE_HANDLE _feature)
 
-  IF(DEFINED ${_feature}_VERSION)
-    MESSAGE(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")
-  ENDIF()
+  if(DEFINED ${_feature}_VERSION)
+    message(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")
+  endif()
 
   #
   # Respect a possible ${_feature}_FOUND variable that is set to a truth
   # value. We need this for modern™ MPI detection where CMake's
   # FindMPI.cmake might only set MPI_FOUND to true and nothing else.
   #
-  IF(NOT DEFINED ${_feature}_FOUND)
-    SET(${_feature}_FOUND TRUE)
-  ENDIF()
+  if(NOT DEFINED ${_feature}_FOUND)
+    set(${_feature}_FOUND TRUE)
+  endif()
 
   #
   # Clear temporary variables
   #
-  FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
+  foreach(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
     set(_temp_${_suffix} "")
-  ENDFOREACH()
+  endforeach()
 
   #
   # State variables for parsing keywords and arguments. We store the
@@ -73,98 +73,98 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature)
   # whether we encountered an "OPTIONAL" or "REQUIRED" keyword in
   # ${_required}
   #
-  SET(_current_suffix "")
-  SET(_required TRUE)
+  set(_current_suffix "")
+  set(_required TRUE)
 
   #
   # A temporary list accumulating all variables that should be "cleared"
   # when the feature gets disabled.
   #
-  SET(_clear_variables_list "")
+  set(_clear_variables_list "")
 
-  FOREACH(_arg ${ARGN})
-    IF(("${_arg}" IN_LIST DEAL_II_LIST_SUFFIXES) OR
+  foreach(_arg ${ARGN})
+    if(("${_arg}" IN_LIST DEAL_II_LIST_SUFFIXES) OR
        ("${_arg}" IN_LIST DEAL_II_STRING_SUFFIXES) OR
        ("${_arg}" STREQUAL "CLEAR"))
       #
       # We encountered a new keyword.
       #
-      SET(_current_suffix "${_arg}")
+      set(_current_suffix "${_arg}")
 
-    ELSEIF("${_arg}" STREQUAL "REQUIRED")
-      SET(_required TRUE)
+    elseif("${_arg}" STREQUAL "REQUIRED")
+      set(_required TRUE)
 
-    ELSEIF("${_arg}" STREQUAL "OPTIONAL")
-      SET(_required FALSE)
+    elseif("${_arg}" STREQUAL "OPTIONAL")
+      set(_required FALSE)
 
-    ELSEIF(_arg MATCHES "^(optimized|debug|general)$"
+    elseif(_arg MATCHES "^(optimized|debug|general)$"
             AND "${_current_suffix}" STREQUAL "LIBRARIES")
-      LIST(APPEND _temp_${_current_suffix} ${_arg})
+      list(APPEND _temp_${_current_suffix} ${_arg})
 
-    ELSE()
-      IF ("${_current_suffix}" STREQUAL "")
-        MESSAGE(FATAL_ERROR
+    else()
+      if ("${_current_suffix}" STREQUAL "")
+        message(FATAL_ERROR
           "Internal configuration error: the second "
           "argument to DEAL_II_PACKAGE_HANDLE must be a keyword"
           )
-      ENDIF()
+      endif()
 
-      MARK_AS_ADVANCED(${_arg})
+      mark_as_advanced(${_arg})
 
-      IF("${_current_suffix}" STREQUAL "CLEAR")
-        IF(NOT _arg MATCHES "^(optimized|debug|general)$")
-          LIST(APPEND _clear_variables_list ${_arg})
-        ENDIF()
+      if("${_current_suffix}" STREQUAL "CLEAR")
+        if(NOT _arg MATCHES "^(optimized|debug|general)$")
+          list(APPEND _clear_variables_list ${_arg})
+        endif()
 
-      ELSE()
+      else()
 
-        IF("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
-          IF(_required)
-            IF("${${_arg}}" MATCHES "^\\s*$")
-              MESSAGE(STATUS
+        if("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
+          if(_required)
+            if("${${_arg}}" MATCHES "^\\s*$")
+              message(STATUS
                 "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" empty ***"
                 )
-            ELSE()
-              MESSAGE(STATUS
+            else()
+              message(STATUS
                 "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
                 )
-            ENDIF()
-            SET(${_feature}_FOUND FALSE)
-          ENDIF()
-        ELSE()
-          LIST(APPEND _temp_${_current_suffix} ${${_arg}})
-        ENDIF()
-      ENDIF()
-    ENDIF()
-  ENDFOREACH()
+            endif()
+            set(${_feature}_FOUND FALSE)
+          endif()
+        else()
+          list(APPEND _temp_${_current_suffix} ${${_arg}})
+        endif()
+      endif()
+    endif()
+  endforeach()
 
-  SET(${_feature}_CLEAR_VARIABLES ${_clear} CACHE INTERNAL "")
+  set(${_feature}_CLEAR_VARIABLES ${_clear} CACHE INTERNAL "")
 
-  IF(${_feature}_FOUND)
+  if(${_feature}_FOUND)
     #
     # Deduplicate and stringify entries:
     #
-    FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
-      IF(_suffix MATCHES "INCLUDE_DIRS$")
-        REMOVE_DUPLICATES(_temp_${_suffix})
-      ELSE()
-        REMOVE_DUPLICATES(_temp_${_suffix} REVERSE)
-      ENDIF()
-    ENDFOREACH()
-    FOREACH(_suffix ${_DEAL_II_STRING_SUFFIXES})
-      TO_STRING(_temp_${_suffix} ${_temp_${_suffix}})
-    ENDFOREACH()
+    foreach(_suffix ${DEAL_II_LIST_SUFFIXES})
+      if(_suffix MATCHES "INCLUDE_DIRS$")
+        remove_duplicates(_temp_${_suffix})
+      else()
+        remove_duplicates(_temp_${_suffix} REVERSE)
+      endif()
+    endforeach()
+    foreach(_suffix ${_DEAL_II_STRING_SUFFIXES})
+      to_string(_temp_${_suffix} ${_temp_${_suffix}})
+    endforeach()
 
     #
     # Write back into global variables:
     #
-    CLEAR_FEATURE(${_feature})
-    FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
-      IF(NOT "${_temp_${_suffix}}" STREQUAL "")
+    clear_feature(${_feature})
+    foreach(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
+      if(NOT "${_temp_${_suffix}}" STREQUAL "")
         set(${_feature}_${_suffix} "${_temp_${_suffix}}")
-        MESSAGE(STATUS "  ${_feature}_${_suffix}: ${${_feature}_${_suffix}}")
-      ENDIF()
-    ENDFOREACH()
+        message(STATUS "  ${_feature}_${_suffix}: ${${_feature}_${_suffix}}")
+      endif()
+    endforeach()
 
     #
     # Remove certain system libraries from the link interface. This is
@@ -172,20 +172,20 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature)
     # we always set up threading by linking against libpthread.so if
     # necessary).
     #
-    FOREACH(_suffix LIBRARIES LIBRARIES_DEBUG LIBRARIES_RELEASE)
-      IF(NOT "${${_feature}_${_suffix}}" STREQUAL "")
-        LIST(REMOVE_ITEM ${_feature}_${_suffix}
+    foreach(_suffix LIBRARIES LIBRARIES_DEBUG LIBRARIES_RELEASE)
+      if(NOT "${${_feature}_${_suffix}}" STREQUAL "")
+        list(REMOVE_ITEM ${_feature}_${_suffix}
           "pthread" "-pthread" "-lpthread" "c" "-lc"
           )
-      ENDIF()
-    ENDFOREACH()
+      endif()
+    endforeach()
 
-    MESSAGE(STATUS "Found ${_feature}")
+    message(STATUS "Found ${_feature}")
 
-    MARK_AS_ADVANCED(${_feature}_DIR ${_feature}_ARCH)
+    mark_as_advanced(${_feature}_DIR ${_feature}_ARCH)
 
-  ELSE()
+  else()
 
-    MESSAGE(STATUS "Could NOT find ${_feature}")
-  ENDIF()
-ENDMACRO()
+    message(STATUS "Could NOT find ${_feature}")
+  endif()
+endmacro()

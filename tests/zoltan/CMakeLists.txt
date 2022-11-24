@@ -1,7 +1,7 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-INCLUDE(../setup_testsubproject.cmake)
-PROJECT(testsuite CXX)
+cmake_minimum_required(VERSION 3.3.0)
+include(../setup_testsubproject.cmake)
+project(testsuite CXX)
 
-IF(DEAL_II_WITH_TRILINOS AND DEAL_II_TRILINOS_WITH_ZOLTAN)
-  DEAL_II_PICKUP_TESTS()
-ENDIF()
+if(DEAL_II_WITH_TRILINOS AND DEAL_II_TRILINOS_WITH_ZOLTAN)
+  deal_ii_pickup_tests()
+endif()

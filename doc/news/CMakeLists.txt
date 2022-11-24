@@ -17,15 +17,15 @@
 #
 # Set up all necessary bits for the changelog generation
 #
-IF(DEAL_II_COMPONENT_DOCUMENTATION)
+if(DEAL_II_COMPONENT_DOCUMENTATION)
 
-  MESSAGE(STATUS "")
-  MESSAGE(STATUS "Setting up changelog generation")
+  message(STATUS "")
+  message(STATUS "Setting up changelog generation")
 
   #
   # Generate changes.h.
   #
-  ADD_CUSTOM_COMMAND(
+  add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/changes.h
     COMMAND ${CMAKE_COMMAND} -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/changes.h
                              -P ${CMAKE_CURRENT_SOURCE_DIR}/changes/create_changes_h.cmake
@@ -41,10 +41,10 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
       ${CMAKE_CURRENT_SOURCE_DIR}/changes/incompatibilities
   )
 
-  ADD_CUSTOM_TARGET(changelog ALL
+  add_custom_target(changelog ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/changes.h
   )
 
-  ADD_DEPENDENCIES(documentation changelog)
+  add_dependencies(documentation changelog)
 
-ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
+endif(DEAL_II_COMPONENT_DOCUMENTATION)

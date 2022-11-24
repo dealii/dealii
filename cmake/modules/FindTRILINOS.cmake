@@ -29,13 +29,13 @@
 #   TRILINOS_WITH_MPI
 #
 
-SET(TRILINOS_DIR "" CACHE PATH "An optional hint to a Trilinos installation")
-SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
+set(TRILINOS_DIR "" CACHE PATH "An optional hint to a Trilinos installation")
+set_if_empty(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 
 #
 # Include the trilinos package configuration:
 #
-FIND_PACKAGE(TRILINOS_CONFIG
+find_package(TRILINOS_CONFIG
   CONFIG QUIET
   NAMES Trilinos TRILINOS
   HINTS
@@ -49,67 +49,67 @@ FIND_PACKAGE(TRILINOS_CONFIG
   )
 
 
-IF(DEFINED Trilinos_VERSION)
+if(DEFINED Trilinos_VERSION)
   #
   # Extract version numbers:
   #
-  SET(TRILINOS_VERSION "${Trilinos_VERSION}")
+  set(TRILINOS_VERSION "${Trilinos_VERSION}")
 
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^([0-9]+).*$" "\\1"
     TRILINOS_VERSION_MAJOR "${Trilinos_VERSION}")
 
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^[0-9]+\\.([0-9]+).*$" "\\1"
     TRILINOS_VERSION_MINOR "${Trilinos_VERSION}")
 
   # If there is no subminor number, 
   # TRILINOS_VERSION_SUBMINOR is set to an empty string. 
   # If that is the case, set the subminor number to zero
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^[0-9]+\\.[0-9]+\\.?(([0-9]+)?).*$" "\\1"
     TRILINOS_VERSION_SUBMINOR "${Trilinos_VERSION}")
-  IF("${TRILINOS_VERSION_SUBMINOR}" STREQUAL "")
-    SET(TRILINOS_VERSION_SUBMINOR "0")
-  ENDIF()  
-ENDIF()
+  if("${TRILINOS_VERSION_SUBMINOR}" STREQUAL "")
+    set(TRILINOS_VERSION_SUBMINOR "0")
+  endif()  
+endif()
 
 #
 # Look for Epetra_config.h - we'll query it to determine MPI and 64bit
 # indices support:
 #
-DEAL_II_FIND_FILE(EPETRA_CONFIG_H Epetra_config.h
+deal_ii_find_file(EPETRA_CONFIG_H Epetra_config.h
   HINTS ${Trilinos_INCLUDE_DIRS}
   NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
   NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
   )
 
-IF(EXISTS ${EPETRA_CONFIG_H})
+if(EXISTS ${EPETRA_CONFIG_H})
   #
   # Determine whether Trilinos was configured with MPI and 64bit indices:
   #
-  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_MPI_STRING
+  file(STRINGS "${EPETRA_CONFIG_H}" EPETRA_MPI_STRING
     REGEX "^[ \t]*#[ \t]*define[ \t]+HAVE_MPI")
-  IF("${EPETRA_MPI_STRING}" STREQUAL "")
-    SET(TRILINOS_WITH_MPI FALSE)
-  ELSE()
-    SET(TRILINOS_WITH_MPI TRUE)
-  ENDIF()
-  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_32BIT_STRING
+  if("${EPETRA_MPI_STRING}" STREQUAL "")
+    set(TRILINOS_WITH_MPI FALSE)
+  else()
+    set(TRILINOS_WITH_MPI TRUE)
+  endif()
+  file(STRINGS "${EPETRA_CONFIG_H}" EPETRA_32BIT_STRING
     REGEX "^[ \t]*#[ \t]*define[ \t]+EPETRA_NO_32BIT_GLOBAL_INDICES")
-  IF("${EPETRA_64BIT_STRING}" STREQUAL "")
-    SET(TRILINOS_WITH_NO_32BITS_INDICES TRUE)
-  ELSE()
-    SET(TRILINOS_WITH_NO_32BITS_INDICES FALSE)
-  ENDIF()
-  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_64BIT_STRING
+  if("${EPETRA_64BIT_STRING}" STREQUAL "")
+    set(TRILINOS_WITH_NO_32BITS_INDICES TRUE)
+  else()
+    set(TRILINOS_WITH_NO_32BITS_INDICES FALSE)
+  endif()
+  file(STRINGS "${EPETRA_CONFIG_H}" EPETRA_64BIT_STRING
     REGEX "^[ \t]*#[ \t]*define[ \t]+EPETRA_NO_64BIT_GLOBAL_INDICES")
-  IF("${EPETRA_64BIT_STRING}" STREQUAL "")
-    SET(TRILINOS_WITH_NO_64BITS_INDICES TRUE)
-  ELSE()
-    SET(TRILINOS_WITH_NO_64BITS_INDICES FALSE)
-  ENDIF()
-ENDIF()
+  if("${EPETRA_64BIT_STRING}" STREQUAL "")
+    set(TRILINOS_WITH_NO_64BITS_INDICES TRUE)
+  else()
+    set(TRILINOS_WITH_NO_64BITS_INDICES FALSE)
+  endif()
+endif()
 
 
 #
@@ -117,32 +117,32 @@ ENDIF()
 #
 # Especially deduplicate stuff...
 #
-REMOVE_DUPLICATES(Trilinos_LIBRARIES REVERSE)
-REMOVE_DUPLICATES(Trilinos_TPL_LIBRARIES REVERSE)
+remove_duplicates(Trilinos_LIBRARIES REVERSE)
+remove_duplicates(Trilinos_TPL_LIBRARIES REVERSE)
 
-REMOVE_DUPLICATES(Trilinos_INCLUDE_DIRS)
-STRING(REGEX REPLACE
+remove_duplicates(Trilinos_INCLUDE_DIRS)
+string(REGEX REPLACE
   "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
   Trilinos_INCLUDE_DIRS "${Trilinos_INCLUDE_DIRS}"
   )
 
-REMOVE_DUPLICATES(Trilinos_TPL_INCLUDE_DIRS)
+remove_duplicates(Trilinos_TPL_INCLUDE_DIRS)
 
-IF(TARGET Kokkos::kokkos)
-  GET_PROPERTY(KOKKOS_COMPILE_FLAGS_FULL TARGET Kokkos::kokkos PROPERTY INTERFACE_COMPILE_OPTIONS)
-  STRING(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
-  STRING(REPLACE ";" " " KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
-ENDIF()
+if(TARGET Kokkos::kokkos)
+  get_property(KOKKOS_COMPILE_FLAGS_FULL TARGET Kokkos::kokkos PROPERTY INTERFACE_COMPILE_OPTIONS)
+  string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
+  string(REPLACE ";" " " KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
+endif()
 
 #
 # We'd like to have the full library names but the Trilinos package only
 # exports a list with short names...
 # So we check again for every lib and store the full path:
 #
-SET(_libraries "")
-FOREACH(_library ${Trilinos_LIBRARIES})
-  LIST(APPEND _libraries TRILINOS_LIBRARY_${_library})
-  DEAL_II_FIND_LIBRARY(TRILINOS_LIBRARY_${_library}
+set(_libraries "")
+foreach(_library ${Trilinos_LIBRARIES})
+  list(APPEND _libraries TRILINOS_LIBRARY_${_library})
+  deal_ii_find_library(TRILINOS_LIBRARY_${_library}
     NAMES ${_library}
     HINTS ${Trilinos_LIBRARY_DIRS}
     NO_DEFAULT_PATH
@@ -152,10 +152,10 @@ FOREACH(_library ${Trilinos_LIBRARIES})
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH
     )
-ENDFOREACH()
+endforeach()
 
 
-DEAL_II_PACKAGE_HANDLE(TRILINOS
+deal_ii_package_handle(TRILINOS
   LIBRARIES
     REQUIRED ${_libraries}
     OPTIONAL Trilinos_TPL_LIBRARIES MPI_CXX_LIBRARIES

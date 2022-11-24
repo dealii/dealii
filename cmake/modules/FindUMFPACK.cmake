@@ -27,22 +27,22 @@
 #   UMFPACK_VERSION_SUBMINOR
 #
 
-SET(UMFPACK_DIR "" CACHE PATH "An optional hint to an UMFPACK directory")
-SET(SUITESPARSE_DIR "" CACHE PATH
+set(UMFPACK_DIR "" CACHE PATH "An optional hint to an UMFPACK directory")
+set(SUITESPARSE_DIR "" CACHE PATH
   "An optional hint to a SUITESPARSE directory"
   )
-FOREACH(_comp SUITESPARSE SUITESPARSE_CONFIG UMFPACK AMD CHOLMOD COLAMD)
-  SET_IF_EMPTY(${_comp}_DIR "$ENV{${_comp}_DIR}")
-ENDFOREACH()
+foreach(_comp SUITESPARSE SUITESPARSE_CONFIG UMFPACK AMD CHOLMOD COLAMD)
+  set_if_empty(${_comp}_DIR "$ENV{${_comp}_DIR}")
+endforeach()
 
 #
 # Two macros to make life easier:
 #
 
-MACRO(FIND_UMFPACK_PATH _comp _file)
-  STRING(TOLOWER ${_comp} _comp_lowercase)
-  STRING(TOUPPER ${_comp} _comp_uppercase)
-  DEAL_II_FIND_PATH(${_comp}_INCLUDE_DIR ${_file}
+macro(FIND_UMFPACK_PATH _comp _file)
+  string(TOLOWER ${_comp} _comp_lowercase)
+  string(TOUPPER ${_comp} _comp_uppercase)
+  deal_ii_find_path(${_comp}_INCLUDE_DIR ${_file}
     HINTS
       ${${_comp_uppercase}_DIR}
       ${SUITESPARSE_DIR}/${_comp}
@@ -52,11 +52,11 @@ MACRO(FIND_UMFPACK_PATH _comp _file)
     PATH_SUFFIXES
       ${_comp_lowercase} include/${_comp_lowercase} include Include ${_comp}/Include suitesparse
     )
-ENDMACRO()
+endmacro()
 
-MACRO(FIND_UMFPACK_LIBRARY _comp _name)
-  STRING(TOUPPER ${_comp} _comp_uppercase)
-  DEAL_II_FIND_LIBRARY(${_comp}_LIBRARY
+macro(FIND_UMFPACK_LIBRARY _comp _name)
+  string(TOUPPER ${_comp} _comp_uppercase)
+  deal_ii_find_library(${_comp}_LIBRARY
     NAMES ${_name} lib${_name}
     HINTS
       ${${_comp_uppercase}_DIR}
@@ -67,7 +67,7 @@ MACRO(FIND_UMFPACK_LIBRARY _comp _name)
     PATH_SUFFIXES
     lib${LIB_SUFFIX} lib64 lib Lib ${_comp}/Lib
     )
-ENDMACRO()
+endmacro()
 
 
 #
@@ -76,36 +76,36 @@ ENDMACRO()
 FIND_UMFPACK_PATH(UMFPACK umfpack.h)
 FIND_UMFPACK_PATH(AMD amd.h)
 
-IF(EXISTS ${UMFPACK_INCLUDE_DIR}/umfpack.h)
+if(EXISTS ${UMFPACK_INCLUDE_DIR}/umfpack.h)
   #
   # Well, recent versions of UMFPACK include SuiteSparse_config.h, if so,
   # ensure that we'll find these headers as well.
   #
-  FILE(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_SUITESPARSE_STRING
+  file(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_SUITESPARSE_STRING
     REGEX "#include \"SuiteSparse_config.h\"")
-  IF(NOT "${UMFPACK_SUITESPARSE_STRING}" STREQUAL "")
+  if(NOT "${UMFPACK_SUITESPARSE_STRING}" STREQUAL "")
     FIND_UMFPACK_PATH(SuiteSparse_config SuiteSparse_config.h)
-  ENDIF()
+  endif()
 
-  FILE(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_MAJOR_STRING
+  file(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_MAJOR_STRING
     REGEX "#define.*UMFPACK_MAIN_VERSION")
-  STRING(REGEX REPLACE "^.*UMFPACK_MAIN_VERSION.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*UMFPACK_MAIN_VERSION.*([0-9]+).*" "\\1"
     UMFPACK_VERSION_MAJOR "${UMFPACK_VERSION_MAJOR_STRING}"
     )
-  FILE(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_MINOR_STRING
+  file(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_MINOR_STRING
     REGEX "#define.*UMFPACK_SUB_VERSION")
-  STRING(REGEX REPLACE "^.*UMFPACK_SUB_VERSION.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*UMFPACK_SUB_VERSION.*([0-9]+).*" "\\1"
     UMFPACK_VERSION_MINOR "${UMFPACK_VERSION_MINOR_STRING}"
     )
-  FILE(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_SUBMINOR_STRING
+  file(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_SUBMINOR_STRING
     REGEX "#define.*UMFPACK_SUBSUB_VERSION")
-  STRING(REGEX REPLACE "^.*UMFPACK_SUBSUB_VERSION.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*UMFPACK_SUBSUB_VERSION.*([0-9]+).*" "\\1"
     UMFPACK_VERSION_SUBMINOR "${UMFPACK_VERSION_SUBMINOR_STRING}"
     )
-  SET(UMFPACK_VERSION
+  set(UMFPACK_VERSION
     "${UMFPACK_VERSION_MAJOR}.${UMFPACK_VERSION_MINOR}.${UMFPACK_VERSION_SUBMINOR}"
     )
-ENDIF()
+endif()
 
 #
 # Link against everything we can find to avoid underlinkage:
@@ -124,9 +124,9 @@ FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 # lib does not record its dependence on librt.so as evidenced
 # by ldd :-( ):
 #
-FIND_SYSTEM_LIBRARY(rt_LIBRARY NAMES rt)
+find_system_library(rt_LIBRARY NAMES rt)
 
-DEAL_II_PACKAGE_HANDLE(UMFPACK
+deal_ii_package_handle(UMFPACK
   LIBRARIES
     REQUIRED UMFPACK_LIBRARY
     OPTIONAL CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY CAMD_LIBRARY SuiteSparse_config_LIBRARY
@@ -146,8 +146,8 @@ DEAL_II_PACKAGE_HANDLE(UMFPACK
     AMD_INCLUDE_DIR SuiteSparse_config_INCLUDE_DIR
   )
 
-IF(UMFPACK_FOUND)
-  MARK_AS_ADVANCED(SUITESPARSE_DIR)
-ELSE()
-  MARK_AS_ADVANCED(CLEAR SUITESPARSE_DIR)
-ENDIF()
+if(UMFPACK_FOUND)
+  mark_as_advanced(SUITESPARSE_DIR)
+else()
+  mark_as_advanced(CLEAR SUITESPARSE_DIR)
+endif()

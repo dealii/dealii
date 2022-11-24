@@ -13,9 +13,9 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_unity_include_src
+set(_unity_include_src
   affine_constraints.cc
   block_sparse_matrix.cc
   block_sparse_matrix_ez.cc
@@ -51,7 +51,7 @@ SET(_unity_include_src
   )
 
 # make sure that files requiring the LAPACK wrappers are compiled separately.
-SET(_separate_src
+set(_separate_src
   full_matrix.cc
   lapack_full_matrix.cc
   qr.cc
@@ -62,15 +62,15 @@ SET(_separate_src
   )
 
 # Add CUDA wrapper files
-IF(DEAL_II_WITH_CUDA)
-  SET(_separate_src
+if(DEAL_II_WITH_CUDA)
+  set(_separate_src
     ${_separate_src}
     vector_memory_cuda.cc
     affine_constraints_cuda.cc
     )
-ENDIF()
+endif()
 
-SET(_inst
+set(_inst
   affine_constraints.inst.in
   block_sparse_matrix.inst.in
   block_vector.inst.in
@@ -97,8 +97,8 @@ SET(_inst
 # Add PETSc wrapper files. If PETSc has not been found,
 # then these files should be empty and there is no need
 # to even look at them
-IF(DEAL_II_WITH_PETSC)
-  SET(_unity_include_src
+if(DEAL_II_WITH_PETSC)
+  set(_unity_include_src
     ${_unity_include_src}
     petsc_full_matrix.cc
     petsc_matrix_base.cc
@@ -112,27 +112,27 @@ IF(DEAL_II_WITH_PETSC)
     petsc_sparse_matrix.cc
     petsc_vector_base.cc
   )
-ENDIF()
+endif()
 
 # Same for SLEPc
-IF(DEAL_II_WITH_SLEPC)
-  SET(_unity_include_src
+if(DEAL_II_WITH_SLEPC)
+  set(_unity_include_src
     ${_unity_include_src}
     slepc_solver.cc
     slepc_spectral_transformation.cc
   )
-ENDIF()
+endif()
 
-IF(DEAL_II_WITH_GINKGO)
-  SET(_unity_include_src
+if(DEAL_II_WITH_GINKGO)
+  set(_unity_include_src
     ${_unity_include_src}
     ginkgo_solver.cc
   )
-ENDIF()
+endif()
 
 # Also add Trilinos wrapper files
-IF(DEAL_II_WITH_TRILINOS)
-  SET(_unity_include_src
+if(DEAL_II_WITH_TRILINOS)
+  set(_unity_include_src
     ${_unity_include_src}
     trilinos_block_sparse_matrix.cc
     trilinos_block_vector.cc
@@ -148,21 +148,21 @@ IF(DEAL_II_WITH_TRILINOS)
     trilinos_vector.cc
   )
 
-  SET(_separate_src
+  set(_separate_src
     ${_separate_src}
     trilinos_precondition_muelu.cc
     )
 
-  SET(_inst
+  set(_inst
     ${_inst}
     trilinos_sparse_matrix.inst.in
     trilinos_vector.inst.in
   )
-ENDIF()
+endif()
 
 # Add CUDA wrapper files
-IF(DEAL_II_WITH_CUDA)
-  SET(_separate_src
+if(DEAL_II_WITH_CUDA)
+  set(_separate_src
     ${_separate_src}
     cuda_kernels.cc
     cuda_precondition.cc
@@ -172,25 +172,25 @@ IF(DEAL_II_WITH_CUDA)
     la_parallel_vector_cuda.cc
     read_write_vector_cuda.cc
   )
-ENDIF()
+endif()
 
 # determined by profiling
-SET(_n_includes_per_unity_file 20)
+set(_n_includes_per_unity_file 20)
 
-IF(DEAL_II_UNITY_BUILD)
+if(DEAL_II_UNITY_BUILD)
   # sort files so that the petsc and trilinos files are not together
-  LIST(SORT _unity_include_src)
-ENDIF()
+  list(SORT _unity_include_src)
+endif()
 
-SETUP_SOURCE_LIST("${_unity_include_src}"
+setup_source_list("${_unity_include_src}"
   "${_separate_src}"
   ${_n_includes_per_unity_file}
   _src
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/lac/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_lac OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_lac "${_inst}")
+deal_ii_add_library(obj_lac OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_lac "${_inst}")

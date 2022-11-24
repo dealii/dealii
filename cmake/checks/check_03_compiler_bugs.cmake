@@ -28,9 +28,9 @@
 #
 # - Timo Heister, 2013, 2015
 #
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0.3" )
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-vec")
-ENDIF()
+if(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0.3" )
+  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-no-vec")
+endif()
 
 
 #
@@ -38,9 +38,9 @@ ENDIF()
 # tests/fe/curl_curl_01.debug but 16.0.2 is known to work. Blacklist this
 # version. Also see github.com/dealii/dealii/issues/2203
 #
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "16.0.1" )
-  MESSAGE(FATAL_ERROR "Intel compiler version 16.0.1 is not supported, please update to 16.0.2 or newer!")
-ENDIF()
+if(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "16.0.1" )
+  message(FATAL_ERROR "Intel compiler version 16.0.1 is not supported, please update to 16.0.2 or newer!")
+endif()
 
 
 #
@@ -53,7 +53,7 @@ ENDIF()
 #
 # - Mathias Anselmann, Matthias Maier, David Wells, 2021
 #
-CHECK_CXX_COMPILER_BUG(
+check_cxx_compiler_bug(
   "
   struct NonMovable {
     NonMovable() = default;

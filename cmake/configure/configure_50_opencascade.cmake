@@ -17,4 +17,4 @@
 # Configuration for the OpenCASCADE library:
 #
 
-CONFIGURE_FEATURE(OPENCASCADE)
+configure_feature(OPENCASCADE)

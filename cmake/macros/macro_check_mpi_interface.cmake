@@ -18,43 +18,43 @@
 # one deal.II picked up
 #
 # Usage:
-#     CHECK_MPI_INTERFACE(_feature _var),
+#     check_mpi_interface(_feature _var),
 #
 
-MACRO(CHECK_MPI_INTERFACE _feature _var)
-  IF(DEAL_II_WITH_MPI AND MPI_LIBRARIES)
+macro(CHECK_MPI_INTERFACE _feature _var)
+  if(DEAL_II_WITH_MPI AND MPI_LIBRARIES)
 
-    SET(_nope FALSE)
+    set(_nope FALSE)
 
-    FOREACH(_library ${${_feature}_LIBRARIES})
-      IF( _library MATCHES "/libmpi\\.(a|so)[^/]*$")
+    foreach(_library ${${_feature}_LIBRARIES})
+      if( _library MATCHES "/libmpi\\.(a|so)[^/]*$")
 
-        GET_FILENAME_COMPONENT(_file1 ${_library} REALPATH)
+        get_filename_component(_file1 ${_library} REALPATH)
 
-        SET(_not_found TRUE)
-        FOREACH(_mpi_library ${MPI_LIBRARIES})
-          GET_FILENAME_COMPONENT(_file2 ${_mpi_library} REALPATH)
-          IF("${_file1}" STREQUAL "${_file2}")
-            SET(_not_found FALSE)
-            BREAK()
-          ENDIF()
-        ENDFOREACH()
+        set(_not_found TRUE)
+        foreach(_mpi_library ${MPI_LIBRARIES})
+          get_filename_component(_file2 ${_mpi_library} REALPATH)
+          if("${_file1}" STREQUAL "${_file2}")
+            set(_not_found FALSE)
+            break()
+          endif()
+        endforeach()
 
-        IF(_not_found)
-          SET(_nope TRUE)
-          SET(_spurious_library ${_library})
-          BREAK()
-        ENDIF()
-      ENDIF()
-    ENDFOREACH()
+        if(_not_found)
+          set(_nope TRUE)
+          set(_spurious_library ${_library})
+          break()
+        endif()
+      endif()
+    endforeach()
 
-    IF(_nope)
-      MESSAGE(STATUS "Could not find a sufficient ${_feature} installation: "
+    if(_nope)
+      message(STATUS "Could not find a sufficient ${_feature} installation: "
         "${_feature} is compiled against a different MPI library than the one "
         "deal.II picked up."
         )
-      TO_STRING(_str ${MPI_LIBRARIES})
-      SET(${_feature}_ADDITIONAL_ERROR_STRING
+      to_string(_str ${MPI_LIBRARIES})
+      set(${_feature}_ADDITIONAL_ERROR_STRING
         ${${_feature}_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ${_feature} installation:\n"
         "${_feature} has to be compiled against the same MPI library as deal.II "
@@ -63,8 +63,8 @@ MACRO(CHECK_MPI_INTERFACE _feature _var)
         "which is not listed in MPI_LIBRARIES:\n"
         "  MPI_LIBRARIES = \"${_str}\"\n"
         )
-      SET(${_var} FALSE)
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+      set(${_var} FALSE)
+    endif()
+  endif()
+endmacro()
 

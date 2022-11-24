@@ -22,58 +22,58 @@
 # Disallow the default detection of taskflow for the time being to avoid
 # unpleasant surprises on user side.
 #
-SET(DEAL_II_WITH_TASKFLOW OFF CACHE BOOL "")
+set(DEAL_II_WITH_TASKFLOW OFF CACHE BOOL "")
 
-MACRO(FEATURE_TASKFLOW_FIND_EXTERNAL var)
-  FIND_PACKAGE(TASKFLOW)
+macro(FEATURE_TASKFLOW_FIND_EXTERNAL var)
+  find_package(TASKFLOW)
 
-  IF(TASKFLOW_FOUND)
-    SET(${var} TRUE)
-  ENDIF()
+  if(TASKFLOW_FOUND)
+    set(${var} TRUE)
+  endif()
 
-  IF(TASKFLOW_VERSION VERSION_LESS "2.4")
+  if(TASKFLOW_VERSION VERSION_LESS "2.4")
     # Clear the previously determined version numbers to avoid confusion
-    SET(TASKFLOW_VERSION "bundled")
-    SET(TASKFLOW_VERSION_MAJOR "")
-    SET(TASKFLOW_VERSION_MINOR "")
+    set(TASKFLOW_VERSION "bundled")
+    set(TASKFLOW_VERSION_MAJOR "")
+    set(TASKFLOW_VERSION_MINOR "")
 
-    MESSAGE(STATUS
+    message(STATUS
       "The externally provided Taskflow library is older than version 2.4, "
       "which cannot be used with deal.II."
       )
-    SET(TASKFLOW_ADDITIONAL_ERROR_STRING
+    set(TASKFLOW_ADDITIONAL_ERROR_STRING
       "The externally provided Taskflow library is older than version\n"
       "2.4, which is the oldest version compatible with deal.II."
       )
-    SET(${var} FALSE)
-  ENDIF()
+    set(${var} FALSE)
+  endif()
 
 
-  IF(NOT TASKFLOW_VERSION VERSION_LESS "3.0" AND NOT DEAL_II_HAVE_CXX17)
+  if(NOT TASKFLOW_VERSION VERSION_LESS "3.0" AND NOT DEAL_II_HAVE_CXX17)
     # Clear the previously determined version numbers to avoid confusion
-    SET(TASKFLOW_VERSION "bundled")
-    SET(TASKFLOW_VERSION_MAJOR "")
-    SET(TASKFLOW_VERSION_MINOR "")
+    set(TASKFLOW_VERSION "bundled")
+    set(TASKFLOW_VERSION_MAJOR "")
+    set(TASKFLOW_VERSION_MINOR "")
 
-    MESSAGE(STATUS
+    message(STATUS
       "The externally provided Taskflow library (version 3.0 onwards)
       requires C++17 support, which has not been configured."
       )
-    SET(TASKFLOW_ADDITIONAL_ERROR_STRING
+    set(TASKFLOW_ADDITIONAL_ERROR_STRING
       "The externally provided Taskflow library (version 3.0 onwards) "
       "requires C++17 support, but no C++17 support had been detected "
       "during configuration.\n"
       "Try to set -DDEAL_II_CXX_FLAGS=\"-std=c++17\" by hand.\n"
       )
-    SET(${var} FALSE)
-  ENDIF()
-ENDMACRO()
+    set(${var} FALSE)
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_TASKFLOW_CONFIGURE_BUNDLED)
-  LIST(APPEND TASKFLOW_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
-ENDMACRO()
+macro(FEATURE_TASKFLOW_CONFIGURE_BUNDLED)
+  list(APPEND TASKFLOW_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
+endmacro()
 
 
-CONFIGURE_FEATURE(TASKFLOW)
+configure_feature(TASKFLOW)
 

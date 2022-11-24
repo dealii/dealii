@@ -17,32 +17,32 @@
 # Configuration for Kokkos support in deal.II:
 #
 
-SET(DEAL_II_WITH_KOKKOS ON # Always true. We need it :-]
+set(DEAL_II_WITH_KOKKOS ON # Always true. We need it :-]
   CACHE BOOL "Build deal.II with support for Kokkos." FORCE
   )
 
-MACRO(FEATURE_KOKKOS_CONFIGURE_BUNDLED)
-  SET(KOKKOS_BUNDLED_INCLUDE_DIRS
+macro(FEATURE_KOKKOS_CONFIGURE_BUNDLED)
+  set(KOKKOS_BUNDLED_INCLUDE_DIRS
     ${KOKKOS_FOLDER}/algorithms/src
     ${KOKKOS_FOLDER}/containers/src
     ${KOKKOS_FOLDER}/core/src
     ${KOKKOS_FOLDER}/simd/src
     ${KOKKOS_FOLDER}/tpls/desul/include
     )
-ENDMACRO()
+endmacro()
 
-CONFIGURE_FEATURE(KOKKOS)
+configure_feature(KOKKOS)
 
 #
 # DEAL_II_WITH_KOKKOS is always required.
 #
-IF(NOT DEAL_II_WITH_KOKKOS)
-  IF(DEAL_II_FEATURE_AUTODETECTION)
-    FEATURE_ERROR_MESSAGE("KOKKOS")
-  ELSE()
-    MESSAGE(FATAL_ERROR "\n"
+if(NOT DEAL_II_WITH_KOKKOS)
+  if(DEAL_II_FEATURE_AUTODETECTION)
+    feature_error_message("KOKKOS")
+  else()
+    message(FATAL_ERROR "\n"
       "Unmet configuration requirements: "
       "DEAL_II_WITH_KOKKOS required, but set to OFF!\n\n"
       )
-  ENDIF()
-ENDIF()
+  endif()
+endif()

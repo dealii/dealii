@@ -36,10 +36,10 @@
 # the manual work anyway.
 #
 
-SET(GSL_DIR "" CACHE PATH "An optional hint to a GSL installation")
-SET_IF_EMPTY(GSL_DIR "$ENV{GSL_DIR}")
+set(GSL_DIR "" CACHE PATH "An optional hint to a GSL installation")
+set_if_empty(GSL_DIR "$ENV{GSL_DIR}")
 
-DEAL_II_FIND_LIBRARY(GSL_LIBRARY
+deal_ii_find_library(GSL_LIBRARY
   NAMES gsl
   HINTS ${GSL_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
@@ -50,27 +50,27 @@ DEAL_II_FIND_LIBRARY(GSL_LIBRARY
 # found we assume that gsl has to be linked against this library,
 # alternatively as a fall back try known system cblas names
 #
-DEAL_II_FIND_LIBRARY(GSL_CBLAS_LIBRARY
+deal_ii_find_library(GSL_CBLAS_LIBRARY
   NAMES gslcblas cblas refcblas
   HINTS ${GSL_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_PATH(GSL_INCLUDE_DIR gsl/gsl_version.h
+deal_ii_find_path(GSL_INCLUDE_DIR gsl/gsl_version.h
   HINTS ${GSL_DIR}
   PATH_SUFFIXES include
   )
 
-IF(EXISTS "${GSL_INCLUDE_DIR}/gsl/gsl_version.h" )
-  FILE(STRINGS "${GSL_INCLUDE_DIR}/gsl/gsl_version.h" GSL_VERSION_STRING_LINE
+if(EXISTS "${GSL_INCLUDE_DIR}/gsl/gsl_version.h" )
+  file(STRINGS "${GSL_INCLUDE_DIR}/gsl/gsl_version.h" GSL_VERSION_STRING_LINE
     REGEX "^[ \t]*#[ \t]*define[ \t]+GSL_VERSION"
     )
-  STRING(REGEX REPLACE ".*([0-9].[0-9]+).*" "\\1" GSL_VERSION
+  string(REGEX REPLACE ".*([0-9].[0-9]+).*" "\\1" GSL_VERSION
     "${GSL_VERSION_STRING_LINE}"
     )
-ENDIF()
+endif()
 
-DEAL_II_PACKAGE_HANDLE(GSL
+deal_ii_package_handle(GSL
   LIBRARIES
     REQUIRED GSL_LIBRARY
     OPTIONAL GSL_CBLAS_LIBRARY

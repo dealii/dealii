@@ -22,64 +22,64 @@
 #   KOKKOS_INTERFACE_LINK_FLAGS
 #
 
-SET(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
-SET_IF_EMPTY(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
+set(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
+set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 
 
-IF(DEAL_II_TRILINOS_WITH_KOKKOS)
+if(DEAL_II_TRILINOS_WITH_KOKKOS)
   # Let ArborX know that we have found Kokkos
-  SET(Kokkos_FOUND ON)
+  set(Kokkos_FOUND ON)
   # Let deal.II know that we have found Kokkos
-  SET(KOKKOS_FOUND ON)
-ELSE()
+  set(KOKKOS_FOUND ON)
+else()
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-  LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-  FIND_PACKAGE(Kokkos 3.7.0 QUIET
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  find_package(Kokkos 3.7.0 QUIET
     HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
     )
-  LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-  IF(Kokkos_FOUND)
+  if(Kokkos_FOUND)
     # We are only interested in Kokkos if it is not part of Trilinos
-    IF(TARGET Kokkos::kokkos AND TARGET Kokkos::kokkoscore)
-      GET_PROPERTY(KOKKOS_INSTALL_INCLUDE_DIR TARGET Kokkos::kokkos PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
-      GET_PROPERTY(KOKKOS_EXTRA_LD_FLAGS_FULL TARGET Kokkos::kokkoscore PROPERTY INTERFACE_LINK_OPTIONS)
-      STRING(REGEX REPLACE "\\$<\\$<LINK_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_EXTRA_LD_FLAGS "${KOKKOS_EXTRA_LD_FLAGS_FULL}")
-      STRING(REPLACE ";" " " KOKKOS_EXTRA_LD_FLAGS "${KOKKOS_EXTRA_LD_FLAGS}")
-      GET_PROPERTY(KOKKOS_COMPILE_FLAGS_FULL TARGET Kokkos::kokkoscore PROPERTY INTERFACE_COMPILE_OPTIONS)
-      STRING(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
-      STRING(REPLACE ";" " " KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
+    if(TARGET Kokkos::kokkos AND TARGET Kokkos::kokkoscore)
+      get_property(KOKKOS_INSTALL_INCLUDE_DIR TARGET Kokkos::kokkos PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+      get_property(KOKKOS_EXTRA_LD_FLAGS_FULL TARGET Kokkos::kokkoscore PROPERTY INTERFACE_LINK_OPTIONS)
+      string(REGEX REPLACE "\\$<\\$<LINK_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_EXTRA_LD_FLAGS "${KOKKOS_EXTRA_LD_FLAGS_FULL}")
+      string(REPLACE ";" " " KOKKOS_EXTRA_LD_FLAGS "${KOKKOS_EXTRA_LD_FLAGS}")
+      get_property(KOKKOS_COMPILE_FLAGS_FULL TARGET Kokkos::kokkoscore PROPERTY INTERFACE_COMPILE_OPTIONS)
+      string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
+      string(REPLACE ";" " " KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
 
       # We need to disable SIMD vectorization for CUDA device code.
       # Otherwise, nvcc compilers from version 9 on will emit an error message like:
       # "[...] contains a vector, which is not supported in device code". We
       # would like to set the variable in check_01_cpu_feature but at that point
       # we don't know if CUDA support is enabled in Kokkos
-      IF(Kokkos_ENABLE_CUDA)
-        SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+      if(Kokkos_ENABLE_CUDA)
+        set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
         # Require lambda support to use Kokkos as a backend
         KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
-      ENDIF()
+      endif()
 
-      DEAL_II_FIND_LIBRARY(KOKKOS_CORE_LIBRARY
+      deal_ii_find_library(KOKKOS_CORE_LIBRARY
         NAMES kokkoscore
         HINTS ${KOKKOS_DIR}/lib ${Kokkos_DIR}/lib $ENV{Kokkos_DIR}/lib
         PATH_SUFFIXES
           lib${LIB_SUFFIX} lib64 lib
         )
 
-      DEAL_II_FIND_LIBRARY(KOKKOS_CONTAINERS_LIBRARY
+      deal_ii_find_library(KOKKOS_CONTAINERS_LIBRARY
         NAMES kokkoscontainers
         HINTS ${KOKKOS_DIR}/lib ${Kokkos_DIR}/lib $ENV{Kokkos_DIR}/lib
         PATH_SUFFIXES
           lib${LIB_SUFFIX} lib64 lib
         )
-    ELSE()
-      SET(Kokkos_FOUND FALSE)
-    ENDIF()
-  ENDIF()
+    else()
+      set(Kokkos_FOUND FALSE)
+    endif()
+  endif()
 
-  DEAL_II_PACKAGE_HANDLE(KOKKOS
+  deal_ii_package_handle(KOKKOS
     LIBRARIES REQUIRED KOKKOS_CORE_LIBRARY KOKKOS_CONTAINERS_LIBRARY
     INCLUDE_DIRS REQUIRED KOKKOS_INSTALL_INCLUDE_DIR
     USER_INCLUDE_DIRS REQUIRED KOKKOS_INSTALL_INCLUDE_DIR
@@ -87,4 +87,4 @@ ELSE()
     LINKER_FLAGS OPTIONAL KOKKOS_EXTRA_LD_FLAGS
     CLEAR KOKKOS_DIR KOKKOS_CORE_LIBRARY KOKKOS_CONTAINERS_LIBRARY
     )
-ENDIF()
+endif()

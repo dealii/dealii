@@ -24,12 +24,12 @@
 # two distinct setups.
 #
 
-MESSAGE(STATUS "Setting up project configuration")
+message(STATUS "Setting up project configuration")
 
 #
 # Configure the template-arguments file
 #
-CONFIGURE_FILE( # for binary dir:
+configure_file( # for binary dir:
   ${CMAKE_CURRENT_SOURCE_DIR}/template-arguments.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
   )
@@ -41,7 +41,7 @@ CONFIGURE_FILE( # for binary dir:
 #                                                                      #
 ########################################################################
 
-SET(_macros
+set(_macros
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
@@ -49,10 +49,10 @@ SET(_macros
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
   )
-FILE(COPY ${_macros}
+file(COPY ${_macros}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
   )
-INSTALL(FILES ${_macros}
+install(FILES ${_macros}
   DESTINATION ${DEAL_II_SHARE_RELDIR}/macros
   COMPONENT library
   )
@@ -69,7 +69,7 @@ INSTALL(FILES ${_macros}
 # deprecation warnings are actually shown for user code:
 #
 
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
+strip_flag(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 #
 # Strip -Wsuggest-override. Enabling this warning is a stylistic choice
@@ -77,64 +77,64 @@ STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 # Let's be nice and disable the flag for now.
 #
 
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wsuggest-override")
+strip_flag(DEAL_II_CXX_FLAGS "-Wsuggest-override")
 
 #
 # Populate a bunch of CONFIG_* variables with useful information:
 #
 
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
+foreach(_build ${DEAL_II_BUILD_TYPES})
 
-  IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
-    SET(_keyword "general")
-  ELSE()
-    IF(_build MATCHES DEBUG)
-      SET(_keyword "debug")
-    ELSE()
-      SET(_keyword "optimized")
-    ENDIF()
-  ENDIF()
+  if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+    set(_keyword "general")
+  else()
+    if(_build MATCHES DEBUG)
+      set(_keyword "debug")
+    else()
+      set(_keyword "optimized")
+    endif()
+  endif()
 
   #
   # Build up library name depending on link type and platform:
   #
 
-  IF(BUILD_SHARED_LIBS)
-    SET(_type "SHARED")
-  ELSE()
-    SET(_type "STATIC")
-  ENDIF()
+  if(BUILD_SHARED_LIBS)
+    set(_type "SHARED")
+  else()
+    set(_type "STATIC")
+  endif()
 
-  SET(_name "${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}")
-  SET(CONFIG_LIBRARIES_${_build}
+  set(_name "${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}")
+  set(CONFIG_LIBRARIES_${_build}
     "\${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}/${_name}"
     ${DEAL_II_LIBRARIES_${_build}}
     ${DEAL_II_LIBRARIES}
     )
-  LIST(APPEND CONFIG_LIBRARIES ${_keyword} \${DEAL_II_LIBRARIES_${_build}})
+  list(APPEND CONFIG_LIBRARIES ${_keyword} \${DEAL_II_LIBRARIES_${_build}})
 
-  SET(CONFIG_TARGET_${_build} ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
-  LIST(APPEND CONFIG_TARGET ${_keyword} \${DEAL_II_TARGET_${_build}})
-ENDFOREACH()
+  set(CONFIG_TARGET_${_build} ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+  list(APPEND CONFIG_TARGET ${_keyword} \${DEAL_II_TARGET_${_build}})
+endforeach()
 
 #
 # For binary dir:
 #
 
-SET(CONFIG_BUILD_DIR TRUE)
-SET(CONFIG_INCLUDE_DIRS
+set(CONFIG_BUILD_DIR TRUE)
+set(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include
   ${CMAKE_SOURCE_DIR}/include/
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   @ONLY
   )
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
@@ -146,32 +146,32 @@ CONFIGURE_FILE(
 
 # Make sure that we only ever record the bundled subdirectory if it is in
 # fact created:
-IF("${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
-  SET(_installed_bundled "")
-ELSE()
-  SET(_installed_bundled
+if("${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
+  set(_installed_bundled "")
+else()
+  set(_installed_bundled
     "\${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled"
     )
-ENDIF()
+endif()
 
-SET(CONFIG_BUILD_DIR FALSE)
-SET(CONFIG_INCLUDE_DIRS
+set(CONFIG_BUILD_DIR FALSE)
+set(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
   ${_installed_bundled}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   @ONLY
   )
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
   )
-INSTALL(FILES
+install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake
@@ -183,52 +183,52 @@ INSTALL(FILES
 # Append feature configuration to all configuration files:
 #
 
-SET(_files
+set(_files
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   )
-FOREACH(_file ${_files})
-  FILE(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
-  FILE(APPEND ${_file}
-    "SET(DEAL_II_WITH_CXX11 ON)\n"
-    "SET(DEAL_II_WITH_CXX14 ON)\n"
-    "SET(DEAL_II_WITH_CXX17 ${DEAL_II_HAVE_CXX17})\n"
-    "SET(DEAL_II_WITH_THREADS ON)\n"
+foreach(_file ${_files})
+  file(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
+  file(APPEND ${_file}
+    "set(DEAL_II_WITH_CXX11 ON)\n"
+    "set(DEAL_II_WITH_CXX14 ON)\n"
+    "set(DEAL_II_WITH_CXX17 ${DEAL_II_HAVE_CXX17})\n"
+    "set(DEAL_II_WITH_THREADS ON)\n"
     )
-ENDFOREACH()
+endforeach()
 
-GET_CMAKE_PROPERTY(_res VARIABLES)
-FOREACH(_var ${_res})
-  IF(_var MATCHES "DEAL_II_.*WITH")
-    LIST(APPEND _additional_config_variables ${_var})
-  ENDIF()
-ENDFOREACH()
+get_cmake_property(_res VARIABLES)
+foreach(_var ${_res})
+  if(_var MATCHES "DEAL_II_.*WITH")
+    list(APPEND _additional_config_variables ${_var})
+  endif()
+endforeach()
 
-SET(_deal_ii_features_sorted ${DEAL_II_FEATURES})
-LIST(SORT _deal_ii_features_sorted)
-FOREACH(_name ${_deal_ii_features_sorted})
-  SET(_var DEAL_II_WITH_${_name})
+set(_deal_ii_features_sorted ${DEAL_II_FEATURES})
+list(SORT _deal_ii_features_sorted)
+foreach(_name ${_deal_ii_features_sorted})
+  set(_var DEAL_II_WITH_${_name})
 
-  FOREACH(_file ${_files})
-    FILE(APPEND ${_file} "SET(${_var} ${${_var}})\n")
+  foreach(_file ${_files})
+    file(APPEND ${_file} "set(${_var} ${${_var}})\n")
     #
     # Do not pollute deal.IIConfig.cmake with package details of
     # unconfigured features.
     #
-    IF(${_var})
-      IF(NOT "${${_name}_VERSION}" STREQUAL "")
-        FILE(APPEND ${_file}
-          "SET(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
+    if(${_var})
+      if(NOT "${${_name}_VERSION}" STREQUAL "")
+        file(APPEND ${_file}
+          "set(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
           )
-      ENDIF()
-      FOREACH(_additional ${_additional_config_variables})
-        IF(_additional MATCHES "DEAL_II_${_name}_WITH")
-          FILE(APPEND ${_file} "SET(${_additional} ${${_additional}})\n")
-        ENDIF()
-      ENDFOREACH()
-    ENDIF()
-  ENDFOREACH()
-ENDFOREACH()
+      endif()
+      foreach(_additional ${_additional_config_variables})
+        if(_additional MATCHES "DEAL_II_${_name}_WITH")
+          file(APPEND ${_file} "set(${_additional} ${${_additional}})\n")
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+endforeach()
 
 
 ########################################################################
@@ -259,120 +259,120 @@ ENDFOREACH()
 # We need to gather some variables for the regex below to work.
 #
 
-SET(_library_prefixes "")
-IF (CMAKE_SHARED_LIBRARY_PREFIX)
-  LIST(APPEND _library_prefixes ${CMAKE_SHARED_LIBRARY_PREFIX})
-ENDIF()
-IF (CMAKE_STATIC_LIBRARY_PREFIX)
-  LIST(APPEND _library_prefixes ${CMAKE_STATIC_LIBRARY_PREFIX})
-ENDIF()
-STRING(REPLACE ";" "|" _library_prefixes "${_library_prefixes}")
+set(_library_prefixes "")
+if (CMAKE_SHARED_LIBRARY_PREFIX)
+  list(APPEND _library_prefixes ${CMAKE_SHARED_LIBRARY_PREFIX})
+endif()
+if (CMAKE_STATIC_LIBRARY_PREFIX)
+  list(APPEND _library_prefixes ${CMAKE_STATIC_LIBRARY_PREFIX})
+endif()
+string(REPLACE ";" "|" _library_prefixes "${_library_prefixes}")
 
-SET(_library_suffixes "")
-IF (CMAKE_SHARED_LIBRARY_SUFFIX)
-  LIST(APPEND _library_suffixes ${CMAKE_SHARED_LIBRARY_SUFFIX})
-ENDIF()
-IF (CMAKE_STATIC_LIBRARY_SUFFIX)
-  LIST(APPEND _library_suffixes ${CMAKE_STATIC_LIBRARY_SUFFIX})
-ENDIF()
-STRING(REPLACE ";" "|" _library_suffixes "${_library_suffixes}")
+set(_library_suffixes "")
+if (CMAKE_SHARED_LIBRARY_SUFFIX)
+  list(APPEND _library_suffixes ${CMAKE_SHARED_LIBRARY_SUFFIX})
+endif()
+if (CMAKE_STATIC_LIBRARY_SUFFIX)
+  list(APPEND _library_suffixes ${CMAKE_STATIC_LIBRARY_SUFFIX})
+endif()
+string(REPLACE ";" "|" _library_suffixes "${_library_suffixes}")
 
 #
 # Build up the link line from our list of libraries:
 #
 
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build_lowercase)
+foreach(_build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${_build} _build_lowercase)
 
-  SET(_name "${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}")
+  set(_name "${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}")
 
-  SET(CONFIG_RPATH_${_build}_PC "\\\${libdir}")
-  SET(CONFIG_LIBRARIES_${_build}_PC "-L\${libdir} -l${_name}")
+  set(CONFIG_RPATH_${_build}_PC "\\\${libdir}")
+  set(CONFIG_LIBRARIES_${_build}_PC "-L\${libdir} -l${_name}")
 
-  FOREACH(_lib ${DEAL_II_LIBRARIES_${_build}} ${DEAL_II_LIBRARIES})
+  foreach(_lib ${DEAL_II_LIBRARIES_${_build}} ${DEAL_II_LIBRARIES})
 
-    GET_FILENAME_COMPONENT(_name ${_lib} NAME)
-    GET_FILENAME_COMPONENT(_dir ${_lib} PATH)
+    get_filename_component(_name ${_lib} NAME)
+    get_filename_component(_dir ${_lib} PATH)
 
-    IF("${_dir}" STREQUAL "")
+    if("${_dir}" STREQUAL "")
       # ${_lib} is a simple library name, just add it to the link line:
-      SET(_library_string "-l${_lib}")
+      set(_library_string "-l${_lib}")
 
-    ELSE()
+    else()
       # ${_lib} is a full library path:
 
       #
       # Only append a library directory if it is new ...
       #
 
-      LIST(FIND CONFIG_RPATH_${_build}_PC "${_dir}" _index)
-      IF (${_index} EQUAL -1)
-        SET(_library_string "-L${_dir} ")
-        LIST(APPEND CONFIG_RPATH_${_build}_PC ${_dir})
-      ELSE()
-        SET(_library_string "")
-      ENDIF()
+      list(FIND CONFIG_RPATH_${_build}_PC "${_dir}" _index)
+      if (${_index} EQUAL -1)
+        set(_library_string "-L${_dir} ")
+        list(APPEND CONFIG_RPATH_${_build}_PC ${_dir})
+      else()
+        set(_library_string "")
+      endif()
 
       # Recover short name:
-      IF(_library_prefixes)
-        STRING(REGEX REPLACE "^(${_library_prefixes})" "" _name "${_name}")
-      ENDIF()
-      IF(_library_suffixes)
-        STRING(REGEX REPLACE "(${_library_suffixes})$" "" _name "${_name}")
-      ENDIF()
-      SET(_library_string "${_library_string}-l${_name}")
-    ENDIF()
+      if(_library_prefixes)
+        string(REGEX REPLACE "^(${_library_prefixes})" "" _name "${_name}")
+      endif()
+      if(_library_suffixes)
+        string(REGEX REPLACE "(${_library_suffixes})$" "" _name "${_name}")
+      endif()
+      set(_library_string "${_library_string}-l${_name}")
+    endif()
 
-    SET(CONFIG_LIBRARIES_${_build}_PC
+    set(CONFIG_LIBRARIES_${_build}_PC
       "${CONFIG_LIBRARIES_${_build}_PC} ${_library_string}"
       )
-  ENDFOREACH()
+  endforeach()
 
-  TO_STRING_AND_ADD_PREFIX(CONFIG_RPATH_${_build}_PC
+  to_string_and_add_prefix(CONFIG_RPATH_${_build}_PC
     "-Wl,-rpath," ${CONFIG_RPATH_${_build}_PC}
     )
-ENDFOREACH()
+endforeach()
 
 
 #
 # For binary dir (aka build dir):
 #
 
-SET(CONFIG_PATH_PC "${CMAKE_BINARY_DIR}")
+set(CONFIG_PATH_PC "${CMAKE_BINARY_DIR}")
 
-TO_STRING_AND_ADD_PREFIX(CONFIG_INCLUDE_DIRS_PC "-I"
+to_string_and_add_prefix(CONFIG_INCLUDE_DIRS_PC "-I"
   \\\${prefix}/include
   ${CMAKE_SOURCE_DIR}/include
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build_lowercase)
+foreach(_build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${_build} _build_lowercase)
 
-  SET(_config_directory "${CMAKE_BINARY_DIR}/${DEAL_II_PKGCONF_RELDIR}")
+  set(_config_directory "${CMAKE_BINARY_DIR}/${DEAL_II_PKGCONF_RELDIR}")
 
-  CONFIGURE_FILE(
+  configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config_${_build_lowercase}.pc.in
     ${_config_directory}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build_lowercase}.pc
     @ONLY
     )
-ENDFOREACH()
+endforeach()
 
 #
 # For installation:
 #
 
-SET(CONFIG_PATH_PC "${CMAKE_INSTALL_PREFIX}")
+set(CONFIG_PATH_PC "${CMAKE_INSTALL_PREFIX}")
 
-TO_STRING_AND_ADD_PREFIX(CONFIG_INCLUDE_DIRS_PC "-I"
+to_string_and_add_prefix(CONFIG_INCLUDE_DIRS_PC "-I"
   \\\${includedir}
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build_lowercase)
+foreach(_build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${_build} _build_lowercase)
 
   #
   # Only populate the pkgconf files for the install directory if
@@ -384,25 +384,25 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   # FIXME: Unify RPATH handling between cmake and pkgconf configuration and
   # clearly document RPATH behavior.
   #
-  IF(NOT CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-    SET(CONFIG_RPATH_${_build}_PC "")
-  ENDIF()
+  if(NOT CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+    set(CONFIG_RPATH_${_build}_PC "")
+  endif()
 
-  CONFIGURE_FILE(
+  configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config_${_build_lowercase}.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build_lowercase}.pc
     @ONLY
     )
-  INSTALL(FILES
+  install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build_lowercase}.pc
     DESTINATION ${DEAL_II_PKGCONF_RELDIR}
     COMPONENT library
     )
-ENDFOREACH()
+endforeach()
 
 #
 # Job's done.
 #
 
-MESSAGE(STATUS "Setting up project configuration - Done")
+message(STATUS "Setting up project configuration - Done")
 

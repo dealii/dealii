@@ -19,7 +19,7 @@
 # DEAL_II_* variables
 #
 # Usage:
-#     REGISTER_FEATURE(feature)
+#     register_feature(feature)
 #
 # This macro will add
 #
@@ -29,9 +29,9 @@
 # DEAL_II_STRING_SUFFIXES to the corresponding DEAL_II_* variables
 #
 
-MACRO(REGISTER_FEATURE _feature)
+macro(REGISTER_FEATURE _feature)
 
-  IF(DEFINED ${_feature}_LIBRARIES)
+  if(DEFINED ${_feature}_LIBRARIES)
     #
     # Add ${_feature}_LIBRARIES to
     #   DEAL_II_LIBRARIES
@@ -39,34 +39,34 @@ MACRO(REGISTER_FEATURE _feature)
     #   DEAL_II_LIBRARIES_RELEASE
     # depending on the "optimized", "debug" or "general" keyword
     #
-    SET(_toggle "general")
-    FOREACH(_tmp ${${_feature}_LIBRARIES})
-      IF( "${_tmp}" STREQUAL "debug" OR
+    set(_toggle "general")
+    foreach(_tmp ${${_feature}_LIBRARIES})
+      if( "${_tmp}" STREQUAL "debug" OR
           "${_tmp}" STREQUAL "optimized" OR
           "${_tmp}" STREQUAL "general" )
-        SET(_toggle "${_tmp}")
-      ELSE()
-        IF("${_toggle}" STREQUAL "general")
-          LIST(APPEND DEAL_II_LIBRARIES ${_tmp})
-        ELSEIF("${_toggle}" STREQUAL "debug")
-          LIST(APPEND DEAL_II_LIBRARIES_DEBUG ${_tmp})
-        ELSEIF("${_toggle}" STREQUAL "optimized")
-          LIST(APPEND DEAL_II_LIBRARIES_RELEASE ${_tmp})
-        ENDIF()
-      ENDIF()
-    ENDFOREACH()
-  ENDIF()
+        set(_toggle "${_tmp}")
+      else()
+        if("${_toggle}" STREQUAL "general")
+          list(APPEND DEAL_II_LIBRARIES ${_tmp})
+        elseif("${_toggle}" STREQUAL "debug")
+          list(APPEND DEAL_II_LIBRARIES_DEBUG ${_tmp})
+        elseif("${_toggle}" STREQUAL "optimized")
+          list(APPEND DEAL_II_LIBRARIES_RELEASE ${_tmp})
+        endif()
+      endif()
+    endforeach()
+  endif()
 
-  FOREACH(_var ${DEAL_II_LIST_SUFFIXES})
-    IF(NOT "${_var}" STREQUAL "LIBRARIES" AND DEFINED ${_feature}_${_var})
-      LIST(APPEND DEAL_II_${_var} ${${_feature}_${_var}})
-    ENDIF()
-  ENDFOREACH()
+  foreach(_var ${DEAL_II_LIST_SUFFIXES})
+    if(NOT "${_var}" STREQUAL "LIBRARIES" AND DEFINED ${_feature}_${_var})
+      list(APPEND DEAL_II_${_var} ${${_feature}_${_var}})
+    endif()
+  endforeach()
 
-  FOREACH(_var ${DEAL_II_STRING_SUFFIXES})
-    IF(DEFINED ${_feature}_${_var})
-      ADD_FLAGS(DEAL_II_${_var} "${${_feature}_${_var}}")
-    ENDIF()
-  ENDFOREACH()
+  foreach(_var ${DEAL_II_STRING_SUFFIXES})
+    if(DEFINED ${_feature}_${_var})
+      add_flags(DEAL_II_${_var} "${${_feature}_${_var}}")
+    endif()
+  endforeach()
 
-ENDMACRO()
+endmacro()

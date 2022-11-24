@@ -17,19 +17,19 @@
 # Configuration for the SCALAPACK library:
 #
 
-SET(FEATURE_SCALAPACK_DEPENDS MPI LAPACK)
+set(FEATURE_SCALAPACK_DEPENDS MPI LAPACK)
 
 
-MACRO(FEATURE_SCALAPACK_FIND_EXTERNAL var)
-  FIND_PACKAGE(SCALAPACK)
+macro(FEATURE_SCALAPACK_FIND_EXTERNAL var)
+  find_package(SCALAPACK)
 
-  IF(SCALAPACK_FOUND)
-    SET(${var} TRUE)
-    CHECK_MPI_INTERFACE(SCALAPACK ${var})
+  if(SCALAPACK_FOUND)
+    set(${var} TRUE)
+    check_mpi_interface(SCALAPACK ${var})
 
-    IF (${var})
-      CLEAR_CMAKE_REQUIRED()
-      SET(CMAKE_REQUIRED_LIBRARIES ${SCALAPACK_LIBRARIES} ${LAPACK_LIBRARIES})
+    if (${var})
+      clear_cmake_required()
+      set(CMAKE_REQUIRED_LIBRARIES ${SCALAPACK_LIBRARIES} ${LAPACK_LIBRARIES})
       CHECK_C_SOURCE_COMPILES("
         void pdsyevr_();
         void pssyevr_();
@@ -39,13 +39,13 @@ MACRO(FEATURE_SCALAPACK_FIND_EXTERNAL var)
           return 0;
         }"
         DEAL_II_SCALAPACK_HAS_PDSYEVR_PSSYEVR)
-        RESET_CMAKE_REQUIRED()
+        reset_cmake_required()
 
-      IF(NOT DEAL_II_SCALAPACK_HAS_PDSYEVR_PSSYEVR)
-        MESSAGE(STATUS "Could not find a sufficient SCALAPACK installation: "
+      if(NOT DEAL_II_SCALAPACK_HAS_PDSYEVR_PSSYEVR)
+        message(STATUS "Could not find a sufficient SCALAPACK installation: "
           "The required symbols pdsyevr_ and pssyevr_ were not found."
           )
-        SET(SCALAPACK_ADDITIONAL_ERROR_STRING
+        set(SCALAPACK_ADDITIONAL_ERROR_STRING
           ${SCALAPACK_ADDITIONAL_ERROR_STRING}
           "Could not find a sufficient SCALAPACK installation: \n"
           "SCALAPACK symbol check for pdsyevr_ and pssyevr_ failed! "
@@ -54,10 +54,10 @@ MACRO(FEATURE_SCALAPACK_FIND_EXTERNAL var)
           "  CMakeFiles/CMakeError.log\n"
           "for further information.\n"
           )
-        SET(${var} FALSE)
-      ENDIF()
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+        set(${var} FALSE)
+      endif()
+    endif()
+  endif()
+endmacro()
 
-CONFIGURE_FEATURE(SCALAPACK)
+configure_feature(SCALAPACK)

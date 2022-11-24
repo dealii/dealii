@@ -22,54 +22,54 @@
 #
 
 
-IF("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
+if("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
   #
   # In case that CMAKE_INSTALL_PREFIX wasn't set, we assume that the user
   # doesn't actually want to install but just use deal.II in the build
   # directory. In this case, do not add the "install" phase to the
   # convenience targets.
   #
-  MACRO(_add_custom_target _name)
-    ADD_CUSTOM_TARGET(${_name})
-  ENDMACRO()
+  macro(_add_custom_target _name)
+    add_custom_target(${_name})
+  endmacro()
 
   # Print precise information about the convenience targets:
-  SET(_description_string "build")
-ELSE()
-  MACRO(_add_custom_target _name)
-    ADD_CUSTOM_TARGET(${_name}
+  set(_description_string "build")
+else()
+  macro(_add_custom_target _name)
+    add_custom_target(${_name}
       COMMAND ${CMAKE_COMMAND}
         -DCOMPONENT="${_name}" -P cmake_install.cmake
       COMMENT "Build and install component \"library\"."
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       )
-  ENDMACRO()
+  endmacro()
 
   # Print precise information about the convenience targets:
-  SET(_description_string "build and install")
-ENDIF()
+  set(_description_string "build and install")
+endif()
 
 # The library can always be compiled and/or installed unconditionally ;-)
 _add_custom_target(library)
 
-FOREACH(_component documentation examples python_bindings)
-  STRING(TOUPPER "${_component}" _component_uppercase)
-  IF(DEAL_II_COMPONENT_${_component_uppercase})
+foreach(_component documentation examples python_bindings)
+  string(TOUPPER "${_component}" _component_uppercase)
+  if(DEAL_II_COMPONENT_${_component_uppercase})
     _add_custom_target(${_component})
-  ELSE()
-    STRING(TOUPPER ${_component} _componentuppercase)
+  else()
+    string(TOUPPER ${_component} _componentuppercase)
 
-    SET(_error_description_message
+    set(_error_description_message
       "Error: Could not ${_description_string} disabled component ${_component}.")
-    DECORATE_WITH_STARS(${_error_description_message}
+    decorate_with_stars(${_error_description_message}
       _decorated_error_description_message)
 
-    SET(_reconfiguration_help_message
+    set(_reconfiguration_help_message
       "Please reconfigure with -DDEAL_II_COMPONENT_${_componentuppercase}=ON")
-    DECORATE_WITH_STARS(${_reconfiguration_help_message}
+    decorate_with_stars(${_reconfiguration_help_message}
       _decorated_reconfiguration_help_message)
 
-    ADD_CUSTOM_TARGET(${_component}
+    add_custom_target(${_component}
       COMMAND
            ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo ''
@@ -81,11 +81,11 @@ FOREACH(_component documentation examples python_bindings)
         && ${CMAKE_COMMAND} -E echo ''
         && false
       )
-  ENDIF()
-ENDFOREACH()
+  endif()
+endforeach()
 
-IF(NOT DEAL_II_COMPONENT_PACKAGE)
-  ADD_CUSTOM_TARGET(package
+if(NOT DEAL_II_COMPONENT_PACKAGE)
+  add_custom_target(package
     COMMAND
          ${CMAKE_COMMAND} -E echo ''
       && ${CMAKE_COMMAND} -E echo ''
@@ -97,13 +97,13 @@ IF(NOT DEAL_II_COMPONENT_PACKAGE)
       && ${CMAKE_COMMAND} -E echo ''
       && false
     )
-ENDIF()
+endif()
 
 #
 # Provide an indentation target for indenting uncommitted changes and changes on
 # the current feature branch
 #
-ADD_CUSTOM_TARGET(indent
+add_custom_target(indent
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   COMMAND ./contrib/utilities/indent
   COMMENT "Indenting recently changed files in the deal.II directories"
@@ -112,7 +112,7 @@ ADD_CUSTOM_TARGET(indent
 #
 # Provide "indent" target for indenting all headers and source files
 #
-ADD_CUSTOM_TARGET(indent-all
+add_custom_target(indent-all
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   COMMAND ./contrib/utilities/indent-all
   COMMENT "Indenting all files in the deal.II directories"
@@ -122,14 +122,14 @@ ADD_CUSTOM_TARGET(indent-all
 #
 # Provide an "info" target to print a help message:
 #
-IF(CMAKE_GENERATOR MATCHES "Ninja")
-  SET(_make_command "ninja")
-ELSE()
-  SET(_make_command "make")
-ENDIF()
+if(CMAKE_GENERATOR MATCHES "Ninja")
+  set(_make_command "ninja")
+else()
+  set(_make_command "make")
+endif()
 
-FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"MESSAGE(
+file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+"message(
 \"###
 #
 #  The following targets are available (invoke by $ ${_make_command} <target>):
@@ -164,26 +164,26 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 # Provide "relocate" target to run install_name_tool on all external libraries
 # under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}
 #
-IF(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND
   NOT "${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}" STREQUAL "")
-  ADD_CUSTOM_TARGET(relocate
+  add_custom_target(relocate
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMAND ./contrib/utilities/relocate_libraries.py
     COMMENT "Running install_name_tool under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}"
     )
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+  file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   "#
 #    relocate       - fix RPATH for external libraries, if packaging was requested
 "
    )
-ENDIF()
+endif()
 
-FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 "#
 ###\")"
 )
 
-ADD_CUSTOM_TARGET(info
+add_custom_target(info
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   )
 
@@ -191,4 +191,4 @@ ADD_CUSTOM_TARGET(info
 #
 # Provide a target to build all .inst files
 #
-ADD_CUSTOM_TARGET(expand_all_instantiations)
+add_custom_target(expand_all_instantiations)

@@ -13,9 +13,9 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_unity_include_src
+set(_unity_include_src
   mg_base.cc
   mg_level_global_transfer.cc
   mg_transfer_block.cc
@@ -26,21 +26,21 @@ SET(_unity_include_src
   multigrid.cc
   )
 
-SET(_separate_src
+set(_separate_src
   mg_tools.cc
   mg_transfer_matrix_free.cc
   )
 
 # concatenate all unity inclusion files in one file
-SET(_n_includes_per_unity_file 15)
+set(_n_includes_per_unity_file 15)
 
-SETUP_SOURCE_LIST("${_unity_include_src}"
+setup_source_list("${_unity_include_src}"
   "${_separate_src}"
   ${_n_includes_per_unity_file}
   _src
   )
 
-SET(_inst
+set(_inst
   mg_base.inst.in
   mg_level_global_transfer.inst.in
   mg_tools.inst.in
@@ -53,9 +53,9 @@ SET(_inst
   multigrid.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/multigrid/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_multigrid OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_multigrid "${_inst}")
+deal_ii_add_library(obj_multigrid OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_multigrid "${_inst}")

@@ -17,15 +17,15 @@
 # Remove all occurrences of "${flag}" in the string variable.
 #
 # Usage:
-#     STRIP_FLAG(variable flag)
+#     strip_flag(variable flag)
 #
 
-MACRO(STRIP_FLAG _variable _flag)
-  STRING(REPLACE " " "  " ${_variable} "${${_variable}}")
-  SET(${_variable} " ${${_variable}} ")
-  STRING(REPLACE " " "  " _flag2 "${_flag}")
-  STRING(REPLACE " ${_flag2} " " " ${_variable} "${${_variable}}")
-  STRING(REPLACE "  " " " ${_variable} "${${_variable}}")
-  STRING(STRIP "${${_variable}}" ${_variable})
-ENDMACRO()
+macro(STRIP_FLAG _variable _flag)
+  string(REPLACE " " "  " ${_variable} "${${_variable}}")
+  set(${_variable} " ${${_variable}} ")
+  string(REPLACE " " "  " _flag2 "${_flag}")
+  string(REPLACE " ${_flag2} " " " ${_variable} "${${_variable}}")
+  string(REPLACE "  " " " ${_variable} "${${_variable}}")
+  string(STRIP "${${_variable}}" ${_variable})
+endmacro()
 

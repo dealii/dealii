@@ -1,3 +1,3 @@
-SET(TRACK "Experimental")
-SET(COVERAGE TRUE)
-INCLUDE(${CMAKE_CURRENT_LIST_DIR}/run_testsuite.cmake)
+set(TRACK "Experimental")
+set(COVERAGE TRUE)
+include(${CMAKE_CURRENT_LIST_DIR}/run_testsuite.cmake)

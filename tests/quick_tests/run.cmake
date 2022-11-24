@@ -18,9 +18,9 @@
 # error messages.
 include(ProcessorCount)
 PROCESSORCOUNT(_n_processors)
-IF(_n_processors EQUAL 0)
-  SET(_n_processors "1")
-ENDIF()
+if(_n_processors EQUAL 0)
+  set(_n_processors "1")
+endif()
 
 
 # Windows quick tests have a race condition, so disable compiling/running
@@ -30,21 +30,21 @@ ENDIF()
 # "obj_boost_system_debug.dir\Debug\obj_boos.4A356C5C.tlog\obj_boost_system_debug.lastbuildstate". The
 # process cannot access the file '...' because it is being used by another
 # process.
-IF(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
-  SET(_n_processors "1")
-ENDIF()
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+  set(_n_processors "1")
+endif()
 
-SEPARATE_ARGUMENTS(ALL_TESTS)
+separate_arguments(ALL_TESTS)
 
-EXECUTE_PROCESS(COMMAND ${CMAKE_CTEST_COMMAND} -j${_n_processors}
+execute_process(COMMAND ${CMAKE_CTEST_COMMAND} -j${_n_processors}
   -C ${CMAKE_BUILD_TYPE}
   --force-new-ctest-process
   --output-on-failure
   -O quicktests.log
   RESULT_VARIABLE res_var)
 
-IF(NOT "${res_var}" STREQUAL "0")
-  MESSAGE("
+if(NOT "${res_var}" STREQUAL "0")
+  message("
 ***************************************************************************
 **                 Error: Some of the quick tests failed.                **
 ***************************************************************************
@@ -54,39 +54,39 @@ error messages. If you are unable to fix the problems, see the FAQ or write
 to the mailing list linked at http://www.dealii.org\n"
     )
 
-  FOREACH(test ${ALL_TESTS})  
-    IF (${test} MATCHES "^affinity" AND NOT EXISTS ${test}-OK)
-      MESSAGE("
+  foreach(test ${ALL_TESTS})  
+    if (${test} MATCHES "^affinity" AND NOT EXISTS ${test}-OK)
+      message("
 The affinity test can fail when you are linking in a library like BLAS
 which uses OpenMP. Even without calling any BLAS functions, OpenMP messes
 with the thread affinity which causes TBB to run single-threaded only. You
 can fix this by exporting OMP_NUM_THREADS=1. Also see GOMP_CPU_AFFINITY 
 and OMP_PROC_BIND.\n"
         )
-    ENDIF()
+    endif()
 
-    IF (${test} MATCHES "^step-petsc" AND NOT EXISTS ${test}-OK)
-      MESSAGE("
+    if (${test} MATCHES "^step-petsc" AND NOT EXISTS ${test}-OK)
+      message("
 Additional information about PETSc issues is available
 at:\nhttp://www.dealii.org/developer/external-libs/petsc.html\n"
         )
-    ENDIF()
+    endif()
 
-    IF (${test} MATCHES "^p4est" AND NOT EXISTS ${test}-OK)
-      MESSAGE("
+    if (${test} MATCHES "^p4est" AND NOT EXISTS ${test}-OK)
+      message("
 The p4est test can fail if you are running an OpenMPI version before 1.5.
 This is a known problem and the only work around is to update to a more
 recent version or use a different MPI library like MPICH.\n"
         )
-    ENDIF()
+    endif()
 
-  ENDFOREACH()
+  endforeach()
 
-  # The CMake command MESSAGE(SEND_ERROR ...) is, to the best of the authors'
+  # The CMake command message(SEND_ERROR ...) is, to the best of the authors'
   # knowledge, the only way to set the exit status of CMake to a nonzero value.
-  # If we used MESSAGE(SEND_ERROR ...) at the top (with the actual error
+  # If we used message(SEND_ERROR ...) at the top (with the actual error
   # message) then subsequent messages (i.e., the test specific help) would not
   # be printed. Hence, do it down here.
-  MESSAGE(SEND_ERROR "")
+  message(SEND_ERROR "")
 
-ENDIF()
+endif()

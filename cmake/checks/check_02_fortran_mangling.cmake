@@ -32,47 +32,47 @@
 # mangling.
 #
 
-IF(${DEAL_II_Fortran_COMPILER_WORKS})
-  MESSAGE(STATUS "Found a valid Fortran compiler - using it to set up mangling")
-  INCLUDE(FortranCInterface)
-  IF("${FortranCInterface_GLOBAL_CASE}" STREQUAL "LOWER")
-    SET(_name "name")
-  ELSE()
-    SET(_name "NAME")
-  ENDIF()
+if(${DEAL_II_Fortran_COMPILER_WORKS})
+  message(STATUS "Found a valid Fortran compiler - using it to set up mangling")
+  include(FortranCInterface)
+  if("${FortranCInterface_GLOBAL_CASE}" STREQUAL "LOWER")
+    set(_name "name")
+  else()
+    set(_name "NAME")
+  endif()
 
-  # STRING(JOIN ...) is in CMake 3.12 and newer, which we don't yet require
-  SET(DEAL_II_FORTRAN_MANGLE "${_name}")
-  IF(NOT "${FortranCInterface_GLOBAL_PREFIX}" STREQUAL "")
-    SET(DEAL_II_FORTRAN_MANGLE
+  # string(JOIN ...) is in CMake 3.12 and newer, which we don't yet require
+  set(DEAL_II_FORTRAN_MANGLE "${_name}")
+  if(NOT "${FortranCInterface_GLOBAL_PREFIX}" STREQUAL "")
+    set(DEAL_II_FORTRAN_MANGLE
       "${FortranCInterface_GLOBAL_PREFIX} ## ${DEAL_II_FORTRAN_MANGLE}")
-  ENDIF()
-  IF(NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
-    SET(DEAL_II_FORTRAN_MANGLE
+  endif()
+  if(NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
+    set(DEAL_II_FORTRAN_MANGLE
       "${DEAL_II_FORTRAN_MANGLE} ## ${FortranCInterface_GLOBAL_SUFFIX}")
-  ENDIF()
+  endif()
 
   # Same issue for identifiers containing underscores
-  IF("${FortranCInterface_GLOBAL__CASE}" STREQUAL "LOWER")
-    SET(_name "name")
-  ELSE()
-    SET(_name "NAME")
-  ENDIF()
+  if("${FortranCInterface_GLOBAL__CASE}" STREQUAL "LOWER")
+    set(_name "name")
+  else()
+    set(_name "NAME")
+  endif()
 
-  SET(DEAL_II_FORTRAN_MANGLE_UNDERSCORE "${_name}")
-  IF(NOT "${FortranCInterface_GLOBAL__PREFIX}" STREQUAL "")
-    SET(DEAL_II_FORTRAN_MANGLE_UNDERSCORE
+  set(DEAL_II_FORTRAN_MANGLE_UNDERSCORE "${_name}")
+  if(NOT "${FortranCInterface_GLOBAL__PREFIX}" STREQUAL "")
+    set(DEAL_II_FORTRAN_MANGLE_UNDERSCORE
       "${FortranCInterface_GLOBAL__PREFIX} ## ${DEAL_II_FORTRAN_MANGLE_UNDERSCORE}")
-  ENDIF()
-  IF(NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
-    SET(DEAL_II_FORTRAN_MANGLE_UNDERSCORE
+  endif()
+  if(NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
+    set(DEAL_II_FORTRAN_MANGLE_UNDERSCORE
       "${DEAL_II_FORTRAN_MANGLE_UNDERSCORE} ## ${FortranCInterface_GLOBAL__SUFFIX}")
-  ENDIF()
-ELSE()
+  endif()
+else()
   # Otherwise just use GNU mangling. This is almost always the right choice
   # anyway - until 2021 we did not even support other mangling options
-  MESSAGE(STATUS "Could NOT find a valid Fortran compiler - using default mangling")
+  message(STATUS "Could NOT find a valid Fortran compiler - using default mangling")
 
-  SET(DEAL_II_FORTRAN_MANGLE "name ## _")
-  SET(DEAL_II_FORTRAN_MANGLE_UNDERSCORE "name ## _")
-ENDIF()
+  set(DEAL_II_FORTRAN_MANGLE "name ## _")
+  set(DEAL_II_FORTRAN_MANGLE_UNDERSCORE "name ## _")
+endif()

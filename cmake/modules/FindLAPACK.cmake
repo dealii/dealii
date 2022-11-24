@@ -31,49 +31,49 @@
 # We have to use a trick with CMAKE_PREFIX_PATH to make LAPACK_DIR and
 # BLAS_DIR work...
 #
-OPTION(LAPACK_WITH_64BIT_BLAS_INDICES
+option(LAPACK_WITH_64BIT_BLAS_INDICES
   "BLAS has 64 bit integers."
   OFF
   )
-MARK_AS_ADVANCED(LAPACK_WITH_64BIT_BLAS_INDICES)
+mark_as_advanced(LAPACK_WITH_64BIT_BLAS_INDICES)
 
-SET(LAPACK_DIR "" CACHE PATH "An optional hint to a LAPACK installation")
-SET(BLAS_DIR "" CACHE PATH "An optional hint to a BLAS installation")
-SET_IF_EMPTY(BLAS_DIR "$ENV{BLAS_DIR}")
-SET_IF_EMPTY(LAPACK_DIR "$ENV{LAPACK_DIR}")
+set(LAPACK_DIR "" CACHE PATH "An optional hint to a LAPACK installation")
+set(BLAS_DIR "" CACHE PATH "An optional hint to a BLAS installation")
+set_if_empty(BLAS_DIR "$ENV{BLAS_DIR}")
+set_if_empty(LAPACK_DIR "$ENV{LAPACK_DIR}")
 
-SET(_cmake_prefix_path_backup "${CMAKE_PREFIX_PATH}")
+set(_cmake_prefix_path_backup "${CMAKE_PREFIX_PATH}")
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-SET(CMAKE_PREFIX_PATH ${BLAS_DIR} ${LAPACK_DIR} ${_cmake_prefix_path_backup})
-FIND_PACKAGE(BLAS)
+set(CMAKE_PREFIX_PATH ${BLAS_DIR} ${LAPACK_DIR} ${_cmake_prefix_path_backup})
+find_package(BLAS)
 
-SET(CMAKE_PREFIX_PATH ${LAPACK_DIR} ${_cmake_prefix_path_backup})
-FIND_PACKAGE(LAPACK)
+set(CMAKE_PREFIX_PATH ${LAPACK_DIR} ${_cmake_prefix_path_backup})
+find_package(LAPACK)
 
-SET(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+set(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
 # Filter out spurious "FALSE" in the library lists:
 #
-IF(DEFINED BLAS_LIBRARIES)
-  LIST(REMOVE_ITEM BLAS_LIBRARIES "FALSE")
-ENDIF()
-IF(DEFINED LAPACK_LIBRARIES)
-  LIST(REMOVE_ITEM LAPACK_LIBRARIES "FALSE")
-ENDIF()
+if(DEFINED BLAS_LIBRARIES)
+  list(REMOVE_ITEM BLAS_LIBRARIES "FALSE")
+endif()
+if(DEFINED LAPACK_LIBRARIES)
+  list(REMOVE_ITEM LAPACK_LIBRARIES "FALSE")
+endif()
 
 #
 # Work around a bug in CMake 3.11 by simply filtering out
 # "PkgConf::PKGC_BLAS". See bug
 #   https://gitlab.kitware.com/cmake/cmake/issues/17934
 #
-IF(DEFINED BLAS_LIBRARIES)
-  LIST(REMOVE_ITEM BLAS_LIBRARIES "PkgConfig::PKGC_BLAS")
-ENDIF()
+if(DEFINED BLAS_LIBRARIES)
+  list(REMOVE_ITEM BLAS_LIBRARIES "PkgConfig::PKGC_BLAS")
+endif()
 
 #
 # Well, in case of static archives we have to manually pick up the
@@ -82,8 +82,8 @@ ENDIF()
 # If CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES is not available, do it
 # unconditionally for the most common case (gfortran).
 #
-IF(NOT BUILD_SHARED_LIBS)
-  SET(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
+if(NOT BUILD_SHARED_LIBS)
+  set(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
   #
   # Since CMake 3.9 the gcc runtime libraries libgcc.a and libgcc_s.so.1
   # have been added to the CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES variable.
@@ -91,17 +91,17 @@ IF(NOT BUILD_SHARED_LIBS)
   # libgcc_s.so.1 from the link interface; otherwise completely static
   # linkage is broken.
   #
-  LIST(REMOVE_ITEM _fortran_libs gcc_s)
-  SET_IF_EMPTY(_fortran_libs gfortran quadmath m)
+  list(REMOVE_ITEM _fortran_libs gcc_s)
+  set_if_empty(_fortran_libs gfortran quadmath m)
 
-  FOREACH(_lib ${_fortran_libs})
-    FIND_SYSTEM_LIBRARY(${_lib}_LIBRARY NAMES ${_lib})
-    LIST(APPEND _additional_libraries ${_lib}_LIBRARY)
-  ENDFOREACH()
-ENDIF()
+  foreach(_lib ${_fortran_libs})
+    find_system_library(${_lib}_LIBRARY NAMES ${_lib})
+    list(APPEND _additional_libraries ${_lib}_LIBRARY)
+  endforeach()
+endif()
 
 
-DEAL_II_PACKAGE_HANDLE(LAPACK
+deal_ii_package_handle(LAPACK
   LIBRARIES
     REQUIRED LAPACK_LIBRARIES
     OPTIONAL BLAS_LIBRARIES ${_additional_libraries}

@@ -18,19 +18,19 @@
 # variable.
 #
 # Usage:
-#     REPLACE_FLAG(variable flag replacement)
+#     replace_flag(variable flag replacement)
 #
 
-MACRO(REPLACE_FLAG _variable _flag _replacement)
-  STRING(STRIP "${_replacement}" _replacement_stripped)
-  STRING(REPLACE " " "  " ${_variable} "${${_variable}}")
-  SET(${_variable} " ${${_variable}} ")
-  STRING(REPLACE " " "  " _flag2 "${_flag}")
-  IF(NOT "${_replacement_stripped}" STREQUAL "")
-    STRING(REPLACE " ${_flag2} " " ${_replacement_stripped} " ${_variable} "${${_variable}}")
-  ELSE()
-    STRING(REPLACE " ${_flag2} " " " ${_variable} "${${_variable}}")
-  ENDIF()
-  STRING(REPLACE "  " " " ${_variable} "${${_variable}}")
-  STRING(STRIP "${${_variable}}" ${_variable})
-ENDMACRO()
+macro(REPLACE_FLAG _variable _flag _replacement)
+  string(STRIP "${_replacement}" _replacement_stripped)
+  string(REPLACE " " "  " ${_variable} "${${_variable}}")
+  set(${_variable} " ${${_variable}} ")
+  string(REPLACE " " "  " _flag2 "${_flag}")
+  if(NOT "${_replacement_stripped}" STREQUAL "")
+    string(REPLACE " ${_flag2} " " ${_replacement_stripped} " ${_variable} "${${_variable}}")
+  else()
+    string(REPLACE " ${_flag2} " " " ${_variable} "${${_variable}}")
+  endif()
+  string(REPLACE "  " " " ${_variable} "${${_variable}}")
+  string(STRIP "${${_variable}}" ${_variable})
+endmacro()

@@ -17,17 +17,17 @@
 # Configuration for the umfpack library:
 #
 
-SET(FEATURE_UMFPACK_DEPENDS LAPACK)
+set(FEATURE_UMFPACK_DEPENDS LAPACK)
 
-MACRO(FEATURE_UMFPACK_CONFIGURE_BUNDLED)
-  SET(UMFPACK_BUNDLED_INCLUDE_DIRS
+macro(FEATURE_UMFPACK_CONFIGURE_BUNDLED)
+  set(UMFPACK_BUNDLED_INCLUDE_DIRS
     ${UMFPACK_FOLDER}/UMFPACK/Include
     ${UMFPACK_FOLDER}/AMD/Include
     )
-ENDMACRO()
+endmacro()
 
-MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
+macro(FEATURE_UMFPACK_ERROR_MESSAGE)
+  message(FATAL_ERROR "\n"
     "Could not find umfpack and supporting libraries!\n"
     "Please ensure that the libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"
@@ -41,6 +41,6 @@ MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
     "by setting DEAL_II_ALLOW_BUNDLED=ON or DEAL_II_FORCE_BUNDLED_UMFPACK=ON.\n"
     "(BLAS and LAPACK have to be installed for bundled UMFPACK to be available)\n\n"
     )
-ENDMACRO()
+endmacro()
 
-CONFIGURE_FEATURE(UMFPACK)
+configure_feature(UMFPACK)

@@ -13,7 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_BINARY_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
@@ -27,9 +27,9 @@ INCLUDE_DIRECTORIES(
 # DEAL_II_BUILD_TYPES (usually PyDealIIDebug and PyDealIIRelease)
 #
 
-INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
+include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
-SET(_src
+set(_src
   wrappers.cc
   export_tria_accessor.cc
   export_cell_accessor.cc
@@ -48,12 +48,12 @@ SET(_src
   reference_cell_wrapper.cc
   )
 
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build_lowercase)
+foreach(_build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${_build} _build_lowercase)
 
   PYTHON_ADD_MODULE(PyDealII_${_build_lowercase} ${_src})
 
-  SET_TARGET_PROPERTIES(PyDealII_${_build_lowercase} PROPERTIES
+  set_target_properties(PyDealII_${_build_lowercase} PROPERTIES
     OUTPUT_NAME "${PYTHON_BINDINGS_${_build}_NAME}"
     LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
     LINKER_LANGUAGE "CXX"
@@ -62,46 +62,46 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
     )
-  IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    SET_TARGET_PROPERTIES(PyDealII_${_build_lowercase} PROPERTIES
+  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    set_target_properties(PyDealII_${_build_lowercase} PROPERTIES
       MACOSX_RPATH OFF
       BUILD_WITH_INSTALL_RPATH OFF
       INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${DEAL_II_PYTHON_RELDIR}"
       )
-  ENDIF()
+  endif()
 
-  TARGET_LINK_LIBRARIES(PyDealII_${_build_lowercase}
+  target_link_libraries(PyDealII_${_build_lowercase}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
     ${Boost_LIBRARIES}
     ${PYTHON_LIBRARIES}
     )
 
-  EXPORT(TARGETS PyDealII_${_build_lowercase}
+  export(TARGETS PyDealII_${_build_lowercase}
     FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
     APPEND
     )
 
-  INSTALL(TARGETS  PyDealII_${_build_lowercase}
+  install(TARGETS  PyDealII_${_build_lowercase}
     COMPONENT python_bindings
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
     LIBRARY DESTINATION ${DEAL_II_PYTHON_RELDIR}
     ARCHIVE DESTINATION ${DEAL_II_PYTHON_RELDIR}
     )
 
-  ADD_DEPENDENCIES(python_bindings PyDealII_${_build_lowercase})
-ENDFOREACH()
+  add_dependencies(python_bindings PyDealII_${_build_lowercase})
+endforeach()
 
 #
 # Copy python sources to binary directory and set up installation:
 #
 
-SET(_python_sources
+set(_python_sources
   __init__.py
   )
-FILE(COPY ${_python_sources}
+file(COPY ${_python_sources}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}
   )
-INSTALL(FILES ${_python_sources}
+install(FILES ${_python_sources}
   DESTINATION ${DEAL_II_PYTHON_RELDIR}
   COMPONENT python_bindings
   )

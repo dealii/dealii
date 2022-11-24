@@ -21,172 +21,172 @@
 #    prune_tests    - remove all testsuite subprojects
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.3.0)
 
-MACRO(SET_IF_EMPTY _variable)
-  IF("${${_variable}}" STREQUAL "")
-    SET(${_variable} ${ARGN})
-  ENDIF()
-ENDMACRO()
+macro(SET_IF_EMPTY _variable)
+  if("${${_variable}}" STREQUAL "")
+    set(${_variable} ${ARGN})
+  endif()
+endmacro()
 
-SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
-SET_IF_EMPTY(DEAL_II_DIR $ENV{DEAL_II_DIR})
+set_if_empty(MAKEOPTS $ENV{MAKEOPTS})
+set_if_empty(DEAL_II_DIR $ENV{DEAL_II_DIR})
 
 #
 # A bit of necessary setup if tests are configured as a stand-alone
 # project:
 #
 
-IF(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
-  FIND_PACKAGE(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR})
-  DEAL_II_INITIALIZE_CACHED_VARIABLES()
-  PROJECT(TESTSUITE CXX)
-  FILE(WRITE ${CMAKE_BINARY_DIR}/detailed.log
+if(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+  find_package(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR})
+  deal_ii_initialize_cached_variables()
+  project(TESTSUITE CXX)
+  file(WRITE ${CMAKE_BINARY_DIR}/detailed.log
     "#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}"
     )
-ENDIF()
+endif()
 
 #
 # A bit of necessary setup if tests are included via ADD_SUBDIRECTORY from
 # the top-level CMake project:
 #
 
-IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
 
   #
   # We have to repeat the policy statement here because the new
   # CMAKE_MINIMUM_REQUIRED call resets our previous policy set in the main
   # CMakeLists.txt file.
   #
-  IF("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
+  if("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
     # allow to override "test" target for quick tests
-    CMAKE_POLICY(SET CMP0037 OLD)
-  ENDIF()
+    cmake_policy(SET CMP0037 OLD)
+  endif()
 
   #
   # If this CMakeLists.txt file is called from within the deal.II build
   # system, set up quick tests as well:
   #
-  ADD_SUBDIRECTORY(quick_tests)
+  add_subdirectory(quick_tests)
 
-  MESSAGE(STATUS "Setting up testsuite")
+  message(STATUS "Setting up testsuite")
 
   #
   # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR and
   # CMAKE_BINARY_DIR/tests:
   #
-  FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)\n")
+  file(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "subdirs(tests)\n")
 
-  SET(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
+  set(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
 
-ELSE()
+else()
 
-  MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
-  MESSAGE(STATUS "")
+  message(STATUS "This is CMake ${CMAKE_VERSION}")
+  message(STATUS "")
 
-  IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-    MESSAGE(FATAL_ERROR "The testsuite cannot be configured in-source. "
+  if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+    message(FATAL_ERROR "The testsuite cannot be configured in-source. "
       "Please create a separate build directory!"
       )
-  ENDIF()
+  endif()
 
-  FIND_PACKAGE(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR} $ENV{DEAL_II_DIR})
-  PROJECT(testsuite NONE)
-  SET(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
-ENDIF()
+  find_package(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR} $ENV{DEAL_II_DIR})
+  project(testsuite NONE)
+  set(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
+endif()
 
-FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 
 #
 # Always undefine the following variables in the setup_tests target:
 #
-FOREACH(_var
+foreach(_var
     DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT
     TEST_MPI_RANK_LIMIT TEST_THREAD_LIMIT ENABLE_PERFORMANCE_TESTS
     TESTING_ENVIRONMENT
     )
-  LIST(APPEND _options "-U${_var}")
-  IF(NOT "${${_var}}" STREQUAL "")
-    LIST(APPEND _options "-D${_var}=${${_var}}")
-  ENDIF()
-ENDFOREACH()
+  list(APPEND _options "-U${_var}")
+  if(NOT "${${_var}}" STREQUAL "")
+    list(APPEND _options "-D${_var}=${${_var}}")
+  endif()
+endforeach()
 
 #
 # Find all testsuite subprojects, i.e., every directory that contains a
 # CMakeLists.txt file (with the exception of "quick_tests").
 #
-SET(_categories)
-FILE(GLOB _dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+set(_categories)
+file(GLOB _dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/*
   )
-FOREACH(_dir ${_dirs})
-  IF( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_dir}/CMakeLists.txt AND
+foreach(_dir ${_dirs})
+  if( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_dir}/CMakeLists.txt AND
       NOT ${_dir} MATCHES quick_tests)
-    LIST(APPEND _categories ${_dir})
-  ENDIF()
-ENDFOREACH()
+    list(APPEND _categories ${_dir})
+  endif()
+endforeach()
 
 #
 # Custom targets for the testsuite:
 #
 
 # Setup tests:
-ADD_CUSTOM_TARGET(setup_tests)
+add_custom_target(setup_tests)
 
 # Remove all tests:
-ADD_CUSTOM_TARGET(prune_tests)
+add_custom_target(prune_tests)
 
-FOREACH(_category ${_categories})
-  SET(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
+foreach(_category ${_categories})
+  set(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
 
-  FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category})
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category})
 
-  IF(DEAL_II_MSVC)
-    SET(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir})
-  ELSE()
+  if(DEAL_II_MSVC)
+    set(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir})
+  else()
     # Do not pass the generator with -G so that we use make instead of ninja
     # for the test projects. This is because calling ninja several times in
     # parallel for the same project will break the configuration.
-    SET(_command ${CMAKE_COMMAND} ${_options} ${_category_dir} > /dev/null)
-  ENDIF()
+    set(_command ${CMAKE_COMMAND} ${_options} ${_category_dir} > /dev/null)
+  endif()
 
-  ADD_CUSTOM_TARGET(setup_tests_${_category}
+  add_custom_target(setup_tests_${_category}
     COMMAND ${_command}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMENT "Processing tests/${_category}"
     )
-  ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
+  add_dependencies(setup_tests setup_tests_${_category})
 
-  ADD_CUSTOM_TARGET(prune_tests_${_category}
+  add_custom_target(prune_tests_${_category}
     COMMAND ${CMAKE_COMMAND} -E remove_directory
       ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMAND ${CMAKE_COMMAND} -E make_directory
       ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMENT "Processing tests/${_category}"
     )
-  ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
+  add_dependencies(prune_tests prune_tests_${_category})
 
-  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
-    "SUBDIRS(${_category})\n"
+  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
+    "subdirs(${_category})\n"
     )
-ENDFOREACH()
+endforeach()
 
 
-IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   #
   # Add a dummy target to make files known to IDEs like qtcreator
   #
 
-  FILE(GLOB _misc
+  file(GLOB _misc
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/*/*.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/*/*.h
   )
 
-  ADD_CUSTOM_TARGET(dummy_tests_files
+  add_custom_target(dummy_tests_files
     SOURCES ${_misc}
   )
 
-  MESSAGE(STATUS "Setting up testsuite - Done")
-ENDIF()
+  message(STATUS "Setting up testsuite - Done")
+endif()

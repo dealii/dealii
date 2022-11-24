@@ -22,49 +22,49 @@
 #   ARBORX_INTERFACE_LINK_FLAGS
 #
 
-SET(ARBORX_DIR "" CACHE PATH "An optional hint to an ArborX installation")
-SET_IF_EMPTY(ARBORX_DIR "$ENV{ARBORX_DIR}")
+set(ARBORX_DIR "" CACHE PATH "An optional hint to an ArborX installation")
+set_if_empty(ARBORX_DIR "$ENV{ARBORX_DIR}")
 
 
-FIND_PACKAGE(ArborX
+find_package(ArborX
   HINTS ${ARBORX_DIR} ${ArborX_DIR} $ENV{ArborX_DIR}
   )
 
-IF(ArborX_FOUND)
-  GET_PROPERTY(ARBORX_INSTALL_INCLUDE_DIR TARGET ArborX::ArborX PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+if(ArborX_FOUND)
+  get_property(ARBORX_INSTALL_INCLUDE_DIR TARGET ArborX::ArborX PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
 
   #
   # Check whether ArborX was compiled with MPI support
   #
-  MESSAGE(STATUS
+  message(STATUS
     "Checking whether the found ArborX has MPI support:"
     )
 
   #
   # Look for ArborX_Config.hpp - we'll query it to determine MPI support:
   #
-  DEAL_II_FIND_FILE(ARBORX_CONFIG_HPP ArborX_Config.hpp
+  deal_ii_find_file(ARBORX_CONFIG_HPP ArborX_Config.hpp
     HINTS ${ARBORX_INSTALL_INCLUDE_DIR}
     NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
     NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
     )
 
-  IF(EXISTS ${ARBORX_CONFIG_HPP})
+  if(EXISTS ${ARBORX_CONFIG_HPP})
     #
     # Determine whether ArborX was configured with MPI:
     #
-    FILE(STRINGS "${ARBORX_CONFIG_HPP}" ARBORX_MPI_STRING
+    file(STRINGS "${ARBORX_CONFIG_HPP}" ARBORX_MPI_STRING
       REGEX "#define ARBORX_ENABLE_MPI")
-    IF("${ARBORX_MPI_STRING}" STREQUAL "")
-      MESSAGE(STATUS "ArborX has no MPI support")
-    ELSE()
-      SET(DEAL_II_ARBORX_WITH_MPI TRUE)
-      MESSAGE(STATUS "ArborX has MPI support")
-    ENDIF()
-  ENDIF()
-ENDIF()
+    if("${ARBORX_MPI_STRING}" STREQUAL "")
+      message(STATUS "ArborX has no MPI support")
+    else()
+      set(DEAL_II_ARBORX_WITH_MPI TRUE)
+      message(STATUS "ArborX has MPI support")
+    endif()
+  endif()
+endif()
 
-DEAL_II_PACKAGE_HANDLE(ARBORX
+deal_ii_package_handle(ARBORX
   # ArborX is a header-only library
   INCLUDE_DIRS REQUIRED ARBORX_INSTALL_INCLUDE_DIR
   USER_INCLUDE_DIRS REQUIRED ARBORX_INSTALL_INCLUDE_DIR

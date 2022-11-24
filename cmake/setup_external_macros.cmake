@@ -17,11 +17,11 @@
 # Include all external (cmake) macros that we will use:
 #
 
-INCLUDE(CheckCXXCompilerFlag)
-INCLUDE(CheckCXXSourceCompiles)
-INCLUDE(CheckCXXSourceRuns)
-INCLUDE(CheckCXXSymbolExists)
-INCLUDE(CheckIncludeFileCXX)
+include(CheckCXXCompilerFlag)
+include(CheckCXXSourceCompiles)
+include(CheckCXXSourceRuns)
+include(CheckCXXSymbolExists)
+include(CheckIncludeFileCXX)
 
-INCLUDE(CheckCSourceCompiles)
-INCLUDE(CheckFunctionExists)
+include(CheckCSourceCompiles)
+include(CheckFunctionExists)

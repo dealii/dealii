@@ -17,68 +17,68 @@
 # Configuration for the p4est and sc libraries:
 #
 
-SET(FEATURE_P4EST_DEPENDS MPI)
+set(FEATURE_P4EST_DEPENDS MPI)
 
 
-MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
-  FIND_PACKAGE(P4EST)
+macro(FEATURE_P4EST_FIND_EXTERNAL var)
+  find_package(P4EST)
 
-  IF(P4EST_FOUND)
-    SET(${var} TRUE)
+  if(P4EST_FOUND)
+    set(${var} TRUE)
 
     #
     # We require at least version 2.0
     #
-    SET(_version_required 2.0)
-    IF(P4EST_VERSION VERSION_LESS ${_version_required})
-      MESSAGE(STATUS "Insufficient p4est installation found: "
+    set(_version_required 2.0)
+    if(P4EST_VERSION VERSION_LESS ${_version_required})
+      message(STATUS "Insufficient p4est installation found: "
         "At least version ${_version_required} is required."
         )
-      SET(P4EST_ADDITIONAL_ERROR_STRING
+      set(P4EST_ADDITIONAL_ERROR_STRING
         "Insufficient p4est installation found!\n"
         "At least version ${_version_required} is required.\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Check whether p4est supports mpi:
     #
-    IF(NOT P4EST_WITH_MPI)
-      MESSAGE(STATUS "Insufficient p4est installation found: "
+    if(NOT P4EST_WITH_MPI)
+      message(STATUS "Insufficient p4est installation found: "
         "p4est has to be configured with MPI enabled."
         )
-      SET(P4EST_ADDITIONAL_ERROR_STRING
+      set(P4EST_ADDITIONAL_ERROR_STRING
         ${P4EST_ADDITIONAL_ERROR_STRING}
         "Insufficient p4est installation found!\n"
         "p4est has to be configured with MPI enabled.\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Check whether p4est is built against zlib:
     #
-    IF(NOT P4EST_WITH_ZLIB)
-      MESSAGE(STATUS "Insufficient p4est installation found: "
+    if(NOT P4EST_WITH_ZLIB)
+      message(STATUS "Insufficient p4est installation found: "
         "p4est has to be configured with enabled zlib support."
         )
-      SET(P4EST_ADDITIONAL_ERROR_STRING
+      set(P4EST_ADDITIONAL_ERROR_STRING
         ${P4EST_ADDITIONAL_ERROR_STRING}
         "Insufficient p4est installation found!\n"
         "p4est has to be configured with enabled zlib support.\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-    CHECK_MPI_INTERFACE(P4EST ${var})
-  ENDIF()
-ENDMACRO()
+    check_mpi_interface(P4EST ${var})
+  endif()
+endmacro()
 
-MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_P4EST_WITH_VTK_BINARY ${P4EST_WITH_VTK_BINARY})
-  SET(DEAL_II_P4EST_WITH_SEARCH_LOCAL ${P4EST_WITH_SEARCH_LOCAL})
-ENDMACRO()
+macro(FEATURE_P4EST_CONFIGURE_EXTERNAL)
+  set(DEAL_II_P4EST_WITH_VTK_BINARY ${P4EST_WITH_VTK_BINARY})
+  set(DEAL_II_P4EST_WITH_SEARCH_LOCAL ${P4EST_WITH_SEARCH_LOCAL})
+endmacro()
 
 
-CONFIGURE_FEATURE(P4EST)
+configure_feature(P4EST)

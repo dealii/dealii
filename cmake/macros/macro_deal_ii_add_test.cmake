@@ -100,44 +100,44 @@
 #         * "heavy":  compute node, >=32 physical cores, >=128GB RAM
 #
 # Usage:
-#     DEAL_II_ADD_TEST(category test_name comparison_file)
+#     deal_ii_add_test(category test_name comparison_file)
 #
 
-FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
+function(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
-  IF(NOT TARGET compile_test_executables)
-    ADD_CUSTOM_TARGET(compile_test_executables)
-  ENDIF()
+  if(NOT TARGET compile_test_executables)
+    add_custom_target(compile_test_executables)
+  endif()
 
-  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
-    MESSAGE(FATAL_ERROR
+  if(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
+    message(FATAL_ERROR
       "\nDEAL_II_ADD_TEST can only be called in external (test sub-) projects after "
       "the inclusion of deal.IIConfig.cmake. It is not intended for "
       "internal use.\n\n"
       )
-  ENDIF()
+  endif()
 
-  GET_FILENAME_COMPONENT(_file ${_comparison_file} NAME)
+  get_filename_component(_file ${_comparison_file} NAME)
 
   #
   # Determine valid build configurations for this test:
   #
-  SET(_configuration)
-  IF(_file MATCHES "\\.debug\\.")
-    SET(_configuration DEBUG)
-  ELSEIF(_file MATCHES "\\.release\\.")
-    SET(_configuration RELEASE)
-  ENDIF()
+  set(_configuration)
+  if(_file MATCHES "\\.debug\\.")
+    set(_configuration DEBUG)
+  elseif(_file MATCHES "\\.release\\.")
+    set(_configuration RELEASE)
+  endif()
 
   #
   # Determine whether the test should be run with mpirun:
   #
-  STRING(REGEX MATCH "mpirun=([0-9]+|max)" _n_cpu ${_file})
-  IF("${_n_cpu}" STREQUAL "")
-    SET(_n_cpu 0) # 0 indicates that no mpirun should be used
-  ELSE()
-    STRING(REGEX REPLACE "^mpirun=([0-9]+|max)$" "\\1" _n_cpu ${_n_cpu})
-  ENDIF()
+  string(REGEX MATCH "mpirun=([0-9]+|max)" _n_cpu ${_file})
+  if("${_n_cpu}" STREQUAL "")
+    set(_n_cpu 0) # 0 indicates that no mpirun should be used
+  else()
+    string(REGEX REPLACE "^mpirun=([0-9]+|max)$" "\\1" _n_cpu ${_n_cpu})
+  endif()
 
   #
   # If we encounter the special string "mpirun=max" set the number of MPI
@@ -145,32 +145,32 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   # limit has been specified, i.e., TEST_MPI_RANK_LIMIT is 0, skip defining
   # the test.
   #
-  IF("${_n_cpu}" STREQUAL "max")
-    IF(TEST_MPI_RANK_LIMIT EQUAL 0)
-      RETURN()
-    ENDIF()
-    SET(_n_cpu "${TEST_MPI_RANK_LIMIT}")
-  ENDIF()
+  if("${_n_cpu}" STREQUAL "max")
+    if(TEST_MPI_RANK_LIMIT EQUAL 0)
+      return()
+    endif()
+    set(_n_cpu "${TEST_MPI_RANK_LIMIT}")
+  endif()
 
   #
   # If the number of MPI ranks specified for the test via .mpirun=N.
   # exceeds the limit ${TEST_MPI_RANK_LIMIT}, skip defining the test
   #
-  IF(TEST_MPI_RANK_LIMIT GREATER 0 AND _n_cpu GREATER TEST_MPI_RANK_LIMIT)
-    RETURN()
-  ENDIF()
+  if(TEST_MPI_RANK_LIMIT GREATER 0 AND _n_cpu GREATER TEST_MPI_RANK_LIMIT)
+    return()
+  endif()
 
   #
   # Determine whether the test declaration specifies a thread pool size via
   # threads=N:
   #
-  STRING(REGEX MATCH "threads=([0-9]+|max)" _n_threads ${_file})
-  IF("${_n_threads}" STREQUAL "")
-    SET(_n_threads 0) # 0 indicates that the default thread pool size
+  string(REGEX MATCH "threads=([0-9]+|max)" _n_threads ${_file})
+  if("${_n_threads}" STREQUAL "")
+    set(_n_threads 0) # 0 indicates that the default thread pool size
                       # should be used (currently set to 3 in tests.h)
-  ELSE()
-    STRING(REGEX REPLACE "^threads=([0-9]+|max)$" "\\1" _n_threads ${_n_threads})
-  ENDIF()
+  else()
+    string(REGEX REPLACE "^threads=([0-9]+|max)$" "\\1" _n_threads ${_n_threads})
+  endif()
 
   #
   # If we encounter the special string "threads=max" set the number of
@@ -178,47 +178,47 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   # If no limit has been specified, i.e., TEST_THREAD_LIMIT is 0, skip
   # defining the test.
   #
-  IF("${_n_threads}" STREQUAL "max")
-    IF(TEST_THREAD_LIMIT EQUAL 0)
-      RETURN()
-    ENDIF()
-    SET(_n_threads "${TEST_THREAD_LIMIT}")
-  ENDIF()
+  if("${_n_threads}" STREQUAL "max")
+    if(TEST_THREAD_LIMIT EQUAL 0)
+      return()
+    endif()
+    set(_n_threads "${TEST_THREAD_LIMIT}")
+  endif()
 
   #
   # If the number of threads specified for the test via .threads=N. exceeds
   # the limit ${TEST_THREAD_LIMIT}, skip defining the test
   #
-  IF(TEST_THREAD_LIMIT GREATER 0 AND _n_threads GREATER TEST_THREAD_LIMIT)
-    RETURN()
-  ENDIF()
+  if(TEST_THREAD_LIMIT GREATER 0 AND _n_threads GREATER TEST_THREAD_LIMIT)
+    return()
+  endif()
 
   #
   # Determine the expected build stage of this test:
   #
-  STRING(REGEX MATCH "expect=([a-z]*)" _expect ${_file})
-  IF("${_expect}" STREQUAL "")
-    SET(_expect "PASSED")
-  ELSE()
-    STRING(REGEX REPLACE "^expect=([a-z]*)$" "\\1" _expect ${_expect})
-    STRING(TOUPPER ${_expect} _expect)
-  ENDIF()
+  string(REGEX MATCH "expect=([a-z]*)" _expect ${_file})
+  if("${_expect}" STREQUAL "")
+    set(_expect "PASSED")
+  else()
+    string(REGEX REPLACE "^expect=([a-z]*)$" "\\1" _expect ${_expect})
+    string(TOUPPER ${_expect} _expect)
+  endif()
 
   #
   # Determine whether the .run_only keyword is present:
   #
-  SET(_run_only FALSE)
-  IF(_file MATCHES "\\.run_only$")
-    SET(_run_only TRUE)
-  ENDIF()
+  set(_run_only FALSE)
+  if(_file MATCHES "\\.run_only$")
+    set(_run_only TRUE)
+  endif()
 
   #
   # Determine whether the .exclusive. keyword is present:
   #
-  SET(_exclusive FALSE)
-  IF(_file MATCHES "\\.exclusive\\.")
-    SET(_exclusive TRUE)
-  ENDIF()
+  set(_exclusive FALSE)
+  if(_file MATCHES "\\.exclusive\\.")
+    set(_exclusive TRUE)
+  endif()
 
   #
   # Determine for which build types a test should be defined.
@@ -226,42 +226,42 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   # Every deal.II build type (given by the list DEAL_II_BUILD_TYPES) that
   # is a (case insensitive) substring of CMAKE_BUILD_TYPE:
   #
-  IF("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    SET(_build_types DEBUG)
-  ELSEIF("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    SET(_build_types RELEASE)
-  ELSEIF("${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
-    SET(_build_types DEBUG RELEASE)
-  ELSE()
-    MESSAGE(FATAL_ERROR
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(_build_types DEBUG)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    set(_build_types RELEASE)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+    set(_build_types DEBUG RELEASE)
+  else()
+    message(FATAL_ERROR
       "\nDEAL_II_ADD_TEST requires CMAKE_BUILD_TYPE to be set to "
       "\"Debug\", \"Release\", or \"DebugRelease\"\n\n"
       )
-  ENDIF()
+  endif()
 
-  FOREACH(_build ${_build_types})
-    LIST(FIND DEAL_II_BUILD_TYPES ${_build} _match)
-    IF("${_match}" STREQUAL "-1")
-      MESSAGE(FATAL_ERROR
+  foreach(_build ${_build_types})
+    list(FIND DEAL_II_BUILD_TYPES ${_build} _match)
+    if("${_match}" STREQUAL "-1")
+      message(FATAL_ERROR
         "\nDEAL_II_ADD_TEST cannot set up a test with CMAKE_BUILD_TYPE "
         "\"${CMAKE_BUILD_TYPE}\". deal.II was build with CMAKE_BUILD_TYPE "
         "\"${DEAL_II_BUILD_TYPE}\"\n\n"
         )
-    ENDIF()
-  ENDFOREACH()
+    endif()
+  endforeach()
 
-  IF(NOT TESTING_ENVIRONMENT MATCHES "^(light|medium|heavy)$")
-    MESSAGE(FATAL_ERROR
+  if(NOT TESTING_ENVIRONMENT MATCHES "^(light|medium|heavy)$")
+    message(FATAL_ERROR
       "The TESTING_ENVIRONMENT variable must be set to either \"light\","
       " \"medium\", or \"heavy\"."
       )
-  ENDIF()
+  endif()
 
   #
   # Determine source or parameter file:
   #
 
-  FILE(GLOB _source_file
+  file(GLOB _source_file
     "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.c[cu]"
     "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm"
     "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in"
@@ -269,85 +269,85 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json.in"
     )
 
-  LIST(LENGTH _source_file _number)
-  IF(NOT _number EQUAL 1)
-    IF(_number EQUAL 0)
-      MESSAGE(FATAL_ERROR "\n${_comparison_file}:\n"
+  list(LENGTH _source_file _number)
+  if(NOT _number EQUAL 1)
+    if(_number EQUAL 0)
+      message(FATAL_ERROR "\n${_comparison_file}:\n"
         "A comparison file (ending in .output or .run-only) has been "
         "picked up but no suitable source file or parameter file was "
         "found. Please provide exactly one of the following.\n"
         "A source file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.c[cu]\",\n"
         "or a parameter file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.(prm|json)[.in]\".\n"
         )
-    ELSE()
-      STRING(REPLACE ";" "\n" _source_file "${_source_file}")
-      MESSAGE(FATAL_ERROR "\n${_comparison_file}:\n"
+    else()
+      string(REPLACE ";" "\n" _source_file "${_source_file}")
+      message(FATAL_ERROR "\n${_comparison_file}:\n"
         "A comparison file (ending in .output or .run-only) has been "
         "picked up with multiple suitable source files or parameter files:\n"
         "${_source_file}\n"
         "There must be exactly one source or parameter file.\n"
         )
-    ENDIF()
-  ENDIF()
+    endif()
+  endif()
 
   #
   # Run CONFIGURE_FILE on every parameter file ending in "in"
   #
 
-  IF("${_source_file}" MATCHES ".in$")
-    SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    STRING(REGEX MATCH "(json|prm).in$" _suffix "${_source_file}")
-    STRING(REPLACE ".in" "" _suffix "${_suffix}")
-    CONFIGURE_FILE(
+  if("${_source_file}" MATCHES ".in$")
+    set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    string(REGEX MATCH "(json|prm).in$" _suffix "${_source_file}")
+    string(REPLACE ".in" "" _suffix "${_suffix}")
+    configure_file(
       "${_source_file}"
       "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_suffix}"
       @ONLY
       )
-    SET(_source_file "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_suffix}")
-  ENDIF()
+    set(_source_file "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_suffix}")
+  endif()
 
-  FOREACH(_build ${_build_types})
+  foreach(_build ${_build_types})
     #
     # Obey "debug" and "release" keywords in the output file:
     #
-    ITEM_MATCHES(_match "${_build}" ${_configuration})
-    IF(_match OR "${_configuration}" STREQUAL "")
-      STRING(TOLOWER ${_build} _build_lowercase)
+    item_matches(_match "${_build}" ${_configuration})
+    if(_match OR "${_configuration}" STREQUAL "")
+      string(TOLOWER ${_build} _build_lowercase)
 
-      SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
-      SET(_target_short ${_test_name}.${_build_lowercase}) # short target name
-      SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
+      set(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
+      set(_target_short ${_test_name}.${_build_lowercase}) # short target name
+      set(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
       #
       # If the variable ${category_test_RUNARGS_PREFIX) is nonempty prepend
       # it to the command line of the test:
       #
       if(NOT "${${_category}_${_test_name}_RUNARGS_PREFIX}" STREQUAL "")
-        SET(_run_args
+        set(_run_args
           ${${_category}_${_test_name}_RUNARGS_PREFIX} "${_run_args}")
-      ENDIF()
+      endif()
 
       #
       # Override target and run command for parameter file variants:
       #
-      IF("${_source_file}" MATCHES "(prm|json)$")
-        IF(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
-          SET(_target ${TEST_TARGET_${_build}})
-        ELSEIF(NOT "${TEST_TARGET}" STREQUAL "")
-          SET(_target ${TEST_TARGET})
-        ELSE()
-          MESSAGE(FATAL_ERROR "\n${_comparison_file}:\n"
+      if("${_source_file}" MATCHES "(prm|json)$")
+        if(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
+          set(_target ${TEST_TARGET_${_build}})
+        elseif(NOT "${TEST_TARGET}" STREQUAL "")
+          set(_target ${TEST_TARGET})
+        else()
+          message(FATAL_ERROR "\n${_comparison_file}:\n"
             "A parameter file \"${_test_name}.(prm|json)(|.in)\" has been "
             "found, but neither \"\${TEST_TARGET}\", nor "
             "\"\${TEST_TARGET_${_build}}\" have been defined.\n"
             )
-        ENDIF()
-        SET(_target_short ${_target})
-        SET(_run_args
+        endif()
+        set(_target_short ${_target})
+        set(_run_args
           "$<TARGET_FILE:${_target}>"
           "${_source_file}"
           )
-      ENDIF()
+      endif()
 
       #
       # If _n_cpu or _n_threads are larger than zero we have to accomodate
@@ -360,96 +360,96 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       # "mpirun_0-threads_0".
       #
 
-      SET(_test_target    ${_category}.${_test_name}) # diff target name
-      SET(_test_full      ${_category}/${_test_name}) # full test name
-      SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
+      set(_test_target    ${_category}.${_test_name}) # diff target name
+      set(_test_full      ${_category}/${_test_name}) # full test name
+      set(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
-      IF(NOT "${_n_cpu}" STREQUAL "0")
-        STRING(APPEND _test_target   ".mpirun${_n_cpu}")
-        STRING(APPEND _test_full     ".mpirun=${_n_cpu}")
-        STRING(APPEND _test_directory "/mpirun=${_n_cpu}")
-      ENDIF()
+      if(NOT "${_n_cpu}" STREQUAL "0")
+        string(APPEND _test_target   ".mpirun${_n_cpu}")
+        string(APPEND _test_full     ".mpirun=${_n_cpu}")
+        string(APPEND _test_directory "/mpirun=${_n_cpu}")
+      endif()
 
-      IF(NOT "${_n_threads}" STREQUAL "0")
-        STRING(APPEND _test_target   ".threads${_n_threads}")
-        STRING(APPEND _test_full     ".threads=${_n_threads}")
-        STRING(APPEND _test_directory "/threads=${_n_threads}")
-      ENDIF()
+      if(NOT "${_n_threads}" STREQUAL "0")
+        string(APPEND _test_target   ".threads${_n_threads}")
+        string(APPEND _test_full     ".threads=${_n_threads}")
+        string(APPEND _test_directory "/threads=${_n_threads}")
+      endif()
 
-      STRING(APPEND _test_target ".${_build_lowercase}.test")
-      STRING(APPEND _test_full   ".${_build_lowercase}")
+      string(APPEND _test_target ".${_build_lowercase}.test")
+      string(APPEND _test_full   ".${_build_lowercase}")
 
       #
       # Test variants with ".mpirun=[...]." have to be executed via mpirun
       # (or whatever ${DEAL_II_MPIEXEC} is set to).
       #
-      IF(NOT "${_n_cpu}" STREQUAL "0")
-        SET(_run_args
+      if(NOT "${_n_cpu}" STREQUAL "0")
+        set(_run_args
           "${DEAL_II_MPIEXEC}"
           ${DEAL_II_MPIEXEC_NUMPROC_FLAG} ${_n_cpu}
           ${DEAL_II_MPIEXEC_PREFLAGS}
           ${_run_args}
           ${DEAL_II_MPIEXEC_POSTFLAGS}
           )
-      ENDIF()
+      endif()
 
-      FILE(MAKE_DIRECTORY ${_test_directory})
+      file(MAKE_DIRECTORY ${_test_directory})
 
       #
       # Add an executable (for the first type of tests) and set up compile
       # definitions and the full link interface. Only add the target once.
       #
 
-      IF(NOT TARGET ${_target})
+      if(NOT TARGET ${_target})
         #
         # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
         # force a complete rerun of this test (BUILD, RUN and DIFF stage)
         # if interrupt_guard.cc is removed by run_test.cmake due to an
         # interruption.
         #
-        ADD_CUSTOM_COMMAND(
+        add_custom_command(
           OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
 
-        ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL
+        add_executable(${_target} EXCLUDE_FROM_ALL
           ${_generated_files}
           ${_source_file}
           ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
 
-        ADD_DEPENDENCIES(compile_test_executables ${_target})
+        add_dependencies(compile_test_executables ${_target})
 
-        SET_TARGET_PROPERTIES(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
+        set_target_properties(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
-        DEAL_II_SETUP_TARGET(${_target} ${_build})
-        TARGET_LINK_LIBRARIES(${_target}
+        deal_ii_setup_target(${_target} ${_build})
+        target_link_libraries(${_target}
           ${TEST_LIBRARIES} ${TEST_LIBRARIES_${_build}}
           )
 
-        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+        set_property(TARGET ${_target} APPEND PROPERTY
           COMPILE_DEFINITIONS
             SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
             TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT}
           )
 
-        IF(ENABLE_PERFORMANCE_TESTS)
-          SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+        if(ENABLE_PERFORMANCE_TESTS)
+          set_property(TARGET ${_target} APPEND PROPERTY
             COMPILE_DEFINITIONS ENABLE_PERFORMANCE_TESTS
             )
-        ENDIF()
+        endif()
 
-        SET_PROPERTY(TARGET ${_target} PROPERTY
+        set_property(TARGET ${_target} PROPERTY
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target_short}"
           )
 
-      ENDIF()
+      endif()
 
       #
       # Add a top level target to run and compare the test:
       #
 
-      ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
+      add_custom_command(OUTPUT ${_test_directory}/output
         COMMAND TEST_N_THREADS=${_n_threads}
           sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           run "${_test_full}" ${_run_args}
@@ -464,8 +464,8 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         VERBATIM
         )
 
-      IF(_run_only)
-        ADD_CUSTOM_TARGET(${_test_target}
+      if(_run_only)
+        add_custom_target(${_test_target}
           COMMAND echo "${_test_full}: BUILD successful."
           COMMAND echo "${_test_full}: RUN successful."
           COMMAND echo "${_test_full}: DIFF skipped."
@@ -473,11 +473,11 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           DEPENDS ${_test_directory}/output
           )
 
-      ELSE()
+      else()
 
-        FILE(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
+        file(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
 
-        ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
+        add_custom_command(OUTPUT ${_test_directory}/diff
           COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
             diff "${_test_full}" "${NUMDIFF_EXECUTABLE}"
             "${_comparison_file}" ${_run_args}
@@ -489,7 +489,7 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           VERBATIM
           )
 
-        ADD_CUSTOM_TARGET(${_test_target}
+        add_custom_target(${_test_target}
           COMMAND echo "${_test_full}: BUILD successful."
           COMMAND echo "${_test_full}: RUN successful."
           COMMAND echo "${_test_full}: DIFF successful."
@@ -497,13 +497,13 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           DEPENDS ${_test_directory}/diff
           )
 
-      ENDIF()
+      endif()
 
       #
       # And finally define the test:
       #
 
-      ADD_TEST(NAME ${_test_full}
+      add_test(NAME ${_test_full}
         COMMAND ${CMAKE_COMMAND}
           -DTRGT=${_test_target}
           -DTEST=${_test_full}
@@ -513,19 +513,19 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
-      SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
+      set_tests_properties(${_test_full} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
 
-      IF(_exclusive)
+      if(_exclusive)
         #
         # Ensure that the test is not executed concurrently with any other
         # tests.
         #
-        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES RUN_SERIAL TRUE)
+        set_tests_properties(${_test_full} PROPERTIES RUN_SERIAL TRUE)
 
-      ELSEIF(NOT ENABLE_PERFORMANCE_TESTS)
+      elseif(NOT ENABLE_PERFORMANCE_TESTS)
         #
         # Limit concurrency of mpi tests. We can only set concurrency for
         # the entire test, which includes the compiling and linking stages
@@ -534,28 +534,28 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         # just choose to model an "average" concurrency as one half of the
         # number of MPI jobs.
         #
-        IF(_n_cpu GREATER 2)
-          MATH(EXPR _slots "${_n_cpu} / 2")
-          SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
-        ENDIF()
+        if(_n_cpu GREATER 2)
+          math(EXPR _slots "${_n_cpu} / 2")
+          set_tests_properties(${_test_full} PROPERTIES PROCESSORS ${_slots})
+        endif()
 
-      ELSE()
+      else()
         #
         # In case ENABLE_PERFORMANCE_TESTS is set we limit the concurrency
         # of performance tests to the number of specified mpi ranks times
         # the number of specified threads.
         #
-        SET(_slots 1)
-        IF(_n_cpu GREATER 0)
-          MATH(EXPR _slots "${_slots} * ${_n_cpu}")
-        ENDIF()
-        IF(_n_threads GREATER 0)
-          MATH(EXPR _slots "${_slots} * ${_n_threads}")
-        ENDIF()
-        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
-      ENDIF()
+        set(_slots 1)
+        if(_n_cpu GREATER 0)
+          math(EXPR _slots "${_slots} * ${_n_cpu}")
+        endif()
+        if(_n_threads GREATER 0)
+          math(EXPR _slots "${_slots} * ${_n_threads}")
+        endif()
+        set_tests_properties(${_test_full} PROPERTIES PROCESSORS ${_slots})
+      endif()
 
-      IF(NOT "${_n_cpu}${_n_threads}" STREQUAL "00")
+      if(NOT "${_n_cpu}${_n_threads}" STREQUAL "00")
         #
         # Running multiple variants in parallel triggers a race condition
         # where the same (not yet existent) executable is built
@@ -564,14 +564,14 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         # Luckily CMake has a mechanism to force a test to be run after
         # another has finished (and both are scheduled):
         #
-        IF(DEFINED TEST_DEPENDENCIES_${_target})
-          SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
+        if(DEFINED TEST_DEPENDENCIES_${_target})
+          set_tests_properties(${_test_full} PROPERTIES
             DEPENDS ${TEST_DEPENDENCIES_${_target}}
             )
-        ENDIF()
-        SET(TEST_DEPENDENCIES_${_target} ${_test_full} PARENT_SCOPE)
-      ENDIF()
+        endif()
+        set(TEST_DEPENDENCIES_${_target} ${_test_full} PARENT_SCOPE)
+      endif()
 
-    ENDIF()
-  ENDFOREACH()
-ENDFUNCTION()
+    endif()
+  endforeach()
+endfunction()

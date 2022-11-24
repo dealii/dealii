@@ -27,16 +27,16 @@
 #   ADOLC_WITH_BOOST_ALLOCATOR
 #
 
-SET(ADOLC_DIR "" CACHE PATH "An optional hint to an ADOL-C installation")
-SET_IF_EMPTY(ADOLC_DIR "$ENV{ADOLC_DIR}")
+set(ADOLC_DIR "" CACHE PATH "An optional hint to an ADOL-C installation")
+set_if_empty(ADOLC_DIR "$ENV{ADOLC_DIR}")
 
-DEAL_II_FIND_PATH(ADOLC_INCLUDE_DIR
+deal_ii_find_path(ADOLC_INCLUDE_DIR
   NAMES adolc/adolc.h
   HINTS ${ADOLC_DIR}
   PATH_SUFFIXES include
   )
 
-DEAL_II_FIND_LIBRARY(ADOLC_LIBRARY
+deal_ii_find_library(ADOLC_LIBRARY
   NAMES adolc
   HINTS ${ADOLC_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
@@ -46,68 +46,68 @@ DEAL_II_FIND_LIBRARY(ADOLC_LIBRARY
 # Look for adolc_settings.h - we'll query it to determine supported features:
 #
 
-DEAL_II_FIND_FILE(ADOLC_SETTINGS_H adolc_settings.h
+deal_ii_find_file(ADOLC_SETTINGS_H adolc_settings.h
   HINTS ${ADOLC_INCLUDE_DIR} "${ADOLC_INCLUDE_DIR}/adolc/internal"
   NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
   NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
   )
 
-IF(EXISTS ${ADOLC_SETTINGS_H})
+if(EXISTS ${ADOLC_SETTINGS_H})
   #
   # Check whether ADOL-C is configured with extra trig functions
   #
-  FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_ATRIG_ERF_STRING
+  file(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_ATRIG_ERF_STRING
     REGEX "^[ \t]*#[ \t]*define[ \t]+ATRIG_ERF"
     )
-  IF(NOT "${ADOLC_ATRIG_ERF_STRING}" STREQUAL "")
-    SET(ADOLC_WITH_ATRIG_ERF TRUE)
-  ELSE()
-    SET(ADOLC_WITH_ATRIG_ERF FALSE)
-  ENDIF()
+  if(NOT "${ADOLC_ATRIG_ERF_STRING}" STREQUAL "")
+    set(ADOLC_WITH_ATRIG_ERF TRUE)
+  else()
+    set(ADOLC_WITH_ATRIG_ERF FALSE)
+  endif()
 
   #
   # Check whether ADOL-C is configured with advanced branching
   #
-  FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_ADVANCED_BRANCHING_STRING
+  file(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_ADVANCED_BRANCHING_STRING
     REGEX "^[ \t]*#[ \t]*define[ \t]+ADOLC_ADVANCED_BRANCHING"
     )
-  IF(NOT "${ADOLC_ADVANCED_BRANCHING_STRING}" STREQUAL "")
-    SET(ADOLC_WITH_ADVANCED_BRANCHING TRUE)
-  ELSE()
-    SET(ADOLC_WITH_ADVANCED_BRANCHING FALSE)
-  ENDIF()
+  if(NOT "${ADOLC_ADVANCED_BRANCHING_STRING}" STREQUAL "")
+    set(ADOLC_WITH_ADVANCED_BRANCHING TRUE)
+  else()
+    set(ADOLC_WITH_ADVANCED_BRANCHING FALSE)
+  endif()
 
   #
   # Check whether ADOL-C is configured with tapeless number reference counting
   #
-  FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_WITH_TAPELESS_REFCOUNTING_STRING
+  file(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_WITH_TAPELESS_REFCOUNTING_STRING
     REGEX "^[ \t]*#[ \t]*define[ \t]+USE_ADTL_REFCOUNTING 1"
     )
-  IF(NOT "${ADOLC_WITH_TAPELESS_REFCOUNTING_STRING}" STREQUAL "")
-    SET(ADOLC_WITH_TAPELESS_REFCOUNTING TRUE)
-  ELSE()
-    SET(ADOLC_WITH_TAPELESS_REFCOUNTING FALSE)
-  ENDIF()
+  if(NOT "${ADOLC_WITH_TAPELESS_REFCOUNTING_STRING}" STREQUAL "")
+    set(ADOLC_WITH_TAPELESS_REFCOUNTING TRUE)
+  else()
+    set(ADOLC_WITH_TAPELESS_REFCOUNTING FALSE)
+  endif()
 
   #
   # Check whether ADOL-C is configured to use the Boost pool allocator
   #
-  FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_BOOST_POOL_STRING
+  file(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_BOOST_POOL_STRING
     REGEX "^[ \t]*#[ \t]*define[ \t]+USE_BOOST_POOL 1"
     )
-  IF(NOT "${ADOLC_BOOST_POOL_STRING}" STREQUAL "")
-    SET(ADOLC_WITH_BOOST_ALLOCATOR TRUE)
-    SET(_additional_include_dirs OPTIONAL BOOST_INCLUDE_DIRS)
-    SET(_additional_library OPTIONAL BOOST_LIBRARIES)
-  ELSE()
-    SET(ADOLC_WITH_BOOST_ALLOCATOR FALSE)
-    SET(_additional_include_dirs)
-    SET(_additional_library)
-  ENDIF()
-ENDIF()
+  if(NOT "${ADOLC_BOOST_POOL_STRING}" STREQUAL "")
+    set(ADOLC_WITH_BOOST_ALLOCATOR TRUE)
+    set(_additional_include_dirs OPTIONAL BOOST_INCLUDE_DIRS)
+    set(_additional_library OPTIONAL BOOST_LIBRARIES)
+  else()
+    set(ADOLC_WITH_BOOST_ALLOCATOR FALSE)
+    set(_additional_include_dirs)
+    set(_additional_library)
+  endif()
+endif()
 
 
-DEAL_II_PACKAGE_HANDLE(ADOLC
+deal_ii_package_handle(ADOLC
   LIBRARIES
     REQUIRED ADOLC_LIBRARY
     ${_additional_library}

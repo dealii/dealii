@@ -17,34 +17,34 @@
 # Configuration for the SUNDIALS library:
 #
 
-MACRO(FEATURE_SUNDIALS_FIND_EXTERNAL var)
-  FIND_PACKAGE(SUNDIALS)
+macro(FEATURE_SUNDIALS_FIND_EXTERNAL var)
+  find_package(SUNDIALS)
 
-  IF(SUNDIALS_FOUND)
-    SET(${var} TRUE)
+  if(SUNDIALS_FOUND)
+    set(${var} TRUE)
 
     #
     # We require at least sundials 5.4.0
     #
-    SET(_version_required 5.4.0)
-    IF(SUNDIALS_VERSION VERSION_LESS ${_version_required})
-      MESSAGE(STATUS "Could not find a sufficient Sundials installation: "
+    set(_version_required 5.4.0)
+    if(SUNDIALS_VERSION VERSION_LESS ${_version_required})
+      message(STATUS "Could not find a sufficient Sundials installation: "
         "deal.II requires at least version ${_version_required}, "
         "but version ${SUNDIALS_VERSION} was found."
         )
-      SET(SUNDIALS_ADDITIONAL_ERROR_STRING
+      set(SUNDIALS_ADDITIONAL_ERROR_STRING
         ${SUNDIALS_ADDITIONAL_ERROR_STRING}
         "The SUNDIALS installation (found at \"${SUNDIALS_DIR}\")\n"
         "with version ${SUNDIALS_VERSION} is too old.\n"
         "deal.II requires at least version ${_version_required}.\n\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+      set(${var} FALSE)
+    endif()
+  endif()
+endmacro()
 
-MACRO(FEATURE_SUNDIALS_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_SUNDIALS_WITH_IDAS ${SUNDIALS_WITH_IDAS})
-ENDMACRO()
+macro(FEATURE_SUNDIALS_CONFIGURE_EXTERNAL)
+  set(DEAL_II_SUNDIALS_WITH_IDAS ${SUNDIALS_WITH_IDAS})
+endmacro()
 
-CONFIGURE_FEATURE(SUNDIALS)
+configure_feature(SUNDIALS)

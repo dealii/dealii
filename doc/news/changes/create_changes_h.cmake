@@ -14,36 +14,36 @@
 ## ---------------------------------------------------------------------
 
 # Auxiliary functions
-FUNCTION(CAT IN_FILE OUT_FILE INDENT)
-  FILE(READ ${IN_FILE} CONTENTS)
-  IF(${INDENT} MATCHES "TRUE")
-    FILE(STRINGS ${IN_FILE} LINESTMP)
-    FOREACH(LINETMP ${LINESTMP})
-      FILE(APPEND ${OUT_FILE} "  ${LINETMP}\n")
-    ENDFOREACH()
-  ELSE()
-    FILE(APPEND ${OUT_FILE} "${CONTENTS}")
-  ENDIF()
-ENDFUNCTION()
+function(CAT IN_FILE OUT_FILE INDENT)
+  file(READ ${IN_FILE} CONTENTS)
+  if(${INDENT} MATCHES "TRUE")
+    file(STRINGS ${IN_FILE} LINESTMP)
+    foreach(LINETMP ${LINESTMP})
+      file(APPEND ${OUT_FILE} "  ${LINETMP}\n")
+    endforeach()
+  else()
+    file(APPEND ${OUT_FILE} "${CONTENTS}")
+  endif()
+endfunction()
 
-FUNCTION(PROCESS IN_DIR OUT_FILE)
-  FILE(APPEND ${OUT_FILE} "<ol>\n")
-  FILE(GLOB ENTRY_LIST ${IN_DIR}/[0-9]*)
-  LIST(SORT ENTRY_LIST)
-  LIST(REVERSE ENTRY_LIST)
-  FOREACH(ENTRY ${ENTRY_LIST})
-    FILE(APPEND ${OUT_FILE} "\n <li>\n")
+function(PROCESS IN_DIR OUT_FILE)
+  file(APPEND ${OUT_FILE} "<ol>\n")
+  file(GLOB ENTRY_LIST ${IN_DIR}/[0-9]*)
+  list(SORT ENTRY_LIST)
+  list(REVERSE ENTRY_LIST)
+  foreach(ENTRY ${ENTRY_LIST})
+    file(APPEND ${OUT_FILE} "\n <li>\n")
     CAT(${ENTRY} ${OUT_FILE} "TRUE")
-    FILE(APPEND ${OUT_FILE} " </li>\n")
-  ENDFOREACH()
-  FILE(APPEND ${OUT_FILE} "\n</ol>\n")
-ENDFUNCTION()
+    file(APPEND ${OUT_FILE} " </li>\n")
+  endforeach()
+  file(APPEND ${OUT_FILE} "\n</ol>\n")
+endfunction()
 
 # Generate 'changes.h'.
 
 # First, create a file 'changes.h.in' based on all changelog fragments.
-SET(OUTPUT_FILE_TEMP "${OUTPUT_FILE}.in")
-FILE(WRITE ${OUTPUT_FILE_TEMP} "")
+set(OUTPUT_FILE_TEMP "${OUTPUT_FILE}.in")
+file(WRITE ${OUTPUT_FILE_TEMP} "")
 CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header
         ${OUTPUT_FILE_TEMP} "FALSE")
 CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_incompatibilities
@@ -63,5 +63,5 @@ CAT    (${CMAKE_CURRENT_SOURCE_DIR}/footer
 
 # Copy it over to 'changes.h' but only touch the time stamp
 # if the file actually changed (this is what CONFIGURE_FILE does).
-MESSAGE(STATUS "Generating changelog file: ${OUTPUT_FILE}")
-CONFIGURE_FILE(${OUTPUT_FILE_TEMP} ${OUTPUT_FILE} COPYONLY)
+message(STATUS "Generating changelog file: ${OUTPUT_FILE}")
+configure_file(${OUTPUT_FILE_TEMP} ${OUTPUT_FILE} COPYONLY)

@@ -17,30 +17,30 @@
 # Check for a compiler bug.
 #
 # Usage:
-#     CHECK_CXX_COMPILER_BUG(source var),
+#     check_cxx_compiler_bug(source var),
 #
 # where source is a snipped of source code and var is a variable that will
 # be set to true if the source could not be compiled and linked successfully.
 # (This just inverts the logic of CHECK_CXX_SOURCE_COMPILES.)
 #
 
-MACRO(CHECK_CXX_COMPILER_BUG _source _var)
-  IF(NOT DEFINED ${_var}_OK)
+macro(CHECK_CXX_COMPILER_BUG _source _var)
+  if(NOT DEFINED ${_var}_OK)
     CHECK_CXX_SOURCE_COMPILES(
       "${_source}"
       ${_var}_OK
       )
-    IF(${_var}_OK)
-      MESSAGE(STATUS "Test successful, do not define ${_var}")
-    ELSE()
-      MESSAGE(STATUS "Test unsuccessful, define ${_var}")
-    ENDIF()
-  ENDIF()
+    if(${_var}_OK)
+      message(STATUS "Test successful, do not define ${_var}")
+    else()
+      message(STATUS "Test unsuccessful, define ${_var}")
+    endif()
+  endif()
 
-  IF(${_var}_OK)
-    SET(${_var})
-  ELSE()
-    SET(${_var} TRUE)
-  ENDIF()
-ENDMACRO()
+  if(${_var}_OK)
+    set(${_var})
+  else()
+    set(${_var} TRUE)
+  endif()
+endmacro()
 

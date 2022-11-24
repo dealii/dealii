@@ -13,37 +13,37 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_unity_include_src
+set(_unity_include_src
   fe_collection.cc
   fe_values.cc
   mapping_collection.cc
   refinement.cc
   )
 
-SET(_separate_src
+set(_separate_src
   )
 
 # concatenate all unity inclusion files in one file
-SET(_n_includes_per_unity_file 15)
+set(_n_includes_per_unity_file 15)
 
-SETUP_SOURCE_LIST("${_unity_include_src}"
+setup_source_list("${_unity_include_src}"
   "${_separate_src}"
   ${_n_includes_per_unity_file}
   _src
   )
 
-SET(_inst
+set(_inst
   fe_collection.inst.in
   fe_values.inst.in
   mapping_collection.inst.in
   refinement.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/hp/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_hp OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_hp "${_inst}")
+deal_ii_add_library(obj_hp OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_hp "${_inst}")

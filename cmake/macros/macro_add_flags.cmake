@@ -18,14 +18,14 @@
 # string "${variable}"
 #
 # Usage:
-#     ADD_FLAGS(variable flags)
+#     add_flags(variable flags)
 #
 
-MACRO(ADD_FLAGS _variable _flags)
-  STRING(STRIP "${_flags}" _flags_stripped)
-  IF(NOT "${_flags_stripped}" STREQUAL "")
-    SET(${_variable} "${${_variable}} ${_flags}")
-    STRING(STRIP "${${_variable}}" ${_variable})
-  ENDIF()
-ENDMACRO()
+macro(ADD_FLAGS _variable _flags)
+  string(STRIP "${_flags}" _flags_stripped)
+  if(NOT "${_flags_stripped}" STREQUAL "")
+    set(${_variable} "${${_variable}} ${_flags}")
+    string(STRIP "${${_variable}}" ${_variable})
+  endif()
+endmacro()
 

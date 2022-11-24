@@ -18,13 +18,13 @@
 # separated string:
 #
 # Usage:
-#     TO_STRING(string ${list1} ${list2} ...)
+#     to_string(string ${list1} ${list2} ...)
 #
 
-MACRO(TO_STRING _variable)
-  SET(${_variable} "")
-  FOREACH(_var  ${ARGN})
-    SET(${_variable} "${${_variable}} ${_var}")
-  ENDFOREACH()
-  STRING(STRIP "${${_variable}}" ${_variable})
-ENDMACRO()
+macro(TO_STRING _variable)
+  set(${_variable} "")
+  foreach(_var  ${ARGN})
+    set(${_variable} "${${_variable}} ${_var}")
+  endforeach()
+  string(STRIP "${${_variable}}" ${_variable})
+endmacro()

@@ -1,51 +1,51 @@
 # A small macro
-MACRO(SET_IF_EMPTY _variable)
-  IF("${${_variable}}" STREQUAL "")
-    SET(${_variable} ${ARGN})
-  ENDIF()
-ENDMACRO()
+macro(SET_IF_EMPTY _variable)
+  if("${${_variable}}" STREQUAL "")
+    set(${_variable} ${ARGN})
+  endif()
+endmacro()
 
 # By default we simply skip test submission to CDash
-SET(TRACK "Experimental")
-SET_IF_EMPTY(SKIP_SUBMISSION TRUE)
+set(TRACK "Experimental")
+set_if_empty(SKIP_SUBMISSION TRUE)
 
-SET(CMAKE_BUILD_TYPE Release)
-SET(DEAL_II_COMPILE_EXAMPLES FALSE)
+set(CMAKE_BUILD_TYPE Release)
+set(DEAL_II_COMPILE_EXAMPLES FALSE)
 
-SET(ENABLE_PERFORMANCE_TESTS TRUE)
+set(ENABLE_PERFORMANCE_TESTS TRUE)
 
 #
 # Determine appropriate resource limits for performance tests:
 #
 
-IF("${TESTING_ENVIRONMENT}" STREQUAL "whistler-node")
+if("${TESTING_ENVIRONMENT}" STREQUAL "whistler-node")
   # Managed by Matthias
-  SET(CTEST_SITE "${TESTING_ENVIRONMENT}")
-  SET(TESTING_ENVIRONMENT "heavy")
-ENDIF()
+  set(CTEST_SITE "${TESTING_ENVIRONMENT}")
+  set(TESTING_ENVIRONMENT "heavy")
+endif()
 
 #
 # Determine appropriate resource limits for performance tests:
 #
 
-SET_IF_EMPTY(TESTING_ENVIRONMENT "light")
+set_if_empty(TESTING_ENVIRONMENT "light")
 
-IF("${TESTING_ENVIRONMENT}" STREQUAL "light")
-  SET_IF_EMPTY(TEST_TIME_LIMIT 600)
-  SET_IF_EMPTY(TEST_MPI_RANK_LIMIT 2)
-  SET_IF_EMPTY(TEST_THREAD_LIMIT 2)
-ELSEIF("${TESTING_ENVIRONMENT}" STREQUAL "medium")
-  SET_IF_EMPTY(TEST_TIME_LIMIT 600)
-  SET_IF_EMPTY(TEST_MPI_RANK_LIMIT 8)
-  SET_IF_EMPTY(TEST_THREAD_LIMIT 8)
-ELSEIF("${TESTING_ENVIRONMENT}" STREQUAL "heavy")
-  SET_IF_EMPTY(TEST_TIME_LIMIT 600)
-  SET_IF_EMPTY(TEST_MPI_RANK_LIMIT 32)
-  SET_IF_EMPTY(TEST_THREAD_LIMIT 32)
-ELSE()
-  MESSAGE(FATAL_ERROR
+if("${TESTING_ENVIRONMENT}" STREQUAL "light")
+  set_if_empty(TEST_TIME_LIMIT 600)
+  set_if_empty(TEST_MPI_RANK_LIMIT 2)
+  set_if_empty(TEST_THREAD_LIMIT 2)
+elseif("${TESTING_ENVIRONMENT}" STREQUAL "medium")
+  set_if_empty(TEST_TIME_LIMIT 600)
+  set_if_empty(TEST_MPI_RANK_LIMIT 8)
+  set_if_empty(TEST_THREAD_LIMIT 8)
+elseif("${TESTING_ENVIRONMENT}" STREQUAL "heavy")
+  set_if_empty(TEST_TIME_LIMIT 600)
+  set_if_empty(TEST_MPI_RANK_LIMIT 32)
+  set_if_empty(TEST_THREAD_LIMIT 32)
+else()
+  message(FATAL_ERROR
     "The variable TESTING_ENVIRONMENT was set to the invalid value "
     "»${TESTING_ENVIRONMENT}«. Valid options are light, medium, heavy.")
-ENDIF()
+endif()
 
-INCLUDE(${CMAKE_CURRENT_LIST_DIR}/run_testsuite.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/run_testsuite.cmake)

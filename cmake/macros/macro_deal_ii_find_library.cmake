@@ -17,17 +17,17 @@
 # A small wrapper around FIND_LIBRARY to be a bit more verbose
 #
 
-MACRO(DEAL_II_FIND_LIBRARY _library_name)
+macro(DEAL_II_FIND_LIBRARY _library_name)
   # Save a string representation of the arguments before cmake's
   # FIND_FILE gets its hands on it.
-  TO_STRING(_str ${ARGN})
+  to_string(_str ${ARGN})
 
-  FIND_LIBRARY(${_library_name} ${ARGN})
+  find_library(${_library_name} ${ARGN})
 
-  IF(${_library_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_library_name} not found! The call was:")
-    MESSAGE(STATUS "    FIND_LIBRARY(${_library_name} ${_str})")
-  ELSE()
-    MESSAGE(STATUS "Found ${_library_name}")
-  ENDIF()
-ENDMACRO()
+  if(${_library_name} MATCHES "-NOTFOUND")
+    message(STATUS "${_library_name} not found! The call was:")
+    message(STATUS "    find_library(${_library_name} ${_str})")
+  else()
+    message(STATUS "Found ${_library_name}")
+  endif()
+endmacro()

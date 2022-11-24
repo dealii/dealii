@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Set up cached variables (prior to the PROJECT(deal.II) call)
+# Set up cached variables (prior to the project(deal.II) call)
 #
 # This file sets up the following cached Options:
 #
@@ -67,46 +67,46 @@
 #                                                                      #
 ########################################################################
 
-If(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  OPTION(DEAL_II_ALLOW_BUNDLED
+if(DEAL_II_HAVE_BUNDLED_DIRECTORY)
+  option(DEAL_II_ALLOW_BUNDLED
     "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"
     ON
     )
-ENDIF()
+endif()
 
-If(DEAL_II_HAVE_DOC_DIRECTORY)
-  OPTION(DEAL_II_COMPONENT_DOCUMENTATION
+if(DEAL_II_HAVE_DOC_DIRECTORY)
+  option(DEAL_II_COMPONENT_DOCUMENTATION
     "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
     OFF
     )
-  LIST(APPEND DEAL_II_COMPONENTS DOCUMENTATION)
+  list(APPEND DEAL_II_COMPONENTS DOCUMENTATION)
 
-ENDIF()
+endif()
 
-OPTION(DEAL_II_COMPONENT_EXAMPLES
+option(DEAL_II_COMPONENT_EXAMPLES
   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
   ON
   )
-LIST(APPEND DEAL_II_COMPONENTS EXAMPLES)
+list(APPEND DEAL_II_COMPONENTS EXAMPLES)
 
-OPTION(DEAL_II_COMPONENT_PACKAGE
+option(DEAL_II_COMPONENT_PACKAGE
   "Generates additional targets for packaging deal.II"
   OFF
   )
-LIST(APPEND DEAL_II_COMPONENTS PACKAGE)
+list(APPEND DEAL_II_COMPONENTS PACKAGE)
 
-OPTION(DEAL_II_COMPONENT_PYTHON_BINDINGS
+option(DEAL_II_COMPONENT_PYTHON_BINDINGS
   "Enable configuration and installation of the python bindings. This adds a COMPONENT \"PYTHON_BINDINGS\" to the build system."
   OFF
   )
-LIST(APPEND DEAL_II_COMPONENTS PYTHON_BINDINGS)
+list(APPEND DEAL_II_COMPONENTS PYTHON_BINDINGS)
 
-OPTION(DEAL_II_ALLOW_AUTODETECTION
+option(DEAL_II_ALLOW_AUTODETECTION
   "Allow to automatically set up features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
   ON
   )
 
-OPTION(DEAL_II_FORCE_AUTODETECTION
+option(DEAL_II_FORCE_AUTODETECTION
   "Force feature autodetection by undefining all DEAL_II_WITH_* variables prior to configure"
   OFF
   )
@@ -122,7 +122,7 @@ OPTION(DEAL_II_FORCE_AUTODETECTION
 # Setup CMAKE_BUILD_TYPE:
 #
 
-SET(CMAKE_BUILD_TYPE
+set(CMAKE_BUILD_TYPE
   "DebugRelease"
   CACHE STRING
   "Choose the type of build, options are: Debug, Release and DebugRelease."
@@ -130,77 +130,77 @@ SET(CMAKE_BUILD_TYPE
 
 # This is cruel, I know. But it is better to only have a known number of
 # options for CMAKE_BUILD_TYPE...
-IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
+if( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
     NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND
     NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease" )
-  MESSAGE(FATAL_ERROR
+  message(FATAL_ERROR
     "CMAKE_BUILD_TYPE does neither match Release, Debug, nor DebugRelease!"
     )
-ENDIF()
+endif()
 
 #
 # Configuration behaviour:
 #
 
-OPTION(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+option(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   "Allow platform introspection for CPU command sets, SSE and AVX"
   ON
   )
-MARK_AS_ADVANCED(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+mark_as_advanced(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
 
-OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
+option(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
   ON
   )
-MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+mark_as_advanced(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
-OPTION(DEAL_II_SETUP_COVERAGE
+option(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
   OFF
   )
-MARK_AS_ADVANCED(DEAL_II_SETUP_COVERAGE)
+mark_as_advanced(DEAL_II_SETUP_COVERAGE)
 
-OPTION(DEAL_II_UNITY_BUILD
+option(DEAL_II_UNITY_BUILD
   "Compile the library by concatenating together source files to form a few large targets instead of many small ones. This lowers total compilation wall time by about 25%."
   OFF)
-MARK_AS_ADVANCED(DEAL_II_UNITY_BUILD)
+mark_as_advanced(DEAL_II_UNITY_BUILD)
 
-OPTION(DEAL_II_EARLY_DEPRECATIONS
+option(DEAL_II_EARLY_DEPRECATIONS
   "Enable deprecation warnings for features deprecated since the last release."
   OFF)
-MARK_AS_ADVANCED(DEAL_II_EARLY_DEPRECATIONS)
+mark_as_advanced(DEAL_II_EARLY_DEPRECATIONS)
 
-SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
+set(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
   )
 
-OPTION(DEAL_II_PREFER_STATIC_LIBS
+option(DEAL_II_PREFER_STATIC_LIBS
   "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
   OFF
   )
-MARK_AS_ADVANCED(DEAL_II_PREFER_STATIC_LIBS)
+mark_as_advanced(DEAL_II_PREFER_STATIC_LIBS)
 
-OPTION(DEAL_II_STATIC_EXECUTABLE
+option(DEAL_II_STATIC_EXECUTABLE
   "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF and DEAL_II_PREFER_STATIC_LIBS=ON"
   OFF
   )
-MARK_AS_ADVANCED(DEAL_II_STATIC_EXECUTABLE)
+mark_as_advanced(DEAL_II_STATIC_EXECUTABLE)
 
-IF(DEAL_II_STATIC_EXECUTABLE)
-  SET(BUILD_SHARED_LIBS "OFF" CACHE BOOL
+if(DEAL_II_STATIC_EXECUTABLE)
+  set(BUILD_SHARED_LIBS "OFF" CACHE BOOL
     "Build a shared library"
     FORCE
     )
-  SET(DEAL_II_PREFER_STATIC_LIBS "ON" CACHE BOOL
+  set(DEAL_II_PREFER_STATIC_LIBS "ON" CACHE BOOL
     "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
     FORCE
     )
-ENDIF()
+endif()
 
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link paths on installation"
   )
-MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+mark_as_advanced(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 
 
 ########################################################################
@@ -213,7 +213,7 @@ MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 # Hide all unused CMake variables:
 #
 
-SET(DEAL_II_REMOVED_FLAGS
+set(DEAL_II_REMOVED_FLAGS
   CMAKE_CXX_FLAGS
   CMAKE_CXX_FLAGS_RELEASE
   CMAKE_CXX_FLAGS_DEBUG
@@ -235,21 +235,21 @@ SET(DEAL_II_REMOVED_FLAGS
   CMAKE_SHARED_LINKER_FLAGS_RELEASE
   CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO
   )
-FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
+foreach(_flag ${DEAL_II_REMOVED_FLAGS})
   #
   # Promote all variables to internal cache. This prevents CMake from
   # populating these variables with default values. Further, store the
   # actual content of the variables such that users can still use
   # CMAKE_CXX_FLAGS(|_RELEASE|_DEBUG).
   #
-  SET(${_flag} ${${_flag}} CACHE INTERNAL "" FORCE)
-ENDFOREACH()
+  set(${_flag} ${${_flag}} CACHE INTERNAL "" FORCE)
+endforeach()
 
 #
 # Promote our configuration variables to cache:
 #
 
-SET(DEAL_II_USED_FLAGS
+set(DEAL_II_USED_FLAGS
   DEAL_II_CXX_FLAGS
   DEAL_II_CXX_FLAGS_DEBUG
   DEAL_II_CXX_FLAGS_RELEASE
@@ -257,47 +257,47 @@ SET(DEAL_II_USED_FLAGS
   DEAL_II_LINKER_FLAGS_DEBUG
   DEAL_II_LINKER_FLAGS_RELEASE
   )
-FOREACH(_flag ${DEAL_II_USED_FLAGS})
-  SET(${_flag} "${${_flag}}" CACHE STRING
+foreach(_flag ${DEAL_II_USED_FLAGS})
+  set(${_flag} "${${_flag}}" CACHE STRING
     "The user supplied cache variable will be appended _at the end_ of the configuration step to the auto generated ${_flag} variable"
     )
-  MARK_AS_ADVANCED(${_flag})
-ENDFOREACH()
+  mark_as_advanced(${_flag})
+endforeach()
 
-FOREACH(_variable
+foreach(_variable
   DEAL_II_DEFINITIONS
   DEAL_II_DEFINITIONS_DEBUG
   DEAL_II_DEFINITIONS_RELEASE
   )
-  SET(${_variable} ${${_variable}} CACHE STRING
+  set(${_variable} ${${_variable}} CACHE STRING
     "Additional, user supplied compile definitions"
     )
-  MARK_AS_ADVANCED(${_variable})
-ENDFOREACH()
+  mark_as_advanced(${_variable})
+endforeach()
 
 #
 # Translate CMake specific variables to deal.II naming:
 #
 
-FOREACH(_flag
+foreach(_flag
     CXX_FLAGS CXX_FLAGS_RELEASE CXX_FLAGS_DEBUG
     )
-  IF(NOT "${CMAKE_${_flag}}" STREQUAL "")
-    MESSAGE(STATUS
+  if(NOT "${CMAKE_${_flag}}" STREQUAL "")
+    message(STATUS
       "Prepending \${CMAKE_${_flag}} to \${DEAL_II_${_flag}}"
       )
-    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
-  ENDIF()
-ENDFOREACH()
+    set(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
+  endif()
+endforeach()
 
-FOREACH(_flag LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE)
-  IF(NOT "${CMAKE_SHARED_${_flag}}" STREQUAL "")
-    MESSAGE(STATUS
+foreach(_flag LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE)
+  if(NOT "${CMAKE_SHARED_${_flag}}" STREQUAL "")
+    message(STATUS
       "Prepending \${CMAKE_SHARED_${_flag}} to \${DEAL_II_${_flag}}"
       )
-    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
-  ENDIF()
-ENDFOREACH()
+    set(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
+  endif()
+endforeach()
 
 
 
@@ -306,7 +306,7 @@ ENDFOREACH()
 # variables.
 #
 
-FOREACH(_flag ${DEAL_II_USED_FLAGS})
+foreach(_flag ${DEAL_II_USED_FLAGS})
   #
   # The order of compiler and linker flags is important. In order to
   # provide an override mechanism we have to save the initial (cached)
@@ -315,18 +315,18 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   # setup_finalize.cmake (called at the end of the main CMakeLists.txt
   # file).
   #
-  SET(${_flag}_SAVED ${${_flag}})
-  SET(${_flag} "")
-ENDFOREACH()
+  set(${_flag}_SAVED ${${_flag}})
+  set(${_flag} "")
+endforeach()
 
 #
 # Also set all unused CMAKE_* flags to an empty string for the
 # configuration run so that it does not confuse the build system (to unset
 # is not an option - it is cached...)
 #
-FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
-  SET(${_flag} "")
-ENDFOREACH()
+foreach(_flag ${DEAL_II_REMOVED_FLAGS})
+  set(${_flag} "")
+endforeach()
 
 #
 # Finally, read in CXXFLAGS, LDFLAGS and NVCCFLAGS from environment and
@@ -336,13 +336,13 @@ ENDFOREACH()
 # old cmake versions happy
 #
 
-SET(DEAL_II_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${DEAL_II_CXX_FLAGS_SAVED}")
-STRING(STRIP "${DEAL_II_CXX_FLAGS_SAVED}" DEAL_II_CXX_FLAGS_SAVED)
-SET(DEAL_II_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${DEAL_II_LINKER_FLAGS_SAVED}")
-STRING(STRIP "${DEAL_II_LINKER_FLAGS_SAVED}" DEAL_II_LINKER_FLAGS_SAVED)
-UNSET(ENV{CXXFLAGS})
-UNSET(ENV{LDFLAGS})
-UNSET(ENV{NVCCFLAGS})
+set(DEAL_II_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${DEAL_II_CXX_FLAGS_SAVED}")
+string(STRIP "${DEAL_II_CXX_FLAGS_SAVED}" DEAL_II_CXX_FLAGS_SAVED)
+set(DEAL_II_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${DEAL_II_LINKER_FLAGS_SAVED}")
+string(STRIP "${DEAL_II_LINKER_FLAGS_SAVED}" DEAL_II_LINKER_FLAGS_SAVED)
+unset(ENV{CXXFLAGS})
+unset(ENV{LDFLAGS})
+unset(ENV{NVCCFLAGS})
 
 
 ########################################################################
@@ -351,45 +351,45 @@ UNSET(ENV{NVCCFLAGS})
 #                                                                      #
 ########################################################################
 
-OPTION(DEAL_II_WITH_64BIT_INDICES
+option(DEAL_II_WITH_64BIT_INDICES
   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
   OFF
   )
-LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
+list(APPEND DEAL_II_FEATURES 64BIT_INDICES)
 
-OPTION(DEAL_II_WITH_COMPLEX_VALUES
+option(DEAL_II_WITH_COMPLEX_VALUES
   "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. This effectively disables the support for computing with complex values. If PETSc is built with complex scalar type, this option must be ON."
   ON
   )
-LIST(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
+list(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
 
-OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
+option(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"
   OFF
   )
-MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
+mark_as_advanced(DEAL_II_DOXYGEN_USE_MATHJAX)
 
-OPTION(DEAL_II_COMPILE_EXAMPLES
+option(DEAL_II_COMPILE_EXAMPLES
   "If set to ON, all configurable example executables will be built and installed as well. If set to OFF, the examples component only installs the source code of example steps."
   ON
   )
-MARK_AS_ADVANCED(DEAL_II_COMPILE_EXAMPLES)
+mark_as_advanced(DEAL_II_COMPILE_EXAMPLES)
 
-OPTION(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
+option(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
   "If set to ON, doxygen documentation is generated using online (from CDN) mathjax copy"
   ON
   )
-MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX)
+mark_as_advanced(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX)
 
-SET(DEAL_II_CPACK_EXTERNAL_LIBS "opt" CACHE STRING
+set(DEAL_II_CPACK_EXTERNAL_LIBS "opt" CACHE STRING
     "A relative path to tree of external libraries that will be installed in bundle package. The path is relative to the /Applications/${DEAL_II_CPACK_BUNDLE_NAME}.app/Contents/Resources directory. It defaults to opt, but you may want to use a different value, for example if you want to distribute a brew based package."
   )
-MARK_AS_ADVANCED(DEAL_II_CPACK_EXTERNAL_LIBS)
+mark_as_advanced(DEAL_II_CPACK_EXTERNAL_LIBS)
 
-SET(DEAL_II_CPACK_BUNDLE_NAME "${DEAL_II_PACKAGE_NAME}" CACHE STRING
+set(DEAL_II_CPACK_BUNDLE_NAME "${DEAL_II_PACKAGE_NAME}" CACHE STRING
     "Name of the application bundle to generate."
   )
-MARK_AS_ADVANCED(DEAL_II_CPACK_BUNDLE_NAME)
+mark_as_advanced(DEAL_II_CPACK_BUNDLE_NAME)
 
 
 ########################################################################
@@ -403,8 +403,8 @@ MARK_AS_ADVANCED(DEAL_II_CPACK_BUNDLE_NAME)
 # much pain, not enough profit"):
 #
 
-IF("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_INSTALL_PREFIX}")
-  MESSAGE(FATAL_ERROR "
+if("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_INSTALL_PREFIX}")
+  message(FATAL_ERROR "
 Error CMAKE_INSTALL_PREFIX is equal to CMAKE_BINARY_DIR.
 It is not possible to install into the build directory. Please set
 CMAKE_INSTALL_PREFIX to a designated install directory different than
@@ -413,39 +413,39 @@ CMAKE_BINARY_DIR.
 without the need to install it, if this is what you tried to do.)
 "
     )
-ENDIF()
+endif()
 
 #
 # Miscellaneous renaming:
 #
 
-GET_CMAKE_PROPERTY(_res VARIABLES)
-FOREACH(_var ${_res})
+get_cmake_property(_res VARIABLES)
+foreach(_var ${_res})
   #
   # Rename (ALLOW|WITH|FORCE|COMPONENT)_* by DEAL_II_(ALLOW|WITH|FORCE|COMPONENT)_*
   #
-  FOREACH(_match ALLOW_ WITH_ FORCE_ COMPONENT_)
-    IF(_var MATCHES "^${_match}")
-      SET(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
-      UNSET(${_var} CACHE)
-    ENDIF()
-  ENDFOREACH()
+  foreach(_match ALLOW_ WITH_ FORCE_ COMPONENT_)
+    if(_var MATCHES "^${_match}")
+      set(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
+      unset(${_var} CACHE)
+    endif()
+  endforeach()
 
   #
   # Same for components:
   #
-  IF(_var MATCHES "^(DOCUMENTATION|EXAMPLES|PACKAGE|PYTHON_BINDINGS)")
-    SET(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
-    UNSET(${_var} CACHE)
-  ENDIF()
+  if(_var MATCHES "^(DOCUMENTATION|EXAMPLES|PACKAGE|PYTHON_BINDINGS)")
+    set(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
+    unset(${_var} CACHE)
+  endif()
 
   #
   # If DEAL_II_FORCE_AUTODETECTION is set undefine all feature toggles
   # DEAL_II_WITH_* prior to configure:
   #
-  IF(DEAL_II_FORCE_AUTODETECTION AND _var MATCHES "^DEAL_II_WITH_"
+  if(DEAL_II_FORCE_AUTODETECTION AND _var MATCHES "^DEAL_II_WITH_"
      # Exclude FEATURES that do not represent external libraries:
      AND NOT _var MATCHES "^DEAL_II_WITH_64BIT_INDICES" )
-    UNSET(${_var} CACHE)
-  ENDIF()
-ENDFOREACH()
+    unset(${_var} CACHE)
+  endif()
+endforeach()

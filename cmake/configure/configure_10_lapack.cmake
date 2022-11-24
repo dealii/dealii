@@ -17,21 +17,21 @@
 # Configuration for the lapack library:
 #
 
-MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
-  CLEAR_CMAKE_REQUIRED()
-  FIND_PACKAGE(LAPACK)
+macro(FEATURE_LAPACK_FIND_EXTERNAL var)
+  clear_cmake_required()
+  find_package(LAPACK)
 
   #
   # We do a check for availability of every single LAPACK function we use.
   #
-  IF(LAPACK_FOUND)
-    SET(${var} TRUE)
+  if(LAPACK_FOUND)
+    set(${var} TRUE)
 
     #
     # Clear the test flags because the following test will use a C compiler
     #
-    CLEAR_CMAKE_REQUIRED()
-    SET(CMAKE_REQUIRED_LIBRARIES
+    clear_cmake_required()
+    set(CMAKE_REQUIRED_LIBRARIES
       ${DEAL_II_LINKER_FLAGS_SAVED} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
       )
 
@@ -62,13 +62,13 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
       }"
       LAPACK_SYMBOL_CHECK)
 
-    IF(NOT LAPACK_SYMBOL_CHECK)
-      MESSAGE(STATUS
+    if(NOT LAPACK_SYMBOL_CHECK)
+      message(STATUS
         "Could not find a sufficient BLAS/LAPACK installation: "
         "BLAS/LAPACK symbol check failed! Consult CMakeFiles/CMakeError.log "
         "for further information."
         )
-      SET(LAPACK_ADDITIONAL_ERROR_STRING
+      set(LAPACK_ADDITIONAL_ERROR_STRING
         ${LAPACK_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient BLAS/LAPACK installation: \n"
         "BLAS/LAPACK symbol check failed! This usually means that your "
@@ -77,13 +77,13 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
         "  CMakeFiles/CMakeError.log\n"
         "for further information.\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # See if we use Intel-MKL by compiling a small program
     #
-    SET(CMAKE_REQUIRED_INCLUDES
+    set(CMAKE_REQUIRED_INCLUDES
       ${LAPACK_INCLUDE_DIRS}
       )
     CHECK_CXX_SOURCE_COMPILES("
@@ -98,20 +98,20 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
       return 0;
     }"
     MKL_SYMBOL_CHECK)
-    IF(MKL_SYMBOL_CHECK)
-      MESSAGE(STATUS
+    if(MKL_SYMBOL_CHECK)
+      message(STATUS
       "Use Intel MKL for BLAS/LAPACK."
       )
-      SET(DEAL_II_LAPACK_WITH_MKL ON)
-    ELSE()
-      MESSAGE(STATUS
+      set(DEAL_II_LAPACK_WITH_MKL ON)
+    else()
+      message(STATUS
       "Use other than Intel MKL implementation of BLAS/LAPACK (consult CMakeFiles/CMakeError.log for further information)."
       )
-      SET(DEAL_II_LAPACK_WITH_MKL OFF)
-    ENDIF()
+      set(DEAL_II_LAPACK_WITH_MKL OFF)
+    endif()
 
-  ENDIF()
-ENDMACRO()
+  endif()
+endmacro()
 
 
-CONFIGURE_FEATURE(LAPACK)
+configure_feature(LAPACK)

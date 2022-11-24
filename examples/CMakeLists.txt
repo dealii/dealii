@@ -13,10 +13,10 @@
 ##
 ## ---------------------------------------------------------------------
 
-IF(DEAL_II_COMPONENT_EXAMPLES)
-  MESSAGE(STATUS "Setting up examples")
+if(DEAL_II_COMPONENT_EXAMPLES)
+  message(STATUS "Setting up examples")
 
-  INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION ${DEAL_II_EXAMPLES_RELDIR}
     COMPONENT examples
     FILES_MATCHING
@@ -47,51 +47,51 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "input/DTMB-5415_bulbous_bow.iges"  # step-54
     )
 
-  IF(DEAL_II_COMPILE_EXAMPLES)
+  if(DEAL_II_COMPILE_EXAMPLES)
     #
     # Make sure that there are no deprecated functions used in the tutorials.
     #
-    STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
+    strip_flag(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
     #
     # Set up all executables:
     #
-    FILE(GLOB _steps
+    file(GLOB _steps
       ${CMAKE_CURRENT_SOURCE_DIR}/step-*/step-*.cc
       ${CMAKE_CURRENT_SOURCE_DIR}/step-*/step-*.cu)
-    FOREACH(_step ${_steps})
-      GET_FILENAME_COMPONENT(_name ${_step} NAME_WE)
-      GET_FILENAME_COMPONENT(_directory ${_step} DIRECTORY)
+    foreach(_step ${_steps})
+      get_filename_component(_name ${_step} NAME_WE)
+      get_filename_component(_directory ${_step} DIRECTORY)
 
       #
       # Extract dependency information from CMakeLists.txt file.
       #
-      SET(_setup FALSE)
-      IF(EXISTS "${_directory}/CMakeLists.txt")
-        FILE(STRINGS "${_directory}/CMakeLists.txt" _dependency_string
+      set(_setup FALSE)
+      if(EXISTS "${_directory}/CMakeLists.txt")
+        file(STRINGS "${_directory}/CMakeLists.txt" _dependency_string
           REGEX "^if.*DEAL_II.* # keep in one line$"
           )
-        STRING(REPLACE "IF(" "" _dependency_string "${_dependency_string}")
-        STRING(REPLACE ") # keep in one line" "" _dependency_string "${_dependency_string}")
-        IF("${_dependency_string}" STREQUAL "")
-          SET(_setup TRUE)
-        ELSE()
+        string(REPLACE "if(" "" _dependency_string "${_dependency_string}")
+        string(REPLACE ") # keep in one line" "" _dependency_string "${_dependency_string}")
+        if("${_dependency_string}" STREQUAL "")
+          set(_setup TRUE)
+        else()
           # if the dependency string evaluates to TRUE then the example
           # CMakeLists.txt encounters a fatal error - we want the opposite logic
           # here so add a NOT.
-          EVALUATE_EXPRESSION("
-            IF(NOT (${_dependency_string}))
-              SET(_setup TRUE)
-            ENDIF()")
-        ENDIF()
-      ENDIF()
+          evaluate_expression("
+            if(NOT (${_dependency_string}))
+              set(_setup TRUE)
+            endif()")
+        endif()
+      endif()
 
-      IF(_setup)
-        FOREACH(_build ${DEAL_II_BUILD_TYPES})
-          STRING(TOLOWER ${_build} _build_lowercase)
-          ADD_EXECUTABLE(${_name}.${_build_lowercase} ${_step})
-          DEAL_II_INSOURCE_SETUP_TARGET(${_name}.${_build_lowercase} ${_build})
-          SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+      if(_setup)
+        foreach(_build ${DEAL_II_BUILD_TYPES})
+          string(TOLOWER ${_build} _build_lowercase)
+          add_executable(${_name}.${_build_lowercase} ${_step})
+          deal_ii_insource_setup_target(${_name}.${_build_lowercase} ${_build})
+          set_target_properties(${_name}.${_build_lowercase}
             PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
@@ -100,45 +100,45 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
           # exectuble on installation, make sure that we add an additional
           # rpath to the library location as well:
           #
-          IF(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-            SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+          if(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+            set_target_properties(${_name}.${_build_lowercase}
               PROPERTIES
               INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
               )
-          ENDIF()
+          endif()
 
-          ADD_DEPENDENCIES(examples ${_name}.${_build_lowercase})
-          INSTALL(TARGETS ${_name}.${_build_lowercase}
+          add_dependencies(examples ${_name}.${_build_lowercase})
+          install(TARGETS ${_name}.${_build_lowercase}
             DESTINATION ${DEAL_II_EXAMPLES_RELDIR}/${_name}
             )
-        ENDFOREACH()
+        endforeach()
 
-      ELSE()
+      else()
 
-        MESSAGE(STATUS "  ${_name} - dependencies not satisfied")
-      ENDIF()
+        message(STATUS "  ${_name} - dependencies not satisfied")
+      endif()
 
-    ENDFOREACH()
+    endforeach()
 
     # the same as above but for the examples folder
-    FILE(GLOB _steps
+    file(GLOB _steps
       ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/*.cc)
-    FOREACH(_step ${_steps})
-      GET_FILENAME_COMPONENT(_name ${_step} NAME_WE)
+    foreach(_step ${_steps})
+      get_filename_component(_name ${_step} NAME_WE)
 
-        FOREACH(_build ${DEAL_II_BUILD_TYPES})
-          STRING(TOLOWER ${_build} _build_lowercase)
-          ADD_EXECUTABLE(${_name}.${_build_lowercase} ${_step})
-          DEAL_II_INSOURCE_SETUP_TARGET(${_name}.${_build_lowercase} ${_build})
+        foreach(_build ${DEAL_II_BUILD_TYPES})
+          string(TOLOWER ${_build} _build_lowercase)
+          add_executable(${_name}.${_build_lowercase} ${_step})
+          deal_ii_insource_setup_target(${_name}.${_build_lowercase} ${_build})
 
-          SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+          set_target_properties(${_name}.${_build_lowercase}
             PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
-        ENDFOREACH()
-    ENDFOREACH()
-  ENDIF()
+        endforeach()
+    endforeach()
+  endif()
 
-  MESSAGE(STATUS "Setting up examples - Done")
+  message(STATUS "Setting up examples - Done")
 
-ENDIF()
+endif()

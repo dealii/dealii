@@ -15,7 +15,7 @@
 
 #
 # Usage:
-#   CHECK_COMPILER_SETUP("compiler flag string" "linker flag string" _var
+#   check_compiler_setup("compiler flag string" "linker flag string" _var
 #     [libraries]
 #     )
 #
@@ -25,37 +25,37 @@
 # ${_var} is set to true, otherwise it is set to false.
 #
 
-MACRO(CHECK_COMPILER_SETUP _compiler_flags_unstr _linker_flags_unstr _var)
+macro(CHECK_COMPILER_SETUP _compiler_flags_unstr _linker_flags_unstr _var)
   #
   # Strip leading and trailing whitespace to make CMake 2.8.8 happy
   #
-  STRING(STRIP "${_compiler_flags_unstr}" _compiler_flags)
-  STRING(STRIP "${_linker_flags_unstr}" _linker_flags)
+  string(STRIP "${_compiler_flags_unstr}" _compiler_flags)
+  string(STRIP "${_linker_flags_unstr}" _linker_flags)
 
   #
   # Rerun this test if flags have changed:
   #
-  IF(NOT "${_compiler_flags}" STREQUAL "${CACHED_${_var}_compiler_flags}"
+  if(NOT "${_compiler_flags}" STREQUAL "${CACHED_${_var}_compiler_flags}"
      OR NOT "${_linker_flags}" STREQUAL "${CACHED_${_var}_linker_flags}"
      OR NOT "${ARGN}" STREQUAL "${CACHED_${_var}_ARGN}")
-    UNSET(${_var} CACHE)
-  ENDIF()
+    unset(${_var} CACHE)
+  endif()
 
-  SET(CACHED_${_var}_compiler_flags "${_compiler_flags}"
+  set(CACHED_${_var}_compiler_flags "${_compiler_flags}"
     CACHE INTERNAL "" FORCE
     )
-  SET(CACHED_${_var}_linker_flags "${_linker_flags}"
+  set(CACHED_${_var}_linker_flags "${_linker_flags}"
     CACHE INTERNAL "" FORCE
     )
-  SET(CACHED_${_var}_ARGN "${ARGN}" CACHE INTERNAL "" FORCE)
+  set(CACHED_${_var}_ARGN "${ARGN}" CACHE INTERNAL "" FORCE)
 
-  SET(CMAKE_REQUIRED_FLAGS "${_compiler_flags} ${_linker_flags}")
-  SET(CMAKE_REQUIRED_LIBRARIES ${ARGN})
+  set(CMAKE_REQUIRED_FLAGS "${_compiler_flags} ${_linker_flags}")
+  set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
 
   CHECK_CXX_SOURCE_COMPILES("int main(){ return 0; }" ${_var})
-  RESET_CMAKE_REQUIRED()
+  reset_cmake_required()
 
-  IF(${_var})
-    SET(${_var} TRUE CACHE INTERNAL "")
-  ENDIF()
-ENDMACRO()
+  if(${_var})
+    set(${_var} TRUE CACHE INTERNAL "")
+  endif()
+endmacro()

@@ -17,17 +17,17 @@
 # A small wrapper around FIND_FILE to be a bit more verbose
 #
 
-MACRO(DEAL_II_FIND_PATH _path_name)
+macro(DEAL_II_FIND_PATH _path_name)
   # Save a string representation of the arguments before cmake's
   # FIND_PATH gets its hands on it.
-  TO_STRING(_str ${ARGN})
+  to_string(_str ${ARGN})
 
-  FIND_PATH(${_path_name} ${ARGN})
+  find_path(${_path_name} ${ARGN})
 
-  IF(${_path_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_path_name} not found! The call was:")
-    MESSAGE(STATUS "    FIND_PATH(${_path_name} ${_str})")
-  ELSE()
-    MESSAGE(STATUS "Found ${_path_name}")
-  ENDIF()
-ENDMACRO()
+  if(${_path_name} MATCHES "-NOTFOUND")
+    message(STATUS "${_path_name} not found! The call was:")
+    message(STATUS "    find_path(${_path_name} ${_str})")
+  else()
+    message(STATUS "Found ${_path_name}")
+  endif()
+endmacro()

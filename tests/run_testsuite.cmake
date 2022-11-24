@@ -78,7 +78,7 @@
 #   COVERAGE
 #     - If set to ON deal.II will be configured with
 #     DEAL_II_SETUP_COVERAGE=ON, CMAKE_BUILD_TYPE=Debug and the
-#     CTEST_COVERAGE() stage will be run. Test results must go into the
+#     ctest_coverage() stage will be run. Test results must go into the
 #     "Experimental" section.
 #
 #   MEMORYCHECK
@@ -99,180 +99,180 @@
 # For details, consult the ./README file.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-MESSAGE("-- This is CTest ${CMAKE_VERSION}")
+cmake_minimum_required(VERSION 3.3.0)
+message("-- This is CTest ${CMAKE_VERSION}")
 
 #
 # TRACK: Default to Experimental:
 #
 
-IF("${TRACK}" STREQUAL "")
-  SET(TRACK "Experimental")
-ENDIF()
+if("${TRACK}" STREQUAL "")
+  set(TRACK "Experimental")
+endif()
 
-IF( NOT "${TRACK}" STREQUAL "Experimental"
+if( NOT "${TRACK}" STREQUAL "Experimental"
     AND NOT "${TRACK}" STREQUAL "Build Tests"
     AND NOT "${TRACK}" STREQUAL "Regression Tests"
     AND NOT "${TRACK}" STREQUAL "Continuous" )
-  MESSAGE(FATAL_ERROR "
+  message(FATAL_ERROR "
 Unknown TRACK \"${TRACK}\" - see the manual for valid values.
 "
     )
-ENDIF()
+endif()
 
-MESSAGE("-- TRACK:                  ${TRACK}")
+message("-- TRACK:                  ${TRACK}")
 
 #
 # CTEST_SOURCE_DIRECTORY:
 #
 
-IF("${CTEST_SOURCE_DIRECTORY}" STREQUAL "")
+if("${CTEST_SOURCE_DIRECTORY}" STREQUAL "")
   #
   # If CTEST_SOURCE_DIRECTORY is not set we just assume that this script
   # was called residing under ./tests in the source directory
   #
-  GET_FILENAME_COMPONENT(CTEST_SOURCE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}" PATH)
+  get_filename_component(CTEST_SOURCE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}" PATH)
 
-  IF(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeLists.txt)
-    MESSAGE(FATAL_ERROR "
+  if(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeLists.txt)
+    message(FATAL_ERROR "
 Could not find a suitable source directory. There is no source directory
 \"../\" relative to the location of this script. Please, set
 CTEST_SOURCE_DIRECTORY manually to the appropriate source directory.
 "
       )
-  ENDIF()
-ENDIF()
+  endif()
+endif()
 
-MESSAGE("-- CTEST_SOURCE_DIRECTORY: ${CTEST_SOURCE_DIRECTORY}")
+message("-- CTEST_SOURCE_DIRECTORY: ${CTEST_SOURCE_DIRECTORY}")
 
 #
 # Read in custom config files:
 #
 
-CTEST_READ_CUSTOM_FILES(${CTEST_SOURCE_DIRECTORY})
+ctest_read_custom_files(${CTEST_SOURCE_DIRECTORY})
 
 #
 # CTEST_BINARY_DIRECTORY:
 #
 
-IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "")
+if("${CTEST_BINARY_DIRECTORY}" STREQUAL "")
   #
   # If CTEST_BINARY_DIRECTORY is not set we just use the current directory
   # except if it is equal to CTEST_SOURCE_DIRECTORY in which case we fail.
   #
-  SET(CTEST_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set(CTEST_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-  IF( ( "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIRECTORY}"
+  if( ( "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIRECTORY}"
         AND NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeCache.txt )
       OR "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}" )
-    MESSAGE(FATAL_ERROR "
+    message(FATAL_ERROR "
 ctest was invoked in the source directory or under ./tests and
 CTEST_BINARY_DIRECTORY is not set. Please either call ctest from within a
 designated build directory, or set CTEST_BINARY_DIRECTORY accordingly.
 "
       )
-  ENDIF()
-ENDIF()
+  endif()
+endif()
 
 #
 # Read in custom config files:
 #
 
-CTEST_READ_CUSTOM_FILES(${CTEST_BINARY_DIRECTORY})
+ctest_read_custom_files(${CTEST_BINARY_DIRECTORY})
 
 # Make sure that for a build test the directory is empty:
-FILE(GLOB _test ${CTEST_BINARY_DIRECTORY}/*)
-IF( "${TRACK}" STREQUAL "Build Tests"
+file(GLOB _test ${CTEST_BINARY_DIRECTORY}/*)
+if( "${TRACK}" STREQUAL "Build Tests"
     AND NOT "${_test}" STREQUAL "" )
-      MESSAGE(FATAL_ERROR "
+      message(FATAL_ERROR "
 TRACK was set to \"Build Tests\" which require an empty build directory.
 But files were found in \"${CTEST_BINARY_DIRECTORY}\"
 "
         )
-ENDIF()
+endif()
 
-MESSAGE("-- CTEST_BINARY_DIRECTORY: ${CTEST_BINARY_DIRECTORY}")
+message("-- CTEST_BINARY_DIRECTORY: ${CTEST_BINARY_DIRECTORY}")
 
 #
 # CTEST_CMAKE_GENERATOR:
 #
 
 # Query Generator from build directory (if possible):
-IF(EXISTS ${CTEST_BINARY_DIRECTORY}/CMakeCache.txt)
-  FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/CMakeCache.txt _generator
+if(EXISTS ${CTEST_BINARY_DIRECTORY}/CMakeCache.txt)
+  file(STRINGS ${CTEST_BINARY_DIRECTORY}/CMakeCache.txt _generator
     REGEX "^CMAKE_GENERATOR:"
     )
-  STRING(REGEX REPLACE "^.*=" "" _generator ${_generator})
-ENDIF()
+  string(REGEX REPLACE "^.*=" "" _generator ${_generator})
+endif()
 
-IF("${CTEST_CMAKE_GENERATOR}" STREQUAL "")
-  IF(NOT "${_generator}" STREQUAL "")
-    SET(CTEST_CMAKE_GENERATOR ${_generator})
-  ELSE()
+if("${CTEST_CMAKE_GENERATOR}" STREQUAL "")
+  if(NOT "${_generator}" STREQUAL "")
+    set(CTEST_CMAKE_GENERATOR ${_generator})
+  else()
     # default to "Unix Makefiles"
-    SET(CTEST_CMAKE_GENERATOR "Unix Makefiles")
-  ENDIF()
-ELSE()
+    set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
+  endif()
+else()
   # ensure that CTEST_CMAKE_GENERATOR (that was apparently set) is
   # compatible with the build directory:
-  IF( NOT "${CTEST_CMAKE_GENERATOR}" STREQUAL "${_generator}"
+  if( NOT "${CTEST_CMAKE_GENERATOR}" STREQUAL "${_generator}"
       AND NOT "${_generator}" STREQUAL "" )
-    MESSAGE(FATAL_ERROR "
+    message(FATAL_ERROR "
 The build directory is already set up with Generator \"${_generator}\", but
 CTEST_CMAKE_GENERATOR was set to a different Generator \"${CTEST_CMAKE_GENERATOR}\".
 "
      )
-  ENDIF()
-ENDIF()
+  endif()
+endif()
 
-MESSAGE("-- CTEST_CMAKE_GENERATOR:  ${CTEST_CMAKE_GENERATOR}")
+message("-- CTEST_CMAKE_GENERATOR:  ${CTEST_CMAKE_GENERATOR}")
 
 #
 # CTEST_SITE:
 #
 
-IF("${CTEST_SITE}" STREQUAL "")
-  FIND_PROGRAM(HOSTNAME_COMMAND NAMES hostname)
-  IF(NOT "${HOSTNAME_COMMAND}" MATCHES "-NOTFOUND")
-    EXEC_PROGRAM(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
-    STRING(REGEX REPLACE "\\..*$" "" _hostname ${_hostname})
-    SET(CTEST_SITE "${_hostname}")
-  ELSE()
+if("${CTEST_SITE}" STREQUAL "")
+  find_program(HOSTNAME_COMMAND NAMES hostname)
+  if(NOT "${HOSTNAME_COMMAND}" MATCHES "-NOTFOUND")
+    exec_program(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
+    string(REGEX REPLACE "\\..*$" "" _hostname ${_hostname})
+    set(CTEST_SITE "${_hostname}")
+  else()
     # Well, no hostname available. What about:
-    SET(CTEST_SITE "BobMorane")
-  ENDIF()
-ENDIF()
+    set(CTEST_SITE "BobMorane")
+  endif()
+endif()
 
-MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
+message("-- CTEST_SITE:             ${CTEST_SITE}")
 
-IF(TRACK MATCHES "^Regression Tests$" AND NOT CTEST_SITE MATCHES "^tester$")
-  MESSAGE(FATAL_ERROR "
+if(TRACK MATCHES "^Regression Tests$" AND NOT CTEST_SITE MATCHES "^tester$")
+  message(FATAL_ERROR "
 I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
 The TRACK \"Regression Tests\" is not for you.
 "
     )
-ENDIF()
+endif()
 
 #
 # Assemble configuration options, we need it now:
 #
 
-IF("${MAKEOPTS}" STREQUAL "")
-  SET(MAKEOPTS $ENV{MAKEOPTS})
-ENDIF()
+if("${MAKEOPTS}" STREQUAL "")
+  set(MAKEOPTS $ENV{MAKEOPTS})
+endif()
 
-IF(NOT "${CONFIG_FILE}" STREQUAL "")
-  SET(_options "-C${CONFIG_FILE}")
-ENDIF()
+if(NOT "${CONFIG_FILE}" STREQUAL "")
+  set(_options "-C${CONFIG_FILE}")
+endif()
 
-IF("${TRACK}" STREQUAL "Build Tests")
-  SET(TEST_PICKUP_REGEX "^do_not_run_any_tests")
-ENDIF()
+if("${TRACK}" STREQUAL "Build Tests")
+  set(TEST_PICKUP_REGEX "^do_not_run_any_tests")
+endif()
 
 # Pass all relevant variables down to configure:
-GET_CMAKE_PROPERTY(_variables VARIABLES)
-FOREACH(_var ${_variables})
-  IF( _var MATCHES "^(ENABLE|TEST|TESTING|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
+get_cmake_property(_variables VARIABLES)
+foreach(_var ${_variables})
+  if( _var MATCHES "^(ENABLE|TEST|TESTING|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
       _var MATCHES "^(DOCUMENTATION|EXAMPLES)" OR
       _var MATCHES "^(ADOLC|ARBORX|ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|KOKKOS|METIS|MPI)_" OR
       _var MATCHES "^(GINKGO|P4EST|PETSC|SCALAPACK|SLEPC|THREADS|TBB|TRILINOS)_" OR
@@ -281,66 +281,66 @@ FOREACH(_var ${_variables})
       _var MATCHES "^CMAKE_BUILD_TYPE$" OR
       _var MATCHES "MAKEOPTS" OR
       ( NOT _var MATCHES "^[_]*CMAKE" AND _var MATCHES "_DIR$" ) )
-    LIST(APPEND _options "-D${_var}=${${_var}}")
-  ENDIF()
-ENDFOREACH()
+    list(APPEND _options "-D${_var}=${${_var}}")
+  endif()
+endforeach()
 
-IF(COVERAGE)
-  LIST(APPEND _options "-DDEAL_II_SETUP_COVERAGE=TRUE")
-  LIST(APPEND _options "-DCMAKE_BUILD_TYPE=Debug")
-ENDIF()
+if(COVERAGE)
+  list(APPEND _options "-DDEAL_II_SETUP_COVERAGE=TRUE")
+  list(APPEND _options "-DCMAKE_BUILD_TYPE=Debug")
+endif()
 
 #
 # CTEST_BUILD_NAME:
 #
 
 # Append compiler information to CTEST_BUILD_NAME:
-IF(NOT EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
+if(NOT EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
   # Apparently, ${CTEST_BINARY_DIRECTORY} is not a configured build
   # directory. In this case we need a trick: set up a dummy project and
   # query it for the compiler information.
-  FILE(WRITE ${CTEST_BINARY_DIRECTORY}/query_for_compiler/CMakeLists.txt "
-FILE(WRITE ${CTEST_BINARY_DIRECTORY}/detailed.log
+  file(WRITE ${CTEST_BINARY_DIRECTORY}/query_for_compiler/CMakeLists.txt "
+file(WRITE ${CTEST_BINARY_DIRECTORY}/detailed.log
   \"#        CMAKE_CXX_COMPILER:     \${CMAKE_CXX_COMPILER_ID} \${CMAKE_CXX_COMPILER_VERSION} on platform \${CMAKE_SYSTEM_NAME} \${CMAKE_SYSTEM_PROCESSOR}\"
   )"
     )
-  EXECUTE_PROCESS(
+  execute_process(
     COMMAND ${CMAKE_COMMAND} ${_options} "-G${CTEST_CMAKE_GENERATOR}" .
     OUTPUT_QUIET ERROR_QUIET
     WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}/query_for_compiler
     )
-  FILE(REMOVE_RECURSE ${CTEST_BINARY_DIRECTORY}/query_for_compiler)
-ENDIF()
+  file(REMOVE_RECURSE ${CTEST_BINARY_DIRECTORY}/query_for_compiler)
+endif()
 
-IF(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
-  FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/detailed.log _compiler_id
+if(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
+  file(STRINGS ${CTEST_BINARY_DIRECTORY}/detailed.log _compiler_id
     REGEX "CMAKE_CXX_COMPILER:"
     )
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^.*CMAKE_CXX_COMPILER:     \(.*\) on platform.*$" "\\1"
     _compiler_id ${_compiler_id}
     )
-  STRING(REGEX REPLACE "^\(.*\) .*$" "\\1" _compiler_name ${_compiler_id})
-  STRING(REGEX REPLACE "^.* " "" _compiler_version ${_compiler_id})
-  STRING(REGEX REPLACE " " "-" _compiler_id ${_compiler_id})
-  IF( NOT "${_compiler_id}" STREQUAL "" OR
+  string(REGEX REPLACE "^\(.*\) .*$" "\\1" _compiler_name ${_compiler_id})
+  string(REGEX REPLACE "^.* " "" _compiler_version ${_compiler_id})
+  string(REGEX REPLACE " " "-" _compiler_id ${_compiler_id})
+  if( NOT "${_compiler_id}" STREQUAL "" OR
       _compiler_id MATCHES "CMAKE_CXX_COMPILER" )
-    SET(CTEST_BUILD_NAME "${_compiler_id}")
-  ENDIF()
-ENDIF()
+    set(CTEST_BUILD_NAME "${_compiler_id}")
+  endif()
+endif()
 
 #
 # Query git information:
 #
 
-FIND_PACKAGE(Git)
+find_package(Git)
 
-IF(NOT GIT_FOUND)
-  MESSAGE(FATAL_ERROR "\nCould not find git. Bailing out.\n"
+if(NOT GIT_FOUND)
+  message(FATAL_ERROR "\nCould not find git. Bailing out.\n"
    )
-ENDIF()
+endif()
 
-EXECUTE_PROCESS(
+execute_process(
    COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%h"
    WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
    OUTPUT_VARIABLE _git_WC_INFO
@@ -348,14 +348,14 @@ EXECUTE_PROCESS(
    OUTPUT_STRIP_TRAILING_WHITESPACE
    )
 
-IF(NOT ${_result} EQUAL 0)
-  MESSAGE(FATAL_ERROR "\nCould not retrieve git information. Bailing out.\n")
-ENDIF()
+if(NOT ${_result} EQUAL 0)
+  message(FATAL_ERROR "\nCould not retrieve git information. Bailing out.\n")
+endif()
 
-STRING(REGEX REPLACE "^\"([^ ]+)\""
+string(REGEX REPLACE "^\"([^ ]+)\""
          "\\1" _git_WC_SHORTREV "${_git_WC_INFO}")
 
-EXECUTE_PROCESS(
+execute_process(
    COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD
    WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
    OUTPUT_VARIABLE _git_WC_BRANCH
@@ -363,38 +363,38 @@ EXECUTE_PROCESS(
    OUTPUT_STRIP_TRAILING_WHITESPACE
    )
 
-STRING(REGEX REPLACE "refs/heads/" ""
+string(REGEX REPLACE "refs/heads/" ""
   _git_WC_BRANCH "${_git_WC_BRANCH}")
 
-IF(NOT "${_git_WC_BRANCH}" STREQUAL "")
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_git_WC_BRANCH}")
-ENDIF()
+if(NOT "${_git_WC_BRANCH}" STREQUAL "")
+  set(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_git_WC_BRANCH}")
+endif()
 
 #
 # Append config file name to CTEST_BUILD_NAME:
 #
 
-IF(NOT "${CONFIG_FILE}" STREQUAL "")
-  GET_FILENAME_COMPONENT(_conf ${CONFIG_FILE} NAME_WE)
-  STRING(REGEX REPLACE "#.*$" "" _conf ${_conf})
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_conf}")
-ENDIF()
+if(NOT "${CONFIG_FILE}" STREQUAL "")
+  get_filename_component(_conf ${CONFIG_FILE} NAME_WE)
+  string(REGEX REPLACE "#.*$" "" _conf ${_conf})
+  set(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_conf}")
+endif()
 
 #
 # Append DESCRIPTION string to CTEST_BUILD_NAME:
 #
 
-IF(NOT "${DESCRIPTION}" STREQUAL "")
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${DESCRIPTION}")
-ENDIF()
+if(NOT "${DESCRIPTION}" STREQUAL "")
+  set(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${DESCRIPTION}")
+endif()
 
-MESSAGE("-- CTEST_BUILD_NAME:       ${CTEST_BUILD_NAME}")
+message("-- CTEST_BUILD_NAME:       ${CTEST_BUILD_NAME}")
 
 #
 # Declare files that should be submitted as notes:
 #
 
-SET(CTEST_NOTES_FILES
+set(CTEST_NOTES_FILES
   ${CTEST_BINARY_DIRECTORY}/revision.log
   ${CTEST_BINARY_DIRECTORY}/summary.log
   ${CTEST_BINARY_DIRECTORY}/detailed.log
@@ -405,97 +405,97 @@ SET(CTEST_NOTES_FILES
 # Setup coverage:
 #
 
-IF(COVERAGE)
-  IF(NOT TRACK MATCHES "Experimental")
-    MESSAGE(FATAL_ERROR "
+if(COVERAGE)
+  if(NOT TRACK MATCHES "Experimental")
+    message(FATAL_ERROR "
 TRACK must be set to  \"Experimental\" if Coverage is enabled via
 COVERAGE=TRUE.
 "
       )
-  ENDIF()
+  endif()
 
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    FIND_PROGRAM(GCOV_COMMAND NAMES llvm-cov)
-    SET(GCOV_COMMAND "${GCOV_COMMAND} gcov")
-    IF(GCOV_COMMAND MATCHES "-NOTFOUND")
-      MESSAGE(FATAL_ERROR "Coverage enabled but could not find the
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    find_program(GCOV_COMMAND NAMES llvm-cov)
+    set(GCOV_COMMAND "${GCOV_COMMAND} gcov")
+    if(GCOV_COMMAND MATCHES "-NOTFOUND")
+      message(FATAL_ERROR "Coverage enabled but could not find the
                            llvm-cov executable, which is part of LLVM.")
-    ENDIF()
-  ELSE()
-    FIND_PROGRAM(GCOV_COMMAND NAMES gcov)
-    IF(GCOV_COMMAND MATCHES "-NOTFOUND")
-      MESSAGE(FATAL_ERROR "Coverage enabled but could not find the
+    endif()
+  else()
+    find_program(GCOV_COMMAND NAMES gcov)
+    if(GCOV_COMMAND MATCHES "-NOTFOUND")
+      message(FATAL_ERROR "Coverage enabled but could not find the
                            gcov executable, which is part of the
                            GNU Compiler Collection.")
-    ENDIF()
-  ENDIF()
+    endif()
+  endif()
 
-  SET(CTEST_COVERAGE_COMMAND "${GCOV_COMMAND}")
-ENDIF()
+  set(CTEST_COVERAGE_COMMAND "${GCOV_COMMAND}")
+endif()
 
-MESSAGE("-- COVERAGE:               ${COVERAGE}")
+message("-- COVERAGE:               ${COVERAGE}")
 
 
 #
 # Setup memcheck:
 #
 
-IF(MEMORYCHECK)
-  IF(NOT TRACK MATCHES "Experimental")
-    MESSAGE(FATAL_ERROR "
+if(MEMORYCHECK)
+  if(NOT TRACK MATCHES "Experimental")
+    message(FATAL_ERROR "
 TRACK must be set to  \"Experimental\" if Memcheck is enabled via
 MEMORYCHECK=TRUE.
 "
       )
-  ENDIF()
+  endif()
 
-  FIND_PROGRAM(MEMORYCHECK_COMMAND NAMES valgrind)
-  IF(MEMORYCOMMAND MATCHES "-NOTFOUND")
-    MESSAGE(FATAL_ERROR "
+  find_program(MEMORYCHECK_COMMAND NAMES valgrind)
+  if(MEMORYCOMMAND MATCHES "-NOTFOUND")
+    message(FATAL_ERROR "
 Memcheck enabled but could not find the valgrind executable. Please install
 valgrind.
 "
        )
-  ENDIF()
+  endif()
 
-  SET(CTEST_MEMORYCHECK_COMMAND "${MEMORYCHECK_COMMAND}")
-ENDIF()
+  set(CTEST_MEMORYCHECK_COMMAND "${MEMORYCHECK_COMMAND}")
+endif()
 
-MESSAGE("-- MEMORYCHECK:               ${MEMORYCHECK}")
+message("-- MEMORYCHECK:               ${MEMORYCHECK}")
 
 
 
-MACRO(CREATE_TARGETDIRECTORIES_TXT)
+macro(CREATE_TARGETDIRECTORIES_TXT)
   #
   # It gets tricky: Fake a TargetDirectories.txt containing _all_ target
   # directories (of the main project and all subprojects) so that the
-  # CTEST_COVERAGE() actually picks everything up...
+  # ctest_coverage() actually picks everything up...
   #
-  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy
     ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt
     ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt.bck
     )
-  FILE(GLOB _subprojects ${CTEST_BINARY_DIRECTORY}/tests/*)
-  FOREACH(_subproject ${_subprojects})
-    IF(EXISTS ${_subproject}/CMakeFiles/TargetDirectories.txt)
-      FILE(READ ${_subproject}/CMakeFiles/TargetDirectories.txt _var)
-      FILE(APPEND ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt ${_var})
-    ENDIF()
-  ENDFOREACH()
-ENDMACRO()
+  file(GLOB _subprojects ${CTEST_BINARY_DIRECTORY}/tests/*)
+  foreach(_subproject ${_subprojects})
+    if(EXISTS ${_subproject}/CMakeFiles/TargetDirectories.txt)
+      file(READ ${_subproject}/CMakeFiles/TargetDirectories.txt _var)
+      file(APPEND ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt ${_var})
+    endif()
+  endforeach()
+endmacro()
 
-MACRO(CLEAR_TARGETDIRECTORIES_TXT)
-  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E rename
+macro(CLEAR_TARGETDIRECTORIES_TXT)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E rename
     ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt.bck
     ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt
     )
-ENDMACRO()
+endmacro()
 
-MESSAGE("-- CMake Options:          ${_options}")
+message("-- CMake Options:          ${_options}")
 
-IF(NOT "${MAKEOPTS}" STREQUAL "")
-  MESSAGE("-- MAKEOPTS:               ${MAKEOPTS}")
-ENDIF()
+if(NOT "${MAKEOPTS}" STREQUAL "")
+  message("-- MAKEOPTS:               ${MAKEOPTS}")
+endif()
 
 
 ########################################################################
@@ -504,27 +504,27 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
-CTEST_START(Experimental TRACK ${TRACK})
+ctest_start(Experimental TRACK ${TRACK})
 
-MESSAGE("-- Running CTEST_UPDATE() to query git information")
-CTEST_UPDATE(SOURCE ${CTEST_SOURCE_DIRECTORY})
+message("-- Running ctest_update() to query git information")
+ctest_update(SOURCE ${CTEST_SOURCE_DIRECTORY})
 
-MESSAGE("-- Running CTEST_CONFIGURE()")
-CTEST_CONFIGURE(OPTIONS "${_options}" RETURN_VALUE _res)
+message("-- Running ctest_configure()")
+ctest_configure(OPTIONS "${_options}" RETURN_VALUE _res)
 
-IF("${_res}" STREQUAL "0")
+if("${_res}" STREQUAL "0")
   # Only run the build stage if configure was successful:
 
-  MESSAGE("-- Running CTEST_BUILD()")
-  SET(CTEST_BUILD_FLAGS "${MAKEOPTS}")
-  CTEST_BUILD(NUMBER_ERRORS _res)
+  message("-- Running ctest_build()")
+  set(CTEST_BUILD_FLAGS "${MAKEOPTS}")
+  ctest_build(NUMBER_ERRORS _res)
 
-  IF("${_res}" STREQUAL "0")
+  if("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
-    IF(ENABLE_PERFORMANCE_TESTS)
-      MESSAGE("-- Running prune_tests")
-      EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
+    if(ENABLE_PERFORMANCE_TESTS)
+      message("-- Running prune_tests")
+      execute_process(COMMAND ${CMAKE_COMMAND}
         --build . --target prune_tests
         -- ${MAKEOPTS}
         WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
@@ -532,20 +532,20 @@ IF("${_res}" STREQUAL "0")
         RESULT_VARIABLE _res
         )
 
-      IF(NOT "${_res}" STREQUAL "0")
-        MESSAGE(FATAL_ERROR "
+      if(NOT "${_res}" STREQUAL "0")
+        message(FATAL_ERROR "
 \"prune_tests\" target exited with an error. Bailing out.
 "
           )
-      ENDIF()
+      endif()
 
-      SET(_target setup_tests_performance)
-    ELSE()
-      SET(_target setup_tests)
-    ENDIF()
+      set(_target setup_tests_performance)
+    else()
+      set(_target setup_tests)
+    endif()
 
-    MESSAGE("-- Running ${_target}")
-    EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
+    message("-- Running ${_target}")
+    execute_process(COMMAND ${CMAKE_COMMAND}
       --build . --target ${_target}
       -- ${MAKEOPTS}
       WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
@@ -553,77 +553,77 @@ IF("${_res}" STREQUAL "0")
       RESULT_VARIABLE _res
       )
 
-    IF(NOT "${_res}" STREQUAL "0")
-      MESSAGE(FATAL_ERROR "
+    if(NOT "${_res}" STREQUAL "0")
+      message(FATAL_ERROR "
 \"setup_tests\" target exited with an error. Bailing out.
 "
         )
-    ENDIF()
+    endif()
 
-    IF(DEAL_II_MSVC)
-      SET(CTEST_BUILD_CONFIGURATION "${JOB_BUILD_CONFIGURATION}")
-    ENDIF()
-    IF(MEMORYCHECK)
-      MESSAGE("-- Running CTEST_MEMCHECK()")
-      CTEST_MEMCHECK()
-    ELSE()
-      MESSAGE("-- Running CTEST_TESTS()")
-      CTEST_TEST()
-    ENDIF(MEMORYCHECK)
+    if(DEAL_II_MSVC)
+      set(CTEST_BUILD_CONFIGURATION "${JOB_BUILD_CONFIGURATION}")
+    endif()
+    if(MEMORYCHECK)
+      message("-- Running ctest_memcheck()")
+      ctest_memcheck()
+    else()
+      message("-- Running CTEST_TESTS()")
+      ctest_test()
+    endif(MEMORYCHECK)
 
-    IF(COVERAGE)
+    if(COVERAGE)
       CREATE_TARGETDIRECTORIES_TXT()
-      MESSAGE("-- Running CTEST_COVERAGE()")
-      CTEST_COVERAGE()
-      SET (CODE_COV_BASH "${CMAKE_CURRENT_LIST_DIR}/../contrib/utilities/programs/codecov/codecov-bash.sh")
-      IF (EXISTS ${CODE_COV_BASH})
-        MESSAGE("-- Running codecov-bash")
-        EXECUTE_PROCESS(COMMAND bash "${CODE_COV_BASH}"
+      message("-- Running ctest_coverage()")
+      ctest_coverage()
+      set (CODE_COV_BASH "${CMAKE_CURRENT_LIST_DIR}/../contrib/utilities/programs/codecov/codecov-bash.sh")
+      if (EXISTS ${CODE_COV_BASH})
+        message("-- Running codecov-bash")
+        execute_process(COMMAND bash "${CODE_COV_BASH}"
                                      "-t ac85e7ce-5316-4bc1-a237-2fe724028c7b" "-x '${GCOV_COMMAND}'"
                         OUTPUT_QUIET)
-      ENDIF()
+      endif()
       CLEAR_TARGETDIRECTORIES_TXT()
-    ENDIF(COVERAGE)
+    endif(COVERAGE)
 
-  ENDIF()
-ENDIF()
+  endif()
+endif()
 
 #
 # Inject compiler information and svn revision into xml files:
 #
 
-FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
-SET(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
-IF(NOT EXISTS ${_path})
-  MESSAGE(FATAL_ERROR "
+file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
+set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
+if(NOT EXISTS ${_path})
+  message(FATAL_ERROR "
 Unable to determine test submission files from TAG. Bailing out.
 "
     )
-ENDIF()
+endif()
 
 #
 # Create performance test report
 #
-IF(ENABLE_PERFORMANCE_TESTS)
-  MESSAGE("-- Collecting performance measurements\n")
-  EXECUTE_PROCESS(
+if(ENABLE_PERFORMANCE_TESTS)
+  message("-- Collecting performance measurements\n")
+  execute_process(
     COMMAND bash "${CMAKE_CURRENT_LIST_DIR}/performance/collect_measurements" "${CTEST_SITE}"
     WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
     )
-ENDIF()
+endif()
 
 
 #
 # And finally submit:
 #
 
-IF(NOT SKIP_SUBMISSION)
-  MESSAGE("-- Running CTEST_SUBMIT()")
-  CTEST_SUBMIT(RETURN_VALUE _res)
+if(NOT SKIP_SUBMISSION)
+  message("-- Running ctest_submit()")
+  ctest_submit(RETURN_VALUE _res)
 
-  IF("${_res}" STREQUAL "0")
-    MESSAGE("-- Submission successful. Goodbye!")
-  ENDIF()
-ENDIF()
+  if("${_res}" STREQUAL "0")
+    message("-- Submission successful. Goodbye!")
+  endif()
+endif()
 
 # .oO( This script is freaky 606 lines long... )
