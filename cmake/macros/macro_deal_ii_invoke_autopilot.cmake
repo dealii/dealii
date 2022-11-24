@@ -44,6 +44,8 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     SET(_make_command " $ make")
   ENDIF()
 
+  set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
   # Define and setup a compilation target:
   ADD_EXECUTABLE(${TARGET} ${TARGET_SRC})
   DEAL_II_SETUP_TARGET(${TARGET})
