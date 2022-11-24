@@ -1282,6 +1282,25 @@ namespace Utilities
            const unsigned int root_process = 0);
 
     /**
+     * A generalization of the classic MPI_Scatter function, that accepts
+     * arbitrary data types T, as long as boost::serialize accepts T as an
+     * argument.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] object_to_send a vector of objects, with size equal to the
+     * number of processes.
+     * @param[in] root_process The process, which sends the objects to all
+     * processes. By default the process with rank 0 is the root process.
+     *
+     * @return Every process receives an object from the root_process.
+     */
+    template <typename T>
+    T
+    scatter(const MPI_Comm &      comm,
+            const std::vector<T> &object_to_send,
+            const unsigned int    root_process = 0);
+
+    /**
      * This function sends an object @p object_to_send from the process @p root_process
      * to all other processes.
      *
@@ -2091,6 +2110,75 @@ namespace Utilities
 #  endif
     }
 
+
+
+    template <typename T>
+    T
+    scatter(const MPI_Comm &      comm,
+            const std::vector<T> &objects_to_send,
+            const unsigned int    root_process)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      (void)root_process;
+      return objects_to_send[0];
+#  else
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+      const auto my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
+
+      AssertIndexRange(root_process, n_procs);
+      AssertThrow(
+        my_rank != root_process || objects_to_send.size() == n_procs,
+        ExcMessage(
+          "The number of objects to be scattered must correspond to the number processes."));
+
+      std::vector<char> send_buffer;
+      std::vector<int>  send_counts;
+      std::vector<int>  send_displacements;
+
+      if (my_rank == root_process)
+        {
+          send_counts.resize(n_procs, 0);
+          send_displacements.resize(n_procs + 1, 0);
+
+          for (unsigned int i = 0; i < n_procs; ++i)
+            {
+              const auto packed_data = Utilities::pack(objects_to_send[i]);
+              send_buffer.insert(send_buffer.end(),
+                                 packed_data.begin(),
+                                 packed_data.end());
+              send_counts[i] = packed_data.size();
+            }
+
+          for (unsigned int i = 0; i < n_procs; ++i)
+            send_displacements[i + 1] = send_displacements[i] + send_counts[i];
+        }
+
+      int n_local_data;
+      MPI_Scatter(send_counts.data(),
+                  1,
+                  MPI_INT,
+                  &n_local_data,
+                  1,
+                  MPI_INT,
+                  root_process,
+                  comm);
+
+      std::vector<char> recv_buffer(n_local_data);
+
+      MPI_Scatterv(send_buffer.data(),
+                   send_counts.data(),
+                   send_displacements.data(),
+                   MPI_CHAR,
+                   recv_buffer.data(),
+                   n_local_data,
+                   MPI_CHAR,
+                   root_process,
+                   comm);
+
+      return Utilities::unpack<T>(recv_buffer);
+#  endif
+    }
 
 
     template <typename T>
