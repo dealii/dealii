@@ -34,7 +34,7 @@ IF(DEAL_II_TRILINOS_WITH_KOKKOS)
 ELSE()
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
   LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-  FIND_PACKAGE(Kokkos 3.7.0
+  FIND_PACKAGE(Kokkos 3.7.0 QUIET
     HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
     )
   LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
