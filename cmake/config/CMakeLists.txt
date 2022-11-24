@@ -84,6 +84,7 @@ strip_flag(DEAL_II_CXX_FLAGS "-Wsuggest-override")
 #
 
 foreach(_build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${_build} _build_lowercase)
 
   if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
     set(_keyword "general")
@@ -113,7 +114,7 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
     )
   list(APPEND CONFIG_LIBRARIES ${_keyword} \${DEAL_II_LIBRARIES_${_build}})
 
-  set(CONFIG_TARGET_${_build} ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+  set(CONFIG_TARGET_${_build} ${DEAL_II_NAMESPACE}::${DEAL_II_NAMESPACE}_${_build_lowercase})
   list(APPEND CONFIG_TARGET ${_keyword} \${DEAL_II_TARGET_${_build}})
 endforeach()
 

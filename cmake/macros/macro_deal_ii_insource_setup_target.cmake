@@ -25,6 +25,7 @@
 #
 
 macro(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
+  string(TOLOWER ${_build} _build_lowercase)
 
   set_target_properties(${_target} PROPERTIES
     LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
@@ -64,9 +65,7 @@ macro(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
 
 get_property(_type TARGET ${_target} PROPERTY TYPE)
 if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
-  target_link_libraries(${_target}
-    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-    )
+  target_link_libraries(${_target} ${DEAL_II_NAMESPACE}_${_build_lowercase})
 endif()
 
 endmacro()
