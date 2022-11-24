@@ -69,7 +69,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
       SET(_setup FALSE)
       IF(EXISTS "${_directory}/CMakeLists.txt")
         FILE(STRINGS "${_directory}/CMakeLists.txt" _dependency_string
-          REGEX "^IF.*DEAL_II.* # keep in one line$"
+          REGEX "^if.*DEAL_II.* # keep in one line$"
           )
         STRING(REPLACE "IF(" "" _dependency_string "${_dependency_string}")
         STRING(REPLACE ") # keep in one line" "" _dependency_string "${_dependency_string}")
