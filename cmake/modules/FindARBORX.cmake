@@ -20,6 +20,7 @@
 #
 #   ARBORX_INCLUDE_DIRS
 #   ARBORX_INTERFACE_LINK_FLAGS
+#   ARBORX_WITH_MPI
 #
 
 set(ARBORX_DIR "" CACHE PATH "An optional hint to an ArborX installation")
@@ -56,9 +57,10 @@ if(ArborX_FOUND)
     file(STRINGS "${ARBORX_CONFIG_HPP}" ARBORX_MPI_STRING
       REGEX "#define ARBORX_ENABLE_MPI")
     if("${ARBORX_MPI_STRING}" STREQUAL "")
+      set(ARBORX_WITH_MPI FALSE)
       message(STATUS "ArborX has no MPI support")
     else()
-      set(DEAL_II_ARBORX_WITH_MPI TRUE)
+      set(ARBORX_WITH_MPI TRUE)
       message(STATUS "ArborX has MPI support")
     endif()
   endif()
