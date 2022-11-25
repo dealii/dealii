@@ -21,7 +21,7 @@ set(FEATURE_SCALAPACK_DEPENDS MPI LAPACK)
 
 
 macro(FEATURE_SCALAPACK_FIND_EXTERNAL var)
-  find_package(SCALAPACK)
+  find_package(DEAL_II_SCALAPACK)
 
   if(SCALAPACK_FOUND)
     set(${var} TRUE)

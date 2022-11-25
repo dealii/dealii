@@ -21,7 +21,7 @@ set(FEATURE_SLEPC_DEPENDS PETSC)
 
 
 macro(FEATURE_SLEPC_FIND_EXTERNAL var)
-  find_package(SLEPC)
+  find_package(DEAL_II_SLEPC)
 
   if(SLEPC_FOUND)
     #

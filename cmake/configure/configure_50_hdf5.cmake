@@ -20,7 +20,7 @@
 set(FEATURE_HDF5_DEPENDS MPI)
 
 macro(FEATURE_HDF5_FIND_EXTERNAL var)
-  find_package(HDF5)
+  find_package(DEAL_II_HDF5)
 
   if(HDF5_FOUND)
     set(${var} TRUE)

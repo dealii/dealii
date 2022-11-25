@@ -25,7 +25,7 @@
 set(DEAL_II_WITH_TASKFLOW OFF CACHE BOOL "")
 
 macro(FEATURE_TASKFLOW_FIND_EXTERNAL var)
-  find_package(TASKFLOW)
+  find_package(DEAL_II_TASKFLOW)
 
   if(TASKFLOW_FOUND)
     set(${var} TRUE)

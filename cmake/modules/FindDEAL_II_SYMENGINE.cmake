@@ -30,7 +30,7 @@ set_if_empty(SYMENGINE_DIR "$ENV{SYMENGINE_DIR}")
 # SymEngine overwrites the CMake module path, so we save
 # and restore it after this library is found and configured.
 #
-set (DEAL_II_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
+set(_cmake_module_path ${CMAKE_MODULE_PATH})
 
 #
 # Include the SymEngine:
@@ -45,7 +45,7 @@ find_package(SymEngine
 #
 # Reset the CMake module path
 #
-set (CMAKE_MODULE_PATH ${DEAL_II_CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${_cmake_module_path})
 
 
 #

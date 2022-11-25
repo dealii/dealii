@@ -28,7 +28,7 @@ endif()
 
 
 macro(FEATURE_CGAL_FIND_EXTERNAL var)
-  find_package(CGAL)
+  find_package(DEAL_II_CGAL)
 
   if(CGAL_FOUND)
     set(${var} TRUE)

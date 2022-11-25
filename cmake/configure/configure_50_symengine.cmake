@@ -19,7 +19,7 @@
 
 
 macro(FEATURE_SYMENGINE_FIND_EXTERNAL var)
-  find_package(SYMENGINE)
+  find_package(DEAL_II_SYMENGINE)
 
   if(SYMENGINE_FOUND)
     set(${var} TRUE)

@@ -124,7 +124,7 @@ endmacro()
 # Default macro for finding an external library:
 #
 macro(FEATURE_FIND_EXTERNAL _feature _var)
-  find_package(${_feature})
+  find_package(DEAL_II_${_feature})
   if(${_feature}_FOUND)
     set(${_var} TRUE)
   endif()

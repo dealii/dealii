@@ -48,9 +48,6 @@ if(NOT BUILD_SHARED_LIBS)
   set(Boost_USE_STATIC_LIBS TRUE)
 endif()
 
-# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-
 # Work around a CMake compatibility issue with boost-1.70.0
 # compare https://gitlab.kitware.com/cmake/cmake/issues/18865
 # and https://lists.boost.org/Archives/boost/2019/02/245016.php
@@ -65,7 +62,6 @@ else()
     serialization system thread
     )
 endif()
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
 # Fall back to dynamic libraries if no static libraries could be found:

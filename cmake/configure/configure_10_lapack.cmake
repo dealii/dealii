@@ -19,7 +19,7 @@
 
 macro(FEATURE_LAPACK_FIND_EXTERNAL var)
   clear_cmake_required()
-  find_package(LAPACK)
+  find_package(DEAL_II_LAPACK)
 
   #
   # We do a check for availability of every single LAPACK function we use.

@@ -44,9 +44,6 @@ set_if_empty(LAPACK_DIR "$ENV{LAPACK_DIR}")
 
 set(_cmake_prefix_path_backup "${CMAKE_PREFIX_PATH}")
 
-# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-
 set(CMAKE_PREFIX_PATH ${BLAS_DIR} ${LAPACK_DIR} ${_cmake_prefix_path_backup})
 find_package(BLAS)
 
@@ -54,7 +51,6 @@ set(CMAKE_PREFIX_PATH ${LAPACK_DIR} ${_cmake_prefix_path_backup})
 find_package(LAPACK)
 
 set(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
 # Filter out spurious "FALSE" in the library lists:

@@ -37,8 +37,6 @@ endif()
 # fail cracefully:
 #
 if(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
-  # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-  list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
   set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON)
   find_package(CGAL QUIET)
 
@@ -49,8 +47,6 @@ if(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
     set(CGAL_LIBRARIES "-NOTFOUND")
     message(STATUS "CGAL wrappers require CGAL version 5 and above.")
   endif()
-
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
   if(CGAL_FOUND)
     get_target_property(CGAL_LIBRARIES CGAL::CGAL INTERFACE_LINK_LIBRARIES)

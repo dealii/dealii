@@ -18,7 +18,7 @@
 #
 
 macro(FEATURE_GINKGO_FIND_EXTERNAL var)
-  find_package(GINKGO)
+  find_package(DEAL_II_GINKGO)
 
   if(GINKGO_FOUND)
     set(${var} TRUE)

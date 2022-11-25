@@ -26,17 +26,12 @@
 set(HDF5_DIR "" CACHE PATH "An optional hint to an hdf5 directory")
 set_if_empty(HDF5_DIR "$ENV{HDF5_DIR}")
 
-# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-
 if(NOT "${HDF5_DIR}" STREQUAL "")
   set(HDF5_ROOT "${HDF5_DIR}")
 endif()
 
 set(HDF5_PREFER_PARALLEL TRUE)
 find_package(HDF5)
-
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 set(_include_dirs "${HDF5_INCLUDE_DIRS}")
 set(_libraries "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")

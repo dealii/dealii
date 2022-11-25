@@ -25,7 +25,7 @@ set(DEAL_II_WITH_MPI OFF CACHE BOOL "")
 #
 
 macro(FEATURE_MPI_FIND_EXTERNAL var)
-  find_package(MPI)
+  find_package(DEAL_II_MPI)
 
   if(MPI_FOUND)
     set(${var} TRUE)
