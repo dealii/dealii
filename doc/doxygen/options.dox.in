@@ -181,7 +181,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_ENABLE_EXTRA_DIAGNOSTICS= \
                          DEAL_II_DISABLE_EXTRA_DIAGNOSTICS= \
                          DEAL_II_DEPRECATED= \
-                         DEAL_II_CUDA_HOST_DEV= \
+                         DEAL_II_HOST_DEV= \
                          DEAL_II_ALWAYS_INLINE= \
                          __device__= \
                          DEAL_II_WITH_ADOLC=1 \
