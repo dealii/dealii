@@ -1,0 +1,93 @@
+<br>
+
+<i>
+This program was contributed by Stefano Zampini, King Abdullah University of Science and Technology.
+
+</i>
+<br>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+The step-15 program solved the following, nonlinear equation
+describing the minimal surface problem:
+@f{align*}{
+    -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
+    \qquad &&\textrm{in} ~ \Omega
+    \\
+    u&=g \qquad\qquad &&\textrm{on} ~ \partial \Omega.
+@f}
+step-15 uses a Newton method, and
+Newton's method works by repeatedly solving a *linearized* problem for
+an update $\delta u_k$ -- called the "search direction" --, computing a
+"step length"
+$\alpha_k$, and then combining them to compute the new
+guess for the solution via
+@f{align*}{
+    u_{k+1} = u_k + \alpha_k \, \delta u_k.
+@f}
+
+Here, we use PETSc to solve the nonlinear system of equations with the SNES
+package, with a very similar interface as discussed for KINSOL in step-77.
+
+<h3> How deal.II interfaces with SNES </h3>
+
+SNES, like many similar packages, works in a pretty abstract way. At
+its core, it sees a nonlinear problem of the form
+@f{align*}{
+    F(U) = 0
+@f}
+(affine variants, where 0 is replaced by a constant vector, are also
+possible) and constructs a sequence of iterates $U_k$ which, in general, are
+vectors of the same length as the vector returned by the function
+$F$. To do this, there are a few things it needs from the user:
+- A way to evaluate, for a given vector $U$, the function $F(U)$. This
+  function is generally called the "residual" operation because the
+  goal is of course to find a point $U^\ast$ for which $F(U^\ast)=0$;
+  if $F(U)$ returns a nonzero vector, then this is the
+  <a href="https://en.wikipedia.org/wiki/Residual_(numerical_analysis)">"residual"</a>
+  (i.e., the "rest", or whatever is "left over"). The function
+  that will do this is in essence the same as the computation of
+  the right hand side vector in step-15, but with an important difference:
+  There, the right hand side denoted the *negative* of the residual,
+  so we have to switch a sign.
+- A way to compute the matrix $J_k$ if that is necessary in the
+  current iteration. This operation will generally be called the
+  "jacobian" operation.
+
+The deal.II interface also offers an alternative approach, more
+in line with the deal.II philosophy:
+- A way to compute the matrix $J_k$ if that is necessary in the
+  current iteration, along with possibly a preconditioner or other
+  data structures. This operation will generally be called the
+  "setup_jacobian" operation.
+- A way to solve a linear system $\tilde J_k x = b$ with whatever
+  matrix $\tilde J_k$ was last computed. This operation will generally
+  be called the "solve_for_jacobian_system" operation.
+
+These operations must be provided in the form of
+[std::function](https://en.cppreference.com/w/cpp/utility/functional/function)
+objects that take the appropriate set of arguments and that generally
+return an integer that indicates success (a zero return value) or
+failure (a nonzero return value). Specifically, the objects we will
+access are the
+PETScWrappers::NonlinearSolver::residual,
+PETScWrappers::NonlinearSolver::setup_jacobian,
+PETScWrappers::NonlinearSolver::solve_jacobian_system,
+PETScWrappers::NonlinearSolver::residual, and
+PETScWrappers::NonlinearSolver::jacobian
+member variables. (See the documentation of these variables for their
+details.) In our implementation, we will use
+[lambda functions](https://en.cppreference.com/w/cpp/language/lambda)
+to implement these "callbacks" that in turn can call member functions;
+SNES will then call these callbacks whenever its internal algorithms
+think it is useful.
+
+
+<h3> Details of the implementation </h3>
+
+The majority of the code of this tutorial program is as in step-15 and
+in step-77, and we will not comment on it, except for one thing.
+We don't need to explicitly factorize the Jacobian matrix ourselves as
+it is done in step-77, since PETSc will automatically do it for
+us when needed.

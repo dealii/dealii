@@ -1,0 +1,189 @@
+<h1>Results</h1>
+
+When running the program, you get output that looks like this:
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+1 norm=0.212073
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+2 norm=0.0189603
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+3 norm=0.000314854
+
+[...]
+@endcode
+
+By default, PETSc uses a Newton solver with cubic backtracking, resampling the Jacobian at each Newton step.
+Thus we compute and factorize the matrix once, and sample the residual to check for a successul line-search.
+The attentive reader should have noticed that in this case we are computing one more extra residual per Newton step.
+This is because the deal.II code is setup to use a Jacobian-free approach, and the extra residual computation
+pops up when computing a matrix-vector product to test the validity of the Newton solution.
+
+Diagnostic for line search can be turned on using the command line "-snes_linesearch_monitor", producing the excerpt below.
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+      Line search: Using full step: fnorm 8.679748230595e-01 gnorm 2.120728179320e-01
+1 norm=0.212073
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+      Line search: Using full step: fnorm 2.120728179320e-01 gnorm 1.896033864659e-02
+2 norm=0.0189603
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+      Line search: Using full step: fnorm 1.896033864659e-02 gnorm 3.148542199408e-04
+3 norm=0.000314854
+
+[...]
+@endcode
+
+We can switch to a Quasi-Newton method by using the command line "-snes_type qn -snes_qn_scale_type jacobian" and
+we can see that our Jacobian is sampled and factored only once, at the cost of an increase of the number of Newton steps:
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+1 norm=0.166391
+  Computing residual vector
+  Computing residual vector
+2 norm=0.0507703
+  Computing residual vector
+  Computing residual vector
+3 norm=0.0160007
+  Computing residual vector
+  Computing residual vector
+  Computing residual vector
+4 norm=0.00172425
+  Computing residual vector
+  Computing residual vector
+  Computing residual vector
+5 norm=0.000460486
+[...]
+@endcode
+
+We can also get some diagnostic on the correctness of the computed Jacobian using "-snes_test_jacobian -snes_test_jacobian_view"
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  ---------- Testing Jacobian -------------
+  Testing hand-coded Jacobian, if (for double precision runs) ||J - Jfd||_F/||J||_F is
+    O(1.e-8), the hand-coded Jacobian is probably correct.
+[...]
+  ||J - Jfd||_F/||J||_F = 0.0196815, ||J - Jfd||_F = 0.503436
+[...]
+  Hand-coded minus finite-difference Jacobian with tolerance 1e-05 ----------
+Mat Object: 1 MPI process
+  type: mpiaij
+row 0: (0, 0.125859)
+row 1: (1, 0.125859)
+row 2:
+row 3:
+row 4: (4, 0.125859)
+row 5:
+row 6:
+row 7:
+row 8:
+[...]
+@endcode
+showing that the only errors we commit in assembling the Jacobian are on the boundary dofs.
+As discussed in the tutorial, those errors are harmless.
+
+The key take-away messages of this program are basically the same of that outlined in step-77:
+
+- The solution is the same as the one we computed in step-15, i.e., the
+  interfaces to PETSc SNES package really did what they were supposed
+  to do. This should not come as a surprise, but the important point is that
+  we don't have to spend the time implementing the complex algorithms that
+  underlie advanced nonlinear solvers ourselves.
+
+- SNES offers a wide variety of solvers and linesearch techniques, not only Newton.
+  It also allows us to control Jacobian setups; however, differently from KINSOL,
+  this is not automatically decided within the library by looking at the residual
+  vector but it needs to be specified by the user. This could be integrated into
+  the deal.II interface if requested.
+
+- As also discussed for the KINSOL example in step-77, optimal preconditioners should be used
+  instead of the LU factorization used here by default. This is already possible within this tutorial
+  by playing with the command line options. For example, algebraic multigrid can be used by
+  simply specifying "-pc_type gamg". When using iterative linear solvers, the Eisenstat-Walker
+  trick can be also requested at command line via "-snes_ksp_ew".
+
+For example, if we run
+@code
+   ./step-86 -pc_type gamg -ksp_type cg -ksp_converged_reason -snes_converged_reason -snes_ksp_ew | grep CONVERGED
+@endcode
+we obtain an output like the one below, that shows that the number of nonlinear iterations used by
+the solver increases as the mesh is refined, and that the number of linear iterations increases as the Newton solver
+is entering the second-order ball of convergence.
+@code
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 4
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 8
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 5
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 11
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 5
+  Linear solve converged due to CONVERGED_RTOL iterations 9
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 5
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 4
+  Linear solve converged due to CONVERGED_RTOL iterations 6
+  Linear solve converged due to CONVERGED_RTOL iterations 7
+  Linear solve converged due to CONVERGED_RTOL iterations 10
+  Linear solve converged due to CONVERGED_RTOL iterations 16
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 6
+@endcode
