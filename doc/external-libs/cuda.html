@@ -13,7 +13,9 @@
     <h1>Installing deal.II with CUDA</h1>
 
     <p>
-      To compile and run CUDA code, you need a CUDA-enabled GPU, appropriate
+      To compile and run CUDA code, you need to use an external Kokkos
+      installation that has been configured with CUDA support.
+      This, in turn, requires a CUDA-enabled GPU, appropriate
       drivers, the CUDA toolkit, and the nvcc compiler. Unlike other libraries,
       you need special hardware and compiler to enable CUDA. Because the
       hardware is always evolving, older GPUs do not support all the
@@ -30,23 +32,7 @@
 
         -DDEAL_II_WITH_CUDA=ON
       </pre>
-      Depending on you system, this may be enough to get CUDA to work. If
-      you are using CUDA 10.2, you will have to make sure that
-      C++17 is disabled.
-      By default, we try to detect the compute capability of your device
-      but you can easily set your own CUDA flags:
-      <pre>
-
-        -DDEAL_II_CUDA_FLAGS="-arch=sm_60"
-      </pre>
-      <code>-DDEAL_II_CUDA_FLAGS_DEBUG</code> and
-      <code>-DDEAL_II_CUDA_FLAGS_RELEASE</code> are also available if you want
-      a finer control on the CUDA flags. The CUDA compiler and the
-      CUDA toolkit root directory can be set using
-      <code>-DDEAL_II_CUDA_COMPILER</code> and
-      <code>-DDEAL_II_CUDA_TOOLKIT_ROOT_DIR</code>.
-      Finally, the CUDA host compiler is the same as the C++ compiler
-      by default, but can be changed using CUDA flags as well.
+      CUDA versions prior to 11.0 don't support C++17 or higher.
     </p>
 
     <p>
