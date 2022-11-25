@@ -15,7 +15,7 @@
 
 #
 # Usage:
-#   UNSET_IF_CHANGED(<internal variable> "string"
+#   unset_if_changed(<internal variable> "string"
 #     [cached variable names]
 #     )
 #
@@ -23,15 +23,15 @@
 # variable>} and unsets all supplied (cached) variables if this string
 # changes.
 #
-MACRO(UNSET_IF_CHANGED _variable _string)
-  IF(DEFINED ${_variable})
-    IF(NOT "${${_variable}}" STREQUAL "${_string}")
-      FOREACH(_arg ${ARGN})
-        MESSAGE(STATUS
+macro(UNSET_IF_CHANGED _variable _string)
+  if(DEFINED ${_variable})
+    if(NOT "${${_variable}}" STREQUAL "${_string}")
+      foreach(_arg ${ARGN})
+        message(STATUS
           "Configuration changed. Unsetting cached variable \"${_arg}\" and rerunning checks.")
-        UNSET(${_arg} CACHE)
-      ENDFOREACH()
-    ENDIF()
-  ENDIF()
-  SET(${_variable} "${_string}" CACHE INTERNAL "" FORCE)
-ENDMACRO()
+        unset(${_arg} CACHE)
+      endforeach()
+    endif()
+  endif()
+  set(${_variable} "${_string}" CACHE INTERNAL "" FORCE)
+endmacro()

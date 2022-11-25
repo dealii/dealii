@@ -23,19 +23,19 @@
 #   SYMENGINE_WITH_LLVM
 #
 
-SET(SYMENGINE_DIR "" CACHE PATH "An optional hint to a SymEngine installation")
-SET_IF_EMPTY(SYMENGINE_DIR "$ENV{SYMENGINE_DIR}")
+set(SYMENGINE_DIR "" CACHE PATH "An optional hint to a SymEngine installation")
+set_if_empty(SYMENGINE_DIR "$ENV{SYMENGINE_DIR}")
 
 #
 # SymEngine overwrites the CMake module path, so we save
 # and restore it after this library is found and configured.
 #
-SET (DEAL_II_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
+set (DEAL_II_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 
 #
 # Include the SymEngine:
 #
-FIND_PACKAGE(SymEngine
+find_package(SymEngine
   CONFIG QUIET
   HINTS ${SYMENGINE_DIR}
   PATH_SUFFIXES lib/cmake/symengine
@@ -45,14 +45,14 @@ FIND_PACKAGE(SymEngine
 #
 # Reset the CMake module path
 #
-SET (CMAKE_MODULE_PATH ${DEAL_II_CMAKE_MODULE_PATH})
+set (CMAKE_MODULE_PATH ${DEAL_II_CMAKE_MODULE_PATH})
 
 
 #
 # Look for symengine_config.h - we'll query it to determine supported features:
 #
-IF(SymEngine_FOUND)
-  DEAL_II_FIND_FILE(SYMENGINE_SETTINGS_H symengine_config.h
+if(SymEngine_FOUND)
+  deal_ii_find_file(SYMENGINE_SETTINGS_H symengine_config.h
     HINTS ${SYMENGINE_INCLUDE_DIRS}
     PATH_SUFFIXES symengine
     NO_DEFAULT_PATH
@@ -62,47 +62,47 @@ IF(SymEngine_FOUND)
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH
     )
-ENDIF()
+endif()
 
 #
 # Version check
 #
-IF(EXISTS ${SYMENGINE_SETTINGS_H})
+if(EXISTS ${SYMENGINE_SETTINGS_H})
 
-  FILE(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_VERSION_MAJOR_STRING
+  file(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_VERSION_MAJOR_STRING
     REGEX "#define.*SYMENGINE_MAJOR_VERSION")
-  STRING(REGEX REPLACE "^.*SYMENGINE_MAJOR_VERSION.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*SYMENGINE_MAJOR_VERSION.*([0-9]+).*" "\\1"
     SYMENGINE_VERSION_MAJOR "${SYMENGINE_VERSION_MAJOR_STRING}"
     )
-  FILE(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_VERSION_MINOR_STRING
+  file(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_VERSION_MINOR_STRING
     REGEX "#define.*SYMENGINE_MINOR_VERSION")
-  STRING(REGEX REPLACE "^.*SYMENGINE_MINOR_VERSION.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*SYMENGINE_MINOR_VERSION.*([0-9]+).*" "\\1"
     SYMENGINE_VERSION_MINOR "${SYMENGINE_VERSION_MINOR_STRING}"
     )
-  FILE(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_VERSION_PATCH_STRING
+  file(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_VERSION_PATCH_STRING
     REGEX "#define.*SYMENGINE_PATCH_VERSION")
-  STRING(REGEX REPLACE "^.*SYMENGINE_PATCH_VERSION.*([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*SYMENGINE_PATCH_VERSION.*([0-9]+).*" "\\1"
     SYMENGINE_VERSION_PATCH "${SYMENGINE_VERSION_PATCH_STRING}"
     )
     
-  SET(SYMENGINE_VERSION ${SymEngine_VERSION})
-ENDIF()
+  set(SYMENGINE_VERSION ${SymEngine_VERSION})
+endif()
 
 #
 # Feature checks
 #
 
-MACRO(_symengine_feature_check _var _regex)
-  IF(EXISTS ${SYMENGINE_SETTINGS_H})
-    FILE(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_${_var}_STRING
+macro(_symengine_feature_check _var _regex)
+  if(EXISTS ${SYMENGINE_SETTINGS_H})
+    file(STRINGS "${SYMENGINE_SETTINGS_H}" SYMENGINE_${_var}_STRING
       REGEX "${_regex}")
-    IF("${SYMENGINE_${_var}_STRING}" STREQUAL "")
-      SET(SYMENGINE_WITH_${_var} FALSE)
-    ELSE()
-      SET(SYMENGINE_WITH_${_var} TRUE)
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+    if("${SYMENGINE_${_var}_STRING}" STREQUAL "")
+      set(SYMENGINE_WITH_${_var} FALSE)
+    else()
+      set(SYMENGINE_WITH_${_var} TRUE)
+    endif()
+  endif()
+endmacro()
 
 # Other possible features of interest: BOOST, GMP
 _symengine_feature_check(LLVM "#define.*HAVE_SYMENGINE_LLVM")
@@ -111,28 +111,28 @@ _symengine_feature_check(LLVM "#define.*HAVE_SYMENGINE_LLVM")
 # Sanitize include dirs:
 #
 
-STRING(REGEX REPLACE
+string(REGEX REPLACE
   "(lib64|lib)\\/cmake\\/symengine\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
   SYMENGINE_INCLUDE_DIRS  "${SYMENGINE_INCLUDE_DIRS}"
   )
-REMOVE_DUPLICATES(SYMENGINE_INCLUDE_DIRS)
+remove_duplicates(SYMENGINE_INCLUDE_DIRS)
 
 #
 # Get the full path for the SYMENGINE_LIBRARIES. Some of these libraries are
 # CMake targets, so we can query them directly for this information.
 #
-FOREACH(SYMENGINE_LIBRARY_NAME ${SYMENGINE_LIBRARIES})
-   IF (TARGET ${SYMENGINE_LIBRARY_NAME})
-       GET_PROPERTY(SYMENGINE_LIBRARY TARGET ${SYMENGINE_LIBRARY_NAME} PROPERTY LOCATION)
-   ELSE ()
-       SET(SYMENGINE_LIBRARY ${SYMENGINE_LIBRARY_NAME})
-   ENDIF()
+foreach(SYMENGINE_LIBRARY_NAME ${SYMENGINE_LIBRARIES})
+   if (TARGET ${SYMENGINE_LIBRARY_NAME})
+       get_property(SYMENGINE_LIBRARY TARGET ${SYMENGINE_LIBRARY_NAME} PROPERTY LOCATION)
+   else ()
+       set(SYMENGINE_LIBRARY ${SYMENGINE_LIBRARY_NAME})
+   endif()
 
-  SET(_symengine_libraries ${_symengine_libraries} ${SYMENGINE_LIBRARY})
-ENDFOREACH()
-SET(SYMENGINE_LIBRARIES ${_symengine_libraries})
+  set(_symengine_libraries ${_symengine_libraries} ${SYMENGINE_LIBRARY})
+endforeach()
+set(SYMENGINE_LIBRARIES ${_symengine_libraries})
 
-DEAL_II_PACKAGE_HANDLE(SYMENGINE
+deal_ii_package_handle(SYMENGINE
   LIBRARIES REQUIRED SYMENGINE_LIBRARIES
   INCLUDE_DIRS REQUIRED SYMENGINE_INCLUDE_DIRS
   USER_INCLUDE_DIRS REQUIRED SYMENGINE_INCLUDE_DIRS

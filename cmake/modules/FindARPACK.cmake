@@ -23,30 +23,30 @@
 #   ARPACK_WITH_PARPACK
 #
 
-SET(ARPACK_DIR "" CACHE PATH "An optional hint to an ARPACK installation")
-SET_IF_EMPTY(ARPACK_DIR "$ENV{ARPACK_DIR}")
+set(ARPACK_DIR "" CACHE PATH "An optional hint to an ARPACK installation")
+set_if_empty(ARPACK_DIR "$ENV{ARPACK_DIR}")
 
-SET(PARPACK_DIR "" CACHE PATH "An optional hint to a PARPACK installation")
-SET_IF_EMPTY(PARPACK_DIR "$ENV{PARPACK_DIR}")
+set(PARPACK_DIR "" CACHE PATH "An optional hint to a PARPACK installation")
+set_if_empty(PARPACK_DIR "$ENV{PARPACK_DIR}")
 
-DEAL_II_FIND_LIBRARY(ARPACK_LIBRARY
+deal_ii_find_library(ARPACK_LIBRARY
   NAMES arpack
   HINTS ${ARPACK_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-IF(DEAL_II_WITH_MPI)
-  GET_FILENAME_COMPONENT(_path "${ARPACK_LIBRARY}" PATH)
-  DEAL_II_FIND_LIBRARY(PARPACK_LIBRARY
+if(DEAL_II_WITH_MPI)
+  get_filename_component(_path "${ARPACK_LIBRARY}" PATH)
+  deal_ii_find_library(PARPACK_LIBRARY
     NAMES parpack
     HINTS ${_path} ${ARPACK_DIR} ${PARPACK_DIR}
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
     )
-ELSE()
-  SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
-ENDIF()
+else()
+  set(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
+endif()
 
-IF(NOT DEAL_II_ARPACK_WITH_PARPACK)
+if(NOT DEAL_II_ARPACK_WITH_PARPACK)
   #
   # We have to avoid an unfortunate symbol clash with "libscalapack.so" -
   # arpack happened to blindly copy a symbol name...
@@ -57,21 +57,21 @@ IF(NOT DEAL_II_ARPACK_WITH_PARPACK)
   # PETSc's link interface. This can be overridden by manually setting
   # DEAL_II_ARPACK_WITH_PARPACK to true.
   #
-  FOREACH(_libraries ${TRILINOS_LIBRARIES} ${PETSC_LIBRARIES})
-    IF("${_libraries}" MATCHES "scalapack")
-      SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
-    ENDIF()
-  ENDFOREACH()
-ENDIF()
+  foreach(_libraries ${TRILINOS_LIBRARIES} ${PETSC_LIBRARIES})
+    if("${_libraries}" MATCHES "scalapack")
+      set(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
+    endif()
+  endforeach()
+endif()
 
 
-IF(NOT PARPACK_LIBRARY MATCHES "-NOTFOUND")
-  SET(ARPACK_WITH_PARPACK TRUE)
-ELSE()
-  SET(ARPACK_WITH_PARPACK FALSE)
-ENDIF()
+if(NOT PARPACK_LIBRARY MATCHES "-NOTFOUND")
+  set(ARPACK_WITH_PARPACK TRUE)
+else()
+  set(ARPACK_WITH_PARPACK FALSE)
+endif()
 
-DEAL_II_PACKAGE_HANDLE(ARPACK
+deal_ii_package_handle(ARPACK
   LIBRARIES
     OPTIONAL PARPACK_LIBRARY
     REQUIRED ARPACK_LIBRARY LAPACK_LIBRARIES

@@ -13,13 +13,13 @@
 ##
 ## ---------------------------------------------------------------------
 
-MESSAGE(STATUS "Setting up library")
+message(STATUS "Setting up library")
 
 #
 # This happens surprisingly often:
 #
-IF("${DEAL_II_PACKAGE_NAME}" STREQUAL  "")
-  MESSAGE(FATAL_ERROR
+if("${DEAL_II_PACKAGE_NAME}" STREQUAL  "")
+  message(FATAL_ERROR
     "\nWrong source directory specified.\n"
     "You pointed cmake to the subdirectory \"source\" instead of the base "
     "directory (the one containing the file \"README.md\"). Make sure that "
@@ -29,13 +29,13 @@ IF("${DEAL_II_PACKAGE_NAME}" STREQUAL  "")
     "  $ cmake  [...options...]  ../\n"
     "(path not ending in \".../source\")"
     )
-ENDIF()
+endif()
 
 #
 # Compile the deal.II library
 #
 
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_BINARY_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
@@ -51,46 +51,46 @@ INCLUDE_DIRECTORIES(
 # end of everything (e.g. numerics/vectors.cc takes several minutes to
 # compile...)
 #
-ADD_SUBDIRECTORY(numerics)
-ADD_SUBDIRECTORY(fe)
-ADD_SUBDIRECTORY(dofs)
-ADD_SUBDIRECTORY(lac)
-ADD_SUBDIRECTORY(base)
-ADD_SUBDIRECTORY(cgal)
-ADD_SUBDIRECTORY(gmsh)
-ADD_SUBDIRECTORY(grid)
-ADD_SUBDIRECTORY(hp)
-ADD_SUBDIRECTORY(multigrid)
-ADD_SUBDIRECTORY(distributed)
-ADD_SUBDIRECTORY(algorithms)
-ADD_SUBDIRECTORY(integrators)
-ADD_SUBDIRECTORY(matrix_free)
-ADD_SUBDIRECTORY(meshworker)
-ADD_SUBDIRECTORY(opencascade)
-ADD_SUBDIRECTORY(particles)
-ADD_SUBDIRECTORY(differentiation)
-ADD_SUBDIRECTORY(physics)
-ADD_SUBDIRECTORY(optimization/rol)
-ADD_SUBDIRECTORY(non_matching)
-ADD_SUBDIRECTORY(sundials)
-ADD_SUBDIRECTORY(arborx)
+add_subdirectory(numerics)
+add_subdirectory(fe)
+add_subdirectory(dofs)
+add_subdirectory(lac)
+add_subdirectory(base)
+add_subdirectory(cgal)
+add_subdirectory(gmsh)
+add_subdirectory(grid)
+add_subdirectory(hp)
+add_subdirectory(multigrid)
+add_subdirectory(distributed)
+add_subdirectory(algorithms)
+add_subdirectory(integrators)
+add_subdirectory(matrix_free)
+add_subdirectory(meshworker)
+add_subdirectory(opencascade)
+add_subdirectory(particles)
+add_subdirectory(differentiation)
+add_subdirectory(physics)
+add_subdirectory(optimization/rol)
+add_subdirectory(non_matching)
+add_subdirectory(sundials)
+add_subdirectory(arborx)
 
-FOREACH(build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${build} build_lowercase)
+foreach(build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${build} build_lowercase)
 
   #
   # Combine all ${build} OBJECT targets to a ${build} library:
   #
 
-  GET_PROPERTY(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})
+  get_property(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})
 
-  ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  add_library(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     dummy.cc # Workaround for a bug in the Xcode generator
     ${_objects}
     )
-  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
+  add_dependencies(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
 
-  SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  set_target_properties(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     PROPERTIES
     VERSION "${DEAL_II_PACKAGE_VERSION}"
     #
@@ -108,14 +108,14 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 
-  IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    set_target_properties(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
       PROPERTIES
       MACOSX_RPATH OFF
       BUILD_WITH_INSTALL_RPATH OFF
       INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
       )
-  ENDIF()
+  endif()
 
   # Under Windows (MSVC) cmake will always generate multi-configuration
   # projects. When building on the command line with 'cmake --build .',
@@ -125,8 +125,8 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
   # so we just hard-wire the location here. We only really need to set static
   # lib locations for _DEBUG (no support for dynamic linking, _RELEASE will be
   # ignored), but we do it anyhow.
-  IF (DEAL_II_MSVC)
-    SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  if (DEAL_II_MSVC)
+    set_target_properties(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
       PROPERTIES
       ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
       LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
@@ -135,34 +135,34 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
       LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
       RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
       )
-  ENDIF()
+  endif()
 
 
-  TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  target_link_libraries(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     ${DEAL_II_LIBRARIES_${build}}
     ${DEAL_II_LIBRARIES}
     )
 
-  FILE(MAKE_DIRECTORY
+  file(MAKE_DIRECTORY
     ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}
     )
-  EXPORT(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  export(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
     APPEND
     )
 
-  INSTALL(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  install(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     COMPONENT library
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
     RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
     LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     )
-ENDFOREACH()
+endforeach()
 
-INSTALL(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+install(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )
 
-MESSAGE(STATUS "Setting up library - Done")
+message(STATUS "Setting up library - Done")

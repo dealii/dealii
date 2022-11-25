@@ -17,31 +17,31 @@
 # Configuration for the petsc library:
 #
 
-SET(FEATURE_PETSC_AFTER MPI)
+set(FEATURE_PETSC_AFTER MPI)
 
 
-MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
-  FIND_PACKAGE(PETSC)
+macro(FEATURE_PETSC_FIND_EXTERNAL var)
+  find_package(PETSC)
 
-  IF(PETSC_FOUND)
+  if(PETSC_FOUND)
     #
     # So, we have found a petsc library. Let's check whether we can use it.
     #
-    SET(${var} TRUE)
+    set(${var} TRUE)
 
     #
     # We support petsc from version 3.7.x onwards
     #
-    IF(${PETSC_VERSION} VERSION_LESS 3.7.0)
-      MESSAGE(STATUS "Could not find a sufficiently modern PETSc installation: "
+    if(${PETSC_VERSION} VERSION_LESS 3.7.0)
+      message(STATUS "Could not find a sufficiently modern PETSc installation: "
         "Version >=3.7.0 required!"
         )
-      SET(PETSC_ADDITIONAL_ERROR_STRING
+      set(PETSC_ADDITIONAL_ERROR_STRING
         "Could not find a sufficiently modern PETSc installation: "
         "Version >=3.7.0 required!\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Petsc has to be configured with the same MPI configuration as
@@ -51,21 +51,21 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # _NOT_ enabled.
     # So we check for this:
     #
-    IF( (PETSC_WITH_MPIUNI AND DEAL_II_WITH_MPI)
+    if( (PETSC_WITH_MPIUNI AND DEAL_II_WITH_MPI)
          OR
          (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_WITH_MPI))
-      MESSAGE(STATUS "Could not find a sufficient PETSc installation: "
+      message(STATUS "Could not find a sufficient PETSc installation: "
         "PETSc has to be configured with the same MPI configuration as deal.II."
         )
-      SET(PETSC_ADDITIONAL_ERROR_STRING
+      set(PETSC_ADDITIONAL_ERROR_STRING
         ${PETSC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient PETSc installation:\n"
         "PETSc has to be configured with the same MPI configuration as deal.II, but found:\n"
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  PETSC_WITH_MPI   = (NOT ${PETSC_WITH_MPIUNI})\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Petsc has to be configured with the same number of bits for indices as
@@ -75,14 +75,14 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # indices support is enabled.
     # So we check for this:
     #
-    IF( (NOT PETSC_WITH_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
+    if( (NOT PETSC_WITH_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
          OR
          (PETSC_WITH_64BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES))
-      MESSAGE(STATUS "Could not find a sufficient PETSc installation: "
+      message(STATUS "Could not find a sufficient PETSc installation: "
         "PETSc has to be configured to use the same number of bits for the "
         "global indices as deal.II."
         )
-      SET(PETSC_ADDITIONAL_ERROR_STRING
+      set(PETSC_ADDITIONAL_ERROR_STRING
         ${PETSC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient PETSc installation:\n"
         "PETSc has to be configured to use the same number of bits for the "
@@ -90,18 +90,18 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
         "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
         "  PETSC_WITH_64BIT_INDICES = (${PETSC_WITH_64BIT_INDICES})\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     # If PETSc is compiled with complex scalar type we need to have support
     # for complex values within deal.II as well.
     #
-    IF( PETSC_WITH_COMPLEX AND NOT DEAL_II_WITH_COMPLEX_VALUES )
-        MESSAGE(STATUS "The PETSc configuration is incompatible with the deal.II configuration: "
+    if( PETSC_WITH_COMPLEX AND NOT DEAL_II_WITH_COMPLEX_VALUES )
+        message(STATUS "The PETSc configuration is incompatible with the deal.II configuration: "
         "PETSc is compiled with complex scalar type. "
         "This requires support for complex values in deal.II as well."
         )
-      SET(PETSC_ADDITIONAL_ERROR_STRING
+      set(PETSC_ADDITIONAL_ERROR_STRING
         ${PETSC_ADDITIONAL_ERROR_STRING}
         "The PETSc configuration is incompatible with the deal.II configuration:\n"
         "PETSc is compiled with complex scalar type. "
@@ -109,35 +109,35 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
         "  DEAL_II_WITH_COMPLEX_VALUES = ${DEAL_II_WITH_COMPLEX_VALUES}\n"
         "  PETSC_WITH_COMPLEX = (${PETSC_WITH_COMPLEX})\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-    CHECK_MPI_INTERFACE(PETSC ${var})
-  ENDIF()
-ENDMACRO()
+    check_mpi_interface(PETSC ${var})
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
-  SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
-  SET(DEAL_II_EXPAND_PETSC_SPARSE_MATRICES
+macro(FEATURE_PETSC_CONFIGURE_EXTERNAL)
+  set(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
+  set(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
+  set(DEAL_II_EXPAND_PETSC_SPARSE_MATRICES
       "PETScWrappers::SparseMatrix"
       "PETScWrappers::MPI::SparseMatrix"
       "PETScWrappers::MPI::BlockSparseMatrix")
   #
   # FIXME:
   # temporary variable until deal.II fully support complex-valued PETSc
-  IF( NOT PETSC_WITH_COMPLEX )
-    SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL "PETScWrappers::MPI::Vector")
-    SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL "PETScWrappers::MPI::BlockVector")
-  ELSE()
-    MESSAGE(STATUS "Compiling with complex-valued algebra")
-  ENDIF()
-ENDMACRO()
+  if( NOT PETSC_WITH_COMPLEX )
+    set(DEAL_II_EXPAND_PETSC_MPI_VECTOR_REAL "PETScWrappers::MPI::Vector")
+    set(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR_REAL "PETScWrappers::MPI::BlockVector")
+  else()
+    message(STATUS "Compiling with complex-valued algebra")
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_PETSC_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
+macro(FEATURE_PETSC_ERROR_MESSAGE)
+  message(FATAL_ERROR "\n"
     "Could not find the petsc library!\n"
     ${PETSC_ADDITIONAL_ERROR_STRING}
     "\nPlease ensure that the petsc library version 3.7.0 or newer is "
@@ -153,10 +153,10 @@ MACRO(FEATURE_PETSC_ERROR_MESSAGE)
     "    $ cmake -DPETSC_DIR=\"...\" -DPETSC_ARCH=\"...\" <...>\n"
     "or set the relevant variables by hand in ccmake.\n\n"
     )
-ENDMACRO()
+endmacro()
 
 
-CONFIGURE_FEATURE(PETSC)
-SET(DEAL_II_PETSC_WITH_COMPLEX ${PETSC_WITH_COMPLEX})
-SET(DEAL_II_PETSC_WITH_HYPRE ${PETSC_WITH_HYPRE})
-SET(DEAL_II_PETSC_WITH_MUMPS ${PETSC_WITH_MUMPS})
+configure_feature(PETSC)
+set(DEAL_II_PETSC_WITH_COMPLEX ${PETSC_WITH_COMPLEX})
+set(DEAL_II_PETSC_WITH_HYPRE ${PETSC_WITH_HYPRE})
+set(DEAL_II_PETSC_WITH_MUMPS ${PETSC_WITH_MUMPS})

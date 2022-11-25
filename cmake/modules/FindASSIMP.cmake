@@ -22,20 +22,20 @@
 #   ASSIMP_INCLUDE_DIRS
 #
 
-SET(ASSIMP_DIR "" CACHE PATH "An optional hint to a Assimp installation")
-SET_IF_EMPTY(ASSIMP_DIR "$ENV{ASSIMP_DIR}")
+set(ASSIMP_DIR "" CACHE PATH "An optional hint to a Assimp installation")
+set_if_empty(ASSIMP_DIR "$ENV{ASSIMP_DIR}")
 
-DEAL_II_FIND_LIBRARY(ASSIMP_LIB NAMES assimp
+deal_ii_find_library(ASSIMP_LIB NAMES assimp
   HINTS ${ASSIMP_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-DEAL_II_FIND_PATH(ASSIMP_INC assimp/defs.h
+deal_ii_find_path(ASSIMP_INC assimp/defs.h
   HINTS ${ASSIMP_DIR}
   PATH_SUFFIXES include
   )
 
-DEAL_II_PACKAGE_HANDLE(ASSIMP
+deal_ii_package_handle(ASSIMP
   LIBRARIES REQUIRED ASSIMP_LIB
   INCLUDE_DIRS REQUIRED ASSIMP_INC
   USER_INCLUDE_DIRS REQUIRED ASSIMP_INC

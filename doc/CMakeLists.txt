@@ -16,18 +16,18 @@
 #
 # Set up all necessary bits for the documentation
 #
-IF(DEAL_II_COMPONENT_DOCUMENTATION)
+if(DEAL_II_COMPONENT_DOCUMENTATION)
 
-  MESSAGE(STATUS "")
-  MESSAGE(STATUS "Setting up documentation")
+  message(STATUS "")
+  message(STATUS "Setting up documentation")
 
-  ADD_SUBDIRECTORY(news)
-  ADD_SUBDIRECTORY(doxygen)
+  add_subdirectory(news)
+  add_subdirectory(doxygen)
 
   #
   # Install the static elements of the html documentation:
   #
-  INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION ${DEAL_II_DOCHTML_RELDIR}
     COMPONENT documentation
     PATTERN "CMakeLists.txt" EXCLUDE
@@ -35,16 +35,16 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
     PATTERN "news" EXCLUDE
     )
 
-  MESSAGE(STATUS "Setting up documentation - Done")
-  MESSAGE(STATUS "")
+  message(STATUS "Setting up documentation - Done")
+  message(STATUS "")
 
-ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
+endif(DEAL_II_COMPONENT_DOCUMENTATION)
 
 #
 # Always install a minimalistic README and LICENSE file:
 #
 
-INSTALL(FILES
+install(FILES
   ${CMAKE_SOURCE_DIR}/README.md
   ${CMAKE_SOURCE_DIR}/LICENSE.md
   DESTINATION ${DEAL_II_DOCREADME_RELDIR}
@@ -55,7 +55,7 @@ INSTALL(FILES
 # Install summary.log an detailed.log
 #
 
-INSTALL(FILES
+install(FILES
   ${CMAKE_BINARY_DIR}/summary.log
   ${CMAKE_BINARY_DIR}/detailed.log
   DESTINATION ${DEAL_II_DOCREADME_RELDIR}
@@ -66,9 +66,9 @@ INSTALL(FILES
 # Add a dummy target to make documentation files known to IDEs.
 #
 
-FILE(GLOB _misc
+file(GLOB _misc
   ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/headers/*.h
   )
 
-ADD_LIBRARY(doxygen_headers OBJECT ${_misc})
-SET_TARGET_PROPERTIES(doxygen_headers PROPERTIES LINKER_LANGUAGE C)
+add_library(doxygen_headers OBJECT ${_misc})
+set_target_properties(doxygen_headers PROPERTIES LINKER_LANGUAGE C)

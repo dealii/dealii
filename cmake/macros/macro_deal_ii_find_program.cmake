@@ -17,17 +17,17 @@
 # A small wrapper around FIND_PROGRAM to be a bit more verbose
 #
 
-MACRO(DEAL_II_FIND_PROGRAM _file_name)
+macro(DEAL_II_FIND_PROGRAM _file_name)
   # Save a string representation of the arguments before cmake's
   # FIND_PROGRAM gets its hands on it.
-  TO_STRING(_str ${ARGN})
+  to_string(_str ${ARGN})
 
-  FIND_PROGRAM(${_file_name} ${ARGN})
+  find_program(${_file_name} ${ARGN})
 
-  IF(${_file_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_file_name} not found! The call was:")
-    MESSAGE(STATUS "    FIND_PROGRAM(${_file_name} ${_str})")
-  ELSE()
-    MESSAGE(STATUS "Found ${_file_name}")
-  ENDIF()
-ENDMACRO()
+  if(${_file_name} MATCHES "-NOTFOUND")
+    message(STATUS "${_file_name} not found! The call was:")
+    message(STATUS "    find_program(${_file_name} ${_str})")
+  else()
+    message(STATUS "Found ${_file_name}")
+  endif()
+endmacro()

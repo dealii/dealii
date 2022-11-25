@@ -65,33 +65,33 @@
 #                                                                      #
 ########################################################################
 
-SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
+set_if_empty(DEAL_II_PACKAGE_NAME "deal.II")
 
-SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR
+set_if_empty(DEAL_II_PACKAGE_VENDOR
   "The deal.II Authors <http://www.dealii.org/>"
   )
-SET_IF_EMPTY(DEAL_II_PACKAGE_DESCRIPTION
+set_if_empty(DEAL_II_PACKAGE_DESCRIPTION
   "Library for solving partial differential equations with the finite element method"
   )
 
-FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
-SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")
+file(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
+set_if_empty(DEAL_II_PACKAGE_VERSION "${_version}")
 
 #
 # We expect a version number of the form "X.Y.Z" or "X.Y.Z-bla", where X, Y, Z
 # are always numbers and bla is a short string ("pre", "rc0", "rc1", etc.).
 #
-STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1"
+string(REGEX REPLACE "^([0-9]+)\\..*" "\\1"
   DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
   )
-STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
+string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
   DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
   )
-STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
   DEAL_II_VERSION_SUBMINOR "${DEAL_II_PACKAGE_VERSION}"
   )
 
-SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_VERSION_SUBMINOR})
+set(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_VERSION_SUBMINOR})
 
 
 ########################################################################
@@ -100,45 +100,45 @@ SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_
 #                                                                      #
 ########################################################################
 
-SET(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
+set(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
 
-STRING(REPLACE "." "_" _base_name "${DEAL_II_PACKAGE_NAME}")
-SET_IF_EMPTY(DEAL_II_BASE_NAME "${_base_name}")
-SET_IF_EMPTY(DEAL_II_DEBUG_SUFFIX ".g")
-SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX "")
+string(REPLACE "." "_" _base_name "${DEAL_II_PACKAGE_NAME}")
+set_if_empty(DEAL_II_BASE_NAME "${_base_name}")
+set_if_empty(DEAL_II_DEBUG_SUFFIX ".g")
+set_if_empty(DEAL_II_RELEASE_SUFFIX "")
 
 #
 # Try to obey the FSHS as close as possible ...
 #
-SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
-SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
-SET_IF_EMPTY(DEAL_II_LIBRARY_RELDIR "lib${LIB_SUFFIX}")
-SET_IF_EMPTY(DEAL_II_PKGCONF_RELDIR "${DEAL_II_LIBRARY_RELDIR}/pkgconfig")
-SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
-SET_IF_EMPTY(DEAL_II_SHARE_RELDIR "share/${DEAL_II_PACKAGE_NAME}")
+set_if_empty(DEAL_II_EXECUTABLE_RELDIR "bin")
+set_if_empty(DEAL_II_INCLUDE_RELDIR "include")
+set_if_empty(DEAL_II_LIBRARY_RELDIR "lib${LIB_SUFFIX}")
+set_if_empty(DEAL_II_PKGCONF_RELDIR "${DEAL_II_LIBRARY_RELDIR}/pkgconfig")
+set_if_empty(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
+set_if_empty(DEAL_II_SHARE_RELDIR "share/${DEAL_II_PACKAGE_NAME}")
 #
 # ... but install the documentation into prominent places:
 #
-SET_IF_EMPTY(DEAL_II_DOCREADME_RELDIR "./")
-SET_IF_EMPTY(DEAL_II_DOCHTML_RELDIR "doc")
-SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "examples")
+set_if_empty(DEAL_II_DOCREADME_RELDIR "./")
+set_if_empty(DEAL_II_DOCHTML_RELDIR "doc")
+set_if_empty(DEAL_II_EXAMPLES_RELDIR "examples")
 
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  LIST(APPEND DEAL_II_BUILD_TYPES "DEBUG")
-ENDIF()
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+  list(APPEND DEAL_II_BUILD_TYPES "DEBUG")
+endif()
 
-IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  LIST(APPEND DEAL_II_BUILD_TYPES "RELEASE")
-ENDIF()
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+  list(APPEND DEAL_II_BUILD_TYPES "RELEASE")
+endif()
 
-SET(DEAL_II_LIST_SUFFIXES
+set(DEAL_II_LIST_SUFFIXES
   DEFINITIONS DEFINITIONS_RELEASE DEFINITIONS_DEBUG
   USER_DEFINITIONS USER_DEFINITIONS_RELEASE USER_DEFINITIONS_DEBUG
   INCLUDE_DIRS USER_INCLUDE_DIRS BUNDLED_INCLUDE_DIRS
   LIBRARIES LIBRARIES_RELEASE LIBRARIES_DEBUG
   )
 
-SET(DEAL_II_STRING_SUFFIXES
+set(DEAL_II_STRING_SUFFIXES
   EXECUTABLE CXX_FLAGS CXX_FLAGS_RELEASE CXX_FLAGS_DEBUG LINKER_FLAGS
   LINKER_FLAGS_RELEASE LINKER_FLAGS_DEBUG
   )
@@ -150,17 +150,17 @@ SET(DEAL_II_STRING_SUFFIXES
 #                                                                      #
 ########################################################################
 
-IF(DEAL_II_PREFER_STATIC_LIBS)
+if(DEAL_II_PREFER_STATIC_LIBS)
   #
   # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
   # is set. This will prefer static archives instead of shared libraries:
   #
-  LIST(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
-ENDIF()
+  list(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
+endif()
 
-IF(CMAKE_CROSSCOMPILING)
+if(CMAKE_CROSSCOMPILING)
   #
   # Disable platform introspection when cross compiling
   #
-  SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
-ENDIF()
+  set(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
+endif()

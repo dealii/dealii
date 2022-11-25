@@ -28,6 +28,9 @@
 # Run indent-all and fail if script fails:
 ./contrib/utilities/indent-all || exit $?
 
+# Run lowercase_cmake and fail if script fails:
+./contrib/utilities/lowercase_cmake || exit $?
+
 # Show the diff in the output:
 git diff
 

@@ -18,51 +18,51 @@
 # part of the deal.II library.
 #
 # Usage:
-#       DEAL_II_INITIALIZE_CACHED_VARIABLES()
+#       deal_ii_initialize_cached_variables()
 #
 # This sets some cached variables to the values used for compiling the
 # deal.II library.
 #
-# This macro has to be called before PROJECT()!
+# This macro has to be called before project()!
 #
 
-MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
+macro(DEAL_II_INITIALIZE_CACHED_VARIABLES)
 
-  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
-    MESSAGE(FATAL_ERROR
+  if(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
+    message(FATAL_ERROR
       "\nDEAL_II_INITIALIZE_CACHED_VARIABLES can only be called in external "
       "projects after the inclusion of deal.IIConfig.cmake. It is not "
       "intended for internal use.\n\n"
       )
-  ENDIF()
+  endif()
 
   #
   # Set build type according to available libraries
   #
-  IF(DEAL_II_BUILD_TYPE MATCHES "Debug")
-    SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+  if(DEAL_II_BUILD_TYPE MATCHES "Debug")
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
       "Choose the type of build, options are: Debug, Release"
       )
-  ELSE()
-    SET(CMAKE_BUILD_TYPE "Release" CACHE STRING
+  else()
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
       "Choose the type of build, options are: Debug, Release"
       )
-  ENDIF()
+  endif()
 
   #
   # Reset build type if unsupported, i.e. if it is not Debug, Release, or
   # DebugRelease, or if the library doesn't support it
   #
-  IF( NOT "${CMAKE_BUILD_TYPE}" MATCHES "^(Debug|Release|DebugRelease)$"
+  if( NOT "${CMAKE_BUILD_TYPE}" MATCHES "^(Debug|Release|DebugRelease)$"
       OR NOT "${DEAL_II_BUILD_TYPE}" MATCHES "${CMAKE_BUILD_TYPE}" )
 
-    IF("${DEAL_II_BUILD_TYPE}" STREQUAL "DebugRelease")
-      SET(_new_build_type "Debug")
-    ELSE()
-      SET(_new_build_type "${DEAL_II_BUILD_TYPE}")
-    ENDIF()
+    if("${DEAL_II_BUILD_TYPE}" STREQUAL "DebugRelease")
+      set(_new_build_type "Debug")
+    else()
+      set(_new_build_type "${DEAL_II_BUILD_TYPE}")
+    endif()
 
-    MESSAGE(
+    message(
 "###
 #
 #  WARNING:
@@ -74,27 +74,27 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
 #
 ###"
       )
-    SET(CMAKE_BUILD_TYPE "${_new_build_type}" CACHE STRING
+    set(CMAKE_BUILD_TYPE "${_new_build_type}" CACHE STRING
       "Choose the type of build, options are: Debug, Release"
       FORCE
       )
 
-  ENDIF()
+  endif()
 
 
-  SET(CMAKE_CXX_COMPILER ${DEAL_II_CXX_COMPILER} CACHE STRING
+  set(CMAKE_CXX_COMPILER ${DEAL_II_CXX_COMPILER} CACHE STRING
     "CXX Compiler.")
-  SET(CMAKE_CXX_FLAGS "" CACHE STRING
+  set(CMAKE_CXX_FLAGS "" CACHE STRING
     "Flags used by the compiler during all build types."
     )
-  SET(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING
+  set(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING
     "Flags used by the compiler during debug builds."
     )
-  SET(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING
+  set(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING
     "Flags used by the compiler during release builds."
     )
 
 
-  MARK_AS_ADVANCED(CMAKE_INSTALL_PREFIX)
+  mark_as_advanced(CMAKE_INSTALL_PREFIX)
 
-ENDMACRO()
+endmacro()

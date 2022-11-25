@@ -35,25 +35,25 @@
 # by some external libraries for the link interface.
 #
 
-IF(MPI_CXX_FOUND)
-  SET(MPI_FOUND TRUE)
-ENDIF()
+if(MPI_CXX_FOUND)
+  set(MPI_FOUND TRUE)
+endif()
 
 #
 # Call the system FindMPI.cmake module:
 #
 
 # in case MPIEXEC is specified first call find_program() so that in case of
-# success its subsequent runs inside FIND_PACKAGE(MPI) do not alter the
+# success its subsequent runs inside find_package(MPI) do not alter the
 # desired result.
-IF(DEFINED ENV{MPIEXEC})
-  FIND_PROGRAM(MPIEXEC $ENV{MPIEXEC})
-ENDIF()
+if(DEFINED ENV{MPIEXEC})
+  find_program(MPIEXEC $ENV{MPIEXEC})
+endif()
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-FIND_PACKAGE(MPI)
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+find_package(MPI)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
 # Older versions of MPI may not have MPI_SEEK_SET, which we
@@ -61,10 +61,10 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 # for this to compile, not *just* the correct include directories.
 #
 
-CLEAR_CMAKE_REQUIRED()
-SET(CMAKE_REQUIRED_FLAGS ${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_LINK_FLAGS})
-SET(CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
-SET(CMAKE_REQUIRED_LIBRARIES ${DEAL_II_LINKER_FLAGS_SAVED} ${MPI_LIBRARIES})
+clear_cmake_required()
+set(CMAKE_REQUIRED_FLAGS ${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_LINK_FLAGS})
+set(CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+set(CMAKE_REQUIRED_LIBRARIES ${DEAL_II_LINKER_FLAGS_SAVED} ${MPI_LIBRARIES})
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <mpi.h>
@@ -75,41 +75,41 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   MPI_HAVE_MPI_SEEK_SET
   )
-RESET_CMAKE_REQUIRED()
+reset_cmake_required()
 
 #
 # Newer versions of FindMPI.cmake only populate MPI_CXX_* (and MPI_C_*,
 # MPI_Fortran_*) variables. Let's rename these version names
 #
 
-IF(NOT DEFINED MPI_VERSION AND DEFINED MPI_CXX_VERSION)
-  SET(MPI_VERSION ${MPI_CXX_VERSION})
-  SET(MPI_VERSION_MAJOR ${MPI_CXX_VERSION_MAJOR})
-  SET(MPI_VERSION_MINOR ${MPI_CXX_VERSION_MINOR})
-ENDIF()
+if(NOT DEFINED MPI_VERSION AND DEFINED MPI_CXX_VERSION)
+  set(MPI_VERSION ${MPI_CXX_VERSION})
+  set(MPI_VERSION_MAJOR ${MPI_CXX_VERSION_MAJOR})
+  set(MPI_VERSION_MINOR ${MPI_CXX_VERSION_MINOR})
+endif()
 
 #
 # Really old versions of CMake do not export any version information. In
 # this case, query the mpi.h header for the necessary information:
 #
 
-DEAL_II_FIND_FILE(MPI_MPI_H
+deal_ii_find_file(MPI_MPI_H
   NAMES mpi.h
   HINTS ${MPI_CXX_INCLUDE_PATH} ${MPI_C_INCLUDE_PATH}
   )
-IF(NOT MPI_MPI_H MATCHES "-NOTFOUND" AND NOT DEFINED MPI_VERSION)
-  FILE(STRINGS "${MPI_MPI_H}" MPI_VERSION_MAJOR_STRING
+if(NOT MPI_MPI_H MATCHES "-NOTFOUND" AND NOT DEFINED MPI_VERSION)
+  file(STRINGS "${MPI_MPI_H}" MPI_VERSION_MAJOR_STRING
     REGEX "#define.*MPI_VERSION")
-  STRING(REGEX REPLACE "^.*MPI_VERSION[ ]+([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*MPI_VERSION[ ]+([0-9]+).*" "\\1"
     MPI_VERSION_MAJOR "${MPI_VERSION_MAJOR_STRING}"
     )
-  FILE(STRINGS ${MPI_MPI_H} MPI_VERSION_MINOR_STRING
+  file(STRINGS ${MPI_MPI_H} MPI_VERSION_MINOR_STRING
     REGEX "#define.*MPI_SUBVERSION")
-  STRING(REGEX REPLACE "^.*MPI_SUBVERSION[ ]+([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*MPI_SUBVERSION[ ]+([0-9]+).*" "\\1"
     MPI_VERSION_MINOR "${MPI_VERSION_MINOR_STRING}"
     )
-  SET(MPI_VERSION "${MPI_VERSION_MAJOR}.${MPI_VERSION_MINOR}")
-ENDIF()
+  set(MPI_VERSION "${MPI_VERSION_MAJOR}.${MPI_VERSION_MINOR}")
+endif()
 
 #
 # Except - this doesn't always work. Some distributions install a header
@@ -118,32 +118,32 @@ ENDIF()
 # straightforward to find the correct header file to query the version
 # information from. Just set a very conservative default:
 #
-IF(NOT DEFINED MPI_VERSION OR MPI_VERSION STREQUAL ".")
-  SET(MPI_VERSION "0.0")
-  SET(MPI_VERSION_MAJOR "0")
-  SET(MPI_VERSION_MINOR "0")
-ENDIF()
+if(NOT DEFINED MPI_VERSION OR MPI_VERSION STREQUAL ".")
+  set(MPI_VERSION "0.0")
+  set(MPI_VERSION_MAJOR "0")
+  set(MPI_VERSION_MINOR "0")
+endif()
 
 #
 # Make sure that we do not run into underlinking on Debian/Ubuntu systems with
 # lld / ld.gold and missing libopen-pal.so on the link line:
 #
 
-CHECK_COMPILER_SETUP(
+check_compiler_setup(
   "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}"
   "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS}"
   MPI_UNDERLINKAGE_OK
   ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES} ${MPI_C_LIBRARIES}
   )
 
-IF(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
+if(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
   # This check only works if MPI_CXX_LIBRARIES is non-empty, otherwise we will just give up
   # and hope for the best...
-  MESSAGE(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
+  message(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
 
-  LIST(GET MPI_CXX_LIBRARIES 0 _lib)
-  GET_FILENAME_COMPONENT(_hint ${_lib} DIRECTORY)
-  DEAL_II_FIND_LIBRARY(_mpi_libopen_pal_library
+  list(GET MPI_CXX_LIBRARIES 0 _lib)
+  get_filename_component(_hint ${_lib} DIRECTORY)
+  deal_ii_find_library(_mpi_libopen_pal_library
     NAMES open-pal
     HINTS ${_hint}
     NO_DEFAULT_PATH
@@ -163,9 +163,9 @@ IF(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
   # and we start dropping -fuse-ld=lld and -fuse-ld=ld.gold from the
   # command line.
   #
-ENDIF()
+endif()
 
-DEAL_II_PACKAGE_HANDLE(MPI
+deal_ii_package_handle(MPI
   LIBRARIES
     OPTIONAL MPI_CXX_LIBRARIES MPI_Fortran_LIBRARIES MPI_C_LIBRARIES _mpi_libopen_pal_library
   INCLUDE_DIRS

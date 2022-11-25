@@ -281,17 +281,17 @@
 # ..................................................
 #
 
-INCLUDE_DIRECTORIES(${UMFPACK_BUNDLED_INCLUDE_DIRS})
+include_directories(${UMFPACK_BUNDLED_INCLUDE_DIRS})
 
 #
 # *Shush!*
 # (Remove locally in this subdirectory)
 #
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wall")
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-sign-compare")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-write-strings")
+strip_flag(DEAL_II_CXX_FLAGS "-pedantic")
+strip_flag(DEAL_II_CXX_FLAGS "-Wall")
+strip_flag(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
+enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-sign-compare")
+enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-write-strings")
 
 
 #
@@ -309,7 +309,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-write-strings")
 #
 # Start by definining which files these collections include.
 #
-SET(src_umfpack_DL_AND_ZL
+set(src_umfpack_DL_AND_ZL
   # Files that originate in $(UMF), which is really just $(UMFCH) for our
   # purposes:
   umf_assemble.cc umf_blas3_update.cc umf_build_tuples.cc umf_create_element.cc
@@ -337,13 +337,13 @@ SET(src_umfpack_DL_AND_ZL
   umfpack_load_symbolic.cc umfpack_save_symbolic.cc
   )
 
-SET(src_umfpack_LL
+set(src_umfpack_LL
   umf_analyze.cc umf_apply_order.cc umf_colamd.cc umf_free.cc umf_fsize.cc
   umf_is_permutation.cc umf_malloc.cc umf_realloc.cc umf_report_perm.cc
   umf_singletons.cc
   )
 
-SET(src_umfpack_GENERIC
+set(src_umfpack_GENERIC
   umfpack_global.cc
   umfpack_tictoc.cc
   umfpack_timer.cc
@@ -357,17 +357,17 @@ SET(src_umfpack_GENERIC
 #-------------------------------------------------------------------------------
 
 # Do what the GNUmakefile calls the DI targets:
-DEAL_II_ADD_LIBRARY(obj_umfpack_L_UMF OBJECT ${src_umfpack_DL_AND_ZL})
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_L_UMF "DLONG")
+deal_ii_add_library(obj_umfpack_L_UMF OBJECT ${src_umfpack_DL_AND_ZL})
+deal_ii_add_definitions(obj_umfpack_L_UMF "DLONG")
 
 # Repeat these steps for complex-valued matrices. This corresponds to
 # the ZL targets:
-DEAL_II_ADD_LIBRARY(obj_umfpack_Z_UMF OBJECT ${src_umfpack_DL_AND_ZL})
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_Z_UMF "ZLONG")
+deal_ii_add_library(obj_umfpack_Z_UMF OBJECT ${src_umfpack_DL_AND_ZL})
+deal_ii_add_definitions(obj_umfpack_Z_UMF "ZLONG")
 
 # Do what the GNUmakefile calls the LL targets:
-DEAL_II_ADD_LIBRARY(obj_umfpack_L_UMFPACK OBJECT ${src_umfpack_LL})
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_L_UMFPACK "DLONG")
+deal_ii_add_library(obj_umfpack_L_UMFPACK OBJECT ${src_umfpack_LL})
+deal_ii_add_definitions(obj_umfpack_L_UMFPACK "DLONG")
 
 
 #-------------------------------------------------------------------------------
@@ -375,58 +375,58 @@ DEAL_II_ADD_DEFINITIONS(obj_umfpack_L_UMFPACK "DLONG")
 # version.
 #-------------------------------------------------------------------------------
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TSOLVE "DLONG" "CONJUGATE_SOLVE")
+deal_ii_add_library(obj_umfpack_DL_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
+deal_ii_add_definitions(obj_umfpack_DL_TSOLVE "DLONG" "CONJUGATE_SOLVE")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TRIPLET_MAP_NOX OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TRIPLET_MAP_NOX "DLONG" "DO_MAP")
+deal_ii_add_library(obj_umfpack_DL_TRIPLET_MAP_NOX OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_DL_TRIPLET_MAP_NOX "DLONG" "DO_MAP")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TRIPLET_MAP_X OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TRIPLET_MAP_X "DLONG" "DO_MAP" "DO_VALUES")
+deal_ii_add_library(obj_umfpack_DL_TRIPLET_MAP_X OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_DL_TRIPLET_MAP_X "DLONG" "DO_MAP" "DO_VALUES")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TRIPLET_NOMAP_X OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TRIPLET_NOMAP_X "DLONG" "DO_VALUES")
+deal_ii_add_library(obj_umfpack_DL_TRIPLET_NOMAP_X OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_DL_TRIPLET_NOMAP_X "DLONG" "DO_VALUES")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TRIPLET_NOMAP_NOX OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TRIPLET_NOMAP_NOX "DLONG")
+deal_ii_add_library(obj_umfpack_DL_TRIPLET_NOMAP_NOX OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_DL_TRIPLET_NOMAP_NOX "DLONG")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_STORE OBJECT umf_store_lu.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_STORE "DLONG" "DROP")
+deal_ii_add_library(obj_umfpack_DL_STORE OBJECT umf_store_lu.cc)
+deal_ii_add_definitions(obj_umfpack_DL_STORE "DLONG" "DROP")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_ASSEMBLE OBJECT umf_assemble.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_ASSEMBLE "DLONG" "FIXQ")
+deal_ii_add_library(obj_umfpack_DL_ASSEMBLE OBJECT umf_assemble.cc)
+deal_ii_add_definitions(obj_umfpack_DL_ASSEMBLE "DLONG" "FIXQ")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_DL_SOLVE OBJECT umfpack_solve.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_SOLVE "DLONG" "WSOLVE")
+deal_ii_add_library(obj_umfpack_DL_SOLVE OBJECT umfpack_solve.cc)
+deal_ii_add_definitions(obj_umfpack_DL_SOLVE "DLONG" "WSOLVE")
 
 # Again with complex arguments:
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_TSOLVE "ZLONG" "CONJUGATE_SOLVE")
+deal_ii_add_library(obj_umfpack_ZL_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_TSOLVE "ZLONG" "CONJUGATE_SOLVE")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_TRIPLET_MAP_NOX OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_TRIPLET_MAP_NOX "ZLONG" "DO_MAP")
+deal_ii_add_library(obj_umfpack_ZL_TRIPLET_MAP_NOX OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_TRIPLET_MAP_NOX "ZLONG" "DO_MAP")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_TRIPLET_MAP_X OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_TRIPLET_MAP_X "ZLONG" "DO_MAP" "DO_VALUES")
+deal_ii_add_library(obj_umfpack_ZL_TRIPLET_MAP_X OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_TRIPLET_MAP_X "ZLONG" "DO_MAP" "DO_VALUES")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_TRIPLET_NOMAP_X OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_TRIPLET_NOMAP_X "ZLONG" "DO_VALUES")
+deal_ii_add_library(obj_umfpack_ZL_TRIPLET_NOMAP_X OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_TRIPLET_NOMAP_X "ZLONG" "DO_VALUES")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_TRIPLET_NOMAP_NOX OBJECT umf_triplet.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_TRIPLET_NOMAP_NOX "ZLONG")
+deal_ii_add_library(obj_umfpack_ZL_TRIPLET_NOMAP_NOX OBJECT umf_triplet.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_TRIPLET_NOMAP_NOX "ZLONG")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_STORE OBJECT umf_store_lu.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_STORE "ZLONG" "DROP")
+deal_ii_add_library(obj_umfpack_ZL_STORE OBJECT umf_store_lu.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_STORE "ZLONG" "DROP")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_ASSEMBLE OBJECT umf_assemble.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_ASSEMBLE "ZLONG" "FIXQ")
+deal_ii_add_library(obj_umfpack_ZL_ASSEMBLE OBJECT umf_assemble.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_ASSEMBLE "ZLONG" "FIXQ")
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_ZL_SOLVE OBJECT umfpack_solve.cc)
-DEAL_II_ADD_DEFINITIONS(obj_umfpack_ZL_SOLVE "ZLONG" "WSOLVE")
+deal_ii_add_library(obj_umfpack_ZL_SOLVE OBJECT umfpack_solve.cc)
+deal_ii_add_definitions(obj_umfpack_ZL_SOLVE "ZLONG" "WSOLVE")
 
 #-------------------------------------------------------------------------------
 # Create the generic routines (GN) using a generic rule
 #-------------------------------------------------------------------------------
 
-DEAL_II_ADD_LIBRARY(obj_umfpack_GENERIC OBJECT ${src_umfpack_GENERIC})
+deal_ii_add_library(obj_umfpack_GENERIC OBJECT ${src_umfpack_GENERIC})
 

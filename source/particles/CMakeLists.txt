@@ -14,9 +14,9 @@
 ## ---------------------------------------------------------------------
 
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+set(_src
   data_out.cc
   particle.cc
   particle_handler.cc
@@ -25,7 +25,7 @@ SET(_src
   utilities.cc
   )
 
-SET(_inst
+set(_inst
   data_out.inst.in
   particle.inst.in
   particle_handler.inst.in
@@ -33,9 +33,9 @@ SET(_inst
   utilities.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/particles/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_particle OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_particle "${_inst}")
+deal_ii_add_library(obj_particle OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_particle "${_inst}")

@@ -17,30 +17,30 @@
 # Configuration for complex value support
 #
 
-IF(${DEAL_II_WITH_COMPLEX_VALUES})
-   SET(DEAL_II_EXPAND_COMPLEX_SCALARS 
+if(${DEAL_II_WITH_COMPLEX_VALUES})
+   set(DEAL_II_EXPAND_COMPLEX_SCALARS 
        "std::complex<double>"
        "std::complex<float>"
       )
-   SET(DEAL_II_EXPAND_COMPLEX_VECTORS 
+   set(DEAL_II_EXPAND_COMPLEX_VECTORS 
        "Vector<std::complex<double> >"
        "Vector<std::complex<float> >"
       )
-   SET(DEAL_II_EXPAND_COMPLEX_BLOCK_VECTORS
+   set(DEAL_II_EXPAND_COMPLEX_BLOCK_VECTORS
        "BlockVector<std::complex<double> >"
        "BlockVector<std::complex<float> >"
       )
-   SET(DEAL_II_EXPAND_COMPLEX_LA_VECTORS
+   set(DEAL_II_EXPAND_COMPLEX_LA_VECTORS
        "LinearAlgebra::Vector<std::complex<double> >"
        "LinearAlgebra::Vector<std::complex<float> >"
       )
-   SET(DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_VECTORS
+   set(DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_VECTORS
        "LinearAlgebra::distributed::Vector<std::complex<double> >"
        "LinearAlgebra::distributed::Vector<std::complex<float> >"
       )
-   SET(DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_BLOCK_VECTORS
+   set(DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_BLOCK_VECTORS
        "LinearAlgebra::distributed::BlockVector<std::complex<double> >"
        "LinearAlgebra::distributed::BlockVector<std::complex<float> >"
       )
-ENDIF()
+endif()
 

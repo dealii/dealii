@@ -30,18 +30,18 @@
 #   P4EST_VERSION_PATCH
 #
 
-SET(P4EST_DIR "" CACHE PATH
+set(P4EST_DIR "" CACHE PATH
   "An optional hint to a p4est installation/directory"
   )
-SET_IF_EMPTY(P4EST_DIR "$ENV{P4EST_DIR}")
-SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
+set_if_empty(P4EST_DIR "$ENV{P4EST_DIR}")
+set_if_empty(SC_DIR "$ENV{SC_DIR}")
 
 #
 # Search for the sc library, usually bundled with p4est. If no SC_DIR was
 # given, take what we chose for p4est.
 #
 
-DEAL_II_FIND_PATH(SC_INCLUDE_DIR sc.h
+deal_ii_find_path(SC_INCLUDE_DIR sc.h
   HINTS
     ${SC_DIR}/FAST
     ${SC_DIR}/DEBUG
@@ -53,13 +53,13 @@ DEAL_II_FIND_PATH(SC_INCLUDE_DIR sc.h
     sc include/p4est include src sc/src
   )
 
-DEAL_II_FIND_LIBRARY(P4EST_LIBRARY_OPTIMIZED
+deal_ii_find_library(P4EST_LIBRARY_OPTIMIZED
   NAMES p4est
   HINTS ${P4EST_DIR}/FAST ${P4EST_DIR}/DEBUG ${P4EST_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib src
   )
 
-DEAL_II_FIND_LIBRARY(SC_LIBRARY_OPTIMIZED
+deal_ii_find_library(SC_LIBRARY_OPTIMIZED
   NAMES sc
   HINTS
     ${SC_DIR}/FAST
@@ -76,106 +76,106 @@ DEAL_II_FIND_LIBRARY(SC_LIBRARY_OPTIMIZED
 # Support debug variants as well:
 #
 
-DEAL_II_FIND_LIBRARY(P4EST_LIBRARY_DEBUG
+deal_ii_find_library(P4EST_LIBRARY_DEBUG
   NAMES p4est
   HINTS ${P4EST_DIR}/DEBUG
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib src
   )
 
-DEAL_II_FIND_LIBRARY(SC_LIBRARY_DEBUG
+deal_ii_find_library(SC_LIBRARY_DEBUG
   NAMES sc
   HINTS ${SC_DIR}/DEBUG ${P4EST_DIR}/DEBUG
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib src sc/src
   )
 
-IF( ( "${P4EST_LIBRARY_OPTIMIZED}" STREQUAL "${P4EST_LIBRARY_DEBUG}"
+if( ( "${P4EST_LIBRARY_OPTIMIZED}" STREQUAL "${P4EST_LIBRARY_DEBUG}"
       AND "${SC_LIBRARY_OPTIMIZED}" STREQUAL "${SC_LIBRARY_DEBUG}" )
     OR P4EST_LIBRARY_DEBUG MATCHES "-NOTFOUND"
     OR SC_LIBRARY_DEBUG MATCHES "-NOTFOUND" )
-  SET(_libraries P4EST_LIBRARY_OPTIMIZED SC_LIBRARY_OPTIMIZED)
-ELSE()
-  SET(_libraries
+  set(_libraries P4EST_LIBRARY_OPTIMIZED SC_LIBRARY_OPTIMIZED)
+else()
+  set(_libraries
     optimized P4EST_LIBRARY_OPTIMIZED SC_LIBRARY_OPTIMIZED
     debug P4EST_LIBRARY_DEBUG SC_LIBRARY_DEBUG
     general
     )
-ENDIF()
+endif()
 
 
-DEAL_II_FIND_PATH(P4EST_INCLUDE_DIR p4est_config.h
+deal_ii_find_path(P4EST_INCLUDE_DIR p4est_config.h
   HINTS ${P4EST_DIR}/FAST ${P4EST_DIR}/DEBUG ${P4EST_DIR}
   PATH_SUFFIXES p4est include/p4est include src
   )
 
-IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
+if(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   #
   # Determine mpi support of p4est:
   #
-  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
+  file(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
     REGEX "#define.*P4EST_MPI 1")
-  IF("${P4EST_MPI_STRING}" STREQUAL "")
-    FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
+  if("${P4EST_MPI_STRING}" STREQUAL "")
+    file(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
       REGEX "#define.*P4EST_ENABLE_MPI")
-    IF("${P4EST_MPI_STRING}" STREQUAL "")
-      SET(P4EST_WITH_MPI FALSE)
-    ELSE()
-      SET(P4EST_WITH_MPI TRUE)
-    ENDIF()
-  ELSE()
-    SET(P4EST_WITH_MPI TRUE)
-  ENDIF()
+    if("${P4EST_MPI_STRING}" STREQUAL "")
+      set(P4EST_WITH_MPI FALSE)
+    else()
+      set(P4EST_WITH_MPI TRUE)
+    endif()
+  else()
+    set(P4EST_WITH_MPI TRUE)
+  endif()
 
   #
   # Is p4est built against zlib?
   #
-  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_ZLIB_STRING
+  file(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_ZLIB_STRING
     REGEX "^#define.*P4EST_HAVE_ZLIB")
-  IF("${P4EST_ZLIB_STRING}" STREQUAL "")
-    SET(P4EST_WITH_ZLIB FALSE)
-  ELSE()
-    SET(P4EST_WITH_ZLIB TRUE)
-  ENDIF()
+  if("${P4EST_ZLIB_STRING}" STREQUAL "")
+    set(P4EST_WITH_ZLIB FALSE)
+  else()
+    set(P4EST_WITH_ZLIB TRUE)
+  endif()
 
   #
   # Is binary vtk output enabled?
   #
-  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VTK_BINARY_STRING
+  file(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VTK_BINARY_STRING
     REGEX "#define.*P4EST_ENABLE_VTK_BINARY 1")
-  IF("${P4EST_VTK_BINARY_STRING}" STREQUAL "")
-    SET(P4EST_WITH_VTK_BINARY FALSE)
-  ELSE()
-    SET(P4EST_WITH_VTK_BINARY TRUE)
-  ENDIF()
+  if("${P4EST_VTK_BINARY_STRING}" STREQUAL "")
+    set(P4EST_WITH_VTK_BINARY FALSE)
+  else()
+    set(P4EST_WITH_VTK_BINARY TRUE)
+  endif()
   
   #
   # Does p4est have search local?
   #
-  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_base.h" P4EST_SEARCH_LOCAL_STRING
+  file(STRINGS "${P4EST_INCLUDE_DIR}/p4est_base.h" P4EST_SEARCH_LOCAL_STRING
     REGEX "#define.*P4EST_SEARCH_LOCAL")
-  IF("${P4EST_SEARCH_LOCAL_STRING}" STREQUAL "")
-    SET(P4EST_WITH_SEARCH_LOCAL FALSE)
-  ELSE()
-    SET(P4EST_WITH_SEARCH_LOCAL TRUE)
-  ENDIF()
+  if("${P4EST_SEARCH_LOCAL_STRING}" STREQUAL "")
+    set(P4EST_WITH_SEARCH_LOCAL FALSE)
+  else()
+    set(P4EST_WITH_SEARCH_LOCAL TRUE)
+  endif()
 
   #
   # Extract version numbers:
   #
-  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VERSION
+  file(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VERSION
     REGEX "^[ \t]*#[ \t]*define[ \t]+P4EST_VERSION \"")
-  STRING(REGEX REPLACE "^.*P4EST_VERSION.*\"([0-9]+.*)\".*" "\\1"
+  string(REGEX REPLACE "^.*P4EST_VERSION.*\"([0-9]+.*)\".*" "\\1"
     P4EST_VERSION "${P4EST_VERSION}"
     )
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^([0-9]+).*$" "\\1"
     P4EST_VERSION_MAJOR "${P4EST_VERSION}")
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^[0-9]+\\.([0-9]+).*$" "\\1"
     P4EST_VERSION_MINOR "${P4EST_VERSION}")
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
     P4EST_VERSION_SUBMINOR "${P4EST_VERSION}")
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
     P4EST_VERSION_PATCH "${P4EST_VERSION}")
 
@@ -189,16 +189,16 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   # empty or be the full version string. In those cases, set those numbers
   # to 0 if necessary.
   #
-  IF("${P4EST_VERSION_SUBMINOR}" MATCHES "^(|${P4EST_VERSION})$")
-    SET(P4EST_VERSION_SUBMINOR "0")
-  ENDIF()
+  if("${P4EST_VERSION_SUBMINOR}" MATCHES "^(|${P4EST_VERSION})$")
+    set(P4EST_VERSION_SUBMINOR "0")
+  endif()
 
-  IF("${P4EST_VERSION_PATCH}" MATCHES "^(|${P4EST_VERSION})$")
-    SET(P4EST_VERSION_PATCH "0")
-  ENDIF()
-ENDIF()
+  if("${P4EST_VERSION_PATCH}" MATCHES "^(|${P4EST_VERSION})$")
+    set(P4EST_VERSION_PATCH "0")
+  endif()
+endif()
 
-DEAL_II_PACKAGE_HANDLE(P4EST
+deal_ii_package_handle(P4EST
   LIBRARIES
     REQUIRED ${_libraries}
     OPTIONAL LAPACK_LIBRARIES MPI_C_LIBRARIES

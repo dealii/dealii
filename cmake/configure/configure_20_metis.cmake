@@ -13,31 +13,31 @@
 ##
 ## ---------------------------------------------------------------------
 
-SET(FEATURE_METIS_AFTER MPI)
+set(FEATURE_METIS_AFTER MPI)
 
 #
 # Configuration for the metis library:
 #
 
-MACRO(FEATURE_METIS_FIND_EXTERNAL var)
-  FIND_PACKAGE(METIS)
+macro(FEATURE_METIS_FIND_EXTERNAL var)
+  find_package(METIS)
 
-  IF(METIS_FOUND)
-    SET(${var} TRUE)
+  if(METIS_FOUND)
+    set(${var} TRUE)
 
-    IF(NOT METIS_VERSION_MAJOR GREATER 4)
-      MESSAGE(STATUS "Insufficient metis installation found: "
+    if(NOT METIS_VERSION_MAJOR GREATER 4)
+      message(STATUS "Insufficient metis installation found: "
         "Version 5.x required!"
         )
-      SET(METIS_ADDITIONAL_ERROR_STRING
+      set(METIS_ADDITIONAL_ERROR_STRING
         "Could not find a sufficiently modern metis installation: "
         "Version 5.x required!\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-    CHECK_MPI_INTERFACE(METIS ${var})
-  ENDIF()
-ENDMACRO()
+    check_mpi_interface(METIS ${var})
+  endif()
+endmacro()
 
-CONFIGURE_FEATURE(METIS)
+configure_feature(METIS)

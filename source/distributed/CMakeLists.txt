@@ -13,9 +13,9 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_unity_include_src
+set(_unity_include_src
   grid_refinement.cc
   cell_weights.cc
   cell_data_transfer.cc
@@ -29,19 +29,19 @@ SET(_unity_include_src
   field_transfer.cc
   )
 
-SET(_separate_src
+set(_separate_src
   )
 
 # concatenate all unity inclusion files in one file
-SET(_n_includes_per_unity_file 15)
+set(_n_includes_per_unity_file 15)
 
-SETUP_SOURCE_LIST("${_unity_include_src}"
+setup_source_list("${_unity_include_src}"
   "${_separate_src}"
   ${_n_includes_per_unity_file}
   _src
   )
 
-SET(_inst
+set(_inst
   grid_refinement.inst.in
   cell_weights.inst.in
   cell_data_transfer.inst.in
@@ -55,9 +55,9 @@ SET(_inst
   p4est_wrappers.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/distributed/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_distributed OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_distributed "${_inst}")
+deal_ii_add_library(obj_distributed OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_distributed "${_inst}")

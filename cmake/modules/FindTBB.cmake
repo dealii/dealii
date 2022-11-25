@@ -27,11 +27,11 @@
 #   TBB_VERSION_MINOR
 #
 
-SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
-SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
+set(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
+set_if_empty(TBB_DIR "$ENV{TBB_DIR}")
 
-FILE(GLOB _path ${TBB_DIR}/build/*_release ${TBB_DIR}/lib/intel64/gcc*)
-DEAL_II_FIND_LIBRARY(TBB_LIBRARY
+file(GLOB _path ${TBB_DIR}/build/*_release ${TBB_DIR}/lib/intel64/gcc*)
+deal_ii_find_library(TBB_LIBRARY
   NAMES tbb
   HINTS
     ${_path}
@@ -42,79 +42,79 @@ DEAL_II_FIND_LIBRARY(TBB_LIBRARY
 #
 # Also search for the debug library:
 #
-FILE(GLOB _path ${TBB_DIR}/build/*_debug ${TBB_DIR}/lib/intel64/gcc*)
-DEAL_II_FIND_LIBRARY(TBB_DEBUG_LIBRARY
+file(GLOB _path ${TBB_DIR}/build/*_debug ${TBB_DIR}/lib/intel64/gcc*)
+deal_ii_find_library(TBB_DEBUG_LIBRARY
   NAMES tbb_debug
   HINTS
     ${_path}
     ${TBB_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
-IF(NOT TBB_DEBUG_LIBRARY MATCHES "-NOTFOUND")
-  SET(TBB_WITH_DEBUGLIB TRUE)
-  SET(_libraries debug TBB_DEBUG_LIBRARY optimized TBB_LIBRARY)
-ELSE()
-  SET(_libraries TBB_LIBRARY)
-ENDIF()
+if(NOT TBB_DEBUG_LIBRARY MATCHES "-NOTFOUND")
+  set(TBB_WITH_DEBUGLIB TRUE)
+  set(_libraries debug TBB_DEBUG_LIBRARY optimized TBB_LIBRARY)
+else()
+  set(_libraries TBB_LIBRARY)
+endif()
 
 #
 # Check for old TBB header layout:
 #
 
-DEAL_II_FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
+deal_ii_find_path(TBB_INCLUDE_DIR tbb/tbb_stddef.h
   HINTS
     ${TBB_DIR}
   PATH_SUFFIXES include include/tbb tbb
   )
 
-IF(EXISTS ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h)
-  FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MAJOR_STRING
+if(EXISTS ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h)
+  file(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MAJOR_STRING
     REGEX "#define.*TBB_VERSION_MAJOR")
-  STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR +([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*TBB_VERSION_MAJOR +([0-9]+).*" "\\1"
     TBB_VERSION_MAJOR "${TBB_VERSION_MAJOR_STRING}"
     )
-  FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MINOR_STRING
+  file(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MINOR_STRING
     REGEX "#define.*TBB_VERSION_MINOR")
-  STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR +([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*TBB_VERSION_MINOR +([0-9]+).*" "\\1"
     TBB_VERSION_MINOR "${TBB_VERSION_MINOR_STRING}"
     )
-  SET(TBB_VERSION
+  set(TBB_VERSION
     "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
     )
 
-  SET(TBB_WITH_ONEAPI FALSE)
-ELSE()
+  set(TBB_WITH_ONEAPI FALSE)
+else()
 
   #
   # Check for new oneAPI TBB header layout:
   #
 
-  DEAL_II_FIND_PATH(TBB_INCLUDE_DIR oneapi/tbb/version.h
+  deal_ii_find_path(TBB_INCLUDE_DIR oneapi/tbb/version.h
     HINTS
       ${TBB_DIR}
     PATH_SUFFIXES include include/tbb tbb
     )
 
-  IF(EXISTS ${TBB_INCLUDE_DIR}/oneapi/tbb/version.h)
-    FILE(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MAJOR_STRING
+  if(EXISTS ${TBB_INCLUDE_DIR}/oneapi/tbb/version.h)
+    file(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MAJOR_STRING
       REGEX "#define.*TBB_VERSION_MAJOR")
-    STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR +([0-9]+).*" "\\1"
+    string(REGEX REPLACE "^.*TBB_VERSION_MAJOR +([0-9]+).*" "\\1"
       TBB_VERSION_MAJOR "${TBB_VERSION_MAJOR_STRING}"
       )
-    FILE(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MINOR_STRING
+    file(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MINOR_STRING
       REGEX "#define.*TBB_VERSION_MINOR")
-    STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR +([0-9]+).*" "\\1"
+    string(REGEX REPLACE "^.*TBB_VERSION_MINOR +([0-9]+).*" "\\1"
       TBB_VERSION_MINOR "${TBB_VERSION_MINOR_STRING}"
       )
-    SET(TBB_VERSION
+    set(TBB_VERSION
       "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
       )
-  ENDIF()
+  endif()
 
-  SET(TBB_WITH_ONEAPI TRUE)
-ENDIF()
+  set(TBB_WITH_ONEAPI TRUE)
+endif()
 
-DEAL_II_PACKAGE_HANDLE(TBB
+deal_ii_package_handle(TBB
   LIBRARIES REQUIRED ${_libraries}
   INCLUDE_DIRS REQUIRED TBB_INCLUDE_DIR
   USER_INCLUDE_DIRS REQUIRED TBB_INCLUDE_DIR

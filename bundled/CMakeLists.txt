@@ -17,73 +17,73 @@
 # Compile and install enabled bundled features:
 #
 
-MESSAGE(STATUS "Setting up bundled features")
+message(STATUS "Setting up bundled features")
 
 
-IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
-  INSTALL(DIRECTORY ${BOOST_FOLDER}/include/boost
+if(FEATURE_BOOST_BUNDLED_CONFIGURED)
+  install(DIRECTORY ${BOOST_FOLDER}/include/boost
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     )
 
-  ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
-  ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/system/src)
+  add_subdirectory(${BOOST_FOLDER}/libs/serialization/src)
+  add_subdirectory(${BOOST_FOLDER}/libs/system/src)
 
-  IF(DEAL_II_WITH_ZLIB)
-    ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/iostreams/src)
-  ELSE()
-    MESSAGE(STATUS "BOOST::Iostreams will not be available because zlib or its header files could not be found")
-  ENDIF()
-ENDIF()
+  if(DEAL_II_WITH_ZLIB)
+    add_subdirectory(${BOOST_FOLDER}/libs/iostreams/src)
+  else()
+    message(STATUS "BOOST::Iostreams will not be available because zlib or its header files could not be found")
+  endif()
+endif()
 
 
-IF(FEATURE_KOKKOS_BUNDLED_CONFIGURED)
-  ADD_SUBDIRECTORY(${KOKKOS_FOLDER})
+if(FEATURE_KOKKOS_BUNDLED_CONFIGURED)
+  add_subdirectory(${KOKKOS_FOLDER})
 
-  INSTALL(DIRECTORY ${KOKKOS_BUNDLED_INCLUDE_DIRS}
+  install(DIRECTORY ${KOKKOS_BUNDLED_INCLUDE_DIRS}
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     )
-ENDIF()
+endif()
 
 
-IF(FEATURE_TASKFLOW_BUNDLED_CONFIGURED)
-  INSTALL(DIRECTORY ${TASKFLOW_FOLDER}/include/taskflow
+if(FEATURE_TASKFLOW_BUNDLED_CONFIGURED)
+  install(DIRECTORY ${TASKFLOW_FOLDER}/include/taskflow
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     )
-ENDIF()
+endif()
 
 
-IF(FEATURE_TBB_BUNDLED_CONFIGURED)
-  INSTALL(DIRECTORY ${TBB_FOLDER}/include/tbb
+if(FEATURE_TBB_BUNDLED_CONFIGURED)
+  install(DIRECTORY ${TBB_FOLDER}/include/tbb
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     FILES_MATCHING PATTERN "*.h"
     )
 
-  ADD_SUBDIRECTORY(${TBB_FOLDER}/src)
-ENDIF()
+  add_subdirectory(${TBB_FOLDER}/src)
+endif()
 
 
-IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
-  ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/UMFPACK/Source)
-  ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/AMD/Source)
+if(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
+  add_subdirectory(${UMFPACK_FOLDER}/UMFPACK/Source)
+  add_subdirectory(${UMFPACK_FOLDER}/AMD/Source)
 
-  INSTALL(DIRECTORY
+  install(DIRECTORY
       ${UMFPACK_FOLDER}/UMFPACK/Include/
       ${UMFPACK_FOLDER}/AMD/Include/
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     FILES_MATCHING PATTERN "*.h"
     )
-ENDIF()
+endif()
 
 
-IF(FEATURE_MUPARSER_BUNDLED_CONFIGURED)
-  ADD_SUBDIRECTORY(${MUPARSER_FOLDER})
-ENDIF()
+if(FEATURE_MUPARSER_BUNDLED_CONFIGURED)
+  add_subdirectory(${MUPARSER_FOLDER})
+endif()
 
 
 
-MESSAGE(STATUS "Setting up bundled features - Done")
+message(STATUS "Setting up bundled features - Done")

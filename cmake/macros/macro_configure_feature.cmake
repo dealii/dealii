@@ -17,7 +17,7 @@
 # This macro is used for the feature configuration in deal.II
 #
 # Usage:
-#     CONFIGURE_FEATURE(feature)
+#     configure_feature(feature)
 #
 #
 # This macro uses the following optional variables and macros:
@@ -48,13 +48,13 @@
 #    fulfilled. In this case all necessary variables for
 #    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
-#    If not defined, FIND_PACKAGE(${feature}) is called.
+#    If not defined, find_package(${feature}) is called.
 #
 # FEATURE_${feature}_CONFIGURE_EXTERNAL()   (macro)
 #    which should setup all necessary configuration for the feature with
 #    external dependencies.
 #
-# FEATURE_${feature}_ERROR_MESSAGE()  (macro)
+# FEATURE_${feature}_ERROR_message()  (macro)
 #    which should print a meaningful error message (with FATAL_ERROR) for
 #    the case that no usable library was found.
 #    If not defined, a suitable default error message will be printed.
@@ -71,45 +71,45 @@
 #
 # A small macro to set the DEAL_II_WITH_${_feature} variables:
 #
-MACRO(SET_CACHED_OPTION _str _value)
-  STRING(TOLOWER "${_str}" _str_lower)
-  SET(DEAL_II_WITH_${_str}
+macro(SET_CACHED_OPTION _str _value)
+  string(TOLOWER "${_str}" _str_lower)
+  set(DEAL_II_WITH_${_str}
     ${_value}
     CACHE BOOL
     "Build deal.II with support for ${_str_lower}."
     FORCE)
-ENDMACRO()
+endmacro()
 
 
 #
 # A small macro to post a default error message:
 #
-MACRO(FEATURE_ERROR_MESSAGE _feature)
-  STRING(TOLOWER ${_feature} _feature_lowercase)
+macro(FEATURE_ERROR_MESSAGE _feature)
+  string(TOLOWER ${_feature} _feature_lowercase)
 
-  IF(DEFINED ${_feature}_DIR)
-    SET(_hint_snippet "
+  if(DEFINED ${_feature}_DIR)
+    set(_hint_snippet "
     $ ${_feature}_DIR=\"...\" cmake <...>
     $ cmake -D${_feature}_DIR=\"...\" <...>
 or set the relevant variables by hand in ccmake."
       )
-  ELSE()
-    SET(_hint_snippet
+  else()
+    set(_hint_snippet
       " or set the relevant variables by hand in ccmake."
       )
-  ENDIF()
+  endif()
 
-  IF(FEATURE_${_feature}_HAVE_BUNDLED)
-    SET(_bundled_snippet
+  if(FEATURE_${_feature}_HAVE_BUNDLED)
+    set(_bundled_snippet
       "\nAlternatively you may choose to compile the bundled library of "
       "${_feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or "
       "DEAL_II_FORCE_BUNDLED_${_feature}=on.\n"
       )
-  ELSE()
-    SET(_bundled_snippet "\n")
-  ENDIF()
+  else()
+    set(_bundled_snippet "\n")
+  endif()
 
-  MESSAGE(FATAL_ERROR "\n"
+  message(FATAL_ERROR "\n"
     "Could not find the ${_feature_lowercase} library!\n"
     ${${_feature}_ADDITIONAL_ERROR_STRING}
     "Please ensure that a suitable ${_feature_lowercase} library is installed on your computer.\n"
@@ -117,18 +117,18 @@ or set the relevant variables by hand in ccmake."
     "for autodetection,${_hint_snippet}"
     ${_bundled_snippet}
     )
-ENDMACRO()
+endmacro()
 
 
 #
 # Default macro for finding an external library:
 #
-MACRO(FEATURE_FIND_EXTERNAL _feature _var)
-  FIND_PACKAGE(${_feature})
-  IF(${_feature}_FOUND)
-    SET(${_var} TRUE)
-  ENDIF()
-ENDMACRO()
+macro(FEATURE_FIND_EXTERNAL _feature _var)
+  find_package(${_feature})
+  if(${_feature}_FOUND)
+    set(${_var} TRUE)
+  endif()
+endmacro()
 
 
 ########################################################################
@@ -137,12 +137,12 @@ ENDMACRO()
 #                                                                      #
 ########################################################################
 
-MACRO(CONFIGURE_FEATURE _feature)
+macro(CONFIGURE_FEATURE _feature)
 
   #
   # Register the feature in the DEAL_II_FEATURES list
   #
-  LIST(APPEND DEAL_II_FEATURES ${_feature})
+  list(APPEND DEAL_II_FEATURES ${_feature})
 
   #
   # This script is arcane black magic. But at least for the better good: We
@@ -156,137 +156,137 @@ MACRO(CONFIGURE_FEATURE _feature)
   # depends on feature A, configure_A.cmake has to be included before
   # configure_B.cmake:
   #
-  FOREACH(_dependency
+  foreach(_dependency
       ${FEATURE_${_feature}_AFTER}
       ${FEATURE_${_feature}_DEPENDS}
       )
-    IF(NOT FEATURE_${_dependency}_PROCESSED)
-      MESSAGE(FATAL_ERROR "\n"
+    if(NOT FEATURE_${_dependency}_PROCESSED)
+      message(FATAL_ERROR "\n"
         "Internal build system error: The configuration of "
         "DEAL_II_WITH_${_feature} depends on "
-        "DEAL_II_WITH_${_dependency}, but CONFIGURE_FEATURE(${_feature}) "
-        "was called before CONFIGURE_FEATURE(${_dependency}).\n\n"
+        "DEAL_II_WITH_${_dependency}, but configure_feature(${_feature}) "
+        "was called before configure_feature(${_dependency}).\n\n"
         )
-    ENDIF()
-  ENDFOREACH()
+    endif()
+  endforeach()
 
   #
   # Obey the user overrides:
   #
-  IF( (NOT DEAL_II_ALLOW_AUTODETECTION) AND
+  if( (NOT DEAL_II_ALLOW_AUTODETECTION) AND
       (NOT DEFINED DEAL_II_WITH_${_feature}) )
-    PURGE_FEATURE(${_feature})
-    SET_CACHED_OPTION(${_feature} OFF)
-  ENDIF()
+    purge_feature(${_feature})
+    set_cached_option(${_feature} OFF)
+  endif()
 
   #
   # Only try to configure ${_feature} if we have to, i.e.
   # DEAL_II_WITH_${_feature} is set to true or not set at all.
   #
-  IF((NOT DEFINED DEAL_II_WITH_${_feature}) OR
+  if((NOT DEFINED DEAL_II_WITH_${_feature}) OR
      DEAL_II_WITH_${_feature})
 
     #
     # Are all dependencies fulfilled?
     #
-    SET(_dependencies_ok TRUE)
-    FOREACH(_dependency ${FEATURE_${_feature}_DEPENDS})
-      IF(NOT DEAL_II_WITH_${_dependency})
-        IF(DEAL_II_WITH_${_feature})
-          MESSAGE(FATAL_ERROR "\n"
+    set(_dependencies_ok TRUE)
+    foreach(_dependency ${FEATURE_${_feature}_DEPENDS})
+      if(NOT DEAL_II_WITH_${_dependency})
+        if(DEAL_II_WITH_${_feature})
+          message(FATAL_ERROR "\n"
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "
             "DEAL_II_WITH_${_dependency} has to be set to \"ON\".\n\n"
             )
-        ELSE()
-          MESSAGE(STATUS
+        else()
+          message(STATUS
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "
             "DEAL_II_WITH_${_dependency} has to be set to \"ON\"."
             )
-          PURGE_FEATURE(${_feature})
-          SET_CACHED_OPTION(${_feature} OFF)
-        ENDIF()
-        SET(_dependencies_ok FALSE)
-      ENDIF()
-    ENDFOREACH()
+          purge_feature(${_feature})
+          set_cached_option(${_feature} OFF)
+        endif()
+        set(_dependencies_ok FALSE)
+      endif()
+    endforeach()
 
-    IF(_dependencies_ok)
-      IF(DEAL_II_FORCE_BUNDLED_${_feature})
+    if(_dependencies_ok)
+      if(DEAL_II_FORCE_BUNDLED_${_feature})
         #
         # First case: DEAL_II_FORCE_BUNDLED_${_feature} is defined:
         #
 
-        PURGE_FEATURE(${_feature})
+        purge_feature(${_feature})
 
-        IF(FEATURE_${_feature}_HAVE_BUNDLED)
-          EVALUATE_EXPRESSION("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
-          MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
-          SET(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
-          SET_CACHED_OPTION(${_feature} ON)
-        ELSE()
-          MESSAGE(FATAL_ERROR "\n"
+        if(FEATURE_${_feature}_HAVE_BUNDLED)
+          evaluate_expression("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+          message(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
+          set(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
+          set_cached_option(${_feature} ON)
+        else()
+          message(FATAL_ERROR "\n"
             "Internal build system error: DEAL_II_FORCE_BUNDLED_${_feature} "
             "defined, but FEATURE_${_feature}_HAVE_BUNDLED not present.\n"
             )
-        ENDIF()
+        endif()
 
-      ELSE(DEAL_II_FORCE_BUNDLED_${_feature})
+      else(DEAL_II_FORCE_BUNDLED_${_feature})
         #
         # Second case: We are allowed to search for an external library
         #
-        IF(COMMAND FEATURE_${_feature}_FIND_EXTERNAL)
-          EVALUATE_EXPRESSION("FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)")
-        ELSE()
-          FEATURE_FIND_EXTERNAL(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
-        ENDIF()
+        if(COMMAND FEATURE_${_feature}_FIND_EXTERNAL)
+          evaluate_expression("FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)")
+        else()
+          feature_find_external(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
+        endif()
 
-        IF(FEATURE_${_feature}_EXTERNAL_FOUND)
-          IF(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
-            EVALUATE_EXPRESSION("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
-          ENDIF()
+        if(FEATURE_${_feature}_EXTERNAL_FOUND)
+          if(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
+            evaluate_expression("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
+          endif()
 
-          MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
-          SET(FEATURE_${_feature}_EXTERNAL_CONFIGURED TRUE)
-          SET_CACHED_OPTION(${_feature} ON)
+          message(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
+          set(FEATURE_${_feature}_EXTERNAL_CONFIGURED TRUE)
+          set_cached_option(${_feature} ON)
 
-        ELSE(FEATURE_${_feature}_EXTERNAL_FOUND)
+        else(FEATURE_${_feature}_EXTERNAL_FOUND)
 
-          PURGE_FEATURE(${_feature})
+          purge_feature(${_feature})
 
-          MESSAGE(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
+          message(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
 
-          IF(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
-            EVALUATE_EXPRESSION("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+          if(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
+            evaluate_expression("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
 
-            MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
-            SET(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
-            SET_CACHED_OPTION(${_feature} ON)
+            message(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
+            set(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
+            set_cached_option(${_feature} ON)
 
-          ELSE()
-            IF(DEAL_II_WITH_${_feature})
-              IF(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)
-                 EVALUATE_EXPRESSION("FEATURE_${_feature}_ERROR_MESSAGE()")
-              ELSE()
-                FEATURE_ERROR_MESSAGE(${_feature})
-              ENDIF()
-            ELSE()
-              SET_CACHED_OPTION(${_feature} OFF)
-            ENDIF()
-          ENDIF()
+          else()
+            if(DEAL_II_WITH_${_feature})
+              if(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)
+                 evaluate_expression("FEATURE_${_feature}_ERROR_message()")
+              else()
+                feature_error_message(${_feature})
+              endif()
+            else()
+              set_cached_option(${_feature} OFF)
+            endif()
+          endif()
 
-        ENDIF(FEATURE_${_feature}_EXTERNAL_FOUND)
+        endif(FEATURE_${_feature}_EXTERNAL_FOUND)
 
-      ENDIF()
-    ENDIF()
-  ELSE()
+      endif()
+    endif()
+  else()
     #
     # DEAL_II_WITH_${_feature} is defined and set to OFF, promote it to
     # cache nevertheless:
     #
-    MESSAGE(STATUS "DEAL_II_WITH_${_feature} is set to off.")
-    PURGE_FEATURE(${_feature})
-    SET_CACHED_OPTION(${_feature} OFF)
-  ENDIF()
+    message(STATUS "DEAL_II_WITH_${_feature} is set to off.")
+    purge_feature(${_feature})
+    set_cached_option(${_feature} OFF)
+  endif()
 
-  SET(FEATURE_${_feature}_PROCESSED TRUE)
+  set(FEATURE_${_feature}_PROCESSED TRUE)
 
-ENDMACRO()
+endmacro()

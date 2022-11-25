@@ -19,24 +19,24 @@
 # variables
 #
 # Usage:
-#     FILTER_SYSTEM_LIBRARIES(feature)
+#     filter_system_libraries(feature)
 #
 
-MACRO(FILTER_SYSTEM_LIBRARIES _feature)
-  FOREACH(_variable
+macro(FILTER_SYSTEM_LIBRARIES _feature)
+  foreach(_variable
     ${_feature}_LIBRARIES
     ${_feature}_LIBRARIES_DEBUG
     ${_feature}_LIBRARIES_RELEASE
     )
-    IF(DEFINED ${_variable})
-      SET(_tmp_${_variable} ${${_variable}})
-      SET(${_variable} "")
-      FOREACH(_lib ${_tmp_${_variable}})
-        IF(_lib MATCHES "lib(bfd|c|dl|gfortran|iberty|m|nsl|opcodes|pthread|quadmath|rt)\\.(a|so)$")
+    if(DEFINED ${_variable})
+      set(_tmp_${_variable} ${${_variable}})
+      set(${_variable} "")
+      foreach(_lib ${_tmp_${_variable}})
+        if(_lib MATCHES "lib(bfd|c|dl|gfortran|iberty|m|nsl|opcodes|pthread|quadmath|rt)\\.(a|so)$")
           string(REGEX REPLACE ".*lib([a-z]+).so$" "\\1" _lib ${_lib})
-        ENDIF()
-        LIST(APPEND ${_variable} ${_lib})
-      ENDFOREACH()
-    ENDIF()
-  ENDFOREACH()
-ENDMACRO()
+        endif()
+        list(APPEND ${_variable} ${_lib})
+      endforeach()
+    endif()
+  endforeach()
+endmacro()

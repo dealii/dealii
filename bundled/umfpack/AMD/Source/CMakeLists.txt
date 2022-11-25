@@ -13,11 +13,11 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(${UMFPACK_BUNDLED_INCLUDE_DIRS})
+include_directories(${UMFPACK_BUNDLED_INCLUDE_DIRS})
 
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
+strip_flag(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
 
-SET(src_amd
+set(src_amd
   amd_1.cc
   amd_2.cc
   amd_aat.cc
@@ -32,11 +32,11 @@ SET(src_amd
   amd_valid.cc
   )
 
-DEAL_II_ADD_LIBRARY(obj_amd_int OBJECT ${src_amd})
-DEAL_II_ADD_DEFINITIONS(obj_amd_int "DINT")
+deal_ii_add_library(obj_amd_int OBJECT ${src_amd})
+deal_ii_add_definitions(obj_amd_int "DINT")
 
-DEAL_II_ADD_LIBRARY(obj_amd_long OBJECT ${src_amd})
-DEAL_II_ADD_DEFINITIONS(obj_amd_long "DLONG")
+deal_ii_add_library(obj_amd_long OBJECT ${src_amd})
+deal_ii_add_definitions(obj_amd_long "DLONG")
 
-DEAL_II_ADD_LIBRARY(obj_amd_global OBJECT "amd_global.cc")
+deal_ii_add_library(obj_amd_global OBJECT "amd_global.cc")
 

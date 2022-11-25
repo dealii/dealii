@@ -18,8 +18,8 @@
 # part of the deal.II library.
 #
 # Usage:
-#       DEAL_II_QUERY_GIT_INFORMATION()
-#       DEAL_II_QUERY_GIT_INFORMATION("CUSTOM_PREFIX")
+#       deal_ii_query_git_information()
+#       deal_ii_query_git_information("CUSTOM_PREFIX")
 #
 # This will try to gather information about current branch, as well as
 # short and long revision. If ${CMAKE_SOURCE_DIR} is the root of a git
@@ -40,39 +40,39 @@
 #       PREFIX_GIT_TIMESTAMP
 #
 
-MACRO(DEAL_II_QUERY_GIT_INFORMATION)
+macro(DEAL_II_QUERY_GIT_INFORMATION)
 
-  MESSAGE(STATUS "Query git repository information.")
+  message(STATUS "Query git repository information.")
 
   # Set prefix.
-  SET(_prefix "")
-  IF(NOT "${ARGN}" STREQUAL "")
-    SET(_prefix "${ARGN}_")
-  ENDIF()
+  set(_prefix "")
+  if(NOT "${ARGN}" STREQUAL "")
+    set(_prefix "${ARGN}_")
+  endif()
 
-  FIND_PACKAGE(Git)
+  find_package(Git)
 
   #
   # Only run the following if we have git and the source directory seems to
   # be under version control.
   #
-  IF(GIT_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.git/HEAD)
+  if(GIT_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.git/HEAD)
     #
     # Bogus configure_file calls to trigger a reconfigure, and thus an
     # update of branch and commit information every time HEAD has changed.
     #
-    CONFIGURE_FILE(
+    configure_file(
       ${CMAKE_SOURCE_DIR}/.git/HEAD
       ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HEAD
       )
-    FILE(STRINGS ${CMAKE_SOURCE_DIR}/.git/HEAD _head_ref LIMIT_COUNT 1)
-    STRING(REPLACE "ref: " "" _head_ref ${_head_ref})
-    IF(EXISTS ${CMAKE_SOURCE_DIR}/.git/${_head_ref})
-      CONFIGURE_FILE(
+    file(STRINGS ${CMAKE_SOURCE_DIR}/.git/HEAD _head_ref LIMIT_COUNT 1)
+    string(REPLACE "ref: " "" _head_ref ${_head_ref})
+    if(EXISTS ${CMAKE_SOURCE_DIR}/.git/${_head_ref})
+      configure_file(
         ${CMAKE_SOURCE_DIR}/.git/${_head_ref}
         ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HEAD_REF
         )
-    ENDIF()
+    endif()
 
     #
     # Query for revision:
@@ -84,72 +84,72 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     #
 
     # --date=iso-strict has been introduced in git 2.2 (released Dec 2014)
-    SET(_date_format)
-    IF(NOT ${GIT_VERSION_STRING} VERSION_LESS 2.2)
-      SET(_date_format "--date=iso-strict")
-    ENDIF()
+    set(_date_format)
+    if(NOT ${GIT_VERSION_STRING} VERSION_LESS 2.2)
+      set(_date_format "--date=iso-strict")
+    endif()
 
-    EXECUTE_PROCESS(
+    execute_process(
        COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"revision=%H, shortrev=%h, date=%cd" ${_date_format}
        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
        OUTPUT_VARIABLE _info
        RESULT_VARIABLE _result
        OUTPUT_STRIP_TRAILING_WHITESPACE
        )
-    IF(${_result} EQUAL 0)
-      STRING(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
+    if(${_result} EQUAL 0)
+      string(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
         "\\1" ${_prefix}GIT_REVISION "${_info}")
-      STRING(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
+      string(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
         "\\2" ${_prefix}GIT_SHORTREV "${_info}")
-      STRING(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
+      string(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
         "\\3" ${_prefix}GIT_TIMESTAMP "${_info}")
 
       #
       # Replace "T" by a space in order to have the same output as
       #   $ date --rfc-3339=seconds"
       #
-      STRING(REPLACE "T" " " ${_prefix}GIT_TIMESTAMP "${${_prefix}GIT_TIMESTAMP}")
-    ENDIF()
+      string(REPLACE "T" " " ${_prefix}GIT_TIMESTAMP "${${_prefix}GIT_TIMESTAMP}")
+    endif()
 
     #
     # Query for branch:
     #
 
-    EXECUTE_PROCESS(
+    execute_process(
        COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD
        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
        OUTPUT_VARIABLE _branch
        RESULT_VARIABLE _result
        OUTPUT_STRIP_TRAILING_WHITESPACE
        )
-    IF(${_result} EQUAL 0)
-      STRING(REGEX REPLACE "refs/heads/" "" ${_prefix}GIT_BRANCH "${_branch}")
-    ENDIF()
+    if(${_result} EQUAL 0)
+      string(REGEX REPLACE "refs/heads/" "" ${_prefix}GIT_BRANCH "${_branch}")
+    endif()
 
     #
     # Query for tag:
     #
-    SET(_script "")
-    IF(EXISTS     ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
-      SET(_script ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
-    ELSEIF(EXISTS ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
-      SET(_script ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
-    ENDIF()
-    IF(NOT "${_script}" STREQUAL "")
-       EXECUTE_PROCESS(
+    set(_script "")
+    if(EXISTS     ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+      set(_script ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+    elseif(EXISTS ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+      set(_script ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_latest_tag.sh)
+    endif()
+    if(NOT "${_script}" STREQUAL "")
+       execute_process(
           COMMAND ${_script}
           WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
           OUTPUT_VARIABLE _tag
           RESULT_VARIABLE _result
           OUTPUT_STRIP_TRAILING_WHITESPACE
           )
-       IF(${_result} EQUAL 0)
-         SET(${_prefix}GIT_TAG ${_tag})
-       ENDIF()
-    ELSE()
-       MESSAGE(STATUS "Could not locate get_latest_tag.sh. " ${_prefix}GIT_TAG " will not be set.")
-    ENDIF()
+       if(${_result} EQUAL 0)
+         set(${_prefix}GIT_TAG ${_tag})
+       endif()
+    else()
+       message(STATUS "Could not locate get_latest_tag.sh. " ${_prefix}GIT_TAG " will not be set.")
+    endif()
 
-  ENDIF()
+  endif()
 
-ENDMACRO()
+endmacro()

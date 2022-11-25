@@ -13,7 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-ADD_EXECUTABLE(expand_instantiations_exe expand_instantiations.cc)
+add_executable(expand_instantiations_exe expand_instantiations.cc)
 
 #
 # We run into a bug when compiling expand_instantiations with
@@ -27,9 +27,9 @@ ADD_EXECUTABLE(expand_instantiations_exe expand_instantiations.cc)
 # linker flag, filtering this one command out of the list of flags
 # does not harm either.
 #
-STRING(REPLACE "-fuse-ld=gold" "" _expand_instantiations_link_flags "${DEAL_II_LINKER_FLAGS}" )
+string(REPLACE "-fuse-ld=gold" "" _expand_instantiations_link_flags "${DEAL_II_LINKER_FLAGS}" )
 
-SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
+set_target_properties(expand_instantiations_exe PROPERTIES
   LINK_FLAGS "${_expand_instantiations_link_flags}"
   LINKER_LANGUAGE "CXX"
   COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS}"
@@ -38,24 +38,24 @@ SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}
   )
 
-IF (DEAL_II_MSVC)
-  SET_TARGET_PROPERTIES(expand_instantiations_exe PROPERTIES
+if (DEAL_II_MSVC)
+  set_target_properties(expand_instantiations_exe PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
-ENDIF()
+endif()
 
-SET(_scripts
+set(_scripts
   ${CMAKE_CURRENT_SOURCE_DIR}/normalize.pl
   ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_closest_tag.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_latest_tag.sh
   )
-FILE(COPY ${_scripts}
+file(COPY ${_scripts}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts
   )
-INSTALL(FILES ${_scripts}
+install(FILES ${_scripts}
   DESTINATION ${DEAL_II_SHARE_RELDIR}/scripts
   COMPONENT library
   )

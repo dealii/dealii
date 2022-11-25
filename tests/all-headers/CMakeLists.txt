@@ -13,14 +13,14 @@
 ##
 ## ---------------------------------------------------------------------
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-INCLUDE(../setup_testsubproject.cmake)
-PROJECT(testsuite CXX)
+cmake_minimum_required(VERSION 3.3.0)
+include(../setup_testsubproject.cmake)
+project(testsuite CXX)
 
 #
 # Set up test environment (does not pick up anything):
 #
-DEAL_II_PICKUP_TESTS()
+deal_ii_pickup_tests()
 
 #
 # Header tests are special:
@@ -30,35 +30,35 @@ DEAL_II_PICKUP_TESTS()
 # header file. We omit linking to save some time.
 #
 
-SET(_category all-headers)
+set(_category all-headers)
 
 #
 # Glob together all header files and strip SOURCE_DIR/include/deal.II to
 # get a correct relative path:
 #
-IF(DEAL_II_BUILD_DIR)
-  LIST(GET DEAL_II_INCLUDE_DIRS 1 _include_dir)
-ELSE()
-  LIST(GET DEAL_II_INCLUDE_DIRS 0 _include_dir)
-ENDIF()
-FILE(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
+if(DEAL_II_BUILD_DIR)
+  list(GET DEAL_II_INCLUDE_DIRS 1 _include_dir)
+else()
+  list(GET DEAL_II_INCLUDE_DIRS 0 _include_dir)
+endif()
+file(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
   ${_include_dir}/deal.II/*.h
   )
 
 
 # Do not test bundled headers to avoid issues when tests are run
 # for an already installed library
-STRING(REGEX REPLACE "bundled/[^;]+;?" "" _headers "${_headers}")
+string(REGEX REPLACE "bundled/[^;]+;?" "" _headers "${_headers}")
 
-FOREACH(_header ${_headers})
-  FOREACH(_build ${DEAL_II_BUILD_TYPES})
-    STRING(TOLOWER ${_build} _build_lowercase)
+foreach(_header ${_headers})
+  foreach(_build ${DEAL_II_BUILD_TYPES})
+    string(TOLOWER ${_build} _build_lowercase)
 
-    SET(_test ${_category}/${_header}.${_build_lowercase})
-    STRING(REGEX REPLACE "\\/" "-" _target ${_header}.${_build_lowercase})
+    set(_test ${_category}/${_header}.${_build_lowercase})
+    string(REGEX REPLACE "\\/" "-" _target ${_header}.${_build_lowercase})
 
     # Respect TEST_PICKUP_REGEX:
-    IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
+    if( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}" )
 
       #
@@ -67,39 +67,39 @@ FOREACH(_header ${_headers})
       # interrupt_guard.cc is removed by run_test.cmake due to an
       # interruption.
       #
-      ADD_CUSTOM_COMMAND(
+      add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
         COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
         )
 
       # Add an object library for each header file and build configuration:
-      ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc
+      add_library(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc
         ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
         )
-      DEAL_II_SETUP_TARGET(${_target} ${_build})
-      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+      deal_ii_setup_target(${_target} ${_build})
+      set_property(TARGET ${_target} APPEND PROPERTY
         COMPILE_DEFINITIONS HEADER=<deal.II/${_header}>
         )
 
-      ADD_CUSTOM_TARGET(${_target}.build
+      add_custom_target(${_target}.build
         COMMAND
              echo "${_test}: BUILD successful."
           && echo "${_test}: PASSED."
         )
-      ADD_DEPENDENCIES(${_target}.build ${_target})
+      add_dependencies(${_target}.build ${_target})
 
       # And finally add the test:
-      ADD_TEST(NAME ${_test}
+      add_test(NAME ${_test}
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.build -DTEST=${_test}
           -DBINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
-      SET_TESTS_PROPERTIES(${_test} PROPERTIES
+      set_tests_properties(${_test} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
-    ENDIF()
-  ENDFOREACH()
-ENDFOREACH()
+    endif()
+  endforeach()
+endforeach()

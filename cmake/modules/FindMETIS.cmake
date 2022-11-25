@@ -26,8 +26,8 @@
 #   METIS_VERSION_SUBMINOR
 #
 
-SET(METIS_DIR "" CACHE PATH "An optional hint to a metis directory")
-SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
+set(METIS_DIR "" CACHE PATH "An optional hint to a metis directory")
+set_if_empty(METIS_DIR "$ENV{METIS_DIR}")
 
 #
 # Metis is usually pretty self contained. So no external dependencies
@@ -36,7 +36,7 @@ SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
 # Link in MPI unconditionally (if found).
 #
 
-DEAL_II_FIND_LIBRARY(METIS_LIBRARY
+deal_ii_find_library(METIS_LIBRARY
   NAMES metis
   HINTS ${METIS_DIR}
   PATH_SUFFIXES
@@ -46,42 +46,42 @@ DEAL_II_FIND_LIBRARY(METIS_LIBRARY
   )
 
 
-DEAL_II_FIND_PATH(METIS_INCLUDE_DIR metis.h
+deal_ii_find_path(METIS_INCLUDE_DIR metis.h
   HINTS ${METIS_DIR}
   PATH_SUFFIXES metis include/metis include
   )
 
-IF(EXISTS ${METIS_INCLUDE_DIR}/metis.h)
+if(EXISTS ${METIS_INCLUDE_DIR}/metis.h)
   #
   # Extract the version number out of metis.h
   #
-  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_major_string
+  file(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_major_string
     REGEX "METIS_VER_MAJOR"
     )
-  STRING(REGEX REPLACE "^.*METIS_VER_MAJOR.* ([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*METIS_VER_MAJOR.* ([0-9]+).*" "\\1"
     METIS_VERSION_MAJOR "${_metis_major_string}"
     )
-  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_minor_string
+  file(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_minor_string
     REGEX "METIS_VER_MINOR"
     )
-  STRING(REGEX REPLACE "^.*METIS_VER_MINOR.* ([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*METIS_VER_MINOR.* ([0-9]+).*" "\\1"
     METIS_VERSION_MINOR "${_metis_minor_string}"
     )
-  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_subminor_string
+  file(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_subminor_string
     REGEX "METIS_VER_SUBMINOR"
     )
-  STRING(REGEX REPLACE "^.*METIS_VER_SUBMINOR.* ([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*METIS_VER_SUBMINOR.* ([0-9]+).*" "\\1"
     METIS_VERSION_SUBMINOR "${_metis_subminor_string}"
     )
-  SET(METIS_VERSION
+  set(METIS_VERSION
     "${METIS_VERSION_MAJOR}.${METIS_VERSION_MINOR}.${METIS_VERSION_SUBMINOR}"
     )
-  IF("${METIS_VERSION}" STREQUAL "..")
-    SET(METIS_VERSION)
-  ENDIF()
-ENDIF()
+  if("${METIS_VERSION}" STREQUAL "..")
+    set(METIS_VERSION)
+  endif()
+endif()
 
-DEAL_II_PACKAGE_HANDLE(METIS
+deal_ii_package_handle(METIS
   LIBRARIES
     REQUIRED METIS_LIBRARY
     OPTIONAL MPI_C_LIBRARIES

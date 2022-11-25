@@ -17,8 +17,8 @@
 # Remove -Wall and -pedantic from DEAL_II_CXX_FLAGS (in directory scope) to
 # avoid some annoying warnings...
 #
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wall")
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
+strip_flag(DEAL_II_CXX_FLAGS "-Wall")
+strip_flag(DEAL_II_CXX_FLAGS "-pedantic")
 
 #
 # As discussed in
@@ -31,31 +31,31 @@ STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
 # this approach. Hence, if supported, disable this particular optimization. The
 # original TBB makefile specifies this flag for recent versions of GCC.
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-flifetime-dse=1")
+enable_if_supported(DEAL_II_CXX_FLAGS "-flifetime-dse=1")
 
 #
 # Disable other warnings:
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wimplicit-fallthrough=0")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wstringop-overflow=0")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-copy")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wtautological-overlap-compare=0")
+enable_if_supported(DEAL_II_CXX_FLAGS "-Wimplicit-fallthrough=0")
+enable_if_supported(DEAL_II_CXX_FLAGS "-Wstringop-overflow=0")
+enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-deprecated-copy")
+enable_if_supported(DEAL_II_CXX_FLAGS "-Wtautological-overlap-compare=0")
 
 
 
-SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-INCLUDE_DIRECTORIES(
+set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+include_directories(
   ${TBB_BUNDLED_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/rml/include
   )
 
-IF(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/version_string.ver")
-  FILE(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version_string.ver"
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/version_string.ver")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version_string.ver"
     "#define __TBB_VERSION_STRINGS(N) \"Custom\"\n"
     )
-ENDIF()
+endif()
 
-SET(src_tbb
+set(src_tbb
   rml/client/rml_tbb.cpp
   tbb/arena.cpp
   tbb/cache_aligned_allocator.cpp
@@ -90,14 +90,14 @@ SET(src_tbb
   tbb/tbb_thread.cpp
   tbb/x86_rtm_rw_mutex.cpp
   )
-DEAL_II_ADD_LIBRARY(obj_tbb OBJECT ${src_tbb})
+deal_ii_add_library(obj_tbb OBJECT ${src_tbb})
 
 #
 # Add necessary definitions:
 #
 
-DEAL_II_ADD_DEFINITIONS(obj_tbb "__TBB_BUILD=1")
-DEAL_II_ADD_DEFINITIONS(obj_tbb "USE_PTHREAD")
-IF(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  DEAL_II_ADD_DEFINITIONS(obj_tbb "DO_ITT_NOTIFY")
-ENDIF()
+deal_ii_add_definitions(obj_tbb "__TBB_BUILD=1")
+deal_ii_add_definitions(obj_tbb "USE_PTHREAD")
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  deal_ii_add_definitions(obj_tbb "DO_ITT_NOTIFY")
+endif()

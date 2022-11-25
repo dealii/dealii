@@ -13,81 +13,81 @@
 ##
 ## ---------------------------------------------------------------------
 
-IF(DEAL_II_COMPONENT_PACKAGE)
-  MESSAGE(STATUS "Setting up CPack")
-  SET(CPACK_GENERATOR "Bundle")
+if(DEAL_II_COMPONENT_PACKAGE)
+  message(STATUS "Setting up CPack")
+  set(CPACK_GENERATOR "Bundle")
 
-  CONFIGURE_FILE(
+  configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/mac_startup_script.sh.in
     ${CMAKE_BINARY_DIR}/cpack/mac_startup_script.sh
     @ONLY
     )
 
-  CONFIGURE_FILE(
+  configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-terminal.in
     ${CMAKE_BINARY_DIR}/cpack/dealii-terminal
     @ONLY
     )
 
-  CONFIGURE_FILE(
+  configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii.conf.in
     ${CMAKE_BINARY_DIR}/cpack/dealii.conf
     @ONLY
     )
 
-  CONFIGURE_FILE(
+  configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/Info.plist.in
     ${CMAKE_BINARY_DIR}/cpack/Info.plist
     @ONLY
     )
 
-  SET(CPACK_PACKAGE_ICON
+  set(CPACK_PACKAGE_ICON
     "${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
     )
 
   set(CPACK_PACKAGE_FILE_NAME
     "dealii-${DEAL_II_PACKAGE_VERSION}"
     )
-  MESSAGE(STATUS "  Disk filename: ${CPACK_PACKAGE_FILE_NAME}.dmg")
+  message(STATUS "  Disk filename: ${CPACK_PACKAGE_FILE_NAME}.dmg")
 
   set(CPACK_BUNDLE_NAME
     "${DEAL_II_CPACK_BUNDLE_NAME}"
     )
-  MESSAGE(STATUS "  Application: ${DEAL_II_CPACK_BUNDLE_NAME}.app")
+  message(STATUS "  Application: ${DEAL_II_CPACK_BUNDLE_NAME}.app")
 
-  SET(CPACK_BUNDLE_ICON
+  set(CPACK_BUNDLE_ICON
     "${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
     )
 
-  SET(CPACK_BUNDLE_PLIST
+  set(CPACK_BUNDLE_PLIST
     "${CMAKE_BINARY_DIR}/cpack/Info.plist"
     )
 
-  SET(CPACK_BUNDLE_STARTUP_COMMAND
+  set(CPACK_BUNDLE_STARTUP_COMMAND
     "${CMAKE_BINARY_DIR}/cpack/mac_startup_script.sh"
     )
 
-  INSTALL(FILES
+  install(FILES
     ${CMAKE_BINARY_DIR}/cpack/dealii.conf
     DESTINATION ${DEAL_II_SHARE_RELDIR}
     )
 
-  INSTALL(PROGRAMS
+  install(PROGRAMS
     ${CMAKE_BINARY_DIR}/cpack/dealii-terminal
     DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
     )
 
-  IF(NOT "${DEAL_II_CPACK_EXTERNAL_LIBS}" STREQUAL "")
-    SET(_SRC "/Applications/${DEAL_II_CPACK_BUNDLE_NAME}.app/Contents/Resources/${DEAL_II_CPACK_EXTERNAL_LIBS}/")
-    IF(IS_DIRECTORY ${_SRC})
-       MESSAGE(STATUS "  Will copy ${_SRC} *as is* in the generated package")
-       INSTALL(DIRECTORY ${_SRC}
+  if(NOT "${DEAL_II_CPACK_EXTERNAL_LIBS}" STREQUAL "")
+    set(_SRC "/Applications/${DEAL_II_CPACK_BUNDLE_NAME}.app/Contents/Resources/${DEAL_II_CPACK_EXTERNAL_LIBS}/")
+    if(IS_DIRECTORY ${_SRC})
+       message(STATUS "  Will copy ${_SRC} *as is* in the generated package")
+       install(DIRECTORY ${_SRC}
          DESTINATION ${DEAL_II_CPACK_EXTERNAL_LIBS}
          USE_SOURCE_PERMISSIONS
          )
-    ENDIF()
-  ENDIF()
+    endif()
+  endif()
 
-  INCLUDE(CPack)
-  MESSAGE(STATUS "Setting up CPack - Done")
-ENDIF()
+  include(CPack)
+  message(STATUS "Setting up CPack - Done")
+endif()

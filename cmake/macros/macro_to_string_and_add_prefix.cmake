@@ -19,13 +19,13 @@
 # element of the list.
 #
 # Usage:
-#     TO_STRING_AND_ADD_PREFIX(string "prefix" ${list1} ${list2} ...)
+#     to_string_and_add_prefix(string "prefix" ${list1} ${list2} ...)
 #
 
-MACRO(TO_STRING_AND_ADD_PREFIX _variable _prefix)
-  SET(${_variable} "")
-  FOREACH(_var ${ARGN})
-    SET(${_variable} "${${_variable}} ${_prefix}${_var}")
-  ENDFOREACH()
-  STRING(STRIP "${${_variable}}" ${_variable})
-ENDMACRO()
+macro(TO_STRING_AND_ADD_PREFIX _variable _prefix)
+  set(${_variable} "")
+  foreach(_var ${ARGN})
+    set(${_variable} "${${_variable}} ${_prefix}${_var}")
+  endforeach()
+  string(STRIP "${${_variable}}" ${_variable})
+endmacro()

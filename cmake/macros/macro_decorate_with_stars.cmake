@@ -27,24 +27,24 @@
 # in such a box then decorate it with just two stars at the beginning.
 #
 # Usage:
-#     DECORATE_WITH_STARS(message decorated_message)
+#     decorate_with_stars(message decorated_message)
 #
 #
-MACRO(DECORATE_WITH_STARS _message _decorated_message)
-  STRING(LENGTH ${_message} _message_length)
-  SET(_line_length 75)
-  MATH(EXPR _unpadded_line_length "${_line_length} - 6")
+macro(DECORATE_WITH_STARS _message _decorated_message)
+  string(LENGTH ${_message} _message_length)
+  set(_line_length 75)
+  math(EXPR _unpadded_line_length "${_line_length} - 6")
 
-  IF(${_message_length} LESS ${_unpadded_line_length})
-    MATH(EXPR _left_pad_size "(${_unpadded_line_length} - ${_message_length} + 1)/2")
-    MATH(EXPR _right_pad_size "(${_unpadded_line_length} - ${_message_length})/2")
+  if(${_message_length} LESS ${_unpadded_line_length})
+    math(EXPR _left_pad_size "(${_unpadded_line_length} - ${_message_length} + 1)/2")
+    math(EXPR _right_pad_size "(${_unpadded_line_length} - ${_message_length})/2")
     # Unfortunately, it looks like taking substrings is the only way to pad
     # strings with run time dependent length.
-    SET(_pad_strings_values "                                              ")
-    STRING(SUBSTRING "${_pad_strings_values}" 0 "${_left_pad_size}" _left_pad)
-    STRING(SUBSTRING "${_pad_strings_values}" 0 "${_right_pad_size}" _right_pad)
-    SET(${_decorated_message} "** ${_left_pad}${_message}${_right_pad} **")
-  ELSE()
-    SET(${_decorated_message} "** ${_message}")
-  ENDIF()
-ENDMACRO()
+    set(_pad_strings_values "                                              ")
+    string(SUBSTRING "${_pad_strings_values}" 0 "${_left_pad_size}" _left_pad)
+    string(SUBSTRING "${_pad_strings_values}" 0 "${_right_pad_size}" _right_pad)
+    set(${_decorated_message} "** ${_left_pad}${_message}${_right_pad} **")
+  else()
+    set(${_decorated_message} "** ${_message}")
+  endif()
+endmacro()

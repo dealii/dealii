@@ -17,5 +17,5 @@
 # Configuration for the gmsh executable:
 #
 
-CONFIGURE_FEATURE(GMSH)
-SET(DEAL_II_GMSH_WITH_API ${GMSH_WITH_API})
+configure_feature(GMSH)
+set(DEAL_II_GMSH_WITH_API ${GMSH_WITH_API})

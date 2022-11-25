@@ -23,25 +23,25 @@
 #   HDF5_IS_PARALLEL
 #
 
-SET(HDF5_DIR "" CACHE PATH "An optional hint to an hdf5 directory")
-SET_IF_EMPTY(HDF5_DIR "$ENV{HDF5_DIR}")
+set(HDF5_DIR "" CACHE PATH "An optional hint to an hdf5 directory")
+set_if_empty(HDF5_DIR "$ENV{HDF5_DIR}")
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-IF(NOT "${HDF5_DIR}" STREQUAL "")
-  SET(HDF5_ROOT "${HDF5_DIR}")
-ENDIF()
+if(NOT "${HDF5_DIR}" STREQUAL "")
+  set(HDF5_ROOT "${HDF5_DIR}")
+endif()
 
-SET(HDF5_PREFER_PARALLEL TRUE)
-FIND_PACKAGE(HDF5)
+set(HDF5_PREFER_PARALLEL TRUE)
+find_package(HDF5)
 
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-SET(_include_dirs "${HDF5_INCLUDE_DIRS}")
-SET(_libraries "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
+set(_include_dirs "${HDF5_INCLUDE_DIRS}")
+set(_libraries "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
 
-DEAL_II_PACKAGE_HANDLE(HDF5
+deal_ii_package_handle(HDF5
   LIBRARIES
     REQUIRED _libraries
     OPTIONAL MPI_C_LIBRARIES

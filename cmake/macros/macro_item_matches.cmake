@@ -17,18 +17,18 @@
 # A small macro to test whether a given list contains an element.
 #
 # Usage:
-#     ITEM_MATCHES(var regex list)
+#     item_matches(var regex list)
 #
 # var is set to true if list contains an item that matches regex.
 #
 
-MACRO(ITEM_MATCHES _var _regex)
-  SET(${_var})
-  FOREACH (_item ${ARGN})
-    IF("${_item}" MATCHES ${_regex})
-      SET(${_var} TRUE)
-      BREAK()
-    ENDIF()
-  ENDFOREACH()
-ENDMACRO()
+macro(ITEM_MATCHES _var _regex)
+  set(${_var})
+  foreach (_item ${ARGN})
+    if("${_item}" MATCHES ${_regex})
+      set(${_var} TRUE)
+      break()
+    endif()
+  endforeach()
+endmacro()
 

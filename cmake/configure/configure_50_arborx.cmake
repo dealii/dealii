@@ -17,6 +17,6 @@
 # Configuration for ArborX support in deal.II:
 #
 
-SET(FEATURE_ARBORX_DEPENDS KOKKOS)
+set(FEATURE_ARBORX_DEPENDS KOKKOS)
 
-CONFIGURE_FEATURE(ARBORX)
+configure_feature(ARBORX)

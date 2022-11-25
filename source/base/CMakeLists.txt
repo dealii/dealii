@@ -13,14 +13,14 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 #
 # All source/base files are sufficiently small that they may be added to the
 # unity build file (see the developer documentation on DEAL_II_UNITY_BUILD
 # for more information).
 #
-SET(_unity_include_src
+set(_unity_include_src
   auto_derivative_function.cc
   bounding_box.cc
   conditional_ostream.cc
@@ -105,30 +105,30 @@ SET(_unity_include_src
   vectorization.cc
   )
 
-SET(_separate_src
+set(_separate_src
   data_out_base.cc
   symmetric_tensor.cc
   )
 
 # Add CUDA wrapper files
-IF(DEAL_II_WITH_CUDA)
-  SET(_separate_src
+if(DEAL_II_WITH_CUDA)
+  set(_separate_src
     ${_separate_src}
     cuda.cc
     partitioner_cuda.cc
   )
-ENDIF()
+endif()
 
 # determined by profiling
-SET(_n_includes_per_unity_file 29)
+set(_n_includes_per_unity_file 29)
 
-SETUP_SOURCE_LIST("${_unity_include_src}"
+setup_source_list("${_unity_include_src}"
   "${_separate_src}"
   ${_n_includes_per_unity_file}
   _src
   )
 
-SET(_inst
+set(_inst
   bounding_box.inst.in
   data_out_base.inst.in
   function.inst.in
@@ -152,11 +152,11 @@ SET(_inst
   time_stepping.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_base OBJECT ${_src} ${_header} ${_inst}
+deal_ii_add_library(obj_base OBJECT ${_src} ${_header} ${_inst}
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   )
-EXPAND_INSTANTIATIONS(obj_base "${_inst}")
+expand_instantiations(obj_base "${_inst}")

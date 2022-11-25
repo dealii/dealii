@@ -13,7 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 #
 # Work around an issue where gcc emits a note that the warning
@@ -24,15 +24,15 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 # -Wno-misleading-indentation on the command line for the
 # grid_generator_cgal.cc compilation unit.
 #
-IF(DEAL_II_WITH_CGAL)
-  ENABLE_IF_SUPPORTED(_flag "-Wno-misleading-indentation")
-  SET_PROPERTY(SOURCE "grid_generator_cgal.cc"
+if(DEAL_II_WITH_CGAL)
+  enable_if_supported(_flag "-Wno-misleading-indentation")
+  set_property(SOURCE "grid_generator_cgal.cc"
     APPEND_STRING PROPERTY COMPILE_FLAGS " ${_flag}"
     )
-ENDIF()
+endif()
 
 
-SET(_unity_include_src
+set(_unity_include_src
   cell_id.cc
   grid_refinement.cc
   grid_reordering.cc
@@ -48,7 +48,7 @@ SET(_unity_include_src
   tria_objects.cc
   )
 
-SET(_separate_src
+set(_separate_src
   grid_generator.cc
   grid_generator_cgal.cc
   grid_generator_from_name.cc
@@ -63,15 +63,15 @@ SET(_separate_src
   )
 
 # include all files in the unity file
-SET(_n_includes_per_unity_file 20)
+set(_n_includes_per_unity_file 20)
 
-SETUP_SOURCE_LIST("${_unity_include_src}"
+setup_source_list("${_unity_include_src}"
   "${_separate_src}"
   ${_n_includes_per_unity_file}
   _src
   )
 
-SET(_inst
+set(_inst
   cell_id.inst.in
   grid_generator_cgal.inst.in
   grid_generator_from_name.inst.in
@@ -93,9 +93,9 @@ SET(_inst
   tria_objects.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_grid OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_grid "${_inst}")
+deal_ii_add_library(obj_grid OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_grid "${_inst}")

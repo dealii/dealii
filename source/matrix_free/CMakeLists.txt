@@ -13,9 +13,9 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+set(_src
   dof_info.cc
   evaluation_template_factory.cc
   evaluation_template_factory_inst2.cc
@@ -40,7 +40,7 @@ SET(_src
   vector_data_exchange.cc
   )
 
-SET(_inst
+set(_inst
   evaluation_template_factory.inst.in
   evaluation_template_face_factory.inst.in
   evaluation_template_factory_hanging_nodes.inst.in
@@ -50,19 +50,19 @@ SET(_inst
   shape_info.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
 
-IF(DEAL_II_WITH_CUDA)
-  SET(_src
+if(DEAL_II_WITH_CUDA)
+  set(_src
     cuda_matrix_free.cc
     ${_src}
     )
-  SET(_inst
+  set(_inst
     ${_inst}
     )
-ENDIF()
+endif()
 
-DEAL_II_ADD_LIBRARY(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_matrix_free "${_inst}")
+deal_ii_add_library(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_matrix_free "${_inst}")

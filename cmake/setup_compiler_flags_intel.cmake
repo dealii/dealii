@@ -20,12 +20,12 @@
 # editing this file.
 #
 
-IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0" )
-  MESSAGE(WARNING "\n"
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0" )
+  message(WARNING "\n"
     "You're using an old version of the Intel C++ Compiler (icc/icpc)!\n"
     "It is strongly recommended to use at least version 15.\n"
     )
-ENDIF()
+endif()
 
 
 ########################
@@ -37,17 +37,17 @@ ENDIF()
 #
 # Set the pic flag.
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
+enable_if_supported(DEAL_II_CXX_FLAGS "-fpic")
 
 #
 # Enable verbose warnings:
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
+enable_if_supported(DEAL_II_CXX_FLAGS "-w2")
 
 #
 # Disable remarks like "Inlining inhibited by limit max-size"
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
+enable_if_supported(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 
 #
 # Disable some warnings that lead to a lot of false positives:
@@ -101,27 +101,27 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 #   -w15531 A portion of SIMD loop is serialized
 #   -w15552 loop was not vectorized with "simd"
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd135")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd175")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd177")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd191")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd193")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd279")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd327")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd383")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd854")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd981")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1418")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1572")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2259")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2651")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd3415")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15531")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15552")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd21")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd68")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd135")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd175")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd177")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd191")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd193")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd279")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd327")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd383")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd854")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd981")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd1418")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd1478")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd1572")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd2259")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd2536")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd2651")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd3415")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd15531")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd15552")
 
 
 #
@@ -140,28 +140,28 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15552")
 #   -w280 selector expression is constant
 #         When writing 'switch(dim)'
 #
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd111")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd128")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd185")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd186")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd280")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd111")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd128")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd185")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd186")
+enable_if_supported(DEAL_II_CXX_FLAGS "-wd280")
 
 
-IF(DEAL_II_STATIC_EXECUTABLE)
+if(DEAL_II_STATIC_EXECUTABLE)
   #
   # To produce a static executable, we have to statically link intel's
   # support libraries:
   #
-  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static")
-  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-intel")
-  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-gcc")
-  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-pthread")
-ELSE()
+  enable_if_supported(DEAL_II_LINKER_FLAGS "-static")
+  enable_if_supported(DEAL_II_LINKER_FLAGS "-static-intel")
+  enable_if_supported(DEAL_II_LINKER_FLAGS "-static-gcc")
+  enable_if_supported(DEAL_II_LINKER_FLAGS "-pthread")
+else()
   #
   # Explicitly link intel support libraries dynamically:
   #
-  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-shared-intel")
-ENDIF()
+  enable_if_supported(DEAL_II_LINKER_FLAGS "-shared-intel")
+endif()
 
 
 #############################
@@ -170,26 +170,26 @@ ENDIF()
 #                           #
 #############################
 
-IF (CMAKE_BUILD_TYPE MATCHES "Release")
+if (CMAKE_BUILD_TYPE MATCHES "Release")
   #
   # General optimization flags:
   #
 
-  ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
+  add_flags(DEAL_II_CXX_FLAGS_RELEASE "-O2")
 
   #
   # Disable assert() in deal.II and user projects in release mode
   #
-  LIST(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
-  LIST(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
+  list(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
+  list(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
 
   # equivalent to -fno-strict-aliasing:
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
+  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
 
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-ip")
+  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-ip")
 
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
-ENDIF()
+  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
+endif()
 
 
 ###########################
@@ -198,14 +198,14 @@ ENDIF()
 #                         #
 ###########################
 
-IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-  LIST(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
-  LIST(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+  list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
+  list(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
 
-  ADD_FLAGS(DEAL_II_CXX_FLAGS_DEBUG "-O0")
+  add_flags(DEAL_II_CXX_FLAGS_DEBUG "-O0")
 
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-g")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-gdwarf-2")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-grecord-gcc-switches")
-ENDIF()
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-g")
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-gdwarf-2")
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-grecord-gcc-switches")
+endif()
 

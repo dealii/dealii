@@ -14,21 +14,21 @@
 ## ---------------------------------------------------------------------
 
 # Expand instantiations in subdirectories
-ADD_SUBDIRECTORY("elasticity")
+add_subdirectory("elasticity")
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+set(_src
   transformations.cc
   )
 
-SET(_inst
+set(_inst
   transformations.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/physics/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_physics OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_physics "${_inst}")
+deal_ii_add_library(obj_physics OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_physics "${_inst}")

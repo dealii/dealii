@@ -19,14 +19,14 @@
 # dynamically linked, i.e. DEAL_II_STATIC_EXECUTABLE=OFF
 #
 # Usage:
-#     SWITCH_LIBRARY_PREFERENCE()
+#     switch_library_preference()
 #
 
-MACRO(SWITCH_LIBRARY_PREFERENCE)
-  IF(DEAL_II_PREFER_STATIC_LIBS AND NOT DEAL_II_STATIC_EXECUTABLE)
+macro(SWITCH_LIBRARY_PREFERENCE)
+  if(DEAL_II_PREFER_STATIC_LIBS AND NOT DEAL_II_STATIC_EXECUTABLE)
     #
     # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
     # is set. This will prefer static archives instead of shared libraries:
-    LIST(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
-  ENDIF()
-ENDMACRO()
+    list(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
+  endif()
+endmacro()

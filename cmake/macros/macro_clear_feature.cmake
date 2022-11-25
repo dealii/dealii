@@ -18,17 +18,17 @@
 # all individual FEATURE_* configuration variables for a given feature.
 #
 # Usage:
-#     CLEAR_FEATURE(feature)
+#     clear_feature(feature)
 #
 # and all other suffixes defined in DEAL_II_LIST_SUFFIXES and
 # DEAL_II_STRING_SUFFIXES to the corresponding DEAL_II_* variables
 #
 
-MACRO(CLEAR_FEATURE _feature)
-  FOREACH(_var ${DEAL_II_LIST_SUFFIXES})
+macro(CLEAR_FEATURE _feature)
+  foreach(_var ${DEAL_II_LIST_SUFFIXES})
     unset(${_feature}_${_var})
-  ENDFOREACH()
-  FOREACH(_var ${DEAL_II_STRING_SUFFIXES})
+  endforeach()
+  foreach(_var ${DEAL_II_STRING_SUFFIXES})
     unset(${_feature}_${_var})
-  ENDFOREACH()
-ENDMACRO()
+  endforeach()
+endmacro()

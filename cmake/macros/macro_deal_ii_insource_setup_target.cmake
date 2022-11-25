@@ -17,56 +17,56 @@
 # This file provides an insource version of the DEAL_II_SETUP_TARGET macro.
 #
 # Usage:
-#       DEAL_II_INSOURCE_SETUP_TARGET(target build)
+#       deal_ii_insource_setup_target(target build)
 #
 # This appends necessary include directories, linker flags, compile
 # definitions and the deal.II library link interface to the given target.
 #
 #
 
-MACRO(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
+macro(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
 
-  SET_TARGET_PROPERTIES(${_target} PROPERTIES
+  set_target_properties(${_target} PROPERTIES
     LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
     LINKER_LANGUAGE "CXX"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
 
-  TARGET_INCLUDE_DIRECTORIES(${_target}
+  target_include_directories(${_target}
     PRIVATE
       "${CMAKE_BINARY_DIR}/include"
       "${CMAKE_SOURCE_DIR}/include"
       ${DEAL_II_BUNDLED_INCLUDE_DIRS}
     )
-  TARGET_INCLUDE_DIRECTORIES(${_target} SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS})
+  target_include_directories(${_target} SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS})
 
-  IF(CMAKE_VERSION VERSION_LESS 3.9 OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
+  if(CMAKE_VERSION VERSION_LESS 3.9 OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set_property(TARGET ${_target} APPEND_STRING PROPERTY
       COMPILE_FLAGS " ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
       )
-    SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+    set_property(TARGET ${_target} APPEND PROPERTY
       COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
       )
 
-  ELSE()
+  else()
 
-    SET(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-    SEPARATE_ARGUMENTS(_flags)
-    TARGET_COMPILE_OPTIONS(${_target} PUBLIC
+    set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
+    separate_arguments(_flags)
+    target_compile_options(${_target} PUBLIC
       $<$<COMPILE_LANGUAGE:CXX>:${_flags}>
       )
 
-    TARGET_COMPILE_DEFINITIONS(${_target}
+    target_compile_definitions(${_target}
       PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
       )
 
-  ENDIF()
+  endif()
 
-GET_PROPERTY(_type TARGET ${_target} PROPERTY TYPE)
-IF(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
-  TARGET_LINK_LIBRARIES(${_target}
+get_property(_type TARGET ${_target} PROPERTY TYPE)
+if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
+  target_link_libraries(${_target}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
     )
-ENDIF()
+endif()
 
-ENDMACRO()
+endmacro()

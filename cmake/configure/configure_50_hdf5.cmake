@@ -17,28 +17,28 @@
 # Configuration for the hdf5 library:
 #
 
-SET(FEATURE_HDF5_DEPENDS MPI)
+set(FEATURE_HDF5_DEPENDS MPI)
 
-MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
-  FIND_PACKAGE(HDF5)
+macro(FEATURE_HDF5_FIND_EXTERNAL var)
+  find_package(HDF5)
 
-  IF(HDF5_FOUND)
-    SET(${var} TRUE)
+  if(HDF5_FOUND)
+    set(${var} TRUE)
 
-    IF(NOT HDF5_IS_PARALLEL)
-      MESSAGE(STATUS "Insufficient hdf5 installation found: "
+    if(NOT HDF5_IS_PARALLEL)
+      message(STATUS "Insufficient hdf5 installation found: "
         "hdf5 has to be configured with MPI support."
         )
-      SET(HDF5_ADDITIONAL_ERROR_STRING
+      set(HDF5_ADDITIONAL_ERROR_STRING
         "Insufficient hdf5 installation found!\n"
         "hdf5 has to be configured with MPI support.\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-    CHECK_MPI_INTERFACE(HDF5 ${var})
-  ENDIF()
-ENDMACRO()
+    check_mpi_interface(HDF5 ${var})
+  endif()
+endmacro()
 
 
-CONFIGURE_FEATURE(HDF5)
+configure_feature(HDF5)

@@ -19,19 +19,19 @@
 #
 
 # Clear the test flags because FindThreads.cmake will use a C compiler:
-CLEAR_CMAKE_REQUIRED()
+clear_cmake_required()
 
-SWITCH_LIBRARY_PREFERENCE()
-FIND_PACKAGE(Threads)
-SWITCH_LIBRARY_PREFERENCE()
+switch_library_preference()
+find_package(Threads)
+switch_library_preference()
 
-RESET_CMAKE_REQUIRED()
+reset_cmake_required()
 
-ADD_FLAGS(DEAL_II_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+add_flags(DEAL_II_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
-IF(NOT Threads_FOUND)
-  MESSAGE(FATAL_ERROR
+if(NOT Threads_FOUND)
+  message(FATAL_ERROR
     "\nFatal configuration error: CMake was unable to detect any threading "
     "support offered by the current compiler. Configuration cannot continue.\n\n"
     )
-ENDIF()
+endif()

@@ -18,59 +18,59 @@
 # MPI support with -DWITH_MPI=ON (or -DDEAL_II_WITH_MPI=ON) on the command
 # line.
 #
-SET(DEAL_II_WITH_MPI OFF CACHE BOOL "")
+set(DEAL_II_WITH_MPI OFF CACHE BOOL "")
 
 #
 # Configuration for mpi support:
 #
 
-MACRO(FEATURE_MPI_FIND_EXTERNAL var)
-  FIND_PACKAGE(MPI)
+macro(FEATURE_MPI_FIND_EXTERNAL var)
+  find_package(MPI)
 
-  IF(MPI_FOUND)
-    SET(${var} TRUE)
+  if(MPI_FOUND)
+    set(${var} TRUE)
 
-    IF(NOT MPI_HAVE_MPI_SEEK_SET)
-      MESSAGE(STATUS
+    if(NOT MPI_HAVE_MPI_SEEK_SET)
+      message(STATUS
         "Could not find a sufficient MPI version: "
         "Your MPI implementation must define MPI_SEEK_SET.")
-      SET(MPI_ADDITIONAL_ERROR_STRING
+      set(MPI_ADDITIONAL_ERROR_STRING
         "Your MPI implementation must define MPI_SEEK_SET.\n")
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-    IF(MPI_VERSION VERSION_LESS "3.0")
-      MESSAGE(STATUS
+    if(MPI_VERSION VERSION_LESS "3.0")
+      message(STATUS
         "Could not find a sufficient MPI version: "
         "Your MPI implementation does not support the MPI 3.0 standard.")
-      SET(MPI_ADDITIONAL_ERROR_STRING
+      set(MPI_ADDITIONAL_ERROR_STRING
         "Your MPI implementation does not support the MPI 3.0 standard.\n")
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-  ENDIF()
-ENDMACRO()
+  endif()
+endmacro()
 
-MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL)
+macro(FEATURE_MPI_CONFIGURE_EXTERNAL)
 
   #
   # We must convert the MPIEXEC_(PRE|POST)FLAGS strings to lists in order
   # to use them in command lines:
   #
-  SEPARATE_ARGUMENTS(MPIEXEC_PREFLAGS)
-  SEPARATE_ARGUMENTS(MPIEXEC_POSTFLAGS)
+  separate_arguments(MPIEXEC_PREFLAGS)
+  separate_arguments(MPIEXEC_POSTFLAGS)
 
   #
   # TODO: We might consider refactoring this option into an automatic check
   # (in Modules/FindMPI.cmake) at some point. For the time being this is an
   # advanced configuration option.
   #
-  OPTION(DEAL_II_MPI_WITH_CUDA_SUPPORT "Enable MPI Cuda support" OFF)
-  MARK_AS_ADVANCED(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-ENDMACRO()
+  option(DEAL_II_MPI_WITH_CUDA_SUPPORT "Enable MPI Cuda support" OFF)
+  mark_as_advanced(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+endmacro()
 
-MACRO(FEATURE_MPI_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
+macro(FEATURE_MPI_ERROR_MESSAGE)
+  message(FATAL_ERROR "\n"
     "Could not find any suitable mpi library!\n"
     ${MPI_ADDITIONAL_ERROR_STRING}
     "\nPlease ensure that an mpi library is installed on your computer\n"
@@ -82,16 +82,16 @@ MACRO(FEATURE_MPI_ERROR_MESSAGE)
     "            -DMPI_Fortran_COMPILER=\".../mpif90\"\\\n"
     "            <...>\n"
     )
-ENDMACRO()
+endmacro()
 
 
-CONFIGURE_FEATURE(MPI)
+configure_feature(MPI)
 
 
-IF(NOT DEAL_II_WITH_MPI)
+if(NOT DEAL_II_WITH_MPI)
   #
   # Disable and hide the DEAL_II_MPI_WITH_CUDA_SUPPORT option
   #
-  SET(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-  UNSET(DEAL_II_MPI_WITH_CUDA_SUPPORT CACHE)
-ENDIF()
+  set(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+  unset(DEAL_II_MPI_WITH_CUDA_SUPPORT CACHE)
+endif()

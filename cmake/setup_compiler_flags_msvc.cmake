@@ -31,28 +31,28 @@
 # version 15.0" is, the c++ compiler is advertised as "MSVC++ 14.1" but the
 # version information is 19.10.x (this is the numbering used by CMake), see
 # https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B#Internal_version_numbering
-IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.10" )
-  MESSAGE(FATAL_ERROR "\n"
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.10" )
+  message(FATAL_ERROR "\n"
     "You're using an old version of the Visual Studio C++ Compiler!\n"
     "You need at least version Visual Studio 2017.\n"
     )
-ENDIF()
+endif()
 
 
 # enable exception handling:
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/EHsc")
+enable_if_supported(DEAL_II_CXX_FLAGS "/EHsc")
 
 
 # Globally disable some legacy min and max macros that cause problems:
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/NOMINMAX")
-LIST(APPEND DEAL_II_DEFINITIONS "NOMINMAX")
-LIST(APPEND DEAL_II_USER_DEFINITIONS "NOMINMAX")
+enable_if_supported(DEAL_II_CXX_FLAGS "/NOMINMAX")
+list(APPEND DEAL_II_DEFINITIONS "NOMINMAX")
+list(APPEND DEAL_II_USER_DEFINITIONS "NOMINMAX")
 
 # fix "fatal error C1128: number of sections exceeded object file format limit"
 # happening in debug mode with visual studio 2015
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/bigobj")
+enable_if_supported(DEAL_II_CXX_FLAGS "/bigobj")
 
-ADD_FLAGS(DEAL_II_CXX_FLAGS "/W3")
+add_flags(DEAL_II_CXX_FLAGS "/W3")
 
 #
 # Selectively disable a bunch of warnings:
@@ -70,23 +70,23 @@ ADD_FLAGS(DEAL_II_CXX_FLAGS "/W3")
 # 4700 - uninitialized local variable
 # 4789 - destination of memory copy is too small
 # 4808 - case 'value' is not a valid value for switch condition of type 'bool
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4068")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4244")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4267")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4996")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4355")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4800")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4146")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4667")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4520")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4700")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4789")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4808")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4068")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4244")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4267")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4996")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4355")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4800")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4146")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4667")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4520")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4700")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4789")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd4808")
 
 
 # Bug in MSVC 2017: bogus warning C5037: an out-of-line definition of a member of a class template cannot have default arguments
 # see https://developercommunity.visualstudio.com/content/problem/81223/incorrect-error-c5037-with-permissive.html
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd5037")
+enable_if_supported(DEAL_II_CXX_FLAGS "/wd5037")
 
 #############################
 #                           #
@@ -94,19 +94,19 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd5037")
 #                           #
 #############################
 
-IF (CMAKE_BUILD_TYPE MATCHES "Release")
+if (CMAKE_BUILD_TYPE MATCHES "Release")
   #
   # General optimization flags: (very basic for now)
   #
-  ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "/O2")
+  add_flags(DEAL_II_CXX_FLAGS_RELEASE "/O2")
 
   #
   # Disable assert() in deal.II and user projects in release mode
   #
-  LIST(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
-  LIST(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
+  list(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
+  list(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
 
-ENDIF()
+endif()
 
 
 ###########################
@@ -115,11 +115,11 @@ ENDIF()
 #                         #
 ###########################
 
-IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-  LIST(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
-  LIST(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+  list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
+  list(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
 
   # generate some debug info:
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "/Zi /MDd /Od")
-ENDIF()
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "/Zi /MDd /Od")
+endif()
 

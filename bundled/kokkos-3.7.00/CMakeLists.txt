@@ -13,7 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-SET(src_kokkos
+set(src_kokkos
   #tpls/desul/src/Lock_Array_CUDA.cpp
   #tpls/desul/src/Lock_Array_HIP.cpp
   core/src/impl/Kokkos_Profiling.cpp
@@ -63,11 +63,11 @@ SET(src_kokkos
   simd/src/Kokkos_SIMD_dummy.cpp
   containers/src/impl/Kokkos_UnorderedMap_impl.cpp
 )
-INCLUDE_DIRECTORIES(${KOKKOS_BUNDLED_INCLUDE_DIRS})
+include_directories(${KOKKOS_BUNDLED_INCLUDE_DIRS})
 
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-float-conversion)
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-missing-field-initializers)
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-suggest-override)
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-unused-but-set-parameter)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-float-conversion)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-missing-field-initializers)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-suggest-override)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-unused-but-set-parameter)
 
-DEAL_II_ADD_LIBRARY(obj_kokkos OBJECT ${src_kokkos})
+deal_ii_add_library(obj_kokkos OBJECT ${src_kokkos})

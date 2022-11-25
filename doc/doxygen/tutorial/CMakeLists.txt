@@ -16,7 +16,7 @@
 
 
 # Collect all of the directory names for the tutorial programs
-FILE(GLOB _deal_ii_steps
+file(GLOB _deal_ii_steps
   ${CMAKE_SOURCE_DIR}/examples/step-*
   )
 
@@ -27,10 +27,10 @@ FILE(GLOB _deal_ii_steps
 # For unclear reasons, the glob returns these files as
 # "/a/b/c/name//doc//author", so make sure we eat the
 # double slashes in the second step
-SET_IF_EMPTY(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
-FILE(GLOB _code_gallery_names
+set_if_empty(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+file(GLOB _code_gallery_names
      "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
-STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
+string(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
 
 #
 # Define target for the tutorial. It depends on the
@@ -43,7 +43,7 @@ STRING(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_nam
 # ../CMakeLists.txt.
 #
 
-ADD_CUSTOM_TARGET(tutorial)
+add_custom_target(tutorial)
 
 #
 # Describe how to build tutorial.h.
@@ -65,23 +65,23 @@ ADD_CUSTOM_TARGET(tutorial)
 file(GLOB _deal_ii_steps_tooltip
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/tooltip
   )
-FOREACH(_gallery ${_code_gallery_names})
-  LIST(APPEND _deal_ii_code_gallery_tooltip
+foreach(_gallery ${_code_gallery_names})
+  list(APPEND _deal_ii_code_gallery_tooltip
        ${_gallery}/doc/tooltip)
-ENDFOREACH()
+endforeach()
 file(GLOB _deal_ii_steps_kind
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
   )
 file(GLOB _deal_ii_steps_buildson
   ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
   )
-FOREACH(_gallery ${_code_gallery_names})
-  LIST(APPEND _deal_ii_code_gallery_buildson
+foreach(_gallery ${_code_gallery_names})
+  list(APPEND _deal_ii_code_gallery_buildson
        ${_gallery}/doc/builds-on)
-ENDFOREACH()
+endforeach()
 
 
-ADD_CUSTOM_COMMAND(
+add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   COMMAND ${PERL_EXECUTABLE}
   ARGS
@@ -99,21 +99,21 @@ ADD_CUSTOM_COMMAND(
     ${_deal_ii_code_gallery_tooltip}
     ${_deal_ii_code_gallery_buildson}
   )
-ADD_CUSTOM_TARGET(build_tutorial_h
+add_custom_target(build_tutorial_h
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
     COMMENT
       "Building tutorial.h")
-ADD_DEPENDENCIES(tutorial build_tutorial_h)
+add_dependencies(tutorial build_tutorial_h)
 
 
 #
 # Prepare the steps for documentation generation
 #
 
-FOREACH(_step ${_deal_ii_steps})
-  GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+foreach(_step ${_deal_ii_steps})
+  get_filename_component(_step "${_step}" NAME)
 
-  ADD_CUSTOM_COMMAND(
+  add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     COMMAND ${PERL_EXECUTABLE}
     ARGS
@@ -126,7 +126,7 @@ FOREACH(_step ${_deal_ii_steps})
     VERBATIM
     )
 
-  ADD_CUSTOM_COMMAND(
+  add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
@@ -145,12 +145,12 @@ FOREACH(_step ${_deal_ii_steps})
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
     )
 
-  ADD_CUSTOM_TARGET(tutorial_${_step}
+  add_custom_target(tutorial_${_step}
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     COMMENT
       "Building doxygen input file for tutorial program <${_step}>"
     )
-  ADD_DEPENDENCIES(tutorial tutorial_${_step})
-ENDFOREACH()
+  add_dependencies(tutorial tutorial_${_step})
+endforeach()

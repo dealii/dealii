@@ -17,4 +17,4 @@
 # Configuration for the GSL library:
 #
 
-CONFIGURE_FEATURE(GSL)
+configure_feature(GSL)

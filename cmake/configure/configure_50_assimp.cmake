@@ -17,4 +17,4 @@
 # Configuration for the ASSIMP library:
 #
 
-CONFIGURE_FEATURE(ASSIMP)
+configure_feature(ASSIMP)

@@ -18,11 +18,11 @@
 # If so, add it to 'variable'.
 #
 # Usage:
-#     ENABLE_IF_SUPPORTED(variable flag)
+#     enable_if_supported(variable flag)
 #
 
-MACRO(ENABLE_IF_SUPPORTED _variable _flag)
-  STRING(STRIP "${_flag}" _flag_stripped)
+macro(ENABLE_IF_SUPPORTED _variable _flag)
+  string(STRIP "${_flag}" _flag_stripped)
 
   #
   # Gcc does not emit a warning if testing -Wno-... flags which leads to
@@ -31,21 +31,21 @@ MACRO(ENABLE_IF_SUPPORTED _variable _flag)
   # compilation unit.
   # Therefore we invert the test for -Wno-... flags:
   #
-  SET(_flag_sanitized "${_flag_stripped}")
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    STRING(REPLACE "-Wno-" "-W" _flag_sanitized "${_flag_stripped}")
-  ENDIF()
+  set(_flag_sanitized "${_flag_stripped}")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    string(REPLACE "-Wno-" "-W" _flag_sanitized "${_flag_stripped}")
+  endif()
 
-  IF(NOT "${_flag_stripped}" STREQUAL "")
-    STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
-    STRING(REGEX REPLACE "\[-+,\]" "_" _flag_name "${_flag_name}")
+  if(NOT "${_flag_stripped}" STREQUAL "")
+    string(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
+    string(REGEX REPLACE "\[-+,\]" "_" _flag_name "${_flag_name}")
 
     CHECK_CXX_COMPILER_FLAG("${_flag_sanitized}" DEAL_II_HAVE_FLAG_${_flag_name})
 
-    IF(DEAL_II_HAVE_FLAG_${_flag_name})
-      SET(${_variable} "${${_variable}} ${_flag_stripped}")
-      STRING(STRIP "${${_variable}}" ${_variable})
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+    if(DEAL_II_HAVE_FLAG_${_flag_name})
+      set(${_variable} "${${_variable}} ${_flag_stripped}")
+      string(STRIP "${${_variable}}" ${_variable})
+    endif()
+  endif()
+endmacro()
 

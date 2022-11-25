@@ -18,14 +18,14 @@
 # library:
 #
 
-MACRO(FEATURE_TBB_FIND_EXTERNAL var)
-  FIND_PACKAGE(TBB)
+macro(FEATURE_TBB_FIND_EXTERNAL var)
+  find_package(TBB)
 
-  IF(TBB_FOUND)
-    SET(${var} TRUE)
-  ENDIF()
+  if(TBB_FOUND)
+    set(${var} TRUE)
+  endif()
 
-  SET(DEAL_II_TBB_WITH_ONEAPI ${TBB_WITH_ONEAPI})
+  set(DEAL_II_TBB_WITH_ONEAPI ${TBB_WITH_ONEAPI})
 
   #
   # TBB currently uses the version numbering scheme
@@ -45,41 +45,41 @@ MACRO(FEATURE_TBB_FIND_EXTERNAL var)
   # (such as GCC 8.1 and newer). To fix this we simply disallow all older
   # versions:
   #
-  IF(TBB_VERSION VERSION_LESS "4.2")
+  if(TBB_VERSION VERSION_LESS "4.2")
     # Clear the previously determined version numbers to avoid confusion
-    SET(TBB_VERSION "bundled")
-    SET(TBB_VERSION_MAJOR "")
-    SET(TBB_VERSION_MINOR "")
+    set(TBB_VERSION "bundled")
+    set(TBB_VERSION_MAJOR "")
+    set(TBB_VERSION_MINOR "")
 
-    MESSAGE(STATUS
+    message(STATUS
       "The externally provided TBB library is older than version 4.2.0, which "
       "cannot be used with deal.II."
       )
-    SET(TBB_ADDITIONAL_ERROR_STRING
+    set(TBB_ADDITIONAL_ERROR_STRING
       "The externally provided TBB library is older than version\n"
       "4.2.0, which is the oldest version compatible with deal.II and its\n"
       "supported compilers."
       )
-    SET(${var} FALSE)
-  ENDIF()
-ENDMACRO()
+    set(${var} FALSE)
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_TBB_CONFIGURE_BUNDLED)
+macro(FEATURE_TBB_CONFIGURE_BUNDLED)
   #
   # We have to disable a bunch of warnings:
   #
-  ENABLE_IF_SUPPORTED(TBB_CXX_FLAGS "-Wno-parentheses")
+  enable_if_supported(TBB_CXX_FLAGS "-Wno-parentheses")
 
   #
   # tbb uses dlopen/dlclose, so link against libdl.so as well:
   #
-  LIST(APPEND TBB_LIBRARIES ${CMAKE_DL_LIBS})
+  list(APPEND TBB_LIBRARIES ${CMAKE_DL_LIBS})
 
-  LIST(APPEND TBB_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
+  list(APPEND TBB_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
 
-  SET(DEAL_II_TBB_WITH_ONEAPI FALSE)
-ENDMACRO()
+  set(DEAL_II_TBB_WITH_ONEAPI FALSE)
+endmacro()
 
 
-CONFIGURE_FEATURE(TBB)
+configure_feature(TBB)

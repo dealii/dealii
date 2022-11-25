@@ -27,43 +27,43 @@
 #   DEAL_II_DEFINITIONS
 #
 
-MACRO(DEAL_II_ADD_LIBRARY _library)
+macro(DEAL_II_ADD_LIBRARY _library)
 
-  FOREACH(_build ${DEAL_II_BUILD_TYPES})
-    STRING(TOLOWER ${_build} _build_lowercase)
+  foreach(_build ${DEAL_II_BUILD_TYPES})
+    string(TOLOWER ${_build} _build_lowercase)
 
-    ADD_LIBRARY(${_library}_${_build_lowercase}
+    add_library(${_library}_${_build_lowercase}
       ${ARGN}
       )
 
-    SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
+    set_target_properties(${_library}_${_build_lowercase} PROPERTIES
       LINKER_LANGUAGE "CXX"
       )
 
-    IF(CMAKE_VERSION VERSION_LESS 3.9 OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    if(CMAKE_VERSION VERSION_LESS 3.9 OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
-      SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
+      set_target_properties(${_library}_${_build_lowercase} PROPERTIES
         COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
         COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
         )
 
-    ELSE()
+    else()
 
-      SET(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-      SEPARATE_ARGUMENTS(_flags)
-      TARGET_COMPILE_OPTIONS(${_library}_${_build_lowercase} PUBLIC
+      set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
+      separate_arguments(_flags)
+      target_compile_options(${_library}_${_build_lowercase} PUBLIC
         $<$<COMPILE_LANGUAGE:CXX>:${_flags}>
         )
 
-      TARGET_COMPILE_DEFINITIONS(${_library}_${_build_lowercase}
+      target_compile_definitions(${_library}_${_build_lowercase}
         PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
         )
 
-    ENDIF()
+    endif()
 
-    SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
+    set_property(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
       "$<TARGET_OBJECTS:${_library}_${_build_lowercase}>"
       )
-  ENDFOREACH()
+  endforeach()
 
-ENDMACRO()
+endmacro()

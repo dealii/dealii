@@ -16,15 +16,15 @@
 #
 # Make sure that the tests are picked up by a global CTest call
 #
-FILE(APPEND ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(contrib/python-bindings/tests)\n")
-ENABLE_TESTING()
+file(APPEND ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "subdirs(contrib/python-bindings/tests)\n")
+enable_testing()
 
-FILE(GLOB _tests "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
-FOREACH(_test_path ${_tests})
- GET_FILENAME_COMPONENT(_test ${_test_path} NAME_WE)
- GET_FILENAME_COMPONENT(_test_directory ${_test_path} DIRECTORY)
- ADD_TEST(NAME python-bindings/${_test} COMMAND ${PYTHON_EXECUTABLE} ${_test_path})
- SET_TESTS_PROPERTIES(python-bindings/${_test} PROPERTIES ENVIRONMENT
+file(GLOB _tests "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
+foreach(_test_path ${_tests})
+ get_filename_component(_test ${_test_path} NAME_WE)
+ get_filename_component(_test_directory ${_test_path} DIRECTORY)
+ add_test(NAME python-bindings/${_test} COMMAND ${PYTHON_EXECUTABLE} ${_test_path})
+ set_tests_properties(python-bindings/${_test} PROPERTIES ENVIRONMENT
    "PYTHONPATH=${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}/../:$ENV{PYTHONPATH};DEAL_II_PYTHON_TESTPATH=${_test_directory}"
    )
-ENDFOREACH()
+endforeach()

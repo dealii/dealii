@@ -13,17 +13,17 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+set(_src
   )
 
-SET(_inst
+set(_inst
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/optimization/rol/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_rol OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_rol "${_inst}")
+deal_ii_add_library(obj_rol OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_rol "${_inst}")

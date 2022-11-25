@@ -24,69 +24,69 @@
 # CGAL_VERSION_SUBMINOR
 #
 
-SET(CGAL_DIR "" CACHE PATH "An optional hint to a CGAL installation")
-SET_IF_EMPTY(CGAL_DIR "$ENV{CGAL_DIR}")
+set(CGAL_DIR "" CACHE PATH "An optional hint to a CGAL installation")
+set_if_empty(CGAL_DIR "$ENV{CGAL_DIR}")
 
-IF(NOT "${CGAL_DIR}" STREQUAL "")
-  SET(CGAL_DIR ${CGAL_DIR})
-ENDIF()
+if(NOT "${CGAL_DIR}" STREQUAL "")
+  set(CGAL_DIR ${CGAL_DIR})
+endif()
 
 #
 # CGAL requires C++17 and an externally configured Boost, otherwise the
-# call to FIND_PACKAGE(CGAL) will fail. Guard the call to FIND_PACKAGE to
+# call to find_package(CGAL) will fail. Guard the call to FIND_PACKAGE to
 # fail cracefully:
 #
-IF(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
+if(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-  LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-  SET(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON)
-  FIND_PACKAGE(CGAL QUIET)
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON)
+  find_package(CGAL QUIET)
 
   # Check version manually. Older binary distros don't do this properly.
-  IF(CGAL_MAJOR_VERSION LESS 5)
-    SET(CGAL_FOUND FALSE)
-    SET(CGAL_INCLUDE_DIRS "-NOTFOUND")
-    SET(CGAL_LIBRARIES "-NOTFOUND")
-    MESSAGE(STATUS "CGAL wrappers require CGAL version 5 and above.")
-  ENDIF()
+  if(CGAL_MAJOR_VERSION LESS 5)
+    set(CGAL_FOUND FALSE)
+    set(CGAL_INCLUDE_DIRS "-NOTFOUND")
+    set(CGAL_LIBRARIES "-NOTFOUND")
+    message(STATUS "CGAL wrappers require CGAL version 5 and above.")
+  endif()
 
-  LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-  IF(CGAL_FOUND)
-    GET_TARGET_PROPERTY(CGAL_LIBRARIES CGAL::CGAL INTERFACE_LINK_LIBRARIES)
+  if(CGAL_FOUND)
+    get_target_property(CGAL_LIBRARIES CGAL::CGAL INTERFACE_LINK_LIBRARIES)
 
-    IF(DEFINED CGAL_VERSION)
-      SET(CGAL_VERSION "${CGAL_VERSION}")
+    if(DEFINED CGAL_VERSION)
+      set(CGAL_VERSION "${CGAL_VERSION}")
 
-      STRING(REGEX REPLACE
+      string(REGEX REPLACE
         "^([0-9]+).*$" "\\1"
         CGAL_VERSION_MAJOR "${CGAL_VERSION}")
 
-      STRING(REGEX REPLACE
+      string(REGEX REPLACE
         "^[0-9]+\\.([0-9]+).*$" "\\1"
         CGAL_VERSION_MINOR "${CGAL_VERSION}")
 
-      STRING(REGEX REPLACE
+      string(REGEX REPLACE
         "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
         CGAL_VERSION_SUBMINOR "${CGAL_VERSION}"
       )
 
-      IF("${CGAL_VERSION_SUBMINOR}" MATCHES "^(|${CGAL_VERSION})$")
-        SET(CGAL_VERSION_SUBMINOR "0")
-      ENDIF()
-    ENDIF()
+      if("${CGAL_VERSION_SUBMINOR}" MATCHES "^(|${CGAL_VERSION})$")
+        set(CGAL_VERSION_SUBMINOR "0")
+      endif()
+    endif()
 
     # Make sure we dont' pass Boost::Boost over to deal.II.
-    LIST(FILTER CGAL_LIBRARIES EXCLUDE REGEX "::")
-  ENDIF()
-ELSE()
-  SET(CGAL_FOUND FALSE)
-  SET(CGAL_INCLUDE_DIRS "-NOTFOUND")
-  SET(CGAL_LIBRARIES "-NOTFOUND")
-  MESSAGE(STATUS "CGAL wrappers require C++17. Disabling CGAL Support.")
-ENDIF()
+    list(FILTER CGAL_LIBRARIES EXCLUDE REGEX "::")
+  endif()
+else()
+  set(CGAL_FOUND FALSE)
+  set(CGAL_INCLUDE_DIRS "-NOTFOUND")
+  set(CGAL_LIBRARIES "-NOTFOUND")
+  message(STATUS "CGAL wrappers require C++17. Disabling CGAL Support.")
+endif()
 
-DEAL_II_PACKAGE_HANDLE(CGAL
+deal_ii_package_handle(CGAL
   INCLUDE_DIRS
   REQUIRED CGAL_INCLUDE_DIRS
   LIBRARIES

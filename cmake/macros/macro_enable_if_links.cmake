@@ -19,25 +19,25 @@
 # If so, add it to variable.
 #
 # Usage:
-#     ENABLE_IF_LINKS(variable flag)
+#     enable_if_links(variable flag)
 #
 
-MACRO(ENABLE_IF_LINKS _variable _flag)
+macro(ENABLE_IF_LINKS _variable _flag)
   # keep on top to avoid cluttering the _flag and _flag_stripped variables
-  ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-Werror")
+  enable_if_supported(CMAKE_REQUIRED_FLAGS "-Werror")
 
-  STRING(STRIP "${_flag}" _flag_stripped)
-  IF(NOT "${_flag_stripped}" STREQUAL "")
-    STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
-    STRING(REGEX REPLACE "\[-+,\]" "_" _flag_name "${_flag_name}")
+  string(STRIP "${_flag}" _flag_stripped)
+  if(NOT "${_flag_stripped}" STREQUAL "")
+    string(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
+    string(REGEX REPLACE "\[-+,\]" "_" _flag_name "${_flag_name}")
 
-    LIST(APPEND CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
+    list(APPEND CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
     CHECK_CXX_SOURCE_COMPILES("int main(){}" DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
-    RESET_CMAKE_REQUIRED()
+    reset_cmake_required()
 
-    IF(DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
-      SET(${_variable} "${${_variable}} ${_flag_stripped}")
-      STRING(STRIP "${${_variable}}" ${_variable})
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+    if(DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
+      set(${_variable} "${${_variable}} ${_flag_stripped}")
+      string(STRIP "${${_variable}}" ${_variable})
+    endif()
+  endif()
+endmacro()

@@ -16,19 +16,19 @@
 #
 # avoid some annoying warnings...
 #
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wall")
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-switch)
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-nested-anon-types)
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-implicit-fallthrough)
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-cast-function-type)
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-float-conversion)
+strip_flag(DEAL_II_CXX_FLAGS "-Wall")
+strip_flag(DEAL_II_CXX_FLAGS "-pedantic")
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-switch)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-nested-anon-types)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-implicit-fallthrough)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-cast-function-type)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-float-conversion)
 
-INCLUDE_DIRECTORIES(
+include_directories(
   include/
 )
 
-DEAL_II_ADD_LIBRARY(obj_muparser OBJECT
+deal_ii_add_library(obj_muparser OBJECT
 src/muParserBase.cpp
 src/muParserBytecode.cpp
 src/muParserCallback.cpp

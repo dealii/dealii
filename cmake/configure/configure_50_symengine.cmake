@@ -18,46 +18,46 @@
 #
 
 
-MACRO(FEATURE_SYMENGINE_FIND_EXTERNAL var)
-  FIND_PACKAGE(SYMENGINE)
+macro(FEATURE_SYMENGINE_FIND_EXTERNAL var)
+  find_package(SYMENGINE)
 
-  IF(SYMENGINE_FOUND)
-    SET(${var} TRUE)
+  if(SYMENGINE_FOUND)
+    set(${var} TRUE)
 
     #
     # We require at least version 0.6 of the symengine library:
     #
-    SET(_version_required "0.6")
+    set(_version_required "0.6")
 
-    IF(SYMENGINE_VERSION VERSION_LESS ${_version_required})
-      MESSAGE(STATUS "Insufficient SymEngine installation found: "
+    if(SYMENGINE_VERSION VERSION_LESS ${_version_required})
+      message(STATUS "Insufficient SymEngine installation found: "
               "At least version ${_version_required} is required "
               "but version ${SYMENGINE_VERSION} was found."
              )
-      SET(SYMENGINE_ADDITIONAL_ERROR_STRING
+      set(SYMENGINE_ADDITIONAL_ERROR_STRING
           "Insufficient SymEngine installation found!\n"
           "At least version ${_version_required} is required "
           "but version ${SYMENGINE_VERSION} was found.\n"
          )
-      SET(${var} FALSE)
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+      set(${var} FALSE)
+    endif()
+  endif()
+endmacro()
 
-MACRO(FEATURE_SYMENGINE_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_SYMENGINE_WITH_LLVM ${SYMENGINE_WITH_LLVM})
+macro(FEATURE_SYMENGINE_CONFIGURE_EXTERNAL)
+  set(DEAL_II_SYMENGINE_WITH_LLVM ${SYMENGINE_WITH_LLVM})
 
-  IF(DEAL_II_SYMENGINE_WITH_LLVM)
-    MESSAGE(STATUS "Configured with SymEngine LLVM capabilities.")
-  ENDIF()
+  if(DEAL_II_SYMENGINE_WITH_LLVM)
+    message(STATUS "Configured with SymEngine LLVM capabilities.")
+  endif()
 
   #
   # Overwrite the compiler flags imported from SymEngine
   #
-  SET(SYMENGINE_CXX_FLAGS)
-  SET(SYMENGINE_CXX_FLAGS_DEBUG)
-  SET(SYMENGINE_CXX_FLAGS_RELEASE)
-ENDMACRO()
+  set(SYMENGINE_CXX_FLAGS)
+  set(SYMENGINE_CXX_FLAGS_DEBUG)
+  set(SYMENGINE_CXX_FLAGS_RELEASE)
+endmacro()
 
 
-CONFIGURE_FEATURE(SYMENGINE)
+configure_feature(SYMENGINE)

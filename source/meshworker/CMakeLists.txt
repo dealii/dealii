@@ -13,24 +13,24 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+set(_src
   mesh_worker.cc
   mesh_worker_info.cc
   mesh_worker_vector_selector.cc
   scratch_data.cc
   )
 
-SET(_inst
+set(_inst
   mesh_worker_info.inst.in
   mesh_worker_vector_selector.inst.in
   scratch_data.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/meshworker/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_meshworker OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_meshworker "${_inst}")
+deal_ii_add_library(obj_meshworker OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_meshworker "${_inst}")

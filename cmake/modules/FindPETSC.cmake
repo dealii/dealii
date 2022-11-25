@@ -33,12 +33,12 @@
 #     PETSC_WITH_MUMPS
 #
 
-SET(PETSC_DIR "" CACHE PATH "An optional hint to a PETSc directory")
-SET(PETSC_ARCH "" CACHE STRING "An optional hint to a PETSc arch")
-SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
-SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
+set(PETSC_DIR "" CACHE PATH "An optional hint to a PETSc directory")
+set(PETSC_ARCH "" CACHE STRING "An optional hint to a PETSc arch")
+set_if_empty(PETSC_DIR "$ENV{PETSC_DIR}")
+set_if_empty(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
-DEAL_II_FIND_LIBRARY(PETSC_LIBRARY
+deal_ii_find_library(PETSC_LIBRARY
   NAMES petsc libpetsc
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
@@ -48,30 +48,30 @@ DEAL_II_FIND_LIBRARY(PETSC_LIBRARY
 # Search for the first part of the includes:
 #
 
-DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
+deal_ii_find_path(PETSC_INCLUDE_DIR_ARCH petscconf.h
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc include include/petsc
 )
 
-SET(PETSC_PETSCCONF_H "${PETSC_INCLUDE_DIR_ARCH}/petscconf.h")
+set(PETSC_PETSCCONF_H "${PETSC_INCLUDE_DIR_ARCH}/petscconf.h")
 
-MACRO(_petsc_feature_check _var _regex)
-  FILE(STRINGS "${PETSC_PETSCCONF_H}" PETSC_${_var}_STRING
+macro(_petsc_feature_check _var _regex)
+  file(STRINGS "${PETSC_PETSCCONF_H}" PETSC_${_var}_STRING
     REGEX "${_regex}")
-  IF("${PETSC_${_var}_STRING}" STREQUAL "")
-    SET(PETSC_WITH_${_var} FALSE)
-  ELSE()
-    SET(PETSC_WITH_${_var} TRUE)
-  ENDIF()
-ENDMACRO()
+  if("${PETSC_${_var}_STRING}" STREQUAL "")
+    set(PETSC_WITH_${_var} FALSE)
+  else()
+    set(PETSC_WITH_${_var} TRUE)
+  endif()
+endmacro()
 
-IF(EXISTS ${PETSC_PETSCCONF_H})
+if(EXISTS ${PETSC_PETSCCONF_H})
   _petsc_feature_check(64BIT_INDICES "#define.*PETSC_USE_64BIT_INDICES 1")
   _petsc_feature_check(COMPLEX "#define.*PETSC_USE_COMPLEX 1")
   _petsc_feature_check(HYPRE "#define.*PETSC_HAVE_HYPRE 1")
   _petsc_feature_check(MPIUNI "#define.*PETSC_HAVE_MPIUNI 1")
   _petsc_feature_check(MUMPS "#define.*PETSC_HAVE_MUMPS 1")
-ENDIF()
+endif()
 
 #
 # Sometimes, this is not enough...
@@ -87,37 +87,37 @@ ENDIF()
 # Either way, we must be able to find petscversion.h:
 #
 
-DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
+deal_ii_find_path(PETSC_INCLUDE_DIR_COMMON petscversion.h
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc include include/petsc
 )
 
-SET(PETSC_PETSCVERSION_H "${PETSC_INCLUDE_DIR_COMMON}/petscversion.h")
-IF(EXISTS ${PETSC_PETSCVERSION_H})
-  FILE(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_MAJOR_STRING
+set(PETSC_PETSCVERSION_H "${PETSC_INCLUDE_DIR_COMMON}/petscversion.h")
+if(EXISTS ${PETSC_PETSCVERSION_H})
+  file(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_MAJOR_STRING
     REGEX "^#[ \t]*define[ \t]+PETSC_VERSION_MAJOR[ \t]+[0-9]+[ \t]*$")
-  STRING(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_MAJOR[ \t]+([0-9]+)[ \t]*$" "\\1"
+  string(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_MAJOR[ \t]+([0-9]+)[ \t]*$" "\\1"
     PETSC_VERSION_MAJOR "${PETSC_VERSION_MAJOR_STRING}"
     )
-  FILE(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_MINOR_STRING
+  file(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_MINOR_STRING
     REGEX "^#[ \t]*define[ \t]+PETSC_VERSION_MINOR[ \t]+[0-9]+[ \t]*$")
-  STRING(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_MINOR[ \t]+([0-9]+)[ \t]*$" "\\1"
+  string(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_MINOR[ \t]+([0-9]+)[ \t]*$" "\\1"
     PETSC_VERSION_MINOR "${PETSC_VERSION_MINOR_STRING}"
     )
-  FILE(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_SUBMINOR_STRING
+  file(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_SUBMINOR_STRING
     REGEX "^#[ \t]*define[ \t]+PETSC_VERSION_SUBMINOR[ \t]+[0-9]+[ \t]*$")
-  STRING(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_SUBMINOR[ \t]+([0-9]+)[ \t]*$" "\\1"
+  string(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_SUBMINOR[ \t]+([0-9]+)[ \t]*$" "\\1"
     PETSC_VERSION_SUBMINOR "${PETSC_VERSION_SUBMINOR_STRING}"
     )
-  FILE(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_PATCH_STRING
+  file(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_PATCH_STRING
     REGEX "^#[ \t]*define[ \t]+PETSC_VERSION_PATCH[ \t]+[0-9]+[ \t]*$")
-  STRING(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_PATCH[ \t]+([0-9]+)[ \t]*$" "\\1"
+  string(REGEX REPLACE "^#[ \t]*define[ \t]+PETSC_VERSION_PATCH[ \t]+([0-9]+)[ \t]*$" "\\1"
     PETSC_VERSION_PATCH "${PETSC_VERSION_PATCH_STRING}"
     )
-  SET(PETSC_VERSION
+  set(PETSC_VERSION
     "${PETSC_VERSION_MAJOR}.${PETSC_VERSION_MINOR}.${PETSC_VERSION_SUBMINOR}.${PETSC_VERSION_PATCH}"
     )
-ENDIF()
+endif()
 
 #
 # So, up to this point it was easy. Now, the tricky part. Search for
@@ -125,89 +125,89 @@ ENDIF()
 # that file:
 #
 
-DEAL_II_FIND_FILE(PETSC_PETSCVARIABLES
+deal_ii_find_file(PETSC_PETSCVARIABLES
   NAMES petscvariables
   HINTS ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_DIR}
   PATH_SUFFIXES conf lib/petsc/conf
   )
 
-IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
+if(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
   #
   # Includes:
   #
 
-  FILE(STRINGS "${PETSC_PETSCVARIABLES}" _external_includes
+  file(STRINGS "${PETSC_PETSCVARIABLES}" _external_includes
     REGEX "^PETSC_CC_INCLUDES =.*")
-  SEPARATE_ARGUMENTS(_external_includes)
+  separate_arguments(_external_includes)
 
-  SET(_petsc_includes)
-  FOREACH(_token ${_external_includes})
+  set(_petsc_includes)
+  foreach(_token ${_external_includes})
     #
     # workaround: Do not pull in scotch include directory. It clashes with
     # our use of the metis headers...
     #
-    IF(_token MATCHES "^-I" AND NOT _token MATCHES "scotch$")
-      STRING(REGEX REPLACE "^-I" "" _token "${_token}")
-      LIST(APPEND _petsc_includes ${_token})
-    ENDIF()
-  ENDFOREACH()
+    if(_token MATCHES "^-I" AND NOT _token MATCHES "scotch$")
+      string(REGEX REPLACE "^-I" "" _token "${_token}")
+      list(APPEND _petsc_includes ${_token})
+    endif()
+  endforeach()
 
   #
   # Link line:
   #
 
-  FILE(STRINGS "${PETSC_PETSCVARIABLES}" PETSC_EXTERNAL_LINK_LINE
+  file(STRINGS "${PETSC_PETSCVARIABLES}" PETSC_EXTERNAL_LINK_LINE
     REGEX "^PETSC_WITH_EXTERNAL_LIB =.*")
 
-  SEPARATE_ARGUMENTS(PETSC_EXTERNAL_LINK_LINE)
+  separate_arguments(PETSC_EXTERNAL_LINK_LINE)
 
-  SET(_hints)
-  SET(_petsc_libraries)
-  SET(_cleanup_variables)
-  FOREACH(_token ${PETSC_EXTERNAL_LINK_LINE})
-    IF(_token MATCHES "^-L")
+  set(_hints)
+  set(_petsc_libraries)
+  set(_cleanup_variables)
+  foreach(_token ${PETSC_EXTERNAL_LINK_LINE})
+    if(_token MATCHES "^-L")
       # Build up hints with the help of all tokens passed with -L:
-      STRING(REGEX REPLACE "^-L" "" _token "${_token}")
-      LIST(APPEND _hints ${_token})
-    ELSEIF(_token MATCHES "^-l")
+      string(REGEX REPLACE "^-L" "" _token "${_token}")
+      list(APPEND _hints ${_token})
+    elseif(_token MATCHES "^-l")
       # Search for every library that was specified with -l:
-      STRING(REGEX REPLACE "^-l" "" _token "${_token}")
+      string(REGEX REPLACE "^-l" "" _token "${_token}")
 
-      IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s|clang_rt)")
-        LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
+      if(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s|clang_rt)")
+        list(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
 
-        IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
-          FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
-        ELSE()
-          DEAL_II_FIND_LIBRARY(PETSC_LIBRARY_${_token}
+        if(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
+          find_system_library(PETSC_LIBRARY_${_token} NAMES ${_token})
+        else()
+          deal_ii_find_library(PETSC_LIBRARY_${_token}
             NAMES ${_token}
             HINTS ${_hints}
             )
-        ENDIF()
-        IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
-          LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
-        ENDIF()
+        endif()
+        if(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
+          list(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
+        endif()
 
-      ENDIF()
+      endif()
 
-    ENDIF()
-  ENDFOREACH()
-ENDIF()
+    endif()
+  endforeach()
+endif()
 
-IF(PETSC_WITH_MPIUNI)
+if(PETSC_WITH_MPIUNI)
   #
   # Workaround: Some distributions happen to not install petscvariables and
   # we consequently might miss some essential include directories. Let's
   # try at least to find the mpiuni include directory.
   #
-  DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_MPIUNI mpiuni/mpi.h
+  deal_ii_find_path(PETSC_INCLUDE_DIR_MPIUNI mpiuni/mpi.h
     HINTS ${PETSC_INCLUDE_DIR_COMMON} ${PETSC_INCLUDE_DIR_ARCH} ${_petsc_includes}
     PATH_SUFFIXES petsc
     )
-  SET(PETSC_INCLUDE_DIR_MPIUNI "${PETSC_INCLUDE_DIR_MPIUNI}/mpiuni")
-ENDIF()
+  set(PETSC_INCLUDE_DIR_MPIUNI "${PETSC_INCLUDE_DIR_MPIUNI}/mpiuni")
+endif()
 
-DEAL_II_PACKAGE_HANDLE(PETSC
+deal_ii_package_handle(PETSC
   LIBRARIES
     REQUIRED PETSC_LIBRARY
     OPTIONAL _petsc_libraries
@@ -222,8 +222,8 @@ DEAL_II_PACKAGE_HANDLE(PETSC
     PETSC_PETSCVARIABLES ${_cleanup_variables}
   )
 
-IF(PETSC_FOUND)
-  MARK_AS_ADVANCED(PETSC_ARCH)
-ELSE()
-  MARK_AS_ADVANCED(CLEAR PETSC_ARCH)
-ENDIF()
+if(PETSC_FOUND)
+  mark_as_advanced(PETSC_ARCH)
+else()
+  mark_as_advanced(CLEAR PETSC_ARCH)
+endif()

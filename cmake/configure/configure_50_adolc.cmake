@@ -17,56 +17,56 @@
 # Configuration for the ADOL-C library:
 #
 
-SET(FEATURE_ADOLC_AFTER BOOST TRILINOS)
+set(FEATURE_ADOLC_AFTER BOOST TRILINOS)
 
-MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
-  FIND_PACKAGE(ADOLC)
+macro(FEATURE_ADOLC_FIND_EXTERNAL var)
+  find_package(ADOLC)
 
-  IF(ADOLC_FOUND)
+  if(ADOLC_FOUND)
     #
     # So, we have a library. Let's see whether we can use it:
     #
-    SET(${var} TRUE)
+    set(${var} TRUE)
 
     #
     # If Adolc is configured to use the Boost allocator (of an external
     # boost library) we must not use a bundled Boost library for deal.II.
     #
-    IF(ADOLC_WITH_BOOST_ALLOCATOR AND FEATURE_BOOST_BUNDLED_CONFIGURED)
-      MESSAGE(STATUS
+    if(ADOLC_WITH_BOOST_ALLOCATOR AND FEATURE_BOOST_BUNDLED_CONFIGURED)
+      message(STATUS
         "Could not find a sufficient ADOL-C installation: "
         "ADOL-C links against external Boost but deal.II was configured "
         "with bundled Boost."
         )
-      SET(ADOLC_ADDITIONAL_ERROR_STRING
+      set(ADOLC_ADDITIONAL_ERROR_STRING
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "ADOL-C links against external Boost but deal.II was configured "
         "with bundled Boost.\n\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # We have to avoid a symbol clash with Trilinos' SEACASChaco library
     # (the libchaco.so shared object exports the global symbol 'divide' but
     # so does adolc itself).
     #
-    ITEM_MATCHES(_module_found SEACASChaco ${Trilinos_PACKAGE_LIST})
-    IF(_module_found)
-      MESSAGE(STATUS
+    item_matches(_module_found SEACASChaco ${Trilinos_PACKAGE_LIST})
+    if(_module_found)
+      message(STATUS
         "Could not find a sufficient ADOL-C installation: "
         "Possible symbol clash between the ADOL-C library and Trilinos' SEACASChaco detected"
         )
-      SET(ADOLC_ADDITIONAL_ERROR_STRING
+      set(ADOLC_ADDITIONAL_ERROR_STRING
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "Possible symbol clash between the ADOL-C library and Trilinos' SEACASChaco detected."
         "If you want to use ADOL-C, please configure deal.II to use a "
         "Trilinos library with disabled SEACASChaco.\n\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # We have to avoid another symbol clash with the netcdf library that
@@ -74,13 +74,13 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
     # object exports the global symbol 'function' but so does adolc
     # itself).
     #
-    IF("${Trilinos_TPL_LIBRARIES}" MATCHES "netcdf")
-      MESSAGE(STATUS
+    if("${Trilinos_TPL_LIBRARIES}" MATCHES "netcdf")
+      message(STATUS
         "Could not find a sufficient ADOL-C installation: "
         "Possible symbol clash between the ADOL-C library and netcdf "
         "(pulled in as optional external dependency of Trilinos) detected"
         )
-      SET(ADOLC_ADDITIONAL_ERROR_STRING
+      set(ADOLC_ADDITIONAL_ERROR_STRING
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "Possible symbol clash between the ADOL-C library and netcdf "
@@ -88,16 +88,16 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
         "If you want to use ADOL-C, please configure deal.II to use a "
         "Trilinos library with disabled netcdf bindings.\n\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Check whether we have a recent enough ADOL-C library that can return
     # values from constant objects.
     #
 
-    LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${ADOLC_LIBRARIES})
-    LIST(APPEND CMAKE_REQUIRED_INCLUDES ${ADOLC_INCLUDE_DIRS})
+    list(APPEND CMAKE_REQUIRED_LIBRARIES ${ADOLC_LIBRARIES})
+    list(APPEND CMAKE_REQUIRED_INCLUDES ${ADOLC_INCLUDE_DIRS})
 
     CHECK_CXX_SOURCE_COMPILES("
       #include <adolc/adouble.h>
@@ -128,47 +128,47 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
       }"
       ADOLC_ADOUBLE_OSTREAM_CHECK)
 
-    RESET_CMAKE_REQUIRED()
+    reset_cmake_required()
 
-    IF(NOT ADOLC_DOUBLE_CAST_CHECK)
-      MESSAGE(STATUS
+    if(NOT ADOLC_DOUBLE_CAST_CHECK)
+      message(STATUS
         "Could not find a sufficient ADOL-C installation: "
         "deal.II needs ADOL-C version 2.6.4 or newer."
         )
-      SET(ADOLC_ADDITIONAL_ERROR_STRING
+      set(ADOLC_ADDITIONAL_ERROR_STRING
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "ADOL-C cast check failed.\n"
         "deal.II needs ADOL-C version 2.6.4 or newer.\n\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-    IF(NOT ADOLC_ADOUBLE_OSTREAM_CHECK)
-      MESSAGE(STATUS
+    if(NOT ADOLC_ADOUBLE_OSTREAM_CHECK)
+      message(STATUS
         "Could not find a sufficient ADOL-C installation: "
         "deal.II needs ADOL-C version 2.6.4 or newer."
         )
-      SET(ADOLC_ADDITIONAL_ERROR_STRING
+      set(ADOLC_ADDITIONAL_ERROR_STRING
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "ADOL-C stream output check failed.\n"
         "deal.II needs ADOL-C version 2.6.4 or newer.\n\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+      set(${var} FALSE)
+    endif()
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_ADOLC_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING ${ADOLC_WITH_ADVANCED_BRANCHING})
-  SET(DEAL_II_ADOLC_WITH_ATRIG_ERF ${ADOLC_WITH_ATRIG_ERF})
-  SET(DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING ${ADOLC_WITH_TAPELESS_REFCOUNTING})
-  SET(DEAL_II_ADOLC_WITH_BOOST_ALLOCATOR ${ADOLC_WITH_BOOST_ALLOCATOR})
+macro(FEATURE_ADOLC_CONFIGURE_EXTERNAL)
+  set(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING ${ADOLC_WITH_ADVANCED_BRANCHING})
+  set(DEAL_II_ADOLC_WITH_ATRIG_ERF ${ADOLC_WITH_ATRIG_ERF})
+  set(DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING ${ADOLC_WITH_TAPELESS_REFCOUNTING})
+  set(DEAL_II_ADOLC_WITH_BOOST_ALLOCATOR ${ADOLC_WITH_BOOST_ALLOCATOR})
 
-  SET(DEAL_II_EXPAND_ADOLC_TYPES "adouble; adtl::adouble")
-ENDMACRO()
+  set(DEAL_II_EXPAND_ADOLC_TYPES "adouble; adtl::adouble")
+endmacro()
 
 
-CONFIGURE_FEATURE(ADOLC)
+configure_feature(ADOLC)

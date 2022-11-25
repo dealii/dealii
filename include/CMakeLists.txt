@@ -16,11 +16,11 @@
 #
 # Configure config.h and revision.h
 #
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/config.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/config.h
   )
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/revision.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/revision.h
   )
@@ -28,7 +28,7 @@ CONFIGURE_FILE(
 #
 # Add a rule for how to install the header files:
 #
-INSTALL(DIRECTORY deal.II
+install(DIRECTORY deal.II
   DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"
@@ -37,7 +37,7 @@ INSTALL(DIRECTORY deal.II
 #
 # and don't forget to install all generated header files, too:
 #
-INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
   DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"

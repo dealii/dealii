@@ -14,21 +14,21 @@
 ## ---------------------------------------------------------------------
 
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+set(_src
   kinematics.cc
   standard_tensors.cc
   )
 
-SET(_inst
+set(_inst
   kinematics.inst.in
   standard_tensors.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/physics/elasticity/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_physics_elasticity OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_physics_elasticity "${_inst}")
+deal_ii_add_library(obj_physics_elasticity OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_physics_elasticity "${_inst}")

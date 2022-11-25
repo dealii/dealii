@@ -32,59 +32,59 @@
 #
 
 
-SET(OPENCASCADE_DIR "" CACHE PATH "An optional hint to a OpenCASCADE installation")
-SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OPENCASCADE_DIR}")
-SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OCC_DIR}")
-SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OCE_DIR}")
-SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{CASROOT}")
+set(OPENCASCADE_DIR "" CACHE PATH "An optional hint to a OpenCASCADE installation")
+set_if_empty(OPENCASCADE_DIR "$ENV{OPENCASCADE_DIR}")
+set_if_empty(OPENCASCADE_DIR "$ENV{OCC_DIR}")
+set_if_empty(OPENCASCADE_DIR "$ENV{OCE_DIR}")
+set_if_empty(OPENCASCADE_DIR "$ENV{CASROOT}")
 
 
-DEAL_II_FIND_PATH(OPENCASCADE_INCLUDE_DIR Standard_Version.hxx
+deal_ii_find_path(OPENCASCADE_INCLUDE_DIR Standard_Version.hxx
   HINTS ${OPENCASCADE_DIR}
   PATH_SUFFIXES include include/oce include/opencascade inc
   )
 
-IF(EXISTS ${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx)
-  FILE(STRINGS "${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx" OPENCASCADE_VERSION
+if(EXISTS ${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx)
+  file(STRINGS "${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx" OPENCASCADE_VERSION
     REGEX "^[ \t]*#[ \t]*define[ \t]+OCC_VERSION_COMPLETE "
     )
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "#define OCC_VERSION_COMPLETE.*\"(.*)\"" "\\1"
     OPENCASCADE_VERSION "${OPENCASCADE_VERSION}"
     )
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^([0-9]+).*$" "\\1"
     OPENCASCADE_VERSION_MAJOR "${OPENCASCADE_VERSION}"
     )
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^[0-9]+\\.([0-9]+).*$" "\\1"
     OPENCASCADE_VERSION_MINOR "${OPENCASCADE_VERSION}"
     )
-  STRING(REGEX REPLACE
+  string(REGEX REPLACE
     "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
     OPENCASCADE_VERSION_SUBMINOR "${OPENCASCADE_VERSION}"
     )
-ENDIF()
+endif()
 
 # These seem to be pretty much the only required ones.
-SET(_opencascade_libraries
+set(_opencascade_libraries
   TKBO TKBool TKBRep TKernel TKFeat TKFillet TKG2d TKG3d TKGeomAlgo
   TKGeomBase TKHLR TKIGES TKMath TKMesh TKOffset TKPrim TKShHealing TKSTEP
   TKSTEPAttr TKSTEPBase TKSTEP209 TKSTL TKTopAlgo TKXSBase
   )
 
-SET(_libraries "")
-FOREACH(_library ${_opencascade_libraries})
-  LIST(APPEND _libraries OPENCASCADE_${_library})
-  DEAL_II_FIND_LIBRARY(OPENCASCADE_${_library}
+set(_libraries "")
+foreach(_library ${_opencascade_libraries})
+  list(APPEND _libraries OPENCASCADE_${_library})
+  deal_ii_find_library(OPENCASCADE_${_library}
     NAMES ${_library}
     HINTS ${OPENCASCADE_DIR}
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib mac64/clang/lib mac32/clang/lib lin64/gcc/lib lin32/gcc/lib
     )
-ENDFOREACH()
+endforeach()
 
 
-DEAL_II_PACKAGE_HANDLE(OPENCASCADE
+deal_ii_package_handle(OPENCASCADE
   LIBRARIES
     REQUIRED ${_libraries}
   INCLUDE_DIRS

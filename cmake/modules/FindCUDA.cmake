@@ -27,23 +27,23 @@
 #     CUDA_VERSION_MINOR
 #
 
-SET(CUDA_DIR "" CACHE PATH "An optional hint to a CUDA installation")
-SET_IF_EMPTY(CUDA_DIR "$ENV{CUDA_DIR}")
+set(CUDA_DIR "" CACHE PATH "An optional hint to a CUDA installation")
+set_if_empty(CUDA_DIR "$ENV{CUDA_DIR}")
 
-IF(NOT "${CUDA_DIR}" STREQUAL "")
-  SET(CUDA_TOOLKIT_ROOT_DIR "${CUDA_DIR}")
-ENDIF()
+if(NOT "${CUDA_DIR}" STREQUAL "")
+  set(CUDA_TOOLKIT_ROOT_DIR "${CUDA_DIR}")
+endif()
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-FIND_PACKAGE(CUDA)
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+find_package(CUDA)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-IF(CUDA_FOUND)
-  MESSAGE(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
-ENDIF()
+if(CUDA_FOUND)
+  message(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
+endif()
 
-DEAL_II_PACKAGE_HANDLE(CUDA
+deal_ii_package_handle(CUDA
   LIBRARIES REQUIRED CUDA_LIBRARIES CUDA_cusparse_LIBRARY CUDA_cusolver_LIBRARY
   INCLUDE_DIRS REQUIRED CUDA_INCLUDE_DIRS
   USER_INCLUDE_DIRS REQUIRED CUDA_INCLUDE_DIRS

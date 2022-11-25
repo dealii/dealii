@@ -17,4 +17,4 @@
 # Configuration for the zlib library:
 #
 
-CONFIGURE_FEATURE(ZLIB)
+configure_feature(ZLIB)

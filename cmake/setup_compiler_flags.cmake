@@ -42,8 +42,8 @@
 # All modifications shall be guarded with the ENABLE_IF_SUPPORTED
 # or ENABLE_IF_LINKS macro, e.g.
 #
-#   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
-#   ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
+#   enable_if_supported(DEAL_II_CXX_FLAGS "-fpic")
+#   enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 # Checks for compiler features (such as C++14 support) and compiler
 # specific bugs that
@@ -71,16 +71,16 @@
 # Check the user provided CXX flags:
 #
 
-FOREACH(build ${DEAL_II_BUILD_TYPES})
-  CHECK_COMPILER_SETUP(
+foreach(build ${DEAL_II_BUILD_TYPES})
+  check_compiler_setup(
     "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}"
     "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS_${build}_SAVED}"
     DEAL_II_HAVE_USABLE_USER_FLAGS_${build}
     ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
     )
 
-  IF(NOT DEAL_II_HAVE_USABLE_USER_FLAGS_${build})
-    MESSAGE(FATAL_ERROR "
+  if(NOT DEAL_II_HAVE_USABLE_USER_FLAGS_${build})
+    message(FATAL_ERROR "
   Configuration error: Cannot compile with the user supplied flags:
     CXX flags (${build}): ${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}
     LD flags  (${build}): ${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS_${build}_SAVED}
@@ -90,8 +90,8 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     DEAL_II_LINKER_FLAGS, DEAL_II_CXX_FLAGS_${build}
   and the environment variables CXXFLAGS, LDFLAGS.\n\n"
       )
-  ENDIF()
-ENDFOREACH()
+  endif()
+endforeach()
 
 
 ########################################################################
@@ -100,7 +100,7 @@ ENDFOREACH()
 #                                                                      #
 ########################################################################
 
-IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+if(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #
   # *Hooray* We are allowed to set compiler flags :-]
   #
@@ -108,40 +108,40 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #
   # General setup for GCC and compilers sufficiently close to GCC:
   #
-  IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
+  if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
       CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
-    SET(DEAL_II_KNOWN_COMPILER TRUE)
-  ENDIF()
+    verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
+    set(DEAL_II_KNOWN_COMPILER TRUE)
+  endif()
 
   #
   # Setup for ICC compiler (version >= 10):
   #
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
-    SET(DEAL_II_KNOWN_COMPILER TRUE)
-  ENDIF()
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
+    set(DEAL_II_KNOWN_COMPILER TRUE)
+  endif()
 
   #
   # Setup for MSVC compiler (version >= 2012):
   #
-   IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
-    SET(DEAL_II_KNOWN_COMPILER TRUE)
-  ENDIF()
+   if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
+    set(DEAL_II_KNOWN_COMPILER TRUE)
+  endif()
 
-  IF(NOT DEAL_II_KNOWN_COMPILER)
-    MESSAGE(FATAL_ERROR "\n"
+  if(NOT DEAL_II_KNOWN_COMPILER)
+    message(FATAL_ERROR "\n"
       "Unknown compiler!\n"
       "If you're serious about it, set DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF "
       "and set the relevant compiler options by hand.\n\n"
       )
-  ENDIF()
+  endif()
 
-ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+else(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
-  MESSAGE(STATUS
+  message(STATUS
     "Skipped setup of default compiler flags "
     "(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF)"
     )
-ENDIF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+endif(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)

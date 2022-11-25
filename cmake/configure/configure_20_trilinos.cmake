@@ -17,100 +17,100 @@
 # Configuration for the trilinos library:
 #
 
-SET(FEATURE_TRILINOS_DEPENDS MPI)
+set(FEATURE_TRILINOS_DEPENDS MPI)
 
-MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
-  FIND_PACKAGE(TRILINOS)
+macro(FEATURE_TRILINOS_FIND_EXTERNAL var)
+  find_package(TRILINOS)
 
-  IF(TRILINOS_FOUND)
+  if(TRILINOS_FOUND)
     #
     # So, we have a library. Let's see whether we can use it:
     #
-    SET(${var} TRUE)
+    set(${var} TRUE)
 
     #
     # Set TRILINOS_DIR to something meaningful if empty
     #
-    IF("${TRILINOS_DIR}" STREQUAL "")
-      SET(TRILINOS_DIR "<system location>")
-    ENDIF()
+    if("${TRILINOS_DIR}" STREQUAL "")
+      set(TRILINOS_DIR "<system location>")
+    endif()
 
     #
     # Check whether all required modules of trilinos are installed:
     #
-    MESSAGE(STATUS
+    message(STATUS
       "Checking whether the found trilinos package contains all required modules:"
       )
 
-    FOREACH(_module
+    foreach(_module
         Amesos Epetra Ifpack AztecOO Teuchos ML
       )
-      ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
-      IF(_module_found)
-        MESSAGE(STATUS "  Found ${_module}")
-      ELSE()
-        MESSAGE(STATUS "  Module ${_module} not found!")
-        SET(_modules_missing "${_modules_missing} ${_module}")
-        SET(${var} FALSE)
-      ENDIF()
-    ENDFOREACH()
+      item_matches(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
+      if(_module_found)
+        message(STATUS "  Found ${_module}")
+      else()
+        message(STATUS "  Module ${_module} not found!")
+        set(_modules_missing "${_modules_missing} ${_module}")
+        set(${var} FALSE)
+      endif()
+    endforeach()
 
-    IF(NOT ${var})
-      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+    if(NOT ${var})
+      message(STATUS "Could not find a sufficient Trilinos installation: "
         "Missing ${_modules_missing}"
         )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+      set(TRILINOS_ADDITIONAL_ERROR_STRING
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "is missing one or more modules necessary for the deal.II Trilinos interfaces:\n"
         "  ${_modules_missing}\n\n"
         "Please re-install Trilinos with the missing Trilinos subpackages enabled.\n\n"
         )
-    ENDIF()
+    endif()
 
     #
     # We require at least Trilinos 12.4
     #
-    IF(TRILINOS_VERSION VERSION_LESS 12.4)
+    if(TRILINOS_VERSION VERSION_LESS 12.4)
 
-      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+      message(STATUS "Could not find a sufficient Trilinos installation: "
         "deal.II requires at least version 12.4, but version ${TRILINOS_VERSION} was found."
         )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+      set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "with version ${TRILINOS_VERSION} is too old.\n"
         "deal.II requires at least version 12.4.\n\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Trilinos has to be configured with the same MPI configuration as
     # deal.II.
     #
-    IF(NOT TRILINOS_WITH_MPI)
-      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+    if(NOT TRILINOS_WITH_MPI)
+      message(STATUS "Could not find a sufficient Trilinos installation: "
         "Trilinos has to have MPI support enabled."
         )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+      set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "has to be configured with MPI support, but found:\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Trilinos has to be configured with 32bit indices if deal.II uses
     # unsigned int.
     #
-    IF(TRILINOS_WITH_NO_32BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES)
-      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+    if(TRILINOS_WITH_NO_32BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES)
+      message(STATUS "Could not find a sufficient Trilinos installation: "
         "deal.II was configured to use 32bit global indices but "
         "Trilinos was not."
         )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+      set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "has to be configured to use the same number of bits as deal.II, but "
@@ -118,19 +118,19 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
         "  TRILINOS_WITH_NO_32BIT_INDICES = ${TRILINOS_WITH_NO_32_BIT_INDICES}\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
     #
     # Trilinos has to be configured with 64bit indices if deal.II uses
     # unsigned long long int.
     #
-    IF(TRILINOS_WITH_NO_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
-      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+    if(TRILINOS_WITH_NO_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
+      message(STATUS "Could not find a sufficient Trilinos installation: "
         "deal.II was configured to use 64bit global indices but "
         "Trilinos was not."
         )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+      set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "has to be configured to use the same number of bits as deal.II, but "
@@ -138,88 +138,88 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
         "  TRILINOS_WITH_NO_64BIT_INDICES = ${TRILINOS_WITH_NO_64_BIT_INDICES}\n"
         )
-      SET(${var} FALSE)
-    ENDIF()
+      set(${var} FALSE)
+    endif()
 
-    CHECK_MPI_INTERFACE(TRILINOS ${var})
+    check_mpi_interface(TRILINOS ${var})
 
     #
     # Check which optional features of trilinos are installed.
     #
-    IF (${var})
+    if (${var})
       #
       # Check for modules.
       #
-      FOREACH(_optional_module Belos EpetraExt Kokkos MueLu ROL Sacado SEACAS Tpetra Zoltan)
-        ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
-        IF(_module_found)
-          MESSAGE(STATUS "  Found ${_optional_module}")
-          STRING(TOUPPER "${_optional_module}" _optional_module_upper)
-          SET(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
-        ELSE()
-          MESSAGE(STATUS "  Module ${_optional_module} not found!")
-        ENDIF()
-      ENDFOREACH()
+      foreach(_optional_module Belos EpetraExt Kokkos MueLu ROL Sacado SEACAS Tpetra Zoltan)
+        item_matches(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
+        if(_module_found)
+          message(STATUS "  Found ${_optional_module}")
+          string(TOUPPER "${_optional_module}" _optional_module_upper)
+          set(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
+        else()
+          message(STATUS "  Module ${_optional_module} not found!")
+        endif()
+      endforeach()
 
       #
       # Check for third-party libraries (tpl).
       #
-      FOREACH(_optional_tpl MUMPS)
-        ITEM_MATCHES(_tpl_found ${_optional_tpl} ${Trilinos_TPL_LIST})
-        IF(_tpl_found)
-          MESSAGE(STATUS "  Found ${_optional_tpl}")
-          STRING(TOUPPER "${_optional_tpl}" _optional_tpl_upper)
-          SET(DEAL_II_TRILINOS_WITH_${_optional_tpl_upper} ON)
-        ELSE()
-          MESSAGE(STATUS "  Module ${_optional_tpl} not found!")
-        ENDIF()
-      ENDFOREACH()
-    ENDIF()
+      foreach(_optional_tpl MUMPS)
+        item_matches(_tpl_found ${_optional_tpl} ${Trilinos_TPL_LIST})
+        if(_tpl_found)
+          message(STATUS "  Found ${_optional_tpl}")
+          string(TOUPPER "${_optional_tpl}" _optional_tpl_upper)
+          set(DEAL_II_TRILINOS_WITH_${_optional_tpl_upper} ON)
+        else()
+          message(STATUS "  Module ${_optional_tpl} not found!")
+        endif()
+      endforeach()
+    endif()
 
-    IF(DEAL_II_TRILINOS_WITH_KOKKOS)
-      IF(DEAL_II_FORCE_BUNDLED_KOKKOS)
-        SET(TRILINOS_ADDITIONAL_ERROR_STRING
+    if(DEAL_II_TRILINOS_WITH_KOKKOS)
+      if(DEAL_II_FORCE_BUNDLED_KOKKOS)
+        set(TRILINOS_ADDITIONAL_ERROR_STRING
           ${TRILINOS_ADDITIONAL_ERROR_STRING}
           "The Trilinos installation (found at \"${TRILINOS_DIR}\")"
           "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
-        SET(${var} FALSE)
-      ENDIF()
+        set(${var} FALSE)
+      endif()
 
-      IF(Kokkos_ENABLE_CUDA)
+      if(Kokkos_ENABLE_CUDA)
         # We need to disable SIMD vectorization for CUDA device code.
         # Otherwise, nvcc compilers from version 9 on will emit an error message like:
         # "[...] contains a vector, which is not supported in device code". We
         # would like to set the variable in check_01_cpu_feature but at that point
         # we don't know if CUDA support is enabled in Kokkos
-        SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
-      ENDIF()
+        set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+      endif()
 
       # We need a recent version of Trilinos to use kokkos_check. We want to use
       # VERSION_GREATER_EQUAL 13.0 but this requires CMake 3.7
-      IF(TRILINOS_VERSION VERSION_GREATER 12.99 AND Kokkos_ENABLE_CUDA)
+      if(TRILINOS_VERSION VERSION_GREATER 12.99 AND Kokkos_ENABLE_CUDA)
         KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
-      ENDIF()
-    ENDIF()
+      endif()
+    endif()
 
-    IF(DEAL_II_TRILINOS_WITH_TPETRA)
+    if(DEAL_II_TRILINOS_WITH_TPETRA)
       #
       # Check if Tpetra is usable in fact.
       #
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
-      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
 
       # For the case of Trilinos being compiled with openmp support the
       # following Tpetra test needs -fopenmp to succeed. Make sure that we
       # supply the correct compiler and linker flags:
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
+      add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
 
-      IF(DEAL_II_WITH_64BIT_INDICES)
-        SET(_global_index_type "std::uint64_t")
-      ELSE()
-        SET(_global_index_type "unsigned int")
-      ENDIF()
+      if(DEAL_II_WITH_64BIT_INDICES)
+        set(_global_index_type "std::uint64_t")
+      else()
+        set(_global_index_type "unsigned int")
+      endif()
 
       CHECK_CXX_SOURCE_COMPILES(
         "
@@ -240,25 +240,25 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         TRILINOS_TPETRA_IS_FUNCTIONAL
         )
 
-      RESET_CMAKE_REQUIRED()
+      reset_cmake_required()
 
-      IF(NOT TRILINOS_TPETRA_IS_FUNCTIONAL)
-        MESSAGE(
+      if(NOT TRILINOS_TPETRA_IS_FUNCTIONAL)
+        message(
           STATUS
           "Tpetra was found but is not usable! Disabling Tpetra support."
           )
-        SET(DEAL_II_TRILINOS_WITH_TPETRA OFF)
-      ENDIF()
-    ENDIF()
+        set(DEAL_II_TRILINOS_WITH_TPETRA OFF)
+      endif()
+    endif()
 
-    IF(DEAL_II_TRILINOS_WITH_MUELU)
+    if(DEAL_II_TRILINOS_WITH_MUELU)
       #
       # Check if MueLu is actually usable.
       #
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
-      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
 
       CHECK_CXX_SOURCE_COMPILES(
         "
@@ -276,22 +276,22 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         TRILINOS_MUELU_IS_FUNCTIONAL
         )
 
-      RESET_CMAKE_REQUIRED()
+      reset_cmake_required()
 
-      IF(NOT TRILINOS_MUELU_IS_FUNCTIONAL)
-        MESSAGE(
+      if(NOT TRILINOS_MUELU_IS_FUNCTIONAL)
+        message(
           STATUS
           "MueLu was found but is not usable through Epetra! Disabling MueLu support."
           )
-        SET(DEAL_II_TRILINOS_WITH_MUELU OFF)
-      ENDIF()
-    ENDIF()
+        set(DEAL_II_TRILINOS_WITH_MUELU OFF)
+      endif()
+    endif()
 
     # the only thing we use from SEACAS right now is ExodusII, so just check
     # that it works
-    IF(${DEAL_II_TRILINOS_WITH_SEACAS})
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES})
+    if(${DEAL_II_TRILINOS_WITH_SEACAS})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES})
       CHECK_CXX_SOURCE_COMPILES(
         "
         #include <exodusII.h>
@@ -313,22 +313,22 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         TRILINOS_SEACAS_IS_FUNCTIONAL
         )
 
-      RESET_CMAKE_REQUIRED()
+      reset_cmake_required()
 
-      IF(NOT TRILINOS_SEACAS_IS_FUNCTIONAL)
-        MESSAGE(
+      if(NOT TRILINOS_SEACAS_IS_FUNCTIONAL)
+        message(
           STATUS
           "SEACAS was found but doesn't seem to include ExodusII. Disabling SEACAS support."
           )
-        SET(DEAL_II_TRILINOS_WITH_SEACAS OFF)
-      ENDIF()
-    ENDIF()
+        set(DEAL_II_TRILINOS_WITH_SEACAS OFF)
+      endif()
+    endif()
 
-    IF(${DEAL_II_TRILINOS_WITH_SACADO})
+    if(${DEAL_II_TRILINOS_WITH_SACADO})
       #
       # Look for Sacado_config.h - we'll query it to determine C++11 support:
       #
-      DEAL_II_FIND_FILE(SACADO_CONFIG_H Sacado_config.h
+      deal_ii_find_file(SACADO_CONFIG_H Sacado_config.h
         HINTS ${Trilinos_INCLUDE_DIRS}
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
@@ -344,14 +344,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       #
       # Test whether the compiler hits this issue
       #
-      DEAL_II_FIND_FILE(SACADO_TRAD_HPP Sacado_trad.hpp
+      deal_ii_find_file(SACADO_TRAD_HPP Sacado_trad.hpp
         HINTS ${Trilinos_INCLUDE_DIRS}
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
         )
 
-      IF(EXISTS ${SACADO_TRAD_HPP})
-        LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      if(EXISTS ${SACADO_TRAD_HPP})
+        list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
 
         CHECK_CXX_SOURCE_COMPILES(
           "
@@ -366,50 +366,50 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
           "
           TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
           )
-        RESET_CMAKE_REQUIRED()
-      ENDIF()
+        reset_cmake_required()
+      endif()
 
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+    endif()
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
-  SET(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
-  SET(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES 
+macro(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
+  set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
+  set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
+  set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES 
       "TrilinosWrappers::SparseMatrix"
       "TrilinosWrappers::BlockSparseMatrix")
-  SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
-  SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-  SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
-  IF (${DEAL_II_TRILINOS_WITH_TPETRA})
-    SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
-    SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
-    IF (${DEAL_II_WITH_COMPLEX_NUMBERS})
-      SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
-      SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
-    ENDIF()
-  ENDIF()
-  IF(${DEAL_II_TRILINOS_WITH_SACADO})
+  set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
+  set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
+  set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
+  if (${DEAL_II_TRILINOS_WITH_TPETRA})
+    set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
+    set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    if (${DEAL_II_WITH_COMPLEX_NUMBERS})
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
+    endif()
+  endif()
+  if(${DEAL_II_TRILINOS_WITH_SACADO})
     # Note: Only CMake 3.0 and greater support line continuation with the "\" character
     #       Elements of string lists are naturally separated by a ";"
-    SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
+    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
         "Sacado::Fad::DFad<double>"
         "Sacado::Fad::DFad<float>"
         "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
         "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
-    SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
+    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
         "Sacado::Rad::ADvar<double>"
         "Sacado::Rad::ADvar<float>"
         "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
         "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>")
 
-    IF (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
-      SET(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
-    ENDIF()
-  ENDIF()
-ENDMACRO()
+    if (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
+      set(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
+    endif()
+  endif()
+endmacro()
 
 
-CONFIGURE_FEATURE(TRILINOS)
+configure_feature(TRILINOS)

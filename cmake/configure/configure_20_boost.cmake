@@ -17,36 +17,36 @@
 # Configuration for the boost library:
 #
 
-IF(NOT FEATURE_ZLIB_PROCESSED)
-  MESSAGE(FATAL_ERROR "\n"
+if(NOT FEATURE_ZLIB_PROCESSED)
+  message(FATAL_ERROR "\n"
     "Internal build system error: The configuration of "
     "DEAL_II_WITH_BOOST depends on "
-    "DEAL_II_WITH_ZLIB, but CONFIGURE_FEATURE(BOOST) "
-    "was called before CONFIGURE_FEATURE(ZLIB).\n\n"
+    "DEAL_II_WITH_ZLIB, but configure_feature(BOOST) "
+    "was called before configure_feature(ZLIB).\n\n"
     )
-ENDIF()
+endif()
 
 
-SET(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
+set(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
   CACHE BOOL "Build deal.II with support for boost." FORCE
   )
 
 
-MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
+macro(FEATURE_BOOST_CONFIGURE_COMMON)
   # Some standard library implementations do not implement std::auto_ptr
   # (anymore) which was deprecated for C++11 and removed in the C++17 standard.
   # Older boost versions can't know about this but provide a possibility to
   # circumvent the issue. Hence, we just check ourselves.
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
-  ELSE()
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
-  ENDIF()
+  if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    add_flags(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
+  else()
+    add_flags(CMAKE_REQUIRED_FLAGS "-Werror")
+  endif()
   # The configure function is called only once. In case an externally provided
   # boost library is detected, BOOST_INCLUDE_DIRS contains the include paths to
   # be used and BOOST_BUNDLED_INCLUDE_DIRS is empty. For the bundled library, it
   # is the other way around.
-  LIST(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
+  list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
 
   # In case, the boost library already sets BOOST_NO_AUTO_PTR we report
   # DEAL_II_HAS_AUTO_PTR to be true to avoid redefining the macro.
@@ -66,19 +66,19 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
     "
     DEAL_II_HAS_AUTO_PTR)
 
-  RESET_CMAKE_REQUIRED()
+  reset_cmake_required()
 
   # Fix some problems by defining some additional preprocessor
   # symbols. Ultimately these are added into DEAL_II_DEFINITIONS and
   # DEAL_II_USER_DEFINITIONS. They are separate here so that they show up in
   # detailed.log under DEAL_II_WITH_BOOST as, logically, they are part of our
   # boost configuration.
-  IF(NOT DEAL_II_HAS_AUTO_PTR)
-    LIST(APPEND BOOST_DEFINITIONS "BOOST_NO_AUTO_PTR")
-    LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_AUTO_PTR")
-  ENDIF()
+  if(NOT DEAL_II_HAS_AUTO_PTR)
+    list(APPEND BOOST_DEFINITIONS "BOOST_NO_AUTO_PTR")
+    list(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_AUTO_PTR")
+  endif()
 
-  ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
+  enable_if_supported(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
 
   # At least BOOST 1.74 has the problem that some of the BOOST headers
   # include other BOOST headers that are deprecated, and this then leads to
@@ -88,9 +88,9 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
   # boost library is detected, BOOST_INCLUDE_DIRS contains the include paths to
   # be used and BOOST_BUNDLED_INCLUDE_DIRS is empty. For the bundled library, it
   # is the other way around.
-  LIST(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
+  list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
 
-  CHECK_CXX_COMPILER_BUG(
+  check_cxx_compiler_bug(
     "
     #define BOOST_CONFIG_HEADER_DEPRECATED_HPP_INCLUDED
     #define BOOST_HEADER_DEPRECATED(a) _Pragma(\"GCC error \\\"stop compilation\\\"\");
@@ -98,66 +98,66 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
     int main() { return 0; }
     "
     DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS)
-  RESET_CMAKE_REQUIRED()
-ENDMACRO()
+  reset_cmake_required()
+endmacro()
 
 
-MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
+macro(FEATURE_BOOST_CONFIGURE_BUNDLED)
   #
   # Add rt to the link interface as well, boost/chrono needs it.
   #
-  IF(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
-    FIND_SYSTEM_LIBRARY(rt_LIBRARY NAMES rt)
-    MARK_AS_ADVANCED(rt_LIBRARY)
-    IF(NOT rt_LIBRARY MATCHES "-NOTFOUND")
-      SET(BOOST_LIBRARIES ${rt_LIBRARY})
-    ENDIF()
-  ENDIF()
+  if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    find_system_library(rt_LIBRARY NAMES rt)
+    mark_as_advanced(rt_LIBRARY)
+    if(NOT rt_LIBRARY MATCHES "-NOTFOUND")
+      set(BOOST_LIBRARIES ${rt_LIBRARY})
+    endif()
+  endif()
 
   # We need to set this path before calling the configure function
   # to be able to use the include paths in the checks.
-  SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
+  set(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
   #
   # We still need the version information, which is set up in the FindBoost
   # module in the non-bundled case:
   #
-  FILE(STRINGS "${BOOST_BUNDLED_INCLUDE_DIRS}/boost/version.hpp"
+  file(STRINGS "${BOOST_BUNDLED_INCLUDE_DIRS}/boost/version.hpp"
     BOOST_VERSION_STRING
     REGEX "#define.*BOOST_VERSION")
 
-  STRING(REGEX REPLACE "^.*BOOST_VERSION.* ([0-9]+).*" "\\1"
+  string(REGEX REPLACE "^.*BOOST_VERSION.* ([0-9]+).*" "\\1"
     BOOST_VERSION_NUMBER "${BOOST_VERSION_STRING}"
     )
-  MATH(EXPR Boost_MAJOR_VERSION "${BOOST_VERSION_NUMBER} / 100000")
-  MATH(EXPR Boost_MINOR_VERSION "${BOOST_VERSION_NUMBER} / 100 % 1000")
-  MATH(EXPR Boost_SUBMINOR_VERSION "${BOOST_VERSION_NUMBER} % 100")
+  math(EXPR Boost_MAJOR_VERSION "${BOOST_VERSION_NUMBER} / 100000")
+  math(EXPR Boost_MINOR_VERSION "${BOOST_VERSION_NUMBER} / 100 % 1000")
+  math(EXPR Boost_SUBMINOR_VERSION "${BOOST_VERSION_NUMBER} % 100")
 
   FEATURE_BOOST_CONFIGURE_COMMON()
 
-  IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     #
     # Bundled boost tries to (dl)open itself as a dynamic library on
     # Windows. Disable this undesired behavior by exporting
     # BOOST_ALL_NO_LIB on Windows platforms (for bundled boost).
     #
-    LIST(APPEND BOOST_DEFINITIONS "BOOST_ALL_NO_LIB")
-    LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_ALL_NO_LIB")
-  ENDIF()
-ENDMACRO()
+    list(APPEND BOOST_DEFINITIONS "BOOST_ALL_NO_LIB")
+    list(APPEND BOOST_USER_DEFINITIONS "BOOST_ALL_NO_LIB")
+  endif()
+endmacro()
 
-MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
-  FIND_PACKAGE(BOOST)
+macro(FEATURE_BOOST_FIND_EXTERNAL var)
+  find_package(BOOST)
 
-  IF(BOOST_FOUND)
-    SET(${var} TRUE)
+  if(BOOST_FOUND)
+    set(${var} TRUE)
 
-    IF(DEAL_II_WITH_ZLIB)
+    if(DEAL_II_WITH_ZLIB)
       #
       # Test that Boost.Iostreams is usable.
       #
-      RESET_CMAKE_REQUIRED()
-      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_LIBRARIES})
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
+      reset_cmake_required()
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
 
       CHECK_CXX_SOURCE_COMPILES(
         "
@@ -179,34 +179,34 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
         "
         BOOST_IOSTREAMS_USABLE
         )
-      IF(NOT ${BOOST_IOSTREAMS_USABLE})
-        MESSAGE(STATUS
+      if(NOT ${BOOST_IOSTREAMS_USABLE})
+        message(STATUS
           "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
           "with zlib support but a simple test failed! "
           "Therefore, the bundled boost package is used."
           )
-        SET(BOOST_ADDITIONAL_ERROR_STRING
+        set(BOOST_ADDITIONAL_ERROR_STRING
           "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
           "with zlib support but a simple test failed! "
           )
-        SET(${var} FALSE)
-      ENDIF()
-      RESET_CMAKE_REQUIRED()
-    ENDIF() # DEAL_II_WITH_ZLIB
+        set(${var} FALSE)
+      endif()
+      reset_cmake_required()
+    endif() # DEAL_II_WITH_ZLIB
 
-    IF(${BOOST_VERSION} VERSION_LESS 1.74.0 AND DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+    if(${BOOST_VERSION} VERSION_LESS 1.74.0 AND DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
       #
       # Test that Boost.Serialization is usable.
       #
-      IF(NOT DEFINED BOOST_SERIALIZATION_USABLE OR NOT ${BOOST_SERIALIZATION_USABLE})
+      if(NOT DEFINED BOOST_SERIALIZATION_USABLE OR NOT ${BOOST_SERIALIZATION_USABLE})
         # Only run this check if it hasn't successfully run previously.
-        MESSAGE(STATUS "Performing Test BOOST_SERIALIZATION_USABLE")
+        message(STATUS "Performing Test BOOST_SERIALIZATION_USABLE")
 
-        SET(_binary_test_dir ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBugWorkdir)
+        set(_binary_test_dir ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBugWorkdir)
 
-        FILE(REMOVE_RECURSE ${_binary_test_dir})
-        FILE(MAKE_DIRECTORY ${_binary_test_dir})
-        EXECUTE_PROCESS(
+        file(REMOVE_RECURSE ${_binary_test_dir})
+        file(MAKE_DIRECTORY ${_binary_test_dir})
+        execute_process(
           COMMAND ${CMAKE_COMMAND}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
@@ -221,61 +221,61 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
           OUTPUT_QUIET
           ERROR_QUIET
           )
-        IF(${_result} EQUAL 0)
-          EXECUTE_PROCESS(
+        if(${_result} EQUAL 0)
+          execute_process(
             COMMAND ${CMAKE_COMMAND} --build . --target run
             WORKING_DIRECTORY ${_binary_test_dir}
             RESULT_VARIABLE _result
             OUTPUT_QUIET
             ERROR_QUIET
             )
-        ENDIF()
-        IF(${_result} EQUAL 0)
-          MESSAGE(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Success")
-          SET(BOOST_SERIALIZATION_USABLE TRUE CACHE INTERNAL "")
-        ELSE()
-          MESSAGE(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Failed")
-          SET(BOOST_SERIALIZATION_USABLE FALSE)
-        ENDIF()
-      ENDIF()
+        endif()
+        if(${_result} EQUAL 0)
+          message(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Success")
+          set(BOOST_SERIALIZATION_USABLE TRUE CACHE INTERNAL "")
+        else()
+          message(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Failed")
+          set(BOOST_SERIALIZATION_USABLE FALSE)
+        endif()
+      endif()
 
-      IF(NOT ${BOOST_SERIALIZATION_USABLE})
-        MESSAGE(STATUS
+      if(NOT ${BOOST_SERIALIZATION_USABLE})
+        message(STATUS
           "The externally provided Boost.Serialization library "
           "failed to pass a crucial test. \n"
           "Therefore, the bundled boost package is used. \n"
           "The configured testing project can be found at \n"
           "${_binary_test_dir}"
           )
-        SET(BOOST_ADDITIONAL_ERROR_STRING
+        set(BOOST_ADDITIONAL_ERROR_STRING
           "The externally provided Boost.Serialization library "
           "failed to pass a crucial test."
           )
-        SET(${var} FALSE)
-      ENDIF()
-    ENDIF() # DEAL_II_ALLOW_PLATFORM_INTROSPECTION
-  ENDIF()
-ENDMACRO()
+        set(${var} FALSE)
+      endif()
+    endif() # DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+  endif()
+endmacro()
 
 
-MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
+macro(FEATURE_BOOST_CONFIGURE_EXTERNAL)
   FEATURE_BOOST_CONFIGURE_COMMON()
-ENDMACRO()
+endmacro()
 
 
-CONFIGURE_FEATURE(BOOST)
+configure_feature(BOOST)
 
 
 #
 # DEAL_II_WITH_BOOST is always required.
 #
-IF(NOT DEAL_II_WITH_BOOST)
-  IF(DEAL_II_FEATURE_AUTODETECTION)
-    FEATURE_ERROR_MESSAGE("BOOST")
-  ELSE()
-    MESSAGE(FATAL_ERROR "\n"
+if(NOT DEAL_II_WITH_BOOST)
+  if(DEAL_II_FEATURE_AUTODETECTION)
+    feature_error_message("BOOST")
+  else()
+    message(FATAL_ERROR "\n"
       "Unmet configuration requirements: "
       "DEAL_II_WITH_BOOST required, but set to OFF!\n\n"
       )
-  ENDIF()
-ENDIF()
+  endif()
+endif()

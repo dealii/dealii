@@ -1,0 +1,54 @@
+#!/bin/bash
+## ---------------------------------------------------------------------
+##
+## Copyright (C) 2022 - 2022 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## The deal.II library is free software; you can use it, redistribute
+## it, and/or modify it under the terms of the GNU Lesser General
+## Public License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+## The full text of the license can be found in the file LICENSE at
+## the top level of the deal.II distribution.
+##
+## ---------------------------------------------------------------------
+
+#
+#
+#
+
+if [ ! -f contrib/utilities/lowercase_cmake ]; then
+  echo "*** This script must be run from the top-level directory of deal.II."
+  exit 1
+fi
+
+#
+# Collect all CMake functions and deal.II macro/functions:
+#
+
+collect_function_names() {
+  grep -iP "^(macro|function)\(.*" cmake/macros/macro_* |
+    sed -E -e 's#cmake/macros/macro_.*(macro|function)\(##I' -e 's#( .*\)|\))$##' |
+    sort |
+    tr '[:upper:]' '[:lower:]'
+  cmake --help-command-list | grep -v "cmake version"
+}
+
+#
+# Create a rules file for sed:
+#
+
+SED_FILE="$(mktemp --tmpdir dealii_cmake_lowercase_sed.XXXXXXXXXX)"
+trap 'rm -f -- "$SED_FILE"' EXIT
+
+collect_function_names | while read command ; do
+  echo 's/'"${command}"'\(\s*\)(/'"$command"'\1(/gI'
+done > "${SED_FILE}"
+
+#
+# Apply rules file to all CMake files:
+#
+
+git ls-files -z -- '*.cmake' '*.cmake.in' '*CMakeLists.txt' |
+  xargs -0 sed -i -f "${SED_FILE}"

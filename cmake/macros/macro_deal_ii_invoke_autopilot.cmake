@@ -18,7 +18,7 @@
 # part of the deal.II library.
 #
 # Usage:
-#       DEAL_II_INVOKE_AUTOPILOT()
+#       deal_ii_invoke_autopilot()
 #
 # where it is assumed that the following variables are defined:
 #
@@ -35,66 +35,66 @@
 #                         empty
 #
 
-MACRO(DEAL_II_INVOKE_AUTOPILOT)
+macro(DEAL_II_INVOKE_AUTOPILOT)
 
   # Generator specific values:
-  IF(CMAKE_GENERATOR MATCHES "Ninja")
-    SET(_make_command "$ ninja")
-  ELSE()
-    SET(_make_command " $ make")
-  ENDIF()
+  if(CMAKE_GENERATOR MATCHES "Ninja")
+    set(_make_command "$ ninja")
+  else()
+    set(_make_command " $ make")
+  endif()
 
   set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
   # Define and setup a compilation target:
-  ADD_EXECUTABLE(${TARGET} ${TARGET_SRC})
-  DEAL_II_SETUP_TARGET(${TARGET})
+  add_executable(${TARGET} ${TARGET_SRC})
+  deal_ii_setup_target(${TARGET})
 
-  MESSAGE(STATUS "Autopilot invoked")
+  message(STATUS "Autopilot invoked")
 
   # Define a custom target to easily run the program:
 
-  IF(NOT DEFINED TARGET_RUN)
-    SET(TARGET_RUN ${TARGET})
-  ENDIF()
+  if(NOT DEFINED TARGET_RUN)
+    set(TARGET_RUN ${TARGET})
+  endif()
 
-  IF(CMAKE_SYSTEM_NAME MATCHES "(CYGWIN|Windows)")
+  if(CMAKE_SYSTEM_NAME MATCHES "(CYGWIN|Windows)")
     #
     # Hack for Cygwin and Windows targets: Export PATH to point to the
     # dynamic library.
     #
-    SET(_delim ":")
-    IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-      SET(_delim ";")
-    ENDIF()
-    FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
-      "SET(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR}${_delim}${DEAL_II_PATH}/${DEAL_II_EXECUTABLE_RELDIR}${_delim}\$ENV{PATH}\")\n"
-      "EXECUTE_PROCESS(COMMAND ${CMAKE_BUILD_TYPE}\\\\${TARGET_RUN}\n"
+    set(_delim ":")
+    if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+      set(_delim ";")
+    endif()
+    file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+      "set(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR}${_delim}${DEAL_II_PATH}/${DEAL_II_EXECUTABLE_RELDIR}${_delim}\$ENV{PATH}\")\n"
+      "execute_process(COMMAND ${CMAKE_BUILD_TYPE}\\\\${TARGET_RUN}\n"
       "  RESULT_VARIABLE _return_value\n"
       "  )\n"
-      "IF(NOT \"\${_return_value}\" STREQUAL \"0\")\n"
-      "  MESSAGE(SEND_ERROR \"\nProgram terminated with exit code: \${_return_value}\")\n"
-      "ENDIF()\n"
+      "if(NOT \"\${_return_value}\" STREQUAL \"0\")\n"
+      "  message(SEND_ERROR \"\nProgram terminated with exit code: \${_return_value}\")\n"
+      "endif()\n"
       )
-    SET(_command
+    set(_command
       ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       )
 
-  ELSE()
+  else()
 
-    SET(_command ${TARGET_RUN})
-  ENDIF()
+    set(_command ${TARGET_RUN})
+  endif()
 
-  IF(NOT "${TARGET_RUN}" STREQUAL "")
-    ADD_CUSTOM_TARGET(run
+  if(NOT "${TARGET_RUN}" STREQUAL "")
+    add_custom_target(run
       COMMAND ${_command}
       DEPENDS ${TARGET}
       COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
       )
-    SET(_run_targets
+    set(_run_targets
       "#      ${_make_command} run            - to (compile, link and) run the program\n"
       )
-  ENDIF()
+  endif()
 
 
   #
@@ -103,21 +103,21 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
   # tasks that need networking.
   #
 
-  IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    IF(DEFINED OSX_CERTIFICATE_NAME)
-      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
+  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    if(DEFINED OSX_CERTIFICATE_NAME)
+      add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
         COMMAND codesign -f -s ${OSX_CERTIFICATE_NAME} ${TARGET}
         COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
         COMMENT "Digitally signing ${TARGET}"
         DEPENDS ${TARGET}
         VERBATIM
         )
-      ADD_CUSTOM_TARGET(sign ALL
+      add_custom_target(sign ALL
         DEPENDS ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
         )
-      ADD_DEPENDENCIES(run sign)
-    ELSE()
-      ADD_CUSTOM_TARGET(sign
+      add_dependencies(run sign)
+    else()
+      add_custom_target(sign
         COMMAND
            ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo '***************************************************************************'
@@ -127,19 +127,19 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
         && ${CMAKE_COMMAND} -E echo ''
         COMMENT "Digitally signing ${TARGET}"
         )
-    ENDIF()
+    endif()
 
-    SET(_run_targets
+    set(_run_targets
       "${_run_targets}#\n#      ${_make_command} sign           - to sign the executable with the supplied OSX developer key\n"
       )
-  ENDIF()
+  endif()
 
   #
   # Define custom targets to easily switch the build type:
   #
 
-  IF(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
-    ADD_CUSTOM_TARGET(debug
+  if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
+    add_custom_target(debug
       COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
       COMMAND ${CMAKE_COMMAND} -E echo "***"
       COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
@@ -147,10 +147,10 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
       VERBATIM
       )
-  ENDIF()
+  endif()
 
-  IF(${DEAL_II_BUILD_TYPE} MATCHES "Release")
-    ADD_CUSTOM_TARGET(release
+  if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
+    add_custom_target(release
       COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
       COMMAND ${CMAKE_COMMAND} -E echo "***"
       COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
@@ -158,31 +158,31 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       COMMENT "Switching CMAKE_BUILD_TYPE to Release"
       VERBATIM
       )
-  ENDIF()
+  endif()
 
   #
   # Only mention release and debug targets if it is actually possible to
   # switch between them:
   #
 
-  IF(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
-    SET(_switch_targets
+  if(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
+    set(_switch_targets
 "#      ${_make_command} debug          - to switch the build type to 'Debug'
 #      ${_make_command} release        - to switch the build type to 'Release'\n"
       )
-  ENDIF()
+  endif()
 
   # And another custom target to clean up all files generated by the program:
-  IF("${CLEAN_UP_FILES}" STREQUAL "")
-    SET(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2)
-  ENDIF()
-  ADD_CUSTOM_TARGET(runclean
+  if("${CLEAN_UP_FILES}" STREQUAL "")
+    set(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2)
+  endif()
+  add_custom_target(runclean
     COMMAND ${CMAKE_COMMAND} -E remove ${CLEAN_UP_FILES}
     COMMENT "runclean invoked"
     )
 
   # Define a distclean target to remove every generated file:
-  ADD_CUSTOM_TARGET(distclean
+  add_custom_target(distclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target runclean
     COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
@@ -193,18 +193,18 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     )
 
   # Define a strip-comments target:
-  FIND_PACKAGE(Perl QUIET)
-  IF(PERL_FOUND)
-    ADD_CUSTOM_TARGET(strip_comments
+  find_package(Perl QUIET)
+  if(PERL_FOUND)
+    add_custom_target(strip_comments
       COMMAND ${PERL_EXECUTABLE} -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${TARGET_SRC}
       COMMENT "strip comments"
       )
-  ENDIF()
+  endif()
 
 
   # Print out some usage information to file:
-  FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
-"MESSAGE(
+  file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+"message(
 \"###
 #
 #  Project  ${TARGET}  set up with  ${DEAL_II_PACKAGE_NAME}-${DEAL_II_PACKAGE_VERSION}  found at
@@ -217,20 +217,20 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
 ${_run_targets}#
 ${_switch_targets}#
 ")
-  IF(NOT CMAKE_GENERATOR MATCHES "Ninja")
-    FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+  if(NOT CMAKE_GENERATOR MATCHES "Ninja")
+    file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} edit_cache     - to change (cached) configuration variables
 #                               and rerun the configure and generate phases of CMake
 #
 ")
-  ENDIF()
-  IF(PERL_FOUND)
-    FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+  endif()
+  if(PERL_FOUND)
+    file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} strip_comments - to strip the source files in this
 #                               directory off their comments; this is irreversible
 ")
-  ENDIF()
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+  endif()
+  file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} clean          - to remove the generated executable as well as
 #                               all intermediate compilation files
 #      ${_make_command} runclean       - to remove all output generated by the program
@@ -244,17 +244,17 @@ ${_switch_targets}#
 ###\")"
      )
 
-  ADD_CUSTOM_TARGET(info
+  add_custom_target(info
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
     )
 
   # Print this message once:
-  IF(NOT USAGE_PRINTED)
-    INCLUDE(${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake)
-    SET(USAGE_PRINTED TRUE CACHE INTERNAL "")
-  ELSE()
-    MESSAGE(STATUS "Run  ${_make_command} info  to print a detailed help message")
-  ENDIF()
+  if(NOT USAGE_PRINTED)
+    include(${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake)
+    set(USAGE_PRINTED TRUE CACHE INTERNAL "")
+  else()
+    message(STATUS "Run  ${_make_command} info  to print a detailed help message")
+  endif()
 
-ENDMACRO()
+endmacro()
 
