@@ -1,0 +1,8 @@
+subsection Running parameters
+  set Solver type       = newtonls
+  set Absolute error tolerance = 1.e-9
+  set Relative error tolerance = 2.e-9
+  set Step tolerance = 3.e-9
+  set Maximum iterations = 23
+  set Maximum function evaluations = 77
+end

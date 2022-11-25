@@ -1,0 +1,30 @@
+# Default Parameters
+subsection Running parameters
+  set Absolute error tolerance     = 0
+  set Maximum function evaluations = 0
+  set Maximum iterations           = 0
+  set Relative error tolerance     = 0
+  set Solver type                  = 
+  set Step tolerance               = 0
+end
+# Testing Parameters
+subsection Running parameters
+  set Absolute error tolerance     = 1.e-9
+  set Maximum function evaluations = 77
+  set Maximum iterations           = 23
+  set Relative error tolerance     = 2.e-9
+  set Solver type                  = newtonls
+  set Step tolerance               = 3.e-9
+end
+# Test PETSc interface (FD)
+#   Solution 1, 1
+#   Iterations 8
+# Test PETSc interface
+#   Solution 1, 1
+#   Iterations 8
+# Test user interface
+#   Solution 1, 1
+#   Iterations 8
+# Test user interface (affine)
+#   Solution 1, 1
+#   Iterations 8

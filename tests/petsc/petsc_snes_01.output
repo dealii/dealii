@@ -1,0 +1,9 @@
+# Test PETSc interface
+#   Solution 1, 1
+#   Iterations 8
+# Test user interface
+#   Solution 1, 1
+#   Iterations 8
+# Test user interface (affine)
+#   Solution 1, 1
+#   Iterations 8
