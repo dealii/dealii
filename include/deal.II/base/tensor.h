@@ -1035,7 +1035,7 @@ Tensor<0, dim, Number>::end_raw() const
 
 
 template <int dim, typename Number>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE
 Tensor<0, dim, Number>::operator Number &()
 {
   // We cannot use Assert inside a CUDA kernel
@@ -1063,7 +1063,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator=(const Tensor<0, dim, OtherNumber> &p)
 {
   value = internal::NumberType<Number>::value(p.value);
@@ -1073,7 +1073,7 @@ Tensor<0, dim, Number>::operator=(const Tensor<0, dim, OtherNumber> &p)
 
 #  if defined(__INTEL_COMPILER) || defined(DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG)
 template <int dim, typename Number>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator=(const Tensor<0, dim, Number> &p)
 {
   value = p.value;
@@ -1095,7 +1095,7 @@ Tensor<0, dim, Number>::operator=(Tensor<0, dim, Number> &&other) noexcept
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator=(const OtherNumber &d)
 {
   value = internal::NumberType<Number>::value(d);
@@ -1131,7 +1131,7 @@ Tensor<0, dim, Number>::operator!=(const Tensor<0, dim, OtherNumber> &p) const
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator+=(const Tensor<0, dim, OtherNumber> &p)
 {
   value += p.value;
@@ -1141,7 +1141,7 @@ Tensor<0, dim, Number>::operator+=(const Tensor<0, dim, OtherNumber> &p)
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator-=(const Tensor<0, dim, OtherNumber> &p)
 {
   value -= p.value;
@@ -1155,7 +1155,7 @@ namespace internal
   namespace ComplexWorkaround
   {
     template <typename Number, typename OtherNumber>
-    constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE void
+    constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE void
     multiply_assign_scalar(Number &val, const OtherNumber &s)
     {
       val *= s;
@@ -1163,7 +1163,7 @@ namespace internal
 
 #  ifdef __CUDA_ARCH__
     template <typename Number, typename OtherNumber>
-    constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE void
+    constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE void
     multiply_assign_scalar(std::complex<Number> &, const OtherNumber &)
     {
       printf("This function is not implemented for std::complex<Number>!\n");
@@ -1176,7 +1176,7 @@ namespace internal
 
 template <int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator*=(const OtherNumber &s)
 {
   internal::ComplexWorkaround::multiply_assign_scalar(value, s);
@@ -1385,10 +1385,10 @@ namespace internal
   namespace TensorSubscriptor
   {
     template <typename ArrayElementType, int dim>
-    constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE ArrayElementType &
-    subscript(ArrayElementType * values,
-              const unsigned int i,
-              std::integral_constant<int, dim>)
+    constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE ArrayElementType &
+                                             subscript(ArrayElementType * values,
+                                                       const unsigned int i,
+                                                       std::integral_constant<int, dim>)
     {
       // We cannot use Assert in a CUDA kernel
 #  ifndef __CUDA_ARCH__
@@ -1398,10 +1398,10 @@ namespace internal
     }
 
     template <typename ArrayElementType>
-    constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE ArrayElementType &
-    subscript(ArrayElementType *dummy,
-              const unsigned int,
-              std::integral_constant<int, 0>)
+    constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE ArrayElementType &
+                                             subscript(ArrayElementType *dummy,
+                                                       const unsigned int,
+                                                       std::integral_constant<int, 0>)
     {
       // We cannot use Assert in a CUDA kernel
 #  ifndef __CUDA_ARCH__
@@ -1417,7 +1417,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE
   typename Tensor<rank_, dim, Number>::value_type &
   Tensor<rank_, dim, Number>::operator[](const unsigned int i)
 {
@@ -1712,7 +1712,7 @@ Tensor<rank_, dim, Number>::norm() const
 
 
 template <int rank_, int dim, typename Number>
-constexpr inline DEAL_II_HOST_DEV_ALWAYS_INLINE
+constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE
   typename numbers::NumberTraits<Number>::real_type
   Tensor<rank_, dim, Number>::norm_square() const
 {
