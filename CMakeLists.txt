@@ -35,6 +35,8 @@ MESSAGE(STATUS "")
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
 #
 # We support all policy changes up to version 3.3. Thus, explicitly set all
 # policies CMP0001 - CMP0054 to new for version 3.3 (and later) to avoid

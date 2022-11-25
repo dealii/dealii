@@ -37,6 +37,8 @@
 
 MACRO(DEAL_II_INVOKE_AUTOPILOT)
 
+  SET(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
   # Generator specific values:
   IF(CMAKE_GENERATOR MATCHES "Ninja")
     SET(_make_command "$ ninja")
