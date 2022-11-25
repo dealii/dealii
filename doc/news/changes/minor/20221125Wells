@@ -1,0 +1,5 @@
+Changed: All SparsityPattern classes now inherit from a new class SparsityPatternBase
+which provides an API for efficiently adding new entries. As a consequence of this change,
+the majority of templates over the sparsity pattern type have been removed.
+<br>
+(David Wells, 2022/11/25)
