@@ -50,10 +50,7 @@ if(DEFINED ENV{MPIEXEC})
   find_program(MPIEXEC $ENV{MPIEXEC})
 endif()
 
-# temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 find_package(MPI)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
 # Older versions of MPI may not have MPI_SEEK_SET, which we
