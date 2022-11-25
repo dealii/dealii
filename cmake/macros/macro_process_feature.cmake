@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# deal_ii_package_handle(<feature>
+# process_feature(<feature>
 #  {<conf. variable> {(REQUIRED|OPTIONAL) <variables>}}
 #  [CLEAR <variables>]
 #  )
@@ -25,7 +25,7 @@
 #
 # Its usage is best explained with an example:
 #
-#   deal_ii_package_handle(PETSC
+#   process_feature(PETSC
 #     LIBRARIES
 #       REQUIRED PETSC_LIBRARY
 #       OPTIONAL _petsc_libraries
@@ -45,7 +45,9 @@
 # search.
 #
 
-macro(deal_ii_package_handle _feature)
+macro(process_feature _feature)
+
+  message(STATUS "Configuring ${_feature} interface target:")
 
   if(DEFINED ${_feature}_VERSION)
     message(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")
@@ -105,7 +107,7 @@ macro(deal_ii_package_handle _feature)
       if ("${_current_suffix}" STREQUAL "")
         message(FATAL_ERROR
           "Internal configuration error: the second "
-          "argument to DEAL_II_PACKAGE_HANDLE must be a keyword"
+          "argument to process_feature must be a keyword"
           )
       endif()
 
@@ -156,6 +158,20 @@ macro(deal_ii_package_handle _feature)
     endforeach()
 
     #
+    # Remove certain system libraries from the link interface. This is
+    # purely cosmetic (we always implicitly link against the C library, and
+    # we always set up threading by linking against libpthread.so if
+    # necessary).
+    #
+    foreach(_suffix LIBRARIES LIBRARIES_DEBUG LIBRARIES_RELEASE)
+      if(NOT "${_temp_${_suffix}}" STREQUAL "")
+        list(REMOVE_ITEM _temp_${_suffix}
+          "pthread" "-pthread" "-lpthread" "c" "-lc"
+          )
+      endif()
+    endforeach()
+
+    #
     # Write back into global variables:
     #
     clear_feature(${_feature})
@@ -166,26 +182,15 @@ macro(deal_ii_package_handle _feature)
       endif()
     endforeach()
 
-    #
-    # Remove certain system libraries from the link interface. This is
-    # purely cosmetic (we always implicitly link against the C library, and
-    # we always set up threading by linking against libpthread.so if
-    # necessary).
-    #
-    foreach(_suffix LIBRARIES LIBRARIES_DEBUG LIBRARIES_RELEASE)
-      if(NOT "${${_feature}_${_suffix}}" STREQUAL "")
-        list(REMOVE_ITEM ${_feature}_${_suffix}
-          "pthread" "-pthread" "-lpthread" "c" "-lc"
-          )
-      endif()
-    endforeach()
-
-    message(STATUS "Found ${_feature}")
-
     mark_as_advanced(${_feature}_DIR ${_feature}_ARCH)
+
+    #
+    # Finally create interface target:
+    #
+    # define_feature_target(${_feature})
 
   else()
 
-    message(STATUS "Could NOT find ${_feature}")
+    message(STATUS "Could NOT configure ${_feature}")
   endif()
 endmacro()

@@ -198,7 +198,7 @@ if(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   endif()
 endif()
 
-deal_ii_package_handle(P4EST
+process_feature(P4EST
   LIBRARIES
     REQUIRED ${_libraries}
     OPTIONAL LAPACK_LIBRARIES MPI_C_LIBRARIES

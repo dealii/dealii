@@ -89,7 +89,7 @@ if(EXISTS ${SLEPC_SLEPCVERSION_H})
     )
 endif()
 
-deal_ii_package_handle(SLEPC
+process_feature(SLEPC
   LIBRARIES
     REQUIRED SLEPC_LIBRARY PETSC_LIBRARIES
   INCLUDE_DIRS

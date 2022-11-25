@@ -114,7 +114,7 @@ else()
   set(TBB_WITH_ONEAPI TRUE)
 endif()
 
-deal_ii_package_handle(TBB
+process_feature(TBB
   LIBRARIES REQUIRED ${_libraries}
   INCLUDE_DIRS REQUIRED TBB_INCLUDE_DIR
   CLEAR TBB_DEBUG_LIBRARY TBB_LIBRARY TBB_INCLUDE_DIR

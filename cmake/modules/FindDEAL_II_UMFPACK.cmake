@@ -126,7 +126,7 @@ FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 #
 find_system_library(rt_LIBRARY NAMES rt)
 
-deal_ii_package_handle(UMFPACK
+process_feature(UMFPACK
   LIBRARIES
     REQUIRED UMFPACK_LIBRARY
     OPTIONAL CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY CAMD_LIBRARY SuiteSparse_config_LIBRARY

@@ -97,7 +97,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 
-deal_ii_package_handle(LAPACK
+process_feature(LAPACK
   LIBRARIES
     REQUIRED LAPACK_LIBRARIES
     OPTIONAL BLAS_LIBRARIES ${_additional_libraries}

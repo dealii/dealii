@@ -40,7 +40,7 @@ if(CUDA_FOUND)
   message(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
 endif()
 
-deal_ii_package_handle(CUDA
+process_feature(CUDA
   LIBRARIES REQUIRED CUDA_LIBRARIES CUDA_cusparse_LIBRARY CUDA_cusolver_LIBRARY
   INCLUDE_DIRS REQUIRED CUDA_INCLUDE_DIRS
   CLEAR

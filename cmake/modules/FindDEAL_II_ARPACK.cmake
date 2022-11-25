@@ -71,7 +71,7 @@ else()
   set(ARPACK_WITH_PARPACK FALSE)
 endif()
 
-deal_ii_package_handle(ARPACK
+process_feature(ARPACK
   LIBRARIES
     OPTIONAL PARPACK_LIBRARY
     REQUIRED ARPACK_LIBRARY LAPACK_LIBRARIES

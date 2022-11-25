@@ -207,7 +207,7 @@ if(PETSC_WITH_MPIUNI)
   set(PETSC_INCLUDE_DIR_MPIUNI "${PETSC_INCLUDE_DIR_MPIUNI}/mpiuni")
 endif()
 
-deal_ii_package_handle(PETSC
+process_feature(PETSC
   LIBRARIES
     REQUIRED PETSC_LIBRARY
     OPTIONAL _petsc_libraries

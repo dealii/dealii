@@ -107,7 +107,7 @@ if(EXISTS ${ADOLC_SETTINGS_H})
 endif()
 
 
-deal_ii_package_handle(ADOLC
+process_feature(ADOLC
   LIBRARIES
     REQUIRED ADOLC_LIBRARY
     ${_additional_library}

@@ -70,7 +70,7 @@ if(EXISTS "${GSL_INCLUDE_DIR}/gsl/gsl_version.h" )
     )
 endif()
 
-deal_ii_package_handle(GSL
+process_feature(GSL
   LIBRARIES
     REQUIRED GSL_LIBRARY
     OPTIONAL GSL_CBLAS_LIBRARY

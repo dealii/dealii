@@ -84,7 +84,7 @@ foreach(_library ${_opencascade_libraries})
 endforeach()
 
 
-deal_ii_package_handle(OPENCASCADE
+process_feature(OPENCASCADE
   LIBRARIES
     REQUIRED ${_libraries}
   INCLUDE_DIRS
