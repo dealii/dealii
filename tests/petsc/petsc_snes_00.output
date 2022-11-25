@@ -1,0 +1,40 @@
+# Default Parameters
+subsection Running parameters
+  set absolute error tolerance     = 0
+  set linesearch type              = 
+  set maximum function evaluations = -1
+  set maximum iterations           = -1
+  set options prefix               = 
+  set relative error tolerance     = 0
+  set solver type                  = 
+  set step tolerance               = 0
+end
+# Testing Parameters
+subsection Running parameters
+  set absolute error tolerance     = 1.e-9
+  set linesearch type              = 
+  set maximum function evaluations = 77
+  set maximum iterations           = 23
+  set options prefix               = 
+  set relative error tolerance     = 2.e-9
+  set solver type                  = newtonls
+  set step tolerance               = 3.e-9
+end
+# Test PETSc interface (MFFD)
+#     0: 3.16228
+#     1: 2.84158
+#     2: 2.5438
+#     3: 2.27647
+#     4: 1.36494
+#     5: 0.288774
+#     6: 0.0203366
+#     7: 7.92738e-05
+#     8: 1.22106e-09
+#   Solution 1, 1
+#   Iterations 8
+# Test PETSc interface
+#   Solution 1, 1
+#   Iterations 8
+# Test user interface
+#   Solution 1, 1
+#   Iterations 8

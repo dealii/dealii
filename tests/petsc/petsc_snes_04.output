@@ -1,0 +1,12 @@
+
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_snes.templates.h> in function
+    unsigned int dealii::PETScWrappers::NonlinearSolver<VectorType, PMatrixType, AMatrixType>::solve(VectorType&) [with VectorType = dealii::PETScWrappers::MPI::Vector; PMatrixType = dealii::PETScWrappers::MatrixBase; AMatrixType = dealii::PETScWrappers::MatrixBase]
+The violated condition was: 
+    reason > 0
+Additional information: 
+    SNES solver did not converge after 0 iterations with reason
+    DIVERGED_MAX_IT
+--------------------------------------------------------
+
