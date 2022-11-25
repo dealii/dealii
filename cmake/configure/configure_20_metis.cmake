@@ -20,7 +20,7 @@ set(FEATURE_METIS_AFTER MPI)
 #
 
 macro(FEATURE_METIS_FIND_EXTERNAL var)
-  find_package(METIS)
+  find_package(DEAL_II_METIS)
 
   if(METIS_FOUND)
     set(${var} TRUE)

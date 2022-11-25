@@ -20,7 +20,7 @@
 set(FEATURE_ADOLC_AFTER BOOST TRILINOS)
 
 macro(FEATURE_ADOLC_FIND_EXTERNAL var)
-  find_package(ADOLC)
+  find_package(DEAL_II_ADOLC)
 
   if(ADOLC_FOUND)
     #

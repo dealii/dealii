@@ -44,7 +44,7 @@ macro(FEATURE_CUDA_FIND_EXTERNAL var)
     # still use it because it is very convenient to (a) check that CUDA is
     # installed, (b) get compiler path and include directories / libraries.
     #
-    find_package(CUDA)
+    find_package(DEAL_II_CUDA)
 
     if(CUDA_FOUND)
       #

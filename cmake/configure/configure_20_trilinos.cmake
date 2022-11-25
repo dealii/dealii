@@ -20,7 +20,7 @@
 set(FEATURE_TRILINOS_DEPENDS MPI)
 
 macro(FEATURE_TRILINOS_FIND_EXTERNAL var)
-  find_package(TRILINOS)
+  find_package(DEAL_II_TRILINOS)
 
   if(TRILINOS_FOUND)
     #

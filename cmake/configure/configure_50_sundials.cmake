@@ -18,7 +18,7 @@
 #
 
 macro(FEATURE_SUNDIALS_FIND_EXTERNAL var)
-  find_package(SUNDIALS)
+  find_package(DEAL_II_SUNDIALS)
 
   if(SUNDIALS_FOUND)
     set(${var} TRUE)

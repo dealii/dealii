@@ -143,7 +143,7 @@ macro(FEATURE_BOOST_CONFIGURE_BUNDLED)
 endmacro()
 
 macro(FEATURE_BOOST_FIND_EXTERNAL var)
-  find_package(BOOST)
+  find_package(DEAL_II_BOOST)
 
   if(BOOST_FOUND)
     set(${var} TRUE)

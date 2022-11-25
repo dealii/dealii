@@ -21,7 +21,7 @@ set(FEATURE_PETSC_AFTER MPI)
 
 
 macro(FEATURE_PETSC_FIND_EXTERNAL var)
-  find_package(PETSC)
+  find_package(DEAL_II_PETSC)
 
   if(PETSC_FOUND)
     #

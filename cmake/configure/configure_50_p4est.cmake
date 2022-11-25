@@ -21,7 +21,7 @@ set(FEATURE_P4EST_DEPENDS MPI)
 
 
 macro(FEATURE_P4EST_FIND_EXTERNAL var)
-  find_package(P4EST)
+  find_package(DEAL_II_P4EST)
 
   if(P4EST_FOUND)
     set(${var} TRUE)

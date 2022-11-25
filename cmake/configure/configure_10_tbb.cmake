@@ -19,7 +19,7 @@
 #
 
 macro(FEATURE_TBB_FIND_EXTERNAL var)
-  find_package(TBB)
+  find_package(DEAL_II_TBB)
 
   if(TBB_FOUND)
     set(${var} TRUE)
