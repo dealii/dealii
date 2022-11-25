@@ -126,7 +126,7 @@ set(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include
   ${CMAKE_SOURCE_DIR}/include/
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_USER_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
   )
 
 configure_file(
@@ -158,7 +158,7 @@ set(CONFIG_BUILD_DIR FALSE)
 set(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
   ${_installed_bundled}
-  ${DEAL_II_USER_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
   )
 
 configure_file(
@@ -344,7 +344,7 @@ to_string_and_add_prefix(CONFIG_INCLUDE_DIRS_PC "-I"
   \\\${prefix}/include
   ${CMAKE_SOURCE_DIR}/include
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_USER_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
   )
 
 foreach(_build ${DEAL_II_BUILD_TYPES})
@@ -368,7 +368,7 @@ set(CONFIG_PATH_PC "${CMAKE_INSTALL_PREFIX}")
 to_string_and_add_prefix(CONFIG_INCLUDE_DIRS_PC "-I"
   \\\${includedir}
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_USER_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
   )
 
 foreach(_build ${DEAL_II_BUILD_TYPES})

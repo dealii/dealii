@@ -45,7 +45,7 @@ macro(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
       COMPILE_FLAGS " ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
       )
     set_property(TARGET ${_target} APPEND PROPERTY
-      COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
+      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
       )
 
   else()

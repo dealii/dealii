@@ -46,7 +46,6 @@ enable_if_supported(DEAL_II_CXX_FLAGS "/EHsc")
 # Globally disable some legacy min and max macros that cause problems:
 enable_if_supported(DEAL_II_CXX_FLAGS "/NOMINMAX")
 list(APPEND DEAL_II_DEFINITIONS "NOMINMAX")
-list(APPEND DEAL_II_USER_DEFINITIONS "NOMINMAX")
 
 # fix "fatal error C1128: number of sections exceeded object file format limit"
 # happening in debug mode with visual studio 2015
@@ -104,7 +103,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
   # Disable assert() in deal.II and user projects in release mode
   #
   list(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
-  list(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
 
 endif()
 
@@ -117,7 +115,6 @@ endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
-  list(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
 
   # generate some debug info:
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "/Zi /MDd /Od")

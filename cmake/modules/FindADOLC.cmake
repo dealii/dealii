@@ -114,9 +114,6 @@ deal_ii_package_handle(ADOLC
   INCLUDE_DIRS
     REQUIRED ADOLC_INCLUDE_DIR
     ${_additional_include_dirs}
-  USER_INCLUDE_DIRS
-    REQUIRED ADOLC_INCLUDE_DIR
-    ${_additional_include_dirs}
   CLEAR ADOLC_INCLUDE_DIR ADOLC_LIBRARY ADOLC_SETTINGS_H
     ADOLC_DOUBLE_CAST_CHECK ADOLC_ADOUBLE_OSTREAM_CHECK # clean up checks in configure_adolc.cmake
   )

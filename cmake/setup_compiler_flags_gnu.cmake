@@ -198,7 +198,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
   # Disable assert() in deal.II and user projects in release mode
   #
   list(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
-  list(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
 
   #
   # There are many places in the library where we create a new typedef and then
@@ -218,7 +217,6 @@ endif()
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
 
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
-  list(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
 
   #
   # In recent versions, gcc often eliminates too much debug information

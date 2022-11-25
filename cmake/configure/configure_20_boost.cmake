@@ -68,14 +68,12 @@ macro(FEATURE_BOOST_CONFIGURE_COMMON)
 
   reset_cmake_required()
 
-  # Fix some problems by defining some additional preprocessor
-  # symbols. Ultimately these are added into DEAL_II_DEFINITIONS and
-  # DEAL_II_USER_DEFINITIONS. They are separate here so that they show up in
-  # detailed.log under DEAL_II_WITH_BOOST as, logically, they are part of our
-  # boost configuration.
+  # Fix some problems by defining some additional preprocessor symbols.
+  # Ultimately these are added into DEAL_II_DEFINITIONS. They are separate
+  # here so that they show up in detailed.log under DEAL_II_WITH_BOOST as,
+  # logically, they are part of our boost configuration.
   if(NOT DEAL_II_HAS_AUTO_PTR)
     list(APPEND BOOST_DEFINITIONS "BOOST_NO_AUTO_PTR")
-    list(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_AUTO_PTR")
   endif()
 
   enable_if_supported(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
@@ -141,7 +139,6 @@ macro(FEATURE_BOOST_CONFIGURE_BUNDLED)
     # BOOST_ALL_NO_LIB on Windows platforms (for bundled boost).
     #
     list(APPEND BOOST_DEFINITIONS "BOOST_ALL_NO_LIB")
-    list(APPEND BOOST_USER_DEFINITIONS "BOOST_ALL_NO_LIB")
   endif()
 endmacro()
 

@@ -145,16 +145,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
   _detailed("#        DEAL_II_DEFINITIONS_DEBUG:    ${BASE_DEFINITIONS_DEBUG}\n")
 endif()
 
-_detailed("#        DEAL_II_USER_DEFINITIONS:     ${BASE_DEFINITIONS}\n")
-if(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_USER_DEFINITIONS_REL: ${BASE_DEFINITIONS_RELEASE}\n")
-endif()
-if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_USER_DEFINITIONS_DEB: ${BASE_DEFINITIONS_DEBUG}\n")
-endif()
-
 _detailed("#        DEAL_II_INCLUDE_DIRS          ${BASE_INCLUDE_DIRS}\n")
-_detailed("#        DEAL_II_USER_INCLUDE_DIRS:    ${BASE_USER_INCLUDE_DIRS}\n")
 _detailed("#        DEAL_II_BUNDLED_INCLUDE_DIRS: ${BASE_BUNDLED_INCLUDE_DIRS}\n")
 
 _detailed("#        DEAL_II_LIBRARIES:            ${BASE_LIBRARIES}\n")

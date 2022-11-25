@@ -181,7 +181,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
   # Disable assert() in deal.II and user projects in release mode
   #
   list(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
-  list(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
 
   # equivalent to -fno-strict-aliasing:
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
@@ -200,7 +199,6 @@ endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
-  list(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
 
   add_flags(DEAL_II_CXX_FLAGS_DEBUG "-O0")
 
