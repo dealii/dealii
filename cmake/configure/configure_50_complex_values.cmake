@@ -12,17 +12,17 @@
 ## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
- 
+
 #
 # Configuration for complex value support
 #
 
 if(${DEAL_II_WITH_COMPLEX_VALUES})
-   set(DEAL_II_EXPAND_COMPLEX_SCALARS 
+   set(DEAL_II_EXPAND_COMPLEX_SCALARS
        "std::complex<double>"
        "std::complex<float>"
       )
-   set(DEAL_II_EXPAND_COMPLEX_VECTORS 
+   set(DEAL_II_EXPAND_COMPLEX_VECTORS
        "Vector<std::complex<double> >"
        "Vector<std::complex<float> >"
       )

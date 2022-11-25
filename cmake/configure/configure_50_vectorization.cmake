@@ -12,7 +12,7 @@
 ## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
- 
+
 #
 # Configuration for real scalar vectorization
 #
@@ -22,19 +22,19 @@ set(DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED "VectorizedArray<double,1>" "Vectoriz
 set(DEAL_II_EXPAND_FLOAT_VECTORIZED "VectorizedArray<float,1>")
 
 if(${DEAL_II_VECTORIZATION_WIDTH_IN_BITS} GREATER 0)
-   set(DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED 
+   set(DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED
       "${DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED}" "VectorizedArray<double,2>" "VectorizedArray<float,4>")
    set(DEAL_II_EXPAND_FLOAT_VECTORIZED  "${DEAL_II_EXPAND_FLOAT_VECTORIZED}" "VectorizedArray<float,4>")
 endif()
 
 if((${DEAL_II_VECTORIZATION_WIDTH_IN_BITS} GREATER 128))
-   set(DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED 
+   set(DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED
       "${DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED}" "VectorizedArray<double,4>" "VectorizedArray<float,8>")
    set(DEAL_II_EXPAND_FLOAT_VECTORIZED  "${DEAL_II_EXPAND_FLOAT_VECTORIZED}" "VectorizedArray<float,8>")
 endif()
 
 if((${DEAL_II_VECTORIZATION_WIDTH_IN_BITS} GREATER 256))
-   set(DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED 
+   set(DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED
       "${DEAL_II_EXPAND_REAL_SCALARS_VECTORIZED}" "VectorizedArray<double,8>" "VectorizedArray<float,16>")
    set(DEAL_II_EXPAND_FLOAT_VECTORIZED  "${DEAL_II_EXPAND_FLOAT_VECTORIZED}" "VectorizedArray<float,16>")
 endif()

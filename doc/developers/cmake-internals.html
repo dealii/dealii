@@ -346,7 +346,7 @@ RESET_CMAKE_REQUIRED()
 FEATURE_FOUND
 FEATURE_LIBRARIES (with optimized, debug, release keywords)
 FEATURE_LIBRARIES(_DEBUG|_RELEASE)
-FEATURE_INCLUDE_DIRS FEATURE_USER_INCLUDE_DIRS
+FEATURE_INCLUDE_DIRS
 FEATURE_LINKER_FLAGS(|_DEBUG|_RELEASE)
 FEATURE_CXX_FLAGS(|_DEBUG|_RELEASE)
 FEATURE_DEFINITIONS(|_DEBUG|_RELEASE)
@@ -422,7 +422,7 @@ SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
 <pre>
 FEATURE_LIBRARIES
 FEATURE_LIBRARIES(|_DEBUG|_RELEASE)
-FEATURE_(|USER_|BUNDLED_)INCLUDE_DIRS
+FEATURE_(|BUNDLED_)INCLUDE_DIRS
 FEATURE_LINKER_FLAGS(|_DEBUG|_RELEASE)
 FEATURE_CXX_FLAGS(|_DEBUG|_RELEASE)
 FEATURE_DEFINITIONS(|_DEBUG|_RELEASE)
@@ -548,16 +548,11 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
       </ul>
 
     <li>
-      For internal use, for setting necessary include dirs for the compilation of the
+      Used to keep track of external include dirs, necessary for the
+      compilation of the library and user programs:
       <acronym>deal.II</acronym> library:
       <ul>
         <li> <code>DEAL_II_INCLUDE_DIRS</code>
-      </ul>
-    <li>
-      Used to keep track of external include dirs, necessary for the
-      compilation of user programs:
-      <ul>
-        <li> <code>DEAL_II_USER_INCLUDE_DIRS</code>
       </ul>
     <li>
       Include dirs from bundled packages necessary for the compilation of
@@ -567,21 +562,13 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
       </ul>
 
     <li>
-      For internal use, for setting necessary preprocessor definitions
-      (<code>-D&lt;...&gt;</code>) for the compilation of the
-      deal.II library:
+      For setting necessary preprocessor definitions
+      (<code>-D&lt;...&gt;</code>) for the compilation of the deal.II
+      library:
       <ul>
         <li> <code>DEAL_II_DEFINITIONS</code>
         <li> <code>DEAL_II_DEFINITIONS_DEBUG</code>
         <li> <code>DEAL_II_DEFINITIONS_RELEASE</code>
-      </ul>
-    <li>
-      For external use, used to keep track of external preprocessor
-      definitions, necessary for the compilation of user programs:
-      <ul>
-        <li> <code>DEAL_II_USER_DEFINITIONS</code>
-        <li> <code>DEAL_II_USER_DEFINITIONS_DEBUG</code>
-        <li> <code>DEAL_II_USER_DEFINITIONS_RELEASE</code>
       </ul>
 
     <li>

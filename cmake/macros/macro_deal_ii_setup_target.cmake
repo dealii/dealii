@@ -35,7 +35,7 @@
 #   "${DEAL_II_LINKER_FLAGS ${DEAL_II_LINKER_FLAGS_<build type>}"
 #
 # COMPILE_DEFINITIONS is appended with
-#   "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_<build type>}"
+#   "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_<build type>}"
 #
 # If no "DEBUG" or "RELEASE" keyword is specified after the target, the
 # current CMAKE_BUILD_TYPE is used instead. A CMAKE_BUILD_TYPE "Debug" is
@@ -119,7 +119,7 @@ macro(DEAL_II_SETUP_TARGET _target)
       COMPILE_FLAGS " ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
       )
     set_property(TARGET ${_target} APPEND PROPERTY
-      COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
+      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
       )
 
   else()
@@ -131,7 +131,7 @@ macro(DEAL_II_SETUP_TARGET _target)
       )
 
     target_compile_definitions(${_target}
-      PUBLIC ${DEAL_II_USER_DEFINITIONS} ${DEAL_II_USER_DEFINITIONS_${_build}}
+      PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
       )
 
   endif()

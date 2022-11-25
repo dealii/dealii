@@ -89,8 +89,6 @@ deal_ii_package_handle(OPENCASCADE
     REQUIRED ${_libraries}
   INCLUDE_DIRS
     REQUIRED OPENCASCADE_INCLUDE_DIR
-  USER_INCLUDE_DIRS
-    REQUIRED OPENCASCADE_INCLUDE_DIR
   CLEAR
     _opencascade_libraries ${_libraries}
   )
