@@ -224,6 +224,7 @@
 #cmakedefine DEAL_II_PETSC_WITH_COMPLEX
 #cmakedefine DEAL_II_PETSC_WITH_HYPRE
 #cmakedefine DEAL_II_PETSC_WITH_MUMPS
+#cmakedefine DEAL_II_PETSC_WITH_KOKKOS
 
 /* cmake/modules/FindSUNDIALS.cmake */
 #cmakedefine DEAL_II_SUNDIALS_WITH_IDAS

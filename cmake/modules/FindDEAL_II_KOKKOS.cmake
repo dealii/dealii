@@ -26,7 +26,7 @@ set(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
 set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 
 
-if(DEAL_II_TRILINOS_WITH_KOKKOS)
+if(DEAL_II_TRILINOS_WITH_KOKKOS OR DEAL_II_PETSC_WITH_KOKKOS)
   # Let ArborX know that we have found Kokkos
   set(Kokkos_FOUND ON)
   # Let deal.II know that we have found Kokkos

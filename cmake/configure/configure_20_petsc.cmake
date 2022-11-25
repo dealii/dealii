@@ -112,6 +112,17 @@ macro(feature_petsc_find_external var)
       set(${var} FALSE)
     endif()
 
+    if(DEAL_II_PETSC_WITH_KOKKOS)
+      if(DEAL_II_FORCE_BUNDLED_KOKKOS)
+        set(PETSC_ADDITIONAL_ERROR_STRING
+          ${PETSC_ADDITIONAL_ERROR_STRING}
+          "The PETSc installation (found at \"${PETSC_DIR}\")"
+          "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
+        set(${var} FALSE)
+      endif()
+    endif()
+
+
     check_mpi_interface(PETSC ${var})
   endif()
 endmacro()
@@ -160,3 +171,4 @@ configure_feature(PETSC)
 set(DEAL_II_PETSC_WITH_COMPLEX ${PETSC_WITH_COMPLEX})
 set(DEAL_II_PETSC_WITH_HYPRE ${PETSC_WITH_HYPRE})
 set(DEAL_II_PETSC_WITH_MUMPS ${PETSC_WITH_MUMPS})
+set(DEAL_II_PETSC_WITH_KOKKOS ${PETSC_WITH_KOKKOS})
