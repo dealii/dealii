@@ -683,6 +683,12 @@
  *       <br/> Keywords: FEInterfaceValues, NonMatching::FEImmersedSurfaceValues
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-86</td>
+ *       <td> The nonlinear minimal surface equation revisited.
+ *       Interfacing with PETSc' SNES nonlinear solver.
+ *       </td></tr>
+ *
  * </table>
  *
  *
@@ -803,7 +809,8 @@
  *       step-18,
  *       step-40,
  *       step-50,
- *       step-55
+ *       step-55,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -916,7 +923,9 @@
  *       step-42,
  *       step-43,
  *       step-57,
- *       step-70
+ *       step-70,
+ *       step-77,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1079,7 +1088,8 @@
  *       step-58,
  *       step-62,
  *       step-81,
- *       step-82
+ *       step-82,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1119,7 +1129,8 @@
  *       step-55,
  *       step-59,
  *       step-66,
- *       step-75
+ *       step-75,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1155,7 +1166,9 @@
  *       step-41,
  *       step-42,
  *       step-44,
- *       step-57
+ *       step-57,
+ *       step-77,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1215,7 +1228,9 @@
  *     <td> Minimal surface equation
  *     </td>
  *     <td>
- *       step-15
+ *       step-15,
+ *       step-77,
+ *       step-86
  *     </td>
  *   </tr>
  *
