@@ -561,7 +561,7 @@ namespace Step17
     // <i>not</i> want to make the matrix symmetric is because this
     // would require us to write into column entries that actually
     // reside on other processes, i.e., it involves communicating
-    // data. This is always expensive.
+    // data.
     //
     // Experience tells us that CG also works (and works almost as
     // well) if we don't remove the columns associated with boundary
