@@ -103,7 +103,7 @@
 #     deal_ii_add_test(category test_name comparison_file)
 #
 
-function(DEAL_II_ADD_TEST _category _test_name _comparison_file)
+function(deal_ii_add_test _category _test_name _comparison_file)
 
   if(NOT TARGET compile_test_executables)
     add_custom_target(compile_test_executables)

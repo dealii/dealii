@@ -29,7 +29,7 @@
 # DEAL_II_STRING_SUFFIXES to the corresponding DEAL_II_* variables
 #
 
-macro(REGISTER_FEATURE _feature)
+macro(register_feature _feature)
 
   if(DEFINED ${_feature}_LIBRARIES)
     #

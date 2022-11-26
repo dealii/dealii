@@ -19,7 +19,7 @@
 
 set(FEATURE_TRILINOS_DEPENDS MPI)
 
-macro(FEATURE_TRILINOS_FIND_EXTERNAL var)
+macro(feature_trilinos_find_external var)
   find_package(DEAL_II_TRILINOS)
 
   if(TRILINOS_FOUND)
@@ -374,7 +374,7 @@ macro(FEATURE_TRILINOS_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
+macro(feature_trilinos_configure_external)
   set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
   set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
   set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES 

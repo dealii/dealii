@@ -50,7 +50,7 @@
 # FATAL_ERROR.
 #
 
-macro(DEAL_II_SETUP_TARGET _target)
+macro(deal_ii_setup_target _target)
 
   if(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     message(FATAL_ERROR

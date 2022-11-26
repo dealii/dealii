@@ -22,7 +22,7 @@
 # var is set to true if list contains an item that matches regex.
 #
 
-macro(ITEM_MATCHES _var _regex)
+macro(item_matches _var _regex)
   set(${_var})
   foreach (_item ${ARGN})
     if("${_item}" MATCHES ${_regex})

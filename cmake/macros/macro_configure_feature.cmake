@@ -71,7 +71,7 @@
 #
 # A small macro to set the DEAL_II_WITH_${_feature} variables:
 #
-macro(SET_CACHED_OPTION _str _value)
+macro(set_cached_option _str _value)
   string(TOLOWER "${_str}" _str_lower)
   set(DEAL_II_WITH_${_str}
     ${_value}
@@ -84,7 +84,7 @@ endmacro()
 #
 # A small macro to post a default error message:
 #
-macro(FEATURE_ERROR_MESSAGE _feature)
+macro(feature_error_message _feature)
   string(TOLOWER ${_feature} _feature_lowercase)
 
   if(DEFINED ${_feature}_DIR)
@@ -123,7 +123,7 @@ endmacro()
 #
 # Default macro for finding an external library:
 #
-macro(FEATURE_FIND_EXTERNAL _feature _var)
+macro(feature_find_external _feature _var)
   find_package(DEAL_II_${_feature})
   if(${_feature}_FOUND)
     set(${_var} TRUE)
@@ -137,7 +137,7 @@ endmacro()
 #                                                                      #
 ########################################################################
 
-macro(CONFIGURE_FEATURE _feature)
+macro(configure_feature _feature)
 
   #
   # Register the feature in the DEAL_II_FEATURES list
@@ -229,33 +229,33 @@ macro(CONFIGURE_FEATURE _feature)
             )
         endif()
 
-      else(DEAL_II_FORCE_BUNDLED_${_feature})
+      else()
         #
         # Second case: We are allowed to search for an external library
         #
-        if(COMMAND FEATURE_${_feature}_FIND_EXTERNAL)
-          evaluate_expression("FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)")
+        if(COMMAND feature_${_feature}_find_external)
+          evaluate_expression("feature_${_feature}_find_external(FEATURE_${_feature}_EXTERNAL_FOUND)")
         else()
           feature_find_external(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
         endif()
 
         if(FEATURE_${_feature}_EXTERNAL_FOUND)
-          if(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
-            evaluate_expression("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
+          if(COMMAND feature_${_feature}_configure_external)
+            evaluate_expression("feature_${_feature}_configure_external()")
           endif()
 
           message(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
           set(FEATURE_${_feature}_EXTERNAL_CONFIGURED TRUE)
           set_cached_option(${_feature} ON)
 
-        else(FEATURE_${_feature}_EXTERNAL_FOUND)
+        else()
 
           purge_feature(${_feature})
 
           message(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
 
           if(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
-            evaluate_expression("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+            evaluate_expression("feature_${_feature}_configure_bundled()")
 
             message(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
             set(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
@@ -263,8 +263,8 @@ macro(CONFIGURE_FEATURE _feature)
 
           else()
             if(DEAL_II_WITH_${_feature})
-              if(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)
-                 evaluate_expression("FEATURE_${_feature}_ERROR_message()")
+              if(COMMAND feature_${_feature}_error_message)
+                 evaluate_expression("feature_${_feature}_error_message()")
               else()
                 feature_error_message(${_feature})
               endif()
@@ -273,7 +273,7 @@ macro(CONFIGURE_FEATURE _feature)
             endif()
           endif()
 
-        endif(FEATURE_${_feature}_EXTERNAL_FOUND)
+        endif()
 
       endif()
     endif()

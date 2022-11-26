@@ -32,7 +32,7 @@ set(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
   )
 
 
-macro(FEATURE_BOOST_CONFIGURE_COMMON)
+macro(feature_boost_configure_common)
   # Some standard library implementations do not implement std::auto_ptr
   # (anymore) which was deprecated for C++11 and removed in the C++17 standard.
   # Older boost versions can't know about this but provide a possibility to
@@ -100,7 +100,7 @@ macro(FEATURE_BOOST_CONFIGURE_COMMON)
 endmacro()
 
 
-macro(FEATURE_BOOST_CONFIGURE_BUNDLED)
+macro(feature_boost_configure_bundled)
   #
   # Add rt to the link interface as well, boost/chrono needs it.
   #
@@ -142,7 +142,7 @@ macro(FEATURE_BOOST_CONFIGURE_BUNDLED)
   endif()
 endmacro()
 
-macro(FEATURE_BOOST_FIND_EXTERNAL var)
+macro(feature_boost_find_external var)
   find_package(DEAL_II_BOOST)
 
   if(BOOST_FOUND)
@@ -255,7 +255,7 @@ macro(FEATURE_BOOST_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_BOOST_CONFIGURE_EXTERNAL)
+macro(feature_boost_configure_external)
   FEATURE_BOOST_CONFIGURE_COMMON()
 endmacro()
 

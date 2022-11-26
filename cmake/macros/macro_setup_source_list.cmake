@@ -25,7 +25,7 @@
 # otherwise, if DEAL_II_UNITY_BUILD=OFF, then all source files are added to the
 # variable _source_files.
 #
-macro(SETUP_SOURCE_LIST _unity_include_src _separate_src _n_includes_per_unity_file _output_src)
+macro(setup_source_list _unity_include_src _separate_src _n_includes_per_unity_file _output_src)
   if(DEAL_II_UNITY_BUILD)
     setup_unity_target("${_unity_include_src}" ${_n_includes_per_unity_file} ${_output_src})
     set(${_output_src}

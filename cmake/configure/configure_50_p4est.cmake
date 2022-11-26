@@ -20,7 +20,7 @@
 set(FEATURE_P4EST_DEPENDS MPI)
 
 
-macro(FEATURE_P4EST_FIND_EXTERNAL var)
+macro(feature_p4est_find_external var)
   find_package(DEAL_II_P4EST)
 
   if(P4EST_FOUND)
@@ -75,7 +75,7 @@ macro(FEATURE_P4EST_FIND_EXTERNAL var)
   endif()
 endmacro()
 
-macro(FEATURE_P4EST_CONFIGURE_EXTERNAL)
+macro(feature_p4est_configure_external)
   set(DEAL_II_P4EST_WITH_VTK_BINARY ${P4EST_WITH_VTK_BINARY})
   set(DEAL_II_P4EST_WITH_SEARCH_LOCAL ${P4EST_WITH_SEARCH_LOCAL})
 endmacro()

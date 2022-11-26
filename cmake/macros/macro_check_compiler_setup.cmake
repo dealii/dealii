@@ -25,7 +25,7 @@
 # ${_var} is set to true, otherwise it is set to false.
 #
 
-macro(CHECK_COMPILER_SETUP _compiler_flags_unstr _linker_flags_unstr _var)
+macro(check_compiler_setup _compiler_flags_unstr _linker_flags_unstr _var)
   #
   # Strip leading and trailing whitespace to make CMake 2.8.8 happy
   #

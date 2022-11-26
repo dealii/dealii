@@ -18,7 +18,7 @@
 # library:
 #
 
-macro(FEATURE_TBB_FIND_EXTERNAL var)
+macro(feature_tbb_find_external var)
   find_package(DEAL_II_TBB)
 
   if(TBB_FOUND)
@@ -65,7 +65,7 @@ macro(FEATURE_TBB_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_TBB_CONFIGURE_BUNDLED)
+macro(feature_tbb_configure_bundled)
   #
   # We have to disable a bunch of warnings:
   #

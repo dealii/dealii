@@ -38,7 +38,7 @@ if(DEAL_II_COMPONENT_DOCUMENTATION)
   message(STATUS "Setting up documentation - Done")
   message(STATUS "")
 
-endif(DEAL_II_COMPONENT_DOCUMENTATION)
+endif()
 
 #
 # Always install a minimalistic README and LICENSE file:

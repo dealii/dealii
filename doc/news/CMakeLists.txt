@@ -47,4 +47,4 @@ if(DEAL_II_COMPONENT_DOCUMENTATION)
 
   add_dependencies(documentation changelog)
 
-endif(DEAL_II_COMPONENT_DOCUMENTATION)
+endif()

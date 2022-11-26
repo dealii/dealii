@@ -19,7 +19,7 @@
 
 set(FEATURE_HDF5_DEPENDS MPI)
 
-macro(FEATURE_HDF5_FIND_EXTERNAL var)
+macro(feature_hdf5_find_external var)
   find_package(DEAL_II_HDF5)
 
   if(HDF5_FOUND)

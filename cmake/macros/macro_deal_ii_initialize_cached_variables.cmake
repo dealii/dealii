@@ -26,7 +26,7 @@
 # This macro has to be called before project()!
 #
 
-macro(DEAL_II_INITIALIZE_CACHED_VARIABLES)
+macro(deal_ii_initialize_cached_variables)
 
   if(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     message(FATAL_ERROR

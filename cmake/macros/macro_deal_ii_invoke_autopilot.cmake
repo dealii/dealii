@@ -35,7 +35,7 @@
 #                         empty
 #
 
-macro(DEAL_II_INVOKE_AUTOPILOT)
+macro(deal_ii_invoke_autopilot)
 
   # Generator specific values:
   if(CMAKE_GENERATOR MATCHES "Ninja")

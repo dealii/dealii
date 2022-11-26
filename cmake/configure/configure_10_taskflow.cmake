@@ -24,7 +24,7 @@
 #
 set(DEAL_II_WITH_TASKFLOW OFF CACHE BOOL "")
 
-macro(FEATURE_TASKFLOW_FIND_EXTERNAL var)
+macro(feature_taskflow_find_external var)
   find_package(DEAL_II_TASKFLOW)
 
   if(TASKFLOW_FOUND)
@@ -70,7 +70,7 @@ macro(FEATURE_TASKFLOW_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_TASKFLOW_CONFIGURE_BUNDLED)
+macro(feature_taskflow_configure_bundled)
   list(APPEND TASKFLOW_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
 endmacro()
 

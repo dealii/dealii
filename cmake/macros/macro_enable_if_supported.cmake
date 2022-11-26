@@ -21,7 +21,7 @@
 #     enable_if_supported(variable flag)
 #
 
-macro(ENABLE_IF_SUPPORTED _variable _flag)
+macro(enable_if_supported _variable _flag)
   string(STRIP "${_flag}" _flag_stripped)
 
   #

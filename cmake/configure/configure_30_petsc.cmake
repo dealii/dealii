@@ -20,7 +20,7 @@
 set(FEATURE_PETSC_AFTER MPI)
 
 
-macro(FEATURE_PETSC_FIND_EXTERNAL var)
+macro(feature_petsc_find_external var)
   find_package(DEAL_II_PETSC)
 
   if(PETSC_FOUND)
@@ -117,7 +117,7 @@ macro(FEATURE_PETSC_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_PETSC_CONFIGURE_EXTERNAL)
+macro(feature_petsc_configure_external)
   set(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
   set(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
   set(DEAL_II_EXPAND_PETSC_SPARSE_MATRICES
@@ -136,7 +136,7 @@ macro(FEATURE_PETSC_CONFIGURE_EXTERNAL)
 endmacro()
 
 
-macro(FEATURE_PETSC_ERROR_MESSAGE)
+macro(feature_petsc_error_message)
   message(FATAL_ERROR "\n"
     "Could not find the petsc library!\n"
     ${PETSC_ADDITIONAL_ERROR_STRING}

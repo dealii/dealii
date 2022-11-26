@@ -22,7 +22,7 @@
 # evaluate_expression("<expression>")
 #
 
-macro(EVALUATE_EXPRESSION _the_expression)
+macro(evaluate_expression _the_expression)
   set(_tmp_name
     "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/evaluate_expression.tmp"
     )

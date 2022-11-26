@@ -22,7 +22,7 @@
 #
 set(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
-macro(FEATURE_CUDA_FIND_EXTERNAL var)
+macro(feature_cuda_find_external var)
   if(NOT Kokkos_ENABLE_CUDA)
     set(CUDA_ADDITIONAL_ERROR_STRING
       ${CUDA_ADDITIONAL_ERROR_STRING}
@@ -103,7 +103,7 @@ macro(FEATURE_CUDA_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_CUDA_CONFIGURE_EXTERNAL)
+macro(feature_cuda_configure_external)
   # We cannot use -pedantic as compiler flags. nvcc generates code that
   # produces a lot of warnings when pedantic is enabled. So filter out the
   # flag:
@@ -112,7 +112,7 @@ macro(FEATURE_CUDA_CONFIGURE_EXTERNAL)
 endmacro()
 
 
-macro(FEATURE_CUDA_ERROR_MESSAGE)
+macro(feature_cuda_error_message)
   message(FATAL_ERROR "\n"
     "Could not find any suitable cuda library!\n"
     ${CUDA_ADDITIONAL_ERROR_STRING}

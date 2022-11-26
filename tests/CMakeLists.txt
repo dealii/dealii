@@ -23,7 +23,7 @@
 
 cmake_minimum_required(VERSION 3.3.0)
 
-macro(SET_IF_EMPTY _variable)
+macro(set_if_empty _variable)
   if("${${_variable}}" STREQUAL "")
     set(${_variable} ${ARGN})
   endif()

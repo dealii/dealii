@@ -17,7 +17,7 @@
 # Configuration for the SUNDIALS library:
 #
 
-macro(FEATURE_SUNDIALS_FIND_EXTERNAL var)
+macro(feature_sundials_find_external var)
   find_package(DEAL_II_SUNDIALS)
 
   if(SUNDIALS_FOUND)
@@ -43,7 +43,7 @@ macro(FEATURE_SUNDIALS_FIND_EXTERNAL var)
   endif()
 endmacro()
 
-macro(FEATURE_SUNDIALS_CONFIGURE_EXTERNAL)
+macro(feature_sundials_configure_external)
   set(DEAL_II_SUNDIALS_WITH_IDAS ${SUNDIALS_WITH_IDAS})
 endmacro()
 

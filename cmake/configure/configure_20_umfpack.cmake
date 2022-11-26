@@ -19,14 +19,14 @@
 
 set(FEATURE_UMFPACK_DEPENDS LAPACK)
 
-macro(FEATURE_UMFPACK_CONFIGURE_BUNDLED)
+macro(feature_umfpack_configure_bundled)
   set(UMFPACK_BUNDLED_INCLUDE_DIRS
     ${UMFPACK_FOLDER}/UMFPACK/Include
     ${UMFPACK_FOLDER}/AMD/Include
     )
 endmacro()
 
-macro(FEATURE_UMFPACK_ERROR_MESSAGE)
+macro(feature_umfpack_error_message)
   message(FATAL_ERROR "\n"
     "Could not find umfpack and supporting libraries!\n"
     "Please ensure that the libraries are installed on your computer.\n"

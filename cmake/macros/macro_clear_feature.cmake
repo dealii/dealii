@@ -24,11 +24,8 @@
 # DEAL_II_STRING_SUFFIXES to the corresponding DEAL_II_* variables
 #
 
-macro(CLEAR_FEATURE _feature)
-  foreach(_var ${DEAL_II_LIST_SUFFIXES})
-    unset(${_feature}_${_var})
-  endforeach()
-  foreach(_var ${DEAL_II_STRING_SUFFIXES})
+macro(clear_feature _feature)
+  foreach(_var ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
     unset(${_feature}_${_var})
   endforeach()
 endmacro()

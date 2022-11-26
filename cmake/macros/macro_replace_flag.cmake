@@ -21,7 +21,7 @@
 #     replace_flag(variable flag replacement)
 #
 
-macro(REPLACE_FLAG _variable _flag _replacement)
+macro(replace_flag _variable _flag _replacement)
   string(STRIP "${_replacement}" _replacement_stripped)
   string(REPLACE " " "  " ${_variable} "${${_variable}}")
   set(${_variable} " ${${_variable}} ")

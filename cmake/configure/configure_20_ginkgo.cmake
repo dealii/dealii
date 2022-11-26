@@ -17,7 +17,7 @@
 # Configuration for the Ginkgo library:
 #
 
-macro(FEATURE_GINKGO_FIND_EXTERNAL var)
+macro(feature_ginkgo_find_external var)
   find_package(DEAL_II_GINKGO)
 
   if(GINKGO_FOUND)

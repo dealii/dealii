@@ -465,7 +465,7 @@ message("-- MEMORYCHECK:               ${MEMORYCHECK}")
 
 
 
-macro(CREATE_TARGETDIRECTORIES_TXT)
+macro(create_targetdirectories_txt)
   #
   # It gets tricky: Fake a TargetDirectories.txt containing _all_ target
   # directories (of the main project and all subprojects) so that the
@@ -484,7 +484,7 @@ macro(CREATE_TARGETDIRECTORIES_TXT)
   endforeach()
 endmacro()
 
-macro(CLEAR_TARGETDIRECTORIES_TXT)
+macro(clear_targetdirectories_txt)
   execute_process(COMMAND ${CMAKE_COMMAND} -E rename
     ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt.bck
     ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt
@@ -569,7 +569,7 @@ if("${_res}" STREQUAL "0")
     else()
       message("-- Running CTEST_TESTS()")
       ctest_test()
-    endif(MEMORYCHECK)
+    endif()
 
     if(COVERAGE)
       CREATE_TARGETDIRECTORIES_TXT()
@@ -583,7 +583,7 @@ if("${_res}" STREQUAL "0")
                         OUTPUT_QUIET)
       endif()
       CLEAR_TARGETDIRECTORIES_TXT()
-    endif(COVERAGE)
+    endif()
 
   endif()
 endif()

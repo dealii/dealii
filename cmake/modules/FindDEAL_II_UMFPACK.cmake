@@ -39,7 +39,7 @@ endforeach()
 # Two macros to make life easier:
 #
 
-macro(FIND_UMFPACK_PATH _comp _file)
+macro(find_umfpack_path _comp _file)
   string(TOLOWER ${_comp} _comp_lowercase)
   string(TOUPPER ${_comp} _comp_uppercase)
   deal_ii_find_path(${_comp}_INCLUDE_DIR ${_file}
@@ -54,7 +54,7 @@ macro(FIND_UMFPACK_PATH _comp _file)
     )
 endmacro()
 
-macro(FIND_UMFPACK_LIBRARY _comp _name)
+macro(find_umfpack_library _comp _name)
   string(TOUPPER ${_comp} _comp_uppercase)
   deal_ii_find_library(${_comp}_LIBRARY
     NAMES ${_name} lib${_name}

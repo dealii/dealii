@@ -21,7 +21,7 @@
 #     check_mpi_interface(_feature _var),
 #
 
-macro(CHECK_MPI_INTERFACE _feature _var)
+macro(check_mpi_interface _feature _var)
   if(DEAL_II_WITH_MPI AND MPI_LIBRARIES)
 
     set(_nope FALSE)
