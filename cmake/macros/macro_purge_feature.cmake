@@ -24,12 +24,7 @@ macro(PURGE_FEATURE _feature)
   #
   # uncached:
   #
-  foreach(_var ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
-    if(NOT _var MATCHES BUNDLED)
-      set(${_feature}_${_var})
-    endif()
-  endforeach()
-
+  clear_feature(${_feature})
   unset(${_feature}_FOUND)
   unset(${_feature}_VERSION)
 
