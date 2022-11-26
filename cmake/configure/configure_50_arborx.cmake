@@ -21,7 +21,7 @@ set(FEATURE_ARBORX_AFTER MPI)
 set(FEATURE_ARBORX_DEPENDS KOKKOS)
 
 macro(feature_arborx_find_external var)
-  find_package(ARBORX)
+  find_package(DEAL_II_ARBORX)
 
   if(ARBORX_FOUND)
     #
