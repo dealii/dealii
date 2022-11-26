@@ -230,7 +230,7 @@ namespace PETScWrappers
                          sparsity_pattern.n_cols());
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      ierr = MatSetType(matrix, MATMPIAIJ);
+      ierr = MatSetType(matrix, MATAIJ);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
 
@@ -249,7 +249,7 @@ namespace PETScWrappers
       // if (preset_nonzero_locations == true)
       if (local_rows.n_elements() > 0)
         {
-          // MatMPIAIJSetPreallocationCSR
+          // MatXXXAIJSetPreallocationCSR
           // can be used to allocate the sparsity
           // pattern of a matrix
 
@@ -300,12 +300,19 @@ namespace PETScWrappers
                                               rowstart_in_window.data(),
                                               colnums_in_window.data(),
                                               nullptr);
+          ierr = MatSeqAIJSetPreallocationCSR(matrix,
+                                              rowstart_in_window.data(),
+                                              colnums_in_window.data(),
+                                              nullptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
       else
         {
           PetscInt i = 0;
-          ierr       = MatMPIAIJSetPreallocationCSR(matrix, &i, &i, nullptr);
+
+          ierr = MatSeqAIJSetPreallocationCSR(matrix, &i, &i, nullptr);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          ierr = MatMPIAIJSetPreallocationCSR(matrix, &i, &i, nullptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
       compress(dealii::VectorOperation::insert);
@@ -358,7 +365,7 @@ namespace PETScWrappers
                          sparsity_pattern.n_cols());
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      ierr = MatSetType(matrix, MATMPIAIJ);
+      ierr = MatSetType(matrix, MATAIJ);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // next preset the exact given matrix
@@ -376,7 +383,7 @@ namespace PETScWrappers
       // class.
       if (preset_nonzero_locations == true)
         {
-          // MatMPIAIJSetPreallocationCSR
+          // MatXXXAIJSetPreallocationCSR
           // can be used to allocate the sparsity
           // pattern of a matrix if it is already
           // available:
@@ -419,6 +426,10 @@ namespace PETScWrappers
           // then call the petsc function
           // that summarily allocates these
           // entries:
+          ierr = MatSeqAIJSetPreallocationCSR(matrix,
+                                              rowstart_in_window.data(),
+                                              colnums_in_window.data(),
+                                              nullptr);
           ierr = MatMPIAIJSetPreallocationCSR(matrix,
                                               rowstart_in_window.data(),
                                               colnums_in_window.data(),
