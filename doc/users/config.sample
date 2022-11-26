@@ -15,529 +15,135 @@
 #
 # Component configuration:
 #
+# set(DEAL_II_COMPONENT_DOCUMENTATION OFF CACHE BOOL "")
+# set(DEAL_II_COMPONENT_EXAMPLES ON CACHE BOOL "")
+# set(DEAL_II_COMPONENT_PACKAGE OFF CACHE BOOL "")
+# set(DEAL_II_COMPONENT_PYTHON_BINDINGS OFF CACHE BOOL "")
 #
-# SET(DEAL_II_COMPONENT_DOCUMENTATION OFF CACHE BOOL
-#   "Enable configuration, build and installation of the html documentation. This adds a COMPONENT \"documentation\" to the build system."
-#   )
-#
-# SET(DEAL_II_COMPONENT_EXAMPLES ON CACHE BOOL
-#   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
-#   )
-#
-
 
 #
 # General Feature configuration:
 #
+# set(DEAL_II_ALLOW_BUNDLED ON CACHE BOOL "")
+# set(DEAL_II_ALLOW_AUTODETECTION ON CACHE BOOL "")
+# set(DEAL_II_FORCE_AUTODETECTION OFF CACHE BOOL "")
 #
-# SET(DEAL_II_ALLOW_BUNDLED ON CACHE BOOL
-#   "Allow the use of libraries bundled with the source tarball. (DEAL_II_FORCE_BUNDLED* will overwrite this option.)"
-#   )
-#
-# SET(DEAL_II_ALLOW_AUTODETECTION ON CACHE BOOL
-#   "Allow to automatically setup features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
-#   )
-#
-# SET(DEAL_II_FORCE_AUTODETECTION OFF CACHE BOOL
-#   "Force feature autodetection by undefining all DEAL_II_WITH_* variables prior to configure"
-#   )
-#
-# For further feature configuration, see section
-# "Advanced feature configuration" below.
-#
-
 
 #
 # Build configuration:
 #
+# set(CMAKE_BUILD_TYPE "DebugRelease" CACHE STRING "")
 #
-# SET(CMAKE_BUILD_TYPE "DebugRelease" CACHE STRING
-#   "Choose the type of build, options are: Debug, Release and DebugRelease."
-#   )
+# set(CMAKE_CXX_COMPILER "" CACHE STRING "")
+# set(CMAKE_C_COMPILER "" CACHE STRING "")
+# set(CMAKE_Fortran_COMPILER "" CACHE STRING "")
+# set(DEAL_II_CXX_FLAGS "" CACHE STRING "")
+# set(DEAL_II_CXX_FLAGS_DEBUG "" CACHE STRING "")
+# set(DEAL_II_CXX_FLAGS_RELEASE "" CACHE STRING "")
+# set(DEAL_II_LINKER_FLAGS "" CACHE STRING "")
+# set(DEAL_II_LINKER_FLAGS_DEBUG "" CACHE STRING "")
+# set(DEAL_II_LINKER_FLAGS_RELEASE "" CACHE STRING "")
+# set(DEAL_II_DEFINITIONS "" CACHE STRING "")
+# set(DEAL_II_DEFINITIONS_DEBUG "" CACHE STRING "")
+# set(DEAL_II_DEFINITIONS_RELEASE "" CACHE STRING "")
 #
-# SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION ON CACHE BOOL
-#   "Allow platform introspection for CPU command set, SSE and AVX"
-#   )
+# set(DEAL_II_ALLOW_PLATFORM_INTROSPECTION ON CACHE BOOL "")
+# set(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS ON CACHE BOOL "")
+# set(DEAL_II_SETUP_COVERAGE OFF CACHE BOOL "")
+# set(DEAL_II_UNITY_BUILD OFF CACHE BOOL "")
+# set(DEAL_II_EARLY_DEPRECATIONS OFF CACHE BOOL "")
+# set(BUILD_SHARED_LIBS "ON" CACHE BOOL "")
+# set(DEAL_II_PREFER_STATIC_LIBS "OFF" CACHE BOOL "")
+# set(DEAL_II_STATIC_EXECUTABLE "OFF" CACHE BOOL "")
+# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL "")
+
 #
-# SET(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS ON CACHE BOOL
-#   "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
-#   )
+# Miscellaneous options:
 #
-# SET(DEAL_II_SETUP_COVERAGE OFF CACHE BOOL
-#   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
-#   )
-#
-# SET(CMAKE_CXX_COMPILER "" CACHE STRING
-#   "CXX Compiler."
-#   )
-#
-# SET(CMAKE_C_COMPILER "" CACHE STRING
-#   "C Compiler."
-#   )
-#
-# SET(CMAKE_Fortran_COMPILER "" CACHE STRING
-#   "Fortran Compiler."
-#   )
-#
-# SET(CMAKE_CXX_FLAGS "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated CMAKE_CXX_FLAGS variable"
-#   )
-#
-# SET(DEAL_II_CXX_FLAGS_DEBUG "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_CXX_FLAGS_DEBUG variable"
-#   )
-#
-# SET(DEAL_II_CXX_FLAGS_RELEASE "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_CXX_FLAGS_RELEASE variable"
-#   )
-#
-# SET(DEAL_II_LINKER_FLAGS "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS variable"
-#   )
-#
-# SET(DEAL_II_LINKER_FLAGS_DEBUG "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS_DEBUG variable"
-#   )
-#
-# SET(DEAL_II_LINKER_FLAGS_RELEASE "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS_RELEASE variable"
-#   )
-#
-# SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
-#   "Build a shared library"
-#   )
-#
-# SET(DEAL_II_PREFER_STATIC_LIBS "OFF" CACHE BOOL
-#   "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
-#   )
-#
-# OPTION(DEAL_II_STATIC_EXECUTABLE "OFF" CACHE BOOL
-#   "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF and DEAL_II_PREFER_STATIC_LIBS=ON"
-#   )
-#
-# SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
-#   "Set the rpath of the library to the external link paths on installation"
-#   )
-#
-# SET(DEAL_II_WITH_64BIT_INDICES "OFF" CACHE BOOL
-#   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
-#   )
-#
+# set(DEAL_II_COMPILE_EXAMPLES "ON" CACHE BOOL "")
+# set(DEAL_II_DOXYGEN_USE_MATHJAX "OFF" CACHE BOOL "")
+# set(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX "OFF" CACHE BOOL "")
+# set(DEAL_II_CPACK_EXTERNAL_LIBS "opt" CACHE STRING "")
+# set(DEAL_II_CPACK_BUNDLE_NAME "deal.II" CACHE STRING "")
 #
 
 
 ###########################################################################
 #                                                                         #
-#                     Advanced Feature Configuration:                     #
+#                          Feature Configuration:                         #
 #                                                                         #
 ###########################################################################
 
 #
-# Arpack:
+# In order to hint for custom installation paths you can
 #
-# SET(DEAL_II_WITH_ARPACK ON CACHE BOOL
-#   "Build deal.II with support for arpack"
+#  1/ use CMAKE_PREFIX_PATH
 #
-# Automatic detection:
+#     a list variable that contains installation prefixes that CMake
+#     searches first.
 #
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(ARPACK_DIR "/.../..." CACHE PATH "")
+#     Example CMake call:
+#     $ cmake -DCMAKE_PREFIX_PATH="/path/to/library/1;/path/to/library/2" [...]
 #
-# Manual setup:
+#  2/ use <FEATURE>_DIR
 #
-# SET(ARPACK_FOUND TRUE CACHE BOOL "")
-# SET(ARPACK_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(ARPACK_LINKER_FLAGS "..." CACHE STRING "")
+#     a string variable that contains installation prefixes that CMake
+#     searches first for location a given feature library.
 #
-
-
+#     Example CMake call:
+#     $ cmake -DTRILINOS_DIR="/path/to/trilinos" [...]
 #
-# Boost:
+# It is possible to override a given feature detection entirely by
+# specifying (a subset of) the following variables on the command line:
 #
-# SET(DEAL_II_WITH_BOOST ON CACHE BOOL
-#   "Build deal.II with support for boost"
-#   FORCE)
+#     DEAL_II_<FEATURE>_FOUND=true    (bool)
+#     <FEATURE>_LIBRARIES             (list)
 #
-# SET(DEAL_II_FORCE_BUNDLED_BOOST TRUE CACHE BOOL
-#   "Always use the bundled boost library instead of an external one."
-#   )
-#
-# Boost is a mandatory build time dependency.
-#
-# Automatic detection:
-#
-# SET(Boost_DIR "..." CACHE PATH
-#   "The preferred installation prefix for searching for boost"
-#   )
-#
-# Have a look at the very long configuration list in FindBoost.cmake.
-#
-# Manual setup:
-#
-# SET(Boost_FOUND TRUE CACHE BOOL "")
-# SET(Boost_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(Boost_LIBRARIES "libraries;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+#     <FEATURE>_LIBRARIES_DEBUG       (list)
+#     <FEATURE>_LIBRARIES_RELEASE     (list)
+#     <FEATURE>_CXX_FLAGS             (string)
+#     <FEATURE>_CXX_FLAGS_DEBUG       (string)
+#     <FEATURE>_CXX_FLAGS_RELEASE     (string)
+#     <FEATURE>_LINKER_FLAGS          (string)
+#     <FEATURE>_LINKER_FLAGS_DEBUG    (string)
+#     <FEATURE>_LINKER_FLAGS_RELEASE  (string)
+#     <FEATURE>_DEFINITIONS           (list)
+#     <FEATURE>_DEFINITIONS_DEBUG     (list)
+#     <FEATURE>_DEFINITIONS_RELEASE   (list)
 #
 
-
 #
-# Muparser:
+# set(DEAL_II_WITH_64BIT_INDICES "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_ADOLC "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_ARBORX "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_ARPACK "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_ASSIMP "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_BOOST "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_CGAL "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_COMPLEX_VALUES "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_CUDA "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_GINKGO "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_GMSH "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_GSL "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_HDF5 "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_KOKKOS "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_LAPACK "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_METIS "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_MPI "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_MUPARSER "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_OPENCASCADE "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_P4EST "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_PETSC "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_SCALAPACK "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_SLEPC "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_SUNDIALS "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_SYMENGINE "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_TASKFLOW "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_TBB "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_TRILINOS "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_UMFPACK "ON" CACHE BOOL "")
+# set(DEAL_II_WITH_ZLIB "ON" CACHE BOOL "")
 #
-# SET(DEAL_II_WITH_MUPARSER TRUE CACHE BOOL
-#   "Build deal.II with support for muparser"
-#   )
-#
-# SET(DEAL_II_FORCE_BUNDLED_MUPARSER TRUE CACHE BOOL
-#   "Always use the bundled muparser library instead of an external one."
-#   )
-#
-
-
-#
-# HDF5:
-#
-# SET(DEAL_II_WITH_HDF5 ON CACHE BOOL
-#   "Build deal.II with support for hdf5"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(HDF5_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(HDF5_FOUND TRUE CACHE BOOL "")
-# SET(HDF5_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(HDF5_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-#
-
-
-#
-# BLAS and LAPACK:
-#
-# SET(DEAL_II_WITH_LAPACK ON CACHE BOOL
-#   "Build deal.II with support for lapack"
-#   )
-#
-#
-# Automatic detection:
-#
-# You can set the BLAS/LAPACK vendor that should be found with
-#
-# SET(BLA_VENDOR "Goto" CACHE STRING "")
-#   Valid vendors: Goto, ATLAS, PhiPACK, CXML, DXML, SunPerf, SCSL, SGIMATH,
-#   IBMESSL, Intel10_32, Intel10_64lp, Intel10_64lp_seq, ACML, ACML_MP,
-#   ACML_GPU, Apple, NAS, Generic
-#
-# BLA_VENDOR will also be recognized by FindLAPACK.cmake.
-#
-# If your BLAS/LAPACK installation resides at a non system location, specify
-# a hint with LAPACK_DIR and BLAS_DIR, or CMAKE_PREFIX_PATH:
-#
-# SET(LAPACK_DIR "..." CACHE PATH
-#   "The preferred installation prefix for searching for LAPACK"
-#   )
-#
-# SET(BLAS_DIR "..." CACHE PATH
-#   "The preferred installation prefix for searching for BLAS"
-#   )
-#
-#
-# Manual setup:
-#
-# SET(BLAS_FOUND TRUE CACHE BOOL "")
-# SET(BLAS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(BLAS_LINKER_FLAGS "..." CACHE STRING "")
-#
-# SET(LAPACK_FOUND TRUE CACHE BOOL "")
-# SET(LAPACK_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(LAPACK_LINKER_FLAGS "..." CACHE STRING "")
-#
-
-
-#
-# Metis:
-#
-# SET(DEAL_II_WITH_METIS ON CACHE BOOL
-#   "Build deal.II with support for metis"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(METIS_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(METIS_FOUND TRUE CACHE BOOL "")
-# SET(METIS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(METIS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(METIS_VERSION "x.y.z" CACHE STRING "")
-# SET(METIS_VERSION_MAJOR "x" CACHE STRING "")
-# SET(METIS_VERSION_MINOR "y" CACHE STRING "")
-# SET(METIS_VERSION_SUBMINOR "z" CACHE STRING "")
-#
-
-
-#
-# MPI:
-#
-# SET(DEAL_II_WITH_MPI ON CACHE BOOL
-#   "Build deal.II with support for mpi"
-#   )
-#
-#
-# Automatic detection:
-#
-# If DEAL_II_WITH_MPI is undefined, autodetection of MPI is very
-# conservative. Only the current compiler and the variable MPI_CXX_COMPILER
-# is used to find MPI. (MPI_CXX_COMPILER takes precedence.)
-#
-# (MPI_C_COMPILER and MPI_Fortran_COMPILER are considered, too)
-#
-#
-# DEAL_II_WITH_MPI=ON will trigger a more sophisticated search for MPI.
-#
-# The best way to force a specific MPI implementation to be used is to set
-# CMAKE_CXX_COMPILER, CMAKE_C_COMPILER and CMAKE_Fortran_COMPILER to the
-# appropriate MPI wrapper (See above).
-#
-# Alternatively, specify the mpi wrapper that will be queried for the mpi
-# link interface:
-#
-# SET(MPI_CXX_COMPILER "mpicxx" CACHE STRING "")
-#
-# SET(MPI_C_COMPILER "mpicc" CACHE STRING "")
-# SET(MPI_Fortran_COMPILER "mpif90" CACHE STRING "")
-#
-#
-# Manual setup:
-#
-# SET(MPI_CXX_FOUND TRUE CACHE BOOL "")
-#
-# and set the current compiler to an MPI wrapper. Alternatively, you can
-# specify the complete link interface as well as compile and link flags
-# via:
-#
-# SET(MPI_CXX_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(MPI_CXX_INCLUDE_PATH "include directory for mpi" CACHE STRING "")
-# SET(MPI_CXX_COMPILE_FLAGS "..." CACHE STRING "")
-# SET(MPI_CXX_LINK_FLAGS "..." CACHE STRING "")
-# SET(MPI_VERSION "x.y" CACHE STRING "")
-# SET(MPI_VERSION_MAJOR "x" CACHE STRING "")
-# SET(MPI_VERSION_MINOR "y" CACHE STRING "")
-#
-# Additionally:
-#
-# SET(MPI_C_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(MPI_Fortran_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-#
-#
-
-
-#
-# muPaser:
-#
-# SET(DEAL_II_WITH_MUPARSER ON CACHE BOOL
-#   "Build deal.II with support for muparser"
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(MUPARSER_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(MUPARSER_FOUND TRUE CACHE BOOL "")
-# SET(MUPARSER_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(MUPARSER_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-#
-
-
-#
-# P4EST:
-#
-# SET(DEAL_II_WITH_P4EST ON CACHE BOOL
-#   "Build deal.II with support for p4est"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(P4EST_DIR "/.../..." CACHE PATH "")
-# also, if necessary, SC_DIR
-#
-# Manual setup:
-#
-# SET(P4EST_FOUND TRUE CACHE BOOL "")
-# SET(P4EST_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(P4EST_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(P4EST_WITH_MPI TRUE CACHE BOOL "")
-# SET(P4EST_VERSION "x.y.z.p" CACHE STRING "")
-# SET(P4EST_VERSION_MAJOR "x" CACHE STRING "")
-# SET(P4EST_VERSION_MINOR "y" CACHE STRING "")
-# SET(P4EST_VERSION_SUBMINOR "z" CACHE STRING "")
-# SET(P4EST_VERSION_PATCH "p" CACHE STRING "")
-#
-
-
-#
-# PETSc:
-#
-# SET(DEAL_II_WITH_PETSC ON CACHE BOOL
-#   "Build deal.II with support for petsc"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(PETSC_DIR "/.../..." CACHE PATH "")
-# SET(PETSC_ARCH "..." CACHE STRING "")
-#
-# Manual setup:
-#
-# SET(PETSC_FOUND TRUE CACHE BOOL "")
-# SET(PETSC_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(PETSC_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(PETSC_VERSION "x.y.z.p" CACHE STRING "")
-# SET(PETSC_VERSION_MAJOR "x" CACHE STRING "")
-# SET(PETSC_VERSION_MINOR "y" CACHE STRING "")
-# SET(PETSC_VERSION_SUBMINOR "z" CACHE STRING "")
-# SET(PETSC_VERSION_PATCH "p" CACHE STRING "")
-# SET(PETSC_WITH_MPI_UNI FALSE CACHE BOOL "")
-# SET(PETSC_WITH_COMPLEX FALSE CACHE BOOL "")
-#
-
-
-#
-# SLEPc:
-#
-# SET(DEAL_II_WITH_SLEPC ON CACHE BOOL
-#   "Build deal.II with support for slepc"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(SLEPC_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(SLEPC_FOUND TRUE CACHE BOOL "")
-# SET(SLEPC_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(SLEPC_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(SLEPC_VERSION "x.y.z.p" CACHE STRING "")
-# SET(SLEPC_VERSION_MAJOR "x" CACHE STRING "")
-# SET(SLEPC_VERSION_MINOR "y" CACHE STRING "")
-# SET(SLEPC_VERSION_SUBMINOR "z" CACHE STRING "")
-# SET(SLEPC_VERSION_PATCH "p" CACHE STRING "")
-# SET(SLEPC_WITH_MPI_UNI FALSE CACHE BOOL "")
-#
-
-
-#
-# TBB support:
-#
-# SET(DEAL_II_WITH_TBB ON CACHE BOOL
-#   "Build deal.II with support for threads via TBB"
-#   )
-#
-# SET(DEAL_II_FORCE_BUNDLED_TBB TRUE CACHE BOOL
-#   "Always use the bundled tbb library instead of an external one."
-#   )
-#
-# Automatic setup:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(TBB_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(TBB_FOUND TRUE CACHE BOOL "")
-# SET(TBB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(TBB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(TBB_WITH_DEBUGLIB TRUE CACHE BOOL "")
-# SET(TBB_VERSION "x.y" CACHE STRING "")
-# SET(TBB_VERSION_MAJOR "x" CACHE STRING "")
-# SET(TBB_VERSION_MINOR "y" CACHE STRING "")
-#
-
-
-#
-# Trilinos:
-#
-# SET(DEAL_II_WITH_TRILINOS ON CACHE BOOL
-#   "Build deal.II with support for trilinos"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(TRILINOS_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(TRILINOS_FOUND TRUE CACHE BOOL "")
-# SET(TRILINOS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(TRILINOS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(TRILINOS_VERSION "x.y.z" CACHE STRING "")
-# SET(TRILINOS_VERSION_MAJOR "x" CACHE STRING "")
-# SET(TRILINOS_VERSION_MINOR "y" CACHE STRING "")
-# SET(TRILINOS_VERSION_SUBMINOR "z" CACHE STRING "")
-# SET(TRILINOS_WITH_MPI TRUE CACHE BOOL "")
-#
-
-
-#
-# UMFPACK:
-#
-# SET(DEAL_II_WITH_UMFPACK ON CACHE BOOL
-#   "Build deal.II with support for umfpack"
-#   )
-#
-# SET(DEAL_II_FORCE_BUNDLED_UMFPACK TRUE CACHE BOOL
-#   "Always use the bundled umfpack library instead of an external one."
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(UMFPACK_DIR "/.../..." CACHE PATH "")
-# also, if necessary, SUITESPARSE_DIR (AMD_DIR, CHOLMOD_DIR, COLAMD_DIR, SUITESPARSECONFIG_DIR)
-#
-# Manual setup:
-#
-# SET(UMFPACK_FOUND TRUE CACHE BOOL "")
-# SET(UMFPACK_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(UMFPACK_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(UMFPACK_LINKER_FLAGS "..." CACHE STRING "")
-# SET(UMFPACK_VERSION "x.y.z" CACHE STRING "")
-# SET(UMFPACK_VERSION_MAJOR "x" CACHE STRING "")
-# SET(UMFPACK_VERSION_MINOR "y" CACHE STRING "")
-# SET(UMFPACK_VERSION_SUBMINOR "z" CACHE STRING "")
-#
-
-
-#
-# ZLIB:
-#
-# SET(DEAL_II_WITH_ZLIB ON CACHE BOOL
-#   "Build deal.II with support for zlib"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(ZLIB_ROOT "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(ZLIB_FOUND TRUE CACHE BOOL "")
-# SET(ZLIB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(ZLIB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-#
-
 
 
 ###########################################################################
@@ -545,7 +151,6 @@
 #                         Advanced Configuration:                         #
 #                                                                         #
 ###########################################################################
-
 
 #
 # Platform introspection:
@@ -556,61 +161,26 @@
 #
 # To enable support for AVX and SSE manually, set:
 #
-#   SET(DEAL_II_HAVE_SSE TRUE CACHE BOOL "")
-#   SET(DEAL_II_HAVE_AVX TRUE CACHE BOOL "")
-#   SET(DEAL_II_HAVE_AVX512 TRUE CACHE BOOL "")
+# set(DEAL_II_HAVE_SSE TRUE CACHE BOOL "")
+# set(DEAL_II_HAVE_AVX TRUE CACHE BOOL "")
+# set(DEAL_II_HAVE_AVX512 TRUE CACHE BOOL "")
 #
 
-
 #
-# Obnoxiously advanced configuration about paths, install locations and
-# names:
+# Advanced configuration of paths, install locations and names:
 #
-# SET(DEAL_II_PACKAGE_NAME "deal.II" CACHE STRING
-#   "The glorious package name"
-#   )
+# set(DEAL_II_PACKAGE_NAME "deal.II" CACHE STRING "")
+# set(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}" CACHE STRING "")
 #
-# SET(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}" CACHE STRING
-#   "Basename for the CMake project config file"
-#   )
+# set(DEAL_II_BASE_NAME "deal_II" CACHE STRING "")
+# set(DEAL_II_DEBUG_SUFFIX ".g" CACHE STRING "")
+# set(DEAL_II_RELEASE_SUFFIX "" CACHE STRING "")
 #
-# SET(DEAL_II_BASE_NAME "deal_II" CACHE STRING
-#   "Basename for the library"
-#   )
-#
-# SET(DEAL_II_DEBUG_SUFFIX ".g" CACHE STRING
-#   "Library suffix for the debug library"
-#   )
-#
-# SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX "" CACHE STRING
-#   "Library suffix for the release library"
-#   )
-#
-# SET(DEAL_II_DOCHTML_RELDIR "doc" CACHE STRING
-#   "Relative installation directory for html documentation"
-#   )
-#
-# SET(DEAL_II_DOCREADME_RELDIR "" CACHE STRING
-#   "Relative installation directory for readme"
-#   )
-#
-# SET(DEAL_II_EXAMPLES_RELDIR "examples" CACHE STRING
-#   "Relative installation directory for examples"
-#   )
-#
-# SET(DEAL_II_EXECUTABLE_RELDIR "bin" CACHE STRING
-#   "Relative installation directory for binary targets"
-#   )
-#
-# SET(DEAL_II_INCLUDE_RELDIR "include" CACHE STRING
-#   "Relative installation directory for include files"
-#   )
-#
-# SET(DEAL_II_LIBRARY_RELDIR "lib" CACHE STRING
-#   "Relative installation directory for library targets"
-#   )
-#
-# SET(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}" CACHE STRING
-#   "Relative installation directory for the CMake project configuration"
-#   )
+# set(DEAL_II_DOCHTML_RELDIR "doc" CACHE STRING "")
+# set(DEAL_II_DOCREADME_RELDIR "" CACHE STRING "")
+# set(DEAL_II_EXAMPLES_RELDIR "examples" CACHE STRING "")
+# set(DEAL_II_EXECUTABLE_RELDIR "bin" CACHE STRING
+# set(DEAL_II_INCLUDE_RELDIR "include" CACHE STRING "")
+# set(DEAL_II_LIBRARY_RELDIR "lib" CACHE STRING "")
+# set(DEAL_II_PROJECT_CONFIG_RELDIR "lib/cmake/deal.II" CACHE STRING "")
 #

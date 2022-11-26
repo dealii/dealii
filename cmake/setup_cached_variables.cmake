@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -20,12 +20,12 @@
 #
 # General configuration options:
 #
-#     DEAL_II_ALLOW_AUTODETECTION
 #     DEAL_II_ALLOW_BUNDLED
 #     DEAL_II_COMPONENT_DOCUMENTATION
 #     DEAL_II_COMPONENT_EXAMPLES
 #     DEAL_II_COMPONENT_PACKAGE
 #     DEAL_II_COMPONENT_PYTHON_BINDINGS
+#     DEAL_II_ALLOW_AUTODETECTION
 #     DEAL_II_FORCE_AUTODETECTION
 #
 # Options regarding compilation and linking:
@@ -35,6 +35,7 @@
 #     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 #     DEAL_II_SETUP_COVERAGE
 #     DEAL_II_UNITY_BUILD
+#     DEAL_II_EARLY_DEPRECATIONS
 #     BUILD_SHARED_LIBS
 #     DEAL_II_PREFER_STATIC_LIBS
 #     DEAL_II_STATIC_EXECUTABLE
@@ -45,15 +46,19 @@
 #     DEAL_II_LINKER_FLAGS                 *)
 #     DEAL_II_LINKER_FLAGS_DEBUG
 #     DEAL_II_LINKER_FLAGS_RELEASE
+#     DEAL_II_DEFINITIONS
+#     DEAL_II_DEFINITIONS_DEBUG
+#     DEAL_II_DEFINITIONS_RELEASE
 #
 # Components and miscellaneous options:
 #
 #     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_WITH_COMPLEX_VALUES
-#     DEAL_II_DOXYGEN_USE_MATHJAX
 #     DEAL_II_COMPILE_EXAMPLES
-#     DEAL_II_CPACK_BUNDLE_NAME
+#     DEAL_II_DOXYGEN_USE_MATHJAX
+#     DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
 #     DEAL_II_CPACK_EXTERNAL_LIBS
+#     DEAL_II_CPACK_BUNDLE_NAME
 #
 # *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
 #     (a nonempty cached variable has precedence and will not be
@@ -363,17 +368,17 @@ option(DEAL_II_WITH_COMPLEX_VALUES
   )
 list(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
 
-option(DEAL_II_DOXYGEN_USE_MATHJAX
-  "If set to ON, doxygen documentation is generated using mathjax"
-  OFF
-  )
-mark_as_advanced(DEAL_II_DOXYGEN_USE_MATHJAX)
-
 option(DEAL_II_COMPILE_EXAMPLES
   "If set to ON, all configurable example executables will be built and installed as well. If set to OFF, the examples component only installs the source code of example steps."
   ON
   )
 mark_as_advanced(DEAL_II_COMPILE_EXAMPLES)
+
+option(DEAL_II_DOXYGEN_USE_MATHJAX
+  "If set to ON, doxygen documentation is generated using mathjax"
+  OFF
+  )
+mark_as_advanced(DEAL_II_DOXYGEN_USE_MATHJAX)
 
 option(DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
   "If set to ON, doxygen documentation is generated using online (from CDN) mathjax copy"
