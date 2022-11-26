@@ -271,7 +271,6 @@ EXTERNAL_GROUPS        = YES
 # Configuration options related to the dot tool
 #---------------------------------------------------------------------------
 
-CLASS_DIAGRAMS         = YES
 HIDE_UNDOC_RELATIONS   = NO
 HAVE_DOT               = YES
 CLASS_GRAPH            = YES
@@ -287,7 +286,6 @@ GRAPHICAL_HIERARCHY    = NO
 DIRECTORY_GRAPH        = YES
 DOT_IMAGE_FORMAT       = svg
 MAX_DOT_GRAPH_DEPTH    = 5
-DOT_TRANSPARENT        = NO
 GENERATE_LEGEND        = YES
 
 DOT_CLEANUP            = YES
