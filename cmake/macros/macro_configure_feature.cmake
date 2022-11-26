@@ -233,15 +233,15 @@ macro(CONFIGURE_FEATURE _feature)
         #
         # Second case: We are allowed to search for an external library
         #
-        if(COMMAND FEATURE_${_feature}_FIND_EXTERNAL)
-          evaluate_expression("FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)")
+        if(COMMAND feature_${_feature}_find_external)
+          evaluate_expression("feature_${_feature}_find_external(FEATURE_${_feature}_EXTERNAL_FOUND)")
         else()
           feature_find_external(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
         endif()
 
         if(FEATURE_${_feature}_EXTERNAL_FOUND)
-          if(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
-            evaluate_expression("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
+          if(COMMAND feature_${_feature}_configure_external)
+            evaluate_expression("feature_${_feature}_configure_external()")
           endif()
 
           message(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
@@ -255,7 +255,7 @@ macro(CONFIGURE_FEATURE _feature)
           message(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
 
           if(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
-            evaluate_expression("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+            evaluate_expression("feature_${_feature}_configure_bundled()")
 
             message(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
             set(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
@@ -263,8 +263,8 @@ macro(CONFIGURE_FEATURE _feature)
 
           else()
             if(DEAL_II_WITH_${_feature})
-              if(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)
-                 evaluate_expression("FEATURE_${_feature}_ERROR_message()")
+              if(COMMAND feature_${_feature}_error_message)
+                 evaluate_expression("feature_${_feature}_error_message()")
               else()
                 feature_error_message(${_feature})
               endif()
