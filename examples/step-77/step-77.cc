@@ -364,7 +364,7 @@ namespace Step77
                                     evaluation_point_gradients[q]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_residual(i) =
+              cell_residual(i) +=
                 (fe_values.shape_grad(i, q)      // \nabla \phi_i
                  * coeff                         // * a_n
                  * evaluation_point_gradients[q] // * \nabla u_n
