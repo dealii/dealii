@@ -27,6 +27,17 @@
 macro(clear_feature _feature)
   foreach(_var ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
     unset(${_feature}_${_var})
+    #
+    # If an unset variable is still defined then it is a cached variable.
+    # We want to retain this cached variable because it has been set by the
+    # user (and might have been used for the feature configuration). But it
+    # is important that we clear the variable so that the process_feature()
+    # macro can function as intended. As a workaround let's simply set it
+    # to the empty string.
+    #
+    if(DEFINED ${_feature}_${_var})
+      set(${_feature}_${_var} "")
+    endif()
   endforeach()
   unset(${_FEATURE}_FOUND)
   unset(${_FEATURE}_SPLIT_CONFIGURATION)
