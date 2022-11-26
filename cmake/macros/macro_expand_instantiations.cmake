@@ -32,7 +32,7 @@
 #    a list of inst.in files that will be expanded
 #
 
-macro(EXPAND_INSTANTIATIONS _target _inst_in_files)
+macro(expand_instantiations _target _inst_in_files)
 
   foreach (_inst_in_file ${_inst_in_files})
     string(REGEX REPLACE "\\.in$" "" _inst_file "${_inst_in_file}" )

@@ -21,7 +21,7 @@
 #     add_flags(variable flags)
 #
 
-macro(ADD_FLAGS _variable _flags)
+macro(add_flags _variable _flags)
   string(STRIP "${_flags}" _flags_stripped)
   if(NOT "${_flags_stripped}" STREQUAL "")
     set(${_variable} "${${_variable}} ${_flags}")

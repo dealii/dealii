@@ -23,7 +23,7 @@
 # variable>} and unsets all supplied (cached) variables if this string
 # changes.
 #
-macro(UNSET_IF_CHANGED _variable _string)
+macro(unset_if_changed _variable _string)
   if(DEFINED ${_variable})
     if(NOT "${${_variable}}" STREQUAL "${_string}")
       foreach(_arg ${ARGN})

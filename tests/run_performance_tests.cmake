@@ -1,5 +1,5 @@
 # A small macro
-macro(SET_IF_EMPTY _variable)
+macro(set_if_empty _variable)
   if("${${_variable}}" STREQUAL "")
     set(${_variable} ${ARGN})
   endif()

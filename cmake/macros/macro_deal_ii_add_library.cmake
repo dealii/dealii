@@ -27,7 +27,7 @@
 #   DEAL_II_DEFINITIONS
 #
 
-macro(DEAL_II_ADD_LIBRARY _library)
+macro(deal_ii_add_library _library)
 
   foreach(_build ${DEAL_II_BUILD_TYPES})
     string(TOLOWER ${_build} _build_lowercase)

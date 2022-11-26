@@ -17,7 +17,7 @@
 # A small wrapper around FIND_LIBRARY to be a bit more verbose
 #
 
-macro(DEAL_II_FIND_LIBRARY _library_name)
+macro(deal_ii_find_library _library_name)
   # Save a string representation of the arguments before cmake's
   # FIND_FILE gets its hands on it.
   to_string(_str ${ARGN})

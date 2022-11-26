@@ -19,7 +19,7 @@ set(FEATURE_METIS_AFTER MPI)
 # Configuration for the metis library:
 #
 
-macro(FEATURE_METIS_FIND_EXTERNAL var)
+macro(feature_metis_find_external var)
   find_package(DEAL_II_METIS)
 
   if(METIS_FOUND)

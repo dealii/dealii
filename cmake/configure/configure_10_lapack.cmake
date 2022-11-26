@@ -17,7 +17,7 @@
 # Configuration for the lapack library:
 #
 
-macro(FEATURE_LAPACK_FIND_EXTERNAL var)
+macro(feature_lapack_find_external var)
   clear_cmake_required()
   find_package(DEAL_II_LAPACK)
 

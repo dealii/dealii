@@ -135,10 +135,10 @@ if(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
       )
   endif()
 
-else(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+else()
 
   message(STATUS
     "Skipped setup of default compiler flags "
     "(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF)"
     )
-endif(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+endif()

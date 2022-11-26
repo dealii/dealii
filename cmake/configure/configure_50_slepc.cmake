@@ -20,7 +20,7 @@
 set(FEATURE_SLEPC_DEPENDS PETSC)
 
 
-macro(FEATURE_SLEPC_FIND_EXTERNAL var)
+macro(feature_slepc_find_external var)
   find_package(DEAL_II_SLEPC)
 
   if(SLEPC_FOUND)
@@ -50,7 +50,7 @@ macro(FEATURE_SLEPC_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_SLEPC_ERROR_MESSAGE)
+macro(feature_slepc_error_message)
   message(FATAL_ERROR "\n"
     "Could not find the SLEPc library!\n"
     ${SLEPC_ADDITIONAL_ERROR_STRING}

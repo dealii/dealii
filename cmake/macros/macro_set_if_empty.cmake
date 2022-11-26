@@ -16,7 +16,7 @@
 #
 # If 'variable' is empty it will be set to 'value'
 #
-macro(SET_IF_EMPTY _variable)
+macro(set_if_empty _variable)
   if("${${_variable}}" STREQUAL "")
     set(${_variable} ${ARGN})
   endif()

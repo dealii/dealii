@@ -45,7 +45,7 @@
 # search.
 #
 
-macro(DEAL_II_PACKAGE_HANDLE _feature)
+macro(deal_ii_package_handle _feature)
 
   if(DEFINED ${_feature}_VERSION)
     message(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")

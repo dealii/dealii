@@ -21,7 +21,7 @@
 #     to_string(string ${list1} ${list2} ...)
 #
 
-macro(TO_STRING _variable)
+macro(to_string _variable)
   set(${_variable} "")
   foreach(_var  ${ARGN})
     set(${_variable} "${${_variable}} ${_var}")

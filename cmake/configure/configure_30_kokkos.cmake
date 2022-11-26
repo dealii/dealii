@@ -21,7 +21,7 @@ set(DEAL_II_WITH_KOKKOS ON # Always true. We need it :-]
   CACHE BOOL "Build deal.II with support for Kokkos." FORCE
   )
 
-macro(FEATURE_KOKKOS_CONFIGURE_BUNDLED)
+macro(feature_kokkos_configure_bundled)
   set(KOKKOS_BUNDLED_INCLUDE_DIRS
     ${KOKKOS_FOLDER}/algorithms/src
     ${KOKKOS_FOLDER}/containers/src

@@ -27,7 +27,7 @@ if(NOT FEATURE_BOOST_PROCESSED)
 endif()
 
 
-macro(FEATURE_CGAL_FIND_EXTERNAL var)
+macro(feature_cgal_find_external var)
   find_package(DEAL_II_CGAL)
 
   if(CGAL_FOUND)
@@ -55,7 +55,7 @@ macro(FEATURE_CGAL_FIND_EXTERNAL var)
 endmacro()
 
 
-macro(FEATURE_CGAL_CONFIGURE_EXTERNAL)
+macro(feature_cgal_configure_external)
   # Similarly to the DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS check run
   # in configure_20_boost.cmake we have to check whether cgal includes
   # a deprecated boost header. If yes, disable the boost deprecated header

@@ -20,7 +20,7 @@
 #     strip_flag(variable flag)
 #
 
-macro(STRIP_FLAG _variable _flag)
+macro(strip_flag _variable _flag)
   string(REPLACE " " "  " ${_variable} "${${_variable}}")
   set(${_variable} " ${${_variable}} ")
   string(REPLACE " " "  " _flag2 "${_flag}")

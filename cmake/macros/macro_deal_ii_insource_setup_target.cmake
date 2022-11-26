@@ -24,7 +24,7 @@
 #
 #
 
-macro(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
+macro(deal_ii_insource_setup_target _target _build)
   string(TOLOWER ${_build} _build_lowercase)
 
   set_target_properties(${_target} PROPERTIES

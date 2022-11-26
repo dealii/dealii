@@ -20,7 +20,7 @@
 set(FEATURE_SCALAPACK_DEPENDS MPI LAPACK)
 
 
-macro(FEATURE_SCALAPACK_FIND_EXTERNAL var)
+macro(feature_scalapack_find_external var)
   find_package(DEAL_II_SCALAPACK)
 
   if(SCALAPACK_FOUND)

@@ -24,7 +24,7 @@ set(DEAL_II_WITH_MPI OFF CACHE BOOL "")
 # Configuration for mpi support:
 #
 
-macro(FEATURE_MPI_FIND_EXTERNAL var)
+macro(feature_mpi_find_external var)
   find_package(DEAL_II_MPI)
 
   if(MPI_FOUND)
@@ -51,7 +51,7 @@ macro(FEATURE_MPI_FIND_EXTERNAL var)
   endif()
 endmacro()
 
-macro(FEATURE_MPI_CONFIGURE_EXTERNAL)
+macro(feature_mpi_configure_external)
 
   #
   # We must convert the MPIEXEC_(PRE|POST)FLAGS strings to lists in order
@@ -69,7 +69,7 @@ macro(FEATURE_MPI_CONFIGURE_EXTERNAL)
   mark_as_advanced(DEAL_II_MPI_WITH_CUDA_SUPPORT)
 endmacro()
 
-macro(FEATURE_MPI_ERROR_MESSAGE)
+macro(feature_mpi_error_message)
   message(FATAL_ERROR "\n"
     "Could not find any suitable mpi library!\n"
     ${MPI_ADDITIONAL_ERROR_STRING}

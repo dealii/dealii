@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 # Auxiliary functions
-function(CAT IN_FILE OUT_FILE INDENT)
+function(cat IN_FILE OUT_FILE INDENT)
   file(READ ${IN_FILE} CONTENTS)
   if(${INDENT} MATCHES "TRUE")
     file(STRINGS ${IN_FILE} LINESTMP)
@@ -26,7 +26,7 @@ function(CAT IN_FILE OUT_FILE INDENT)
   endif()
 endfunction()
 
-function(PROCESS IN_DIR OUT_FILE)
+function(process IN_DIR OUT_FILE)
   file(APPEND ${OUT_FILE} "<ol>\n")
   file(GLOB ENTRY_LIST ${IN_DIR}/[0-9]*)
   list(SORT ENTRY_LIST)

@@ -22,7 +22,7 @@
 #     filter_system_libraries(feature)
 #
 
-macro(FILTER_SYSTEM_LIBRARIES _feature)
+macro(filter_system_libraries _feature)
   foreach(_variable
     ${_feature}_LIBRARIES
     ${_feature}_LIBRARIES_DEBUG

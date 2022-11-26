@@ -22,7 +22,7 @@
 #     switch_library_preference()
 #
 
-macro(SWITCH_LIBRARY_PREFERENCE)
+macro(switch_library_preference)
   if(DEAL_II_PREFER_STATIC_LIBS AND NOT DEAL_II_STATIC_EXECUTABLE)
     #
     # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS

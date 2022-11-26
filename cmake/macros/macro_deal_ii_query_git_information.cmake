@@ -40,7 +40,7 @@
 #       PREFIX_GIT_TIMESTAMP
 #
 
-macro(DEAL_II_QUERY_GIT_INFORMATION)
+macro(deal_ii_query_git_information)
 
   message(STATUS "Query git repository information.")
 

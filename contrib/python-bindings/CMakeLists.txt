@@ -96,4 +96,4 @@ if(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   message(STATUS "Setting up python bindings - Done")
   message(STATUS "")
 
-endif(DEAL_II_COMPONENT_PYTHON_BINDINGS)
+endif()

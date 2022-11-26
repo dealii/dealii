@@ -21,7 +21,7 @@
 #     remove_duplicates(list [REVERSE])
 #
 
-macro(REMOVE_DUPLICATES _list)
+macro(remove_duplicates _list)
   if(NOT "${${_list}}" STREQUAL "")
     if("${ARGN}" STREQUAL "REVERSE")
       list(REVERSE ${_list})

@@ -30,7 +30,7 @@
 # where language is either C or Fortran
 #
 
-macro(ENABLE_LANGUAGE_OPTIONAL _language)
+macro(enable_language_optional _language)
   if(NOT ${_language}_CHECKED)
     #
     # Run this check exactly once:

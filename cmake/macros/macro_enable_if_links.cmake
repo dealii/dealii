@@ -22,7 +22,7 @@
 #     enable_if_links(variable flag)
 #
 
-macro(ENABLE_IF_LINKS _variable _flag)
+macro(enable_if_links _variable _flag)
   # keep on top to avoid cluttering the _flag and _flag_stripped variables
   enable_if_supported(CMAKE_REQUIRED_FLAGS "-Werror")
 

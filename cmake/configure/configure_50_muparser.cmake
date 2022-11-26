@@ -17,7 +17,7 @@
 # Configuration for the MUPARSER library:
 #
 
-macro(FEATURE_MUPARSER_CONFIGURE_BUNDLED)
+macro(feature_muparser_configure_bundled)
   set(MUPARSER_BUNDLED_INCLUDE_DIRS ${MUPARSER_FOLDER}/include)
 endmacro()
 

@@ -30,7 +30,7 @@
 #     decorate_with_stars(message decorated_message)
 #
 #
-macro(DECORATE_WITH_STARS _message _decorated_message)
+macro(decorate_with_stars _message _decorated_message)
   string(LENGTH ${_message} _message_length)
   set(_line_length 75)
   math(EXPR _unpadded_line_length "${_line_length} - 6")

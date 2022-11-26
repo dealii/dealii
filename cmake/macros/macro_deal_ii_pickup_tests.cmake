@@ -77,13 +77,13 @@
 # Two very small macros that are used below:
 #
 
-macro(SET_IF_EMPTY _variable)
+macro(set_if_empty _variable)
   if("${${_variable}}" STREQUAL "")
     set(${_variable} ${ARGN})
   endif()
 endmacro()
 
-macro(ITEM_MATCHES _var _regex)
+macro(item_matches _var _regex)
   set(${_var})
   foreach (_item ${ARGN})
     if("${_item}" MATCHES ${_regex})
@@ -94,7 +94,7 @@ macro(ITEM_MATCHES _var _regex)
 endmacro()
 
 
-macro(DEAL_II_PICKUP_TESTS)
+macro(deal_ii_pickup_tests)
 
   if(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     message(FATAL_ERROR

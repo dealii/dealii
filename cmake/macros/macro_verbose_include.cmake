@@ -13,7 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-macro(VERBOSE_INCLUDE _file)
+macro(verbose_include _file)
   message(STATUS "")
   message(STATUS "Include ${_file}")
   include(${_file})

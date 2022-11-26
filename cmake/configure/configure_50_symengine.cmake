@@ -18,7 +18,7 @@
 #
 
 
-macro(FEATURE_SYMENGINE_FIND_EXTERNAL var)
+macro(feature_symengine_find_external var)
   find_package(DEAL_II_SYMENGINE)
 
   if(SYMENGINE_FOUND)
@@ -44,7 +44,7 @@ macro(FEATURE_SYMENGINE_FIND_EXTERNAL var)
   endif()
 endmacro()
 
-macro(FEATURE_SYMENGINE_CONFIGURE_EXTERNAL)
+macro(feature_symengine_configure_external)
   set(DEAL_II_SYMENGINE_WITH_LLVM ${SYMENGINE_WITH_LLVM})
 
   if(DEAL_II_SYMENGINE_WITH_LLVM)

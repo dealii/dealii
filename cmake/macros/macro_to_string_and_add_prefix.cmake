@@ -22,7 +22,7 @@
 #     to_string_and_add_prefix(string "prefix" ${list1} ${list2} ...)
 #
 
-macro(TO_STRING_AND_ADD_PREFIX _variable _prefix)
+macro(to_string_and_add_prefix _variable _prefix)
   set(${_variable} "")
   foreach(_var ${ARGN})
     set(${_variable} "${${_variable}} ${_prefix}${_var}")

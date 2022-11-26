@@ -24,7 +24,7 @@
 # (This just inverts the logic of CHECK_CXX_SOURCE_COMPILES.)
 #
 
-macro(CHECK_CXX_COMPILER_BUG _source _var)
+macro(check_cxx_compiler_bug _source _var)
   if(NOT DEFINED ${_var}_OK)
     CHECK_CXX_SOURCE_COMPILES(
       "${_source}"

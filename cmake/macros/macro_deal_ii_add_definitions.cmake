@@ -19,7 +19,7 @@
 # to _add_ compile definitions to every target we have specified.
 #
 
-macro(DEAL_II_ADD_DEFINITIONS _name)
+macro(deal_ii_add_definitions _name)
 
   foreach(_build ${DEAL_II_BUILD_TYPES})
     string(TOLOWER ${_build} _build_lowercase)

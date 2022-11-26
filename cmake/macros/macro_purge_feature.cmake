@@ -20,7 +20,7 @@
 #     purge_feature(feature)
 #
 
-macro(PURGE_FEATURE _feature)
+macro(purge_feature _feature)
   #
   # uncached:
   #

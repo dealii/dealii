@@ -17,7 +17,7 @@
 # A small wrapper around FIND_PROGRAM to be a bit more verbose
 #
 
-macro(DEAL_II_FIND_PROGRAM _file_name)
+macro(deal_ii_find_program _file_name)
   # Save a string representation of the arguments before cmake's
   # FIND_PROGRAM gets its hands on it.
   to_string(_str ${ARGN})

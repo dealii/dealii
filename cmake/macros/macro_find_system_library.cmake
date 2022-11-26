@@ -21,7 +21,7 @@
 #   find_system_library(variable NAMES [list of possible names])
 #
 
-macro(FIND_SYSTEM_LIBRARY)
+macro(find_system_library)
   set(_argn ${ARGN})
   list(GET _argn 0 _variable)
   list(REMOVE_AT _argn 0 1)

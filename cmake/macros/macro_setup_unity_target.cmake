@@ -21,7 +21,7 @@
 # and the number of files to be included per unity file. It generates the unity
 # build files and appends their names to _output_src.
 #
-macro(SETUP_UNITY_TARGET _unity_include_src _n_includes_per_unity_file _output_src)
+macro(setup_unity_target _unity_include_src _n_includes_per_unity_file _output_src)
   #
   # The unity build files need access to the original source files:
   #
