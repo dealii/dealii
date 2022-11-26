@@ -19,9 +19,10 @@
 #  [CLEAR <variables>]
 #  )
 #
-# This macro is an alternative implementation of the
-# FIND_PACKAGE_HANDLE_STANDARD_ARGS macro shipped with CMake - aka do
-# everything that was expected from CMake in the first place *sigh*
+# This macro processes a configuration statement similar to
+# FIND_PACKAGE_HANDLE_STANDARD_ARGS() macro shipped with CMake - but in
+# contrast to the CMake macro it populates corresponding FEATURE_*
+# variables.
 #
 # Its usage is best explained with an example:
 #
@@ -36,22 +37,35 @@
 #     )
 #
 # This will check whether all REQUIRED variables are non-empty and
-# different from "-NOTFOUND". If so, PETSC_LIBRARIES and PETSC_INCLUDE_DIRS
-# is defined and populated with the contents of all specified variables.
-# Optional variables with no content or whose content is "-NOTFOUND" are
-# filtered out.
+# different from "-NOTFOUND". If so, the PETSC_LIBRARIES and
+# PETSC_INCLUDE_DIRS will be defined and populated with the contents of all
+# specified variables. Optional variables with no content or whose content
+# is "-NOTFOUND" are filtered out.
+#
 # After the 'CLEAR' statement all internally cached variables should be
 # listed - this is used to provide a possibility to undo a feature
 # search.
 #
+# Valid suffixes are
+#   CXX_FLAGS    CXX_FLAGS_RELEASE    CXX_FLAGS_DEBUG
+#   DEFINITIONS  DEFINITIONS_RELEASE  DEFINITIONS_DEBUG
+#   EXECUTABLE
+#   INCLUDE_DIRS
+#   LIBRARIES    LIBRARIES_RELEASE    LIBRARIES_DEBUG
+#   LINKER_FLAGS LINKER_FLAGS_RELEASE LINKER_FLAGS_DEBUG
+#
+# Note: The contents of all <feature>_<suffix> variables will be cleared
+#
+# In addition the macro defines the booleans
+#
+#   <feature>_FOUND                -  true if processing was successful
+#   <feature>_SPLIT_CONFIGURATION  -  true if separate debug and release
+#                                     values have been defined.
+#
 
 macro(process_feature _feature)
 
-  message(STATUS "Configuring ${_feature} interface target:")
-
-  if(DEFINED ${_feature}_VERSION)
-    message(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")
-  endif()
+  message(STATUS "Processing ${_feature} variables and targets")
 
   #
   # Respect a possible ${_feature}_FOUND variable that is set to a truth
@@ -79,6 +93,11 @@ macro(process_feature _feature)
   set(_required TRUE)
 
   #
+  # Record whether we have encountered split *_DEBUG/*_RELEASE variables
+  #
+  set(_split_configuration FALSE)
+
+  #
   # A temporary list accumulating all variables that should be "cleared"
   # when the feature gets disabled.
   #
@@ -92,6 +111,10 @@ macro(process_feature _feature)
       # We encountered a new keyword.
       #
       set(_current_suffix "${_arg}")
+
+      if(_current_suffix MATCHES "_DEBUG" OR _current_suffix MATCHES "_RELEASE")
+        set(_split_configuration TRUE)
+      endif()
 
     elseif("${_arg}" STREQUAL "REQUIRED")
       set(_required TRUE)
@@ -156,6 +179,7 @@ macro(process_feature _feature)
     foreach(_suffix ${_DEAL_II_STRING_SUFFIXES})
       to_string(_temp_${_suffix} ${_temp_${_suffix}})
     endforeach()
+    set(${_feature}_SPLIT_CONFIGURATION ${_split_configuration})
 
     #
     # Remove certain system libraries from the link interface. This is
@@ -178,19 +202,16 @@ macro(process_feature _feature)
     foreach(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
       if(NOT "${_temp_${_suffix}}" STREQUAL "")
         set(${_feature}_${_suffix} "${_temp_${_suffix}}")
-        message(STATUS "  ${_feature}_${_suffix}: ${${_feature}_${_suffix}}")
       endif()
     endforeach()
 
     mark_as_advanced(${_feature}_DIR ${_feature}_ARCH)
 
-    #
-    # Finally create interface target:
-    #
-    # define_feature_target(${_feature})
+    message(STATUS "Processing ${_feature} variables and targets - Done")
 
   else()
 
-    message(STATUS "Could NOT configure ${_feature}")
+    clear_feature(${_feature})
+    message(STATUS "Unable to process ${_feature}")
   endif()
 endmacro()
