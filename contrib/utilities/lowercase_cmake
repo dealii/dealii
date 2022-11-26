@@ -47,10 +47,21 @@ collect_function_names | while read command ; do
 done > "${SED_FILE}"
 
 #
-# Add rules to ensure that else() and endif() do not contain a statement.
+# Add rules to ensure that else(), endif(), enmacro(), enfunction()
+# statements do not contain a parameter.
 #
-echo 's/else([^)]*)/else()/gI' > "${SED_FILE}"
-echo 's/endif([^)]*)/endif()/gI' > "${SED_FILE}"
+
+echo 's/else([^)]*)/else()/gI' >> "${SED_FILE}"
+echo 's/endif([^)]*)/endif()/gI' >> "${SED_FILE}"
+echo 's/endmacro([^)]*)/endmacro()/gI' >> "${SED_FILE}"
+echo 's/endfunction([^)]*)/endfunction()/gI' >> "${SED_FILE}"
+
+#
+# Add rules to ensure that all macro definitions are lowercase.
+#
+
+echo 's/macro\(\s*\)(\(\S*\)/macro\1(\L\2\E/gI' >> "${SED_FILE}"
+echo 's/function\(\s*\)(\(\S*\)/function\1(\L\2\E/gI' >> "${SED_FILE}"
 
 #
 # Apply rules file to all CMake files:
