@@ -84,13 +84,13 @@ foreach(build ${DEAL_II_BUILD_TYPES})
 
   get_property(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})
 
-  add_library(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  add_library(${DEAL_II_NAMESPACE}_${build_lowercase}
     dummy.cc # Workaround for a bug in the Xcode generator
     ${_objects}
     )
-  add_dependencies(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
+  add_dependencies(library ${DEAL_II_NAMESPACE}_${build_lowercase})
 
-  set_target_properties(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
     PROPERTIES
     VERSION "${DEAL_II_PACKAGE_VERSION}"
     #
@@ -103,13 +103,16 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     LINKER_LANGUAGE "CXX"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
     COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
+    ARCHIVE_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
+    LIBRARY_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
+    RUNTIME_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set_target_properties(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
       PROPERTIES
       MACOSX_RPATH OFF
       BUILD_WITH_INSTALL_RPATH OFF
@@ -126,7 +129,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   # lib locations for _DEBUG (no support for dynamic linking, _RELEASE will be
   # ignored), but we do it anyhow.
   if (DEAL_II_MSVC)
-    set_target_properties(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
       PROPERTIES
       ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
       LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
@@ -138,7 +141,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   endif()
 
 
-  target_link_libraries(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  target_link_libraries(${DEAL_II_NAMESPACE}_${build_lowercase}
     ${DEAL_II_LIBRARIES_${build}}
     ${DEAL_II_LIBRARIES}
     )
@@ -146,12 +149,13 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   file(MAKE_DIRECTORY
     ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}
     )
-  export(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  export(TARGETS ${DEAL_II_NAMESPACE}_${build_lowercase}
+    NAMESPACE "${DEAL_II_NAMESPACE}::"
     FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
     APPEND
     )
 
-  install(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  install(TARGETS ${DEAL_II_NAMESPACE}_${build_lowercase}
     COMPONENT library
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
     RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
@@ -161,6 +165,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
 endforeach()
 
 install(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+  NAMESPACE "${DEAL_II_NAMESPACE}::"
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )

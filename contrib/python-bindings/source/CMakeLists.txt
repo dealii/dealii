@@ -71,7 +71,7 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
   endif()
 
   target_link_libraries(PyDealII_${_build_lowercase}
-    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
+    ${DEAL_II_NAMESPACE}_${_build_lowercase}
     ${Boost_LIBRARIES}
     ${PYTHON_LIBRARIES}
     )

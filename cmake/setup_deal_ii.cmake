@@ -36,6 +36,8 @@
 #     DEAL_II_VERSION
 #
 # Information about paths, install locations and names:
+
+#     DEAL_II_NAMESPACE               *)
 #
 #     DEAL_II_PROJECT_CONFIG_NAME     *)
 #     DEAL_II_BASE_NAME               *)
@@ -100,7 +102,11 @@ set(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_
 #                                                                      #
 ########################################################################
 
-set(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
+string(REPLACE "." "" _namespace "${DEAL_II_PACKAGE_NAME}")
+string(TOLOWER "${_namespace}" _namespace)
+set_if_empty(DEAL_II_NAMESPACE "${_namespace}")
+
+set_if_empty(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
 
 string(REPLACE "." "_" _base_name "${DEAL_II_PACKAGE_NAME}")
 set_if_empty(DEAL_II_BASE_NAME "${_base_name}")
