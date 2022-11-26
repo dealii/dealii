@@ -362,12 +362,12 @@ namespace LinearAlgebra
              const bool                          omit_zeroing_entries = false);
 
       /**
-       * Initialize the vector. The local range is specified by @p
-       * locally_owned_set (note that this must be a contiguous interval,
-       * multiple intervals are not possible). The IndexSet @p ghost_indices
-       * specifies ghost indices, i.e., indices which one might need to read
-       * data from or accumulate data from. It is allowed that the set of
-       * ghost indices also contains the local range, but it does not need to.
+       * Initialize the vector. The local range is specified by @p local_range
+       * (note that this must be a contiguous interval, multiple intervals are
+       * not possible). The IndexSet @p ghost_indices specifies ghost indices,
+       * i.e., indices which one might need to read data from or accumulate data
+       * from. It is allowed that the set of ghost indices also contains the
+       * local range, but it does not need to.
        *
        * This function involves global communication, so it should only be
        * called once for a given layout. Use the @p reinit function with

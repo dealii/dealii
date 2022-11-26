@@ -300,6 +300,35 @@ namespace LinearAlgebra
              const bool                  omit_zeroing_entries = false);
 
       /**
+       * Initialize the block vector. For each block, the local range is
+       * specified by the corresponding entry in @p local_ranges (note that this
+       * must be a contiguous interval, multiple intervals are not possible).
+       * The parameter @p ghost_indices specifies ghost indices for each block,
+       * i.e., indices which one might need to read data from or accumulate data
+       * from. It is allowed that the set of ghost indices also contains the
+       * local range, but it does not need to.
+       *
+       * This function involves global communication, so it should only be
+       * called once for a given layout. Use the @p reinit function with
+       * BlockVector<Number> argument to create additional vectors with the same
+       * parallel layout.
+       *
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
+       */
+      void
+      reinit(const std::vector<IndexSet> &local_ranges,
+             const std::vector<IndexSet> &ghost_indices,
+             const MPI_Comm &             communicator);
+
+      /**
+       * Same as above, but without ghost entries.
+       */
+      void
+      reinit(const std::vector<IndexSet> &local_ranges,
+             const MPI_Comm &             communicator);
+
+      /**
        * This function copies the data that has accumulated in the data buffer
        * for ghost indices to the owning processor. For the meaning of the
        * argument @p operation, see the entry on

@@ -62,15 +62,7 @@ namespace LinearAlgebra
                                      const std::vector<IndexSet> &ghost_indices,
                                      const MPI_Comm &             communicator)
     {
-      std::vector<size_type> sizes(local_ranges.size());
-      for (unsigned int i = 0; i < local_ranges.size(); ++i)
-        sizes[i] = local_ranges[i].size();
-
-      this->block_indices.reinit(sizes);
-      this->components.resize(this->n_blocks());
-
-      for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        this->block(i).reinit(local_ranges[i], ghost_indices[i], communicator);
+      reinit(local_ranges, ghost_indices, communicator);
     }
 
 
@@ -78,15 +70,7 @@ namespace LinearAlgebra
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
                                      const MPI_Comm &             communicator)
     {
-      std::vector<size_type> sizes(local_ranges.size());
-      for (unsigned int i = 0; i < local_ranges.size(); ++i)
-        sizes[i] = local_ranges[i].size();
-
-      this->block_indices.reinit(sizes);
-      this->components.resize(this->n_blocks());
-
-      for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        this->block(i).reinit(local_ranges[i], communicator);
+      reinit(local_ranges, communicator);
     }
 
 
@@ -95,11 +79,13 @@ namespace LinearAlgebra
     BlockVector<Number>::BlockVector(const BlockVector<Number> &v)
       : BlockVectorBase<Vector<Number>>()
     {
-      this->components.resize(v.n_blocks());
       this->block_indices = v.block_indices;
 
-      for (size_type i = 0; i < this->n_blocks(); ++i)
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->components[i] = v.components[i];
+
+      this->collect_sizes();
     }
 
 
@@ -131,11 +117,12 @@ namespace LinearAlgebra
                                 const bool omit_zeroing_entries)
     {
       this->block_indices.reinit(block_sizes);
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
 
-      for (size_type i = 0; i < this->n_blocks(); ++i)
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->components[i].reinit(block_sizes[i], omit_zeroing_entries);
+
+      this->collect_sizes();
     }
 
 
@@ -146,12 +133,57 @@ namespace LinearAlgebra
     BlockVector<Number>::reinit(const BlockVector<Number2> &v,
                                 const bool omit_zeroing_entries)
     {
-      this->block_indices = v.get_block_indices();
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
+      if (this->n_blocks() != v.n_blocks())
+        this->block_indices = v.get_block_indices();
 
+      this->components.resize(this->n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        this->block(i).reinit(v.block(i), omit_zeroing_entries);
+        this->components[i].reinit(v.block(i), omit_zeroing_entries);
+
+      this->collect_sizes();
+    }
+
+
+
+    template <typename Number>
+    void
+    BlockVector<Number>::reinit(const std::vector<IndexSet> &local_ranges,
+                                const std::vector<IndexSet> &ghost_indices,
+                                const MPI_Comm &             communicator)
+    {
+      AssertDimension(local_ranges.size(), ghost_indices.size());
+
+      // update the number of blocks
+      this->block_indices.reinit(local_ranges.size(), 0);
+
+      // initialize each block
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(local_ranges[i],
+                                   ghost_indices[i],
+                                   communicator);
+
+      // update block_indices content
+      this->collect_sizes();
+    }
+
+
+
+    template <typename Number>
+    void
+    BlockVector<Number>::reinit(const std::vector<IndexSet> &local_ranges,
+                                const MPI_Comm &             communicator)
+    {
+      // update the number of blocks
+      this->block_indices.reinit(local_ranges.size(), 0);
+
+      // initialize each block
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(local_ranges[i], communicator);
+
+      // update block_indices content
+      this->collect_sizes();
     }
 
 
@@ -178,12 +210,14 @@ namespace LinearAlgebra
              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
-        reinit(v.n_blocks(), true);
+        this->block_indices = v.block_indices;
 
+      this->components.resize(this->n_blocks());
       for (size_type i = 0; i < this->n_blocks(); ++i)
-        this->components[i] = v.block(i);
+        this->components[i] = v.components[i];
 
       this->collect_sizes();
+
       return *this;
     }
 
