@@ -248,6 +248,7 @@ macro(configure_feature _feature)
           if(COMMAND feature_${_feature}_configure_external)
             evaluate_expression("feature_${_feature}_configure_external()")
           endif()
+          define_interface_target(${_feature})
 
           message(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
           set(FEATURE_${_feature}_EXTERNAL_CONFIGURED TRUE)
