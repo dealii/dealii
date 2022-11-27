@@ -2986,7 +2986,7 @@ namespace DataOutBase
 
                 case 1:
                   {
-                    const unsigned int d1 = 1;
+                    constexpr unsigned int d1 = 1;
 
                     for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                       {
@@ -3000,8 +3000,8 @@ namespace DataOutBase
 
                 case 2:
                   {
-                    const unsigned int d1 = 1;
-                    const unsigned int d2 = n;
+                    constexpr unsigned int d1 = 1;
+                    const unsigned int     d2 = n;
 
                     for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                       for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
@@ -3018,9 +3018,9 @@ namespace DataOutBase
 
                 case 3:
                   {
-                    const unsigned int d1 = 1;
-                    const unsigned int d2 = n;
-                    const unsigned int d3 = n * n;
+                    constexpr unsigned int d1 = 1;
+                    const unsigned int     d2 = n;
+                    const unsigned int     d3 = n * n;
 
                     for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
                       for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
@@ -3093,9 +3093,9 @@ namespace DataOutBase
             const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
             const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
             // Offsets of outer loops
-            const unsigned int d1 = 1;
-            const unsigned int d2 = n;
-            const unsigned int d3 = n * n;
+            constexpr unsigned int d1 = 1;
+            const unsigned int     d2 = n;
+            const unsigned int     d3 = n * n;
             for (unsigned int i3 = 0; i3 <= n3; ++i3)
               for (unsigned int i2 = 0; i2 <= n2; ++i2)
                 for (unsigned int i1 = 0; i1 <= n1; ++i1)
@@ -6219,10 +6219,10 @@ namespace DataOutBase
 
                     case 1:
                       {
-                        const unsigned int d1 = 1;
+                        constexpr unsigned int d1 = 1;
 
                         auto write_cell =
-                          [&flags, &out, &cells, d1](const unsigned int start) {
+                          [&flags, &out, &cells](const unsigned int start) {
                             if (deal_ii_with_zlib &&
                                 (flags.compression_level !=
                                  DataOutBase::CompressionLevel::plain_text))
@@ -6248,27 +6248,27 @@ namespace DataOutBase
 
                     case 2:
                       {
-                        const unsigned int d1 = 1;
-                        const unsigned int d2 = n;
+                        constexpr unsigned int d1 = 1;
+                        const unsigned int     d2 = n;
 
-                        auto write_cell = [&flags, &out, &cells, d1, d2](
-                                            const unsigned int start) {
-                          if (deal_ii_with_zlib &&
-                              (flags.compression_level !=
-                               DataOutBase::CompressionLevel::plain_text))
-                            {
-                              cells.push_back(start);
-                              cells.push_back(start + d1);
-                              cells.push_back(start + d2 + d1);
-                              cells.push_back(start + d2);
-                            }
-                          else
-                            {
-                              out << start << '\t' << start + d1 << '\t'
-                                  << start + d2 + d1 << '\t' << start + d2;
-                              out << '\n';
-                            }
-                        };
+                        auto write_cell =
+                          [&flags, &out, &cells, d2](const unsigned int start) {
+                            if (deal_ii_with_zlib &&
+                                (flags.compression_level !=
+                                 DataOutBase::CompressionLevel::plain_text))
+                              {
+                                cells.push_back(start);
+                                cells.push_back(start + d1);
+                                cells.push_back(start + d2 + d1);
+                                cells.push_back(start + d2);
+                              }
+                            else
+                              {
+                                out << start << '\t' << start + d1 << '\t'
+                                    << start + d2 + d1 << '\t' << start + d2;
+                                out << '\n';
+                              }
+                          };
 
                         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
@@ -6282,11 +6282,11 @@ namespace DataOutBase
 
                     case 3:
                       {
-                        const unsigned int d1 = 1;
-                        const unsigned int d2 = n;
-                        const unsigned int d3 = n * n;
+                        constexpr unsigned int d1 = 1;
+                        const unsigned int     d2 = n;
+                        const unsigned int     d3 = n * n;
 
-                        auto write_cell = [&flags, &out, &cells, d1, d2, d3](
+                        auto write_cell = [&flags, &out, &cells, d2, d3](
                                             const unsigned int start) {
                           if (deal_ii_with_zlib &&
                               (flags.compression_level !=
