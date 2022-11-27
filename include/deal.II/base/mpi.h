@@ -1287,8 +1287,9 @@ namespace Utilities
      * argument.
      *
      * @param[in] comm MPI communicator.
-     * @param[in] object_to_send a vector of objects, with size equal to the
-     * number of processes.
+     * @param[in] objects_to_send A vector of objects to send from the root
+     * process, with size equal to the number of processes. On all other
+     * processes the vector is empty.
      * @param[in] root_process The process, which sends the objects to all
      * processes. By default the process with rank 0 is the root process.
      *
@@ -1297,7 +1298,7 @@ namespace Utilities
     template <typename T>
     T
     scatter(const MPI_Comm &      comm,
-            const std::vector<T> &object_to_send,
+            const std::vector<T> &objects_to_send,
             const unsigned int    root_process = 0);
 
     /**
@@ -2121,6 +2122,9 @@ namespace Utilities
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
       (void)root_process;
+
+      AssertDimension(objects_to_send.size(), 1);
+
       return objects_to_send[0];
 #  else
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
@@ -2128,7 +2132,8 @@ namespace Utilities
 
       AssertIndexRange(root_process, n_procs);
       AssertThrow(
-        my_rank != root_process || objects_to_send.size() == n_procs,
+        (my_rank != root_process && objects_to_send.size() == 0) ||
+          objects_to_send.size() == n_procs,
         ExcMessage(
           "The number of objects to be scattered must correspond to the number processes."));
 
@@ -2155,26 +2160,28 @@ namespace Utilities
         }
 
       int n_local_data;
-      MPI_Scatter(send_counts.data(),
-                  1,
-                  MPI_INT,
-                  &n_local_data,
-                  1,
-                  MPI_INT,
-                  root_process,
-                  comm);
+      int ierr = MPI_Scatter(send_counts.data(),
+                             1,
+                             MPI_INT,
+                             &n_local_data,
+                             1,
+                             MPI_INT,
+                             root_process,
+                             comm);
+      AssertThrowMPI(ierr);
 
       std::vector<char> recv_buffer(n_local_data);
 
-      MPI_Scatterv(send_buffer.data(),
-                   send_counts.data(),
-                   send_displacements.data(),
-                   MPI_CHAR,
-                   recv_buffer.data(),
-                   n_local_data,
-                   MPI_CHAR,
-                   root_process,
-                   comm);
+      ierr = MPI_Scatterv(send_buffer.data(),
+                          send_counts.data(),
+                          send_displacements.data(),
+                          MPI_CHAR,
+                          recv_buffer.data(),
+                          n_local_data,
+                          MPI_CHAR,
+                          root_process,
+                          comm);
+      AssertThrowMPI(ierr);
 
       return Utilities::unpack<T>(recv_buffer);
 #  endif
