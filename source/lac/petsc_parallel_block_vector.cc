@@ -93,6 +93,11 @@ namespace PETScWrappers
       return petsc_nest_vector;
     }
 
+    BlockVector::operator const Vec &() const
+    {
+      return petsc_nest_vector;
+    }
+
     void
     BlockVector::collect_sizes()
     {

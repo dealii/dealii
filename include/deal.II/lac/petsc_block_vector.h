@@ -273,6 +273,15 @@ namespace PETScWrappers
       get_mpi_communicator() const;
 
       /**
+       * Conversion operator to gain access to the underlying PETSc type. If you
+       * do this, you cut this class off some information it may need, so this
+       * conversion operator should only be used if you know what you do. In
+       * particular, it should only be used for read-only operations into the
+       * vector.
+       */
+      operator const Vec &() const;
+
+      /**
        * Return a reference to the underlying PETSc type. It can be used to
        * modify the underlying data, so use it only when you know what you
        * are doing.
