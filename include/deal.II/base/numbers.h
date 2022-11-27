@@ -32,9 +32,9 @@
 #include <cstddef>
 #include <type_traits>
 
-#define DEAL_II_HOST_DEV KOKKOS_FUNCTION
-#define DEAL_II_CUDA_HOST_DEV DEAL_II_HOST_DEV
-#define DEAL_II_HOST_DEV_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
+#define DEAL_II_HOST_DEVICE KOKKOS_FUNCTION
+#define DEAL_II_CUDA_HOST_DEV DEAL_II_HOST_DEVICE
+#define DEAL_II_HOST_DEVICE_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
 
 // Forward-declare the automatic differentiation types so we can add prototypes
 // for our own wrappers.
@@ -269,7 +269,7 @@ namespace numbers
 
   /**
    * Check whether the given type can be used in CUDA device code.
-   * If not, DEAL_II_HOST_DEV needs to be disabled for functions
+   * If not, DEAL_II_HOST_DEVICE needs to be disabled for functions
    * that use this type.
    */
   template <typename Number, typename = void>
@@ -457,8 +457,8 @@ namespace numbers
      *
      * @note This function can also be used in CUDA device code.
      */
-    static constexpr DEAL_II_HOST_DEV const number &
-                                            conjugate(const number &x);
+    static constexpr DEAL_II_HOST_DEVICE const number &
+                                               conjugate(const number &x);
 
     /**
      * Return the square of the absolute value of the given number. Since the
@@ -469,7 +469,7 @@ namespace numbers
      * for this function.
      */
     template <typename Dummy = number>
-    static constexpr DEAL_II_HOST_DEV
+    static constexpr DEAL_II_HOST_DEVICE
       std::enable_if_t<std::is_same<Dummy, number>::value &&
                          is_cuda_compatible<Dummy>::value,
                        real_type>
@@ -586,7 +586,7 @@ namespace numbers
 
 
   template <typename number>
-  constexpr DEAL_II_HOST_DEV const number &
+  constexpr DEAL_II_HOST_DEVICE const number &
   NumberTraits<number>::conjugate(const number &x)
   {
     return x;
@@ -596,7 +596,7 @@ namespace numbers
 
   template <typename number>
   template <typename Dummy>
-  constexpr DEAL_II_HOST_DEV
+  constexpr DEAL_II_HOST_DEVICE
     std::enable_if_t<std::is_same<Dummy, number>::value &&
                        is_cuda_compatible<Dummy>::value,
                      typename NumberTraits<number>::real_type>
@@ -729,8 +729,8 @@ namespace internal
   template <typename T>
   struct NumberType
   {
-    static constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE const T &
-                                                          value(const T &t)
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE const T &
+                                                             value(const T &t)
     {
       return t;
     }
@@ -744,7 +744,7 @@ namespace internal
 
     // Type T is constructible from F.
     template <typename F>
-    static constexpr DEAL_II_HOST_DEV_ALWAYS_INLINE T
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE T
     value(const F &f,
           std::enable_if_t<!std::is_same<typename std::decay<T>::type,
                                          typename std::decay<F>::type>::value &&
