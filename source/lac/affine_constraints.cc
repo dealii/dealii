@@ -124,6 +124,8 @@ INSTANTIATE_DLTG_VECTOR(TrilinosWrappers::MPI::Vector);
 
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix, Vector<double>);
 INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
+                              LinearAlgebra::distributed::Vector<double>);
+INSTANTIATE_DLTG_VECTORMATRIX(TrilinosWrappers::SparseMatrix,
                               TrilinosWrappers::MPI::Vector);
 
 INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
