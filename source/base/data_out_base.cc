@@ -6190,7 +6190,7 @@ namespace DataOutBase
             else
               {
                 const unsigned int n_subdivisions = patch.n_subdivisions;
-                const unsigned int n              = n_subdivisions + 1;
+                const unsigned int n_points_per_direction = n_subdivisions + 1;
 
                 switch (dim)
                   {
@@ -6219,8 +6219,6 @@ namespace DataOutBase
 
                     case 1:
                       {
-                        constexpr unsigned int d1 = 1;
-
                         auto write_cell =
                           [&flags, &out, &cells](const unsigned int start) {
                             if (deal_ii_with_zlib &&
@@ -6228,11 +6226,11 @@ namespace DataOutBase
                                  DataOutBase::CompressionLevel::plain_text))
                               {
                                 cells.push_back(start);
-                                cells.push_back(start + d1);
+                                cells.push_back(start + 1);
                               }
                             else
                               {
-                                out << start << '\t' << start + d1;
+                                out << start << '\t' << start + 1;
                                 out << '\n';
                               }
                           };
@@ -6240,7 +6238,7 @@ namespace DataOutBase
                         for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                           {
                             const unsigned int starting_offset =
-                              first_vertex_of_patch + i1 * d1;
+                              first_vertex_of_patch + i1;
                             write_cell(starting_offset);
                           }
                         break;
@@ -6248,24 +6246,24 @@ namespace DataOutBase
 
                     case 2:
                       {
-                        constexpr unsigned int d1 = 1;
-                        const unsigned int     d2 = n;
-
                         auto write_cell =
-                          [&flags, &out, &cells, d2](const unsigned int start) {
+                          [&flags, &out, &cells, n_points_per_direction](
+                            const unsigned int start) {
                             if (deal_ii_with_zlib &&
                                 (flags.compression_level !=
                                  DataOutBase::CompressionLevel::plain_text))
                               {
                                 cells.push_back(start);
-                                cells.push_back(start + d1);
-                                cells.push_back(start + d2 + d1);
-                                cells.push_back(start + d2);
+                                cells.push_back(start + 1);
+                                cells.push_back(start + n_points_per_direction +
+                                                1);
+                                cells.push_back(start + n_points_per_direction);
                               }
                             else
                               {
-                                out << start << '\t' << start + d1 << '\t'
-                                    << start + d2 + d1 << '\t' << start + d2;
+                                out << start << '\t' << start + 1 << '\t'
+                                    << start + n_points_per_direction + 1
+                                    << '\t' << start + n_points_per_direction;
                                 out << '\n';
                               }
                           };
@@ -6274,7 +6272,8 @@ namespace DataOutBase
                           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                             {
                               const unsigned int starting_offset =
-                                first_vertex_of_patch + i2 * d2 + i1 * d1;
+                                first_vertex_of_patch +
+                                i2 * n_points_per_direction + i1;
                               write_cell(starting_offset);
                             }
                         break;
@@ -6282,33 +6281,57 @@ namespace DataOutBase
 
                     case 3:
                       {
-                        constexpr unsigned int d1 = 1;
-                        const unsigned int     d2 = n;
-                        const unsigned int     d3 = n * n;
-
-                        auto write_cell = [&flags, &out, &cells, d2, d3](
+                        auto write_cell = [&flags,
+                                           &out,
+                                           &cells,
+                                           n_points_per_direction](
                                             const unsigned int start) {
                           if (deal_ii_with_zlib &&
                               (flags.compression_level !=
                                DataOutBase::CompressionLevel::plain_text))
                             {
                               cells.push_back(start);
-                              cells.push_back(start + d1);
-                              cells.push_back(start + d2 + d1);
-                              cells.push_back(start + d2);
-                              cells.push_back(start + d3);
-                              cells.push_back(start + d3 + d1);
-                              cells.push_back(start + d3 + d2 + d1);
-                              cells.push_back(start + d3 + d2);
+                              cells.push_back(start + 1);
+                              cells.push_back(start + n_points_per_direction +
+                                              1);
+                              cells.push_back(start + n_points_per_direction);
+                              cells.push_back(start + n_points_per_direction *
+                                                        n_points_per_direction);
+                              cells.push_back(start +
+                                              n_points_per_direction *
+                                                n_points_per_direction +
+                                              1);
+                              cells.push_back(start +
+                                              n_points_per_direction *
+                                                n_points_per_direction +
+                                              n_points_per_direction + 1);
+                              cells.push_back(start +
+                                              n_points_per_direction *
+                                                n_points_per_direction +
+                                              n_points_per_direction);
                             }
                           else
                             {
-                              out << start << '\t' << start + d1 << '\t'
-                                  << start + d2 + d1 << '\t' << start + d2
-                                  << '\t' << start + d3 << '\t'
-                                  << start + d3 + d1 << '\t'
-                                  << start + d3 + d2 + d1 << '\t'
-                                  << start + d3 + d2;
+                              out << start << '\t' << start + 1 << '\t'
+                                  << start + n_points_per_direction + 1 << '\t'
+                                  << start + n_points_per_direction << '\t'
+                                  << start + n_points_per_direction *
+                                               n_points_per_direction
+                                  << '\t'
+                                  << start +
+                                       n_points_per_direction *
+                                         n_points_per_direction +
+                                       1
+                                  << '\t'
+                                  << start +
+                                       n_points_per_direction *
+                                         n_points_per_direction +
+                                       n_points_per_direction + 1
+                                  << '\t'
+                                  << start +
+                                       n_points_per_direction *
+                                         n_points_per_direction +
+                                       n_points_per_direction;
                               out << '\n';
                             }
                         };
@@ -6318,8 +6341,10 @@ namespace DataOutBase
                             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                               {
                                 const unsigned int starting_offset =
-                                  first_vertex_of_patch + i3 * d3 + i2 * d2 +
-                                  i1 * d1;
+                                  first_vertex_of_patch +
+                                  i3 * n_points_per_direction *
+                                    n_points_per_direction +
+                                  i2 * n_points_per_direction + i1;
                                 write_cell(starting_offset);
                               }
                         break;
