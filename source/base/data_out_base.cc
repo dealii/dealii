@@ -90,6 +90,13 @@ namespace
 namespace
 {
 #ifdef DEAL_II_WITH_ZLIB
+  constexpr bool deal_ii_with_zlib = true;
+#else
+  constexpr bool deal_ii_with_zlib = false;
+#endif
+
+
+#ifdef DEAL_II_WITH_ZLIB
   /**
    * Convert between the CompressionLevel enum (used inside VtkFlags
    * for example) and the preprocessor constant defined by zlib.
@@ -137,6 +144,7 @@ namespace
       }
   }
 #  endif
+#endif
 
   /**
    * Do a zlib compression followed by a base64 encoding of the given data. The
@@ -147,6 +155,7 @@ namespace
   compress_array(const std::vector<T> &              data,
                  const DataOutBase::CompressionLevel compression_level)
   {
+#ifdef DEAL_II_WITH_ZLIB
     if (data.size() != 0)
       {
         const std::size_t uncompressed_size = (data.size() * sizeof(T));
@@ -197,9 +206,15 @@ namespace
       }
     else
       return {};
-  }
-
+#else
+    (void)data;
+    (void)compression_level;
+    Assert(false,
+           ExcMessage("This function can only be called if cmake found "
+                      "a working libz installation."));
+    return {};
 #endif
+  }
 
 
 
@@ -217,17 +232,13 @@ namespace
                       const DataOutBase::CompressionLevel compression_level,
                       const int                           precision)
   {
-    (void)compression_level;
-    (void)precision;
-
-#ifdef DEAL_II_WITH_ZLIB
-    if (compression_level != DataOutBase::CompressionLevel::plain_text)
+    if (deal_ii_with_zlib &&
+        (compression_level != DataOutBase::CompressionLevel::plain_text))
       {
         // compress the data we have in memory
         return compress_array(data, compression_level);
       }
     else
-#endif
       {
         std::ostringstream stream;
         stream.precision(precision);
@@ -1552,29 +1563,6 @@ namespace
     VtuStream(std::ostream &stream, const DataOutBase::VtkFlags &flags);
 
     /**
-     * The order of vertices for these cells in different dimensions is
-     * <ol>
-     * <li> [0,1]
-     * <li> []
-     * <li> []
-     * </ol>
-     */
-    template <int dim>
-    void
-    write_cell(const unsigned int                   index,
-               const unsigned int                   start,
-               const std::array<unsigned int, dim> &offsets);
-
-    /**
-     * Print vertices [start, start+n_points[
-     */
-    void
-    write_cell_single(const unsigned int   index,
-                      const unsigned int   start,
-                      const unsigned int   n_points,
-                      const ReferenceCell &reference_cell);
-
-    /**
      * Write a high-order cell type, i.e., a Lagrange cell
      * in the VTK terminology.
      * The connectivity order of the points is given in the
@@ -2064,149 +2052,17 @@ namespace
 
   template <int dim>
   void
-  VtuStream::write_cell(const unsigned int,
-                        const unsigned int                   start,
-                        const std::array<unsigned int, dim> &offsets)
-  {
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
-      {
-        switch (dim)
-          {
-            case 0:
-              {
-                cells.push_back(start);
-                break;
-              }
-
-            case 1:
-              {
-                const unsigned int d1 = offsets[0];
-                cells.push_back(start);
-                cells.push_back(start + d1);
-                break;
-              }
-
-            case 2:
-              {
-                const unsigned int d1 = offsets[0];
-                const unsigned int d2 = offsets[1];
-                cells.push_back(start);
-                cells.push_back(start + d1);
-                cells.push_back(start + d2 + d1);
-                cells.push_back(start + d2);
-                break;
-              }
-
-            case 3:
-              {
-                const unsigned int d1 = offsets[0];
-                const unsigned int d2 = offsets[1];
-                const unsigned int d3 = offsets[2];
-                cells.push_back(start);
-                cells.push_back(start + d1);
-                cells.push_back(start + d2 + d1);
-                cells.push_back(start + d2);
-                cells.push_back(start + d3);
-                cells.push_back(start + d3 + d1);
-                cells.push_back(start + d3 + d2 + d1);
-                cells.push_back(start + d3 + d2);
-                break;
-              }
-
-            default:
-              Assert(false, ExcNotImplemented());
-          }
-      }
-    else
-#endif
-      {
-        switch (dim)
-          {
-            case 0:
-              {
-                stream << start;
-                break;
-              }
-
-            case 1:
-              {
-                const unsigned int d1 = offsets[0];
-                stream << start << '\t' << start + d1;
-                break;
-              }
-
-            case 2:
-              {
-                const unsigned int d1 = offsets[0];
-                const unsigned int d2 = offsets[1];
-                stream << start << '\t' << start + d1 << '\t' << start + d2 + d1
-                       << '\t' << start + d2;
-                break;
-              }
-
-            case 3:
-              {
-                const unsigned int d1 = offsets[0];
-                const unsigned int d2 = offsets[1];
-                const unsigned int d3 = offsets[2];
-                stream << start << '\t' << start + d1 << '\t' << start + d2 + d1
-                       << '\t' << start + d2 << '\t' << start + d3 << '\t'
-                       << start + d3 + d1 << '\t' << start + d3 + d2 + d1
-                       << '\t' << start + d3 + d2;
-                break;
-              }
-
-            default:
-              Assert(false, ExcNotImplemented());
-          }
-        stream << '\n';
-      }
-  }
-
-  void
-  VtuStream::write_cell_single(const unsigned int   index,
-                               const unsigned int   start,
-                               const unsigned int   n_points,
-                               const ReferenceCell &reference_cell)
-  {
-    (void)index;
-
-    static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
-
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
-      {
-        for (unsigned int i = 0; i < n_points; ++i)
-          cells.push_back(
-            start + (reference_cell == ReferenceCells::Pyramid ? table[i] : i));
-      }
-    else
-#endif
-      {
-        for (unsigned int i = 0; i < n_points; ++i)
-          stream << '\t'
-                 << start + (reference_cell == ReferenceCells::Pyramid ?
-                               table[i] :
-                               i);
-        stream << '\n';
-      }
-  }
-
-  template <int dim>
-  void
   VtuStream::write_high_order_cell(const unsigned int,
                                    const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+    if (deal_ii_with_zlib &&
+        (flags.compression_level != DataOutBase::CompressionLevel::plain_text))
       {
         for (const auto &c : connectivity)
           cells.push_back(start + c);
       }
     else
-#endif
       {
         for (const auto &c : connectivity)
           stream << '\t' << start + c;
@@ -2217,18 +2073,16 @@ namespace
   void
   VtuStream::flush_cells()
   {
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != DataOutBase::CompressionLevel::plain_text)
+    if (deal_ii_with_zlib &&
+        (flags.compression_level != DataOutBase::CompressionLevel::plain_text))
       {
         // compress the data we have in memory and write them to the stream.
         // then release the data
         *this << vtu_stringize_array(cells,
                                      flags.compression_level,
-                                     stream.precision())
-              << '\n';
+                                     stream.precision());
         cells.clear();
       }
-#endif
   }
 } // namespace
 
@@ -3132,7 +2986,7 @@ namespace DataOutBase
 
                 case 1:
                   {
-                    const unsigned int d1 = 1;
+                    constexpr unsigned int d1 = 1;
 
                     for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                       {
@@ -3146,8 +3000,8 @@ namespace DataOutBase
 
                 case 2:
                   {
-                    const unsigned int d1 = 1;
-                    const unsigned int d2 = n;
+                    constexpr unsigned int d1 = 1;
+                    const unsigned int     d2 = n;
 
                     for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                       for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
@@ -3164,9 +3018,9 @@ namespace DataOutBase
 
                 case 3:
                   {
-                    const unsigned int d1 = 1;
-                    const unsigned int d2 = n;
-                    const unsigned int d3 = n * n;
+                    constexpr unsigned int d1 = 1;
+                    const unsigned int     d2 = n;
+                    const unsigned int     d3 = n * n;
 
                     for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
                       for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
@@ -3239,9 +3093,9 @@ namespace DataOutBase
             const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
             const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
             // Offsets of outer loops
-            const unsigned int d1 = 1;
-            const unsigned int d2 = n;
-            const unsigned int d3 = n * n;
+            constexpr unsigned int d1 = 1;
+            const unsigned int     d2 = n;
+            const unsigned int     d3 = n * n;
             for (unsigned int i3 = 0; i3 <= n3; ++i3)
               for (unsigned int i2 = 0; i2 <= n2; ++i2)
                 for (unsigned int i1 = 0; i1 <= n1; ++i1)
@@ -6029,10 +5883,9 @@ namespace DataOutBase
       out << "<VTKFile type=\"UnstructuredGrid\" version=\"2.2\"";
     else
       out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != CompressionLevel::plain_text)
+    if (deal_ii_with_zlib &&
+        (flags.compression_level != CompressionLevel::plain_text))
       out << " compressor=\"vtkZLibDataCompressor\"";
-#endif
 #ifdef DEAL_II_WORDS_BIGENDIAN
     out << " byte_order=\"BigEndian\"";
 #else
@@ -6214,10 +6067,10 @@ namespace DataOutBase
       }
 
     const char *ascii_or_binary =
-#ifdef DEAL_II_WITH_ZLIB
-      (flags.compression_level != CompressionLevel::plain_text) ? "binary" :
-#endif
-                                                                  "ascii";
+      (deal_ii_with_zlib &&
+       (flags.compression_level != CompressionLevel::plain_text)) ?
+        "binary" :
+        "ascii";
 
 
     // first count the number of cells and cells for later use
@@ -6279,92 +6132,220 @@ namespace DataOutBase
     out << "  </Points>\n\n";
     //-------------------------------
     // now for the cells
-    VtuStream vtu_out(out, flags);
-
     out << "  <Cells>\n";
     out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
         << ascii_or_binary << "\">\n";
     if (flags.write_higher_order_cells)
-      write_high_order_cells(patches, vtu_out, /* legacy_format = */ false);
+      {
+        std::ostringstream o;
+        {
+          VtuStream vtu_out(o, flags);
+
+          write_high_order_cells(patches, vtu_out, /* legacy_format = */ false);
+          vtu_out.flush_cells();
+        }
+        out << o.str() << '\n';
+      }
     else
       {
         Assert(dim <= 3, ExcNotImplemented());
-        unsigned int count                 = 0;
-        unsigned int first_vertex_of_patch = 0;
+
+        std::vector<int32_t> cells;
+        unsigned int         first_vertex_of_patch = 0;
+
         for (const auto &patch : patches)
           {
             // special treatment of simplices since they are not subdivided
             if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
               {
-                vtu_out.write_cell_single(count++,
-                                          first_vertex_of_patch,
-                                          patch.data.n_cols(),
-                                          patch.reference_cell);
-                first_vertex_of_patch += patch.data.n_cols();
+                const unsigned int n_points = patch.data.n_cols();
+                static const std::array<unsigned int, 5>
+                  pyramid_index_translation_table = {{0, 1, 3, 2, 4}};
+
+                if (deal_ii_with_zlib &&
+                    (flags.compression_level !=
+                     DataOutBase::CompressionLevel::plain_text))
+                  {
+                    for (unsigned int i = 0; i < n_points; ++i)
+                      cells.push_back(
+                        first_vertex_of_patch +
+                        (patch.reference_cell == ReferenceCells::Pyramid ?
+                           pyramid_index_translation_table[i] :
+                           i));
+                  }
+                else
+                  {
+                    for (unsigned int i = 0; i < n_points; ++i)
+                      out << '\t'
+                          << first_vertex_of_patch +
+                               (patch.reference_cell ==
+                                    ReferenceCells::Pyramid ?
+                                  pyramid_index_translation_table[i] :
+                                  i);
+                    out << '\n';
+                  }
+
+                first_vertex_of_patch += n_points;
               }
             else
               {
                 const unsigned int n_subdivisions = patch.n_subdivisions;
-                const unsigned int n              = n_subdivisions + 1;
+                const unsigned int n_points_per_direction = n_subdivisions + 1;
 
                 switch (dim)
                   {
                     case 0:
                       {
-                        const unsigned int offset = first_vertex_of_patch;
-                        // First write line in x direction
-                        vtu_out.template write_cell<0>(count++, offset, {});
+                        auto write_cell =
+                          [&flags, &out, &cells](const unsigned int start) {
+                            if (deal_ii_with_zlib &&
+                                (flags.compression_level !=
+                                 DataOutBase::CompressionLevel::plain_text))
+                              {
+                                cells.push_back(start);
+                              }
+                            else
+                              {
+                                out << start;
+                                out << '\n';
+                              }
+                          };
+
+                        const unsigned int starting_offset =
+                          first_vertex_of_patch;
+                        write_cell(starting_offset);
                         break;
                       }
 
                     case 1:
                       {
-                        const unsigned int d1 = 1;
+                        auto write_cell =
+                          [&flags, &out, &cells](const unsigned int start) {
+                            if (deal_ii_with_zlib &&
+                                (flags.compression_level !=
+                                 DataOutBase::CompressionLevel::plain_text))
+                              {
+                                cells.push_back(start);
+                                cells.push_back(start + 1);
+                              }
+                            else
+                              {
+                                out << start << '\t' << start + 1;
+                                out << '\n';
+                              }
+                          };
+
                         for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                           {
-                            const unsigned int offset =
-                              first_vertex_of_patch + i1 * d1;
-                            // First write line in x direction
-                            vtu_out.template write_cell<1>(count++,
-                                                           offset,
-                                                           {{d1}});
+                            const unsigned int starting_offset =
+                              first_vertex_of_patch + i1;
+                            write_cell(starting_offset);
                           }
                         break;
                       }
 
                     case 2:
                       {
-                        const unsigned int d1 = 1;
-                        const unsigned int d2 = n;
+                        auto write_cell =
+                          [&flags, &out, &cells, n_points_per_direction](
+                            const unsigned int start) {
+                            if (deal_ii_with_zlib &&
+                                (flags.compression_level !=
+                                 DataOutBase::CompressionLevel::plain_text))
+                              {
+                                cells.push_back(start);
+                                cells.push_back(start + 1);
+                                cells.push_back(start + n_points_per_direction +
+                                                1);
+                                cells.push_back(start + n_points_per_direction);
+                              }
+                            else
+                              {
+                                out << start << '\t' << start + 1 << '\t'
+                                    << start + n_points_per_direction + 1
+                                    << '\t' << start + n_points_per_direction;
+                                out << '\n';
+                              }
+                          };
+
                         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                             {
-                              const unsigned int offset =
-                                first_vertex_of_patch + i2 * d2 + i1 * d1;
-                              // First write line in x direction
-                              vtu_out.template write_cell<2>(count++,
-                                                             offset,
-                                                             {{d1, d2}});
+                              const unsigned int starting_offset =
+                                first_vertex_of_patch +
+                                i2 * n_points_per_direction + i1;
+                              write_cell(starting_offset);
                             }
                         break;
                       }
 
                     case 3:
                       {
-                        const unsigned int d1 = 1;
-                        const unsigned int d2 = n;
-                        const unsigned int d3 = n * n;
+                        auto write_cell = [&flags,
+                                           &out,
+                                           &cells,
+                                           n_points_per_direction](
+                                            const unsigned int start) {
+                          if (deal_ii_with_zlib &&
+                              (flags.compression_level !=
+                               DataOutBase::CompressionLevel::plain_text))
+                            {
+                              cells.push_back(start);
+                              cells.push_back(start + 1);
+                              cells.push_back(start + n_points_per_direction +
+                                              1);
+                              cells.push_back(start + n_points_per_direction);
+                              cells.push_back(start + n_points_per_direction *
+                                                        n_points_per_direction);
+                              cells.push_back(start +
+                                              n_points_per_direction *
+                                                n_points_per_direction +
+                                              1);
+                              cells.push_back(start +
+                                              n_points_per_direction *
+                                                n_points_per_direction +
+                                              n_points_per_direction + 1);
+                              cells.push_back(start +
+                                              n_points_per_direction *
+                                                n_points_per_direction +
+                                              n_points_per_direction);
+                            }
+                          else
+                            {
+                              out << start << '\t' << start + 1 << '\t'
+                                  << start + n_points_per_direction + 1 << '\t'
+                                  << start + n_points_per_direction << '\t'
+                                  << start + n_points_per_direction *
+                                               n_points_per_direction
+                                  << '\t'
+                                  << start +
+                                       n_points_per_direction *
+                                         n_points_per_direction +
+                                       1
+                                  << '\t'
+                                  << start +
+                                       n_points_per_direction *
+                                         n_points_per_direction +
+                                       n_points_per_direction + 1
+                                  << '\t'
+                                  << start +
+                                       n_points_per_direction *
+                                         n_points_per_direction +
+                                       n_points_per_direction;
+                              out << '\n';
+                            }
+                        };
+
                         for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
                           for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                               {
-                                const unsigned int offset =
-                                  first_vertex_of_patch + i3 * d3 + i2 * d2 +
-                                  i1 * d1;
-                                // First write line in x direction
-                                vtu_out.template write_cell<3>(count++,
-                                                               offset,
-                                                               {{d1, d2, d3}});
+                                const unsigned int starting_offset =
+                                  first_vertex_of_patch +
+                                  i3 * n_points_per_direction *
+                                    n_points_per_direction +
+                                  i2 * n_points_per_direction + i1;
+                                write_cell(starting_offset);
                               }
                         break;
                       }
@@ -6379,7 +6360,15 @@ namespace DataOutBase
               }
           }
 
-        vtu_out.flush_cells();
+        // Flush the 'cells' object we created herein.
+        if (deal_ii_with_zlib && (flags.compression_level !=
+                                  DataOutBase::CompressionLevel::plain_text))
+          {
+            out << vtu_stringize_array(cells,
+                                       flags.compression_level,
+                                       out.precision())
+                << '\n';
+          }
       }
     out << "    </DataArray>\n";
 
@@ -6423,8 +6412,8 @@ namespace DataOutBase
         << ascii_or_binary << "\">\n";
 
     // this should compress well :-)
-#ifdef DEAL_II_WITH_ZLIB
-    if (flags.compression_level != CompressionLevel::plain_text)
+    if (deal_ii_with_zlib &&
+        (flags.compression_level != CompressionLevel::plain_text))
       {
         std::vector<uint8_t> cell_types_uint8_t(cell_types.size());
         for (unsigned int i = 0; i < cell_types.size(); ++i)
@@ -6435,7 +6424,6 @@ namespace DataOutBase
                                    out.precision());
       }
     else
-#endif
       {
         out << vtu_stringize_array(cell_types,
                                    flags.compression_level,
@@ -8280,10 +8268,10 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   write_vtu(f);
 #else
 
-  const unsigned int myrank = Utilities::MPI::this_mpi_process(comm);
+  const unsigned int myrank  = Utilities::MPI::this_mpi_process(comm);
   const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
-  MPI_Info info;
-  int ierr = MPI_Info_create(&info);
+  MPI_Info           info;
+  int                ierr = MPI_Info_create(&info);
   AssertThrowMPI(ierr);
   MPI_File fh;
   ierr = MPI_File_open(
@@ -8300,7 +8288,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   AssertThrowMPI(ierr);
 
   // Define header size so we can broadcast later.
-  unsigned int header_size;
+  unsigned int  header_size;
   std::uint64_t footer_offset;
 
   // write header
@@ -8319,7 +8307,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   AssertThrowMPI(ierr);
 
   {
-    const auto &patches = get_patches();
+    const auto &                  patches      = get_patches();
     const types::global_dof_index my_n_patches = patches.size();
     const types::global_dof_index global_n_patches =
       Utilities::MPI::sum(my_n_patches, comm);
@@ -8338,7 +8326,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
 
     // Use prefix sum to find specific offset to write at.
     const std::uint64_t size_on_proc = ss.str().size();
-    std::uint64_t prefix_sum = 0;
+    std::uint64_t       prefix_sum   = 0;
     ierr =
       MPI_Exscan(&size_on_proc, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
     AssertThrowMPI(ierr);
@@ -8581,11 +8569,11 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   // from this rank to rank 0 (if they are different ranks).
 
   const bool have_data = (data_filter.n_nodes() > 0);
-  MPI_Comm split_comm;
+  MPI_Comm   split_comm;
   {
-    const int key = myrank;
+    const int key   = myrank;
     const int color = (have_data ? 1 : 0);
-    const int ierr = MPI_Comm_split(comm, color, key, &split_comm);
+    const int ierr  = MPI_Comm_split(comm, color, key, &split_comm);
     AssertThrowMPI(ierr);
   }
 
@@ -8610,7 +8598,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                ExcNotImplemented());
 #  endif
 
-      XDMFEntry entry(h5_mesh_filename,
+      XDMFEntry          entry(h5_mesh_filename,
                       h5_solution_filename,
                       cur_time,
                       global_node_cell_count[0],
@@ -8646,7 +8634,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
       // receive the XDMF data on rank 0 if we don't have it...
 
       MPI_Status status;
-      int ierr = MPI_Probe(MPI_ANY_SOURCE, tag, comm, &status);
+      int        ierr = MPI_Probe(MPI_ANY_SOURCE, tag, comm, &status);
       AssertThrowMPI(ierr);
 
       int len;
@@ -9269,11 +9257,11 @@ DataOutBase::write_hdf5_parallel(
   // create a new communicator that only contains ranks with cells and
   // use that to perform the write operations:
   const bool have_patches = (patches.size() > 0);
-  MPI_Comm split_comm;
+  MPI_Comm   split_comm;
   {
-    const int key = Utilities::MPI::this_mpi_process(comm);
+    const int key   = Utilities::MPI::this_mpi_process(comm);
     const int color = (have_patches ? 1 : 0);
-    const int ierr = MPI_Comm_split(comm, color, key, &split_comm);
+    const int ierr  = MPI_Comm_split(comm, color, key, &split_comm);
     AssertThrowMPI(ierr);
   }
 
