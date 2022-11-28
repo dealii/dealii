@@ -29,6 +29,11 @@ macro(feature_kokkos_configure_bundled)
     ${KOKKOS_FOLDER}/simd/src
     ${KOKKOS_FOLDER}/tpls/desul/include
     )
+
+  enable_if_supported(DEAL_II_CXX_FLAGS -Wno-float-conversion)
+  enable_if_supported(DEAL_II_CXX_FLAGS -Wno-missing-field-initializers)
+  enable_if_supported(DEAL_II_CXX_FLAGS -Wno-suggest-override)
+  enable_if_supported(DEAL_II_CXX_FLAGS -Wno-unused-but-set-parameter)
 endmacro()
 
 configure_feature(KOKKOS)
