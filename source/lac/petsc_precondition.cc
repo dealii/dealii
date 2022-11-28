@@ -41,6 +41,12 @@ namespace PETScWrappers
 
 
 
+  PreconditionBase::PreconditionBase()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
+
   PreconditionBase::~PreconditionBase()
   {
     try
@@ -133,6 +139,13 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionJacobi -------------------- */
+
+  PreconditionJacobi::PreconditionJacobi()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
+
   PreconditionJacobi::PreconditionJacobi(const MPI_Comm &      comm,
                                          const AdditionalData &additional_data_)
     : PreconditionBase(comm)
@@ -191,6 +204,9 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionBlockJacobi -------------------- */
 
+  PreconditionBlockJacobi::PreconditionBlockJacobi()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
 
   PreconditionBlockJacobi::PreconditionBlockJacobi(
     const MPI_Comm &      comm,
@@ -250,6 +266,12 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionSOR -------------------- */
 
+  PreconditionSOR::PreconditionSOR()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
+
   PreconditionSOR::AdditionalData::AdditionalData(const double omega)
     : omega(omega)
   {}
@@ -293,6 +315,12 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionSSOR -------------------- */
+
+  PreconditionSSOR::PreconditionSSOR()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
 
   PreconditionSSOR::AdditionalData::AdditionalData(const double omega)
     : omega(omega)
@@ -342,6 +370,11 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionICC -------------------- */
 
+  PreconditionICC::PreconditionICC()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
 
   PreconditionICC::AdditionalData::AdditionalData(const unsigned int levels)
     : levels(levels)
@@ -386,6 +419,12 @@ namespace PETScWrappers
 
 
   /* ----------------- PreconditionILU -------------------- */
+
+  PreconditionILU::PreconditionILU()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
 
   PreconditionILU::AdditionalData::AdditionalData(const unsigned int levels)
     : levels(levels)
@@ -536,6 +575,14 @@ namespace PETScWrappers
     }
   } // namespace
 #  endif
+
+
+
+  PreconditionBoomerAMG::PreconditionBoomerAMG()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
 
   PreconditionBoomerAMG::PreconditionBoomerAMG(
     const MPI_Comm &      comm,
@@ -724,6 +771,12 @@ namespace PETScWrappers
 
 
 
+  PreconditionParaSails::PreconditionParaSails()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
+
   PreconditionParaSails::PreconditionParaSails(
     const MatrixBase &    matrix,
     const AdditionalData &additional_data)
@@ -822,6 +875,12 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionNone ------------------------- */
 
+  PreconditionNone::PreconditionNone()
+    : PreconditionBase(MPI_COMM_NULL)
+  {}
+
+
+
   PreconditionNone::PreconditionNone(const MatrixBase &    matrix,
                                      const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
@@ -862,6 +921,12 @@ namespace PETScWrappers
     : pivoting(pivoting)
     , zero_pivot(zero_pivot)
     , damping(damping)
+  {}
+
+
+
+  PreconditionLU::PreconditionLU()
+    : PreconditionBase(MPI_COMM_NULL)
   {}
 
 
@@ -921,6 +986,13 @@ namespace PETScWrappers
     , use_faces(use_faces)
     , symmetric(symmetric)
     , coords(coords)
+  {}
+
+
+
+  template <int dim>
+  PreconditionBDDC<dim>::PreconditionBDDC()
+    : PreconditionBase(MPI_COMM_NULL)
   {}
 
 
