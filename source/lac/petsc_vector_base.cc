@@ -18,7 +18,6 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/memory_consumption.h>
-#  include <deal.II/base/multithread_info.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_compatibility.h>
@@ -125,11 +124,7 @@ namespace PETScWrappers
     : vector(nullptr)
     , ghosted(false)
     , last_action(::dealii::VectorOperation::unknown)
-  {
-    Assert(MultithreadInfo::is_running_single_threaded(),
-           ExcMessage("PETSc does not support multi-threaded access, set "
-                      "the thread limit to 1 in MPI_InitFinalize()."));
-  }
+  {}
 
 
 
@@ -139,10 +134,6 @@ namespace PETScWrappers
     , ghost_indices(v.ghost_indices)
     , last_action(::dealii::VectorOperation::unknown)
   {
-    Assert(MultithreadInfo::is_running_single_threaded(),
-           ExcMessage("PETSc does not support multi-threaded access, set "
-                      "the thread limit to 1 in MPI_InitFinalize()."));
-
     PetscErrorCode ierr = VecDuplicate(v.vector, &vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -159,10 +150,6 @@ namespace PETScWrappers
     , last_action(::dealii::VectorOperation::unknown)
   {
     /* TODO GHOSTED */
-    Assert(MultithreadInfo::is_running_single_threaded(),
-           ExcMessage("PETSc does not support multi-threaded access, set "
-                      "the thread limit to 1 in MPI_InitFinalize()."));
-
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(vector));
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
