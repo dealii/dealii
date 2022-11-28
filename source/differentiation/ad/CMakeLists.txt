@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   ad_drivers.cc
   ad_helpers.cc

@@ -13,16 +13,10 @@
 ##
 ## ---------------------------------------------------------------------
 
-
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
-
 set(_src
   surface_mesh.cc
   intersections.cc
 )
-
-
 
 set(_inst
 surface_mesh.inst.in

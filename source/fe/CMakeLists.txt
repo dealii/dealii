@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_unity_include_src
   block_mask.cc
   component_mask.cc

@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_unity_include_src
   data_out.cc
   data_out_faces.cc

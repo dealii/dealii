@@ -35,14 +35,6 @@ endif()
 # Compile the deal.II library
 #
 
-include_directories(
-  ${CMAKE_BINARY_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/include/
-  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-  SYSTEM
-  ${DEAL_II_INCLUDE_DIRS}
-  )
-
 #
 # List the directories where we have source files. the ones with the longest
 # compile jobs come first so that 'make -j N' saturates many processors also
@@ -51,6 +43,7 @@ include_directories(
 # end of everything (e.g. numerics/vectors.cc takes several minutes to
 # compile...)
 #
+set(CMAKE_INCLUDE_CURRENT_DIR true)
 add_subdirectory(numerics)
 add_subdirectory(fe)
 add_subdirectory(dofs)
@@ -83,16 +76,26 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   # Combine all ${build} OBJECT targets to a ${build} library:
   #
 
-  get_property(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})
-
-  add_library(${DEAL_II_NAMESPACE}_${build_lowercase}
-    dummy.cc # Workaround for a bug in the Xcode generator
-    ${_objects}
-    )
+  add_library(${DEAL_II_NAMESPACE}_${build_lowercase} dummy.cc)
   add_dependencies(library ${DEAL_II_NAMESPACE}_${build_lowercase})
+
+  #
+  # Add compile flags, definitions and (public) feature (recorded in
+  # DEAL_II_TARGETS(|_DEBUG|_RELEASE)).
+  #
+  populate_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase} ${build})
+
+  #
+  # Add all object targets as private link targets
+  #
+  get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
+  target_link_libraries(${DEAL_II_NAMESPACE}_${build_lowercase}
+    PRIVATE ${_object_targets}
+    )
 
   set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
     PROPERTIES
+    LINKER_LANGUAGE "CXX"
     VERSION "${DEAL_II_PACKAGE_VERSION}"
     #
     # Sonaming: Well... we just use the version number.
@@ -100,10 +103,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     # a C++ library is still ABI backwards compatible :-]
     #
     SOVERSION "${DEAL_II_PACKAGE_VERSION}"
-    LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
-    LINKER_LANGUAGE "CXX"
-    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
-    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
     ARCHIVE_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
     LIBRARY_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
     RUNTIME_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
@@ -141,15 +140,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       )
   endif()
 
-
-  target_link_libraries(${DEAL_II_NAMESPACE}_${build_lowercase}
-    ${DEAL_II_LIBRARIES_${build}}
-    ${DEAL_II_LIBRARIES}
-    )
-
-  file(MAKE_DIRECTORY
-    ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}
-    )
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR})
   export(TARGETS ${DEAL_II_NAMESPACE}_${build_lowercase}
     NAMESPACE "${DEAL_II_NAMESPACE}::"
     FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake

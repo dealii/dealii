@@ -13,9 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   data_out.cc
   particle.cc

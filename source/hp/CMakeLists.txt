@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_unity_include_src
   fe_collection.cc
   fe_values.cc

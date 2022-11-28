@@ -106,43 +106,51 @@ endif()
 _both("#\n")
 
 _detailed(
-"#  Base configuration (prior to feature configuration):
-#        DEAL_II_CXX_FLAGS:            ${BASE_CXX_FLAGS}
+"#  Base configuration:
+#        DEAL_II_CXX_FLAGS:            ${DEAL_II_CXX_FLAGS}
 "
   )
 if(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_CXX_FLAGS_RELEASE:    ${BASE_CXX_FLAGS_RELEASE}\n")
+  _detailed("#        DEAL_II_CXX_FLAGS_RELEASE:    ${DEAL_II_CXX_FLAGS_RELEASE}\n")
 endif()
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:      ${BASE_CXX_FLAGS_DEBUG}\n")
+  _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:      ${DEAL_II_CXX_FLAGS_DEBUG}\n")
 endif()
 
-_detailed("#        DEAL_II_LINKER_FLAGS:         ${BASE_LINKER_FLAGS}\n")
+_detailed("#        DEAL_II_LINKER_FLAGS:         ${DEAL_II_LINKER_FLAGS}\n")
 if(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_LINKER_FLAGS_RELEASE: ${BASE_LINKER_FLAGS_RELEASE}\n")
+  _detailed("#        DEAL_II_LINKER_FLAGS_RELEASE: ${DEAL_II_LINKER_FLAGS_RELEASE}\n")
 endif()
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_LINKER_FLAGS_DEBUG:   ${BASE_LINKER_FLAGS_DEBUG}\n")
+  _detailed("#        DEAL_II_LINKER_FLAGS_DEBUG:   ${DEAL_II_LINKER_FLAGS_DEBUG}\n")
 endif()
 
-_detailed("#        DEAL_II_DEFINITIONS:          ${BASE_DEFINITIONS}\n")
+_detailed("#        DEAL_II_DEFINITIONS:          ${DEAL_II_DEFINITIONS}\n")
 if(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_DEFINITIONS_RELEASE:  ${BASE_DEFINITIONS_RELEASE}\n")
+  _detailed("#        DEAL_II_DEFINITIONS_RELEASE:  ${DEAL_II_DEFINITIONS_RELEASE}\n")
 endif()
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_DEFINITIONS_DEBUG:    ${BASE_DEFINITIONS_DEBUG}\n")
+  _detailed("#        DEAL_II_DEFINITIONS_DEBUG:    ${DEAL_II_DEFINITIONS_DEBUG}\n")
 endif()
 
-_detailed("#        DEAL_II_INCLUDE_DIRS          ${BASE_INCLUDE_DIRS}\n")
-_detailed("#        DEAL_II_BUNDLED_INCLUDE_DIRS: ${BASE_BUNDLED_INCLUDE_DIRS}\n")
+_detailed("#        DEAL_II_INCLUDE_DIRS          ${DEAL_II_INCLUDE_DIRS}\n")
 
-_detailed("#        DEAL_II_LIBRARIES:            ${BASE_LIBRARIES}\n")
+_detailed("#        DEAL_II_LIBRARIES:            ${DEAL_II_LIBRARIES}\n")
 if(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_LIBRARIES_RELEASE:    ${BASE_LIBRARIES_RELEASE}\n")
+  _detailed("#        DEAL_II_LIBRARIES_RELEASE:    ${DEAL_II_LIBRARIES_RELEASE}\n")
 endif()
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_LIBRARIES_DEBUG:      ${BASE_LIBRARIES_DEBUG}\n")
+  _detailed("#        DEAL_II_LIBRARIES_DEBUG:      ${DEAL_II_LIBRARIES_DEBUG}\n")
 endif()
+
+_detailed("#        DEAL_II_TARGETS:              ${DEAL_II_TARGETS}\n")
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+  _detailed("#        DEAL_II_TARGETS_RELEASE:      ${DEAL_II_TARGETS_RELEASE}\n")
+endif()
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+  _detailed("#        DEAL_II_TARGETS_DEBUG:        ${DEAL_II_TARGETS_DEBUG}\n")
+endif()
+
 _detailed("#        DEAL_II_VECTORIZATION_WIDTH_IN_BITS: ${DEAL_II_VECTORIZATION_WIDTH_IN_BITS}\n")
 
 if(DEAL_II_HAVE_CXX20)

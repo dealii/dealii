@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -41,37 +41,30 @@ function(define_object_library _library)
 
   foreach(_build ${DEAL_II_BUILD_TYPES})
     string(TOLOWER ${_build} _build_lowercase)
+    set(_target "${_library}_${_build_lowercase}")
 
-    add_library(${_library}_${_build_lowercase} ${ARGN})
+    add_library(${_target} ${ARGN})
 
-    set_target_properties(${_library}_${_build_lowercase} PROPERTIES
-      LINKER_LANGUAGE "CXX"
-      )
+    #
+    # Add standard properties defined in DEAL_II_* variables:
+    #
 
-    target_link_libraries(${_library}_${_build_lowercase}
-      PUBLIC ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
-      )
+    populate_target_properties(${_target} ${_build})
 
     if("${_library}" MATCHES "^bundled_")
       #
       # Record all bundled object libraries in the global property
       # DEAL_II_BUNDLED_TARGETS_${_build}
       #
-      set_property(GLOBAL APPEND PROPERTY DEAL_II_BUNDLED_TARGETS_${_build}
-        ${_library}_${_build_lowercase}
-        )
+      set_property(GLOBAL APPEND PROPERTY DEAL_II_BUNDLED_TARGETS_${_build} ${_target})
     else()
       get_property(_bundled_object_targets
         GLOBAL PROPERTY DEAL_II_BUNDLED_TARGETS_${build}
         )
-      target_link_libraries(${_library}_${_build_lowercase}
-        PRIVATE ${_bundled_object_targets}
-        )
+      target_link_libraries(${_target} PRIVATE ${_bundled_object_targets})
     endif()
 
-    set_property(GLOBAL APPEND PROPERTY DEAL_II_OBJECT_TARGETS_${_build}
-      ${_library}_${_build_lowercase}
-      )
+    set_property(GLOBAL APPEND PROPERTY DEAL_II_OBJECT_TARGETS_${_build} ${_target})
   endforeach()
 
 endfunction()

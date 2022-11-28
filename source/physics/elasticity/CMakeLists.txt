@@ -13,9 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   kinematics.cc
   standard_tensors.cc

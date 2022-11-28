@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 #
 # All source/base files are sufficiently small that they may be added to the
 # unity build file (see the developer documentation on DEAL_II_UNITY_BUILD

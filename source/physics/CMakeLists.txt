@@ -16,8 +16,6 @@
 # Expand instantiations in subdirectories
 add_subdirectory("elasticity")
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   transformations.cc
   )
