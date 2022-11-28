@@ -472,6 +472,18 @@ namespace PETScWrappers
              const bool                    preset_nonzero_locations = true);
 
       /**
+       * Create a square matrix where the size() of the IndexSet determines the
+       * global number of rows and columns and the entries of the IndexSet
+       * give the rows and columns for the calling processor. Note that only
+       * ascending, 1:1 IndexSets are supported.
+       */
+      template <typename SparsityPatternType>
+      void
+      reinit(const IndexSet &           local_partitioning,
+             const SparsityPatternType &sparsity_pattern,
+             const MPI_Comm &           communicator);
+
+      /**
        * Create a matrix where the size() of the IndexSets determine the
        * global number of rows and columns and the entries of the IndexSet
        * give the rows and columns for the calling processor. Note that only
