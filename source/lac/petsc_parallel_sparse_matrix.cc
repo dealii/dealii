@@ -159,6 +159,15 @@ namespace PETScWrappers
     template <typename SparsityPatternType>
     void
     SparseMatrix::reinit(const IndexSet &           local_rows,
+                         const SparsityPatternType &sparsity_pattern,
+                         const MPI_Comm &           communicator)
+    {
+      do_reinit(communicator, local_rows, local_rows, sparsity_pattern);
+    }
+
+    template <typename SparsityPatternType>
+    void
+    SparseMatrix::reinit(const IndexSet &           local_rows,
                          const IndexSet &           local_columns,
                          const SparsityPatternType &sparsity_pattern,
                          const MPI_Comm &           communicator)
@@ -688,8 +697,18 @@ namespace PETScWrappers
 
     template void
     SparseMatrix::reinit(const IndexSet &,
+                         const SparsityPattern &,
+                         const MPI_Comm &);
+
+    template void
+    SparseMatrix::reinit(const IndexSet &,
                          const IndexSet &,
                          const SparsityPattern &,
+                         const MPI_Comm &);
+
+    template void
+    SparseMatrix::reinit(const IndexSet &,
+                         const DynamicSparsityPattern &,
                          const MPI_Comm &);
 
     template void
