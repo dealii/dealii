@@ -28,7 +28,7 @@ include_directories(
   include/
 )
 
-deal_ii_add_library(obj_muparser OBJECT
+define_object_library(bundled_muparser OBJECT
   src/muParserBase.cpp
   src/muParserBytecode.cpp
   src/muParserCallback.cpp

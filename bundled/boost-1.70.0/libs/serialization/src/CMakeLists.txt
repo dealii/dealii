@@ -58,4 +58,4 @@ enable_if_supported(DEAL_II_CXX_FLAGS -Wno-c11-extensions)
 enable_if_supported(DEAL_II_CXX_FLAGS -Wno-deprecated-copy)
 enable_if_supported(DEAL_II_CXX_FLAGS -Wno-uninitialized)
 
-deal_ii_add_library(obj_boost_serialization OBJECT ${src_boost_serialization})
+define_object_library(bundled_boost_serialization OBJECT ${src_boost_serialization})

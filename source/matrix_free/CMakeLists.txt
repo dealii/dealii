@@ -64,5 +64,5 @@ if(DEAL_II_WITH_CUDA)
     )
 endif()
 
-deal_ii_add_library(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_matrix_free "${_inst}")
+define_object_library(object_matrix_free OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_matrix_free "${_inst}")

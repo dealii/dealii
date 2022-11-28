@@ -33,5 +33,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/cgal/*.h
   )
 
-deal_ii_add_library(obj_cgal OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_cgal "${_inst}")
+define_object_library(object_cgal OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_cgal "${_inst}")

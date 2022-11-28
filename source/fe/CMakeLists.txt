@@ -150,5 +150,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/fe/*.h
   )
 
-deal_ii_add_library(obj_fe OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_fe "${_inst}")
+define_object_library(object_fe OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_fe "${_inst}")

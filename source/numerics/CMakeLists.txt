@@ -112,5 +112,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/numerics/*.h
   )
 
-deal_ii_add_library(obj_numerics OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_numerics "${_inst}")
+define_object_library(object_numerics OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_numerics "${_inst}")

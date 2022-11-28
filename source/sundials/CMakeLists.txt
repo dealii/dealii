@@ -32,5 +32,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/sundials/*.h
   )
 
-deal_ii_add_library(obj_sundials OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_sundials "${_inst}")
+define_object_library(object_sundials OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_sundials "${_inst}")

@@ -25,5 +25,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/optimization/rol/*.h
   )
 
-deal_ii_add_library(obj_rol OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_rol "${_inst}")
+define_object_library(object_rol OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_rol "${_inst}")

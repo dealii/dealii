@@ -30,5 +30,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/physics/elasticity/*.h
   )
 
-deal_ii_add_library(obj_physics_elasticity OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_physics_elasticity "${_inst}")
+define_object_library(object_physics_elasticity OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_physics_elasticity "${_inst}")

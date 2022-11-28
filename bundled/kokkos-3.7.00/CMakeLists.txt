@@ -69,4 +69,4 @@ enable_if_supported(DEAL_II_CXX_FLAGS -Wno-missing-field-initializers)
 enable_if_supported(DEAL_II_CXX_FLAGS -Wno-suggest-override)
 enable_if_supported(DEAL_II_CXX_FLAGS -Wno-unused-but-set-parameter)
 
-deal_ii_add_library(obj_kokkos OBJECT ${src_kokkos})
+define_object_library(bundled_kokkos OBJECT ${src_kokkos})

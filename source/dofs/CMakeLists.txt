@@ -61,5 +61,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
   )
 
-deal_ii_add_library(obj_dofs OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_dofs "${_inst}")
+define_object_library(object_dofs OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_dofs "${_inst}")

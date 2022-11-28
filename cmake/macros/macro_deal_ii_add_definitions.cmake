@@ -15,7 +15,7 @@
 
 #
 # A small wrapper around
-# SET_TARget_property(... PROPERTIES COMPILE_DEFINITIONS ...)
+# set_target_property(... PROPERTIES COMPILE_DEFINITIONS ...)
 # to _add_ compile definitions to every target we have specified.
 #
 
