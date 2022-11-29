@@ -979,8 +979,6 @@ namespace WorkStream
               using WorkerAndCopier = internal::tbb_colored::
                 WorkerAndCopier<Iterator, ScratchData, CopyData>;
 
-              using RangeType = typename std::vector<Iterator>::const_iterator;
-
               WorkerAndCopier worker_and_copier(worker,
                                                 copier,
                                                 sample_scratch_data,
