@@ -89,10 +89,13 @@ if(DEAL_II_COMPONENT_EXAMPLES)
       if(_setup)
         foreach(_build ${DEAL_II_BUILD_TYPES})
           string(TOLOWER ${_build} _build_lowercase)
-          add_executable(${_name}.${_build_lowercase} ${_step})
-          insource_setup_target(${_name}.${_build_lowercase} ${_build})
-          set_target_properties(${_name}.${_build_lowercase}
+          set(_target "example_${_name}_${_build_lowercase}")
+          string(REPLACE "-" "_" _target "${_target}")
+          add_executable(${_target} ${_step})
+          insource_setup_target(${_target} ${_build})
+          set_target_properties(${_target}
             PROPERTIES
+            RUNTIME_OUTPUT_NAME "${_name}.${_build_lowercase}"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
           #
@@ -101,14 +104,14 @@ if(DEAL_II_COMPONENT_EXAMPLES)
           # rpath to the library location as well:
           #
           if(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-            set_target_properties(${_name}.${_build_lowercase}
+            set_target_properties(${_target}
               PROPERTIES
               INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
               )
           endif()
 
-          add_dependencies(examples ${_name}.${_build_lowercase})
-          install(TARGETS ${_name}.${_build_lowercase}
+          add_dependencies(examples ${_target})
+          install(TARGETS ${_target}
             DESTINATION ${DEAL_II_EXAMPLES_RELDIR}/${_name}
             )
         endforeach()
@@ -120,19 +123,23 @@ if(DEAL_II_COMPONENT_EXAMPLES)
 
     endforeach()
 
-    # the same as above but for the examples folder
-    file(GLOB _steps
-      ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/*.cc)
+    #
+    # Also compile some documentation examples:
+    #
+
+    file(GLOB _steps ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/*.cc)
     foreach(_step ${_steps})
       get_filename_component(_name ${_step} NAME_WE)
 
         foreach(_build ${DEAL_II_BUILD_TYPES})
           string(TOLOWER ${_build} _build_lowercase)
-          add_executable(${_name}.${_build_lowercase} ${_step})
-          insource_setup_target(${_name}.${_build_lowercase} ${_build})
-
-          set_target_properties(${_name}.${_build_lowercase}
+          set(_target "example_${_name}_${_build_lowercase}")
+          string(REPLACE "-" "_" _target "${_target}")
+          add_executable(${_target} ${_step})
+          insource_setup_target(${_target} ${_build})
+          set_target_properties(${_target}
             PROPERTIES
+            RUNTIME_OUTPUT_NAME "${_name}.${_build_lowercase}"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
         endforeach()
