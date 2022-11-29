@@ -148,15 +148,12 @@ endmacro()
 macro(feature_boost_configure_external)
   enable_if_supported(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
 
+  #
   # At least BOOST 1.74 has the problem that some of the BOOST headers
   # include other BOOST headers that are deprecated, and this then leads to
   # warnings. That's rather annoying.
-
-  # The configure function is called only once. In case an externally provided
-  # boost library is detected, BOOST_INCLUDE_DIRS contains the include paths to
-  # be used and BOOST_BUNDLED_INCLUDE_DIRS is empty. For the bundled library, it
-  # is the other way around.
-  list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
+  #
+  list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
 
   check_cxx_compiler_bug(
     "
