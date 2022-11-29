@@ -6494,7 +6494,6 @@ namespace DataOutBase
     // place
     const Table<2, float> data_vectors =
       std::move(*create_global_data_table_task.return_value());
-    std::vector<bool> data_set_written(n_data_sets, false);
 
     // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
     // data, which we do not support explicitly here). all following data sets
@@ -6502,7 +6501,6 @@ namespace DataOutBase
     out << "  <PointData Scalars=\"scalars\">\n";
 
     const auto stringize_nonscalar_data_range = [&flags,
-                                                 &data_set_written,
                                                  &data_names,
                                                  &data_vectors,
                                                  ascii_or_binary,
@@ -6538,10 +6536,6 @@ namespace DataOutBase
                         "Can't declare a vector with more than 3 components "
                         "in VTK/VTU format."));
         }
-
-      // mark these components as already written:
-      for (unsigned int i = first_component; i <= last_component; ++i)
-        data_set_written[i] = true;
 
       // write the header. concatenate all the component names with double
       // underscores unless a vector name has been specified
@@ -6691,14 +6685,21 @@ namespace DataOutBase
 
 
     // When writing, first write out all vector and tensor data
+    std::vector<bool> data_set_handled(n_data_sets, false);
     for (const auto &range : nonscalar_data_ranges)
       {
+        // Mark these components as already handled:
+        const auto first_component = std::get<0>(range);
+        const auto last_component  = std::get<1>(range);
+        for (unsigned int i = first_component; i <= last_component; ++i)
+          data_set_handled[i] = true;
+
         out << stringize_nonscalar_data_range(range);
       }
 
     // Now do the left over scalar data sets
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-      if (data_set_written[data_set] == false)
+      if (data_set_handled[data_set] == false)
         {
           out << stringize_scalar_data_set(data_set);
         }
