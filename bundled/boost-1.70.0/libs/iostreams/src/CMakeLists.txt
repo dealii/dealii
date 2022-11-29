@@ -25,8 +25,8 @@ set(src_boost_iostreams
     mapped_file.cpp
     zlib.cpp
     )
-
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-deprecated-copy)
 enable_if_supported(DEAL_II_CXX_FLAGS -Wno-c11-extensions)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-deprecated-copy)
+enable_if_supported(DEAL_II_CXX_FLAGS -Wno-uninitialized)
 
 deal_ii_add_library(obj_boost_iostreams OBJECT ${src_boost_iostreams})
