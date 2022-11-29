@@ -155,7 +155,7 @@ foreach(_library ${Trilinos_LIBRARIES})
 endforeach()
 
 
-deal_ii_package_handle(TRILINOS
+process_feature(TRILINOS
   LIBRARIES
     REQUIRED ${_libraries}
     OPTIONAL Trilinos_TPL_LIBRARIES MPI_CXX_LIBRARIES

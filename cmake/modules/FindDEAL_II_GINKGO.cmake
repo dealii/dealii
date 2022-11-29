@@ -75,7 +75,7 @@ if(Ginkgo_FOUND)
   set(GINKGO_VERSION "${GINKGO_PROJECT_VERSION}")
 endif()
 
-deal_ii_package_handle(GINKGO
+process_feature(GINKGO
   LIBRARIES REQUIRED ${_libraries}
   INCLUDE_DIRS REQUIRED GINKGO_INSTALL_INCLUDE_DIR
   CLEAR Ginkgo_DIR ${_libraries}

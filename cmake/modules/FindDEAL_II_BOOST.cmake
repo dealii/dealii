@@ -90,7 +90,7 @@ if(Boost_FOUND)
     )
 endif()
 
-deal_ii_package_handle(BOOST
+process_feature(BOOST
   LIBRARIES REQUIRED Boost_LIBRARIES
   INCLUDE_DIRS REQUIRED Boost_INCLUDE_DIRS
   CLEAR

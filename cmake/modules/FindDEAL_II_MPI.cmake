@@ -154,7 +154,7 @@ if(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
   #
   # Note: We don't need to check whether the find library call is
   # successful: If libopen-pal cannot be found then the
-  # DEAL_II_PACKAGE_HANDLE will drop the library automatically.
+  # process_feature will drop the library automatically.
   #
   # In this case the sanity check in cmake/setup_finalize.cmake will fail
   # and we start dropping -fuse-ld=lld and -fuse-ld=ld.gold from the
@@ -162,7 +162,7 @@ if(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
   #
 endif()
 
-deal_ii_package_handle(MPI
+process_feature(MPI
   LIBRARIES
     OPTIONAL MPI_CXX_LIBRARIES MPI_Fortran_LIBRARIES MPI_C_LIBRARIES _mpi_libopen_pal_library
   INCLUDE_DIRS

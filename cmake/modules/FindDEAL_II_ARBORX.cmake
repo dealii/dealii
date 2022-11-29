@@ -66,7 +66,7 @@ if(ArborX_FOUND)
   endif()
 endif()
 
-deal_ii_package_handle(ARBORX
+process_feature(ARBORX
   # ArborX is a header-only library
   INCLUDE_DIRS REQUIRED ARBORX_INSTALL_INCLUDE_DIR
   CLEAR ARBORX_DIR ArborX_DIR

@@ -81,7 +81,7 @@ if(EXISTS ${METIS_INCLUDE_DIR}/metis.h)
   endif()
 endif()
 
-deal_ii_package_handle(METIS
+process_feature(METIS
   LIBRARIES
     REQUIRED METIS_LIBRARY
     OPTIONAL MPI_C_LIBRARIES

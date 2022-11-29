@@ -35,7 +35,7 @@ deal_ii_find_path(ASSIMP_INC assimp/defs.h
   PATH_SUFFIXES include
   )
 
-deal_ii_package_handle(ASSIMP
+process_feature(ASSIMP
   LIBRARIES REQUIRED ASSIMP_LIB
   INCLUDE_DIRS REQUIRED ASSIMP_INC
   CLEAR ASSIMP_LIB ASSIMP_INC

@@ -229,6 +229,11 @@ foreach(_feature ${_deal_ii_features_sorted})
       _featurelog("set(DEAL_II_${_feature}_DIR \"${${_feature}_DIR}\")\n")
     endif()
 
+    if(NOT "${${_feature}_SPLIT_CONFIGURATION}" STREQUAL "")
+      _detailed("#            ${_feature}_SPLIT_CONFIGURATION = ${${_feature}_SPLIT_CONFIGURATION}\n")
+      _featurelog("set(DEAL_II_${_feature}_SPLIT_CONFIGURATION \"${${_feature}_SPLIT_CONFIGURATION}\")\n")
+    endif()
+
     #
     # Print the feature configuration:
     #

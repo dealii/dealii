@@ -82,7 +82,7 @@ else()
   message(STATUS "CGAL wrappers require C++17. Disabling CGAL Support.")
 endif()
 
-deal_ii_package_handle(CGAL
+process_feature(CGAL
   LIBRARIES OPTIONAL CGAL_LIBRARIES
   INCLUDE_DIRS REQUIRED CGAL_INCLUDE_DIRS
   CLEAR

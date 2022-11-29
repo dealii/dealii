@@ -122,7 +122,7 @@ if(NOT SUNDIALS_CONFIG_H MATCHES "-NOTFOUND")
     )
 endif()
 
-deal_ii_package_handle(SUNDIALS
+process_feature(SUNDIALS
   LIBRARIES REQUIRED
     ${_sundials_lib_ida}
     SUNDIALS_LIB_ARKODE

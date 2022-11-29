@@ -36,7 +36,7 @@ find_package(HDF5)
 set(_include_dirs "${HDF5_INCLUDE_DIRS}")
 set(_libraries "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
 
-deal_ii_package_handle(HDF5
+process_feature(HDF5
   LIBRARIES
     REQUIRED _libraries
     OPTIONAL MPI_C_LIBRARIES
