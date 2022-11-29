@@ -233,10 +233,14 @@ macro(configure_feature _feature)
         #
         # Second case: We are allowed to search for an external library
         #
-        if(COMMAND feature_${_feature}_find_external)
-          evaluate_expression("feature_${_feature}_find_external(FEATURE_${_feature}_EXTERNAL_FOUND)")
+        if(NOT FEATURE_${_feature}_EXTERNAL_FOUND AND NOT DEAL_II_${_feature}_FOUND)
+          if(COMMAND FEATURE_${_feature}_FIND_EXTERNAL)
+            evaluate_expression("feature_${_feature}_find_external(FEATURE_${_feature}_EXTERNAL_FOUND)")
+          else()
+            feature_find_external(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
+          endif()
         else()
-          feature_find_external(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
+          set(FEATURE_${_feature}_EXTERNAL_FOUND TRUE)
         endif()
 
         if(FEATURE_${_feature}_EXTERNAL_FOUND)
