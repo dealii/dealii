@@ -34,8 +34,10 @@ set(ALL_TESTS) # clean variable
 # define a macro to set up a quick test:
 macro(make_quicktest test_basename build_name mpi_run)
   string(TOLOWER ${build_name} _build_lowercase)
-  set(_target ${test_basename}.${_build_lowercase})
-  list(APPEND ALL_TESTS "${_target}")
+  set(_test "quick_tests/${test_basename}.${_build_lowercase}")
+  set(_target "quick_tests_${test_basename}_${_build_lowercase}")
+
+  list(APPEND ALL_TESTS "${_test}")
   add_executable(${_target} EXCLUDE_FROM_ALL ${test_basename}.cc)
   insource_setup_target(${_target} ${build_name})
 
@@ -48,7 +50,7 @@ macro(make_quicktest test_basename build_name mpi_run)
       set(_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${mpi_run} ${MPIEXEC_PREFLAGS} ./${_target})
     endif()
   endif()
-  add_custom_target(${_target}.run
+  add_custom_target(${_target}_run
     DEPENDS ${_target}
     COMMAND
       ${_command} > ${_target}-OK 2>&1
@@ -56,25 +58,25 @@ macro(make_quicktest test_basename build_name mpi_run)
          && cat ${_target}-OK
          && rm ${_target}-OK
          && exit 1)
-    COMMAND echo "${_target}: PASSED."
+    COMMAND echo "${_test}: PASSED."
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
-  # this is a hack to make sure the -OK file is deleted
-  # even if compilation fails.
-  add_custom_target(reset-${_target}-OK
+  # this is a hack to make sure the -OK file is deleted even if compilation
+  # fails.
+  add_custom_target(reset_${_target}
     COMMAND ${CMAKE_COMMAND} -E remove -f ${_target}-OK
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  add_dependencies(${_target} reset-${_target}-OK)
+  add_dependencies(${_target} reset_${_target})
 
-  add_test(NAME ${_target}
-    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
+  add_test(NAME ${_test}
+    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}_run -DTEST=${_test}
       -DBINARY_DIR=${CMAKE_BINARY_DIR}
       -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  set_tests_properties(${_target} PROPERTIES
+  set_tests_properties(${_test} PROPERTIES
     LABEL "sanity checks"
     ENVIRONMENT "OMPI_MCA_rmaps_base_oversubscribe=1")
   # ^^^ Allow oversubscription for MPI (needed for Openmpi@3.0)
