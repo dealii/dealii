@@ -312,11 +312,13 @@ namespace PETScWrappers
     inline BlockVector::BlockVector(const BlockVector &v)
       : BlockVectorBase<Vector>()
     {
-      this->components.resize(v.n_blocks());
       this->block_indices = v.block_indices;
 
+      this->components.resize(this->n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->components[i] = v.components[i];
+
+      this->collect_sizes();
     }
 
     inline BlockVector::BlockVector(
@@ -346,16 +348,17 @@ namespace PETScWrappers
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
-      Assert(n_blocks() == 0 || n_blocks() == v.n_blocks(),
-             ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+      Assert(this->n_blocks() == 0 || this->n_blocks() == v.n_blocks(),
+             ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
-        reinit(v.n_blocks());
+        this->block_indices = v.block_indices;
 
-      for (size_type i = 0; i < this->n_blocks(); ++i)
-        this->components[i] = v.block(i);
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i] = v.components[i];
 
-      collect_sizes();
+      this->collect_sizes();
 
       return *this;
     }
@@ -384,42 +387,45 @@ namespace PETScWrappers
                         const bool                    omit_zeroing_entries)
     {
       this->block_indices.reinit(block_sizes);
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
 
+      this->components.resize(this->n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->components[i].reinit(communicator,
                                    block_sizes[i],
                                    locally_owned_sizes[i],
                                    omit_zeroing_entries);
+
+      this->collect_sizes();
     }
 
 
     inline void
     BlockVector::reinit(const BlockVector &v, const bool omit_zeroing_entries)
     {
-      this->block_indices = v.get_block_indices();
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
+      if (this->n_blocks() != v.n_blocks())
+        this->block_indices = v.get_block_indices();
 
+      this->components.resize(this->n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        block(i).reinit(v.block(i), omit_zeroing_entries);
+        this->components[i].reinit(v.components[i], omit_zeroing_entries);
+
+      this->collect_sizes();
     }
 
     inline void
     BlockVector::reinit(const std::vector<IndexSet> &parallel_partitioning,
                         const MPI_Comm &             communicator)
     {
-      std::vector<size_type> sizes(parallel_partitioning.size());
-      for (unsigned int i = 0; i < parallel_partitioning.size(); ++i)
-        sizes[i] = parallel_partitioning[i].size();
+      // update the number of blocks
+      this->block_indices.reinit(parallel_partitioning.size(), 0);
 
-      this->block_indices.reinit(sizes);
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
-
+      // initialize each block
+      this->components.resize(this->n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        block(i).reinit(parallel_partitioning[i], communicator);
+        this->components[i].reinit(parallel_partitioning[i], communicator);
+
+      // update block_indices content
+      this->collect_sizes();
     }
 
     inline void
@@ -427,18 +433,20 @@ namespace PETScWrappers
                         const std::vector<IndexSet> &ghost_entries,
                         const MPI_Comm &             communicator)
     {
-      std::vector<types::global_dof_index> sizes(parallel_partitioning.size());
-      for (unsigned int i = 0; i < parallel_partitioning.size(); ++i)
-        sizes[i] = parallel_partitioning[i].size();
+      AssertDimension(parallel_partitioning.size(), ghost_entries.size());
 
-      this->block_indices.reinit(sizes);
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
+      // update the number of blocks
+      this->block_indices.reinit(parallel_partitioning.size(), 0);
 
+      // initialize each block
+      this->components.resize(this->n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        block(i).reinit(parallel_partitioning[i],
-                        ghost_entries[i],
-                        communicator);
+        this->components[i].reinit(parallel_partitioning[i],
+                                   ghost_entries[i],
+                                   communicator);
+
+      // update block_indices content
+      this->collect_sizes();
     }
 
 

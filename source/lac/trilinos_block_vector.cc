@@ -41,16 +41,17 @@ namespace TrilinosWrappers
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
-      Assert(n_blocks() == 0 || n_blocks() == v.n_blocks(),
-             ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+      Assert(this->n_blocks() == 0 || this->n_blocks() == v.n_blocks(),
+             ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
-        reinit(v.n_blocks());
+        this->block_indices = v.block_indices;
 
-      for (size_type i = 0; i < this->n_blocks(); ++i)
-        this->components[i] = v.block(i);
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i] = v.components[i];
 
-      collect_sizes();
+      this->collect_sizes();
 
       return *this;
     }
@@ -71,24 +72,18 @@ namespace TrilinosWrappers
                         const MPI_Comm &             communicator,
                         const bool                   omit_zeroing_entries)
     {
-      const size_type        no_blocks = parallel_partitioning.size();
-      std::vector<size_type> block_sizes(no_blocks);
+      // update the number of blocks
+      this->block_indices.reinit(parallel_partitioning.size(), 0);
 
-      for (size_type i = 0; i < no_blocks; ++i)
-        {
-          block_sizes[i] = parallel_partitioning[i].size();
-        }
+      // initialize each block
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(parallel_partitioning[i],
+                                   communicator,
+                                   omit_zeroing_entries);
 
-      this->block_indices.reinit(block_sizes);
-      if (components.size() != n_blocks())
-        components.resize(n_blocks());
-
-      for (size_type i = 0; i < n_blocks(); ++i)
-        components[i].reinit(parallel_partitioning[i],
-                             communicator,
-                             omit_zeroing_entries);
-
-      collect_sizes();
+      // update block_indices content
+      this->collect_sizes();
     }
 
 
@@ -99,25 +94,21 @@ namespace TrilinosWrappers
                         const MPI_Comm &             communicator,
                         const bool                   vector_writable)
     {
-      const size_type        no_blocks = parallel_partitioning.size();
-      std::vector<size_type> block_sizes(no_blocks);
+      AssertDimension(parallel_partitioning.size(), ghost_values.size());
 
-      for (size_type i = 0; i < no_blocks; ++i)
-        {
-          block_sizes[i] = parallel_partitioning[i].size();
-        }
+      // update the number of blocks
+      this->block_indices.reinit(parallel_partitioning.size(), 0);
 
-      this->block_indices.reinit(block_sizes);
-      if (components.size() != n_blocks())
-        components.resize(n_blocks());
+      // initialize each block
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(parallel_partitioning[i],
+                                   ghost_values[i],
+                                   communicator,
+                                   vector_writable);
 
-      for (size_type i = 0; i < n_blocks(); ++i)
-        components[i].reinit(parallel_partitioning[i],
-                             ghost_values[i],
-                             communicator,
-                             vector_writable);
-
-      collect_sizes();
+      // update block_indices content
+      this->collect_sizes();
     }
 
 
@@ -125,14 +116,16 @@ namespace TrilinosWrappers
     void
     BlockVector::reinit(const BlockVector &v, const bool omit_zeroing_entries)
     {
-      block_indices = v.get_block_indices();
-      if (components.size() != n_blocks())
-        components.resize(n_blocks());
+      if (this->n_blocks() != v.n_blocks())
+        this->block_indices = v.get_block_indices();
 
-      for (size_type i = 0; i < n_blocks(); ++i)
-        components[i].reinit(v.block(i), omit_zeroing_entries, false);
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(v.components[i],
+                                   omit_zeroing_entries,
+                                   false);
 
-      collect_sizes();
+      this->collect_sizes();
     }
 
 
@@ -140,15 +133,11 @@ namespace TrilinosWrappers
     void
     BlockVector::reinit(const size_type num_blocks)
     {
-      std::vector<size_type> block_sizes(num_blocks, 0);
-      this->block_indices.reinit(block_sizes);
-      if (this->components.size() != this->n_blocks())
-        this->components.resize(this->n_blocks());
+      this->block_indices.reinit(num_blocks, 0);
 
-      for (size_type i = 0; i < this->n_blocks(); ++i)
-        components[i].clear();
-
-      collect_sizes();
+      this->components.resize(this->n_blocks());
+      for (auto &c : this->components)
+        c.clear();
     }
 
 
@@ -158,21 +147,18 @@ namespace TrilinosWrappers
       const TrilinosWrappers::BlockSparseMatrix &m,
       const BlockVector &                        v)
     {
-      Assert(m.n_block_rows() == v.n_blocks(),
-             ExcDimensionMismatch(m.n_block_rows(), v.n_blocks()));
-      Assert(m.n_block_cols() == v.n_blocks(),
-             ExcDimensionMismatch(m.n_block_cols(), v.n_blocks()));
+      AssertDimension(m.n_block_rows(), v.n_blocks());
+      AssertDimension(m.n_block_cols(), v.n_blocks());
 
-      if (v.n_blocks() != n_blocks())
-        {
-          block_indices = v.get_block_indices();
-          components.resize(v.n_blocks());
-        }
+      if (this->n_blocks() != v.n_blocks())
+        this->block_indices = v.get_block_indices();
 
-      for (size_type i = 0; i < this->n_blocks(); ++i)
-        components[i].import_nonlocal_data_for_fe(m.block(i, i), v.block(i));
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].import_nonlocal_data_for_fe(m.block(i, i),
+                                                        v.block(i));
 
-      collect_sizes();
+      this->collect_sizes();
     }
 
 
@@ -183,7 +169,7 @@ namespace TrilinosWrappers
                        const bool         scientific,
                        const bool         across) const
     {
-      for (size_type i = 0; i < this->n_blocks(); ++i)
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
         {
           if (across)
             out << 'C' << i << ':';
