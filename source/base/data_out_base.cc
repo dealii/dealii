@@ -4989,18 +4989,17 @@ namespace DataOutBase
     unsigned int n_cells;
     std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
 
-    // in gmv format the vertex coordinates and the data have an order that is a
-    // bit unpleasant (first all x coordinates, then all y coordinate, ...;
-    // first all data of variable 1, then variable 2, etc), so we have to copy
-    // the data vectors a bit around
+    // For the format we write here, we need to write all node values relating
+    // to one variable at a time. We could in principle do this by looping
+    // over all patches and extracting the values corresponding to the one
+    // variable we're dealing with right now, and then start the process over
+    // for the next variable with another loop over all patches.
     //
-    // note that we copy vectors when looping over the patches since we have to
-    // write them one variable at a time and don't want to use more than one
-    // loop
-    //
-    // this copying of data vectors can be done while we already output the
-    // vertices, so do this on a separate task and when wanting to write out the
-    // data, we wait for that task to finish
+    // An easier way is to create a global table that for each variable
+    // lists all values. This copying of data vectors can be done in the
+    // background while we're already working on vertices and cells,
+    // so do this on a separate task and when wanting to write out the
+    // data, we wait for that task to finish.
     Threads::Task<std::unique_ptr<Table<2, double>>>
       create_global_data_table_task = Threads::new_task(
         [&patches]() { return create_global_data_table(patches); });
@@ -5165,19 +5164,17 @@ namespace DataOutBase
     }
 
 
-    // in Tecplot FEBLOCK format the vertex coordinates and the data have an
-    // order that is a bit unpleasant (first all x coordinates, then all y
-    // coordinate, ...; first all data of variable 1, then variable 2, etc), so
-    // we have to copy the data vectors a bit around
+    // For the format we write here, we need to write all node values relating
+    // to one variable at a time. We could in principle do this by looping
+    // over all patches and extracting the values corresponding to the one
+    // variable we're dealing with right now, and then start the process over
+    // for the next variable with another loop over all patches.
     //
-    // note that we copy vectors when looping over the patches since we have to
-    // write them one variable at a time and don't want to use more than one
-    // loop
-    //
-    // this copying of data vectors can be done while we already output the
-    // vertices, so do this on a separate task and when wanting to write out the
-    // data, we wait for that task to finish
-
+    // An easier way is to create a global table that for each variable
+    // lists all values. This copying of data vectors can be done in the
+    // background while we're already working on vertices and cells,
+    // so do this on a separate task and when wanting to write out the
+    // data, we wait for that task to finish.
     Threads::Task<std::unique_ptr<Table<2, double>>>
       create_global_data_table_task = Threads::new_task(
         [&patches]() { return create_global_data_table(patches); });
@@ -5401,18 +5398,18 @@ namespace DataOutBase
         tec_var_names += " ";
         tec_var_names += data_names[data_set];
       }
-    // in Tecplot FEBLOCK format the vertex coordinates and the data have an
-    // order that is a bit unpleasant (first all x coordinates, then all y
-    // coordinate, ...; first all data of variable 1, then variable 2, etc), so
-    // we have to copy the data vectors a bit around
+
+    // For the format we write here, we need to write all node values relating
+    // to one variable at a time. We could in principle do this by looping
+    // over all patches and extracting the values corresponding to the one
+    // variable we're dealing with right now, and then start the process over
+    // for the next variable with another loop over all patches.
     //
-    // note that we copy vectors when looping over the patches since we have to
-    // write them one variable at a time and don't want to use more than one
-    // loop
-    //
-    // this copying of data vectors can be done while we already output the
-    // vertices, so do this on a separate task and when wanting to write out the
-    // data, we wait for that task to finish
+    // An easier way is to create a global table that for each variable
+    // lists all values. This copying of data vectors can be done in the
+    // background while we're already working on vertices and cells,
+    // so do this on a separate task and when wanting to write out the
+    // data, we wait for that task to finish.
     Threads::Task<std::unique_ptr<Table<2, double>>>
       create_global_data_table_task = Threads::new_task(
         [&patches]() { return create_global_data_table(patches); });
@@ -5702,18 +5699,17 @@ namespace DataOutBase
     std::tie(n_nodes, n_cells, n_points_and_n_cells) =
       count_nodes_and_cells_and_points(patches, flags.write_higher_order_cells);
 
-    // in gmv format the vertex coordinates and the data have an order that is a
-    // bit unpleasant (first all x coordinates, then all y coordinate, ...;
-    // first all data of variable 1, then variable 2, etc), so we have to copy
-    // the data vectors a bit around
+    // For the format we write here, we need to write all node values relating
+    // to one variable at a time. We could in principle do this by looping
+    // over all patches and extracting the values corresponding to the one
+    // variable we're dealing with right now, and then start the process over
+    // for the next variable with another loop over all patches.
     //
-    // note that we copy vectors when looping over the patches since we have to
-    // write them one variable at a time and don't want to use more than one
-    // loop
-    //
-    // this copying of data vectors can be done while we already output the
-    // vertices, so do this on a separate task and when wanting to write out the
-    // data, we wait for that task to finish
+    // An easier way is to create a global table that for each variable
+    // lists all values. This copying of data vectors can be done in the
+    // background while we're already working on vertices and cells,
+    // so do this on a separate task and when wanting to write out the
+    // data, we wait for that task to finish.
     Threads::Task<std::unique_ptr<Table<2, double>>>
       create_global_data_table_task = Threads::new_task(
         [&patches]() { return create_global_data_table(patches); });
@@ -6079,18 +6075,17 @@ namespace DataOutBase
     std::tie(n_nodes, n_cells, std::ignore) =
       count_nodes_and_cells_and_points(patches, flags.write_higher_order_cells);
 
-    // in gmv format the vertex coordinates and the data have an order that is a
-    // bit unpleasant (first all x coordinates, then all y coordinate, ...;
-    // first all data of variable 1, then variable 2, etc), so we have to copy
-    // the data vectors a bit around
+    // For the format we write here, we need to write all node values relating
+    // to one variable at a time. We could in principle do this by looping
+    // over all patches and extracting the values corresponding to the one
+    // variable we're dealing with right now, and then start the process over
+    // for the next variable with another loop over all patches.
     //
-    // note that we copy vectors when looping over the patches since we have to
-    // write them one variable at a time and don't want to use more than one
-    // loop
-    //
-    // this copying of data vectors can be done while we already output the
-    // vertices, so do this on a separate task and when wanting to write out the
-    // data, we wait for that task to finish
+    // An easier way is to create a global table that for each variable
+    // lists all values. This copying of data vectors can be done in the
+    // background while we're already working on vertices and cells,
+    // so do this on a separate task and when wanting to write out the
+    // data, we wait for that task to finish.
     Threads::Task<std::unique_ptr<Table<2, float>>>
       create_global_data_table_task = Threads::new_task([&patches]() {
         return create_global_data_table<dim, spacedim, float>(patches);
@@ -9151,6 +9146,17 @@ DataOutBase::write_filtered_data(
   unsigned int n_nodes;
   std::tie(n_nodes, std::ignore) = count_nodes_and_cells(patches);
 
+  // For the format we write here, we need to write all node values relating
+  // to one variable at a time. We could in principle do this by looping
+  // over all patches and extracting the values corresponding to the one
+  // variable we're dealing with right now, and then start the process over
+  // for the next variable with another loop over all patches.
+  //
+  // An easier way is to create a global table that for each variable
+  // lists all values. This copying of data vectors can be done in the
+  // background while we're already working on vertices and cells,
+  // so do this on a separate task and when wanting to write out the
+  // data, we wait for that task to finish.
   Threads::Task<std::unique_ptr<Table<2, double>>>
     create_global_data_table_task = Threads::new_task(
       [&patches]() { return create_global_data_table(patches); });
