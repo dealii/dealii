@@ -32,6 +32,11 @@ option(DEAL_II_FORCE_BUNDLED_BOOST
 set(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
 
 macro(feature_boost_configure_bundled)
+  set(BOOST_VERSION "1.70.0")
+  set(BOOST_VERSION_MAJOR "1")
+  set(BOOST_VERSION_MINOR "70")
+  set(BOOST_VERSION_SUBMINOR "0")
+
   #
   # Add rt to the link interface as well, boost/chrono needs it.
   #
@@ -42,21 +47,6 @@ macro(feature_boost_configure_bundled)
       list(APPEND DEAL_II_LIBRARIES ${rt_LIBRARY})
     endif()
   endif()
-
-  #
-  # We still need the version information, which is set up in the FindBoost
-  # module in the non-bundled case:
-  #
-  file(STRINGS "${BOOST_FOLDER}/include/boost/version.hpp"
-    BOOST_VERSION_STRING
-    REGEX "#define.*BOOST_VERSION")
-
-  string(REGEX REPLACE "^.*BOOST_VERSION.* ([0-9]+).*" "\\1"
-    BOOST_VERSION_NUMBER "${BOOST_VERSION_STRING}"
-    )
-  math(EXPR Boost_MAJOR_VERSION "${BOOST_VERSION_NUMBER} / 100000")
-  math(EXPR Boost_MINOR_VERSION "${BOOST_VERSION_NUMBER} / 100 % 1000")
-  math(EXPR Boost_SUBMINOR_VERSION "${BOOST_VERSION_NUMBER} % 100")
 
   if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     #
@@ -86,6 +76,10 @@ option(DEAL_II_FORCE_BUNDLED_KOKKOS
 set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
 
 macro(feature_kokkos_configure_bundled)
+  set(KOKKOS_VERSION "3.7.0")
+  set(Kokkos_DEVICES "Serial")
+  set(Kokkos_ARCH " ")
+
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS
     ${KOKKOS_FOLDER}/algorithms/src
     ${KOKKOS_FOLDER}/containers/src
@@ -109,6 +103,8 @@ option(DEAL_II_FORCE_BUNDLED_TASKFLOW
 set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-2.5.0")
 
 macro(feature_taskflow_configure_bundled)
+  set(TASKFLOW_VERSION "2.5.0")
+
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
 endmacro()
 
@@ -132,6 +128,10 @@ if( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
 endif()
 
 macro(feature_tbb_configure_bundled)
+  set(TBB_VERSION "2018.0")
+  set(TBB_VERSION_MAJOR "2018")
+  set(TBB_VERSION_MINOR "0")
+
   #
   # We have to disable a bunch of warnings:
   #
@@ -161,6 +161,11 @@ option(DEAL_II_FORCE_BUNDLED_UMFPACK
 set(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
 
 macro(feature_umfpack_configure_bundled)
+  set(UMFPACK_VERSION "5.0.2")
+  set(UMFPACK_VERSION_MAJOR "5")
+  set(UMFPACK_VERSION_MINOR "0")
+  set(UMFPACK_VERSION_SUBMINOR "2")
+
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS
     ${UMFPACK_FOLDER}/UMFPACK/Include ${UMFPACK_FOLDER}/AMD/Include
     )
@@ -178,7 +183,11 @@ option(DEAL_II_FORCE_BUNDLED_MUPARSER
 
 set(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_3_3/")
 
-
 macro(feature_muparser_configure_bundled)
+  set(MUPARSER_VERSION "2.3.3")
+  set(MUPARSER_VERSION_MAJOR "2")
+  set(MUPARSER_VERSION_MINOR "3")
+  set(MUPARSER_VERSION_SUBMINOR "3")
+
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${MUPARSER_FOLDER}/include)
 endmacro()
