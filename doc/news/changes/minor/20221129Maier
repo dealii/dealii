@@ -1,0 +1,6 @@
+Improved: The quick_tests mechanism has been redesigned. The tests are now
+called <code>quick_tests/[tests].[build]</code> and can be invoked via
+ctest as well.
+<br>
+(Matthias Maier, 2022/11/29)
+

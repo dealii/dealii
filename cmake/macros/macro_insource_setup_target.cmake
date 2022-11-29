@@ -14,17 +14,16 @@
 ## ---------------------------------------------------------------------
 
 #
-# This file provides an insource version of the DEAL_II_SETUP_TARGET macro.
+# This file provides an "insource" version of the DEAL_II_SETUP_TARGET macro.
 #
 # Usage:
-#       deal_ii_insource_setup_target(target build)
+#       insource_setup_target(target build)
 #
 # This appends necessary include directories, linker flags, compile
 # definitions and the deal.II library link interface to the given target.
 #
-#
 
-macro(deal_ii_insource_setup_target _target _build)
+function(insource_setup_target _target _build)
   string(TOLOWER ${_build} _build_lowercase)
 
   set_target_properties(${_target} PROPERTIES
@@ -60,12 +59,11 @@ macro(deal_ii_insource_setup_target _target _build)
     target_compile_definitions(${_target}
       PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
       )
-
   endif()
 
-get_property(_type TARGET ${_target} PROPERTY TYPE)
-if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
-  target_link_libraries(${_target} ${DEAL_II_NAMESPACE}_${_build_lowercase})
-endif()
+  get_property(_type TARGET ${_target} PROPERTY TYPE)
+  if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
+    target_link_libraries(${_target} ${DEAL_II_NAMESPACE}_${_build_lowercase})
+  endif()
 
-endmacro()
+endfunction()

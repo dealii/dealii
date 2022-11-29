@@ -95,7 +95,9 @@ else()
   set(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
 endif()
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
+    "subdirs(quick_tests)\n"
+    )
 
 #
 # Always undefine the following variables in the setup_tests target:
