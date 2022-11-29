@@ -759,8 +759,8 @@ namespace DoFRenumbering
                          const std::vector<unsigned int> &component_order_arg,
                          const bool                       is_level_operation)
   {
-    const hp::FECollection<dim, spacedim> fe_collection(
-      start->get_dof_handler().get_fe_collection());
+    const hp::FECollection<dim, spacedim> &fe_collection =
+      start->get_dof_handler().get_fe_collection();
 
     // do nothing if the FE has only
     // one component
@@ -1072,8 +1072,8 @@ namespace DoFRenumbering
                      const ENDITERATOR &                   end,
                      const bool                            is_level_operation)
   {
-    const hp::FECollection<dim, spacedim> fe_collection(
-      start->get_dof_handler().get_fe_collection());
+    const hp::FECollection<dim, spacedim> &fe_collection =
+      start->get_dof_handler().get_fe_collection();
 
     // do nothing if the FE has only
     // one component
