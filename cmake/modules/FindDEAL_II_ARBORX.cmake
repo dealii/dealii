@@ -27,7 +27,7 @@ set(ARBORX_DIR "" CACHE PATH "An optional hint to an ArborX installation")
 set_if_empty(ARBORX_DIR "$ENV{ARBORX_DIR}")
 
 
-find_package(ArborX
+find_package(ArborX QUIET
   HINTS ${ARBORX_DIR} ${ArborX_DIR} $ENV{ArborX_DIR}
   )
 

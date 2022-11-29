@@ -32,7 +32,7 @@ set_if_empty(GINKGO_DIR "$ENV{GINKGO_DIR}")
 # subsequent configuration to fail.
 #
 set(_cmake_module_path ${CMAKE_MODULE_PATH})
-find_package(Ginkgo
+find_package(Ginkgo QUIET
   HINTS ${GINKGO_DIR} ${Ginkgo_DIR} $ENV{Ginkgo_DIR}
   )
 set(CMAKE_MODULE_PATH ${_cmake_module_path})
