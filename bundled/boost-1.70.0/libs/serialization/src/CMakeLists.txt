@@ -14,11 +14,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(
-  ${BOOST_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_INCLUDE_DIRS}
-  )
-
 set(src_boost_serialization
   archive_exception.cpp
   basic_archive.cpp

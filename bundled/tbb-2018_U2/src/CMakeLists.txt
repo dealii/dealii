@@ -45,7 +45,6 @@ enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-tautological-overlap-compare")
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 include_directories(
-  ${TBB_BUNDLED_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/rml/include
   )
 

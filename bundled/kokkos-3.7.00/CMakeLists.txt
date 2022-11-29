@@ -63,7 +63,6 @@ set(src_kokkos
   simd/src/Kokkos_SIMD_dummy.cpp
   containers/src/impl/Kokkos_UnorderedMap_impl.cpp
 )
-include_directories(${KOKKOS_BUNDLED_INCLUDE_DIRS})
 
 enable_if_supported(DEAL_II_CXX_FLAGS -Wno-float-conversion)
 enable_if_supported(DEAL_II_CXX_FLAGS -Wno-missing-field-initializers)

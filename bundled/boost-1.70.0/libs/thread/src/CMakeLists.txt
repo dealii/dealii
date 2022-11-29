@@ -14,11 +14,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(
-  ${BOOST_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_INCLUDE_DIRS}
-  )
-
 if(DEAL_II_USE_MT_POSIX)
   set(src_boost_thread
     pthread/once.cpp

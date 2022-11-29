@@ -14,11 +14,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(
-  ${BOOST_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_INCLUDE_DIRS}
-  )
-
 set(src_boost_iostreams
     file_descriptor.cpp
     gzip.cpp

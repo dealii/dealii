@@ -18,6 +18,7 @@
 # setup of compilation targets and installation here:
 #
 
+
 #
 # Boost C++ libraries
 #
@@ -29,6 +30,48 @@ option(DEAL_II_FORCE_BUNDLED_BOOST
   OFF)
 
 set(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
+
+macro(feature_boost_configure_bundled)
+  #
+  # Add rt to the link interface as well, boost/chrono needs it.
+  #
+  if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    find_system_library(rt_LIBRARY NAMES rt)
+    mark_as_advanced(rt_LIBRARY)
+    if(NOT rt_LIBRARY MATCHES "-NOTFOUND")
+      list(APPEND DEAL_II_LIBRARIES ${rt_LIBRARY})
+    endif()
+  endif()
+
+  #
+  # We still need the version information, which is set up in the FindBoost
+  # module in the non-bundled case:
+  #
+  file(STRINGS "${BOOST_FOLDER}/include/boost/version.hpp"
+    BOOST_VERSION_STRING
+    REGEX "#define.*BOOST_VERSION")
+
+  string(REGEX REPLACE "^.*BOOST_VERSION.* ([0-9]+).*" "\\1"
+    BOOST_VERSION_NUMBER "${BOOST_VERSION_STRING}"
+    )
+  math(EXPR Boost_MAJOR_VERSION "${BOOST_VERSION_NUMBER} / 100000")
+  math(EXPR Boost_MINOR_VERSION "${BOOST_VERSION_NUMBER} / 100 % 1000")
+  math(EXPR Boost_SUBMINOR_VERSION "${BOOST_VERSION_NUMBER} % 100")
+
+  if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    #
+    # Bundled boost tries to (dl)open itself as a dynamic library on
+    # Windows. Disable this undesired behavior by exporting
+    # BOOST_ALL_NO_LIB on Windows platforms (for bundled boost).
+    #
+    list(APPEND DEAL_II_DEFINITIONS "BOOST_ALL_NO_LIB")
+  endif()
+
+  enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
+
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
+endmacro()
+
 
 #
 # Kokkos
@@ -42,6 +85,17 @@ option(DEAL_II_FORCE_BUNDLED_KOKKOS
 
 set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
 
+macro(feature_kokkos_configure_bundled)
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS
+    ${KOKKOS_FOLDER}/algorithms/src
+    ${KOKKOS_FOLDER}/containers/src
+    ${KOKKOS_FOLDER}/core/src
+    ${KOKKOS_FOLDER}/simd/src
+    ${KOKKOS_FOLDER}/tpls/desul/include
+    )
+endmacro()
+
+
 #
 # Taskflow
 #
@@ -53,6 +107,10 @@ option(DEAL_II_FORCE_BUNDLED_TASKFLOW
   OFF)
 
 set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-2.5.0")
+
+macro(feature_taskflow_configure_bundled)
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
+endmacro()
 
 
 #
@@ -73,6 +131,23 @@ if( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
   set(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
 endif()
 
+macro(feature_tbb_configure_bundled)
+  #
+  # We have to disable a bunch of warnings:
+  #
+  enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-parentheses")
+
+  #
+  # tbb uses dlopen/dlclose, so link against libdl.so as well:
+  #
+  list(APPEND DEAL_II_LIBRARIES ${CMAKE_DL_LIBS})
+
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
+
+  set(DEAL_II_TBB_WITH_ONEAPI FALSE)
+endmacro()
+
+
 #
 # UMFPACK, AMD and UFCONFIG:
 #
@@ -85,6 +160,12 @@ option(DEAL_II_FORCE_BUNDLED_UMFPACK
 
 set(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
 
+macro(feature_umfpack_configure_bundled)
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS
+    ${UMFPACK_FOLDER}/UMFPACK/Include ${UMFPACK_FOLDER}/AMD/Include
+    )
+endmacro()
+
 
 #
 # muparser
@@ -96,3 +177,8 @@ option(DEAL_II_FORCE_BUNDLED_MUPARSER
   OFF)
 
 set(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_3_3/")
+
+
+macro(feature_muparser_configure_bundled)
+  list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${MUPARSER_FOLDER}/include)
+endmacro()

@@ -70,10 +70,5 @@ macro(feature_taskflow_find_external var)
 endmacro()
 
 
-macro(feature_taskflow_configure_bundled)
-  list(APPEND TASKFLOW_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
-endmacro()
-
-
 configure_feature(TASKFLOW)
 

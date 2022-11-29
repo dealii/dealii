@@ -65,21 +65,4 @@ macro(feature_tbb_find_external var)
 endmacro()
 
 
-macro(feature_tbb_configure_bundled)
-  #
-  # We have to disable a bunch of warnings:
-  #
-  enable_if_supported(TBB_CXX_FLAGS "-Wno-parentheses")
-
-  #
-  # tbb uses dlopen/dlclose, so link against libdl.so as well:
-  #
-  list(APPEND TBB_LIBRARIES ${CMAKE_DL_LIBS})
-
-  list(APPEND TBB_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
-
-  set(DEAL_II_TBB_WITH_ONEAPI FALSE)
-endmacro()
-
-
 configure_feature(TBB)
