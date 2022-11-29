@@ -37,7 +37,7 @@ macro(make_quicktest test_basename build_name mpi_run)
   set(_target ${test_basename}.${_build_lowercase})
   list(APPEND ALL_TESTS "${_target}")
   add_executable(${_target} EXCLUDE_FROM_ALL ${test_basename}.cc)
-  deal_ii_insource_setup_target(${_target} ${build_name})
+  insource_setup_target(${_target} ${build_name})
 
   if("${mpi_run}" STREQUAL "")
     set(_command ${_target})

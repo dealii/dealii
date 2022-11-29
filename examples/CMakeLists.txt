@@ -90,7 +90,7 @@ if(DEAL_II_COMPONENT_EXAMPLES)
         foreach(_build ${DEAL_II_BUILD_TYPES})
           string(TOLOWER ${_build} _build_lowercase)
           add_executable(${_name}.${_build_lowercase} ${_step})
-          deal_ii_insource_setup_target(${_name}.${_build_lowercase} ${_build})
+          insource_setup_target(${_name}.${_build_lowercase} ${_build})
           set_target_properties(${_name}.${_build_lowercase}
             PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
@@ -129,7 +129,7 @@ if(DEAL_II_COMPONENT_EXAMPLES)
         foreach(_build ${DEAL_II_BUILD_TYPES})
           string(TOLOWER ${_build} _build_lowercase)
           add_executable(${_name}.${_build_lowercase} ${_step})
-          deal_ii_insource_setup_target(${_name}.${_build_lowercase} ${_build})
+          insource_setup_target(${_name}.${_build_lowercase} ${_build})
 
           set_target_properties(${_name}.${_build_lowercase}
             PROPERTIES
