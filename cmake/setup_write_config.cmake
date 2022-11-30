@@ -44,6 +44,7 @@ set(_log_detailed "${CMAKE_BINARY_DIR}/detailed.log")
 set(_log_summary  "${CMAKE_BINARY_DIR}/summary.log")
 set(_log_feature "${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake")
 file(REMOVE ${_log_detailed} ${_log_summary} ${_log_feature})
+file(WRITE ${_log_feature} "")
 
 macro(_both)
   # Write to both log files:
