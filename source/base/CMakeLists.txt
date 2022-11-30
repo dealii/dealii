@@ -48,6 +48,7 @@ set(_unity_include_src
   job_identifier.cc
   logstream.cc
   hdf5.cc
+  kokkos.cc
   mpi.cc
   mpi_compute_index_owner_internal.cc
   mpi_noncontiguous_partitioner.cc

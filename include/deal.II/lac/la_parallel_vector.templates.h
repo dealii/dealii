@@ -135,17 +135,12 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
-              Number *new_val;
-              Utilities::System::posix_memalign(
-                reinterpret_cast<void **>(&new_val),
-                64,
-                sizeof(Number) * new_alloc_size);
-              data.values = {new_val, [](Number *data) { std::free(data); }};
+              Kokkos::resize(data.values, new_alloc_size);
 
               allocated_size = new_alloc_size;
 
               data.values_sm = {
-                ArrayView<const Number>(data.values.get(), new_alloc_size)};
+                ArrayView<const Number>(data.values.data(), new_alloc_size)};
             }
           else
             {
@@ -229,13 +224,25 @@ namespace LinearAlgebra
                 data.values_sm[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
-              data.values = {ptr_aligned, [mpi_window](Number *) mutable {
-                               // note: we are creating here a copy of the
-                               // window other approaches led to segmentation
-                               // faults
-                               const auto ierr = MPI_Win_free(&mpi_window);
-                               AssertThrowMPI(ierr);
-                             }};
+              data.values =
+                Kokkos::View<Number *,
+                             Kokkos::HostSpace,
+                             Kokkos::MemoryTraits<Kokkos::Unmanaged>>(
+                  ptr_aligned, new_alloc_size);
+
+              // Kokkos will not free the memory because the memory is
+              // unmanaged. Instead we use a shared pointer to take care of
+              // that.
+              data.values_sm_ptr = {ptr_aligned,
+                                    [mpi_window](Number *) mutable {
+                                      // note: we are creating here a copy of
+                                      // the window other approaches led to
+                                      // segmentation faults
+                                      const auto ierr =
+                                        MPI_Win_free(&mpi_window);
+                                      AssertThrowMPI(ierr);
+                                    }};
+
 #else
               Assert(false, ExcInternalError());
 #endif
@@ -332,19 +339,17 @@ namespace LinearAlgebra
 
           if (new_alloc_size > allocated_size)
             {
-              Assert(((allocated_size > 0 && data.values_dev != nullptr) ||
-                      data.values_dev == nullptr),
+              Assert(((allocated_size > 0 && data.values.size() != 0) ||
+                      data.values.size() == 0),
                      ExcInternalError());
 
-              Number *new_val_dev;
-              Utilities::CUDA::malloc(new_val_dev, new_alloc_size);
-              data.values_dev.reset(new_val_dev);
+              Kokkos::resize(data.values, new_alloc_size);
 
               allocated_size = new_alloc_size;
             }
           else if (new_alloc_size == 0)
             {
-              data.values_dev.reset();
+              Kokkos::resize(data.values, 0);
               allocated_size = 0;
             }
         }
@@ -418,14 +423,14 @@ namespace LinearAlgebra
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_permutated<
               Number><<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
               indices_dev,
-              data.values_dev.get(),
+              data.values.data(),
               tmp_vector.begin(),
               tmp_n_elements);
           else
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::set_permutated<
               Number><<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
               indices_dev,
-              data.values_dev.get(),
+              data.values.data(),
               tmp_vector.begin(),
               tmp_n_elements);
 
@@ -455,7 +460,7 @@ namespace LinearAlgebra
             Number,
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::LInfty<Number>>
             <<<dim3(n_blocks, 1), dim3(::dealii::CUDAWrappers::block_size)>>>(
-              result_device, data.values_dev.get(), size);
+              result_device, data.values.data(), size);
 
           // Copy the result back to the host
           error_code = cudaMemcpy(&result,
@@ -523,8 +528,8 @@ namespace LinearAlgebra
       resize_val(size, comm_sm);
 
       // delete previous content in import data
-      import_data.values.reset();
-      import_data.values_dev.reset();
+      Kokkos::resize(import_data.values_host_buffer, 0);
+      Kokkos::resize(import_data.values, 0);
 
       // set partitioner to serial version
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(size);
@@ -554,8 +559,8 @@ namespace LinearAlgebra
       resize_val(local_size + ghost_size, comm_sm);
 
       // delete previous content in import data
-      import_data.values.reset();
-      import_data.values_dev.reset();
+      Kokkos::resize(import_data.values_host_buffer, 0);
+      Kokkos::resize(import_data.values, 0);
 
       // create partitioner
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(local_size,
@@ -600,8 +605,8 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.values.reset();
-      import_data.values_dev.reset();
+      Kokkos::resize(import_data.values_host_buffer, 0);
+      Kokkos::resize(import_data.values, 0);
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
@@ -663,8 +668,8 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.values.reset();
-      import_data.values_dev.reset();
+      Kokkos::resize(import_data.values_host_buffer, 0);
+      Kokkos::resize(import_data.values, 0);
 
       vector_is_ghosted = false;
     }
@@ -925,21 +930,27 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::zero_out_ghost_values() const
     {
-      if (data.values != nullptr)
-        std::fill_n(data.values.get() + partitioner->locally_owned_size(),
-                    partitioner->n_ghost_indices(),
-                    Number());
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
-      if (data.values_dev != nullptr)
+      if (data.values.size() != 0)
         {
-          const cudaError_t cuda_error_code =
-            cudaMemset(data.values_dev.get() +
-                         partitioner->locally_owned_size(),
-                       0,
-                       partitioner->n_ghost_indices() * sizeof(Number));
-          AssertCuda(cuda_error_code);
-        }
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+            {
+              const cudaError_t cuda_error_code =
+                cudaMemset(data.values.data() +
+                             partitioner->locally_owned_size(),
+                           0,
+                           partitioner->n_ghost_indices() * sizeof(Number));
+              AssertCuda(cuda_error_code);
+            }
+          else
 #endif
+            {
+              std::fill_n(data.values.data() +
+                            partitioner->locally_owned_size(),
+                          partitioner->n_ghost_indices(),
+                          Number());
+            }
+        }
 
       vector_is_ghosted = false;
     }
@@ -964,13 +975,12 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
             {
-              if (import_data.values_dev == nullptr)
-                import_data.values_dev.reset(
-                  Utilities::CUDA::allocate_device_data<Number>(
-                    partitioner->n_import_indices()));
+              if (import_data.values_host_buffer.size() == 0)
+                Kokkos::resize(import_data.values_host_buffer,
+                               partitioner->n_import_indices());
             }
           else
 #  endif
@@ -981,15 +991,9 @@ namespace LinearAlgebra
                 std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
                 "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
 #  endif
-              if (import_data.values == nullptr)
-                {
-                  Number *new_val;
-                  Utilities::System::posix_memalign(
-                    reinterpret_cast<void **>(&new_val),
-                    64,
-                    sizeof(Number) * partitioner->n_import_indices());
-                  import_data.values.reset(new_val);
-                }
+              if (import_data.values.size() == 0)
+                Kokkos::resize(import_data.values,
+                               partitioner->n_import_indices());
             }
         }
 
@@ -1001,34 +1005,19 @@ namespace LinearAlgebra
           // device. We use values to store the elements because the function
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
-          Number *new_val;
-          Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_val),
-                                            64,
-                                            sizeof(Number) * allocated_size);
-
-          data.values = {new_val, [](Number *data) { std::free(data); }};
-
-          cudaError_t cuda_error_code =
-            cudaMemcpy(data.values.get(),
-                       data.values_dev.get(),
-                       allocated_size * sizeof(Number),
-                       cudaMemcpyDeviceToHost);
-          AssertCuda(cuda_error_code);
-        }
-#  endif
-
-#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      if (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value)
-        {
+          data.values_host_buffer =
+            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
+                                                data.values);
           partitioner->import_from_ghosted_array_start(
             operation,
             communication_channel,
-            ArrayView<Number, MemorySpace::CUDA>(
-              data.values_dev.get() + partitioner->locally_owned_size(),
+            ArrayView<Number, MemorySpace::Host>(
+              data.values_host_buffer.data() +
+                partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
-            ArrayView<Number, MemorySpace::CUDA>(
-              import_data.values_dev.get(), partitioner->n_import_indices()),
+            ArrayView<Number, MemorySpace::Host>(
+              import_data.values_host_buffer.data(),
+              partitioner->n_import_indices()),
             compress_requests);
         }
       else
@@ -1037,11 +1026,11 @@ namespace LinearAlgebra
           partitioner->import_from_ghosted_array_start(
             operation,
             communication_channel,
-            ArrayView<Number, MemorySpace::Host>(
-              data.values.get() + partitioner->locally_owned_size(),
+            ArrayView<Number, MemorySpaceType>(
+              data.values.data() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
-            ArrayView<Number, MemorySpace::Host>(
-              import_data.values.get(), partitioner->n_import_indices()),
+            ArrayView<Number, MemorySpaceType>(import_data.values.data(),
+                                               partitioner->n_import_indices()),
             compress_requests);
         }
 #else
@@ -1067,59 +1056,57 @@ namespace LinearAlgebra
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
           Assert(partitioner->n_import_indices() == 0 ||
-                   import_data.values_dev != nullptr,
-                 ExcNotInitialized());
-          partitioner
-            ->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
-              operation,
-              ArrayView<const Number, MemorySpace::CUDA>(
-                import_data.values_dev.get(), partitioner->n_import_indices()),
-              ArrayView<Number, MemorySpace::CUDA>(
-                data.values_dev.get(), partitioner->locally_owned_size()),
-              ArrayView<Number, MemorySpace::CUDA>(
-                data.values_dev.get() + partitioner->locally_owned_size(),
-                partitioner->n_ghost_indices()),
-              compress_requests);
-        }
-      else
-#  endif
-        {
-          Assert(partitioner->n_import_indices() == 0 ||
-                   import_data.values != nullptr,
+                   import_data.values_host_buffer.size() != 0,
                  ExcNotInitialized());
           partitioner
             ->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
               operation,
               ArrayView<const Number, MemorySpace::Host>(
-                import_data.values.get(), partitioner->n_import_indices()),
+                import_data.values_host_buffer.data(),
+                partitioner->n_import_indices()),
               ArrayView<Number, MemorySpace::Host>(
-                data.values.get(), partitioner->locally_owned_size()),
+                data.values_host_buffer.data(),
+                partitioner->locally_owned_size()),
               ArrayView<Number, MemorySpace::Host>(
-                data.values.get() + partitioner->locally_owned_size(),
+                data.values_host_buffer.data() +
+                  partitioner->locally_owned_size(),
                 partitioner->n_ghost_indices()),
               compress_requests);
-        }
 
-#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined  DEAL_II_MPI_WITH_CUDA_SUPPORT
-      // The communication is done on the host, so we need to
-      // move the data back to the device.
-      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
-        {
+          // The communication is done on the host, so we need to
+          // move the data back to the device.
           cudaError_t cuda_error_code =
-            cudaMemcpy(data.values_dev.get(),
-                       data.values.get(),
+            cudaMemcpy(data.values.data(),
+                       data.values_host_buffer.data(),
                        allocated_size * sizeof(Number),
                        cudaMemcpyHostToDevice);
           AssertCuda(cuda_error_code);
 
-          data.values.reset();
+          Kokkos::resize(data.values_host_buffer, 0);
         }
+      else
 #  endif
+        {
+          Assert(partitioner->n_import_indices() == 0 ||
+                   import_data.values.size() != 0,
+                 ExcNotInitialized());
+          partitioner
+            ->import_from_ghosted_array_finish<Number, MemorySpaceType>(
+              operation,
+              ArrayView<const Number, MemorySpaceType>(
+                import_data.values.data(), partitioner->n_import_indices()),
+              ArrayView<Number, MemorySpaceType>(
+                data.values.data(), partitioner->locally_owned_size()),
+              ArrayView<Number, MemorySpaceType>(
+                data.values.data() + partitioner->locally_owned_size(),
+                partitioner->n_ghost_indices()),
+              compress_requests);
+        }
+
 #else
       (void)operation;
 #endif
@@ -1146,77 +1133,67 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          Assert(
-            (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
-            ExcMessage(
-              "Using MemorySpace::CUDA only allowed if the code is compiled with a CUDA compiler!"));
-          if (import_data.values_dev == nullptr)
-            import_data.values_dev.reset(
-              Utilities::CUDA::allocate_device_data<Number>(
-                partitioner->n_import_indices()));
-#  else
-#    ifdef DEAL_II_MPI_WITH_CUDA_SUPPORT
-          static_assert(
-            std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
-            "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
-#    endif
-          if (import_data.values == nullptr)
+    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
-              Number *new_val;
-              Utilities::System::posix_memalign(
-                reinterpret_cast<void **>(&new_val),
-                64,
-                sizeof(Number) * partitioner->n_import_indices());
-              import_data.values.reset(new_val);
+              if (import_data.values_host_buffer.size() == 0)
+                Kokkos::resize(import_data.values_host_buffer,
+                               partitioner->n_import_indices());
             }
+          else
 #  endif
+            {
+#  ifdef DEAL_II_MPI_WITH_CUDA_SUPPORT
+              static_assert(
+                std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
+                "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
+#  endif
+              if (import_data.values.size() == 0)
+                Kokkos::resize(import_data.values,
+                               partitioner->n_import_indices());
+            }
         }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
     !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      // Move the data to the host and then move it back to the
-      // device. We use values to store the elements because the function
-      // uses a view of the array and thus we need the data on the host to
-      // outlive the scope of the function.
-      Number *new_val;
-      Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_val),
-                                        64,
-                                        sizeof(Number) * allocated_size);
+      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+        {
+          // Move the data to the host and then move it back to the
+          // device. We use values to store the elements because the function
+          // uses a view of the array and thus we need the data on the host to
+          // outlive the scope of the function.
+          data.values_host_buffer =
+            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
+                                                data.values);
 
-      data.values = {new_val, [](Number *data) { std::free(data); }};
-
-      cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
-                                               data.values_dev.get(),
-                                               allocated_size * sizeof(Number),
-                                               cudaMemcpyDeviceToHost);
-      AssertCuda(cuda_error_code);
+          partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
+            communication_channel,
+            ArrayView<const Number, MemorySpace::Host>(
+              data.values_host_buffer.data(),
+              partitioner->locally_owned_size()),
+            ArrayView<Number, MemorySpace::Host>(
+              import_data.values_host_buffer.data(),
+              partitioner->n_import_indices()),
+            ArrayView<Number, MemorySpace::Host>(
+              data.values_host_buffer.data() +
+                partitioner->locally_owned_size(),
+              partitioner->n_ghost_indices()),
+            update_ghost_values_requests);
+        }
+      else
 #  endif
-
-#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
-      partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
-        communication_channel,
-        ArrayView<const Number, MemorySpace::Host>(
-          data.values.get(), partitioner->locally_owned_size()),
-        ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
-                                             partitioner->n_import_indices()),
-        ArrayView<Number, MemorySpace::Host>(
-          data.values.get() + partitioner->locally_owned_size(),
-          partitioner->n_ghost_indices()),
-        update_ghost_values_requests);
-#  else
-      partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
-        communication_channel,
-        ArrayView<const Number, MemorySpace::CUDA>(
-          data.values_dev.get(), partitioner->locally_owned_size()),
-        ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
-                                             partitioner->n_import_indices()),
-        ArrayView<Number, MemorySpace::CUDA>(
-          data.values_dev.get() + partitioner->locally_owned_size(),
-          partitioner->n_ghost_indices()),
-        update_ghost_values_requests);
-#  endif
+        {
+          partitioner->export_to_ghosted_array_start<Number, MemorySpaceType>(
+            communication_channel,
+            ArrayView<const Number, MemorySpaceType>(
+              data.values.data(), partitioner->locally_owned_size()),
+            ArrayView<Number, MemorySpaceType>(import_data.values.data(),
+                                               partitioner->n_import_indices()),
+            ArrayView<Number, MemorySpaceType>(
+              data.values.data() + partitioner->locally_owned_size(),
+              partitioner->n_ghost_indices()),
+            update_ghost_values_requests);
+        }
 
 #else
       (void)communication_channel;
@@ -1240,39 +1217,40 @@ namespace LinearAlgebra
           // make this function thread safe
           std::lock_guard<std::mutex> lock(mutex);
 
-#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
-          partitioner->export_to_ghosted_array_finish(
-            ArrayView<Number, MemorySpace::Host>(
-              data.values.get() + partitioner->locally_owned_size(),
-              partitioner->n_ghost_indices()),
-            update_ghost_values_requests);
-#  else
-          partitioner->export_to_ghosted_array_finish(
-            ArrayView<Number, MemorySpace::CUDA>(
-              data.values_dev.get() + partitioner->locally_owned_size(),
-              partitioner->n_ghost_indices()),
-            update_ghost_values_requests);
-#  endif
-        }
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+            {
+              partitioner->export_to_ghosted_array_finish(
+                ArrayView<Number, MemorySpace::Host>(
+                  data.values_host_buffer.data() +
+                    partitioner->locally_owned_size(),
+                  partitioner->n_ghost_indices()),
+                update_ghost_values_requests);
 
-#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined  DEAL_II_MPI_WITH_CUDA_SUPPORT
-      // The communication is done on the host, so we need to
-      // move the data back to the device.
-      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
-        {
-          cudaError_t cuda_error_code =
-            cudaMemcpy(data.values_dev.get() +
-                         partitioner->locally_owned_size(),
-                       data.values.get() + partitioner->locally_owned_size(),
-                       partitioner->n_ghost_indices() * sizeof(Number),
-                       cudaMemcpyHostToDevice);
-          AssertCuda(cuda_error_code);
+              // The communication is done on the host, so we need to
+              // move the data back to the device.
+              cudaError_t cuda_error_code =
+                cudaMemcpy(data.values.data() +
+                             partitioner->locally_owned_size(),
+                           data.values_host_buffer.data() +
+                             partitioner->locally_owned_size(),
+                           partitioner->n_ghost_indices() * sizeof(Number),
+                           cudaMemcpyHostToDevice);
+              AssertCuda(cuda_error_code);
 
-          data.values.reset();
-        }
+              Kokkos::resize(data.values_host_buffer, 0);
+            }
+          else
 #  endif
+            {
+              partitioner->export_to_ghosted_array_finish(
+                ArrayView<Number, MemorySpaceType>(
+                  data.values.data() + partitioner->locally_owned_size(),
+                  partitioner->n_ghost_indices()),
+                update_ghost_values_requests);
+            }
+        }
 
 #endif
       vector_is_ghosted = true;
@@ -2078,7 +2056,8 @@ namespace LinearAlgebra
       if (partitioner.use_count() > 0)
         memory +=
           partitioner->memory_consumption() / partitioner.use_count() + 1;
-      if (import_data.values != nullptr || import_data.values_dev != nullptr)
+      if (import_data.values_host_buffer.size() != 0 ||
+          import_data.values.size() != 0)
         memory += (static_cast<std::size_t>(partitioner->n_import_indices()) *
                    sizeof(Number));
       return memory;
