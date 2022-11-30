@@ -6075,26 +6075,10 @@ namespace DataOutBase
     std::tie(n_nodes, n_cells, std::ignore) =
       count_nodes_and_cells_and_points(patches, flags.write_higher_order_cells);
 
-    // For the format we write here, we need to write all node values relating
-    // to one variable at a time. We could in principle do this by looping
-    // over all patches and extracting the values corresponding to the one
-    // variable we're dealing with right now, and then start the process over
-    // for the next variable with another loop over all patches.
-    //
-    // An easier way is to create a global table that for each variable
-    // lists all values. This copying of data vectors can be done in the
-    // background while we're already working on vertices and cells,
-    // so do this on a separate task and when wanting to write out the
-    // data, we wait for that task to finish.
-    Threads::Task<std::unique_ptr<Table<2, float>>>
-      create_global_data_table_task = Threads::new_task([&patches]() {
-        return create_global_data_table<dim, spacedim, float>(patches);
-      });
-
-    out << "<Piece NumberOfPoints=\"" << n_nodes << "\" NumberOfCells=\""
-        << n_cells << "\" >\n";
-
-    //-----------------------------
+    // -----------------
+    // In the following, let us first set up a number of lambda functions that
+    // will be used in building the different parts of the VTU file. We will
+    // later call them in turn on different tasks.
     // first make up a list of used vertices along with their coordinates
     const auto stringize_vertex_information = [&patches,
                                                &flags,
@@ -6135,7 +6119,7 @@ namespace DataOutBase
 
       return o.str();
     };
-    out << stringize_vertex_information();
+
 
     //-------------------------------
     // Now for the cells. The first part of this is how vertices
@@ -6395,7 +6379,6 @@ namespace DataOutBase
 
       return o.str();
     };
-    out << stringize_cell_to_vertex_information();
 
 
     //-------------------------------
@@ -6479,14 +6462,223 @@ namespace DataOutBase
 
         return o.str();
       };
-    out << stringize_cell_offset_and_type_information();
 
 
     //-------------------------------------
     // data output.
 
-    // now write the data vectors to @p{out} first make sure that all data is in
-    // place
+    const auto stringize_nonscalar_data_range =
+      [&flags,
+       &data_names,
+       ascii_or_binary,
+       n_data_sets,
+       n_nodes,
+       output_precision = out.precision()](const Table<2, float> &data_vectors,
+                                           const auto &           range) {
+        std::ostringstream o;
+
+        const auto  first_component = std::get<0>(range);
+        const auto  last_component  = std::get<1>(range);
+        const auto &name            = std::get<2>(range);
+        const bool  is_tensor =
+          (std::get<3>(range) ==
+           DataComponentInterpretation::component_is_part_of_tensor);
+        const unsigned int n_components = (is_tensor ? 9 : 3);
+        AssertThrow(last_component >= first_component,
+                    ExcLowerRange(last_component, first_component));
+        AssertThrow(last_component < n_data_sets,
+                    ExcIndexRange(last_component, 0, n_data_sets));
+        if (is_tensor)
+          {
+            AssertThrow((last_component + 1 - first_component <= 9),
+                        ExcMessage(
+                          "Can't declare a tensor with more than 9 components "
+                          "in VTK/VTU format."));
+          }
+        else
+          {
+            AssertThrow((last_component + 1 - first_component <= 3),
+                        ExcMessage(
+                          "Can't declare a vector with more than 3 components "
+                          "in VTK/VTU format."));
+          }
+
+        // write the header. concatenate all the component names with double
+        // underscores unless a vector name has been specified
+        o << "    <DataArray type=\"Float32\" Name=\"";
+
+        if (!name.empty())
+          o << name;
+        else
+          {
+            for (unsigned int i = first_component; i < last_component; ++i)
+              o << data_names[i] << "__";
+            o << data_names[last_component];
+          }
+
+        o << "\" NumberOfComponents=\"" << n_components << "\" format=\""
+          << ascii_or_binary << "\"";
+        // If present, also list the physical units for this quantity. Look
+        // this up for either the name of the whole vector/tensor, or if that
+        // isn't listed, via its first component.
+        if (!name.empty())
+          {
+            if (flags.physical_units.find(name) != flags.physical_units.end())
+              o << " units=\"" << flags.physical_units.at(name) << "\"";
+          }
+        else
+          {
+            if (flags.physical_units.find(data_names[first_component]) !=
+                flags.physical_units.end())
+              o << " units=\""
+                << flags.physical_units.at(data_names[first_component]) << "\"";
+          }
+        o << ">\n";
+
+        // now write data. pad all vectors to have three components
+        std::vector<float> data;
+        data.reserve(n_nodes * n_components);
+
+        for (unsigned int n = 0; n < n_nodes; ++n)
+          {
+            if (!is_tensor)
+              {
+                switch (last_component - first_component)
+                  {
+                    case 0:
+                      data.push_back(data_vectors(first_component, n));
+                      data.push_back(0);
+                      data.push_back(0);
+                      break;
+
+                    case 1:
+                      data.push_back(data_vectors(first_component, n));
+                      data.push_back(data_vectors(first_component + 1, n));
+                      data.push_back(0);
+                      break;
+
+                    case 2:
+                      data.push_back(data_vectors(first_component, n));
+                      data.push_back(data_vectors(first_component + 1, n));
+                      data.push_back(data_vectors(first_component + 2, n));
+                      break;
+
+                    default:
+                      // Anything else is not yet implemented
+                      Assert(false, ExcInternalError());
+                  }
+              }
+            else
+              {
+                Tensor<2, 3> vtk_data;
+                vtk_data = 0.;
+
+                const unsigned int size = last_component - first_component + 1;
+                if (size == 1)
+                  // 1D, 1 element
+                  {
+                    vtk_data[0][0] = data_vectors(first_component, n);
+                  }
+                else if (size == 4)
+                  // 2D, 4 elements
+                  {
+                    for (unsigned int c = 0; c < size; ++c)
+                      {
+                        const auto ind =
+                          Tensor<2, 2>::unrolled_to_component_indices(c);
+                        vtk_data[ind[0]][ind[1]] =
+                          data_vectors(first_component + c, n);
+                      }
+                  }
+                else if (size == 9)
+                  // 3D 9 elements
+                  {
+                    for (unsigned int c = 0; c < size; ++c)
+                      {
+                        const auto ind =
+                          Tensor<2, 3>::unrolled_to_component_indices(c);
+                        vtk_data[ind[0]][ind[1]] =
+                          data_vectors(first_component + c, n);
+                      }
+                  }
+                else
+                  {
+                    Assert(false, ExcInternalError());
+                  }
+
+                // now put the tensor into data
+                // note we padd with zeros because VTK format always wants to
+                // see a 3x3 tensor, regardless of dimension
+                for (unsigned int i = 0; i < 3; ++i)
+                  for (unsigned int j = 0; j < 3; ++j)
+                    data.push_back(vtk_data[i][j]);
+              }
+          } // loop over nodes
+
+        o << vtu_stringize_array(data,
+                                 flags.compression_level,
+                                 output_precision);
+        o << '\n';
+        o << "    </DataArray>\n";
+
+        return o.str();
+      };
+
+    const auto stringize_scalar_data_set =
+      [&flags,
+       &data_names,
+       ascii_or_binary,
+       output_precision = out.precision()](const Table<2, float> &data_vectors,
+                                           const unsigned int     data_set) {
+        std::ostringstream o;
+
+        o << "    <DataArray type=\"Float32\" Name=\"" << data_names[data_set]
+          << "\" format=\"" << ascii_or_binary << "\"";
+        // If present, also list the physical units for this quantity.
+        if (flags.physical_units.find(data_names[data_set]) !=
+            flags.physical_units.end())
+          o << " units=\"" << flags.physical_units.at(data_names[data_set])
+            << "\"";
+
+        o << ">\n";
+
+        const std::vector<float> data(data_vectors[data_set].begin(),
+                                      data_vectors[data_set].end());
+        o << vtu_stringize_array(data,
+                                 flags.compression_level,
+                                 output_precision);
+        o << '\n';
+        o << "    </DataArray>\n";
+
+        return o.str();
+      };
+
+
+    // For the format we write here, we need to write all node values relating
+    // to one variable at a time. We could in principle do this by looping
+    // over all patches and extracting the values corresponding to the one
+    // variable we're dealing with right now, and then start the process over
+    // for the next variable with another loop over all patches.
+    //
+    // An easier way is to create a global table that for each variable
+    // lists all values. This copying of data vectors can be done in the
+    // background while we're already working on vertices and cells,
+    // so do this on a separate task and when wanting to write out the
+    // data, we wait for that task to finish.
+    Threads::Task<std::unique_ptr<Table<2, float>>>
+      create_global_data_table_task = Threads::new_task([&patches]() {
+        return create_global_data_table<dim, spacedim, float>(patches);
+      });
+
+    out << "<Piece NumberOfPoints=\"" << n_nodes << "\" NumberOfCells=\""
+        << n_cells << "\" >\n";
+
+    //-----------------------------
+    out << stringize_vertex_information();
+    out << stringize_cell_to_vertex_information();
+    out << stringize_cell_offset_and_type_information();
+
+    // For what follows, we have to have the reordered data available:
     const Table<2, float> data_vectors =
       std::move(*create_global_data_table_task.return_value());
 
@@ -6494,190 +6686,6 @@ namespace DataOutBase
     // data, which we do not support explicitly here). all following data sets
     // are point data
     out << "  <PointData Scalars=\"scalars\">\n";
-
-    const auto stringize_nonscalar_data_range = [&flags,
-                                                 &data_names,
-                                                 &data_vectors,
-                                                 ascii_or_binary,
-                                                 n_data_sets,
-                                                 n_nodes,
-                                                 output_precision =
-                                                   out.precision()](
-                                                  const auto &range) {
-      std::ostringstream o;
-
-      const auto  first_component = std::get<0>(range);
-      const auto  last_component  = std::get<1>(range);
-      const auto &name            = std::get<2>(range);
-      const bool  is_tensor =
-        (std::get<3>(range) ==
-         DataComponentInterpretation::component_is_part_of_tensor);
-      const unsigned int n_components = (is_tensor ? 9 : 3);
-      AssertThrow(last_component >= first_component,
-                  ExcLowerRange(last_component, first_component));
-      AssertThrow(last_component < n_data_sets,
-                  ExcIndexRange(last_component, 0, n_data_sets));
-      if (is_tensor)
-        {
-          AssertThrow((last_component + 1 - first_component <= 9),
-                      ExcMessage(
-                        "Can't declare a tensor with more than 9 components "
-                        "in VTK/VTU format."));
-        }
-      else
-        {
-          AssertThrow((last_component + 1 - first_component <= 3),
-                      ExcMessage(
-                        "Can't declare a vector with more than 3 components "
-                        "in VTK/VTU format."));
-        }
-
-      // write the header. concatenate all the component names with double
-      // underscores unless a vector name has been specified
-      o << "    <DataArray type=\"Float32\" Name=\"";
-
-      if (!name.empty())
-        o << name;
-      else
-        {
-          for (unsigned int i = first_component; i < last_component; ++i)
-            o << data_names[i] << "__";
-          o << data_names[last_component];
-        }
-
-      o << "\" NumberOfComponents=\"" << n_components << "\" format=\""
-        << ascii_or_binary << "\"";
-      // If present, also list the physical units for this quantity. Look
-      // this up for either the name of the whole vector/tensor, or if that
-      // isn't listed, via its first component.
-      if (!name.empty())
-        {
-          if (flags.physical_units.find(name) != flags.physical_units.end())
-            o << " units=\"" << flags.physical_units.at(name) << "\"";
-        }
-      else
-        {
-          if (flags.physical_units.find(data_names[first_component]) !=
-              flags.physical_units.end())
-            o << " units=\""
-              << flags.physical_units.at(data_names[first_component]) << "\"";
-        }
-      o << ">\n";
-
-      // now write data. pad all vectors to have three components
-      std::vector<float> data;
-      data.reserve(n_nodes * n_components);
-
-      for (unsigned int n = 0; n < n_nodes; ++n)
-        {
-          if (!is_tensor)
-            {
-              switch (last_component - first_component)
-                {
-                  case 0:
-                    data.push_back(data_vectors(first_component, n));
-                    data.push_back(0);
-                    data.push_back(0);
-                    break;
-
-                  case 1:
-                    data.push_back(data_vectors(first_component, n));
-                    data.push_back(data_vectors(first_component + 1, n));
-                    data.push_back(0);
-                    break;
-
-                  case 2:
-                    data.push_back(data_vectors(first_component, n));
-                    data.push_back(data_vectors(first_component + 1, n));
-                    data.push_back(data_vectors(first_component + 2, n));
-                    break;
-
-                  default:
-                    // Anything else is not yet implemented
-                    Assert(false, ExcInternalError());
-                }
-            }
-          else
-            {
-              Tensor<2, 3> vtk_data;
-              vtk_data = 0.;
-
-              const unsigned int size = last_component - first_component + 1;
-              if (size == 1)
-                // 1D, 1 element
-                {
-                  vtk_data[0][0] = data_vectors(first_component, n);
-                }
-              else if (size == 4)
-                // 2D, 4 elements
-                {
-                  for (unsigned int c = 0; c < size; ++c)
-                    {
-                      const auto ind =
-                        Tensor<2, 2>::unrolled_to_component_indices(c);
-                      vtk_data[ind[0]][ind[1]] =
-                        data_vectors(first_component + c, n);
-                    }
-                }
-              else if (size == 9)
-                // 3D 9 elements
-                {
-                  for (unsigned int c = 0; c < size; ++c)
-                    {
-                      const auto ind =
-                        Tensor<2, 3>::unrolled_to_component_indices(c);
-                      vtk_data[ind[0]][ind[1]] =
-                        data_vectors(first_component + c, n);
-                    }
-                }
-              else
-                {
-                  Assert(false, ExcInternalError());
-                }
-
-              // now put the tensor into data
-              // note we padd with zeros because VTK format always wants to
-              // see a 3x3 tensor, regardless of dimension
-              for (unsigned int i = 0; i < 3; ++i)
-                for (unsigned int j = 0; j < 3; ++j)
-                  data.push_back(vtk_data[i][j]);
-            }
-        } // loop over nodes
-
-      o << vtu_stringize_array(data, flags.compression_level, output_precision);
-      o << '\n';
-      o << "    </DataArray>\n";
-
-      return o.str();
-    };
-
-    const auto stringize_scalar_data_set = [&flags,
-                                            &data_names,
-                                            &data_vectors,
-                                            ascii_or_binary,
-                                            output_precision = out.precision()](
-                                             const unsigned int data_set) {
-      std::ostringstream o;
-
-      o << "    <DataArray type=\"Float32\" Name=\"" << data_names[data_set]
-        << "\" format=\"" << ascii_or_binary << "\"";
-      // If present, also list the physical units for this quantity.
-      if (flags.physical_units.find(data_names[data_set]) !=
-          flags.physical_units.end())
-        o << " units=\"" << flags.physical_units.at(data_names[data_set])
-          << "\"";
-
-      o << ">\n";
-
-      const std::vector<float> data(data_vectors[data_set].begin(),
-                                    data_vectors[data_set].end());
-      o << vtu_stringize_array(data, flags.compression_level, output_precision);
-      o << '\n';
-      o << "    </DataArray>\n";
-
-      return o.str();
-    };
-
 
     // When writing, first write out all vector and tensor data
     std::vector<bool> data_set_handled(n_data_sets, false);
@@ -6689,14 +6697,14 @@ namespace DataOutBase
         for (unsigned int i = first_component; i <= last_component; ++i)
           data_set_handled[i] = true;
 
-        out << stringize_nonscalar_data_range(range);
+        out << stringize_nonscalar_data_range(data_vectors, range);
       }
 
     // Now do the left over scalar data sets
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
       if (data_set_handled[data_set] == false)
         {
-          out << stringize_scalar_data_set(data_set);
+          out << stringize_scalar_data_set(data_vectors, data_set);
         }
 
     out << "  </PointData>\n";
