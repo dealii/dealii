@@ -21,17 +21,9 @@ set(DEAL_II_WITH_KOKKOS ON # Always true. We need it :-]
   CACHE BOOL "Build deal.II with support for Kokkos." FORCE
   )
 
-macro(feature_kokkos_configure_bundled)
-  set(KOKKOS_BUNDLED_INCLUDE_DIRS
-    ${KOKKOS_FOLDER}/algorithms/src
-    ${KOKKOS_FOLDER}/containers/src
-    ${KOKKOS_FOLDER}/core/src
-    ${KOKKOS_FOLDER}/simd/src
-    ${KOKKOS_FOLDER}/tpls/desul/include
-    )
-endmacro()
 
 configure_feature(KOKKOS)
+
 
 #
 # DEAL_II_WITH_KOKKOS is always required.
@@ -46,3 +38,4 @@ if(NOT DEAL_II_WITH_KOKKOS)
       )
   endif()
 endif()
+

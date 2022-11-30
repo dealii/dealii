@@ -29,12 +29,12 @@ include_directories(
 )
 
 deal_ii_add_library(obj_muparser OBJECT
-src/muParserBase.cpp
-src/muParserBytecode.cpp
-src/muParserCallback.cpp
-src/muParser.cpp
-src/muParserError.cpp
-src/muParserInt.cpp
-src/muParserTest.cpp
-src/muParserTokenReader.cpp
+  src/muParserBase.cpp
+  src/muParserBytecode.cpp
+  src/muParserCallback.cpp
+  src/muParser.cpp
+  src/muParserError.cpp
+  src/muParserInt.cpp
+  src/muParserTest.cpp
+  src/muParserTokenReader.cpp
   )

@@ -281,8 +281,6 @@
 # ..................................................
 #
 
-include_directories(${UMFPACK_BUNDLED_INCLUDE_DIRS})
-
 #
 # *Shush!*
 # (Remove locally in this subdirectory)

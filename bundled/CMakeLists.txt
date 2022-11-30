@@ -19,15 +19,19 @@
 
 message(STATUS "Setting up bundled features")
 
+include_directories(
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
+  )
 
 if(FEATURE_BOOST_BUNDLED_CONFIGURED)
+  add_subdirectory(${BOOST_FOLDER}/libs/serialization/src)
+  add_subdirectory(${BOOST_FOLDER}/libs/system/src)
+
   install(DIRECTORY ${BOOST_FOLDER}/include/boost
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     )
-
-  add_subdirectory(${BOOST_FOLDER}/libs/serialization/src)
-  add_subdirectory(${BOOST_FOLDER}/libs/system/src)
 
   if(DEAL_II_WITH_ZLIB)
     add_subdirectory(${BOOST_FOLDER}/libs/iostreams/src)
@@ -56,13 +60,13 @@ endif()
 
 
 if(FEATURE_TBB_BUNDLED_CONFIGURED)
+  add_subdirectory(${TBB_FOLDER}/src)
+
   install(DIRECTORY ${TBB_FOLDER}/include/tbb
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     FILES_MATCHING PATTERN "*.h"
     )
-
-  add_subdirectory(${TBB_FOLDER}/src)
 endif()
 
 
@@ -83,7 +87,6 @@ endif()
 if(FEATURE_MUPARSER_BUNDLED_CONFIGURED)
   add_subdirectory(${MUPARSER_FOLDER})
 endif()
-
 
 
 message(STATUS "Setting up bundled features - Done")

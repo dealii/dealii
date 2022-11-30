@@ -19,12 +19,6 @@
 
 set(FEATURE_UMFPACK_DEPENDS LAPACK)
 
-macro(feature_umfpack_configure_bundled)
-  set(UMFPACK_BUNDLED_INCLUDE_DIRS
-    ${UMFPACK_FOLDER}/UMFPACK/Include
-    ${UMFPACK_FOLDER}/AMD/Include
-    )
-endmacro()
 
 macro(feature_umfpack_error_message)
   message(FATAL_ERROR "\n"
@@ -42,5 +36,6 @@ macro(feature_umfpack_error_message)
     "(BLAS and LAPACK have to be installed for bundled UMFPACK to be available)\n\n"
     )
 endmacro()
+
 
 configure_feature(UMFPACK)

@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(${UMFPACK_BUNDLED_INCLUDE_DIRS})
-
 strip_flag(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
 
 set(src_amd

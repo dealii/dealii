@@ -32,116 +32,6 @@ set(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
   )
 
 
-macro(feature_boost_configure_common)
-  # Some standard library implementations do not implement std::auto_ptr
-  # (anymore) which was deprecated for C++11 and removed in the C++17 standard.
-  # Older boost versions can't know about this but provide a possibility to
-  # circumvent the issue. Hence, we just check ourselves.
-  if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    add_flags(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
-  else()
-    add_flags(CMAKE_REQUIRED_FLAGS "-Werror")
-  endif()
-  # The configure function is called only once. In case an externally provided
-  # boost library is detected, BOOST_INCLUDE_DIRS contains the include paths to
-  # be used and BOOST_BUNDLED_INCLUDE_DIRS is empty. For the bundled library, it
-  # is the other way around.
-  list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
-
-  # In case, the boost library already sets BOOST_NO_AUTO_PTR we report
-  # DEAL_II_HAS_AUTO_PTR to be true to avoid redefining the macro.
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <memory>
-    #include <boost/config.hpp>
-
-    int main()
-    {
-    #ifndef BOOST_NO_AUTO_PTR
-      int *i = new int;
-      std::auto_ptr<int> x(i);
-    #endif
-      return 0;
-    }
-    "
-    DEAL_II_HAS_AUTO_PTR)
-
-  reset_cmake_required()
-
-  # Fix some problems by defining some additional preprocessor symbols.
-  # Ultimately these are added into DEAL_II_DEFINITIONS. They are separate
-  # here so that they show up in detailed.log under DEAL_II_WITH_BOOST as,
-  # logically, they are part of our boost configuration.
-  if(NOT DEAL_II_HAS_AUTO_PTR)
-    list(APPEND BOOST_DEFINITIONS "BOOST_NO_AUTO_PTR")
-  endif()
-
-  enable_if_supported(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
-
-  # At least BOOST 1.74 has the problem that some of the BOOST headers
-  # include other BOOST headers that are deprecated, and this then leads to
-  # warnings. That's rather annoying.
-
-  # The configure function is called only once. In case an externally provided
-  # boost library is detected, BOOST_INCLUDE_DIRS contains the include paths to
-  # be used and BOOST_BUNDLED_INCLUDE_DIRS is empty. For the bundled library, it
-  # is the other way around.
-  list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS})
-
-  check_cxx_compiler_bug(
-    "
-    #define BOOST_CONFIG_HEADER_DEPRECATED_HPP_INCLUDED
-    #define BOOST_HEADER_DEPRECATED(a) _Pragma(\"GCC error \\\"stop compilation\\\"\");
-    #include <boost/geometry/index/rtree.hpp>
-    int main() { return 0; }
-    "
-    DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS)
-  reset_cmake_required()
-endmacro()
-
-
-macro(feature_boost_configure_bundled)
-  #
-  # Add rt to the link interface as well, boost/chrono needs it.
-  #
-  if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
-    find_system_library(rt_LIBRARY NAMES rt)
-    mark_as_advanced(rt_LIBRARY)
-    if(NOT rt_LIBRARY MATCHES "-NOTFOUND")
-      set(BOOST_LIBRARIES ${rt_LIBRARY})
-    endif()
-  endif()
-
-  # We need to set this path before calling the configure function
-  # to be able to use the include paths in the checks.
-  set(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
-  #
-  # We still need the version information, which is set up in the FindBoost
-  # module in the non-bundled case:
-  #
-  file(STRINGS "${BOOST_BUNDLED_INCLUDE_DIRS}/boost/version.hpp"
-    BOOST_VERSION_STRING
-    REGEX "#define.*BOOST_VERSION")
-
-  string(REGEX REPLACE "^.*BOOST_VERSION.* ([0-9]+).*" "\\1"
-    BOOST_VERSION_NUMBER "${BOOST_VERSION_STRING}"
-    )
-  math(EXPR Boost_MAJOR_VERSION "${BOOST_VERSION_NUMBER} / 100000")
-  math(EXPR Boost_MINOR_VERSION "${BOOST_VERSION_NUMBER} / 100 % 1000")
-  math(EXPR Boost_SUBMINOR_VERSION "${BOOST_VERSION_NUMBER} % 100")
-
-  FEATURE_BOOST_CONFIGURE_COMMON()
-
-  if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    #
-    # Bundled boost tries to (dl)open itself as a dynamic library on
-    # Windows. Disable this undesired behavior by exporting
-    # BOOST_ALL_NO_LIB on Windows platforms (for bundled boost).
-    #
-    list(APPEND BOOST_DEFINITIONS "BOOST_ALL_NO_LIB")
-  endif()
-endmacro()
-
 macro(feature_boost_find_external var)
   find_package(DEAL_II_BOOST)
 
@@ -256,7 +146,24 @@ endmacro()
 
 
 macro(feature_boost_configure_external)
-  FEATURE_BOOST_CONFIGURE_COMMON()
+  enable_if_supported(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
+
+  #
+  # At least BOOST 1.74 has the problem that some of the BOOST headers
+  # include other BOOST headers that are deprecated, and this then leads to
+  # warnings. That's rather annoying.
+  #
+  list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
+
+  check_cxx_compiler_bug(
+    "
+    #define BOOST_CONFIG_HEADER_DEPRECATED_HPP_INCLUDED
+    #define BOOST_HEADER_DEPRECATED(a) _Pragma(\"GCC error \\\"stop compilation\\\"\");
+    #include <boost/geometry/index/rtree.hpp>
+    int main() { return 0; }
+    "
+    DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS)
+  reset_cmake_required()
 endmacro()
 
 
