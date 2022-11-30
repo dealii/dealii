@@ -1667,6 +1667,30 @@ namespace Threads
       return tasks.size();
     }
 
+    /**
+     * Return a vector of objects that contain the return values of
+     * the tasks contained in this group. This function can obviously
+     * only return once all tasks are completed.
+     *
+     * The returned vector contains the returned values of tasks in
+     * the same order in which these tasks were added to the task
+     * group.
+     *
+     * @note This function only makes sense if `RT` is an actual data
+     *   type, rather than `void`. If the TaskGroup stores tasks that have
+     *   no return value, then you should simply call `join_all()`, which
+     *   also waits for all tasks to finish.
+     */
+    std::vector<RT>
+    return_values()
+    {
+      std::vector<RT> results;
+      results.reserve(size());
+      for (auto &t : tasks)
+        results.emplace_back(std::move(t.return_value()));
+      return results;
+    }
+
 
     /**
      * Wait for all tasks in the collection to finish. It is not a problem if
