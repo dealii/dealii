@@ -1474,7 +1474,7 @@ namespace LinearAlgebra
           begin(::dealii::MemorySpace::
                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
         {
-          return data.values.get();
+          return data.values.data();
         }
 
         static inline
@@ -1482,14 +1482,14 @@ namespace LinearAlgebra
           begin(const ::dealii::MemorySpace::
                   MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
         {
-          return data.values.get();
+          return data.values.data();
         }
 
         static inline Number *
         get_values(::dealii::MemorySpace::
                      MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
         {
-          return data.values.get();
+          return data.values.data();
         }
       };
 
@@ -1503,7 +1503,7 @@ namespace LinearAlgebra
           begin(::dealii::MemorySpace::
                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
         {
-          return data.values_dev.get();
+          return data.values_dev.data();
         }
 
         static inline
@@ -1511,14 +1511,14 @@ namespace LinearAlgebra
           begin(const ::dealii::MemorySpace::
                   MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
         {
-          return data.values_dev.get();
+          return data.values_dev.data();
         }
 
         static inline Number *
         get_values(::dealii::MemorySpace::
                      MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
         {
-          return data.values_dev.get();
+          return data.values_dev.data();
         }
       };
     } // namespace internal
