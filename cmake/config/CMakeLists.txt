@@ -65,54 +65,20 @@ install(FILES ${_macros}
 ########################################################################
 
 #
-# Strip -Wno-deprecated-declarations from DEAL_II_CXX_FLAGS so that
-# deprecation warnings are actually shown for user code:
-#
-
-strip_flag(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
-
-#
-# Strip -Wsuggest-override. Enabling this warning is a stylistic choice
-# that might create a substantial amount of warnings in user codebases.
-# Let's be nice and disable the flag for now.
-#
-
-strip_flag(DEAL_II_CXX_FLAGS "-Wsuggest-override")
-
-#
 # Populate a bunch of CONFIG_* variables with useful information:
 #
 
 foreach(_build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${_build} _build_lowercase)
 
-  if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
-    set(_keyword "general")
-  else()
+  set(_keyword)
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
     if(_build MATCHES DEBUG)
       set(_keyword "debug")
     else()
       set(_keyword "optimized")
     endif()
   endif()
-
-  #
-  # Build up library name depending on link type and platform:
-  #
-
-  if(BUILD_SHARED_LIBS)
-    set(_type "SHARED")
-  else()
-    set(_type "STATIC")
-  endif()
-
-  set(_name "${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}")
-  set(CONFIG_LIBRARIES_${_build}
-    "\${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}/${_name}"
-    ${DEAL_II_LIBRARIES_${_build}}
-    ${DEAL_II_LIBRARIES}
-    )
-  list(APPEND CONFIG_LIBRARIES ${_keyword} \${DEAL_II_LIBRARIES_${_build}})
 
   set(CONFIG_TARGET_${_build} ${DEAL_II_NAMESPACE}::${DEAL_II_NAMESPACE}_${_build_lowercase})
   list(APPEND CONFIG_TARGET ${_keyword} \${DEAL_II_TARGET_${_build}})
@@ -123,12 +89,6 @@ endforeach()
 #
 
 set(CONFIG_BUILD_DIR TRUE)
-set(CONFIG_INCLUDE_DIRS
-  \${DEAL_II_PATH}/include
-  ${CMAKE_SOURCE_DIR}/include/
-  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_INCLUDE_DIRS}
-  )
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
@@ -145,22 +105,7 @@ configure_file(
 # For installation:
 #
 
-# Make sure that we only ever record the bundled subdirectory if it is in
-# fact created:
-if("${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
-  set(_installed_bundled "")
-else()
-  set(_installed_bundled
-    "\${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled"
-    )
-endif()
-
 set(CONFIG_BUILD_DIR FALSE)
-set(CONFIG_INCLUDE_DIRS
-  \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
-  ${_installed_bundled}
-  ${DEAL_II_INCLUDE_DIRS}
-  )
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
