@@ -36,19 +36,32 @@ jobs:
         libraries: container iostreams python serialization system thread
         platform: x64
         configuration: Release
-    - name: configure
+    - name: configure deal.II
       run: |
-        cmake -D BOOST_DIR=/home/runner/work/dealii/boost -D BOOST_INCLUDEDIR=/home/runner/work/dealii/boost -D BOOST_LIBRARYDIR=/home/runner/work/dealii/boost/stage/x64/Release/lib -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_COMPILER=g++-10 -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' -D DEAL_II_EARLY_DEPRECATIONS=ON -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON .
-    - name: archive
+        mkdir build
+        cd build
+        cmake -D BOOST_DIR=/home/runner/work/dealii/boost \
+              -D BOOST_INCLUDEDIR=/home/runner/work/dealii/boost \
+              -D BOOST_LIBRARYDIR=/home/runner/work/dealii/boost/stage/x64/Release/lib \
+              -D CMAKE_BUILD_TYPE=Release \
+              -D CMAKE_CXX_COMPILER=g++-10 \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON \
+              ..
+    - name: archive detailed.log
       uses: actions/upload-artifact@v3
       with:
         name: linux-serial-detailed.log
-        path: detailed.log
+        path: build/detailed.log
     - name: build
       run: |
+        cd build
         make -j 2
     - name: quicktest
-      run: make test
+      run: |
+        cd build
+        make test
 
   linux-debug-parallel-simplex:
     # simple parallel debug build using g++ with simplex configuration enabled
@@ -76,7 +89,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - name: configure
+    - name: configure deal.II
       run: |
         mkdir build
         cd build
@@ -91,7 +104,7 @@ jobs:
               -D DEAL_II_WITH_HDF5="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               ..
-    - name: archive
+    - name: archive detailed.log
       uses: actions/upload-artifact@v3
       with:
         name: linux-simplex-detailed.log
@@ -106,7 +119,7 @@ jobs:
         # messaging module was unable to find any relevant network
         # interfaces."
         export OMPI_MCA_btl_base_warn_component_unused='0'
-        
+
         cd build
         make -j 2 setup_tests_simplex
         ctest --output-on-failure -j 2
@@ -156,7 +169,7 @@ jobs:
         repository: kokkos/kokkos
         ref: 3.7.00
         path: kokkos
-    - name: install kokkos
+    - name: compile and install kokkos
       working-directory: kokkos
       run: |
         mkdir build
@@ -169,8 +182,10 @@ jobs:
               -D Kokkos_ARCH_VOLTA70=ON \
               ..
         make install
-    - name: configure
+    - name: configure deal.II
       run: |
+        mkdir build
+        cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D CMAKE_CXX_COMPILER=${GITHUB_WORKSPACE}/kokkos/bin/nvcc_wrapper \
               -D DEAL_II_CXX_FLAGS='-Werror -Wno-non-template-friend' \
@@ -181,17 +196,19 @@ jobs:
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
-              .
-    - name: archive
+              ..
+    - name: archive detailed.log
       uses: actions/upload-artifact@v3
       with:
         name: linux-cuda-detailed.log
-        path: detailed.log
+        path: build/detailed.log
     - name: build deal.II
       run: |
+        cd build
         make -j 2
     - name: build CUDA tests
       run: |
+        cd build
         make -j 2 setup_tests_cuda
         cd tests/cuda
         make -j2 compile_test_executables
@@ -242,9 +259,11 @@ jobs:
         source /opt/intel/oneapi/setvars.sh
         mpiicpc -v
         cmake --version
-    - name: configure
+    - name: configure deal.II
       run: |
         source /opt/intel/oneapi/setvars.sh
+        mkdir build
+        cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D CMAKE_CXX_COMPILER=icpc \
               -D DEAL_II_CXX_FLAGS='-Werror' \
@@ -256,17 +275,19 @@ jobs:
               -D BLAS_DIR=${MKLROOT} \
               -D LAPACK_DIR=${MKLROOT} \
               -D TBB_DIR=${TBBROOT} \
-              .
-    - name: archive
+              ..
+    - name: archive detailed.log
       uses: actions/upload-artifact@v3
       with:
         name: linux-intel-detailed.log
-        path: detailed.log
+        path: build/detailed.log
     - name: build
       run: |
         source /opt/intel/oneapi/setvars.sh
+        cd build
         make -j 2
     - name: quicktest
       run: |
         source /opt/intel/oneapi/setvars.sh
+        cd build
         make test
