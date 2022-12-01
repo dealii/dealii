@@ -605,7 +605,8 @@ namespace CGALWrappers
   std::array<Point<spacedim>, n_vertices>
   get_vertices_in_cgal_order(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
-    const Mapping<dim, spacedim> &                                      mapping)
+    const Mapping<dim, spacedim> &                                      mapping,
+    const double tolerance = std::numeric_limits<double>::min())
   {
     // Elements have to be rectangular or simplices
     Assert(n_vertices == std::pow(2, dim) || n_vertices == dim + 1,
@@ -621,6 +622,10 @@ namespace CGALWrappers
     if (ReferenceCell::n_vertices_to_type(dim, n_vertices) ==
         ReferenceCells::Quadrilateral)
       std::swap(vertices[2], vertices[3]);
+
+    if (tolerance > std::numeric_limits<double>::min())
+      for (auto &v : vertices)
+        Utilities::round(v, -std::log10(tolerance));
 
     return vertices;
   }

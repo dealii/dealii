@@ -404,7 +404,7 @@ namespace CGALWrappers
   compute_intersection_of_cells<2, 2, 2, 4, 4>(
     const std::array<Point<2>, 4> &vertices0,
     const std::array<Point<2>, 4> &vertices1,
-    const double                   tol)
+    const double                   discard_tolerance)
   {
     const auto intersection_test =
       internal::compute_intersection(vertices0, vertices1);
@@ -438,7 +438,7 @@ namespace CGALWrappers
             for (const Face_handle f : cdt.finite_face_handles())
               {
                 if (f->info().in_domain() &&
-                    CGAL::to_double(cdt.triangle(f).area()) > tol)
+                    CGAL::to_double(cdt.triangle(f).area()) > discard_tolerance)
                   {
                     collection.push_back(
                       {{CGALWrappers::cgal_point_to_dealii_point<2>(
@@ -471,7 +471,7 @@ namespace CGALWrappers
   compute_intersection_of_cells<2, 1, 2, 4, 2>(
     const std::array<Point<2>, 4> &vertices0,
     const std::array<Point<2>, 2> &vertices1,
-    const double                   tol)
+    const double                   discard_tolerance)
   {
     std::array<CGALPoint2, 4> pts;
     std::transform(
@@ -491,7 +491,7 @@ namespace CGALWrappers
     for (Face_handle f : cdt.finite_face_handles())
       {
         if (f->info().in_domain() &&
-            CGAL::to_double(cdt.triangle(f).area()) > tol &&
+            CGAL::to_double(cdt.triangle(f).area()) > discard_tolerance &&
             CGAL::do_intersect(segm, cdt.triangle(f)))
           {
             const auto intersection = CGAL::intersection(segm, cdt.triangle(f));
@@ -513,7 +513,7 @@ namespace CGALWrappers
   compute_intersection_of_cells<3, 1, 3, 8, 2>(
     const std::array<Point<3>, 8> &vertices0,
     const std::array<Point<3>, 2> &vertices1,
-    const double                   tol)
+    const double                   discard_tolerance)
   {
 #  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
     std::array<CGALPoint3_exact, 8> pts;
@@ -540,7 +540,7 @@ namespace CGALWrappers
             if (const CGALSegment3_exact *s =
                   boost::get<CGALSegment3_exact>(&*intersection))
               {
-                if (s->squared_length() > tol * tol)
+                if (s->squared_length() > discard_tolerance * discard_tolerance)
                   {
                     vertices.push_back(
                       {{CGALWrappers::cgal_point_to_dealii_point<3>(
@@ -560,7 +560,7 @@ namespace CGALWrappers
         "This function requires a version of CGAL greater or equal than 5.5."));
     (void)vertices0;
     (void)vertices1;
-    (void)tol;
+    (void)discard_tolerance;
     return {};
 #  endif
   }
@@ -570,7 +570,7 @@ namespace CGALWrappers
   compute_intersection_of_cells<3, 2, 3, 8, 4>(
     const std::array<Point<3>, 8> &vertices0,
     const std::array<Point<3>, 4> &vertices1,
-    const double                   tol)
+    const double                   discard_tolerance)
   {
 #  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
     std::array<CGALPoint3_exact, 8> pts_hex;
@@ -614,7 +614,8 @@ namespace CGALWrappers
                 if (const CGALTriangle3_exact *t =
                       boost::get<CGALTriangle3_exact>(&*intersection))
                   {
-                    if (CGAL::to_double(t->squared_area()) > tol * tol)
+                    if (CGAL::to_double(t->squared_area()) >
+                        discard_tolerance * discard_tolerance)
                       {
                         vertices.push_back(
                           {{cgal_point_to_dealii_point<3>((*t)[0]),
@@ -635,7 +636,7 @@ namespace CGALWrappers
                       {
                         const auto triangle = tria_inter.triangle(*it);
                         if (CGAL::to_double(triangle.squared_area()) >
-                            tol * tol)
+                            discard_tolerance * discard_tolerance)
                           {
                             std::array<Point<3>, 3> verts = {
                               {CGALWrappers::cgal_point_to_dealii_point<3>(
@@ -661,7 +662,7 @@ namespace CGALWrappers
         "This function requires a version of CGAL greater or equal than 5.5."));
     (void)vertices0;
     (void)vertices1;
-    (void)tol;
+    (void)discard_tolerance;
     return {};
 #  endif
   }
@@ -673,8 +674,7 @@ namespace CGALWrappers
   compute_intersection_of_cells<3, 3, 3, 8, 8>(
     const std::array<Point<3>, 8> &vertices0,
     const std::array<Point<3>, 8> &vertices1,
-
-    const double tol)
+    const double                   discard_tolerance)
   {
     std::array<CGALPoint3_inexact, 8> pts_hex0;
     std::array<CGALPoint3_inexact, 8> pts_hex1;
@@ -724,7 +724,7 @@ namespace CGALWrappers
             namespace PMP = CGAL::Polygon_mesh_processing;
             const bool test_intersection =
               PMP::corefine_and_compute_intersection(surf0, surf1, sm);
-            if (PMP::volume(sm) > tol && test_intersection)
+            if (PMP::volume(sm) > discard_tolerance && test_intersection)
               {
                 // Collect tetrahedrons
                 Triangulation3_inexact tria;
@@ -760,7 +760,8 @@ namespace CGALWrappers
     const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
     const Mapping<dim0, spacedim> &                              mapping0,
     const Mapping<dim1, spacedim> &                              mapping1,
-    const double                                                 tol)
+    const double discard_tolerance,
+    const double vertex_tolerance)
   {
     Assert(mapping0.get_vertices(cell0).size() == std::pow(2, dim0),
            ExcNotImplemented());
@@ -769,18 +770,17 @@ namespace CGALWrappers
 
     const auto vertices0 =
       CGALWrappers::get_vertices_in_cgal_order<Utilities::pow(2, dim0)>(
-        cell0, mapping0);
+        cell0, mapping0, vertex_tolerance);
     const auto vertices1 =
       CGALWrappers::get_vertices_in_cgal_order<Utilities::pow(2, dim1)>(
-        cell1, mapping1);
+        cell1, mapping1, vertex_tolerance);
 
     return compute_intersection_of_cells<dim0,
                                          dim1,
                                          spacedim,
                                          Utilities::pow(2, dim0),
-                                         Utilities::pow(2, dim1)>(vertices0,
-                                                                  vertices1,
-                                                                  tol);
+                                         Utilities::pow(2, dim1)>(
+      vertices0, vertices1, discard_tolerance);
   }
 
 #  include "intersections.inst"
@@ -802,11 +802,11 @@ std::vector<std::array<Point<spacedim>, dim1 + 1>>
 compute_intersection_of_cells(
   const std::array<Point<spacedim>, n_components0> &vertices0,
   const std::array<Point<spacedim>, n_components1> &vertices1,
-  const double                                      tol)
+  const double                                      discard_tolerance)
 {
   (void)vertices0;
   (void)vertices1;
-  (void)tol;
+  (void)discard_tolerance;
   AssertThrow(false, ExcNeedsCGAL());
 }
 
@@ -817,13 +817,15 @@ compute_intersection_of_cells(
   const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
   const Mapping<dim0, spacedim> &                              mapping0,
   const Mapping<dim1, spacedim> &                              mapping1,
-  const double                                                 tol)
+  const double discard_tolerance,
+  const double vertex_tolerance)
 {
   (void)cell0;
   (void)cell1;
   (void)mapping0;
   (void)mapping1;
-  (void)tol;
+  (void)discard_tolerance;
+  (void)vertex_tolerance;
   AssertThrow(false, ExcNeedsCGAL());
 }
 

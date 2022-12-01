@@ -604,6 +604,27 @@ namespace Utilities
   }
 
 
+
+  template <typename Number>
+  Number
+  round(const Number number, const unsigned int n_digits)
+  {
+    const Number eps =
+      0.5 * std::pow(static_cast<Number>(10.0), static_cast<int>(-n_digits));
+    return truncate_to_n_digits(number + eps, n_digits);
+  }
+
+
+  template <int dim, typename Number>
+  void
+  round(Point<dim, Number> &point, const unsigned int n_digits)
+  {
+    for (unsigned int d = 0; d < dim; ++d)
+      point[d] = round(point[d], n_digits);
+  }
+
+
+
   int
   string_to_int(const std::string &s_)
   {
@@ -1093,6 +1114,24 @@ namespace Utilities
   truncate_to_n_digits(const double, const unsigned int);
   template float
   truncate_to_n_digits(const float, const unsigned int);
+
+  template double
+  round(const double, const unsigned int);
+  template float
+  round(const float, const unsigned int);
+
+  template void
+  round(Point<1, double> &, const unsigned int);
+  template void
+  round(Point<2, double> &, const unsigned int);
+  template void
+  round(Point<3, double> &, const unsigned int);
+  template void
+  round(Point<1, float> &, const unsigned int);
+  template void
+  round(Point<2, float> &, const unsigned int);
+  template void
+  round(Point<3, float> &, const unsigned int);
 
   template std::vector<std::array<std::uint64_t, 1>>
   inverse_Hilbert_space_filling_curve<1, double>(

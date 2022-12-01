@@ -46,8 +46,19 @@ namespace CGALWrappers
    * @param cell1 Iterator to the second cell.
    * @param mapping0 Mapping for the first cell.
    * @param mapping1 Mapping for the second cell.
-   * @param tol Treshold to decide whether or not a simplex is included.
+   * @param discard_tolerance Treshold to decide whether or not a found simplex is included.
+   * @param vertex_tolerance Tolerance to find an intersection. 
+   * In some cases intersections should only be found if cells are intersecting up to machine 
+   * precision. This is the default case.
+   * In some cases however, we want to find an intersection with a certain tolerance. This is 
+   * for example the case if we constructed a triangulation from two non-fitting 
+   * triangulations to realize required jumps in element sizes. To find intersections up to a 
+   * certain tolerance we slightly modify the vertex positions before asking CGAL about 
+   * intersections. This is done by enforcing the same floating point representation for 
+   * vertices that are equivalent up to a certain tolerance using @c Utilities::round().
    * @return Vector of arrays, where each array identify a simplex by its vertices.
+   * @note Rounding with vertex_tolerance does not have any effect on the triangulation, it is 
+   * only applied to a copy of vertices handed to CGAL.
    */
   template <int dim0, int dim1, int spacedim>
   std::vector<std::array<Point<spacedim>, dim1 + 1>>
@@ -56,7 +67,8 @@ namespace CGALWrappers
     const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
     const Mapping<dim0, spacedim> &                              mapping0,
     const Mapping<dim1, spacedim> &                              mapping1,
-    const double                                                 tol = 1e-9);
+    const double discard_tolerance = 1e-9,
+    const double vertex_tolerance  = std::numeric_limits<double>::min());
 
 
   /**
@@ -67,11 +79,11 @@ namespace CGALWrappers
   compute_intersection_of_cells(
     const std::array<Point<spacedim>, n_vertices0> &vertices0,
     const std::array<Point<spacedim>, n_vertices1> &vertices1,
-    const double                                    tol = 1e-9)
+    const double                                    discard_tolerance = 1e-9)
   {
     (void)vertices0;
     (void)vertices1;
-    (void)tol;
+    (void)discard_tolerance;
     Assert(false, ExcMessage("No explicit template instantiation available"));
     return {};
   }
