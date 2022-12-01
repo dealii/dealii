@@ -247,7 +247,7 @@ digraph G
  * automatically inside FEFaceEvaluation::gather_evaluate() and
  * FEFaceEvaluation::integrate_scatter(). It might seem inefficient to do this
  * decision for every integration task, but in the end this is a single `if`
- * statement (conditional jump) that is easily predicable for a modern CPU as
+ * statement (conditional jump) that is easily predictable for a modern CPU as
  * the decision is always the same inside an integration loop. (One only pays
  * by somewhat increased compile times because the compiler needs to generate
  * code for all paths, though).

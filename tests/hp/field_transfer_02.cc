@@ -78,7 +78,7 @@ main(int argc, char *argv[])
   parallel::distributed::experimental::
     FieldTransfer<2, LinearAlgebra::distributed::Vector<double>>
       field_transfer(dof_handler);
-  // Assgin FE_Q to all the cells
+  // Assign FE_Q to all the cells
   for (auto cell : dof_handler.active_cell_iterators())
     {
       if (cell->is_locally_owned())

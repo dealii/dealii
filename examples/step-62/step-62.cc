@@ -486,7 +486,7 @@ namespace step62
 
   // @sect4{The `Rho` class implementation}
 
-  // This class is used to define the mass density. As we have explaine before,
+  // This class is used to define the mass density. As we have explained before,
   // a phononic superlattice cavity is formed by two
   // [Distributed Reflector](https://en.wikipedia.org/wiki/Band_gap),
   // mirrors and a $\lambda/2$ cavity where $\lambda$ is the acoustic

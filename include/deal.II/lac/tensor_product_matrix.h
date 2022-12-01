@@ -321,7 +321,7 @@ namespace internal
           }
 
         const FloatingPointComparator<Number> comparator(
-          eps, false /*use relativ torlerance*/, mask);
+          eps, false /*use relative tolerance*/, mask);
 
         if (comparator(M_0, M_1))
           return true;

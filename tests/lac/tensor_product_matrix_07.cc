@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test TensorProductMatrixSymmetricSum for zero (constrained) rows and colums.
+// Test TensorProductMatrixSymmetricSum for zero (constrained) rows and columns.
 // We consider a single cell with DBC applied to face 2*(dim-1).
 
 #include <deal.II/dofs/dof_handler.h>

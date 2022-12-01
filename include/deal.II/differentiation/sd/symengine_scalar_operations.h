@@ -1193,7 +1193,7 @@ namespace Differentiation
      * the values associated with a key are also symbolic then the returned
      * result may still be symbolic in nature. The terminal result of using the
      * input substitution map, @p symbol_values, is then guaranteed to be
-     * rendered by a single substitition of the returned dependency-resolved
+     * rendered by a single substitution of the returned dependency-resolved
      * map.
      *
      * Example:

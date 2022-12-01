@@ -104,7 +104,7 @@ Plane Surface(1) = {1, 2};
 Curve Loop(3) = {39, 52, 53, 54, 55, 56, -10, -42};
 Plane Surface(2) = {3};
 
-// Surface of bottem left mesh
+// Surface of bottom left mesh
 Curve Loop(4) = {42, 7, 8, 9, 38};
 Curve Loop(5) = {49, 50, 51, 48};
 Plane Surface(3) = {4, 5};
