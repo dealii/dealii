@@ -132,7 +132,18 @@ if(TARGET Kokkos::kokkos)
   get_property(KOKKOS_COMPILE_FLAGS_FULL TARGET Kokkos::kokkos PROPERTY INTERFACE_COMPILE_OPTIONS)
   string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
   string(REPLACE ";" " " KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
-  get_property(KOKKOS_LINK_LIBRARIES TARGET Kokkos::kokkos PROPERTY INTERFACE_LINK_LIBRARIES)
+
+  #
+  # Extract missing openmp linker options from the
+  # "INTERFACE_LINK_LIBRARIES" property of the Kokkos::kokkos target:
+  #
+  set(_kokkos_openmp_flags)
+  get_property(_libraries TARGET Kokkos::kokkos PROPERTY INTERFACE_LINK_LIBRARIES)
+  foreach(_entry ${_libraries})
+    if(${_entry} MATCHES "^-f?openmp")
+      add_flags(_kokkos_openmp_flags "${_entry}")
+    endif()
+  endforeach()
 endif()
 
 #
@@ -159,14 +170,14 @@ endforeach()
 process_feature(TRILINOS
   LIBRARIES
     REQUIRED ${_libraries}
-    OPTIONAL Trilinos_TPL_LIBRARIES MPI_CXX_LIBRARIES KOKKOS_LINK_LIBRARIES
+    OPTIONAL Trilinos_TPL_LIBRARIES MPI_CXX_LIBRARIES
   INCLUDE_DIRS
     REQUIRED Trilinos_INCLUDE_DIRS
     OPTIONAL Trilinos_TPL_INCLUDE_DIRS
   CXX_FLAGS
     OPTIONAL KOKKOS_COMPILE_FLAGS
   LINKER_FLAGS
-    OPTIONAL Trilinos_EXTRA_LD_FLAGS
+  OPTIONAL Trilinos_EXTRA_LD_FLAGS _kokkos_openmp_flags
   CLEAR
     TRILINOS_CONFIG_DIR EPETRA_CONFIG_H SACADO_CMATH_HPP ${_libraries}
     SACADO_CONFIG_H
