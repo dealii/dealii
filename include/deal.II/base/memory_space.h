@@ -43,12 +43,10 @@ namespace MemorySpace
     using kokkos_space = ::Kokkos::DefaultExecutionSpace::memory_space;
   };
 
-#ifdef DEAL_II_WITH_CUDA
   /**
    * Structure describing CUDA memory space.
    */
   using CUDA = Device;
-#endif
 
 } // namespace MemorySpace
 
