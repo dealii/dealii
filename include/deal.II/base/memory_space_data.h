@@ -121,14 +121,14 @@ namespace MemorySpace
     using MemorySpace = Host;
 
     MemorySpaceData()
-    : values((dealii::Impl::ensure_kokkos_initialized(),
+    : values_dev((dealii::Impl::ensure_kokkos_initialized(),
               Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
     {}
 
     void
     copy_to(T *begin, std::size_t n_elements)
     {
-      Assert(n_elements <= values.extent(0),
+      Assert(n_elements <= values_dev.extent(0),
              ExcMessage("n_elements greater than the size of values."));
       using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
       Kokkos::
@@ -137,14 +137,14 @@ namespace MemorySpace
       Kokkos::deep_copy(
         ExecutionSpace{},
         begin_view,
-        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
+        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)));
       ExecutionSpace{}.fence();
     }
 
     void
     copy_from(T *begin, std::size_t n_elements)
     {
-      Assert(n_elements <= values.extent(0),
+      Assert(n_elements <= values_dev.extent(0),
              ExcMessage("n_elements greater than the size of values."));
       using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
       Kokkos::View<const T *,
@@ -153,14 +153,14 @@ namespace MemorySpace
         begin_view(begin, n_elements);
       Kokkos::deep_copy(
         ExecutionSpace{},
-        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)),
+        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)),
         begin_view);
       ExecutionSpace{}.fence();
     }
 
-    Kokkos::View<T *, Kokkos::HostSpace> values;
-
     // unused
+    Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
+
     Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
 
     std::shared_ptr<T> values_sm_ptr;
@@ -186,7 +186,7 @@ namespace MemorySpace
     using MemorySpace = Device;
 
     MemorySpaceData()
-    : values((dealii::Impl::ensure_kokkos_initialized(),
+    : values_host_buffer((dealii::Impl::ensure_kokkos_initialized(),
               Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
     , values_dev(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
         "memoryspace data",
@@ -226,7 +226,7 @@ namespace MemorySpace
       ExecutionSpace{}.fence();
     }
 
-    Kokkos::View<T *, Kokkos::HostSpace> values;
+    Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
     
     Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
     

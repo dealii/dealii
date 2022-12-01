@@ -1734,8 +1734,8 @@ namespace internal
                                                   ::dealii::MemorySpace::Host>
              &data)
       {
-        Vector_copy<Number, Number2> copier(v_data.values.data(),
-                                            data.values.data());
+        Vector_copy<Number, Number2> copier(v_data.values_dev.data(),
+                                            data.values_dev.data());
         parallel_for(copier, 0, size, thread_loop_partitioner);
       }
 
@@ -1748,7 +1748,7 @@ namespace internal
                                                  ::dealii::MemorySpace::Host>
             &data)
       {
-        Vector_set<Number> setter(s, data.values.data());
+        Vector_set<Number> setter(s, data.values_dev.data());
         parallel_for(setter, 0, size, thread_loop_partitioner);
       }
 
@@ -1763,8 +1763,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_add_v<Number> vector_add(data.values.data(),
-                                               v_data.values.data());
+        Vectorization_add_v<Number> vector_add(data.values_dev.data(),
+                                               v_data.values_dev.data());
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
@@ -1779,8 +1779,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_subtract_v<Number> vector_subtract(data.values.data(),
-                                                         v_data.values.data());
+        Vectorization_subtract_v<Number> vector_subtract(data.values_dev.data(),
+                                                         v_data.values_dev.data());
         parallel_for(vector_subtract, 0, size, thread_loop_partitioner);
       }
 
@@ -1794,7 +1794,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_add_factor<Number> vector_add(data.values.data(), a);
+        Vectorization_add_factor<Number> vector_add(data.values_dev.data(), a);
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
@@ -1809,8 +1809,8 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Vectorization_add_av<Number> vector_add(data.values.data(),
-                                                v_data.values.data(),
+        Vectorization_add_av<Number> vector_add(data.values_dev.data(),
+                                                v_data.values_dev.data(),
                                                 a);
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
@@ -1831,7 +1831,7 @@ namespace internal
           &data)
       {
         Vectorization_add_avpbw<Number> vector_add(
-          data.values.data(), v_data.values.data(), w_data.values.data(), a, b);
+          data.values_dev.data(), v_data.values_dev.data(), w_data.values_dev.data(), a, b);
         parallel_for(vector_add, 0, size, thread_loop_partitioner);
       }
 
@@ -1847,8 +1847,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_sadd_xv<Number> vector_sadd(data.values.data(),
-                                                  v_data.values.data(),
+        Vectorization_sadd_xv<Number> vector_sadd(data.values_dev.data(),
+                                                  v_data.values_dev.data(),
                                                   x);
         parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
       }
@@ -1866,8 +1866,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_sadd_xav<Number> vector_sadd(data.values.data(),
-                                                   v_data.values.data(),
+        Vectorization_sadd_xav<Number> vector_sadd(data.values_dev.data(),
+                                                   v_data.values_dev.data(),
                                                    a,
                                                    x);
         parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
@@ -1890,7 +1890,7 @@ namespace internal
           &data)
       {
         Vectorization_sadd_xavbw<Number> vector_sadd(
-          data.values.data(), v_data.values.data(), w_data.values.data(), x, a, b);
+          data.values_dev.data(), v_data.values_dev.data(), w_data.values_dev.data(), x, a, b);
         parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
       }
 
@@ -1904,7 +1904,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_multiply_factor<Number> vector_multiply(data.values.data(),
+        Vectorization_multiply_factor<Number> vector_multiply(data.values_dev.data(),
                                                               factor);
         parallel_for(vector_multiply, 0, size, thread_loop_partitioner);
       }
@@ -1919,8 +1919,8 @@ namespace internal
                                                    ::dealii::MemorySpace::Host>
               &data)
       {
-        Vectorization_scale<Number> vector_scale(data.values.data(),
-                                                 v_data.values.data());
+        Vectorization_scale<Number> vector_scale(data.values_dev.data(),
+                                                 v_data.values_dev.data());
         parallel_for(vector_scale, 0, size, thread_loop_partitioner);
       }
 
@@ -1935,8 +1935,8 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Vectorization_equ_au<Number> vector_equ(data.values.data(),
-                                                v_data.values.data(),
+        Vectorization_equ_au<Number> vector_equ(data.values_dev.data(),
+                                                v_data.values_dev.data(),
                                                 a);
         parallel_for(vector_equ, 0, size, thread_loop_partitioner);
       }
@@ -1957,7 +1957,7 @@ namespace internal
           &data)
       {
         Vectorization_equ_aubv<Number> vector_equ(
-          data.values.data(), v_data.values.data(), w_data.values.data(), a, b);
+          data.values_dev.data(), v_data.values_dev.data(), w_data.values_dev.data(), a, b);
         parallel_for(vector_equ, 0, size, thread_loop_partitioner);
       }
 
@@ -1973,7 +1973,7 @@ namespace internal
       {
         Number                                                   sum;
         dealii::internal::VectorOperations::Dot<Number, Number2> dot(
-          data.values.data(), v_data.values.data());
+          data.values_dev.data(), v_data.values_dev.data());
         dealii::internal::VectorOperations::parallel_reduce(
           dot, 0, size, sum, thread_loop_partitioner);
         AssertIsFinite(sum);
@@ -1991,7 +1991,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Norm2<Number, real_type> norm2(data.values.data());
+        Norm2<Number, real_type> norm2(data.values_dev.data());
         parallel_reduce(norm2, 0, size, sum, thread_loop_partitioner);
       }
 
@@ -2004,7 +2004,7 @@ namespace internal
           MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
       {
         Number            sum;
-        MeanValue<Number> mean(data.values.data());
+        MeanValue<Number> mean(data.values_dev.data());
         parallel_reduce(mean, 0, size, sum, thread_loop_partitioner);
 
         return sum;
@@ -2020,7 +2020,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Norm1<Number, real_type> norm1(data.values.data());
+        Norm1<Number, real_type> norm1(data.values_dev.data());
         parallel_reduce(norm1, 0, size, sum, thread_loop_partitioner);
       }
 
@@ -2035,7 +2035,7 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        NormP<Number, real_type> normp(data.values.data(), p);
+        NormP<Number, real_type> normp(data.values_dev.data(), p);
         parallel_reduce(normp, 0, size, sum, thread_loop_partitioner);
       }
 
@@ -2054,9 +2054,9 @@ namespace internal
           &data)
       {
         Number            sum;
-        AddAndDot<Number> adder(data.values.data(),
-                                v_data.values.data(),
-                                w_data.values.data(),
+        AddAndDot<Number> adder(data.values_dev.data(),
+                                v_data.values_dev.data(),
+                                w_data.values_dev.data(),
                                 a);
         parallel_reduce(adder, 0, size, sum, thread_loop_partitioner);
 
@@ -2112,7 +2112,7 @@ namespace internal
       {
         if (operation == VectorOperation::insert)
           {
-            cudaError_t cuda_error_code = cudaMemcpy(data.values.data(),
+            cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.data(),
                                                      v_data.values_dev.data(),
                                                      size * sizeof(Number),
                                                      cudaMemcpyDeviceToHost);
@@ -2630,7 +2630,7 @@ namespace internal
         if (operation == VectorOperation::insert)
           {
             cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.data(),
-                                                     v_data.values.data(),
+                                                     v_data.values_dev.data(),
                                                      size * sizeof(Number),
                                                      cudaMemcpyHostToDevice);
             AssertCuda(cuda_error_code);
