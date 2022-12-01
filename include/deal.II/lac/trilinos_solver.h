@@ -735,7 +735,7 @@ namespace TrilinosWrappers
 #  ifdef DEAL_II_TRILINOS_WITH_BELOS
   /**
    * Wrapper around the iterate solver package from the Belos
-   * packge
+   * package
    * (https://docs.trilinos.org/latest-release/packages/belos/doc/html/index.html),
    * targeting deal.II data structures.
    */

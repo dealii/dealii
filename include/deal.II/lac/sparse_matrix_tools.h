@@ -117,7 +117,7 @@ namespace SparseMatrixTools
   /**
    * A restriction operation similar to the above one. However, the indices
    * of the blocks can be chosen arbitrarily. If the indices of cells are
-   * given, the ouput is the same as of the above function. However, one
+   * given, the output is the same as of the above function. However, one
    * can also provide, e.g., indices that are also part of a halo around
    * a cell to implement element-block based overlapping Schwarz methods.
    *

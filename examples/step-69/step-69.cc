@@ -995,7 +995,7 @@ namespace Step69
   //  - A copy data: a struct that contains all the local assembly
   //    contributions, in this case <code>CopyData<dim>()</code>.
   //  - A copy data routine: in this case it is
-  //    <code>copy_local_to_global()</code> in charge of actually coping these
+  //    <code>copy_local_to_global()</code> in charge of actually copying these
   //    local contributions into the global objects (matrices and/or vectors)
   //
   // Most of the following lines are spent in the definition of the worker

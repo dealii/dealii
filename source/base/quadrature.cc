@@ -580,7 +580,7 @@ QIterated<1>::QIterated(const Quadrature<1> &        base_quadrature,
 
   // make sure that there is no rounding error for 0.0 and 1.0, since there
   // are multiple asserts in the library checking for equality without
-  // tolorances
+  // tolerances
   for (auto &i : this->quadrature_points)
     if (std::abs(i[0] - 0.0) < 1e-12)
       i[0] = 0.0;

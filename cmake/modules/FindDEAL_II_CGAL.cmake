@@ -34,7 +34,7 @@ endif()
 #
 # CGAL requires C++17 and an externally configured Boost, otherwise the
 # call to find_package(CGAL) will fail. Guard the call to FIND_PACKAGE to
-# fail cracefully:
+# fail gracefully:
 #
 if(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
   set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON)
@@ -72,7 +72,7 @@ if(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
       endif()
     endif()
 
-    # Make sure we dont' pass Boost::Boost over to deal.II.
+    # Make sure we don't pass Boost::Boost over to deal.II.
     list(FILTER CGAL_LIBRARIES EXCLUDE REGEX "::")
   endif()
 else()

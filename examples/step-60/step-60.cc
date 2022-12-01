@@ -299,7 +299,8 @@ namespace Step60
     void setup_embedded_dofs();
 
     // The only unconventional function we have here is the `setup_coupling()`
-    // method, used to generate the sparsity patter for the coupling matrix $C$.
+    // method, used to generate the sparsity pattern for the coupling matrix
+    // $C$.
 
     void setup_coupling();
 

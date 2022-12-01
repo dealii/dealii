@@ -6607,7 +6607,7 @@ namespace DataOutBase
                   }
 
                 // now put the tensor into data
-                // note we padd with zeros because VTK format always wants to
+                // note we pad with zeros because VTK format always wants to
                 // see a 3x3 tensor, regardless of dimension
                 for (unsigned int i = 0; i < 3; ++i)
                   for (unsigned int j = 0; j < 3; ++j)

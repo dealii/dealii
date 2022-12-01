@@ -1027,7 +1027,7 @@ namespace Step63
   // The last thing to note is that since our problem is non-symmetric, we must
   // use an appropriate Krylov subspace method. We choose here to
   // use GMRES since it offers the guarantee of residual reduction in each
-  // iteration. The major disavantage of GMRES is that, for each iteration,
+  // iteration. The major disadvantage of GMRES is that, for each iteration,
   // the number of stored temporary vectors increases by one, and one also needs
   // to compute a scalar product with all previously stored vectors. This is
   // rather expensive. This requirement is relaxed by using the restarted GMRES

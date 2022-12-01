@@ -350,9 +350,9 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       endif()
 
       #
-      # If _n_cpu or _n_threads are larger than zero we have to accomodate
+      # If _n_cpu or _n_threads are larger than zero we have to accommodate
       # the fact that multiple output files specifying a different mpirun or
-      # threads count are present. In order to accomodate this we create a
+      # threads count are present. In order to accommodate this we create a
       # runtime subdirectory "mpirun_M-threads_N" to the test.
       #
       # Note that we could do this unconditionally for every test but for

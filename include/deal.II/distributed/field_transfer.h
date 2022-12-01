@@ -93,7 +93,7 @@ namespace parallel
         const DoFHandler<dim, spacedim> &dof_handler;
 
         /**
-         * Data transfered by cell_data_transfer.
+         * Data transferred by cell_data_transfer.
          */
         std::vector<Vector<Number>> data_to_transfer;
 

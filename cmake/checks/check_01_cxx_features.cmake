@@ -432,7 +432,7 @@ CHECK_CXX_SOURCE_COMPILES(
 
 #
 # Even though [[deprecated]] is a C++14 feature we have to check
-# wether we can actually use the [[deprecated]] attribute in all
+# whether we can actually use the [[deprecated]] attribute in all
 # cases we care about; some of the following are C++17 features.
 #
 CHECK_CXX_SOURCE_COMPILES(
