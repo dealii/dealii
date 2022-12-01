@@ -23,7 +23,9 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/kokkos.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <Kokkos_Core.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <functional>
 #include <memory>
@@ -35,37 +37,47 @@ DEAL_II_NAMESPACE_OPEN
 namespace MemorySpace
 {
   /**
-   * Structure which stores data on the host or the device depending on the
-   * template parameter @p MemorySpace. The data is copied into the structure
-   * which then owns the data and will release the memory when the destructor is
-   * called.
+   * Data structure
    */
   template <typename T, typename MemorySpace>
   struct MemorySpaceData
   {
-    MemorySpaceData();
+    MemorySpaceData()
+    {
+      static_assert(std::is_same<MemorySpace, Host>::value ||
+                      std::is_same<MemorySpace, Device>::value,
+                    "MemorySpace should be Host or Device");
+    }
 
     /**
      * Copy the active data (values for Host and values_dev for Device) to @p begin.
      * If the data is on the device it is moved to the host.
      */
     void
-    copy_to(T *begin, const std::size_t n_elements);
+    copy_to(T *begin, std::size_t n_elements)
+    {
+      (void)begin;
+      (void)n_elements;
+    }
 
     /**
      * Copy the data in @p begin to the active data of the structure (values for
      * Host and values_dev for Device). The pointer @p begin must be on the host.
      */
     void
-    copy_from(const T *begin, const std::size_t n_elements);
+    copy_from(T *begin, std::size_t n_elements)
+    {
+      (void)begin;
+      (void)n_elements;
+    }
 
     /**
-     * Kokkos View to the data on the host
+     * Pointer to data on the host.
      */
     Kokkos::View<T *, Kokkos::HostSpace> values;
 
     /**
-     * Kokkos View to the data on the device
+     * Pointer to data on the device.
      */
     Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
 
@@ -76,12 +88,12 @@ namespace MemorySpace
     // The pointer is shared so that MemorySpaceData can be copied and
     // MemorySpaceData::values can be used in Kokkos::parallel_for. This
     // pointer owns the data when using shared memory with MPI. In this case,
-    // the Kokkos::View in non-owning. When shared memory with MPI is not used,
-    // the pointer is not used.
+    // the (host) Kokkos::View is non-owning. When shared memory with MPI is not
+    // used, the pointer is not used.
     std::shared_ptr<T> values_sm_ptr;
 
     /**
-     * Pointers to the data of the processes sharing the same memory.
+     * Pointers to the data of the processes sharing the same memory. Not used for MemorySpace::Device.
      */
     std::vector<ArrayView<const T>> values_sm;
   };
@@ -93,77 +105,146 @@ namespace MemorySpace
    */
   template <typename T, typename MemorySpace>
   inline void
-  swap(MemorySpaceData<T, MemorySpace> &u, MemorySpaceData<T, MemorySpace> &v);
-
+  swap(MemorySpaceData<T, MemorySpace> &,
+       MemorySpaceData<T, MemorySpace> &)
+  {
+    static_assert(std::is_same<MemorySpace, Host>::value ||
+                    std::is_same<MemorySpace, Device>::value,
+                  "MemorySpace should be Host or Device");
+  }
 
 #ifndef DOXYGEN
 
-  template <typename T, typename MemorySpace>
-  MemorySpaceData<T, MemorySpace>::MemorySpaceData()
+  template <typename T>
+  struct MemorySpaceData<T, Host>
+  {
+    using MemorySpace = Host;
+
+    MemorySpaceData()
+    : values((dealii::Impl::ensure_kokkos_initialized(),
+              Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
+    {}
+
+    void
+    copy_to(T *begin, std::size_t n_elements)
+    {
+      Assert(n_elements <= values.extent(0),
+             ExcMessage("n_elements greater than the size of values."));
+      using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
+      Kokkos::
+        View<T *, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+          begin_view(begin, n_elements);
+      Kokkos::deep_copy(
+        ExecutionSpace{},
+        begin_view,
+        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
+      ExecutionSpace{}.fence();
+    }
+
+    void
+    copy_from(T *begin, std::size_t n_elements)
+    {
+      Assert(n_elements <= values.extent(0),
+             ExcMessage("n_elements greater than the size of values."));
+      using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
+      Kokkos::View<const T *,
+                   Kokkos::HostSpace,
+                   Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+        begin_view(begin, n_elements);
+      Kokkos::deep_copy(
+        ExecutionSpace{},
+        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)),
+        begin_view);
+      ExecutionSpace{}.fence();
+    }
+
+    Kokkos::View<T *, Kokkos::HostSpace> values;
+
+    // unused
+    Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
+
+    std::shared_ptr<T> values_sm_ptr;
+
+    std::vector<ArrayView<const T>> values_sm;
+  };
+
+
+
+  template <typename T>
+  inline void
+  swap(MemorySpaceData<T, Host> &u, MemorySpaceData<T, Host> &v)
+  {
+    std::swap(u.values, v.values);
+    std::swap(u.values_sm_ptr, v.values_sm_ptr);
+  }
+
+
+
+  template <typename T>
+  struct MemorySpaceData<T, Device>
+  {
+    using MemorySpace = Device;
+
+    MemorySpaceData()
     : values((dealii::Impl::ensure_kokkos_initialized(),
               Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
     , values_dev(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
         "memoryspace data",
         0))
-  {}
+    {}
 
+    void
+    copy_to(T *begin, std::size_t n_elements)
+    {
+      Assert(n_elements <= values_dev.extent(0),
+             ExcMessage("n_elements greater than the size of values."));
+      using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
+      Kokkos::
+        View<T *, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+          begin_view(begin, n_elements);
+      Kokkos::deep_copy(
+        ExecutionSpace{},
+        begin_view,
+        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)));
+      ExecutionSpace{}.fence();
+    }
 
-
-  template <typename T, typename MemorySpace>
-  void
-  MemorySpaceData<T, MemorySpace>::copy_to(T *               begin,
-                                           const std::size_t n_elements)
-  {
-    Assert(n_elements <= values.extent(0),
-           ExcMessage("n_elements greater than the size of values."));
-    using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
-    Kokkos::
-      View<T *, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+    void
+    copy_from(T *begin, std::size_t n_elements)
+    {
+      Assert(n_elements <= values_dev.extent(0),
+             ExcMessage("n_elements greater than the size of values."));
+      using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
+      Kokkos::View<const T *,
+                   Kokkos::HostSpace,
+                   Kokkos::MemoryTraits<Kokkos::Unmanaged>>
         begin_view(begin, n_elements);
-    Kokkos::deep_copy(
-      ExecutionSpace{},
-      begin_view,
-      Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
-    ExecutionSpace{}.fence();
-  }
+      Kokkos::deep_copy(
+        ExecutionSpace{},
+        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)),
+        begin_view);
+      ExecutionSpace{}.fence();
+    }
+
+    Kokkos::View<T *, Kokkos::HostSpace> values;
+    
+    Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
+    
+    // unused
+    std::shared_ptr<T> values_sm_ptr;
+  
+    // unused  
+    std::vector<ArrayView<const T>> values_sm;
+  };
 
 
 
-  template <typename T, typename MemorySpace>
-  void
-  MemorySpaceData<T, MemorySpace>::copy_from(const T *         begin,
-                                             const std::size_t n_elements)
-  {
-    Assert(n_elements <= values.extent(0),
-           ExcMessage("n_elements greater than the size of values."));
-    using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
-    Kokkos::View<const T *,
-                 Kokkos::HostSpace,
-                 Kokkos::MemoryTraits<Kokkos::Unmanaged>>
-      begin_view(begin, n_elements);
-    Kokkos::deep_copy(
-      ExecutionSpace{},
-      Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)),
-      begin_view);
-    ExecutionSpace{}.fence();
-  }
-
-
-
-  /**
-   * Swap function similar to std::swap.
-   */
-  template <typename T, typename MemorySpace>
+  template <typename T>
   inline void
-  swap(MemorySpaceData<T, MemorySpace> &u, MemorySpaceData<T, MemorySpace> &v)
+  swap(MemorySpaceData<T, Device> &u, MemorySpaceData<T, Device> &v)
   {
-    auto u_copy = Kokkos::create_mirror(Kokkos::WithoutInitializing, u);
-    typename MemorySpace::execution_space exec_space;
-    // The first two calls to Kokkos::deep_copy are asynchronous. The last call
-    // will wait for the three deep_copy to be done before returning.
-    Kokkos::deep_copy(exec_space, u_copy, u);
-    Kokkos::deep_copy(exec_space, u, v);
-    Kokkos::deep_copy(v, u_copy);
+    std::swap(u.values, v.values);
+    std::swap(u.values_dev, v.values_dev);
   }
 
 #endif

@@ -28,7 +28,8 @@ namespace Impl
   ensure_kokkos_initialized()
   {
     if (!Kokkos::is_initialized())
-      GrowingVectorMemory<
+    {
+	    GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<double, MemorySpace::Host>>{};
     GrowingVectorMemory<
       LinearAlgebra::distributed::Vector<float, MemorySpace::Host>>{};
@@ -54,6 +55,7 @@ namespace Impl
         release_unused_memory);
     Kokkos::initialize();
     std::atexit(Kokkos::finalize);
+  }
   }
 } // namespace Impl
 DEAL_II_NAMESPACE_CLOSE
