@@ -101,7 +101,7 @@ namespace MemorySpace
   template <typename T, typename MemorySpace>
   MemorySpaceData<T, MemorySpace>::MemorySpaceData()
     : values_host_buffer((dealii::Impl::ensure_kokkos_initialized(),
-              Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
+                          Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
     , values(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
         "memoryspace data",
         0))
@@ -157,8 +157,8 @@ namespace MemorySpace
   inline void
   swap(MemorySpaceData<T, MemorySpace> &u, MemorySpaceData<T, MemorySpace> &v)
   {
-    std::swap(u.values_host_buffer, v.values_host_buffer);	  
-    std::swap(u.values, v.values);	  
+    std::swap(u.values_host_buffer, v.values_host_buffer);
+    std::swap(u.values, v.values);
     std::swap(u.values_sm_ptr, v.values_sm_ptr);
   }
 

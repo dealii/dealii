@@ -1656,7 +1656,7 @@ namespace LinearAlgebra
     inline Number *
     Vector<Number, MemorySpace>::get_values() const
     {
-      return  data.values.data();
+      return data.values.data();
     }
 
 

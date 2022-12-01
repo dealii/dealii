@@ -1889,8 +1889,12 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_sadd_xavbw<Number> vector_sadd(
-          data.values.data(), v_data.values.data(), w_data.values.data(), x, a, b);
+        Vectorization_sadd_xavbw<Number> vector_sadd(data.values.data(),
+                                                     v_data.values.data(),
+                                                     w_data.values.data(),
+                                                     x,
+                                                     a,
+                                                     b);
         parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
       }
 
@@ -1904,8 +1908,8 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data)
       {
-        Vectorization_multiply_factor<Number> vector_multiply(data.values.data(),
-                                                              factor);
+        Vectorization_multiply_factor<Number> vector_multiply(
+          data.values.data(), factor);
         parallel_for(vector_multiply, 0, size, thread_loop_partitioner);
       }
 
