@@ -42,9 +42,7 @@ file(WRITE ${CMAKE_BINARY_DIR}/revision.log
 
 set(_log_detailed "${CMAKE_BINARY_DIR}/detailed.log")
 set(_log_summary  "${CMAKE_BINARY_DIR}/summary.log")
-set(_log_feature "${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}FeatureConfig.cmake")
-file(REMOVE ${_log_detailed} ${_log_summary} ${_log_feature})
-file(WRITE ${_log_feature} "")
+file(REMOVE ${_log_detailed} ${_log_summary})
 
 macro(_both)
   # Write to both log files:
@@ -60,11 +58,6 @@ endmacro()
 macro(_summary)
   # Only write to summary.log:
   file(APPEND ${_log_summary} "${ARGN}")
-endmacro()
-
-macro(_featurelog)
-  # Only write to deal.IIFeatureConfig.cmake:
-  file(APPEND ${_log_feature} "${ARGN}")
 endmacro()
 
 _both(
@@ -227,12 +220,10 @@ foreach(_feature ${_deal_ii_features_sorted})
     #
     if(NOT "${${_feature}_DIR}" STREQUAL "")
       _detailed("#            ${_feature}_DIR = ${${_feature}_DIR}\n")
-      _featurelog("set(DEAL_II_${_feature}_DIR \"${${_feature}_DIR}\")\n")
     endif()
 
     if(NOT "${${_feature}_SPLIT_CONFIGURATION}" STREQUAL "")
       _detailed("#            ${_feature}_SPLIT_CONFIGURATION = ${${_feature}_SPLIT_CONFIGURATION}\n")
-      _featurelog("set(DEAL_II_${_feature}_SPLIT_CONFIGURATION \"${${_feature}_SPLIT_CONFIGURATION}\")\n")
     endif()
 
     #
@@ -244,7 +235,6 @@ foreach(_feature ${_deal_ii_features_sorted})
       )
       if(DEFINED ${_feature}_${_var2})
         _detailed("#            ${_feature}_${_var2} = ${${_feature}_${_var2}}\n")
-        _featurelog("set(DEAL_II_${_feature}_${_var2} \"${${_feature}_${_var2}}\")\n")
       endif()
     endforeach()
   else()
