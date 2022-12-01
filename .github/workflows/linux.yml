@@ -176,7 +176,7 @@ jobs:
         cd build
         cmake -D BUILD_SHARED_LIBS=ON \
               -D CMAKE_CXX_COMPILER=${GITHUB_WORKSPACE}/kokkos/bin/nvcc_wrapper \
-              -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/kokkos-install \
+              -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               -D Kokkos_ENABLE_CUDA=ON \
               -D Kokkos_ENABLE_CUDA_LAMBDA=ON \
               -D Kokkos_ARCH_VOLTA70=ON \
@@ -192,7 +192,7 @@ jobs:
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_CUDA="ON" \
               -D DEAL_II_WITH_KOKKOS="ON" \
-              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/kokkos-install \
+              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
