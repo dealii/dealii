@@ -29,17 +29,16 @@ function(print_target_properties _target)
   list(APPEND _messages "Target: ${_target}")
 
   foreach(_property
-      TYPE
-      LINK_LIBRARIES INTERFACE_LINK_LIBRARIES
-      INCLUDE_DIRECTORIES INTERFACE_INCLUDE_DIRECTORIES
-      COMPILE_DEFINITIONS INTERFACE_COMPILE_DEFINITIONS
-      COMPILE_OPTIONS INTERFACE_COMPILE_OPTIONS
-      LINK_OPTIONS INTERFACE_LINK_OPTIONS
+      TYPE VERSION SOVERSION LINK_LIBRARIES INCLUDE_DIRECTORIES
+      COMPILE_DEFINITIONS COMPILE_FEATURES COMPILE_OPTIONS LINK_OPTIONS
+      INTERFACE_LINK_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES
+      INTERFACE_SYSTEM_INCLUDE_DIRECTORIES INTERFACE_COMPILE_DEFINITIONS
+      INTERFACE_COMPILE_OPTIONS INTERFACE_LINK_OPTIONS
       )
     get_target_property(_value ${_target} ${_property})
-    if(NOT "${_value}" MATCHES "-NOTFOUND")
+    if(NOT "${_value}" MATCHES "-NOTFOUND" AND NOT "${_value}" STREQUAL "")
       string(REPLACE ";" " " _value "${_value}")
-      list(APPEND _messages "  ${_property}: ${_value}")
+      list(APPEND _messages "    ${_property}: ${_value}")
     endif()
   endforeach()
 
