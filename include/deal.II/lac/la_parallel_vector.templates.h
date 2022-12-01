@@ -135,12 +135,12 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
-	      Kokkos::resize(data.values_dev, new_alloc_size);    	    
+	      Kokkos::resize(data.values, new_alloc_size);    	    
 
               allocated_size = new_alloc_size;
 
               data.values_sm = {
-                ArrayView<const Number>(data.values_dev.data(), new_alloc_size)};
+                ArrayView<const Number>(data.values.data(), new_alloc_size)};
             }
           else
             {
@@ -224,7 +224,7 @@ namespace LinearAlgebra
                 data.values_sm[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
-              data.values_dev =
+              data.values =
                 Kokkos::View<Number *,
                              Kokkos::HostSpace,
                              Kokkos::MemoryTraits<Kokkos::Unmanaged>>(
@@ -312,7 +312,7 @@ namespace LinearAlgebra
         {
           for (size_type i = 0; i < size; ++i)
             max =
-              std::max(numbers::NumberTraits<Number>::abs(data.values_dev[i]), max);
+              std::max(numbers::NumberTraits<Number>::abs(data.values[i]), max);
         }
       };
 
@@ -339,17 +339,17 @@ namespace LinearAlgebra
 
           if (new_alloc_size > allocated_size)
             {
-              Assert(((allocated_size > 0 && data.values_dev.size() != 0) ||
-                      data.values_dev.size() == 0),
+              Assert(((allocated_size > 0 && data.values.size() != 0) ||
+                      data.values.size() == 0),
                      ExcInternalError());
 
-	      Kokkos::resize(data.values_dev, new_alloc_size);
+	      Kokkos::resize(data.values, new_alloc_size);
 
               allocated_size = new_alloc_size;
             }
           else if (new_alloc_size == 0)
             {
-              Kokkos::resize(data.values_dev, 0);
+              Kokkos::resize(data.values, 0);
               allocated_size = 0;
             }
         }
@@ -423,14 +423,14 @@ namespace LinearAlgebra
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_permutated<
               Number><<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
               indices_dev,
-              data.values_dev.data(),
+              data.values.data(),
               tmp_vector.begin(),
               tmp_n_elements);
           else
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::set_permutated<
               Number><<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
               indices_dev,
-              data.values_dev.data(),
+              data.values.data(),
               tmp_vector.begin(),
               tmp_n_elements);
 
@@ -460,7 +460,7 @@ namespace LinearAlgebra
             Number,
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::LInfty<Number>>
             <<<dim3(n_blocks, 1), dim3(::dealii::CUDAWrappers::block_size)>>>(
-              result_device, data.values_dev.data(), size);
+              result_device, data.values.data(), size);
 
           // Copy the result back to the host
           error_code = cudaMemcpy(&result,
@@ -529,7 +529,7 @@ namespace LinearAlgebra
 
       // delete previous content in import data
       Kokkos::resize(import_data.values_host_buffer, 0);
-      Kokkos::resize(import_data.values_dev, 0);
+      Kokkos::resize(import_data.values, 0);
 
       // set partitioner to serial version
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(size);
@@ -560,7 +560,7 @@ namespace LinearAlgebra
 
       // delete previous content in import data
       Kokkos::resize(import_data.values_host_buffer, 0);
-      Kokkos::resize(import_data.values_dev, 0);
+      Kokkos::resize(import_data.values, 0);
 
       // create partitioner
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(local_size,
@@ -606,7 +606,7 @@ namespace LinearAlgebra
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
       Kokkos::resize(import_data.values_host_buffer, 0);
-      Kokkos::resize(import_data.values_dev, 0);
+      Kokkos::resize(import_data.values, 0);
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
@@ -669,7 +669,7 @@ namespace LinearAlgebra
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
       Kokkos::resize(import_data.values_host_buffer, 0);
-      Kokkos::resize(import_data.values_dev, 0);
+      Kokkos::resize(import_data.values, 0);
 
       vector_is_ghosted = false;
     }
@@ -930,13 +930,13 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::zero_out_ghost_values() const
     {
-      if (data.values_dev.size() != 0)
+      if (data.values.size() != 0)
       {
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
         if (std::is_same_v<MemorySpaceType, MemorySpace::CUDA>)
         {
           const cudaError_t cuda_error_code =
-            cudaMemset(data.values_dev.data() +
+            cudaMemset(data.values.data() +
                          partitioner->locally_owned_size(),
                        0,
                        partitioner->n_ghost_indices() * sizeof(Number));
@@ -945,7 +945,7 @@ namespace LinearAlgebra
 	else
 #endif
 	{
-          std::fill_n(data.values_dev.data() + partitioner->locally_owned_size(),
+          std::fill_n(data.values.data() + partitioner->locally_owned_size(),
                     partitioner->n_ghost_indices(),
                     Number());
         }
@@ -989,8 +989,8 @@ namespace LinearAlgebra
                 std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
                 "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
 #  endif
-              if (import_data.values_dev.size() == 0)
-                Kokkos::resize(import_data.values_dev, partitioner->n_import_indices());
+              if (import_data.values.size() == 0)
+                Kokkos::resize(import_data.values, partitioner->n_import_indices());
             }
         }
 
@@ -1002,7 +1002,7 @@ namespace LinearAlgebra
           // device. We use values to store the elements because the function
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
-          data.values_host_buffer = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, data.values_dev);
+          data.values_host_buffer = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, data.values);
           partitioner->import_from_ghosted_array_start(
             operation,
             communication_channel,
@@ -1020,10 +1020,10 @@ namespace LinearAlgebra
             operation,
             communication_channel,
             ArrayView<Number, MemorySpaceType>(
-              data.values_dev.data() + partitioner->locally_owned_size(),
+              data.values.data() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
             ArrayView<Number, MemorySpaceType>(
-              import_data.values_dev.data(), partitioner->n_import_indices()),
+              import_data.values.data(), partitioner->n_import_indices()),
             compress_requests);
         }
 #else
@@ -1070,7 +1070,7 @@ namespace LinearAlgebra
 	  // The communication is done on the host, so we need to
           // move the data back to the device.
 	  cudaError_t cuda_error_code =
-            cudaMemcpy(data.values_dev.data(),
+            cudaMemcpy(data.values.data(),
                        data.values_host_buffer.data(),
                        allocated_size * sizeof(Number),
                        cudaMemcpyHostToDevice);
@@ -1082,17 +1082,17 @@ namespace LinearAlgebra
 #  endif
         {
           Assert(partitioner->n_import_indices() == 0 ||
-                   import_data.values_dev.size() != 0,
+                   import_data.values.size() != 0,
                  ExcNotInitialized());
           partitioner
             ->import_from_ghosted_array_finish<Number, MemorySpaceType>(
               operation,
               ArrayView<const Number, MemorySpaceType>(
-                import_data.values_dev.data(), partitioner->n_import_indices()),
+                import_data.values.data(), partitioner->n_import_indices()),
               ArrayView<Number, MemorySpaceType>(
-                data.values_dev.data(), partitioner->locally_owned_size()),
+                data.values.data(), partitioner->locally_owned_size()),
               ArrayView<Number, MemorySpaceType>(
-                data.values_dev.data() + partitioner->locally_owned_size(),
+                data.values.data() + partitioner->locally_owned_size(),
                 partitioner->n_ghost_indices()),
               compress_requests);
         }
@@ -1136,8 +1136,8 @@ namespace LinearAlgebra
             std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
             "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
 #    endif
-          if (import_data.values_dev.size() == 0)
-            Kokkos::resize(import_data.values_dev, partitioner->n_import_indices());
+          if (import_data.values.size() == 0)
+            Kokkos::resize(import_data.values, partitioner->n_import_indices());
 		     }
         }
 
@@ -1148,7 +1148,7 @@ namespace LinearAlgebra
        // device. We use values to store the elements because the function
        // uses a view of the array and thus we need the data on the host to
        // outlive the scope of the function.
-       data.values_host_buffer = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, data.values_dev);
+       data.values_host_buffer = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, data.values);
        
        partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
         communication_channel,
@@ -1166,11 +1166,11 @@ namespace LinearAlgebra
       partitioner->export_to_ghosted_array_start<Number, MemorySpaceType>(
         communication_channel,
         ArrayView<const Number, MemorySpaceType>(
-          data.values_dev.data(), partitioner->locally_owned_size()),
-        ArrayView<Number, MemorySpaceType>(import_data.values_dev.data(),
+          data.values.data(), partitioner->locally_owned_size()),
+        ArrayView<Number, MemorySpaceType>(import_data.values.data(),
                                              partitioner->n_import_indices()),
         ArrayView<Number, MemorySpaceType>(
-          data.values_dev.data() + partitioner->locally_owned_size(),
+          data.values.data() + partitioner->locally_owned_size(),
           partitioner->n_ghost_indices()),
         update_ghost_values_requests);
  }
@@ -1210,7 +1210,7 @@ namespace LinearAlgebra
 // The communication is done on the host, so we need to
       // move the data back to the device.
  cudaError_t cuda_error_code =
-            cudaMemcpy(data.values_dev.data() +
+            cudaMemcpy(data.values.data() +
                          partitioner->locally_owned_size(),
                        data.values_host_buffer.data() + partitioner->locally_owned_size(),
                        partitioner->n_ghost_indices() * sizeof(Number),
@@ -1223,7 +1223,7 @@ namespace LinearAlgebra
 		{
           partitioner->export_to_ghosted_array_finish(
             ArrayView<Number, MemorySpaceType>(
-              data.values_dev.data() + partitioner->locally_owned_size(),
+              data.values.data() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
             update_ghost_values_requests);
 		}
@@ -2033,7 +2033,7 @@ namespace LinearAlgebra
       if (partitioner.use_count() > 0)
         memory +=
           partitioner->memory_consumption() / partitioner.use_count() + 1;
-      if (import_data.values_host_buffer.size() != 0 || import_data.values_dev.size() != 0)
+      if (import_data.values_host_buffer.size() != 0 || import_data.values.size() != 0)
         memory += (static_cast<std::size_t>(partitioner->n_import_indices()) *
                    sizeof(Number));
       return memory;

@@ -50,7 +50,7 @@ namespace MemorySpace
     }
 
     /**
-     * Copy the active data (values for Host and values_dev for Device) to @p begin.
+     * Copy the active data (values for Host and values for Device) to @p begin.
      * If the data is on the device it is moved to the host.
      */
     void
@@ -62,7 +62,7 @@ namespace MemorySpace
 
     /**
      * Copy the data in @p begin to the active data of the structure (values for
-     * Host and values_dev for Device). The pointer @p begin must be on the host.
+     * Host and values for Device). The pointer @p begin must be on the host.
      */
     void
     copy_from(T *begin, std::size_t n_elements)
@@ -72,14 +72,9 @@ namespace MemorySpace
     }
 
     /**
-     * Pointer to data on the host.
-     */
-    Kokkos::View<T *, Kokkos::HostSpace> values;
-
-    /**
      * Pointer to data on the device.
      */
-    Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
+    Kokkos::View<T *, typename MemorySpace::kokkos_space> values;
 
     /**
      * Pointer to data on the host. The pointer points to the same data as
@@ -121,14 +116,14 @@ namespace MemorySpace
     using MemorySpace = Host;
 
     MemorySpaceData()
-    : values_dev((dealii::Impl::ensure_kokkos_initialized(),
+    : values((dealii::Impl::ensure_kokkos_initialized(),
               Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
     {}
 
     void
     copy_to(T *begin, std::size_t n_elements)
     {
-      Assert(n_elements <= values_dev.extent(0),
+      Assert(n_elements <= values.extent(0),
              ExcMessage("n_elements greater than the size of values."));
       using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
       Kokkos::
@@ -137,14 +132,14 @@ namespace MemorySpace
       Kokkos::deep_copy(
         ExecutionSpace{},
         begin_view,
-        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)));
+        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
       ExecutionSpace{}.fence();
     }
 
     void
     copy_from(T *begin, std::size_t n_elements)
     {
-      Assert(n_elements <= values_dev.extent(0),
+      Assert(n_elements <= values.extent(0),
              ExcMessage("n_elements greater than the size of values."));
       using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
       Kokkos::View<const T *,
@@ -153,7 +148,7 @@ namespace MemorySpace
         begin_view(begin, n_elements);
       Kokkos::deep_copy(
         ExecutionSpace{},
-        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)),
+        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)),
         begin_view);
       ExecutionSpace{}.fence();
     }
@@ -161,7 +156,7 @@ namespace MemorySpace
     // unused
     Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
 
-    Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
+    Kokkos::View<T *, typename MemorySpace::kokkos_space> values;
 
     std::shared_ptr<T> values_sm_ptr;
 
@@ -188,7 +183,7 @@ namespace MemorySpace
     MemorySpaceData()
     : values_host_buffer((dealii::Impl::ensure_kokkos_initialized(),
               Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
-    , values_dev(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
+    , values(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
         "memoryspace data",
         0))
     {}
@@ -196,7 +191,7 @@ namespace MemorySpace
     void
     copy_to(T *begin, std::size_t n_elements)
     {
-      Assert(n_elements <= values_dev.extent(0),
+      Assert(n_elements <= values.extent(0),
              ExcMessage("n_elements greater than the size of values."));
       using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
       Kokkos::
@@ -205,14 +200,14 @@ namespace MemorySpace
       Kokkos::deep_copy(
         ExecutionSpace{},
         begin_view,
-        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)));
+        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
       ExecutionSpace{}.fence();
     }
 
     void
     copy_from(T *begin, std::size_t n_elements)
     {
-      Assert(n_elements <= values_dev.extent(0),
+      Assert(n_elements <= values.extent(0),
              ExcMessage("n_elements greater than the size of values."));
       using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
       Kokkos::View<const T *,
@@ -221,14 +216,14 @@ namespace MemorySpace
         begin_view(begin, n_elements);
       Kokkos::deep_copy(
         ExecutionSpace{},
-        Kokkos::subview(values_dev, Kokkos::make_pair(std::size_t(0), n_elements)),
+        Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)),
         begin_view);
       ExecutionSpace{}.fence();
     }
 
     Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
     
-    Kokkos::View<T *, typename MemorySpace::kokkos_space> values_dev;
+    Kokkos::View<T *, typename MemorySpace::kokkos_space> values;
     
     // unused
     std::shared_ptr<T> values_sm_ptr;
@@ -244,7 +239,7 @@ namespace MemorySpace
   swap(MemorySpaceData<T, Device> &u, MemorySpaceData<T, Device> &v)
   {
     std::swap(u.values, v.values);
-    std::swap(u.values_dev, v.values_dev);
+    std::swap(u.values_host_buffer, v.values_host_buffer);
   }
 
 #endif
