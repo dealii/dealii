@@ -1148,13 +1148,6 @@ namespace LinearAlgebra
 #  endif
         }
 
-      if (std::is_same_v<MemorySpaceType, MemorySpace::Device>)
-	      std::cout << "device" << std::endl;
-       if (std::is_same_v<MemorySpaceType, MemorySpace::Host>)
-              std::cout << "host" << std::endl;
-     std::cout << "size_dev: " <<  data.values_dev.extent(0) << " " << partitioner->locally_owned_size() << std::endl;
-     std::cout << "size_host: " <<  data.values.extent(0) << " " << partitioner->locally_owned_size() << std::endl;
-
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
     !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
      if (std::is_same_v<MemorySpaceType, MemorySpace::CUDA>) { 
