@@ -210,7 +210,7 @@ $T$, and depending on whether $T$ belongs to $\mathcal{T}_\Omega^h$ or not,
 we set the active_fe_index to either 0 or 1. To do so, we need to
 determine if a given cell is in $\mathcal{T}_\Omega^h$ or not.
 For this purpose, we will use the class NonMatching::MeshClassifier.
-The MeshClassifier takes the discrete level set function,
+The NonMatching::MeshClassifier takes the discrete level set function,
 described as a (DoFHandler, Vector)-pair, as arguments to its constructor:
 @code
   MeshClassifier(const DoFHandler<dim> &level_set_dof_handler,
@@ -232,7 +232,7 @@ so that the zero-contour of $\psi$ goes through $T$.
 | intersected        | $\psi(x)$ varies in sign | $T \cap \Gamma \neq \emptyset$ |
 
 Each active face is classified in the same way, according to how the sign of $\psi$ varies over the face.
-MeshClassifier lets you query this information for a given cell/face via its MeshClassifier::location_to_level_set() methods:
+NonMatching::MeshClassifier lets you query this information for a given cell/face via its NonMatching::MeshClassifier::location_to_level_set() methods:
 @code
   NonMatching::MeshClassifier<dim> mesh_classifier(dof_handler, level_set);
   mesh_classifier.reclassify();
