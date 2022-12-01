@@ -77,7 +77,7 @@ def parse_revision(dirname):
         status = 4
         if fail:
             text = test.find('Results').find('Measurement').find('Value').text
-            if text == None:
+            if text is None:
                 text=""
             failtext = text.encode('utf-8')
             failtextlines = failtext.replace('"','').split('\n')
