@@ -1494,7 +1494,7 @@ namespace VectorTools
             // constraint indices will get the normal that contain the other
             // indices.
             Tensor<1, dim> normal;
-            unsigned       constrained_index = -1;
+            unsigned int   constrained_index = numbers::invalid_unsigned_int;
             for (unsigned int d = 0; d < dim; ++d)
               if (is_constrained[d])
                 {
