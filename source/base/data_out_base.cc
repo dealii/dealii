@@ -6670,23 +6670,22 @@ namespace DataOutBase
         return create_global_data_table<dim, spacedim, float>(patches);
       });
 
-    out << "<Piece NumberOfPoints=\"" << n_nodes << "\" NumberOfCells=\""
-        << n_cells << "\" >\n";
+    // -----------------------------
+    // Now finally get around to actually doing anything. Let's start with
+    // running the first three tasks generating the vertex and cell information:
+    Threads::TaskGroup<std::string> mesh_tasks;
+    mesh_tasks += Threads::new_task(stringize_vertex_information);
+    mesh_tasks += Threads::new_task(stringize_cell_to_vertex_information);
+    mesh_tasks += Threads::new_task(stringize_cell_offset_and_type_information);
 
-    //-----------------------------
-    out << stringize_vertex_information();
-    out << stringize_cell_to_vertex_information();
-    out << stringize_cell_offset_and_type_information();
-
-    // For what follows, we have to have the reordered data available:
+    // For what follows, we have to have the reordered data available. So wait
+    // for that task to conclude and get the resulting data table:
     const Table<2, float> data_vectors =
       std::move(*create_global_data_table_task.return_value());
 
-    // then write data.  the 'POINT_DATA' means: node data (as opposed to cell
-    // data, which we do not support explicitly here). all following data sets
-    // are point data
-    out << "  <PointData Scalars=\"scalars\">\n";
-
+    // Then create the strings for the actual values of the solution vectors,
+    // again on separate tasks:
+    Threads::TaskGroup<std::string> data_tasks;
     // When writing, first write out all vector and tensor data
     std::vector<bool> data_set_handled(n_data_sets, false);
     for (const auto &range : nonscalar_data_ranges)
@@ -6697,19 +6696,30 @@ namespace DataOutBase
         for (unsigned int i = first_component; i <= last_component; ++i)
           data_set_handled[i] = true;
 
-        out << stringize_nonscalar_data_range(data_vectors, range);
+        data_tasks += Threads::new_task([&, range]() {
+          return stringize_nonscalar_data_range(data_vectors, range);
+        });
       }
 
     // Now do the left over scalar data sets
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
       if (data_set_handled[data_set] == false)
         {
-          out << stringize_scalar_data_set(data_vectors, data_set);
+          data_tasks += Threads::new_task([&, data_set]() {
+            return stringize_scalar_data_set(data_vectors, data_set);
+          });
         }
 
+    // Alright, all tasks are now running. Wait for their conclusion and output
+    // all of the data they have produced:
+    out << "<Piece NumberOfPoints=\"" << n_nodes << "\" NumberOfCells=\""
+        << n_cells << "\" >\n";
+    for (const auto &s : mesh_tasks.return_values())
+      out << s;
+    out << "  <PointData Scalars=\"scalars\">\n";
+    for (const auto &s : data_tasks.return_values())
+      out << s;
     out << "  </PointData>\n";
-
-    // Finish up writing a valid XML file
     out << " </Piece>\n";
 
     // make sure everything now gets to disk
