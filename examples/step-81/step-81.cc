@@ -870,8 +870,10 @@ int main()
 {
   try
     {
+      using namespace dealii;
+
       Step81::Maxwell<2> maxwell_2d;
-      dealii::ParameterAcceptor::initialize("parameters.prm");
+      ParameterAcceptor::initialize("parameters.prm");
       maxwell_2d.run();
     }
   catch (std::exception &exc)
