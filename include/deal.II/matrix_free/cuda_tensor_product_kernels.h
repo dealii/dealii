@@ -83,7 +83,7 @@ namespace CUDAWrappers
       static constexpr unsigned int n_q_points =
         Utilities::pow(n_q_points_1d, dim);
 
-      __device__
+      DEAL_II_HOST_DEVICE
       EvaluatorTensorProduct(int mf_object_id);
 
       /**
@@ -91,7 +91,7 @@ namespace CUDAWrappers
        * points.
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       values(Number shape_values[], const Number *in, Number *out) const;
 
       /**
@@ -99,40 +99,40 @@ namespace CUDAWrappers
        * points for a given @p direction.
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       gradients(Number shape_gradients[], const Number *in, Number *out) const;
 
       /**
        * Helper function for values() and gradients().
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       apply(Number shape_data[], const Number *in, Number *out) const;
 
       /**
        * Evaluate the finite element function at the quadrature points.
        */
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       value_at_quad_pts(Number *u);
 
       /**
        * Helper function for integrate(). Integrate the finite element function.
        */
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       integrate_value(Number *u);
 
       /**
        * Evaluate the gradients of the finite element function at the quadrature
        * points.
        */
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       gradient_at_quad_pts(const Number *const u, Number *grad_u[dim]);
 
       /**
        * Evaluate the values and the gradients of the finite element function at
        * the quadrature points.
        */
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       value_and_gradient_at_quad_pts(Number *const u, Number *grad_u[dim]);
 
       /**
@@ -140,14 +140,14 @@ namespace CUDAWrappers
        * element function.
        */
       template <bool add>
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       integrate_gradient(Number *u, Number *grad_u[dim]);
 
       /**
        * Helper function for integrate(). Integrate the values and the gradients
        * of the finite element function.
        */
-      __device__ void
+      DEAL_II_HOST_DEVICE void
       integrate_value_and_gradient(Number *u, Number *grad_u[dim]);
 
       const int mf_object_id;
@@ -156,7 +156,7 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    __device__
+    DEAL_II_HOST_DEVICE
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -169,7 +169,7 @@ namespace CUDAWrappers
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -185,7 +185,7 @@ namespace CUDAWrappers
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -201,7 +201,7 @@ namespace CUDAWrappers
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -210,17 +210,17 @@ namespace CUDAWrappers
                                           const Number *in,
                                           Number *      out) const
     {
-      const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
-      const unsigned int j = (dim == 3) ? threadIdx.y : 0;
-      const unsigned int q = (dim == 1) ? (threadIdx.x % n_q_points_1d) :
-                             (dim == 2) ? threadIdx.y :
-                                          threadIdx.z;
+      KOKKOS_IF_ON_DEVICE(
+        const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
+        const unsigned int j = (dim == 3) ? threadIdx.y : 0;
+        const unsigned int q = (dim == 1) ? (threadIdx.x % n_q_points_1d) :
+                               (dim == 2) ? threadIdx.y :
+                                            threadIdx.z;
 
-      // This loop simply multiply the shape function at the quadrature point by
-      // the value finite element coefficient.
-      Number t = 0;
-      for (int k = 0; k < n_q_points_1d; ++k)
-        {
+        // This loop simply multiply the shape function at the quadrature point
+        // by the value finite element coefficient.
+        Number t = 0;
+        for (int k = 0; k < n_q_points_1d; ++k) {
           const unsigned int shape_idx =
             dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
           const unsigned int source_idx =
@@ -231,24 +231,21 @@ namespace CUDAWrappers
                (in_place ? out[source_idx] : in[source_idx]);
         }
 
-      if (in_place)
-        __syncthreads();
+        if (in_place) __syncthreads();
 
-      const unsigned int destination_idx =
-        (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
-        (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
-                           (i + n_q_points_1d * (j + n_q_points_1d * q));
+        const unsigned int destination_idx =
+          (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
+          (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
+                             (i + n_q_points_1d * (j + n_q_points_1d * q));
 
-      if (add)
-        out[destination_idx] += t;
-      else
-        out[destination_idx] = t;
+        if (add) out[destination_idx] += t;
+        else out[destination_idx] = t;)
     }
 
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline __device__ void
+    DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -268,7 +265,7 @@ namespace CUDAWrappers
             {
               values<0, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<1, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
 
@@ -278,10 +275,10 @@ namespace CUDAWrappers
             {
               values<0, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<1, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<2, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
 
@@ -298,7 +295,7 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline __device__ void
+    DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -318,7 +315,7 @@ namespace CUDAWrappers
             {
               values<0, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<1, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
 
@@ -328,10 +325,10 @@ namespace CUDAWrappers
             {
               values<0, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<1, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<2, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
 
@@ -348,7 +345,7 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline __device__ void
+    DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -372,7 +369,7 @@ namespace CUDAWrappers
               values<0, true, false, false>(
                 get_global_shape_values<Number>(mf_object_id), u, grad_u[1]);
 
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<1, true, false, true>(get_global_shape_values<Number>(
                                              mf_object_id),
@@ -394,7 +391,7 @@ namespace CUDAWrappers
               values<0, true, false, false>(
                 get_global_shape_values<Number>(mf_object_id), u, grad_u[2]);
 
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<1, true, false, true>(get_global_shape_values<Number>(
                                              mf_object_id),
@@ -409,7 +406,7 @@ namespace CUDAWrappers
                                            grad_u[2],
                                            grad_u[2]);
 
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<2, true, false, true>(get_global_shape_values<Number>(
                                              mf_object_id),
@@ -437,7 +434,7 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline __device__ void
+    DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<
       evaluate_general,
       dim,
@@ -452,7 +449,7 @@ namespace CUDAWrappers
             {
               values<0, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               gradients<0, true, false, false>(
                 get_global_co_shape_gradients<Number>(mf_object_id),
@@ -465,10 +462,10 @@ namespace CUDAWrappers
             {
               values<0, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<1, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               gradients<0, true, false, false>(
                 get_global_co_shape_gradients<Number>(mf_object_id),
@@ -485,13 +482,13 @@ namespace CUDAWrappers
             {
               values<0, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<1, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<2, true, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               gradients<0, true, false, false>(
                 get_global_co_shape_gradients<Number>(mf_object_id),
@@ -520,7 +517,7 @@ namespace CUDAWrappers
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <bool add>
-    inline __device__ void
+    DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -550,11 +547,11 @@ namespace CUDAWrappers
                                             grad_u[1],
                                             grad_u[1]);
 
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<1, false, add, false>(
                 get_global_shape_values<Number>(mf_object_id), grad_u[0], u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               gradients<1, false, true, false>(
                 get_global_shape_gradients<Number>(mf_object_id), grad_u[1], u);
 
@@ -575,7 +572,7 @@ namespace CUDAWrappers
                                             grad_u[2],
                                             grad_u[2]);
 
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<1, false, false, true>(get_global_shape_values<Number>(
                                               mf_object_id),
@@ -590,14 +587,14 @@ namespace CUDAWrappers
                                             grad_u[2],
                                             grad_u[2]);
 
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<2, false, add, false>(
                 get_global_shape_values<Number>(mf_object_id), grad_u[0], u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<2, false, true, false>(
                 get_global_shape_values<Number>(mf_object_id), grad_u[1], u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               gradients<2, false, true, false>(
                 get_global_shape_gradients<Number>(mf_object_id), grad_u[2], u);
 
@@ -614,7 +611,7 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline __device__ void
+    DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
@@ -631,7 +628,7 @@ namespace CUDAWrappers
                 get_global_co_shape_gradients<Number>(mf_object_id),
                 grad_u[0],
                 u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<0, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
@@ -644,19 +641,19 @@ namespace CUDAWrappers
                 get_global_co_shape_gradients<Number>(mf_object_id),
                 grad_u[1],
                 u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               gradients<0, false, true, false>(
                 get_global_co_shape_gradients<Number>(mf_object_id),
                 grad_u[0],
                 u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<1, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<0, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               break;
             }
@@ -666,27 +663,27 @@ namespace CUDAWrappers
                 get_global_co_shape_gradients<Number>(mf_object_id),
                 grad_u[2],
                 u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               gradients<1, false, true, false>(
                 get_global_co_shape_gradients<Number>(mf_object_id),
                 grad_u[1],
                 u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               gradients<0, false, true, false>(
                 get_global_co_shape_gradients<Number>(mf_object_id),
                 grad_u[0],
                 u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<2, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<1, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
               values<0, false, false, true>(
                 get_global_shape_values<Number>(mf_object_id), u, u);
-              __syncthreads();
+              KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               break;
             }

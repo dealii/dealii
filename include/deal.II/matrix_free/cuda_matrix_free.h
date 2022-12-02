@@ -38,6 +38,8 @@
 #  include <deal.II/lac/cuda_vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 
+#  include <Kokkos_Core.hpp>
+
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -296,7 +298,7 @@ namespace CUDAWrappers
      *
      * @p func needs to define
      * \code
-     * __device__ void operator()(
+     * DEAL_II_HOST_DEVICE void operator()(
      *   const unsigned int                                          cell,
      *   const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
      *   CUDAWrappers::SharedData<dim, Number> *                     shared_data,
@@ -321,7 +323,7 @@ namespace CUDAWrappers
      *
      * @p func needs to define
      * \code
-     *  __device__ void operator()(
+     *  DEAL_II_HOST_DEVICE void operator()(
      *    const unsigned int                                          cell,
      *    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data);
      * static const unsigned int n_dofs_1d;
@@ -674,7 +676,7 @@ namespace CUDAWrappers
     /**
      * Constructor.
      */
-    __device__
+    DEAL_II_HOST_DEVICE
     SharedData(Number *vd, Number *gq[dim])
       : values(vd)
     {
@@ -700,7 +702,7 @@ namespace CUDAWrappers
   // This function determines the number of cells per block, possibly at compile
   // time (by virtue of being 'constexpr')
   // TODO this function should be rewritten using meta-programming
-  __host__ __device__ constexpr unsigned int
+  DEAL_II_HOST_DEVICE constexpr unsigned int
   cells_per_block_shmem(int dim, int fe_degree)
   {
     /* clang-format off */
@@ -727,14 +729,18 @@ namespace CUDAWrappers
    * @relates CUDAWrappers::MatrixFree
    */
   template <int dim>
-  __device__ inline unsigned int
+  DEAL_II_HOST_DEVICE inline unsigned int
   q_point_id_in_cell(const unsigned int n_q_points_1d)
   {
-    return (
-      dim == 1 ? threadIdx.x % n_q_points_1d :
-      dim == 2 ? threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
-                 threadIdx.x % n_q_points_1d +
-                   n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
+    KOKKOS_IF_ON_DEVICE(
+      return (dim == 1 ?
+                threadIdx.x % n_q_points_1d :
+              dim == 2 ?
+                threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
+                threadIdx.x % n_q_points_1d +
+                  n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));)
+
+    KOKKOS_IF_ON_HOST(AssertThrow(false, ExcInternalError()); return 0;)
   }
 
 
@@ -746,7 +752,7 @@ namespace CUDAWrappers
    * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
-  __device__ inline unsigned int
+  DEAL_II_HOST_DEVICE inline unsigned int
   local_q_point_id(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
@@ -765,11 +771,12 @@ namespace CUDAWrappers
    * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
-  __device__ inline typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
-  get_quadrature_point(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
-    const unsigned int                                          n_q_points_1d)
+  DEAL_II_HOST_DEVICE inline
+    typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
+    get_quadrature_point(
+      const unsigned int                                          cell,
+      const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
+      const unsigned int                                          n_q_points_1d)
   {
     return *(data->q_points + data->padding_length * cell +
              q_point_id_in_cell<dim>(n_q_points_1d));

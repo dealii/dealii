@@ -75,56 +75,56 @@ namespace CUDAWrappers
                                                   [data_array_size];
 
     template <typename Number>
-    __host__ __device__ inline DataArray<Number> &
-             get_global_shape_values(unsigned int i);
+    DEAL_II_HOST_DEVICE inline DataArray<Number> &
+    get_global_shape_values(unsigned int i);
 
     template <>
-    __host__ __device__ inline DataArray<double> &
-             get_global_shape_values<double>(unsigned int i)
+    DEAL_II_HOST_DEVICE inline DataArray<double> &
+    get_global_shape_values<double>(unsigned int i)
     {
       return global_shape_values_d[i];
     }
 
     template <>
-    __host__ __device__ inline DataArray<float> &
-             get_global_shape_values<float>(unsigned int i)
+    DEAL_II_HOST_DEVICE inline DataArray<float> &
+    get_global_shape_values<float>(unsigned int i)
     {
       return global_shape_values_f[i];
     }
 
     template <typename Number>
-    __host__ __device__ inline DataArray<Number> &
-             get_global_shape_gradients(unsigned int i);
+    DEAL_II_HOST_DEVICE inline DataArray<Number> &
+    get_global_shape_gradients(unsigned int i);
 
     template <>
-    __host__ __device__ inline DataArray<double> &
-             get_global_shape_gradients<double>(unsigned int i)
+    DEAL_II_HOST_DEVICE inline DataArray<double> &
+    get_global_shape_gradients<double>(unsigned int i)
     {
       return global_shape_gradients_d[i];
     }
 
     template <>
-    __host__ __device__ inline DataArray<float> &
-             get_global_shape_gradients<float>(unsigned int i)
+    DEAL_II_HOST_DEVICE inline DataArray<float> &
+    get_global_shape_gradients<float>(unsigned int i)
     {
       return global_shape_gradients_f[i];
     }
 
     // for collocation methods
     template <typename Number>
-    __host__ __device__ inline DataArray<Number> &
-             get_global_co_shape_gradients(unsigned int i);
+    DEAL_II_HOST_DEVICE inline DataArray<Number> &
+    get_global_co_shape_gradients(unsigned int i);
 
     template <>
-    __host__ __device__ inline DataArray<double> &
-             get_global_co_shape_gradients<double>(unsigned int i)
+    DEAL_II_HOST_DEVICE inline DataArray<double> &
+    get_global_co_shape_gradients<double>(unsigned int i)
     {
       return global_co_shape_gradients_d[i];
     }
 
     template <>
-    __host__ __device__ inline DataArray<float> &
-             get_global_co_shape_gradients<float>(unsigned int i)
+    DEAL_II_HOST_DEVICE inline DataArray<float> &
+    get_global_co_shape_gradients<float>(unsigned int i)
     {
       return global_co_shape_gradients_f[i];
     }

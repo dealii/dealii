@@ -38,7 +38,7 @@ public:
   MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in)
     : data(data_in){};
 
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
@@ -51,7 +51,7 @@ public:
 
     // set to unit vector
     fe_eval.submit_dof_value(1.);
-    __syncthreads();
+    KOKKOS_IF_ON_DEVICE(__syncthreads();)
     fe_eval.evaluate(/*evaluate_values =*/true, /*evaluate_gradients=*/true);
 
 #ifndef __APPLE__

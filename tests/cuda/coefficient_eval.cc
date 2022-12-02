@@ -35,7 +35,7 @@ class DummyOperator
 public:
   DummyOperator() = default;
 
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
@@ -53,7 +53,7 @@ public:
 
 
 template <int dim, int fe_degree>
-__device__ void
+DEAL_II_HOST_DEVICE void
 DummyOperator<dim, fe_degree>::operator()(
   const unsigned int                                          cell,
   const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
