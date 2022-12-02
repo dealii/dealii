@@ -933,7 +933,7 @@ namespace LinearAlgebra
       if (data.values.size() != 0)
         {
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
-          if (std::is_same_v<MemorySpaceType, MemorySpace::CUDA>)
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
               const cudaError_t cuda_error_code =
                 cudaMemset(data.values.data() +
@@ -1134,7 +1134,7 @@ namespace LinearAlgebra
         {
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
     !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          if (std::is_same_v<MemorySpaceType, MemorySpace::CUDA>)
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
               if (import_data.values_host_buffer.size() == 0)
                 Kokkos::resize(import_data.values_host_buffer,
@@ -1156,7 +1156,7 @@ namespace LinearAlgebra
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
     !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      if (std::is_same_v<MemorySpaceType, MemorySpace::CUDA>)
+      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
           // Move the data to the host and then move it back to the
           // device. We use values to store the elements because the function
