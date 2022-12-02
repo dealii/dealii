@@ -32,7 +32,7 @@
 
 function(define_object_library _library)
 
-  if(NOT "${_library}" MATCHES "^object_" AND NOT "${_library}" MATCHES "^bundled_")
+  if(NOT "${_library}" MATCHES "^(object|bundled)_")
     message(FATAL_ERROR
       "Internal error: The specified target name must begin with object_ "
       "or bundled_. Encountered: ${_library}"

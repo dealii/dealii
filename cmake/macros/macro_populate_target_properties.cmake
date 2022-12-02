@@ -37,11 +37,23 @@
 
 function(populate_target_properties _target _build)
 
+  if(NOT "${_target}" MATCHES "^(object|bundled|${DEAL_II_NAMESPACE})_")
+    message(FATAL_ERROR
+      "Internal error: The specified target name must begin with object_, "
+      "bundled_, or ${DEAL_II_NAMESPACE}. Encountered: ${_target}"
+      )
+  endif()
+
+  set(_visibility PRIVATE)
+  if("${_target}" MATCHES "^${DEAL_II_NAMESPACE}")
+    set(_visibility PUBLIC)
+  endif()
+
   set_target_properties(${_target} PROPERTIES LINKER_LANGUAGE "CXX")
 
-  target_link_libraries(${_target}
-    PUBLIC ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${_build}}
-           ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
+  target_link_libraries(${_target} ${_visibility}
+    ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${_build}}
+   ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
     )
 
   #
@@ -49,9 +61,9 @@ function(populate_target_properties _target _build)
   # and add the contents of ${DEAL_II_INCLUDE_DIRS} as a public interface.
   #
   target_include_directories(${_target} BEFORE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-  target_include_directories(${_target} SYSTEM PUBLIC ${DEAL_II_INCLUDE_DIRS})
+  target_include_directories(${_target} SYSTEM ${_visibility} ${DEAL_II_INCLUDE_DIRS})
 
-  # Build directory specific includes:
+  # Build-directory specific includes:
 
   target_include_directories(${_target} PRIVATE
     ${CMAKE_BINARY_DIR}/include
@@ -61,34 +73,39 @@ function(populate_target_properties _target _build)
 
   # Interface includes:
 
-  set(_includes
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-    "$<INSTALL_INTERFACE:\${DEAL_II_INCLUDE_RELDIR}>"
-    )
-  foreach(_include ${DEAL_II_BUNDLED_INCLUDE_DIRS})
-    list(APPEND _includes $<BUILD_INTERFACE:${_include}>)
-  endforeach()
-  if(NOT "${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
-    list(APPEND _includes "$<INSTALL_INTERFACE:\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled>")
+  if("${_visibility}" STREQUAL "PUBLIC")
+    set(_includes
+      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+      $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+      "$<INSTALL_INTERFACE:\${DEAL_II_INCLUDE_RELDIR}>"
+      )
+    foreach(_include ${DEAL_II_BUNDLED_INCLUDE_DIRS})
+      list(APPEND _includes $<BUILD_INTERFACE:${_include}>)
+    endforeach()
+    if(NOT "${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
+      list(APPEND _includes "$<INSTALL_INTERFACE:\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled>")
+    endif()
+    target_include_directories(${_target} INTERFACE ${_includes})
   endif()
 
-  target_include_directories(${_target} INTERFACE ${_includes})
-
-  target_compile_definitions(${_target}
-    PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+  target_compile_definitions(${_target} ${_visibility}
+    ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
     )
+
+  #
+  # Add copmile and link options with private scope
+  #
 
   separate_arguments(_compile_options UNIX_COMMAND
     "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
     )
-  target_compile_options(${_target}
-    PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
+  target_compile_options(${_target} PRIVATE
+    $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
     )
 
   separate_arguments(_link_options UNIX_COMMAND
     "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
     )
-  target_link_options(${_target} INTERFACE ${_link_options})
+  target_link_options(${_target} PRIVATE ${_link_options})
 
 endfunction()
