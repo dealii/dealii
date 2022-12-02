@@ -93,7 +93,7 @@ using namespace dealii;
 // @sect3{Coefficients and helper classes}
 
 // MatrixFree operators must use the
-// dealii::LinearAlgebra::distributed::Vector vector type. Here we define
+// LinearAlgebra::distributed::Vector vector type. Here we define
 // operations which copy to and from Trilinos vectors for compatibility with
 // the matrix-based code. Note that this functionality does not currently
 // exist for PETSc vector types, so Trilinos must be installed to use the
@@ -101,11 +101,10 @@ using namespace dealii;
 namespace ChangeVectorTypes
 {
   template <typename number>
-  void copy(LA::MPI::Vector &                                         out,
-            const dealii::LinearAlgebra::distributed::Vector<number> &in)
+  void copy(LA::MPI::Vector &                                 out,
+            const LinearAlgebra::distributed::Vector<number> &in)
   {
-    dealii::LinearAlgebra::ReadWriteVector<double> rwv(
-      out.locally_owned_elements());
+    LinearAlgebra::ReadWriteVector<double> rwv(out.locally_owned_elements());
     rwv.import(in, VectorOperation::insert);
 #ifdef USE_PETSC_LA
     AssertThrow(false,
@@ -119,10 +118,10 @@ namespace ChangeVectorTypes
 
 
   template <typename number>
-  void copy(dealii::LinearAlgebra::distributed::Vector<number> &out,
-            const LA::MPI::Vector &                             in)
+  void copy(LinearAlgebra::distributed::Vector<number> &out,
+            const LA::MPI::Vector &                     in)
   {
-    dealii::LinearAlgebra::ReadWriteVector<double> rwv;
+    LinearAlgebra::ReadWriteVector<double> rwv;
 #ifdef USE_PETSC_LA
     (void)in;
     AssertThrow(false,
@@ -916,7 +915,7 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 //
 // Finally, the system_rhs vector is of type LA::MPI::Vector, but the
 // MatrixFree class only work for
-// dealii::LinearAlgebra::distributed::Vector.  Therefore we must
+// LinearAlgebra::distributed::Vector.  Therefore we must
 // compute the right-hand side using MatrixFree functionality and then
 // use the functions in the `ChangeVectorType` namespace to copy it to
 // the correct type.
@@ -1037,7 +1036,7 @@ void LaplaceProblem<dim, degree>::solve()
             preconditioner(dof_handler, mg, mg_transfer);
 
           // Copy the solution vector and right-hand side from LA::MPI::Vector
-          // to dealii::LinearAlgebra::distributed::Vector so that we can solve.
+          // to LinearAlgebra::distributed::Vector so that we can solve.
           MatrixFreeActiveVector solution_copy;
           MatrixFreeActiveVector right_hand_side_copy;
           mf_system_matrix.initialize_dof_vector(solution_copy);

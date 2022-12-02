@@ -660,8 +660,8 @@ namespace Euler_DG
             evaluate_function<dim, VectorizedArrayType, dim>(
               *constant_function, Point<dim, VectorizedArrayType>());
 
-        const dealii::internal::EvaluatorTensorProduct<
-          dealii::internal::EvaluatorVariant::evaluate_evenodd,
+        const internal::EvaluatorTensorProduct<
+          internal::EvaluatorVariant::evaluate_evenodd,
           dim,
           n_points_1d,
           n_points_1d,
@@ -914,7 +914,7 @@ namespace Euler_DG
             // Transform values from collocation space to the original
             // Gauss-Lobatto space:
             internal::FEEvaluationImplBasisChange<
-              dealii::internal::EvaluatorVariant::evaluate_evenodd,
+              internal::EvaluatorVariant::evaluate_evenodd,
               internal::EvaluatorQuantity::hessian,
               dim,
               degree + 1,
