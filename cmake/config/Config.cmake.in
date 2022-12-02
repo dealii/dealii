@@ -140,8 +140,39 @@ set(DEAL_II_MPIEXEC_POSTFLAGS "@MPIEXEC_POSTFLAGS@")
 # Information about library targets and feature configuration
 #
 
-# The library targets file:
 set(DEAL_II_TARGET_CONFIG "${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake")
+
+#
+# We support a rather nonstandard situation where the find_package(deal.II)
+# call happens before proper setup of a toolchain via project(). The
+# reasoning behind this was to properly initialize the compiler in user
+# projects via the deal_ii_initialize_cached_variables():
+#
+#   find_package(deal.II)
+#   deal_ii_initialize_cached_variables()
+#   project(...)
+#   ...
+#   deal_ii_setup_target(...)
+#
+# This requires that the deal_ii_setup_target() loads the target
+# configuration because this has to happen after the call to project().
+#
+# Unfortunately _not_ automatically including all target definitions is
+# non-standard behavior and rather surprising. Therefore, in order to
+# support the modern way of searching for a dependency and using it:
+#
+#   project(...)
+#   find_package(deal.II)
+#   ...
+#   target_link_libraries(... dealii::dealii_[debug|release])
+#
+# we check whether project(... [CXX]) has been called prior to
+# find_package(deal.II) and if yes simply include our target configuration:
+#
+if(DEFINED CMAKE_CXX_COMPILER_ABI)
+  include(${DEAL_II_TARGET_CONFIG})
+  set(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+endif()
 
 # The Debug target:
 set(DEAL_II_TARGET_DEBUG "@CONFIG_TARGET_DEBUG@")
