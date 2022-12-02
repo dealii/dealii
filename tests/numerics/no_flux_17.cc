@@ -92,8 +92,8 @@ compare_constraints(const AffineConstraints<double> &constraints1,
             }
           for (unsigned int i = 0; i < constraint_entries_1->size(); ++i)
             {
-              if (std::abs((*constraint_entries_1)[i].first !=
-                           (*constraint_entries_2)[i].first) > tol ||
+              if ((*constraint_entries_1)[i].first !=
+                    (*constraint_entries_2)[i].first ||
                   std::abs((*constraint_entries_1)[i].second -
                            (*constraint_entries_2)[i].second) > tol)
                 {

@@ -36,14 +36,14 @@ main()
   Triangulation<2> tria2;
   GridGenerator::hyper_ball(tria);
 
-  for (const auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     {
       if (cell->center()[0] < 0)
         cell->set_refine_flag();
     }
   tria.execute_coarsening_and_refinement();
 
-  for (const auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     {
       if (cell->center()[1] < 0)
         cell->set_refine_flag();

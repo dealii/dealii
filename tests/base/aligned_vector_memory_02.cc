@@ -83,7 +83,7 @@ void
 test()
 {
   deallog << "---- Creating outer table" << std::endl;
-  Table<1, C> table({1});
+  Table<1, C> table(1);
 
   // Copy the object, then destroy the copy again.
   {
