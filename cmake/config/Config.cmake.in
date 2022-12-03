@@ -153,13 +153,6 @@ set(DEAL_II_MPIEXEC_PREFLAGS "@MPIEXEC_PREFLAGS@")
 set(DEAL_II_MPIEXEC_POSTFLAGS "@MPIEXEC_POSTFLAGS@")
 
 #
-# Build a static executable:
-#
-
-set(DEAL_II_STATIC_EXECUTABLE "@DEAL_II_STATIC_EXECUTABLE@")
-
-
-#
 # Information about include directories and libraries
 #
 

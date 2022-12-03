@@ -15,15 +15,14 @@
 
 #
 # This macro toggles the preference for static/shared libraries if
-# DEAL_II_PREFER_STATIC_LIBS=TRUE but the final executable will still be
-# dynamically linked, i.e. DEAL_II_STATIC_EXECUTABLE=OFF
+# DEAL_II_PREFER_STATIC_LIBS=TRUE.
 #
 # Usage:
 #     switch_library_preference()
 #
 
 macro(switch_library_preference)
-  if(DEAL_II_PREFER_STATIC_LIBS AND NOT DEAL_II_STATIC_EXECUTABLE)
+  if(DEAL_II_PREFER_STATIC_LIBS)
     #
     # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
     # is set. This will prefer static archives instead of shared libraries:

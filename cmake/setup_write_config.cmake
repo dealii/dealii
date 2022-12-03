@@ -103,12 +103,6 @@ if(CMAKE_CROSSCOMPILING)
     )
 endif()
 
-if(DEAL_II_STATIC_EXECUTABLE)
-  _both(
-    "#\n#        STATIC LINKAGE!\n"
-    )
-endif()
-
 _both("#\n")
 
 _detailed(

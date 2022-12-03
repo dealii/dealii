@@ -147,23 +147,6 @@ enable_if_supported(DEAL_II_CXX_FLAGS "-wd186")
 enable_if_supported(DEAL_II_CXX_FLAGS "-wd280")
 
 
-if(DEAL_II_STATIC_EXECUTABLE)
-  #
-  # To produce a static executable, we have to statically link intel's
-  # support libraries:
-  #
-  enable_if_supported(DEAL_II_LINKER_FLAGS "-static")
-  enable_if_supported(DEAL_II_LINKER_FLAGS "-static-intel")
-  enable_if_supported(DEAL_II_LINKER_FLAGS "-static-gcc")
-  enable_if_supported(DEAL_II_LINKER_FLAGS "-pthread")
-else()
-  #
-  # Explicitly link intel support libraries dynamically:
-  #
-  enable_if_supported(DEAL_II_LINKER_FLAGS "-shared-intel")
-endif()
-
-
 #############################
 #                           #
 #    For Release target:    #
