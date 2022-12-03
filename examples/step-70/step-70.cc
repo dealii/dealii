@@ -143,6 +143,8 @@ namespace LA
 #  include <TopoDS.hxx>
 #endif
 
+#include <boost/algorithm/string/case_conv.hpp>
+
 #include <cmath>
 #include <fstream>
 #include <iostream>
