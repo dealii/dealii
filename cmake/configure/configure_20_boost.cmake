@@ -146,7 +146,10 @@ endmacro()
 
 
 macro(feature_boost_configure_external)
-  enable_if_supported(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
+  #
+  # Avoid a number of warnings:
+  #
+  enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
 
   #
   # At least BOOST 1.74 has the problem that some of the BOOST headers
