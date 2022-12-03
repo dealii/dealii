@@ -79,7 +79,7 @@ namespace
     }
 
     SymmetricTensor<2, dim>
-    hessian(const Point<dim> &, const unsigned int) const
+    hessian(const Point<dim> &, const unsigned int) const override
     {
       SymmetricTensor<2, dim> hess;
       for (unsigned int i = 0; i < dim; ++i)

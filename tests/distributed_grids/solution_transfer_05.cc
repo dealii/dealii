@@ -70,7 +70,7 @@ main(int argc, char **argv)
   values[CellId("0_1:2")] = Vector<double>{0.5, 0.5, 0.5, 0.5};
   values[CellId("0_1:3")] = Vector<double>{0.5, 0.1, 0.5, 0.5};
 
-  for (const auto cell : dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler.active_cell_iterators())
     if (cell->is_artificial() == false)
       cell->set_dof_values(values[cell->id()], v);
 

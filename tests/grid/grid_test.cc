@@ -81,7 +81,7 @@ CurvedLine<dim>::get_new_point_on_line(
 {
   Point<dim> middle = FlatManifold<dim>::get_new_point_on_line(line);
 
-  // if the line is at the top of bottom
+  // if the line is at the top or bottom
   // face: do a special treatment on
   // this line. Note that if the
   // z-value of the midpoint is either
@@ -135,7 +135,7 @@ CurvedLine<dim>::get_new_point_on_quad(
   // z-value of the midpoint is either
   // 0 or 1, then the z-values of all
   // vertices of the quad is like that
-  if (dim == 3 && (middle(dim - 1) == 0) || (middle(dim - 1) == 1))
+  if (dim == 3 && ((middle(dim - 1) == 0) || (middle(dim - 1) == 1)))
     return middle;
 
   double x = middle(0), y = middle(1);
