@@ -36,7 +36,6 @@
 #     DEAL_II_UNITY_BUILD
 #     DEAL_II_EARLY_DEPRECATIONS
 #     BUILD_SHARED_LIBS
-#     DEAL_II_PREFER_STATIC_LIBS
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
 #     DEAL_II_CXX_FLAGS                    *)
 #     DEAL_II_CXX_FLAGS_DEBUG
@@ -170,12 +169,6 @@ mark_as_advanced(DEAL_II_EARLY_DEPRECATIONS)
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
   )
-
-option(DEAL_II_PREFER_STATIC_LIBS
-  "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
-  OFF
-  )
-mark_as_advanced(DEAL_II_PREFER_STATIC_LIBS)
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link paths on installation"

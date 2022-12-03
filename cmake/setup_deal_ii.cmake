@@ -148,24 +148,10 @@ set(DEAL_II_STRING_SUFFIXES
   LINKER_FLAGS_RELEASE LINKER_FLAGS_DEBUG
   )
 
-
-########################################################################
-#                                                                      #
-#              Setup static linkage and crosscompilation:              #
-#                                                                      #
-########################################################################
-
-if(DEAL_II_PREFER_STATIC_LIBS)
-  #
-  # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
-  # is set. This will prefer static archives instead of shared libraries:
-  #
-  list(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
-endif()
+#
+# Disable platform introspection when cross compiling
+#
 
 if(CMAKE_CROSSCOMPILING)
-  #
-  # Disable platform introspection when cross compiling
-  #
   set(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
 endif()
