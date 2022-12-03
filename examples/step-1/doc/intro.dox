@@ -172,7 +172,7 @@ with code written by others, that you may have to think about documenting your
 own code because you may not remember what exactly it is doing a year down the
 road (or because others will be using it as well), or coming up with ways to
 test that your program is doing the right thing. None of this is something
-that we typically train mathematicians, engineers, or scientists in but that
+that we typically train mathematicians, engineers, or scientists to do but that
 is important when you start writing software of more than a few hundred
 lines. Remember: Producing software is not the same as just writing code.
 
@@ -187,12 +187,17 @@ are worthwhile browsing through before you start any large-scale programming:
 
 - You will benefit from becoming a better programmer. An excellent
   resource to this end is the book
-  [Code Complete](https://en.wikipedia.org/wiki/Code_Complete)
+  [Code Complete](https://www.oreilly.com/library/view/code-complete-2nd/0735619670/)
   by Steve McConnell @cite CodeComplete . It's already
   a few years old, with the last edition published in 2004, but it has
   lost none of its appeal as a guide to good programming practices,
   and some of the principal developers use it as a group reading
-  project with every generation of their research group members.
+  project with every generation of their research group members. Another
+  good programming book is
+  [Refactoring: Improving the Design of Existing Code](https://martinfowler.com/books/refactoring.html)
+  by Martin Fowler that is a great introduction and resource for how
+  to continuously transform existing code to make it fit for future
+  extension @cite Refactoring .
 
 - The <a href="http://software-carpentry.org/">Software Carpentry project</a>
   that provides introductions to many topics that are important to dealing
@@ -209,6 +214,14 @@ are worthwhile browsing through before you start any large-scale programming:
   particular for parallel computing. In the "Events" section on
   that site are recorded tutorials and webinars that cover many
   interesting topics.
+
+- An article a few of us wrote, called <a
+  href="https://doi.org/10.1016/j.euromechsol.2022.104845">I'm stuck!
+  How to efficiently debug computational solid mechanics models so you
+  can enjoy the beauty of simulations</a> @cite Comellas_2023 .
+  This article discusses in
+  great detail what you do if a code doesn't work. It is also
+  available on <a href="https://arxiv.org/abs/2209.04198">arXiv</a>.
 
 - An article on <a href="http://arxiv.org/abs/1210.0530">Best
   Practices for Scientific Computing</a> that gives an introduction to
