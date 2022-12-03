@@ -97,48 +97,28 @@ endforeach()
 #                                                                      #
 ########################################################################
 
-if(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-  #
-  # *Hooray* We are allowed to set compiler flags :-]
-  #
-
+if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
+    CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
   #
   # General setup for GCC and compilers sufficiently close to GCC:
   #
-  if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
-      CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-    verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
-    set(DEAL_II_KNOWN_COMPILER TRUE)
-  endif()
+  verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
 
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
   #
   # Setup for ICC compiler (version >= 10):
   #
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
-    set(DEAL_II_KNOWN_COMPILER TRUE)
-  endif()
+  verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
 
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   #
   # Setup for MSVC compiler (version >= 2012):
   #
-   if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
-    set(DEAL_II_KNOWN_COMPILER TRUE)
-  endif()
-
-  if(NOT DEAL_II_KNOWN_COMPILER)
-    message(FATAL_ERROR "\n"
-      "Unknown compiler!\n"
-      "If you're serious about it, set DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF "
-      "and set the relevant compiler options by hand.\n\n"
-      )
-  endif()
+  verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
 
 else()
-
-  message(STATUS
-    "Skipped setup of default compiler flags "
-    "(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF)"
+  message(WARNING "\nUnknown compiler!\n"
+    "Please populate the CMake variables DEAL_II_CXX_FLAGS(|DEBUG|RELEASE) "
+    "and DEAL_II_LINKER_FLAGS(|DEBUG|RELEASE) as needed."
     )
 endif()

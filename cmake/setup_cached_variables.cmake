@@ -32,7 +32,6 @@
 #
 #     CMAKE_BUILD_TYPE
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
-#     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 #     DEAL_II_SETUP_COVERAGE
 #     DEAL_II_UNITY_BUILD
 #     DEAL_II_EARLY_DEPRECATIONS
@@ -152,12 +151,6 @@ option(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   ON
   )
 mark_as_advanced(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-
-option(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-  "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
-  ON
-  )
-mark_as_advanced(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
 option(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
