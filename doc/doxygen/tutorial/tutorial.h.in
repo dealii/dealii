@@ -202,6 +202,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-12b</td>
+ *       <td> A variant of step-12 (for linear advection problems), but
+ *       using the MeshWorker framework for the assembly of linear systems.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-13</td>
  *       <td> Software design questions and
  *       how to write a modular, extensible finite element program.
