@@ -388,10 +388,9 @@ private:
   // We will use the following types throughout the program. First the
   // matrix-based types, after that the matrix-free classes. For the
   // matrix-free implementation, we use @p float for the level operators.
-  using MatrixType         = LA::MPI::SparseMatrix;
-  using VectorType         = LA::MPI::Vector;
-  using PreconditionAMG    = LA::MPI::PreconditionAMG;
-  using PreconditionJacobi = LA::MPI::PreconditionJacobi;
+  using MatrixType      = LA::MPI::SparseMatrix;
+  using VectorType      = LA::MPI::Vector;
+  using PreconditionAMG = LA::MPI::PreconditionAMG;
 
   using MatrixFreeLevelMatrix = MatrixFreeOperators::LaplaceOperator<
     dim,
@@ -1006,7 +1005,7 @@ void LaplaceProblem<dim, degree>::solve()
                                       PreconditionIdentity>
             coarse_grid_solver(coarse_solver, mf_mg_matrix[0], identity);
 
-          using Smoother = dealii::PreconditionJacobi<MatrixFreeLevelMatrix>;
+          using Smoother = PreconditionJacobi<MatrixFreeLevelMatrix>;
           MGSmootherPrecondition<MatrixFreeLevelMatrix,
                                  Smoother,
                                  MatrixFreeLevelVector>
