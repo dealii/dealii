@@ -21,9 +21,7 @@
 # Clear the test flags because FindThreads.cmake will use a C compiler:
 clear_cmake_required()
 
-switch_library_preference()
 find_package(Threads)
-switch_library_preference()
 
 reset_cmake_required()
 
