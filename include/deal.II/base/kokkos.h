@@ -22,9 +22,18 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Impl
 {
+  /**
+   * Records if Kokkos has been initialized by deal.II. The value stored is only
+   * meaningful after ensure_kokkos_initialized() has been called.
+   */
+  extern bool dealii_initialized_kokkos;
+
+  /**
+   * Makes sure that Kokkos is initialized. Sets dealii_initialized_kokkos.
+   */
   void
   ensure_kokkos_initialized();
-}
+} // namespace Impl
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -24,39 +24,14 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Impl
 {
+  bool dealii_initialized_kokkos = false;
+
   void
   ensure_kokkos_initialized()
   {
     if (!Kokkos::is_initialized())
       {
-        GrowingVectorMemory<
-          LinearAlgebra::distributed::Vector<double, MemorySpace::Host>>{};
-        GrowingVectorMemory<
-          LinearAlgebra::distributed::Vector<float, MemorySpace::Host>>{};
-#ifdef DEAL_II_WITH_CUDA
-        GrowingVectorMemory<
-          LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>{};
-        GrowingVectorMemory<
-          LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>{};
-#endif
-        Kokkos::push_finalize_hook(
-          GrowingVectorMemory<
-            LinearAlgebra::distributed::Vector<double, MemorySpace::Host>>::
-            release_unused_memory);
-        Kokkos::push_finalize_hook(
-          GrowingVectorMemory<
-            LinearAlgebra::distributed::Vector<float, MemorySpace::Host>>::
-            release_unused_memory);
-#ifdef DEAL_II_WITH_CUDA
-        Kokkos::push_finalize_hook(
-          GrowingVectorMemory<
-            LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>::
-            release_unused_memory);
-        Kokkos::push_finalize_hook(
-          GrowingVectorMemory<
-            LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>::
-            release_unused_memory);
-#endif
+        dealii_initialized_kokkos = true;
         Kokkos::initialize();
         std::atexit(Kokkos::finalize);
       }

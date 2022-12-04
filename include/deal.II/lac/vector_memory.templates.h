@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/kokkos.h>
 #include <deal.II/base/memory_consumption.h>
 
 #include <deal.II/lac/vector_memory.h>
@@ -32,7 +33,21 @@ template <typename VectorType>
 typename GrowingVectorMemory<VectorType>::Pool &
 GrowingVectorMemory<VectorType>::get_pool()
 {
-  static GrowingVectorMemory<VectorType>::Pool pool;
+  // Kokkos needs to be initialized before constructing the static Pool for
+  // vector types that use Kokkos.
+  // If Kokkos is initialized by deal.II, this make sure that it is finalized
+  // after the Pool has been destroyed.
+  // If Kokkos is not initialized by deal.II, we assume that Kokkos is not
+  // finalized past program end together with static variables and we need to
+  // make sure to empty the Pool when finalizing Kokkos so that the destruction
+  // of the Pool doesn't call Kokkos functions.
+  Impl::ensure_kokkos_initialized();
+  static auto pool = []() {
+    if (!Impl::dealii_initialized_kokkos)
+      Kokkos::push_finalize_hook(
+        GrowingVectorMemory<VectorType>::release_unused_memory);
+    return GrowingVectorMemory<VectorType>::Pool{};
+  }();
   return pool;
 }
 
