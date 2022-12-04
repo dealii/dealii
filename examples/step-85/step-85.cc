@@ -377,11 +377,11 @@ namespace Step85
         // immersed quadrature rules.
         non_matching_fe_values.reinit(cell);
 
-        // After calling reinit, we can retrieve a dealii::FEValues object with
+        // After calling reinit, we can retrieve a FEValues object with
         // quadrature points that corresponds to integrating over the inside
         // region of the cell. This is the object we use to do the local
-        // assembly. This is similar to how hp::FEValues builds dealii::FEValues
-        // objects. However, one difference here is that the dealii::FEValues
+        // assembly. This is similar to how hp::FEValues builds FEValues
+        // objects. However, one difference here is that the FEValues
         // object is returned as an optional. This is a type that wraps an
         // object that may or may not be present. This requires us to add an
         // if-statement to check if the returned optional contains a value,

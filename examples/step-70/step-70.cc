@@ -1431,9 +1431,9 @@ namespace Step70
     std::vector<types::global_dof_index> fluid_dof_indices(
       fluid_fe->n_dofs_per_cell());
 
-    FullMatrix<double>     local_matrix(fluid_fe->n_dofs_per_cell(),
+    FullMatrix<double> local_matrix(fluid_fe->n_dofs_per_cell(),
                                     fluid_fe->n_dofs_per_cell());
-    dealii::Vector<double> local_rhs(fluid_fe->n_dofs_per_cell());
+    Vector<double>     local_rhs(fluid_fe->n_dofs_per_cell());
 
     const auto penalty_parameter =
       1.0 / GridTools::minimal_cell_diameter(fluid_tria);
@@ -1568,9 +1568,8 @@ namespace Step70
     const auto invS = inverse_operator(S, cg, amgS);
 
     const auto P = block_diagonal_operator<2, LA::MPI::BlockVector>(
-      std::array<
-        dealii::LinearOperator<typename LA::MPI::BlockVector::BlockType>,
-        2>{{amgA, amgS}});
+      std::array<LinearOperator<typename LA::MPI::BlockVector::BlockType>, 2>{
+        {amgA, amgS}});
 
     SolverControl solver_control(system_matrix.m(),
                                  1e-10 * system_rhs.l2_norm());

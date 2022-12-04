@@ -128,11 +128,11 @@ namespace Step81
     std::complex<double> mu_inv(const Point<dim> & x,
                                 types::material_id material);
 
-    rank2_type sigma(const dealii::Point<dim> &x,
-                     types::material_id        left,
-                     types::material_id        right);
+    rank2_type sigma(const Point<dim> & x,
+                     types::material_id left,
+                     types::material_id right);
 
-    rank1_type J_a(const dealii::Point<dim> &point, types::material_id id);
+    rank1_type J_a(const Point<dim> &point, types::material_id id);
 
   private:
     rank2_type           epsilon_1;
@@ -212,7 +212,7 @@ namespace Step81
 
   template <int dim>
   typename Parameters<dim>::rank2_type
-  Parameters<dim>::sigma(const dealii::Point<dim> & /*x*/,
+  Parameters<dim>::sigma(const Point<dim> & /*x*/,
                          types::material_id left,
                          types::material_id right)
   {
@@ -221,8 +221,7 @@ namespace Step81
 
   template <int dim>
   typename Parameters<dim>::rank1_type
-  Parameters<dim>::J_a(const dealii::Point<dim> &point,
-                       types::material_id /*id*/)
+  Parameters<dim>::J_a(const Point<dim> &point, types::material_id /*id*/)
   {
     rank1_type J_a;
     const auto distance = (dipole_position - point).norm() / dipole_radius;
@@ -572,8 +571,8 @@ namespace Step81
   // This is a helper function that takes the tangential component of a tensor.
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline Tensor<1, dim, std::complex<double>>
-  tangential_part(const dealii::Tensor<1, dim, std::complex<double>> &tensor,
-                  const Tensor<1, dim> &                              normal)
+  tangential_part(const Tensor<1, dim, std::complex<double>> &tensor,
+                  const Tensor<1, dim> &                      normal)
   {
     auto result = tensor;
     result[0]   = normal[1] * (tensor[0] * normal[1] - tensor[1] * normal[0]);

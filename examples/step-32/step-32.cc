@@ -77,7 +77,7 @@
 
 // This is the only include file that is new: It introduces the
 // parallel::distributed::SolutionTransfer equivalent of the
-// dealii::SolutionTransfer class to take a solution from on mesh to the next
+// SolutionTransfer class to take a solution from on mesh to the next
 // one upon mesh refinement, but in the case of parallel distributed
 // triangulations:
 #include <deal.II/distributed/solution_transfer.h>

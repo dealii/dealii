@@ -36,7 +36,7 @@
 // <code>distributed/tria.h</code> and
 // <code>lac/la_parallel_vector.h</code>. Instead of a Trilinos, or PETSc
 // specific matrix class, we will use a non-distributed
-// dealii::SparseMatrix (<code>lac/sparse_matrix.h</code>) to store the local
+// SparseMatrix (<code>lac/sparse_matrix.h</code>) to store the local
 // part of the $\mathbf{c}_{ij}$, $\mathbf{n}_{ij}$ and $d_{ij}$ matrices.
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/parallel.h>
@@ -1277,17 +1277,17 @@ namespace Step69
               // First column-loop: we compute and store the entries of the
               // matrix norm_matrix and write normalized entries into the
               // matrix nij_matrix:
-              std::for_each(
-                sparsity_pattern.begin(row_index),
-                sparsity_pattern.end(row_index),
-                [&](const dealii::SparsityPatternIterators::Accessor &jt) {
-                  const auto   c_ij = gather_get_entry(cij_matrix, &jt);
-                  const double norm = c_ij.norm();
+              std::for_each(sparsity_pattern.begin(row_index),
+                            sparsity_pattern.end(row_index),
+                            [&](const SparsityPatternIterators::Accessor &jt) {
+                              const auto c_ij =
+                                gather_get_entry(cij_matrix, &jt);
+                              const double norm = c_ij.norm();
 
-                  set_entry(norm_matrix, &jt, norm);
-                  for (unsigned int j = 0; j < dim; ++j)
-                    set_entry(nij_matrix[j], &jt, c_ij[j] / norm);
-                });
+                              set_entry(norm_matrix, &jt, norm);
+                              for (unsigned int j = 0; j < dim; ++j)
+                                set_entry(nij_matrix[j], &jt, c_ij[j] / norm);
+                            });
             }
         };
 
@@ -2636,9 +2636,8 @@ namespace Step69
     // for VectorTools::interpolate(). We work around this issue by, first,
     // creating a lambda function that for a given position <code>x</code>
     // returns just the value of the <code>i</code>th component. This
-    // lambda in turn is converted to a dealii::Function with the help of
+    // lambda in turn is converted to a Function<dim> object with the help of
     // the ScalarFunctionFromFunctionObject wrapper.
-
     for (unsigned int i = 0; i < problem_dimension; ++i)
       VectorTools::interpolate(offline_data.dof_handler,
                                ScalarFunctionFromFunctionObject<dim, double>(
@@ -2681,7 +2680,7 @@ namespace Step69
 
     discretization.triangulation.save(name + "-checkpoint.mesh");
 
-    if (dealii::Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
         std::ofstream file(name + "-checkpoint.metadata", std::ios::binary);
         boost::archive::binary_oarchive oa(file);
