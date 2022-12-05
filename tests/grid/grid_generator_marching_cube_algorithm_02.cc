@@ -43,8 +43,31 @@ using namespace dealii;
 using VectorType = LinearAlgebra::distributed::Vector<double>;
 
 template <int dim>
+class HeavisideFunction : public Function<dim>
+{
+public:
+  HeavisideFunction(const Point<dim> &center, const double radius)
+    : Function<dim>(1)
+    , distance_sphere(center, radius)
+  {}
+
+  double
+  value(const Point<dim> &p, const unsigned int component) const
+  {
+    const double distance = distance_sphere.value(p);
+
+    // compute sign
+    return boost::math::sign(distance);
+  }
+
+  Functions::SignedDistance::Sphere<dim> distance_sphere;
+};
+
+template <int dim>
 void
-test(const unsigned int n_subdivisions, const double iso_level)
+create_mca_tria(const unsigned int   n_subdivisions,
+                const double         iso_level,
+                const Function<dim> &my_function)
 {
   deallog << "dim=" << dim << " iso level: " << iso_level << std::endl;
   const int degree        = 3;
@@ -73,11 +96,10 @@ test(const unsigned int n_subdivisions, const double iso_level)
                    locally_relevant_dofs,
                    MPI_COMM_WORLD);
 
-  dealii::VectorTools::interpolate(
-    mapping,
-    background_dof_handler,
-    Functions::SignedDistance::Sphere<dim>(Point<dim>(), 0.75),
-    ls_vector);
+  dealii::VectorTools::interpolate(mapping,
+                                   background_dof_handler,
+                                   my_function,
+                                   ls_vector);
 
   std::vector<Point<dim>> vertices;
 
@@ -104,6 +126,27 @@ test(const unsigned int n_subdivisions, const double iso_level)
     }
 }
 
+template <int dim>
+void
+test()
+{
+  for (unsigned int i = 1; i <= 3; ++i)
+    {
+      {
+        deallog << "signed distance function" << std::endl;
+        const auto my_function =
+          Functions::SignedDistance::Sphere<dim>(Point<dim>(), 0.75);
+        create_mca_tria<dim>(i, -0.1 + i * 0.05, my_function);
+      }
+      {
+        // test function with constant regions
+        deallog << "heaviside function" << std::endl;
+        const auto my_function = HeavisideFunction<dim>(Point<dim>(), 0.75);
+        create_mca_tria<dim>(i, 0, my_function);
+      }
+    }
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -112,13 +155,8 @@ main(int argc, char *argv[])
 
   deallog << std::scientific << std::setprecision(6);
 
-  // dim==1
-  for (unsigned int i = 1; i <= 3; ++i)
-    test<1>(i, -0.1 + i * 0.05);
-
-  // dim==2
-  for (unsigned int i = 1; i <= 3; ++i)
-    test<2>(i, -0.1 + i * 0.05);
+  test<1>();
+  test<2>();
 
   return 0;
 }
