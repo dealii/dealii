@@ -110,5 +110,15 @@ main(int argc, char **argv)
       check_solve(solver_control, A, u, f, preconditioner, false);
     }
     deallog.pop();
+    deallog.push("Reuse");
+    {
+      // Expects success
+      SolverControl solver_control(200, 1.e-1);
+      solver_control.enable_history_data();
+
+      check_solve(solver_control, A, u, f, preconditioner, true);
+      check_solve(solver_control, A, u, f, preconditioner, true);
+    }
+    deallog.pop();
   }
 }
