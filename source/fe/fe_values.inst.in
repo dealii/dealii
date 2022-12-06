@@ -40,8 +40,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \{
       namespace FEValuesImplementation
       \{
-        template class MappingRelatedData<deal_II_dimension,
-                                          deal_II_space_dimension>;
         template class FiniteElementRelatedData<deal_II_dimension,
                                                 deal_II_space_dimension>;
       \}

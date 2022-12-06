@@ -28,6 +28,7 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_related_data.h>
 
 #include <memory>
 

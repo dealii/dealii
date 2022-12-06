@@ -23,6 +23,7 @@
 #include <deal.II/base/derivative_form.h>
 
 #include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping_related_data.h>
 
 #include <deal.II/grid/tria.h>
 

@@ -24,6 +24,7 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_related_data.h>
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
