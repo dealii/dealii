@@ -6942,12 +6942,6 @@ namespace GridTools
                 if (i + 1 == n_subdivisions)
                   vertices.emplace_back(points[mask[1]]);
               }
-            // check for a saddle point, if iso_level values of the two
-            // corner nodes are identical
-            else if ((std::abs(ls_values[mask[0]] - ls_values[mask[1]]) <
-                      tolerance) &&
-                     (ls_values[mask[0]] >= iso_level))
-              vertices.emplace_back(0.5 * (points[mask[0]] + points[mask[1]]));
             // check if the edge is cut
             else if (((ls_values[mask[0]] > iso_level) &&
                       (ls_values[mask[1]] < iso_level)) ||

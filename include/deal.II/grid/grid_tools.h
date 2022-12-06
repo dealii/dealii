@@ -3431,6 +3431,9 @@ namespace GridTools
    * @note The resulting mesh will not be of high quality, since it might
    *   contain cells with very small diameters if the mesh is cut close to a
    *   vertex.
+   *
+   * @note Iso lines/contours as a saddle point within a subcell is not
+   *       detected by the implemented algorithm.
    */
   template <int dim, typename VectorType>
   class MarchingCubeAlgorithm
