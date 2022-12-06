@@ -103,12 +103,6 @@ if(CMAKE_CROSSCOMPILING)
     )
 endif()
 
-if(DEAL_II_STATIC_EXECUTABLE)
-  _both(
-    "#\n#        STATIC LINKAGE!\n"
-    )
-endif()
-
 _both("#\n")
 
 _detailed(
@@ -162,9 +156,6 @@ endif()
 
 _detailed("#\n")
 
-if(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-  _both("#  WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
-endif()
 _both("#  Configured Features (")
 if(DEFINED DEAL_II_ALLOW_BUNDLED)
   _both("DEAL_II_ALLOW_BUNDLED = ${DEAL_II_ALLOW_BUNDLED}, ")

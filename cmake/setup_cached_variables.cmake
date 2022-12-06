@@ -32,13 +32,10 @@
 #
 #     CMAKE_BUILD_TYPE
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
-#     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 #     DEAL_II_SETUP_COVERAGE
 #     DEAL_II_UNITY_BUILD
 #     DEAL_II_EARLY_DEPRECATIONS
 #     BUILD_SHARED_LIBS
-#     DEAL_II_PREFER_STATIC_LIBS
-#     DEAL_II_STATIC_EXECUTABLE
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
 #     DEAL_II_CXX_FLAGS                    *)
 #     DEAL_II_CXX_FLAGS_DEBUG
@@ -153,12 +150,6 @@ option(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   )
 mark_as_advanced(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
 
-option(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-  "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
-  ON
-  )
-mark_as_advanced(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-
 option(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
   OFF
@@ -178,29 +169,6 @@ mark_as_advanced(DEAL_II_EARLY_DEPRECATIONS)
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
   )
-
-option(DEAL_II_PREFER_STATIC_LIBS
-  "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
-  OFF
-  )
-mark_as_advanced(DEAL_II_PREFER_STATIC_LIBS)
-
-option(DEAL_II_STATIC_EXECUTABLE
-  "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF and DEAL_II_PREFER_STATIC_LIBS=ON"
-  OFF
-  )
-mark_as_advanced(DEAL_II_STATIC_EXECUTABLE)
-
-if(DEAL_II_STATIC_EXECUTABLE)
-  set(BUILD_SHARED_LIBS "OFF" CACHE BOOL
-    "Build a shared library"
-    FORCE
-    )
-  set(DEAL_II_PREFER_STATIC_LIBS "ON" CACHE BOOL
-    "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
-    FORCE
-    )
-endif()
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link paths on installation"
