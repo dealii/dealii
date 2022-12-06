@@ -1484,9 +1484,9 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
       {
         static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value &&
+          std::is_same<MemorySpace, ::dealii::MemorySpace::Device>::value &&
             std::is_same<Number, Number2>::value,
-          "For the CUDA MemorySpace Number and Number2 should be the same type");
+          "For the Device MemorySpace Number and Number2 should be the same type");
       }
 
       static void
@@ -2097,7 +2097,6 @@ namespace internal
           }
       }
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
       template <typename MemorySpace2>
       static void
       import_elements(
@@ -2111,51 +2110,44 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::Device>::value,
           int> = 0)
       {
         if (operation == VectorOperation::insert)
           {
-            cudaError_t cuda_error_code = cudaMemcpy(data.values.data(),
-                                                     v_data.values.data(),
-                                                     size * sizeof(Number),
-                                                     cudaMemcpyDeviceToHost);
-            AssertCuda(cuda_error_code);
+            Kokkos::deep_copy(
+              Kokkos::subview(data.values,
+                              Kokkos::pair<size_type, size_type>(0, size)),
+              Kokkos::subview(v_data.values,
+                              Kokkos::pair<size_type, size_type>(0, size)));
           }
         else
           {
             AssertThrow(false, ExcNotImplemented());
           }
       }
-#endif
     };
 
 
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
     template <typename Number>
-    struct functions<Number, Number, ::dealii::MemorySpace::CUDA>
+    struct functions<Number, Number, ::dealii::MemorySpace::Device>
     {
-      static const int block_size =
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::block_size;
-      static const int chunk_size =
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::chunk_size;
-
       static void
       copy(
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        cudaError_t cuda_error_code = cudaMemcpy(data.values.data(),
-                                                 v_data.values.data(),
-                                                 size * sizeof(Number),
-                                                 cudaMemcpyDeviceToDevice);
-        AssertCuda(cuda_error_code);
+        Kokkos::deep_copy(
+          Kokkos::subview(data.values,
+                          Kokkos::pair<size_type, size_type>(0, size)),
+          Kokkos::subview(v_data.values,
+                          Kokkos::pair<size_type, size_type>(0, size)));
       }
 
       static void
@@ -2163,13 +2155,13 @@ namespace internal
           const size_type size,
           const Number    s,
           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::CUDA>
+                                                 ::dealii::MemorySpace::Device>
             &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
-          <<<n_blocks, block_size>>>(data.values.data(), s, size);
-        AssertCudaKernel();
+        Kokkos::deep_copy(
+          Kokkos::subview(data.values,
+                          Kokkos::pair<size_type, size_type>(0, size)),
+          s);
       }
 
       static void
@@ -2177,18 +2169,20 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
-          <<<n_blocks, block_size>>>(data.values.data(),
-                                     1.,
-                                     v_data.values.data(),
-                                     size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(int i) { data.values(i) += v_data.values(i); });
+        exec.fence();
       }
 
       static void
@@ -2196,18 +2190,20 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
-          <<<n_blocks, block_size>>>(data.values.data(),
-                                     -1.,
-                                     v_data.values.data(),
-                                     size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) { data.values(i) -= v_data.values(i); });
+        exec.fence();
       }
 
       static void
@@ -2216,13 +2212,18 @@ namespace internal
         const size_type size,
         Number          a,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
-          <<<n_blocks, block_size>>>(data.values.data(), a, size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) { data.values(i) += a; });
+        exec.fence();
       }
 
       static void
@@ -2231,18 +2232,22 @@ namespace internal
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
-          <<<n_blocks, block_size>>>(data.values.data(),
-                                     a,
-                                     v_data.values.data(),
-                                     size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) {
+            data.values(i) += a * v_data.values(i);
+          });
+        exec.fence();
       }
 
       static void
@@ -2252,22 +2257,24 @@ namespace internal
         const Number    a,
         const Number    b,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aVbW<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values.data(),
-                                                    a,
-                                                    v_data.values.data(),
-                                                    b,
-                                                    w_data.values.data(),
-                                                    size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) {
+            data.values(i) += a * v_data.values(i) + b * w_data.values(i);
+          });
+        exec.fence();
       }
 
       static void
@@ -2276,16 +2283,22 @@ namespace internal
         const size_type size,
         const Number    x,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(
-            x, data.values.data(), 1., v_data.values.data(), size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) {
+            data.values(i) = x * data.values(i) + v_data.values(i);
+          });
+        exec.fence();
       }
 
       static void
@@ -2295,16 +2308,22 @@ namespace internal
         const Number    x,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(
-            x, data.values.data(), a, v_data.values.data(), size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) {
+            data.values(i) = x * data.values(i) + a * v_data.values(i);
+          });
+        exec.fence();
       }
 
       static void
@@ -2315,23 +2334,25 @@ namespace internal
         const Number    a,
         const Number    b,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(x,
-                                                    data.values.data(),
-                                                    a,
-                                                    v_data.values.data(),
-                                                    b,
-                                                    w_data.values.data(),
-                                                    size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) {
+            data.values(i) =
+              x * data.values(i) + a * v_data.values(i) + b * w_data.values(i);
+          });
+        exec.fence();
       }
 
       static void
@@ -2340,13 +2361,18 @@ namespace internal
         const size_type size,
         const Number    factor,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
-          <<<n_blocks, block_size>>>(data.values.data(), factor, size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) { data.values(i) *= factor; });
+        exec.fence();
       }
 
       static void
@@ -2354,17 +2380,20 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::scale<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values.data(),
-                                                    v_data.values.data(),
-                                                    size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) { data.values(i) *= v_data.values(i); });
+        exec.fence();
       }
 
       static void
@@ -2373,18 +2402,22 @@ namespace internal
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values.data(),
-                                                    a,
-                                                    v_data.values.data(),
-                                                    size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) {
+            data.values(i) = a * v_data.values(i);
+          });
+        exec.fence();
       }
 
       static void
@@ -2394,63 +2427,50 @@ namespace internal
         const Number    a,
         const Number    b,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values.data(),
-                                                    a,
-                                                    v_data.values.data(),
-                                                    b,
-                                                    w_data.values.data(),
-                                                    size);
-        AssertCudaKernel();
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_for(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i) {
+            data.values(i) = a * v_data.values(i) + b * w_data.values(i);
+          });
+        exec.fence();
       }
 
       static Number
       dot(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
           const size_type size,
           const ::dealii::MemorySpace::
-            MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+            MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::CUDA>
+                                                 ::dealii::MemorySpace::Device>
             &data)
       {
-        Number *    result_device;
-        cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-        AssertCuda(error_code);
-        error_code = cudaMemset(result_device, 0, sizeof(Number));
-        AssertCuda(error_code);
-
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::double_vector_reduction<
-          Number,
-          ::dealii::LinearAlgebra::CUDAWrappers::kernel::DotProduct<Number>>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
-                                                    data.values.data(),
-                                                    v_data.values.data(),
-                                                    static_cast<unsigned int>(
-                                                      size));
-        AssertCudaKernel();
-
-        // Copy the result back to the host
         Number result;
-        error_code = cudaMemcpy(&result,
-                                result_device,
-                                sizeof(Number),
-                                cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-        // Free the memory on the device
-        error_code = cudaFree(result_device);
-        AssertCuda(error_code);
+
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_reduce(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i, Number & update) {
+            update += data.values(i) * v_data.values(i);
+          },
+          result);
 
         AssertIsFinite(result);
-
         return result;
       }
 
@@ -2460,9 +2480,8 @@ namespace internal
                &             thread_loop_partitioner,
              const size_type size,
              real_type &     sum,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data)
+             ::dealii::MemorySpace::
+               MemorySpaceData<Number, ::dealii::MemorySpace::Device> &data)
       {
         sum = dot(thread_loop_partitioner, size, data, data);
       }
@@ -2472,32 +2491,23 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &data)
       {
-        Number *    result_device;
-        cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-        AssertCuda(error_code);
-        error_code = cudaMemset(result_device, 0, sizeof(Number));
-
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
-          Number,
-          ::dealii::LinearAlgebra::CUDAWrappers::kernel::ElemSum<Number>>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
-                                                    data.values.data(),
-                                                    size);
-
-        // Copy the result back to the host
         Number result;
-        error_code = cudaMemcpy(&result,
-                                result_device,
-                                sizeof(Number),
-                                cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-        // Free the memory on the device
-        error_code = cudaFree(result_device);
-        AssertCuda(error_code);
 
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_reduce(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i, Number & update) {
+            update += data.values(i);
+          },
+          result);
+
+        AssertIsFinite(result);
         return result;
       }
 
@@ -2508,44 +2518,44 @@ namespace internal
         const size_type size,
         real_type &     sum,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        Number *    result_device;
-        cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-        AssertCuda(error_code);
-        error_code = cudaMemset(result_device, 0, sizeof(Number));
-
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
-          Number,
-          ::dealii::LinearAlgebra::CUDAWrappers::kernel::L1Norm<Number>>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
-                                                    data.values.data(),
-                                                    size);
-
-        // Copy the result back to the host
-        error_code = cudaMemcpy(&sum,
-                                result_device,
-                                sizeof(Number),
-                                cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-        // Free the memory on the device
-        error_code = cudaFree(result_device);
-        AssertCuda(error_code);
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_reduce(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i, Number & update) {
+            update += Kokkos::abs(data.values(i));
+          },
+          sum);
       }
 
       template <typename real_type>
       static void
       norm_p(
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type,
-        real_type &,
-        real_type,
+        const size_type size,
+        real_type &     sum,
+        real_type       exp,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA> &)
+                                               ::dealii::MemorySpace::Device>
+          &data)
       {
-        Assert(false, ExcNotImplemented());
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_reduce(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i, Number & update) {
+            update += Kokkos::pow(Kokkos::abs(data.values(i)), exp);
+          },
+          sum);
       }
 
       static Number
@@ -2554,33 +2564,29 @@ namespace internal
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data)
       {
-        Number *    res_d;
-        cudaError_t error_code = cudaMalloc(&res_d, sizeof(Number));
-        AssertCuda(error_code);
-        error_code = cudaMemset(res_d, 0, sizeof(Number));
-        AssertCuda(error_code);
-
-        const int n_blocks = 1 + size / (chunk_size * block_size);
-        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_and_dot<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(res_d,
-                                                    data.values.data(),
-                                                    v_data.values.data(),
-                                                    w_data.values.data(),
-                                                    a,
-                                                    size);
-
         Number res;
-        error_code =
-          cudaMemcpy(&res, res_d, sizeof(Number), cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-        error_code = cudaFree(res_d);
+
+        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+          execution_space{};
+        Kokkos::parallel_reduce(
+          Kokkos::RangePolicy<
+            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
+                                                                          0,
+                                                                          size),
+          KOKKOS_LAMBDA(size_type i, Number & update) {
+            data.values(i) += a * v_data.values(i);
+            update +=
+              data.values(i) * Number(numbers::NumberTraits<Number>::conjugate(
+                                 w_data.values(i)));
+          },
+          res);
 
         return res;
       }
@@ -2595,10 +2601,10 @@ namespace internal
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
           &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::Device>::value,
           int> = 0)
       {
         if (operation == VectorOperation::insert)
@@ -2625,7 +2631,7 @@ namespace internal
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
           &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::CUDA>
+                                               ::dealii::MemorySpace::Device>
           &data,
         std::enable_if_t<
           std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
@@ -2633,11 +2639,11 @@ namespace internal
       {
         if (operation == VectorOperation::insert)
           {
-            cudaError_t cuda_error_code = cudaMemcpy(data.values.data(),
-                                                     v_data.values.data(),
-                                                     size * sizeof(Number),
-                                                     cudaMemcpyHostToDevice);
-            AssertCuda(cuda_error_code);
+            Kokkos::deep_copy(
+              Kokkos::subview(data.values,
+                              Kokkos::pair<size_type, size_type>(0, size)),
+              Kokkos::subview(v_data.values,
+                              Kokkos::pair<size_type, size_type>(0, size)));
           }
         else
           {
@@ -2645,7 +2651,6 @@ namespace internal
           }
       }
     };
-#endif
   } // namespace VectorOperations
 } // namespace internal
 

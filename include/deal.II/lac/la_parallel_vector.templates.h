@@ -86,9 +86,10 @@ namespace LinearAlgebra
       template <typename Number, typename MemorySpaceType>
       struct la_parallel_vector_templates_functions
       {
-        static_assert(std::is_same<MemorySpaceType, MemorySpace::Host>::value ||
-                        std::is_same<MemorySpaceType, MemorySpace::Device>::value,
-                      "MemorySpace should be Host or CUDA");
+        static_assert(
+          std::is_same<MemorySpaceType, MemorySpace::Host>::value ||
+            std::is_same<MemorySpaceType, MemorySpace::Device>::value,
+          "MemorySpace should be Host or Device");
 
         static void
         resize_val(
@@ -317,24 +318,27 @@ namespace LinearAlgebra
       };
 
       template <typename Number>
-      struct la_parallel_vector_templates_functions<Number,
-                                                    ::dealii::MemorySpace::Device>
+      struct la_parallel_vector_templates_functions<
+        Number,
+        ::dealii::MemorySpace::Device>
       {
         using size_type = types::global_dof_index;
 
         static void
-        resize_val(const types::global_dof_index new_alloc_size,
-                   types::global_dof_index &     allocated_size,
-                   ::dealii::MemorySpace::
-                     MemorySpaceData<Number, ::dealii::MemorySpace::Device> &data,
-                   const MPI_Comm &comm_sm)
+        resize_val(
+          const types::global_dof_index new_alloc_size,
+          types::global_dof_index &     allocated_size,
+          ::dealii::MemorySpace::MemorySpaceData<Number,
+                                                 ::dealii::MemorySpace::Device>
+            &             data,
+          const MPI_Comm &comm_sm)
         {
           (void)comm_sm;
 
           static_assert(
             std::is_same<Number, float>::value ||
               std::is_same<Number, double>::value,
-            "Number should be float or double for CUDA memory space");
+            "Number should be float or double for Device memory space");
 
           if (new_alloc_size > allocated_size)
             {
@@ -378,26 +382,35 @@ namespace LinearAlgebra
           // including ghost entries. this is not really efficient right now
           // because indices are translated twice, once by nth_index_in_set(i)
           // and once for operator() of tmp_vector
-          const IndexSet &       v_stored   = V.get_stored_elements();
-          const size_type        n_elements = v_stored.n_elements();
-	  Kokkos::DefaultHostExecutionSpace host_exec;
-	  Kokkos::View<size_type*, Kokkos::HostSpace> indices("indices", n_elements);
-	  Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(host_exec, 0, n_elements),
-			  KOKKOS_LAMBDA(size_type i) { 
-            indices[i] = communication_pattern->global_to_local(
-              v_stored.nth_index_in_set(i));
-	    });
-	  host_exec.fence();
-	  
+          const IndexSet &                  v_stored = V.get_stored_elements();
+          const size_type                   n_elements = v_stored.n_elements();
+          Kokkos::DefaultHostExecutionSpace host_exec;
+          Kokkos::View<size_type *, Kokkos::HostSpace> indices("indices",
+                                                               n_elements);
+          Kokkos::parallel_for(
+            Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(host_exec,
+                                                                   0,
+                                                                   n_elements),
+            KOKKOS_LAMBDA(size_type i) {
+              indices[i] = communication_pattern->global_to_local(
+                v_stored.nth_index_in_set(i));
+            });
+          host_exec.fence();
+
           // Move the indices to the device
           ::dealii::MemorySpace::Device::kokkos_space::execution_space exec;
-	  Kokkos::View<size_type *, ::dealii::MemorySpace::Device::kokkos_space> indices_dev("indices_dev", n_elements);
-	  Kokkos::deep_copy(exec, indices_dev, indices);
-	  exec.fence();
-	  
+          Kokkos::View<size_type *, ::dealii::MemorySpace::Device::kokkos_space>
+            indices_dev("indices_dev", n_elements);
+          Kokkos::deep_copy(exec, indices_dev, indices);
+          exec.fence();
+
           // Move the data to the device
-	  Kokkos::View<Number *, ::dealii::MemorySpace::Device::kokkos_space> V_dev("V_dev", n_elements);
-	  Kokkos::deep_copy(exec, V_dev, Kokkos::View<Number*, Kokkos::HostSpace>(V.begin(), n_elements));
+          Kokkos::View<Number *, ::dealii::MemorySpace::Device::kokkos_space>
+            V_dev("V_dev", n_elements);
+          Kokkos::deep_copy(
+            exec,
+            V_dev,
+            Kokkos::View<Number *, Kokkos::HostSpace>(V.begin(), n_elements));
           exec.fence();
 
           // Set the values in tmp_vector
@@ -415,17 +428,22 @@ namespace LinearAlgebra
           // Copy the local elements of tmp_vector to the right place in val
           IndexSet        tmp_index_set  = tmp_vector.locally_owned_elements();
           const size_type tmp_n_elements = tmp_index_set.n_elements();
-	  Kokkos::realloc(indices, tmp_n_elements);
-          Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(host_exec, 0, n_elements),
-                          KOKKOS_LAMBDA(size_type i) {
-          indices[i] = locally_owned_elem.index_within_set(
-              tmp_index_set.nth_index_in_set(i));
+          Kokkos::realloc(indices, tmp_n_elements);
+          Kokkos::parallel_for(
+            Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(host_exec,
+                                                                   0,
+                                                                   n_elements),
+            KOKKOS_LAMBDA(size_type i) {
+              indices[i] = locally_owned_elem.index_within_set(
+                tmp_index_set.nth_index_in_set(i));
             });
           host_exec.fence();
-	  Kokkos::realloc(indices_dev, tmp_n_elements);
-	  Kokkos::deep_copy(indices_dev, Kokkos::View<size_type*>(indices.data(), tmp_n_elements));
+          Kokkos::realloc(indices_dev, tmp_n_elements);
+          Kokkos::deep_copy(indices_dev,
+                            Kokkos::View<size_type *>(indices.data(),
+                                                      tmp_n_elements));
 
-	   if (operation == VectorOperation::add)
+          if (operation == VectorOperation::add)
             Kokkos::parallel_for(
               Kokkos::RangePolicy<
                 ::dealii::MemorySpace::Device::kokkos_space::execution_space>(
@@ -449,13 +467,13 @@ namespace LinearAlgebra
         linfty_norm_local(const ::dealii::MemorySpace::MemorySpaceData<
                             Number,
                             ::dealii::MemorySpace::Device> &data,
-                          const unsigned int              size,
-                          RealType &                      result)
+                          const unsigned int                size,
+                          RealType &                        result)
         {
           static_assert(std::is_same<Number, RealType>::value,
                         "RealType should be the same type as Number");
 
-	  typename ::dealii::MemorySpace::Device::kokkos_space::execution_space
+          typename ::dealii::MemorySpace::Device::kokkos_space::execution_space
             exec;
           Kokkos::parallel_reduce(
             Kokkos::RangePolicy<
@@ -929,7 +947,7 @@ namespace LinearAlgebra
       if (data.values_host_buffer.size() > 0)
         Kokkos::deep_copy(Kokkos::subview(data.values_host_buffer, range), 0);
       if (data.values.size() > 0)
-        Kokkos::deep_copy(Kokkos::subview(data.values, range), 0);	    
+        Kokkos::deep_copy(Kokkos::subview(data.values, range), 0);
 
       vector_is_ghosted = false;
     }
@@ -1192,11 +1210,12 @@ namespace LinearAlgebra
 
               // The communication is done on the host, so we need to
               // move the data back to the device.
-	      auto range = Kokkos::make_pair(
-                partitioner->locally_owned_size(),
-                partitioner->locally_owned_size() + partitioner->n_ghost_indices());
+              auto range = Kokkos::make_pair(partitioner->locally_owned_size(),
+                                             partitioner->locally_owned_size() +
+                                               partitioner->n_ghost_indices());
               Kokkos::deep_copy(Kokkos::subview(data.values, range),
-                            Kokkos::subview(data.values_host_buffer, range));
+                                Kokkos::subview(data.values_host_buffer,
+                                                range));
 
               Kokkos::resize(data.values_host_buffer, 0);
             }
@@ -1763,7 +1782,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::norm_sqr_local() const
     {
       real_type sum;
-
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::norm_2(

@@ -52,12 +52,12 @@ namespace internal
     release_all_unused_memory()
     {
 #include "vector_memory_release.inst"
-	      dealii::GrowingVectorMemory<
-        dealii::LinearAlgebra::distributed::Vector<float, MemorySpace::Device>>::
-        release_unused_memory();
-      dealii::GrowingVectorMemory<
-        dealii::LinearAlgebra::distributed::Vector<double, MemorySpace::Device>>::
-        release_unused_memory();
+      dealii::GrowingVectorMemory<dealii::LinearAlgebra::distributed::Vector<
+        float,
+        MemorySpace::Device>>::release_unused_memory();
+      dealii::GrowingVectorMemory<dealii::LinearAlgebra::distributed::Vector<
+        double,
+        MemorySpace::Device>>::release_unused_memory();
 #ifdef DEAL_II_WITH_CUDA
       release_all_unused_cuda_memory();
 #endif
