@@ -2973,11 +2973,10 @@ namespace GridTools
                 else
                   marked = [](const ValueType &) -> bool { return true; };
 
-		auto bla = boost::geometry::index::nearest(p, 1);
-		auto blub = boost::geometry::index::satisfies(marked);
                 std::vector<std::pair<Point<spacedim>, unsigned int>> res;
                 used_vertices_rtree.query(
-				bla && blub,
+                  boost::geometry::index::nearest(p, 1) &&
+                    boost::geometry::index::satisfies(marked),
                   std::back_inserter(res));
 
                 // Searching for a point which is located outside the
