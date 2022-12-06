@@ -359,7 +359,7 @@ private:
     const hp::QCollection<1> &                quadrature,
     const Mapping<2, 2> &                     mapping,
     const Mapping<2, 2>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<2, 2>
+    const internal::FEValuesImplementation::MappingRelatedData<2, 2>
       &                     mapping_data,
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
@@ -376,7 +376,7 @@ private:
     const Quadrature<1> &                     quadrature,
     const Mapping<2, 2> &                     mapping,
     const Mapping<2, 2>::InternalDataBase &   mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<2, 2>
+    const internal::FEValuesImplementation::MappingRelatedData<2, 2>
       &                     mapping_data,
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>

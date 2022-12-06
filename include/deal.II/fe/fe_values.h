@@ -3950,7 +3950,7 @@ protected:
    * An object into which the Mapping::fill_fe_values() and similar functions
    * place their output.
    */
-  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     mapping_output;
 
 

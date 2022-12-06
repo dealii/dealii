@@ -904,7 +904,7 @@ protected:
     const CellSimilarity::Similarity                            cell_similarity,
     const Quadrature<dim> &                                     quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
-    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const = 0;
 
   /**
@@ -937,7 +937,7 @@ protected:
     const unsigned int                                          face_no,
     const hp::QCollection<dim - 1> &                            quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
-    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
 
   /**
@@ -985,7 +985,7 @@ protected:
     const unsigned int                                          subface_no,
     const Quadrature<dim - 1> &                                 quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
-    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const = 0;
 
   /**
@@ -999,7 +999,7 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
-    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
 
   /**
