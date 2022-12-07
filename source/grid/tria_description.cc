@@ -993,7 +993,7 @@ namespace TriangulationDescription
     {
 #ifdef DEAL_II_WITH_MPI
       if (tria.get_communicator() == MPI_COMM_NULL)
-        AssertDimension(partition.local_size(), 0);
+        AssertDimension(partition.locally_owned_size(), 0);
 #endif
 
       if (partition.size() == 0)
@@ -1013,12 +1013,12 @@ namespace TriangulationDescription
       const std::vector<unsigned int> relevant_processes = [&]() {
         std::set<unsigned int> relevant_processes;
 
-        for (unsigned int i = 0; i < partition.local_size(); ++i)
+        for (unsigned int i = 0; i < partition.locally_owned_size(); ++i)
           relevant_processes.insert(
             static_cast<unsigned int>(partition.local_element(i)));
 
         for (const auto &partition : partitions_mg)
-          for (unsigned int i = 0; i < partition.local_size(); ++i)
+          for (unsigned int i = 0; i < partition.locally_owned_size(); ++i)
             relevant_processes.insert(
               static_cast<unsigned int>(partition.local_element(i)));
 

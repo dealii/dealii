@@ -121,8 +121,8 @@ namespace Utilities
         std::vector<
           std::pair<types::global_dof_index, types::global_dof_index>>,
         std::vector<unsigned int>>
-        consensus_algorithm(process, communicator);
-      consensus_algorithm.run();
+        consensus_algorithm;
+      consensus_algorithm.run(process, communicator);
 
       // setup map of processes from where this rank will receive values
       {

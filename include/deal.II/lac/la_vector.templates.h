@@ -557,7 +557,7 @@ namespace LinearAlgebra
 
     out.precision(precision);
 
-    const unsigned int n_elements = this->n_elements();
+    const unsigned int n_elements = this->locally_owned_size();
     for (unsigned int i = 0; i < n_elements; ++i)
       out << this->values[i] << ' ';
     out << '\n' << std::flush;

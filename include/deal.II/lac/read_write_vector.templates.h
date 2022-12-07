@@ -265,7 +265,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::reinit(const ReadWriteVector<Number2> &v,
                                   const bool omit_zeroing_entries)
   {
-    resize_val(v.n_elements());
+    resize_val(v.locally_owned_size());
 
     stored_elements = v.get_stored_elements();
 
@@ -339,7 +339,7 @@ namespace LinearAlgebra
     FunctorTemplate<Functor> functor(*this, func);
     dealii::internal::VectorOperations::parallel_for(functor,
                                                      0,
-                                                     n_elements(),
+                                                     locally_owned_size(),
                                                      thread_loop_partitioner);
   }
 
@@ -353,15 +353,15 @@ namespace LinearAlgebra
       return *this;
 
     thread_loop_partitioner = in_vector.thread_loop_partitioner;
-    if (n_elements() != in_vector.n_elements())
+    if (locally_owned_size() != in_vector.locally_owned_size())
       reinit(in_vector, true);
 
-    if (n_elements() > 0)
+    if (locally_owned_size() > 0)
       {
         dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
           in_vector.values.get(), values.get());
         dealii::internal::VectorOperations::parallel_for(
-          copier, 0, n_elements(), thread_loop_partitioner);
+          copier, 0, locally_owned_size(), thread_loop_partitioner);
       }
 
     return *this;
@@ -375,15 +375,15 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::operator=(const ReadWriteVector<Number2> &in_vector)
   {
     thread_loop_partitioner = in_vector.thread_loop_partitioner;
-    if (n_elements() != in_vector.n_elements())
+    if (locally_owned_size() != in_vector.locally_owned_size())
       reinit(in_vector, true);
 
-    if (n_elements() > 0)
+    if (locally_owned_size() > 0)
       {
         dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
           in_vector.values.get(), values.get());
         dealii::internal::VectorOperations::parallel_for(
-          copier, 0, n_elements(), thread_loop_partitioner);
+          copier, 0, locally_owned_size(), thread_loop_partitioner);
       }
 
     return *this;
@@ -399,7 +399,7 @@ namespace LinearAlgebra
            ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    const size_type this_size = n_elements();
+    const size_type this_size = locally_owned_size();
     if (this_size > 0)
       {
         dealii::internal::VectorOperations::Vector_set<Number> setter(
@@ -999,7 +999,8 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::memory_consumption() const
   {
     std::size_t memory = sizeof(*this);
-    memory += sizeof(Number) * static_cast<std::size_t>(this->n_elements());
+    memory +=
+      sizeof(Number) * static_cast<std::size_t>(this->locally_owned_size());
 
     memory += stored_elements.memory_consumption();
 

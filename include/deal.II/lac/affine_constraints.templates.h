@@ -262,8 +262,9 @@ namespace internal
 
     Utilities::MPI::ConsensusAlgorithms::Selector<
       std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
-      std::vector<unsigned int>>(constrained_indices_process, mpi_communicator)
-      .run();
+      std::vector<unsigned int>>
+      consensus_algorithm;
+    consensus_algorithm.run(constrained_indices_process, mpi_communicator);
 
     // step 2: collect all locally owned constraints
     const auto constrained_indices_by_ranks =
@@ -390,9 +391,9 @@ namespace internal
       Utilities::MPI::ConsensusAlgorithms::Selector<
         std::vector<
           std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>(locally_relevant_dofs_process,
-                                   mpi_communicator)
-        .run();
+        std::vector<unsigned int>>
+        consensus_algorithm;
+      consensus_algorithm.run(locally_relevant_dofs_process, mpi_communicator);
 
       const auto locally_relevant_dofs_by_ranks =
         locally_relevant_dofs_process.get_requesters();

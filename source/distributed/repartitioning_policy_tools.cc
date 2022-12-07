@@ -159,8 +159,8 @@ namespace RepartitioningPolicyTools
         std::vector<
           std::pair<types::global_cell_index, types::global_cell_index>>,
         std::vector<unsigned int>>
-        consensus_algorithm(process, communicator);
-      consensus_algorithm.run();
+        consensus_algorithm;
+      consensus_algorithm.run(process, communicator);
     }
 
     const auto tria =
@@ -288,7 +288,7 @@ namespace RepartitioningPolicyTools
     const auto partitioner =
       tria->global_active_cell_index_partitioner().lock();
 
-    std::vector<unsigned int> weights(partitioner->local_size());
+    std::vector<unsigned int> weights(partitioner->locally_owned_size());
 
     const auto mpi_communicator = tria_in.get_communicator();
     const auto n_subdomains = Utilities::MPI::n_mpi_processes(mpi_communicator);

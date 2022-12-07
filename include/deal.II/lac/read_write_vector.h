@@ -900,7 +900,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::end()
   {
-    return values.get() + this->n_elements();
+    return values.get() + this->locally_owned_size();
   }
 
 
@@ -909,7 +909,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::end() const
   {
-    return values.get() + this->n_elements();
+    return values.get() + this->locally_owned_size();
   }
 
 
@@ -985,7 +985,7 @@ namespace LinearAlgebra
   inline Number
   ReadWriteVector<Number>::local_element(const size_type local_index) const
   {
-    AssertIndexRange(local_index, this->n_elements());
+    AssertIndexRange(local_index, this->locally_owned_size());
 
     return values[local_index];
   }
@@ -996,7 +996,7 @@ namespace LinearAlgebra
   inline Number &
   ReadWriteVector<Number>::local_element(const size_type local_index)
   {
-    AssertIndexRange(local_index, this->n_elements());
+    AssertIndexRange(local_index, this->locally_owned_size());
 
     return values[local_index];
   }
