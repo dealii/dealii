@@ -443,8 +443,8 @@ namespace internal
           std::vector<
             std::pair<types::global_dof_index, types::global_dof_index>>,
           std::vector<unsigned int>>
-          consensus_algorithm(process, comm);
-        consensus_algorithm.run();
+          consensus_algorithm;
+        consensus_algorithm.run(process, comm);
 
         // decompress ghost_indices_within_larger_ghost_set for simpler
         // data access during setup

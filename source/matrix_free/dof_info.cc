@@ -908,7 +908,7 @@ namespace internal
             for (unsigned int i = row_starts[cell * n_components].first;
                  i < row_starts[(cell + 1) * n_components].first;
                  ++i)
-              if (dof_indices[i] >= part.local_size())
+              if (dof_indices[i] >= part.locally_owned_size())
                 ghost_indices.push_back(part.local_to_global(dof_indices[i]));
 
             const unsigned int fe_index =
@@ -919,7 +919,7 @@ namespace internal
             for (unsigned int i = row_starts_plain_indices[cell];
                  i < row_starts_plain_indices[cell] + dofs_this_cell;
                  ++i)
-              if (plain_dof_indices[i] >= part.local_size())
+              if (plain_dof_indices[i] >= part.locally_owned_size())
                 ghost_indices.push_back(
                   part.local_to_global(plain_dof_indices[i]));
           }
@@ -1048,7 +1048,7 @@ namespace internal
                 const unsigned int index =
                   dof_indices_contiguous[dof_access_cell][cell_no];
                 if (flag || (index != numbers::invalid_unsigned_int &&
-                             index >= part.local_size()))
+                             index >= part.locally_owned_size()))
                   {
                     const unsigned int stride =
                       dof_indices_interleave_strides[dof_access_cell][cell_no];
@@ -1132,7 +1132,7 @@ namespace internal
                 const unsigned int index =
                   dof_indices_contiguous[dof_access_cell][cell_no];
                 if (flag || (index != numbers::invalid_unsigned_int &&
-                             index >= part.local_size()))
+                             index >= part.locally_owned_size()))
                   {
                     const unsigned int stride =
                       dof_indices_interleave_strides[dof_access_cell][cell_no];

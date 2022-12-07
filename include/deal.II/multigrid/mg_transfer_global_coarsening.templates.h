@@ -570,8 +570,8 @@ namespace internal
               std::vector<
                 std::pair<types::global_cell_index, types::global_cell_index>>,
               std::vector<unsigned int>>
-              consensus_algorithm(process, communicator);
-            consensus_algorithm.run();
+              consensus_algorithm;
+            consensus_algorithm.run(process, communicator);
           }
 
           for (unsigned i = 0;
@@ -597,8 +597,8 @@ namespace internal
         std::vector<
           std::pair<types::global_cell_index, types::global_cell_index>>,
         std::vector<unsigned int>>
-        consensus_algorithm(process, communicator);
-      consensus_algorithm.run();
+        consensus_algorithm;
+      consensus_algorithm.run(process, communicator);
 
       this->is_dst_locally_owned = is_dst_locally_owned;
       this->is_dst_remote        = is_dst_remote;
@@ -1134,7 +1134,7 @@ namespace internal
 
       touch_count_.copy_locally_owned_data_from(touch_count);
 
-      for (unsigned int i = 0; i < touch_count_.local_size(); ++i)
+      for (unsigned int i = 0; i < touch_count_.locally_owned_size(); ++i)
         touch_count_.local_element(i) =
           constraints_fine.is_constrained(
             touch_count_.get_partitioner()->local_to_global(i)) ?
@@ -3224,8 +3224,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
         std::vector<
           std::pair<types::global_cell_index, types::global_cell_index>>,
         std::vector<unsigned int>>
-        consensus_algorithm(process, communicator);
-      consensus_algorithm.run();
+        consensus_algorithm;
+      consensus_algorithm.run(process, communicator);
 
       bool all_cells_found = true;
 
