@@ -1,0 +1,10 @@
+
+DEAL:0::numproc=2
+DEAL:0::v has ghost elements: 0
+DEAL:0::w has ghost elements: 0
+DEAL:0::w has ghost elements: 1
+DEAL:0::w has ghost elements: 1
+DEAL:0::w has ghost elements: 0
+DEAL:0::x has ghost elements: 1
+DEAL:0::x has ghost elements: 0
+DEAL:0::OK

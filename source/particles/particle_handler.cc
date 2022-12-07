@@ -1395,37 +1395,7 @@ namespace Particles
 
           if (!found_cell)
             {
-              // The particle is not in a neighbor of the old cell.
-              // Look for the new cell in the whole local domain.
-              // This case is rare.
-              std::vector<std::pair<Point<spacedim>, unsigned int>>
-                closest_vertex_in_domain;
-              triangulation_cache->get_used_vertices_rtree().query(
-                boost::geometry::index::nearest(out_particle->get_location(),
-                                                1),
-                std::back_inserter(closest_vertex_in_domain));
-
-              // We should have one and only one result
-              AssertDimension(closest_vertex_in_domain.size(), 1);
-              const unsigned int closest_vertex_index_in_domain =
-                closest_vertex_in_domain[0].second;
-
-              // Search all of the cells adjacent to the closest vertex of the
-              // domain. Most likely we will find the particle in them.
-              for (const auto &cell :
-                   vertex_to_cells[closest_vertex_index_in_domain])
-                {
-                  mapping->transform_points_real_to_unit_cell(
-                    cell, real_locations, reference_locations);
-
-                  if (GeometryInfo<dim>::is_inside_unit_cell(
-                        reference_locations[0]))
-                    {
-                      current_cell = cell;
-                      found_cell   = true;
-                      break;
-                    }
-                }
+		    Assert(false, ExcInternalError());
             }
 
           if (!found_cell)

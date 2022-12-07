@@ -1,0 +1,17 @@
+
+DEAL:0::numproc=4
+DEAL:0::0:ghost entry after max: 6.00000
+DEAL:0::0:ghost entry after min: -1.00000
+DEAL:0::OK
+
+DEAL:1::1:ghost entry after max: 6.00000
+DEAL:1::1:ghost entry after min: -1.00000
+
+
+DEAL:2::2:ghost entry after max: 6.00000
+DEAL:2::2:ghost entry after min: -1.00000
+
+
+DEAL:3::3:ghost entry after max: 6.00000
+DEAL:3::3:ghost entry after min: -1.00000
+

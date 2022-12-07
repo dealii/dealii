@@ -1,0 +1,6 @@
+
+DEAL:0::numproc=2
+DEAL:0::0:0
+DEAL:0::1:16.00
+DEAL:0::L2 norm: 17.55
+DEAL:0::OK
