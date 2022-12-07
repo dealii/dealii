@@ -20,6 +20,15 @@
 
 # Clear the test flags because FindThreads.cmake will use a C compiler:
 CLEAR_CMAKE_REQUIRED()
+#
+# Ensure that we use "-pthread" instead of "-lpthread". We require
+# "-pthread" for certain versions of gcc (and standard library thread
+# support). Otherwise the order of libraries might be wrong on the final
+# link interface and we end up with linker errors such as the following:
+#   /usr/bin/ld: [...]/step-69.cc.o: undefined reference to symbol 'pthread_create@@GLIBC_2.2.5'
+#   /usr/bin/ld: /usr/lib/x86_64-linux-gnu/libpthread.so: error adding symbols: DSO missing from command line
+#
+SET(THREADS_PREFER_PTHREAD_FLAG true)
 
 SWITCH_LIBRARY_PREFERENCE()
 FIND_PACKAGE(Threads)
@@ -28,6 +37,14 @@ SWITCH_LIBRARY_PREFERENCE()
 RESET_CMAKE_REQUIRED()
 
 ADD_FLAGS(DEAL_II_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+
+#
+# Make sure that we compile with "-pthread" as well. The "-pthread"
+# compiler flag might add certain preprocessor definitions when compiling.
+#
+IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-pthread")
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+ENDIF()
 
 IF(NOT Threads_FOUND)
   MESSAGE(FATAL_ERROR
