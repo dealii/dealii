@@ -70,12 +70,15 @@ test()
     {
       unsigned int local_index = partitioner->global_to_local(1);
       double *     values_dev  = v.get_values();
-      Kokkos::deep_copy(Kokkos::View<double, MemorySpace::Device::kokkos_space>(values_dev+local_index), 7);
+      Kokkos::deep_copy(Kokkos::View<double, MemorySpace::Device::kokkos_space>(
+                          values_dev + local_index),
+                        7);
     }
 
-  unsigned int        allocated_size = local_relevant.n_elements();
-  Kokkos::View<double*, MemorySpace::Device::kokkos_space> v_device(v.get_values(), allocated_size);
-  Kokkos::View<double*, Kokkos::HostSpace> v_host("v_host", allocated_size);
+  unsigned int allocated_size = local_relevant.n_elements();
+  Kokkos::View<double *, MemorySpace::Device::kokkos_space> v_device(
+    v.get_values(), allocated_size);
+  Kokkos::View<double *, Kokkos::HostSpace> v_host("v_host", allocated_size);
   Kokkos::deep_copy(v_host, v_device);
 
   AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == myid * 4.0,

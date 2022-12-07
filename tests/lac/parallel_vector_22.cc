@@ -29,10 +29,10 @@
 
 template <typename Number>
 double
-print_value(Number* values_dev, unsigned int index)
+print_value(Number *values_dev, unsigned int index)
 {
   static Kokkos::View<Number, Kokkos::HostSpace> cpu_value("cpu_value");
-  Kokkos::deep_copy(cpu_value, Kokkos::View<Number>(values_dev+index));
+  Kokkos::deep_copy(cpu_value, Kokkos::View<Number>(values_dev + index));
   return cpu_value();
 }
 
@@ -59,12 +59,17 @@ test()
   // create vector
   LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
-  Kokkos::View<double*, MemorySpace::Device::kokkos_space> v_device(v.get_values(), local_relevant.n_elements());
+  Kokkos::View<double *, MemorySpace::Device::kokkos_space> v_device(
+    v.get_values(), local_relevant.n_elements());
   const auto &partitioner = v.get_partitioner();
 
   // set local values
-  Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(myid * 2)), myid*2.0);
-  Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(myid * 2+1)), myid*2.0+1.0);
+  Kokkos::deep_copy(Kokkos::subview(v_device,
+                                    partitioner->global_to_local(myid * 2)),
+                    myid * 2.0);
+  Kokkos::deep_copy(Kokkos::subview(v_device,
+                                    partitioner->global_to_local(myid * 2 + 1)),
+                    myid * 2.0 + 1.0);
   v.compress(VectorOperation::add);
   v *= 2.0;
 
@@ -82,8 +87,8 @@ test()
   // set ghost dof on owning processor and maximize
   if (myid != 0)
     Kokkos::deep_copy(Kokkos::subview(v_device,
-                        partitioner->global_to_local(1)),
-                        7. * myid);
+                                      partitioner->global_to_local(1)),
+                      7. * myid);
   v.compress(VectorOperation::max);
 
   // import ghosts onto all procs
@@ -111,7 +116,9 @@ test()
   // set ghost dof on non-owning processors and minimize
   v.zero_out_ghost_values();
   if (myid == 0)
-    Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(1)), -1);
+    Kokkos::deep_copy(Kokkos::subview(v_device,
+                                      partitioner->global_to_local(1)),
+                      -1);
   v.compress(VectorOperation::min);
   v.update_ghost_values();
 
@@ -125,7 +132,9 @@ test()
   v.zero_out_ghost_values();
   v = 1.0;
   if (myid == 0)
-    Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(1)), -1);
+    Kokkos::deep_copy(Kokkos::subview(v_device,
+                                      partitioner->global_to_local(1)),
+                      -1);
 
   // maximize
   v.compress(VectorOperation::max);
@@ -142,7 +151,8 @@ test()
   // maximum is -1:
   v.zero_out_ghost_values();
   v = 1.0;
-  Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(1)), -1);
+  Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(1)),
+                    -1);
   v.compress(VectorOperation::max);
   v.update_ghost_values();
   deallog << myid << ":"
@@ -154,7 +164,8 @@ test()
   // than zero
   v.zero_out_ghost_values();
   v = -1.0;
-  Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(1)), -1);
+  Kokkos::deep_copy(Kokkos::subview(v_device, partitioner->global_to_local(1)),
+                    -1);
   v.compress(VectorOperation::max);
   deallog << myid << ":"
           << "ghost entry after first max: "

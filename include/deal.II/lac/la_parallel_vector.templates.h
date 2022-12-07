@@ -482,7 +482,7 @@ namespace LinearAlgebra
             KOKKOS_LAMBDA(size_type i, RealType & update) {
               update = Kokkos::max(update, Kokkos::abs(data.values(i)));
             },
-	    Kokkos::Max<RealType, Kokkos::HostSpace>(result));
+            Kokkos::Max<RealType, Kokkos::HostSpace>(result));
         }
       };
     } // namespace internal

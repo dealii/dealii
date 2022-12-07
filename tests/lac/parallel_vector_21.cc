@@ -50,10 +50,14 @@ test()
   v2.reinit(v, true);
 
   // set locally owned range of v2 manually
-  Kokkos::View<double*, MemorySpace::Device::kokkos_space> v2_view(v2.get_values(), v2.local_size());
+  Kokkos::View<double *, MemorySpace::Device::kokkos_space> v2_view(
+    v2.get_values(), v2.local_size());
   Kokkos::deep_copy(v2_view, 1.);
 
-  Kokkos::parallel_for(v2.local_size(), KOKKOS_LAMBDA(int i) { KOKKOS_IMPL_DO_NOT_USE_PRINTF("%d: %f\n", i, v2_view(i));});
+  Kokkos::parallel_for(
+    v2.local_size(), KOKKOS_LAMBDA(int i) {
+      KOKKOS_IMPL_DO_NOT_USE_PRINTF("%d: %f\n", i, v2_view(i));
+    });
   // add entries to ghost values
   // Because of limitation in import, the IndexSet of the ReadWriteVector needs
   // to have the local elements.

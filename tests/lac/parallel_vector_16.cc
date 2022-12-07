@@ -54,15 +54,18 @@ test()
 
   LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
-  Kokkos::View<double*, MemorySpace::Device::kokkos_space> v_view(v.get_values(), local_relevant.n_elements());
+  Kokkos::View<double *, MemorySpace::Device::kokkos_space> v_view(
+    v.get_values(), local_relevant.n_elements());
 
-  deallog << "Local range of proc 0: " << v.get_partitioner()->local_range().first << " "
+  deallog << "Local range of proc 0: "
+          << v.get_partitioner()->local_range().first << " "
           << v.get_partitioner()->local_range().second << std::endl;
 
   // set local values
   for (types::global_dof_index i = 0; i < local_size; ++i)
     {
-	    Kokkos::deep_copy(Kokkos::subview(v_view, i), min_index + myid * local_size + i);
+      Kokkos::deep_copy(Kokkos::subview(v_view, i),
+                        min_index + myid * local_size + i);
     }
 
   deallog << "vector norm: " << v.l2_norm() << std::endl;
@@ -74,10 +77,18 @@ test()
 
   v.zero_out_ghost_values();
   const auto &partitioner = v.get_partitioner();
-  Kokkos::deep_copy(Kokkos::subview(v_view, partitioner->global_to_local(min_index + 38)), min_index);
-  Kokkos::deep_copy(Kokkos::subview(v_view, partitioner->global_to_local(min_index + 39)), min_index*2);
-  Kokkos::deep_copy(Kokkos::subview(v_view, partitioner->global_to_local(min_index + 41)), min_index+7);
-  Kokkos::deep_copy(Kokkos::subview(v_view, partitioner->global_to_local(min_index + 42)), -static_cast<double>(min_index));
+  Kokkos::deep_copy(
+    Kokkos::subview(v_view, partitioner->global_to_local(min_index + 38)),
+    min_index);
+  Kokkos::deep_copy(
+    Kokkos::subview(v_view, partitioner->global_to_local(min_index + 39)),
+    min_index * 2);
+  Kokkos::deep_copy(
+    Kokkos::subview(v_view, partitioner->global_to_local(min_index + 41)),
+    min_index + 7);
+  Kokkos::deep_copy(
+    Kokkos::subview(v_view, partitioner->global_to_local(min_index + 42)),
+    -static_cast<double>(min_index));
   v.compress(VectorOperation::add);
   v.update_ghost_values();
   v.print(deallog.get_file_stream(), 12, false, false);

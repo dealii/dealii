@@ -1395,7 +1395,7 @@ namespace Particles
 
           if (!found_cell)
             {
-		    Assert(false, ExcInternalError());
+              Assert(false, ExcInternalError());
             }
 
           if (!found_cell)

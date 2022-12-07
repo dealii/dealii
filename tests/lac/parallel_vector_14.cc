@@ -68,7 +68,8 @@ test()
 
       v.import(rw_vector, VectorOperation::insert);
 
-      LinearAlgebra::distributed::Vector<double, MemorySpace::Device> w(v), u(v);
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Device> w(v),
+        u(v);
       u = 0;
 
       v *= 2.0;
