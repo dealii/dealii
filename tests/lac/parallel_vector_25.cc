@@ -53,15 +53,15 @@ test()
   vec_ref.compress(VectorOperation::insert);
 
   auto partitioner = vec_ref.get_partitioner();
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> vec_dev(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> vec_dev(
     partitioner);
   LinearAlgebra::distributed::Vector<double, MemorySpace::Host> vec_host(
     partitioner);
 
-  // Assignment from Host to CUDA
+  // Assignment from Host to Device
   vec_dev.import(vec_ref, VectorOperation::insert);
 
-  // Assignment from CUDA to Host
+  // Assignment from Device to Host
   vec_host.import(vec_dev, VectorOperation::insert);
 
   for (unsigned int i = 0; i < ghost_size; ++i)

@@ -48,7 +48,7 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
     local_owned, local_owned, MPI_COMM_WORLD);
 
   // set local values
@@ -102,7 +102,7 @@ test()
   {
     const double norm_sqr = v.l2_norm() * v.l2_norm();
     AssertThrow(std::fabs(v * v - norm_sqr) < 1e-15, ExcInternalError());
-    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v2;
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v2;
     v2 = v;
     AssertThrow(std::fabs(v2 * v - norm_sqr) < 1e-15, ExcInternalError());
 
@@ -116,7 +116,7 @@ test()
     bool allzero = v.all_zero();
     if (myid == 0)
       deallog << " v==0 ? " << allzero << std::endl;
-    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v2;
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v2;
     v2.reinit(v);
     allzero = v2.all_zero();
     if (myid == 0)

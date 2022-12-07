@@ -80,7 +80,7 @@ test()
       local_relevant.add_range(4, 7);
     }
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
   v = 0.;
 

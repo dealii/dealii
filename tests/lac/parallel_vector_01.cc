@@ -44,7 +44,7 @@ test()
   IndexSet local_owned(numproc * 2);
   local_owned.add_range(myid * 2, myid * 2 + 2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
     local_owned, local_owned, MPI_COMM_WORLD);
 
   // set local values
