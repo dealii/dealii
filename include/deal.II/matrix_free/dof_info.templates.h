@@ -103,6 +103,15 @@ namespace internal
                       goto no_constraint;
                     }
 
+                  // case with zero-constrained DoF: Append invalid number,
+                  // this will be handled by the read functions
+                  if (n_entries == 0)
+                    {
+                      dof_indices.push_back(numbers::invalid_unsigned_int);
+                      constraint_iterator.first++;
+                      continue;
+                    }
+
                   // append a new index to the indicators
                   constraint_indicator.push_back(constraint_iterator);
                   constraint_indicator.back().second =
@@ -407,14 +416,15 @@ namespace internal
                                       n_components]
                              .first;
                      ++it)
-                  {
-                    const unsigned int myindex =
-                      dof_indices[it] / chunk_size_zero_vector;
-                    if (touched_first_by[myindex] ==
-                        numbers::invalid_unsigned_int)
-                      touched_first_by[myindex] = chunk;
-                    touched_last_by[myindex] = chunk;
-                  }
+                  if (dof_indices[it] != numbers::invalid_unsigned_int)
+                    {
+                      const unsigned int myindex =
+                        dof_indices[it] / chunk_size_zero_vector;
+                      if (touched_first_by[myindex] ==
+                          numbers::invalid_unsigned_int)
+                        touched_first_by[myindex] = chunk;
+                      touched_last_by[myindex] = chunk;
+                    }
               }
             if (faces.size() > 0)
               {
@@ -431,14 +441,16 @@ namespace internal
                                  it !=
                                  row_starts[(cell + 1) * n_components].first;
                                  ++it)
-                              {
-                                const unsigned int myindex =
-                                  dof_indices[it] / chunk_size_zero_vector;
-                                if (touched_first_by[myindex] ==
-                                    numbers::invalid_unsigned_int)
-                                  touched_first_by[myindex] = chunk;
-                                touched_last_by[myindex] = chunk;
-                              }
+                              if (dof_indices[it] !=
+                                  numbers::invalid_unsigned_int)
+                                {
+                                  const unsigned int myindex =
+                                    dof_indices[it] / chunk_size_zero_vector;
+                                  if (touched_first_by[myindex] ==
+                                      numbers::invalid_unsigned_int)
+                                    touched_first_by[myindex] = chunk;
+                                  touched_last_by[myindex] = chunk;
+                                }
                           };
 
                         fill_touched_by_for_cell(faces[face].cells_interior[v]);

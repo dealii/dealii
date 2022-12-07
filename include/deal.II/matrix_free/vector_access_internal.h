@@ -407,7 +407,7 @@ namespace internal
     template <typename VectorType>
     void
     process_dof_gather(const unsigned int * indices,
-                       VectorType &         vec,
+                       const VectorType &   vec,
                        const unsigned int   constant_offset,
                        VectorizedArrayType &res,
                        std::integral_constant<bool, true>) const
@@ -437,8 +437,11 @@ namespace internal
                        VectorizedArrayType &res,
                        std::integral_constant<bool, false>) const
     {
+      res = VectorizedArrayType();
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        res[v] = vector_access(vec, indices[v] + constant_offset);
+        if (indices[v] != numbers::invalid_unsigned_int)
+          res[v] = vector_access(vec, indices[v] + constant_offset);
     }
 
 
@@ -613,15 +616,16 @@ namespace internal
     // scatter
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int * indices,
-                       VectorType &         vec,
-                       const unsigned int   constant_offset,
-                       VectorizedArrayType &res,
+    process_dof_gather(const unsigned int *      indices,
+                       VectorType &              vec,
+                       const unsigned int        constant_offset,
+                       const VectorizedArrayType res,
                        std::integral_constant<bool, true>) const
     {
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        vector_access(vec, indices[v] + constant_offset) += res[v];
+        if (indices[v] != numbers::invalid_unsigned_int)
+          vector_access(vec, indices[v] + constant_offset) += res[v];
 #else
       // only use gather in case there is also scatter.
       VectorizedArrayType tmp;
@@ -637,14 +641,15 @@ namespace internal
     // manually append all data
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int * indices,
-                       VectorType &         vec,
-                       const unsigned int   constant_offset,
-                       VectorizedArrayType &res,
+    process_dof_gather(const unsigned int *      indices,
+                       VectorType &              vec,
+                       const unsigned int        constant_offset,
+                       const VectorizedArrayType res,
                        std::integral_constant<bool, false>) const
     {
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        vector_access_add(vec, indices[v] + constant_offset, res[v]);
+        if (indices[v] != numbers::invalid_unsigned_int)
+          vector_access_add(vec, indices[v] + constant_offset, res[v]);
     }
 
 
@@ -807,10 +812,10 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int * indices,
-                       VectorType &         vec,
-                       const unsigned int   constant_offset,
-                       VectorizedArrayType &res,
+    process_dof_gather(const unsigned int *      indices,
+                       VectorType &              vec,
+                       const unsigned int        constant_offset,
+                       const VectorizedArrayType res,
                        std::integral_constant<bool, true>) const
     {
       res.scatter(indices, vec.begin() + constant_offset);
@@ -820,14 +825,15 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int * indices,
-                       VectorType &         vec,
-                       const unsigned int   constant_offset,
-                       VectorizedArrayType &res,
+    process_dof_gather(const unsigned int *      indices,
+                       VectorType &              vec,
+                       const unsigned int        constant_offset,
+                       const VectorizedArrayType res,
                        std::integral_constant<bool, false>) const
     {
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        vector_access(vec, indices[v] + constant_offset) = res[v];
+        if (indices[v] != numbers::invalid_unsigned_int)
+          vector_access(vec, indices[v] + constant_offset) = res[v];
     }
 
 
