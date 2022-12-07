@@ -480,9 +480,9 @@ namespace LinearAlgebra
               ::dealii::MemorySpace::Device::kokkos_space::execution_space>(
               exec, 0, size),
             KOKKOS_LAMBDA(size_type i, RealType & update) {
-              update += Kokkos::abs(data.values(i));
+              update = Kokkos::max(update, Kokkos::abs(data.values(i)));
             },
-            result);
+	    Kokkos::Max<RealType, Kokkos::HostSpace>(result));
         }
       };
     } // namespace internal
