@@ -480,7 +480,12 @@ namespace LinearAlgebra
               ::dealii::MemorySpace::Device::kokkos_space::execution_space>(
               exec, 0, size),
             KOKKOS_LAMBDA(size_type i, RealType & update) {
-              update = Kokkos::max(update, Kokkos::abs(data.values(i)));
+#if KOKKOS_VERSION < 30700
+              update = Kokkos::Experimental::fmax(
+                update, Kokkos::Experimental::fabs(data.values(i)));
+#else
+              update = Kokkos::fmax(update, Kokkos::abs(data.values(i)));
+#endif
             },
             Kokkos::Max<RealType, Kokkos::HostSpace>(result));
         }

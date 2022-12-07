@@ -2529,7 +2529,11 @@ namespace internal
                                                                           0,
                                                                           size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-            update += Kokkos::abs(data.values(i));
+#if KOKKOS_VERSION < 30700
+            update += Kokkos::Experimental::fabs(data.values(i));
+#else
+            update += Kokkos::fabs(data.values(i));
+#endif
           },
           sum);
       }
@@ -2553,7 +2557,12 @@ namespace internal
                                                                           0,
                                                                           size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-            update += Kokkos::pow(Kokkos::abs(data.values(i)), exp);
+#if KOKKOS_VERSION < 30700
+            update += Kokkos::Experimental::pow(
+              Kokkos::Experimental::fabs(data.values(i)), exp);
+#else
+            update += Kokkos::pow(Kokkos::fabs(data.values(i)), exp);
+#endif
           },
           sum);
       }
