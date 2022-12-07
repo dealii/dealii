@@ -2963,7 +2963,30 @@ namespace GridTools
           {
             if (!used_vertices_rtree.empty())
               {
-                Assert(false, ExcInternalError());
+                // If we have an rtree at our disposal, use it.
+                using ValueType = std::pair<Point<spacedim>, unsigned int>;
+                std::function<bool(const ValueType &)> marked;
+                if (marked_vertices.size() == mesh.n_vertices())
+                  marked = [&marked_vertices](const ValueType &value) -> bool {
+                    return marked_vertices[value.second];
+                  };
+                else
+                  marked = [](const ValueType &) -> bool { return true; };
+
+                std::vector<std::pair<Point<spacedim>, unsigned int>> res;
+                used_vertices_rtree.query(
+                  boost::geometry::index::nearest(p, 1) &&
+                    boost::geometry::index::satisfies(marked),
+                  std::back_inserter(res));
+
+                // Searching for a point which is located outside the
+                // triangulation results in res.size() = 0
+                Assert(res.size() < 2,
+                       dealii::ExcMessage("There can not be multiple results"));
+
+                if (res.size() > 0)
+                  if (any_cell_marked(vertex_to_cells[res[0].second]))
+                    closest_vertex_index = res[0].second;
               }
             else
               {
