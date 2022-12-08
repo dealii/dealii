@@ -57,12 +57,12 @@ pipeline
         {
           when {
             not {
-	      anyOf {
-	        branch 'master'
-	        branch pattern: "dealii-*", comparator: "GLOB"
-	      }
+	            anyOf {
+	              branch 'master'
+	              branch pattern: "dealii-*", comparator: "GLOB"
+	            }
             }
-	  }
+	        }
 
           steps
           {
