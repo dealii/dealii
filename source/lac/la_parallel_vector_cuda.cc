@@ -26,6 +26,7 @@ namespace LinearAlgebra
   {
     template class Vector<float, ::dealii::MemorySpace::Device>;
     template class Vector<double, ::dealii::MemorySpace::Device>;
+
     template void
     Vector<float, ::dealii::MemorySpace::Host>::import<
       ::dealii::MemorySpace::Device>(
@@ -58,6 +59,15 @@ namespace LinearAlgebra
       ::dealii::MemorySpace::Device>(
       const Vector<double, ::dealii::MemorySpace::Device> &,
       VectorOperation::values);
+
+    template void
+    Vector<float, ::dealii::MemorySpace::Device>::reinit<float>(
+      const Vector<float, ::dealii::MemorySpace::Device> &,
+      const bool);
+    template void
+    Vector<double, ::dealii::MemorySpace::Device>::reinit<double>(
+      const Vector<double, ::dealii::MemorySpace::Device> &,
+      const bool);
   } // namespace distributed
 } // namespace LinearAlgebra
 
