@@ -17,5 +17,8 @@
 # Configuration for the gmsh executable:
 #
 
+macro(feature_gmsh_configure_external)
+  set(DEAL_II_GMSH_WITH_API ${GMSH_WITH_API})
+endmacro()
+
 configure_feature(GMSH)
-set(DEAL_II_GMSH_WITH_API ${GMSH_WITH_API})
