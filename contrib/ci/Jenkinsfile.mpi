@@ -57,12 +57,12 @@ pipeline
         {
           when {
             not {
-	            anyOf {
-	              branch 'master'
-	              branch pattern: "dealii-*", comparator: "GLOB"
-	            }
+              anyOf {
+                branch 'master'
+                branch pattern: "dealii-*", comparator: "GLOB"
+              }
             }
-	        }
+          }
 
           steps
           {
@@ -124,7 +124,7 @@ pipeline
               sh "cp /home/dealii/build/detailed.log $WORKSPACE/detailed-mpi.log || true"
               archiveArtifacts artifacts: 'detailed-mpi.log', fingerprint: true
             }
-	    
+
             failure
             {
               githubNotify context: 'Jenkins: MPI', description: 'build failed',  status: 'FAILURE'
