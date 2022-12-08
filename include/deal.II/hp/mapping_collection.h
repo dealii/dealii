@@ -22,6 +22,7 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/hp/collection.h>
 
@@ -171,6 +172,13 @@ namespace hp
     for (const auto p : mapping_pointers)
       push_back(*p);
   }
+
+
+
+  template <int dim, int spacedim>
+  MappingCollection<dim, spacedim>
+    StaticMappingQ1<dim, spacedim>::mapping_collection =
+      MappingCollection<dim, spacedim>(MappingQ1<dim, spacedim>{});
 
 } // namespace hp
 

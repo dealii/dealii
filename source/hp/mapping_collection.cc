@@ -53,34 +53,6 @@ namespace hp
       std::shared_ptr<const Mapping<dim, spacedim>>(new_mapping.clone()));
   }
 
-  //---------------------------------------------------------------------------
-
-
-  namespace
-  {
-    /**
-     * Create and return a reference to a static MappingQ1 object. We can't
-     * use the one in ::StaticMappingQ1 to initialize the static object below
-     * since we can't make sure that the constructor for that object is run
-     * before we want to use the object (when constructing mapping_collection
-     * below).  Therefore we create a helper function which returns a
-     * reference to a static object that will be constructed the first time
-     * this function is called.
-     */
-    template <int dim, int spacedim>
-    MappingQ<dim, spacedim> &
-    get_static_mapping_q1()
-    {
-      static MappingQ1<dim, spacedim> mapping;
-      return mapping;
-    }
-  } // namespace
-
-  template <int dim, int spacedim>
-  MappingCollection<dim, spacedim>
-    StaticMappingQ1<dim, spacedim>::mapping_collection =
-      MappingCollection<dim, spacedim>(get_static_mapping_q1<dim, spacedim>());
-
 } // namespace hp
 
 
