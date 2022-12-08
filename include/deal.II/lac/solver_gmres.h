@@ -204,7 +204,10 @@ public:
        */
       modified_gram_schmidt,
       /**
-       * Use classical Gram-Schmidt algorithm.
+       * Use classical Gram-Schmidt algorithm. Since this approach works on
+       * multi-vectors and performs a global reduction only once, it is
+       * more efficient than the modified Gram-Schmidt algorithm.
+       * However, it might be numerically unstable.
        */
       classical_gram_schmidt
     };
