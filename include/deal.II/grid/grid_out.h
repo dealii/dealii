@@ -1098,7 +1098,7 @@ public:
   void
   write_msh(const Triangulation<dim, spacedim> &tria, std::ostream &out) const;
 
-#ifdef DEAL_II_GMSH_WITH_API
+#if defined(DEAL_II_WITH_GMSH) && defined(DEAL_II_GMSH_WITH_API)
   /**
    * Write the triangulation in any format supported by gmsh API.
    *
