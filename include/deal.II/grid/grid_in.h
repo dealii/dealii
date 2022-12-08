@@ -521,7 +521,7 @@ public:
   void
   read_msh(std::istream &in);
 
-#ifdef DEAL_II_GMSH_WITH_API
+#if defined(DEAL_II_WITH_GMSH) && defined(DEAL_II_GMSH_WITH_API)
   /**
    * Read grid data using Gmsh API. Any file supported by Gmsh can be passed as
    * argument. The format is deduced from the filename extension.

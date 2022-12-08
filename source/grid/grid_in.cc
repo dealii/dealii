@@ -31,7 +31,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/serialization/serialization.hpp>
 
-#ifdef DEAL_II_GMSH_WITH_API
+#if defined(DEAL_II_WITH_GMSH) && defined(DEAL_II_GMSH_WITH_API)
 #  include <gmsh.h>
 #endif
 
@@ -2706,7 +2706,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
 
 
-#ifdef DEAL_II_GMSH_WITH_API
+#if defined(DEAL_II_WITH_GMSH) && defined(DEAL_II_GMSH_WITH_API)
 template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_msh(const std::string &fname)

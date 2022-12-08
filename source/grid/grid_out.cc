@@ -32,7 +32,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
-#ifdef DEAL_II_GMSH_WITH_API
+#if defined(DEAL_II_WITH_GMSH) && defined(DEAL_II_GMSH_WITH_API)
 #  include <gmsh.h>
 #endif
 
@@ -1434,7 +1434,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
 
 
 
-#ifdef DEAL_II_GMSH_WITH_API
+#if defined(DEAL_II_WITH_GMSH) && defined(DEAL_II_GMSH_WITH_API)
 template <int dim, int spacedim>
 void
 GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
