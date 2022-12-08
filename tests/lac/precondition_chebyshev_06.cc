@@ -62,6 +62,11 @@ main()
         Chebyshev::AdditionalData::EigenvalueAlgorithm::power_iteration;
       cheby.initialize(A, cheby_data);
 
+      Chebyshev cheby_4;
+      cheby_data.polynomial_type =
+        Chebyshev::AdditionalData::PolynomialType::fourth_kind;
+      cheby_4.initialize(A, cheby_data);
+
       Vector<double> v(dim);
       Vector<double> tmp1(dim), tmp2(dim);
       for (unsigned int i = 0; i < 3; ++i)
@@ -79,9 +84,14 @@ main()
           tmp2 -= v;
           const double cheby_residual = tmp2.l2_norm();
 
+          A.vmult(tmp1, v);
+          cheby_4.vmult(tmp2, tmp1);
+          tmp2 -= v;
+          const double cheby_4_residual = tmp2.l2_norm();
+
           deallog << "Residual step i=" << i << ":  "
                   << " ilu=" << ilu_residual << ", cheby=" << cheby_residual
-                  << std::endl;
+                  << ", 4th-kind cheby=" << cheby_4_residual << std::endl;
         }
     }
 
