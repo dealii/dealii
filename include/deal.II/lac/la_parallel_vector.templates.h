@@ -362,7 +362,7 @@ namespace LinearAlgebra
           const ReadWriteVector<Number> &V,
           VectorOperation::values        operation,
           std::shared_ptr<const Utilities::MPI::Partitioner>
-                          communication_pattern,
+            &             communication_pattern,
           const IndexSet &locally_owned_elem,
           ::dealii::MemorySpace::MemorySpaceData<Number,
                                                  ::dealii::MemorySpace::Device>
