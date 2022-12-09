@@ -63,124 +63,59 @@ pipeline
       }
     }
 
-    stage('Build and Test')
+    stage('gcc-serial')
     {
-      parallel
+      agent
       {
-
-        stage('gcc-serial')
+        docker
         {
-          agent
-          {
-            docker
-            {
-              image 'tjhei/candi:v9.0.1-r4'
-            }
-          }
+          image 'tjhei/candi:v9.0.1-r4'
+        }
+      }
 
-          post {
-            always {
-              sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/serial.xml || true"
-              xunit tools: [CTest(pattern: '*.xml')]
-              sh "cp /home/dealii/build/detailed.log $WORKSPACE/detailed-serial.log || true"
-              archiveArtifacts artifacts: 'detailed-serial.log', fingerprint: true
-            }
-
-            cleanup {
-              cleanWs()
-            }
-
-            failure {
-              githubNotify context: 'CI', description: 'serial build failed',  status: 'FAILURE'
-            }
-          }
-
-          steps
-          {
-            timeout(time: 6, unit: 'HOURS')
-            {
-              sh "echo \"building on node ${env.NODE_NAME}\""
-              sh '''#!/bin/bash
-                 set -e
-                 set -x
-                 export NP=`grep -c ^processor /proc/cpuinfo`
-                 export TEST_TIME_LIMIT=1200
-                 mkdir -p /home/dealii/build
-                 cd /home/dealii/build
-                 cmake -G "Ninja" \
-                   -D DEAL_II_CXX_FLAGS='-Werror' \
-                   -D DEAL_II_CXX_FLAGS_DEBUG='-Og' \
-                   -D DEAL_II_EARLY_DEPRECATIONS=ON \
-                   -D CMAKE_BUILD_TYPE=Debug \
-                   -D DEAL_II_WITH_MPI=OFF \
-                   -D DEAL_II_UNITY_BUILD=ON \
-                   $WORKSPACE/
-                 time ninja -j $NP
-                 time ninja test # quicktests
-                 time ninja setup_tests
-                 time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
-              '''
-            }
-          }
+      post {
+        always {
+          sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/serial.xml || true"
+          xunit tools: [CTest(pattern: '*.xml')]
+          sh "cp /home/dealii/build/detailed.log $WORKSPACE/detailed-serial.log || true"
+          archiveArtifacts artifacts: 'detailed-serial.log', fingerprint: true
         }
 
-
-        stage('gcc-mpi')
-        {
-          agent
-          {
-            docker
-            {
-              image 'tjhei/candi:v9.0.1-r4'
-            }
-          }
-
-          post {
-            always {
-              sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/mpi.xml || true"
-              xunit tools: [CTest(pattern: '*.xml')]
-              sh "cp /home/dealii/build/detailed.log $WORKSPACE/detailed-mpi.log || true"
-              archiveArtifacts artifacts: 'detailed-mpi.log', fingerprint: true
-            }
-
-            cleanup {
-              cleanWs()
-            }
-
-            failure {
-              githubNotify context: 'CI', description: 'mpi build failed',  status: 'FAILURE'
-            }
-          }
-
-          steps
-          {
-            timeout(time: 6, unit: 'HOURS')
-            {
-              sh "echo \"building on node ${env.NODE_NAME}\""
-              sh '''#!/bin/bash
-                  set -e
-                  set -x
-                  export NP=`grep -c ^processor /proc/cpuinfo`
-                  mkdir -p /home/dealii/build
-                  cd /home/dealii/build
-                  cmake -G "Ninja" \
-                    -D DEAL_II_CXX_FLAGS='-Werror' \
-                    -D DEAL_II_CXX_FLAGS_DEBUG='-Og' \
-                    -D DEAL_II_EARLY_DEPRECATIONS=ON \
-                    -D CMAKE_BUILD_TYPE=Debug \
-                    -D DEAL_II_WITH_MPI=ON \
-                    -D DEAL_II_UNITY_BUILD=OFF \
-                    $WORKSPACE/
-                  time ninja -j $NP
-                  time ninja test # quicktests
-                  time ninja setup_tests
-                  time ctest -R "all-headers|multigrid/transfer|matrix_free/matrix_" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
-              '''
-            }
-          }
-
+        cleanup {
+          cleanWs()
         }
 
+        failure {
+          githubNotify context: 'CI', description: 'serial build failed',  status: 'FAILURE'
+        }
+      }
+
+      steps
+      {
+        timeout(time: 6, unit: 'HOURS')
+        {
+          sh "echo \"building on node ${env.NODE_NAME}\""
+          sh '''#!/bin/bash
+              set -e
+              set -x
+              export NP=`grep -c ^processor /proc/cpuinfo`
+              export TEST_TIME_LIMIT=1200
+              mkdir -p /home/dealii/build
+              cd /home/dealii/build
+              cmake -G "Ninja" \
+                -D DEAL_II_CXX_FLAGS='-Werror' \
+                -D DEAL_II_CXX_FLAGS_DEBUG='-Og' \
+                -D DEAL_II_EARLY_DEPRECATIONS=ON \
+                -D CMAKE_BUILD_TYPE=Debug \
+                -D DEAL_II_WITH_MPI=OFF \
+                -D DEAL_II_UNITY_BUILD=ON \
+                $WORKSPACE/
+              time ninja -j $NP
+              time ninja test # quicktests
+              time ninja setup_tests
+              time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
+          '''
+        }
       }
     }
 
