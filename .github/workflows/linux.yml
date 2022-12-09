@@ -36,6 +36,10 @@ jobs:
         libraries: container iostreams python serialization system thread
         platform: x64
         configuration: Release
+    - name: Install mold linker
+      uses: rui314/setup-mold@v1
+      with:
+        make-default: false
     - name: configure deal.II
       run: |
         mkdir build
@@ -85,6 +89,10 @@ jobs:
             petsc-dev \
             libmetis-dev \
             libhdf5-mpi-dev
+    - name: Install mold linker
+      uses: rui314/setup-mold@v1
+      with:
+        make-default: false
     - name: info
       run: |
         mpicc -v
@@ -160,6 +168,10 @@ jobs:
             numdiff \
             openmpi-bin \
             libboost-all-dev
+    - name: Install mold linker
+      uses: rui314/setup-mold@v1
+      with:
+        make-default: false
     - name: info
       run: |
         mpicc -v
@@ -254,6 +266,10 @@ jobs:
                                 intel-oneapi-mkl-devel \
                                 intel-oneapi-tbb-devel
         sudo apt-get clean
+    - name: Install mold linker
+      uses: rui314/setup-mold@v1
+      with:
+        make-default: false
     - name: info
       run: |
         source /opt/intel/oneapi/setvars.sh
