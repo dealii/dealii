@@ -47,19 +47,25 @@ execute_process(COMMAND ${CMAKE_CTEST_COMMAND}
   -R "quick_tests/(step.debug|step.release|affinity|.*.${_build_type})"
   OUTPUT_VARIABLE _output ERROR_VARIABLE _output RESULT_VARIABLE _return_value
   )
+file(WRITE quick_tests.log ${_output})
 message(${_output})
 
 if(NOT "${_return_value}" STREQUAL "0")
   message("
-***************************************************************************
-**                                                                       **
-**                 Error: Some of the quick tests failed.                **
-**                                                                       **
-***************************************************************************
+**************************************************************************
+**                                                                      **
+**                Error: Some of the quick tests failed.                **
+**                                                                      **
+**************************************************************************
 
-Please scroll up or check the file tests/quick_tests/quicktests.log for the
-error messages. If you are unable to fix the problems, see the FAQ or write
-to the mailing list linked at http://www.dealii.org\n"
+Check the files quick_tests.log and Testing/Temporary/LastTest.log located
+in your build directory for error messages. Alternatively, you can run all
+failing quick tests again via
+
+        $ ctest --rerun-failed --output-on-failure -R quick_tests/
+
+If you are unable to fix this problem, write to the mailing list linked at
+https://www.dealii.org\n"
     )
 
   string(REPLACE "\n" ";" _output "${_output}")
