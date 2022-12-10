@@ -150,6 +150,30 @@ endforeach()
 
 
 if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+
+  #
+  # Define a top-level "test" target that runs our quick tests wrapper.
+  #
+
+  if("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
+    # allow to override "test" target for quick tests
+    cmake_policy(SET CMP0037 OLD)
+  endif()
+
+  # Use the first available build type (this prefers debug mode if available):
+  list(GET DEAL_II_BUILD_TYPES 0 _my_build)
+  add_custom_target(test
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${_my_build} -P ${CMAKE_CURRENT_SOURCE_DIR}/run_quick_tests.cmake
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running quicktests..."
+    )
+
+  # Depend on the library target to ensure that deal.II is actually
+  # compiled, as well as on the setup_tests_quick_tests target to ensure
+  # that quick tests are actually available.
+  add_dependencies(test library)
+  add_dependencies(test setup_tests_quick_tests)
+
   #
   # Add a dummy target to make files known to IDEs like qtcreator
   #
@@ -159,11 +183,8 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/*/*.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/*/*.h
-  )
-
-  add_custom_target(testsuite
-    SOURCES ${_misc}
-  )
+    )
+  add_custom_target(testsuite SOURCES ${_misc})
 
   message(STATUS "Setting up testsuite - Done")
 endif()
