@@ -416,52 +416,6 @@ namespace GridTools
 
     return (t34 + t64 + t95 + t125 + t156 + t181 + t207 + t228) / 12.;
   }
-
-
-
-  namespace
-  {
-    // the following class is only needed in 2d, so avoid trouble with compilers
-    // warning otherwise
-    class Rotate2d
-    {
-    public:
-      explicit Rotate2d(const double angle)
-        : rotation_matrix(
-            Physics::Transformations::Rotations::rotation_matrix_2d(angle))
-      {}
-      Point<2>
-      operator()(const Point<2> &p) const
-      {
-        return static_cast<Point<2>>(rotation_matrix * p);
-      }
-
-    private:
-      const Tensor<2, 2, double> rotation_matrix;
-    };
-  } // namespace
-
-
-
-  template <>
-  void
-  rotate(const double angle, Triangulation<2> &triangulation)
-  {
-    transform(Rotate2d(angle), triangulation);
-  }
-
-
-
-  template <>
-  void
-  rotate(const double angle, Triangulation<3> &triangulation)
-  {
-    (void)angle;
-    (void)triangulation;
-
-    AssertThrow(
-      false, ExcMessage("GridTools::rotate() is not available for dim = 3."));
-  }
 } /* namespace GridTools */
 
 DEAL_II_NAMESPACE_CLOSE

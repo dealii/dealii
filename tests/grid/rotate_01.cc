@@ -32,6 +32,20 @@ test();
 
 template <>
 void
+test<1, 2>()
+{
+  const int                    dim      = 1;
+  const int                    spacedim = 2;
+  Triangulation<dim, spacedim> tria;
+  GridGenerator::hyper_sphere<spacedim>(tria);
+
+  // GridOut().write_gnuplot (tria, deallog.get_file_stream());
+  GridTools::rotate(numbers::PI / 3.0, tria);
+  GridOut().write_gnuplot(tria, deallog.get_file_stream());
+}
+
+template <>
+void
 test<2, 2>()
 {
   const int                            dim      = 2;
@@ -79,6 +93,7 @@ main()
 {
   initlog();
 
+  test<1, 2>();
   test<2, 2>();
   test<1, 3>();
   test<2, 3>();

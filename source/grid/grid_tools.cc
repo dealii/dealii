@@ -2053,6 +2053,25 @@ namespace GridTools
     };
 
 
+    // Transformation to rotate around one of the cartesian z-axis in 2D.
+    class Rotate2d
+    {
+    public:
+      explicit Rotate2d(const double angle)
+        : rotation_matrix(
+            Physics::Transformations::Rotations::rotation_matrix_2d(angle))
+      {}
+      Point<2>
+      operator()(const Point<2> &p) const
+      {
+        return static_cast<Point<2>>(rotation_matrix * p);
+      }
+
+    private:
+      const Tensor<2, 2, double> rotation_matrix;
+    };
+
+
     // Transformation to rotate around one of the cartesian axes.
     class Rotate3d
     {
@@ -2099,6 +2118,38 @@ namespace GridTools
         Triangulation<dim, spacedim> &triangulation)
   {
     transform(internal::Shift<spacedim>(shift_vector), triangulation);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  rotate(const double angle, Triangulation<dim, spacedim> &triangulation)
+  {
+    (void)angle;
+    (void)triangulation;
+
+    AssertThrow(false,
+                ExcMessage(
+                  "GridTools::rotate() is only available for spacedim = 2."));
+  }
+
+
+
+  template <>
+  void
+  rotate(const double angle, Triangulation<1, 2> &triangulation)
+  {
+    transform(internal::Rotate2d(angle), triangulation);
+  }
+
+
+
+  template <>
+  void
+  rotate(const double angle, Triangulation<2, 2> &triangulation)
+  {
+    transform(internal::Rotate2d(angle), triangulation);
   }
 
 

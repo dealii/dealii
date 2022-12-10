@@ -276,6 +276,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const double,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
+#  if deal_II_space_dimension != 2
+      template void
+      rotate<deal_II_dimension, deal_II_space_dimension>(
+        const double,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+#  endif
+
 #  if deal_II_space_dimension == 3
       template void
       rotate<deal_II_dimension>(
