@@ -1551,8 +1551,7 @@ namespace
      */
     template <int dim>
     void
-    write_high_order_cell(const unsigned int           index,
-                          const unsigned int           start,
+    write_high_order_cell(const unsigned int           start,
                           const std::vector<unsigned> &connectivity);
   };
 
@@ -1571,8 +1570,7 @@ namespace
      */
     template <int dim>
     void
-    write_high_order_cell(const unsigned int           index,
-                          const unsigned int           start,
+    write_high_order_cell(const unsigned int           start,
                           const std::vector<unsigned> &connectivity);
 
     void
@@ -2032,8 +2030,7 @@ namespace
 
   template <int dim>
   void
-  VtkStream::write_high_order_cell(const unsigned int,
-                                   const unsigned int           start,
+  VtkStream::write_high_order_cell(const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
     stream << connectivity.size();
@@ -2052,8 +2049,7 @@ namespace
 
   template <int dim>
   void
-  VtuStream::write_high_order_cell(const unsigned int,
-                                   const unsigned int           start,
+  VtuStream::write_high_order_cell(const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
     if (deal_ii_with_zlib &&
@@ -3059,11 +3055,8 @@ namespace DataOutBase
   {
     Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
-    unsigned int count                 = 0;
     // Array to hold all the node numbers of a cell
     std::vector<unsigned> connectivity;
-    // Array to hold cell order in each dimension
-    std::array<unsigned, dim> cell_order;
 
     for (const auto &patch : patches)
       {
@@ -3074,8 +3067,7 @@ namespace DataOutBase
             for (unsigned int i = 0; i < patch.data.n_cols(); ++i)
               connectivity[i] = i;
 
-            out.template write_high_order_cell<dim>(count++,
-                                                    first_vertex_of_patch,
+            out.template write_high_order_cell<dim>(first_vertex_of_patch,
                                                     connectivity);
 
             first_vertex_of_patch += patch.data.n_cols();
@@ -3085,6 +3077,7 @@ namespace DataOutBase
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
 
+            std::array<unsigned, dim> cell_order;
             cell_order.fill(n_subdivisions);
             connectivity.resize(Utilities::fixed_power<dim>(n));
 
@@ -3146,8 +3139,7 @@ namespace DataOutBase
 
             // Having so set up the 'connectivity' data structure,
             // output it:
-            out.template write_high_order_cell<dim>(count++,
-                                                    first_vertex_of_patch,
+            out.template write_high_order_cell<dim>(first_vertex_of_patch,
                                                     connectivity);
 
             // Finally update the number of the first vertex of this patch
