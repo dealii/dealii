@@ -32,6 +32,7 @@ else()
 endif()
 
 set(performance_instrumentation_step_3_RUNARGS_PREFIX "${_command_line}")
+set(performance_instrumentation_step_3_count_cycles_RUNARGS_PREFIX "${_command_line}")
 set(performance_instrumentation_step_22_RUNARGS_PREFIX "${_command_line}")
 
 deal_ii_pickup_tests()
