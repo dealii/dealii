@@ -3088,31 +3088,69 @@ namespace DataOutBase
             cell_order.fill(n_subdivisions);
             connectivity.resize(Utilities::fixed_power<dim>(n));
 
-            // Length of loops in all dimensons
-            const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
-            const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
-            const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
-            // Offsets of outer loops
-            constexpr unsigned int d1 = 1;
-            const unsigned int     d2 = n;
-            const unsigned int     d3 = n * n;
-            for (unsigned int i3 = 0; i3 <= n3; ++i3)
-              for (unsigned int i2 = 0; i2 <= n2; ++i2)
-                for (unsigned int i1 = 0; i1 <= n1; ++i1)
+            switch (dim)
+              {
+                case 0:
                   {
-                    const unsigned int local_index =
-                      i3 * d3 + i2 * d2 + i1 * d1;
-                    const unsigned int connectivity_index =
-                      vtk_point_index_from_ijk(
-                        i1, i2, i3, cell_order, legacy_format);
-                    connectivity[connectivity_index] = local_index;
+                    Assert(false,
+                           ExcMessage("Point-like cells should not be possible "
+                                      "when writing higher-order cells."));
+                    break;
                   }
+                case 1:
+                  {
+                    for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                      {
+                        const unsigned int local_index = i1;
+                        const unsigned int connectivity_index =
+                          vtk_point_index_from_ijk(
+                            i1, 0, 0, cell_order, legacy_format);
+                        connectivity[connectivity_index] = local_index;
+                      }
 
+                    break;
+                  }
+                case 2:
+                  {
+                    for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                      for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                        {
+                          const unsigned int local_index = i2 * n + i1;
+                          const unsigned int connectivity_index =
+                            vtk_point_index_from_ijk(
+                              i1, i2, 0, cell_order, legacy_format);
+                          connectivity[connectivity_index] = local_index;
+                        }
+
+                    break;
+                  }
+                case 3:
+                  {
+                    for (unsigned int i3 = 0; i3 < n_subdivisions + 1; ++i3)
+                      for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                        for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                          {
+                            const unsigned int local_index =
+                              i3 * n * n + i2 * n + i1;
+                            const unsigned int connectivity_index =
+                              vtk_point_index_from_ijk(
+                                i1, i2, i3, cell_order, legacy_format);
+                            connectivity[connectivity_index] = local_index;
+                          }
+
+                    break;
+                  }
+                default:
+                  Assert(false, ExcNotImplemented());
+              }
+
+            // Having so set up the 'connectivity' data structure,
+            // output it:
             out.template write_high_order_cell<dim>(count++,
                                                     first_vertex_of_patch,
                                                     connectivity);
 
-            // finally update the number of the first vertex of this patch
+            // Finally update the number of the first vertex of this patch
             first_vertex_of_patch += Utilities::fixed_power<dim>(n);
           }
       }
