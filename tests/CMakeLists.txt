@@ -53,22 +53,6 @@ endif()
 
 if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
 
-  #
-  # We have to repeat the policy statement here because the new
-  # CMAKE_MINIMUM_REQUIRED call resets our previous policy set in the main
-  # CMakeLists.txt file.
-  #
-  if("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
-    # allow to override "test" target for quick tests
-    cmake_policy(SET CMP0037 OLD)
-  endif()
-
-  #
-  # If this CMakeLists.txt file is called from within the deal.II build
-  # system, set up quick tests as well:
-  #
-  add_subdirectory(quick_tests)
-
   message(STATUS "Setting up testsuite")
 
   #
@@ -95,9 +79,7 @@ else()
   set(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
 endif()
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
-    "subdirs(quick_tests)\n"
-    )
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 
 #
 # Always undefine the following variables in the setup_tests target:
@@ -115,15 +97,14 @@ endforeach()
 
 #
 # Find all testsuite subprojects, i.e., every directory that contains a
-# CMakeLists.txt file (with the exception of "quick_tests").
+# CMakeLists.txt file.
 #
 set(_categories)
 file(GLOB _dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/*
   )
 foreach(_dir ${_dirs})
-  if( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_dir}/CMakeLists.txt AND
-      NOT ${_dir} MATCHES quick_tests)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_dir}/CMakeLists.txt)
     list(APPEND _categories ${_dir})
   endif()
 endforeach()
