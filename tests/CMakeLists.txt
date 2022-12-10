@@ -19,6 +19,7 @@
 # We define toplevel targets:
 #    setup_tests    - set up testsuite subprojects
 #    prune_tests    - remove all testsuite subprojects
+#    test           - run all quick_tests
 #
 
 cmake_minimum_required(VERSION 3.3.0)
@@ -33,38 +34,10 @@ set_if_empty(MAKEOPTS $ENV{MAKEOPTS})
 set_if_empty(DEAL_II_DIR $ENV{DEAL_II_DIR})
 
 #
-# A bit of necessary setup if tests are configured as a stand-alone
-# project:
+# Setup for the case that tests are configured as a stand-alone project:
 #
 
 if(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
-  find_package(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR})
-  deal_ii_initialize_cached_variables()
-  project(TESTSUITE CXX)
-  file(WRITE ${CMAKE_BINARY_DIR}/detailed.log
-    "#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}"
-    )
-endif()
-
-#
-# A bit of necessary setup if tests are included via ADD_SUBDIRECTORY from
-# the top-level CMake project:
-#
-
-if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
-
-  message(STATUS "Setting up testsuite")
-
-  #
-  # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR and
-  # CMAKE_BINARY_DIR/tests:
-  #
-  file(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "subdirs(tests)\n")
-
-  set(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
-
-else()
-
   message(STATUS "This is CMake ${CMAKE_VERSION}")
   message(STATUS "")
 
@@ -74,9 +47,30 @@ else()
       )
   endif()
 
-  find_package(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR} $ENV{DEAL_II_DIR})
-  project(testsuite NONE)
+  find_package(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR})
+  deal_ii_initialize_cached_variables()
+  project(TESTSUITE CXX)
   set(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
+
+  file(WRITE ${CMAKE_BINARY_DIR}/detailed.log
+    "#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}"
+    )
+endif()
+
+#
+# Setup for the case that tests are included via ADD_SUBDIRECTORY from the
+# top-level CMake project:
+#
+
+if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+  message(STATUS "Setting up testsuite")
+
+  #
+  # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR:
+  #
+  file(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "subdirs(tests)\n")
+
+  set(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
 endif()
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
@@ -167,7 +161,7 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
     ${CMAKE_CURRENT_SOURCE_DIR}/*/*.h
   )
 
-  add_custom_target(dummy_tests_files
+  add_custom_target(testsuite
     SOURCES ${_misc}
   )
 
