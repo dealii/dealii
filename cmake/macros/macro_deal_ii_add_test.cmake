@@ -119,7 +119,6 @@ endmacro()
 
 
 function(deal_ii_add_test _category _test_name _comparison_file)
-
   if(NOT TARGET compile_test_executables)
     add_custom_target(compile_test_executables)
   endif()
