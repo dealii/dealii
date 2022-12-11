@@ -161,6 +161,17 @@ namespace internal
 
       return {Quadrature<dim - 1>(), Quadrature<dim - 1>()};
     }
+
+    inline DEAL_II_ALWAYS_INLINE unsigned int
+    indicate_power_of_two(const unsigned int vectorization_length)
+    {
+      unsigned int vectorization_length_bits = 0;
+      unsigned int my_length                 = vectorization_length;
+      while (my_length >>= 1)
+        ++vectorization_length_bits;
+      return 1 << vectorization_length_bits;
+    }
+
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 
