@@ -2008,13 +2008,6 @@ FESystem<dim, spacedim>::initialize(
       for (unsigned int face_no = 0; face_no < this->n_unique_faces();
            ++face_no)
         {
-          // This logic isn't valid for higher-order wedges because the first
-          // two faces are triangles, so no table will be set up for
-          // quadrilateral faces
-          Assert(this->n_dofs_per_quad(face_no) == 0 ||
-                   this->reference_cell() != ReferenceCells::Wedge,
-                 ExcNotImplemented());
-
           // the array into which we want to write should have the correct size
           // already.
           Assert(this->adjust_quad_dof_index_for_face_orientation_table[face_no]
