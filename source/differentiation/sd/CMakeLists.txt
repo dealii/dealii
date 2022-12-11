@@ -36,5 +36,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/sd/*.h
   )
 
-deal_ii_add_library(obj_differentiation_sd OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_differentiation_sd SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_differentiation_sd "${_inst}")

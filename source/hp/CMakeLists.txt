@@ -45,5 +45,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/hp/*.h
   )
 
-deal_ii_add_library(obj_hp OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_hp SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_hp "${_inst}")

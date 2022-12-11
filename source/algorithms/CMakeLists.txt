@@ -29,5 +29,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/algorithms/*.h
   )
 
-deal_ii_add_library(obj_algorithms OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_algorithms SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_algorithms "${_inst}")

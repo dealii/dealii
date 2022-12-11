@@ -156,7 +156,7 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
   )
 
-deal_ii_add_library(obj_base OBJECT ${_src} ${_header} ${_inst}
+deal_ii_add_library(obj_base SHARED ${_src} ${_header} ${_inst}
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   )
 expand_instantiations(obj_base "${_inst}")

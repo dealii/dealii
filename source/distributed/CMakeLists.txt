@@ -59,5 +59,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/distributed/*.h
   )
 
-deal_ii_add_library(obj_distributed OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_distributed SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_distributed "${_inst}")

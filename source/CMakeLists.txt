@@ -79,7 +79,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${build} build_lowercase)
 
   #
-  # Combine all ${build} OBJECT targets to a ${build} library:
+  # Combine all ${build} SHARED targets to a ${build} library:
   #
 
   get_property(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})

@@ -22,4 +22,4 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/integrators/*.h
   )
 
-deal_ii_add_library(obj_integrators OBJECT ${_src} ${_header})
+deal_ii_add_library(obj_integrators SHARED ${_src} ${_header})

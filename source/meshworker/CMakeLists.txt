@@ -32,5 +32,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/meshworker/*.h
   )
 
-deal_ii_add_library(obj_meshworker OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_meshworker SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_meshworker "${_inst}")

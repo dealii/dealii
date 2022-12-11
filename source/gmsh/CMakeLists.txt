@@ -27,5 +27,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/gmsh/*.h
   )
 
-deal_ii_add_library(obj_gmsh OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_gmsh SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_gmsh "${_inst}")

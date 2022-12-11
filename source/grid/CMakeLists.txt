@@ -97,5 +97,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
   )
 
-deal_ii_add_library(obj_grid OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_grid SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_grid "${_inst}")

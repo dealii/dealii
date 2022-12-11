@@ -36,5 +36,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/non_matching/*.h
   )
 
-deal_ii_add_library(obj_non_matching OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_non_matching SHARED ${_src} ${_header} ${_inst})
 expand_instantiations(obj_non_matching "${_inst}")
