@@ -467,9 +467,8 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       #
 
       add_custom_command(OUTPUT ${_test_directory}/output
-        COMMAND TEST_N_THREADS=${_n_threads}
-          ${BASH} ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          run "${_test_full}" ${_run_args}
+        COMMAND ${BASH} ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+          run "${_test_full}" TEST_N_THREADS=${_n_threads} ${_run_args}
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
           ${_test_directory}/output
