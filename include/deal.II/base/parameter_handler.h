@@ -198,6 +198,21 @@ class MultipleParameterLoop;
  * word with a capital letter and use lowercase letters further on. The same
  * applies to the possible entry values to the right of the <tt>=</tt> sign.
  *
+ * The class can also handle json-files and XML-files. The json input file might
+ * look like the following for the previous example:
+ *   @code
+ *     {
+ *       "Nonlinear solver" : {
+ *         "Nonlinear method" : "Gradient",
+ *         "Linear solver" : {
+ *           "Solver" : "CG",
+ *           "Maximum number of iterations" : 30
+ *         }
+ *       }
+ *     }
+ *   @endcode
+ * The advantage of using json-files is that this format is natively supported
+ * by Python, simplifying the running of paramter studies tremendously.
  *
  * <h3>Including other input files</h3>
  *
