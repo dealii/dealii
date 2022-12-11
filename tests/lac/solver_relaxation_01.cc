@@ -54,6 +54,25 @@ check_solve(SolverType &        solver,
   return result;
 }
 
+template <typename OperatorType>
+class Wrapper
+{
+public:
+  Wrapper(const OperatorType &op)
+    : op(op)
+  {}
+
+  template <typename VectorType>
+  void
+  vmult(VectorType &dst, const VectorType &src) const
+  {
+    op.vmult(dst, src);
+  }
+
+private:
+  const OperatorType &op;
+};
+
 int
 main()
 {
@@ -103,6 +122,12 @@ main()
 
           r1 = check_solve(rich, A, u, f, prec_jacobi);
           r2 = check_solve(relax, A, u, f, prec_jacobi);
+          deallog << "Jacobi  diff " << std::fabs(r1 - r2) / r1 << std::endl;
+
+          r1 = check_solve(
+            rich, A, u, f, Wrapper<PreconditionJacobi<>>(prec_jacobi));
+          r2 = check_solve(
+            relax, A, u, f, Wrapper<PreconditionJacobi<>>(prec_jacobi));
           deallog << "Jacobi  diff " << std::fabs(r1 - r2) / r1 << std::endl;
 
           r1 = check_solve(rich, A, u, f, prec_sor);
