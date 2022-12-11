@@ -1551,8 +1551,7 @@ namespace
      */
     template <int dim>
     void
-    write_high_order_cell(const unsigned int           index,
-                          const unsigned int           start,
+    write_high_order_cell(const unsigned int           start,
                           const std::vector<unsigned> &connectivity);
   };
 
@@ -1571,8 +1570,7 @@ namespace
      */
     template <int dim>
     void
-    write_high_order_cell(const unsigned int           index,
-                          const unsigned int           start,
+    write_high_order_cell(const unsigned int           start,
                           const std::vector<unsigned> &connectivity);
 
     void
@@ -2032,8 +2030,7 @@ namespace
 
   template <int dim>
   void
-  VtkStream::write_high_order_cell(const unsigned int,
-                                   const unsigned int           start,
+  VtkStream::write_high_order_cell(const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
     stream << connectivity.size();
@@ -2052,8 +2049,7 @@ namespace
 
   template <int dim>
   void
-  VtuStream::write_high_order_cell(const unsigned int,
-                                   const unsigned int           start,
+  VtuStream::write_high_order_cell(const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
     if (deal_ii_with_zlib &&
@@ -3059,11 +3055,8 @@ namespace DataOutBase
   {
     Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
-    unsigned int count                 = 0;
     // Array to hold all the node numbers of a cell
     std::vector<unsigned> connectivity;
-    // Array to hold cell order in each dimension
-    std::array<unsigned, dim> cell_order;
 
     for (const auto &patch : patches)
       {
@@ -3074,8 +3067,7 @@ namespace DataOutBase
             for (unsigned int i = 0; i < patch.data.n_cols(); ++i)
               connectivity[i] = i;
 
-            out.template write_high_order_cell<dim>(count++,
-                                                    first_vertex_of_patch,
+            out.template write_high_order_cell<dim>(first_vertex_of_patch,
                                                     connectivity);
 
             first_vertex_of_patch += patch.data.n_cols();
@@ -3085,34 +3077,72 @@ namespace DataOutBase
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
 
+            std::array<unsigned, dim> cell_order;
             cell_order.fill(n_subdivisions);
             connectivity.resize(Utilities::fixed_power<dim>(n));
 
-            // Length of loops in all dimensons
-            const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
-            const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
-            const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
-            // Offsets of outer loops
-            constexpr unsigned int d1 = 1;
-            const unsigned int     d2 = n;
-            const unsigned int     d3 = n * n;
-            for (unsigned int i3 = 0; i3 <= n3; ++i3)
-              for (unsigned int i2 = 0; i2 <= n2; ++i2)
-                for (unsigned int i1 = 0; i1 <= n1; ++i1)
+            switch (dim)
+              {
+                case 0:
                   {
-                    const unsigned int local_index =
-                      i3 * d3 + i2 * d2 + i1 * d1;
-                    const unsigned int connectivity_index =
-                      vtk_point_index_from_ijk(
-                        i1, i2, i3, cell_order, legacy_format);
-                    connectivity[connectivity_index] = local_index;
+                    Assert(false,
+                           ExcMessage("Point-like cells should not be possible "
+                                      "when writing higher-order cells."));
+                    break;
                   }
+                case 1:
+                  {
+                    for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                      {
+                        const unsigned int local_index = i1;
+                        const unsigned int connectivity_index =
+                          vtk_point_index_from_ijk(
+                            i1, 0, 0, cell_order, legacy_format);
+                        connectivity[connectivity_index] = local_index;
+                      }
 
-            out.template write_high_order_cell<dim>(count++,
-                                                    first_vertex_of_patch,
+                    break;
+                  }
+                case 2:
+                  {
+                    for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                      for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                        {
+                          const unsigned int local_index = i2 * n + i1;
+                          const unsigned int connectivity_index =
+                            vtk_point_index_from_ijk(
+                              i1, i2, 0, cell_order, legacy_format);
+                          connectivity[connectivity_index] = local_index;
+                        }
+
+                    break;
+                  }
+                case 3:
+                  {
+                    for (unsigned int i3 = 0; i3 < n_subdivisions + 1; ++i3)
+                      for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                        for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                          {
+                            const unsigned int local_index =
+                              i3 * n * n + i2 * n + i1;
+                            const unsigned int connectivity_index =
+                              vtk_point_index_from_ijk(
+                                i1, i2, i3, cell_order, legacy_format);
+                            connectivity[connectivity_index] = local_index;
+                          }
+
+                    break;
+                  }
+                default:
+                  Assert(false, ExcNotImplemented());
+              }
+
+            // Having so set up the 'connectivity' data structure,
+            // output it:
+            out.template write_high_order_cell<dim>(first_vertex_of_patch,
                                                     connectivity);
 
-            // finally update the number of the first vertex of this patch
+            // Finally update the number of the first vertex of this patch
             first_vertex_of_patch += Utilities::fixed_power<dim>(n);
           }
       }
