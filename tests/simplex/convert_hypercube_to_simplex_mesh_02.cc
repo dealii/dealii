@@ -13,7 +13,7 @@
  *
  * ---------------------------------------------------------------------
  *
- * Like conv_hex_to_simplex, but also refines the grid once.
+ * Like convert_hypercube_to_simplex_mesh_01, but also refines the grid once.
  */
 
 #include <deal.II/grid/grid_generator.h>
