@@ -85,6 +85,11 @@ endmacro()
 
 
 macro(deal_ii_pickup_tests)
+  #
+  # Find bash and perl interpreter:
+  #
+
+  find_package(UnixCommands REQUIRED)
   find_package(Perl REQUIRED)
 
   #
