@@ -7410,9 +7410,9 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::reinit(const unsigned int cell_index)
 {
-  Assert(this->mapped_geometry == nullptr,
+  Assert(this->matrix_free != nullptr,
          ExcMessage("FEEvaluation was initialized without a matrix-free object."
-                    " Integer indexing is not possible"));
+                    " Integer indexing is not possible."));
 
   Assert(this->dof_info != nullptr, ExcNotInitialized());
   Assert(this->mapping_data != nullptr, ExcNotInitialized());
