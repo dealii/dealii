@@ -103,6 +103,21 @@
 #     deal_ii_add_test(category test_name comparison_file)
 #
 
+#
+# A small helper macro that is used below:
+#
+
+macro(item_matches _var _regex)
+  set(${_var})
+  foreach (_item ${ARGN})
+    if("${_item}" MATCHES ${_regex})
+      set(${_var} TRUE)
+      break()
+    endif()
+  endforeach()
+endmacro()
+
+
 function(deal_ii_add_test _category _test_name _comparison_file)
 
   if(NOT TARGET compile_test_executables)

@@ -74,23 +74,13 @@
 #
 
 #
-# Two very small macros that are used below:
+# A small helper macro that is used below:
 #
 
 macro(set_if_empty _variable)
   if("${${_variable}}" STREQUAL "")
     set(${_variable} ${ARGN})
   endif()
-endmacro()
-
-macro(item_matches _var _regex)
-  set(${_var})
-  foreach (_item ${ARGN})
-    if("${_item}" MATCHES ${_regex})
-      set(${_var} TRUE)
-      break()
-    endif()
-  endforeach()
 endmacro()
 
 
