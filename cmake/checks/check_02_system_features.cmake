@@ -91,7 +91,6 @@ if( CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-
   #
   # Export DEAL_II_MSVC if we are on a Windows platform:
   #
@@ -100,21 +99,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
   #
   # Shared library handling:
   #
-
-  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # With MinGW we're lucky:
-    enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--export-all-symbols")
-    enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--enable-auto-import")
-    enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--allow-multiple-definition")
-  else()
-    # Otherwise disable shared libraries:
-    message(WARNING "\n"
-      "BUILD_SHARED_LIBS forced to OFF\n\n"
-      )
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-    # And disable compilation of examples:
-    set(DEAL_II_COMPILE_EXAMPLES OFF CACHE BOOL "" FORCE)
+  # Let's use the CMake infrastructure to automatically export symbols on
+  # Windows targets:
+  #
+  if(BUILD_SHARED_LIBS)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
   endif()
-
 endif()
