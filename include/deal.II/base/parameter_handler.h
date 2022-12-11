@@ -1137,10 +1137,14 @@ public:
    *
    * The action is executed in three different circumstances:
    * - With the default value of the parameter with name @p name, at
-   *   the end of the current function. This is useful because it allows
-   *   for the action to execute whatever it needs to do at least once
-   *   for each parameter, even those that are not actually specified in
-   *   the input file (and thus remain at their default values).
+   *   the end of the current function if @p execute_action is set to
+   *   true. This is useful because it allows for the action to execute
+   *   whatever it needs to do at least once for each parameter, even
+   *   those that are not actually specified in the input file (and
+   *   thus remain at their default values). Note that if the action
+   *   is executed, it converts the default value to a string and back
+   *   afterwards. This can lead to round-off errors so that the default
+   *   values might change in the case of floating-point numbers.
    * - Within the ParameterHandler::set() functions that explicitly
    *   set a value for a parameter.
    * - Within the parse_input() function and similar functions such
@@ -1173,7 +1177,8 @@ public:
    */
   void
   add_action(const std::string &                                  entry,
-             const std::function<void(const std::string &value)> &action);
+             const std::function<void(const std::string &value)> &action,
+             const bool execute_action = true);
 
   /**
    * Declare a new entry name @p entry, set its default value to the content of
@@ -2353,7 +2358,7 @@ ParameterHandler::add_parameter(const std::string &          entry,
     parameter = Patterns::Tools::Convert<ParameterType>::to_value(
       val, *patterns[pattern_index]);
   };
-  add_action(entry, action);
+  add_action(entry, action, false);
 }
 
 DEAL_II_NAMESPACE_CLOSE

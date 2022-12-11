@@ -874,7 +874,8 @@ ParameterHandler::declare_entry(const std::string &          entry,
 void
 ParameterHandler::add_action(
   const std::string &                             entry,
-  const std::function<void(const std::string &)> &action)
+  const std::function<void(const std::string &)> &action,
+  const bool                                      execute_action)
 {
   actions.push_back(action);
 
@@ -898,11 +899,12 @@ ParameterHandler::add_action(
     entries->put(get_current_full_path(entry) + path_separator + "actions",
                  Utilities::int_to_string(actions.size() - 1));
 
-
-  // as documented, run the action on the default value at the very end
-  const std::string default_value = entries->get<std::string>(
-    get_current_full_path(entry) + path_separator + "default_value");
-  action(default_value);
+  if (execute_action)
+    {
+      const std::string default_value = entries->get<std::string>(
+        get_current_full_path(entry) + path_separator + "default_value");
+      action(default_value);
+    }
 }
 
 
