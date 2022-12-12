@@ -114,8 +114,11 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   double monoval_jplus[dim][n_derivatives + 1];
 
   unsigned int start = n_sub;
-
+#ifdef DEAL_II_HAVE_CXX17
+  if constexpr (dim == 2)
+#else
   if (dim == 2)
+#endif
     {
       // In 2d the curl part of the space is spanned by the vectors
       // of two types. The first one is
@@ -198,7 +201,11 @@ PolynomialsRT_Bubbles<dim>::evaluate(
         }
       Assert(start == this->n() - my_degree - 1, ExcInternalError());
     }
+#ifdef DEAL_II_HAVE_CXX17
+  else if constexpr (dim == 3)
+#else
   else if (dim == 3)
+#endif
     {
       // In 3d the first type of basis vector is
       //  [ x^i * y^j * z^k * (j+k+2) ]

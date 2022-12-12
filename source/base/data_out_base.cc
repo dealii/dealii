@@ -3690,6 +3690,12 @@ namespace DataOutBase
             const unsigned int n1              = (dim > 0) ? n : 1;
             const unsigned int n2              = (dim > 1) ? n : 1;
             const unsigned int n3              = (dim > 2) ? n : 1;
+            const unsigned int x_minus         = (dim > 0) ? 0 : 0;
+            const unsigned int x_plus          = (dim > 0) ? 1 : 0;
+            const unsigned int y_minus         = (dim > 1) ? 2 : 0;
+            const unsigned int y_plus          = (dim > 1) ? 3 : 0;
+            const unsigned int z_minus         = (dim > 2) ? 4 : 0;
+            const unsigned int z_plus          = (dim > 2) ? 5 : 0;
             unsigned int       cells_per_patch = Utilities::fixed_power<dim>(n);
             unsigned int       dx              = 1;
             unsigned int       dy              = n;
@@ -3716,7 +3722,7 @@ namespace DataOutBase
                     // Direction -x Last cell in row of other patch
                     if (i1 == 0)
                       {
-                        const unsigned int nn = patch.neighbors[0];
+                        const unsigned int nn = patch.neighbors[x_minus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out
@@ -3731,7 +3737,7 @@ namespace DataOutBase
                     // Direction +x First cell in row of other patch
                     if (i1 == n - 1)
                       {
-                        const unsigned int nn = patch.neighbors[1];
+                        const unsigned int nn = patch.neighbors[x_plus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + ny + nz);
@@ -3747,7 +3753,7 @@ namespace DataOutBase
                     // Direction -y
                     if (i2 == 0)
                       {
-                        const unsigned int nn = patch.neighbors[2];
+                        const unsigned int nn = patch.neighbors[y_minus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out
@@ -3762,7 +3768,7 @@ namespace DataOutBase
                     // Direction +y
                     if (i2 == n - 1)
                       {
-                        const unsigned int nn = patch.neighbors[3];
+                        const unsigned int nn = patch.neighbors[y_plus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + nx + nz);
@@ -3779,7 +3785,7 @@ namespace DataOutBase
                     // Direction -z
                     if (i3 == 0)
                       {
-                        const unsigned int nn = patch.neighbors[4];
+                        const unsigned int nn = patch.neighbors[z_minus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out
@@ -3794,7 +3800,7 @@ namespace DataOutBase
                     // Direction +z
                     if (i3 == n - 1)
                       {
-                        const unsigned int nn = patch.neighbors[5];
+                        const unsigned int nn = patch.neighbors[z_plus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + nx + ny);
