@@ -53,6 +53,13 @@ case $STAGE in
     #    testsuite to explicitly set the number of threads in the header
     #    file tests.h.
     #
+
+    # Read in TEST_N_THREADS from command line:
+    if [[ $1 == TEST_N_THREADS=* ]]; then
+      TEST_N_THREADS="${1#TEST_N_THREADS=}"
+      shift
+    fi
+
     if [ "${TEST_N_THREADS:-0}" -ne 0 ]; then
       export DEAL_II_NUM_THREADS="${TEST_N_THREADS}"
       export TEST_N_THREADS

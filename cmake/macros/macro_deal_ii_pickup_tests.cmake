@@ -74,7 +74,7 @@
 #
 
 #
-# Two very small macros that are used below:
+# A small helper macro that is used below:
 #
 
 macro(set_if_empty _variable)
@@ -83,18 +83,18 @@ macro(set_if_empty _variable)
   endif()
 endmacro()
 
-macro(item_matches _var _regex)
-  set(${_var})
-  foreach (_item ${ARGN})
-    if("${_item}" MATCHES ${_regex})
-      set(${_var} TRUE)
-      break()
-    endif()
-  endforeach()
-endmacro()
-
 
 macro(deal_ii_pickup_tests)
+  #
+  # Find bash and perl interpreter:
+  #
+
+  find_package(UnixCommands REQUIRED)
+  find_package(Perl REQUIRED)
+
+  #
+  # Ensure that this macro is not called internally:
+  #
 
   if(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     message(FATAL_ERROR
@@ -105,88 +105,84 @@ macro(deal_ii_pickup_tests)
   endif()
 
   #
-  # Necessary external interpreters and programs:
+  # Make sure that we know the MPI launcher executable:
   #
+
   if(${DEAL_II_WITH_MPI})
     if("${DEAL_II_MPIEXEC}" STREQUAL "" OR
        "${DEAL_II_MPIEXEC}" STREQUAL "MPIEXEC_EXECUTABLE-NOTFOUND")
-      message(FATAL_ERROR "Could not find an MPI launcher program, which is required "
-"for running the testsuite. Please explicitly specify MPIEXEC_EXECUTABLE to CMake "
-"as a full path to the MPI launcher program.")
+       message(WARNING
+         "\nCould not find an MPI launcher program, which is required for "
+         "running mpi tests within the testsuite. As a consequence all "
+         "tests that require an mpi launcher have been disabled.\n"
+         "If you want to run tests with mpi then please configure deal.II "
+         "by either setting the MPIEXEC environemt variable or the CMake "
+         "variable MPIEXEC_EXECUTABLE to a full path to the MPI launcher "
+         "program.\n\n"
+         )
+       set(DEAL_II_WITH_MPI FALSE)
     endif()
   endif()
 
-  find_package(Perl REQUIRED)
+  #
+  # Figure out the category name for the tests:
+  #
 
-  find_program(NUMDIFF_EXECUTABLE
-    NAMES numdiff
-    HINTS ${NUMDIFF_DIR}
-    PATH_SUFFIXES bin
+  if("${ARGN}" STREQUAL "")
+    get_filename_component(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+  else()
+    set(_category "${ARGN}")
+  endif()
+
+  #
+  # Check that we have the numdiff executable and that it works properly by
+  # running a relative tolerance test:
+  #
+
+  set_if_empty(NUMDIFF_DIR "$ENV{NUMDIFF_DIR}")
+  find_program(NUMDIFF_EXECUTABLE NAMES numdiff
+    HINTS ${NUMDIFF_DIR} PATH_SUFFIXES bin
     )
-
   mark_as_advanced(NUMDIFF_EXECUTABLE)
 
-  if( "${NUMDIFF_EXECUTABLE}" MATCHES "NUMDIFF_EXECUTABLE-NOTFOUND")
-    message(FATAL_ERROR
-      "Could not find numdiff, which is required for running the testsuite.\n"
-      "Please specify NUMDIFF_DIR to a location containing the binary."
-      )
-  endif()
+  set(_file_1 "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-1.txt")
+  set(_file_2 "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-2.txt")
+  set(_output "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-output.txt")
+  file(WRITE "${_file_1}" "0.99999999998\n2.0\n1.0\n")
+  file(WRITE "${_file_2}" "1.00000000001\n2.0\n1.0\n")
 
-  #
-  # Check that numdiff can run and terminate successfully:
-  #
-  execute_process(COMMAND ${NUMDIFF_EXECUTABLE} "-v"
-    TIMEOUT 4 # seconds
-    OUTPUT_QUIET
-    ERROR_QUIET
-    RESULT_VARIABLE _diff_program_status
+  set(_command
+    "${NUMDIFF_EXECUTABLE}" "-r" "1.0e-8" "--" "${_file_1}" "${_file_2}"
     )
 
-  if(NOT "${_diff_program_status}" STREQUAL "0")
-    message(FATAL_ERROR
-      "\nThe command \"${NUMDIFF_EXECUTABLE} -v\" did not run correctly: it "
-      "either failed to exit after a few seconds or returned a nonzero exit "
-      "code. The test suite cannot be set up without this program, so please "
-      "reinstall it and then run the test suite setup command again.\n")
-  endif()
+  string(REPLACE ";" " " _contents "${_command}")
+  file(WRITE "${_output}" "${_contents}\n")
+  execute_process(COMMAND ${_command}
+    TIMEOUT 4 # seconds
+    OUTPUT_VARIABLE _contents
+    ERROR_VARIABLE _contents
+    RESULT_VARIABLE _numdiff_tolerance_test_status
+    )
+  file(APPEND "${_output}" "${_contents}")
 
-  #
-  # Also check that numdiff is not a symlink to diff by running a relative
-  # tolerance test.
-  #
-  string(FIND "${NUMDIFF_EXECUTABLE}" "numdiff" _found_numdiff_binary)
-  if(NOT "${_found_numdiff_binary}" STREQUAL "-1")
-    string(RANDOM _suffix)
-    set(_first_test_file_name
-      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-${_suffix}-1.txt")
-    set(_second_test_file_name
-      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-${_suffix}-2.txt")
-    file(WRITE "${_first_test_file_name}" "0.99999999998\n2.0\n1.0\n")
-    file(WRITE "${_second_test_file_name}" "1.00000000001\n2.0\n1.0\n")
-
-    execute_process(COMMAND ${NUMDIFF_EXECUTABLE}
-      "-r" "1.0e-8" "--" "${_first_test_file_name}" "${_second_test_file_name}"
-      TIMEOUT 4 # seconds
-      OUTPUT_QUIET
-      ERROR_QUIET
-      RESULT_VARIABLE _numdiff_tolerance_test_status
-      )
-
-    #
-    # Tidy up:
-    #
-    file(REMOVE ${_first_test_file_name})
-    file(REMOVE ${_second_test_file_name})
-
-    if(NOT "${_numdiff_tolerance_test_status}" STREQUAL "0")
-      message(FATAL_ERROR
-        "\nThe detected numdiff executable was not able to pass a simple "
-        "relative tolerance test. This usually means that either numdiff "
-        "was misconfigured or that it is a symbolic link to diff. "
-        "The test suite needs numdiff to work correctly: please reinstall "
-        "numdiff and run the test suite configuration again.\n")
+  if(NOT "${_numdiff_tolerance_test_status}" STREQUAL "0")
+    if(NOT "${_category}" MATCHES "^(quick_tests|performance)$")
+      message(WARNING
+        "\nCould not find or execute numdiff, which is required for running "
+        "most of the tests within the testsuite; failing output has been "
+        "recorded in ${_output}"
+        "\nAs a consequence all tests that require test output comparison "
+        "have been disabled.\nIf you want to run tests that require output "
+        "comparison then please specify NUMDIFF_DIR (either as environment "
+        "variable or as CMake variable) to a location containing the "
+        "binary.\n"
+        )
+      set(NUMDIFF_EXECUTABLE "")
     endif()
+  else()
+    file(REMOVE ${_file_1})
+    file(REMOVE ${_file_2})
+    file(REMOVE ${_output})
   endif()
 
   #
@@ -219,15 +215,15 @@ macro(deal_ii_pickup_tests)
 
   enable_testing()
 
-  if("${ARGN}" STREQUAL "")
-    get_filename_component(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-  else()
-    set(_category "${ARGN}")
-  endif()
-
   set(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 
-  file(GLOB _tests "*.output" "*.run_only")
+  # Only run "*.output" comparison tests if we have numdiff:
+  set(_globs "*.output" "*.run_only")
+  if("${NUMDIFF_EXECUTABLE}" STREQUAL "")
+    set(_globs "*.run_only")
+  endif()
+
+  file(GLOB _tests ${_globs})
   foreach(_test ${_tests})
     set(_comparison ${_test})
     get_filename_component(_test ${_test} NAME)
