@@ -852,22 +852,28 @@ namespace python
 
 
 
-  TriangulationWrapper::TriangulationWrapper(const std::string &dimension)
+  TriangulationWrapper::TriangulationWrapper(
+    const std::string &dimension,
+    const int          mesh_smoothing,
+    const bool         check_for_distorted_cells)
   {
     if ((dimension.compare("2D") == 0) || (dimension.compare("2d") == 0))
-      setup("2D", "2D");
+      setup("2D", "2D", mesh_smoothing, check_for_distorted_cells);
     else if ((dimension.compare("3D") == 0) || (dimension.compare("3d") == 0))
-      setup("3D", "3D");
+      setup("3D", "3D", mesh_smoothing, check_for_distorted_cells);
     else
       AssertThrow(false, ExcMessage("Dimension needs to be 2D or 3D"));
   }
 
 
 
-  TriangulationWrapper::TriangulationWrapper(const std::string &dimension,
-                                             const std::string &spacedimension)
+  TriangulationWrapper::TriangulationWrapper(
+    const std::string &dimension,
+    const std::string &spacedimension,
+    const int          mesh_smoothing,
+    const bool         check_for_distorted_cells)
   {
-    setup(dimension, spacedimension);
+    setup(dimension, spacedimension, mesh_smoothing, check_for_distorted_cells);
   }
 
 
@@ -1977,9 +1983,64 @@ namespace python
 
 
 
+  int
+  TriangulationWrapper::get_mesh_smoothing()
+  {
+    if ((dim == 2) && (spacedim == 2))
+      {
+        Triangulation<2, 2> *tria =
+          static_cast<Triangulation<2, 2> *>(triangulation);
+        return (int)tria->get_mesh_smoothing();
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        Triangulation<2, 3> *tria =
+          static_cast<Triangulation<2, 3> *>(triangulation);
+        return (int)tria->get_mesh_smoothing();
+      }
+    else
+      {
+        Triangulation<3, 3> *tria =
+          static_cast<Triangulation<3, 3> *>(triangulation);
+        return (int)tria->get_mesh_smoothing();
+      }
+  }
+
+
+
+  void
+  TriangulationWrapper::set_mesh_smoothing(const int mesh_smoothing)
+  {
+    if ((dim == 2) && (spacedim == 2))
+      {
+        Triangulation<2, 2> *tria =
+          static_cast<Triangulation<2, 2> *>(triangulation);
+        tria->set_mesh_smoothing(
+          (Triangulation<2, 2>::MeshSmoothing)mesh_smoothing);
+      }
+    else if ((dim == 2) && (spacedim == 3))
+      {
+        Triangulation<2, 3> *tria =
+          static_cast<Triangulation<2, 3> *>(triangulation);
+        tria->set_mesh_smoothing(
+          (Triangulation<2, 3>::MeshSmoothing)mesh_smoothing);
+      }
+    else
+      {
+        Triangulation<3, 3> *tria =
+          static_cast<Triangulation<3, 3> *>(triangulation);
+        tria->set_mesh_smoothing(
+          (Triangulation<3, 3>::MeshSmoothing)mesh_smoothing);
+      }
+  }
+
+
+
   void
   TriangulationWrapper::setup(const std::string &dimension,
-                              const std::string &spacedimension)
+                              const std::string &spacedimension,
+                              const int          mesh_smoothing,
+                              const bool         check_for_distorted_cells)
   {
     if ((dimension.compare("2D") == 0) || (dimension.compare("2d") == 0))
       {
@@ -1989,13 +2050,17 @@ namespace python
             (spacedimension.compare("2d") == 0))
           {
             spacedim      = 2;
-            triangulation = new Triangulation<2, 2>();
+            triangulation = new Triangulation<2, 2>(
+              (Triangulation<2, 2>::MeshSmoothing)mesh_smoothing,
+              check_for_distorted_cells);
           }
         else if ((spacedimension.compare("3D") == 0) ||
                  (spacedimension.compare("3d") == 0))
           {
             spacedim      = 3;
-            triangulation = new Triangulation<2, 3>();
+            triangulation = new Triangulation<2, 3>(
+              (Triangulation<2, 3>::MeshSmoothing)mesh_smoothing,
+              check_for_distorted_cells);
           }
         else
           AssertThrow(false,
@@ -2008,7 +2073,9 @@ namespace python
           AssertThrow(false, ExcMessage("Spacedimension needs to be 3D."));
         dim           = 3;
         spacedim      = 3;
-        triangulation = new Triangulation<3, 3>();
+        triangulation = new Triangulation<3, 3>(
+          (Triangulation<3, 3>::MeshSmoothing)mesh_smoothing,
+          check_for_distorted_cells);
       }
     else
       AssertThrow(false, ExcMessage("Dimension needs to be 2D or 3D."));
