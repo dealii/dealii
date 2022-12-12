@@ -107,11 +107,18 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   // of the curl part of the space
   const unsigned int n_derivatives = 3;
   double             monoval_plus[dim][n_derivatives + 1];
-  double             monoval[dim][n_derivatives + 1];
+  double             monoval_i[dim][n_derivatives + 1];
 
-  double monoval_i[dim][n_derivatives + 1];
-  double monoval_j[dim][n_derivatives + 1];
-  double monoval_jplus[dim][n_derivatives + 1];
+
+#ifdef DEAL_II_HAVE_CXX17
+  if constexpr (dim <= 1)
+#else
+  if (dim <= 1)
+#endif
+    {
+      (void)monoval_plus;
+      (void)monoval_i;
+    }
 
   unsigned int start = n_sub;
 #ifdef DEAL_II_HAVE_CXX17
@@ -207,6 +214,10 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   else if (dim == 3)
 #endif
     {
+      double monoval[dim][n_derivatives + 1];
+      double monoval_j[dim][n_derivatives + 1];
+      double monoval_jplus[dim][n_derivatives + 1];
+
       // In 3d the first type of basis vector is
       //  [ x^i * y^j * z^k * (j+k+2) ]
       //  [  -[x^i]' * y^(j+1) * z^k  ]
