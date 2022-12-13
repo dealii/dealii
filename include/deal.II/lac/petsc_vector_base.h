@@ -275,8 +275,7 @@ namespace PETScWrappers
 
     /**
      * Initialize a Vector from a PETSc Vec object. Note that we do not copy
-     * the vector and we do not obtain ownership, so we do not destroy the
-     * PETSc object in the destructor.
+     * the vector.
      */
     explicit VectorBase(const Vec &v);
 
@@ -821,13 +820,6 @@ namespace PETScWrappers
 
     // Make the reference class a friend.
     friend class internal::VectorReference;
-
-    /**
-     * Specifies if the vector is the owner of the PETSc Vec. This is true if
-     * it got created by this class and determines if it gets destroyed in
-     * the destructor.
-     */
-    bool obtained_ownership;
 
     /**
      * Collective set or add operation: This function is invoked by the
