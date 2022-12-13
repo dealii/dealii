@@ -997,9 +997,9 @@ namespace
 
   template <int dim>
   int
-  vtk_point_index_from_ijk(const std::array<unsigned, dim> &,
-                           const std::array<unsigned, dim> &,
-                           const bool)
+  lexicographic_to_vtk_point_index(const std::array<unsigned, dim> &,
+                                   const std::array<unsigned, dim> &,
+                                   const bool)
   {
     Assert(false, ExcNotImplemented());
     return 0;
@@ -1016,9 +1016,9 @@ namespace
    */
   template <>
   int
-  vtk_point_index_from_ijk<2>(const std::array<unsigned, 2> &indices,
-                              const std::array<unsigned, 2> &order,
-                              const bool)
+  lexicographic_to_vtk_point_index<2>(const std::array<unsigned, 2> &indices,
+                                      const std::array<unsigned, 2> &order,
+                                      const bool)
   {
     const unsigned int i = indices[0];
     const unsigned int j = indices[1];
@@ -1073,9 +1073,9 @@ namespace
    */
   template <>
   int
-  vtk_point_index_from_ijk<3>(const std::array<unsigned, 3> &indices,
-                              const std::array<unsigned, 3> &order,
-                              const bool                     legacy_format)
+  lexicographic_to_vtk_point_index<3>(const std::array<unsigned, 3> &indices,
+                                      const std::array<unsigned, 3> &order,
+                                      const bool legacy_format)
   {
     const unsigned int i = indices[0];
     const unsigned int j = indices[1];
@@ -3085,9 +3085,8 @@ namespace DataOutBase
                       {
                         const unsigned int local_index = i1;
                         const unsigned int connectivity_index =
-                          vtk_point_index_from_ijk<1>({{i1}},
-                                                      {{n_subdivisions}},
-                                                      legacy_format);
+                          lexicographic_to_vtk_point_index<1>(
+                            {{i1}}, {{n_subdivisions}}, legacy_format);
                         connectivity[connectivity_index] = local_index;
                       }
 
@@ -3100,10 +3099,10 @@ namespace DataOutBase
                         {
                           const unsigned int local_index = i2 * n + i1;
                           const unsigned int connectivity_index =
-                            vtk_point_index_from_ijk<2>({{i1, i2}},
-                                                        {{n_subdivisions,
-                                                          n_subdivisions}},
-                                                        legacy_format);
+                            lexicographic_to_vtk_point_index<2>(
+                              {{i1, i2}},
+                              {{n_subdivisions, n_subdivisions}},
+                              legacy_format);
                           connectivity[connectivity_index] = local_index;
                         }
 
@@ -3118,11 +3117,12 @@ namespace DataOutBase
                             const unsigned int local_index =
                               i3 * n * n + i2 * n + i1;
                             const unsigned int connectivity_index =
-                              vtk_point_index_from_ijk<3>({{i1, i2, i3}},
-                                                          {{n_subdivisions,
-                                                            n_subdivisions,
-                                                            n_subdivisions}},
-                                                          legacy_format);
+                              lexicographic_to_vtk_point_index<3>(
+                                {{i1, i2, i3}},
+                                {{n_subdivisions,
+                                  n_subdivisions,
+                                  n_subdivisions}},
+                                legacy_format);
                             connectivity[connectivity_index] = local_index;
                           }
 
