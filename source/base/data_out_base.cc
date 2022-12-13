@@ -995,6 +995,18 @@ namespace
 
 
 
+  template <int dim>
+  int
+  vtk_point_index_from_ijk(const std::array<unsigned, dim> &,
+                           const std::array<unsigned, dim> &,
+                           const bool)
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
+
+
+
   /**
    * Given (i,j,k) coordinates within the Lagrange quadrilateral, return an
    * offset into the local connectivity array.
@@ -1002,13 +1014,15 @@ namespace
    * Modified from
    * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
    */
+  template <>
   int
-  vtk_point_index_from_ijk(const unsigned i,
-                           const unsigned j,
-                           const unsigned,
-                           const std::array<unsigned, 2> &order,
-                           const bool)
+  vtk_point_index_from_ijk<2>(const std::array<unsigned, 2> &indices,
+                              const std::array<unsigned, 2> &order,
+                              const bool)
   {
+    const unsigned int i = indices[0];
+    const unsigned int j = indices[1];
+
     const bool ibdy = (i == 0 || i == order[0]);
     const bool jbdy = (j == 0 || j == order[1]);
     // How many boundaries do we lie on at once?
@@ -1057,13 +1071,16 @@ namespace
    * https://github.com/Kitware/VTK/blob/7a0b92864c96680b1f42ee84920df556fc6ebaa3/Documentation/release/dev/node-numbering-change-for-VTK_LAGRANGE_HEXAHEDRON.md
    *
    */
+  template <>
   int
-  vtk_point_index_from_ijk(const unsigned                 i,
-                           const unsigned                 j,
-                           const unsigned                 k,
-                           const std::array<unsigned, 3> &order,
-                           const bool                     legacy_format)
+  vtk_point_index_from_ijk<3>(const std::array<unsigned, 3> &indices,
+                              const std::array<unsigned, 3> &order,
+                              const bool                     legacy_format)
   {
+    const unsigned int i = indices[0];
+    const unsigned int j = indices[1];
+    const unsigned int k = indices[2];
+
     const bool ibdy = (i == 0 || i == order[0]);
     const bool jbdy = (j == 0 || j == order[1]);
     const bool kbdy = (k == 0 || k == order[2]);
@@ -1131,32 +1148,6 @@ namespace
            (order[0] - 1) * (order[1] - 1));
     return offset + (i - 1) +
            (order[0] - 1) * ((j - 1) + (order[1] - 1) * ((k - 1)));
-  }
-
-
-
-  int
-  vtk_point_index_from_ijk(const unsigned,
-                           const unsigned,
-                           const unsigned,
-                           const std::array<unsigned, 0> &,
-                           const bool)
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
-  }
-
-
-
-  int
-  vtk_point_index_from_ijk(const unsigned,
-                           const unsigned,
-                           const unsigned,
-                           const std::array<unsigned, 1> &,
-                           const bool)
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
   }
 
 
@@ -3077,8 +3068,6 @@ namespace DataOutBase
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
 
-            std::array<unsigned, dim> cell_order;
-            cell_order.fill(n_subdivisions);
             connectivity.resize(Utilities::fixed_power<dim>(n));
 
             switch (dim)
@@ -3096,8 +3085,9 @@ namespace DataOutBase
                       {
                         const unsigned int local_index = i1;
                         const unsigned int connectivity_index =
-                          vtk_point_index_from_ijk(
-                            i1, 0, 0, cell_order, legacy_format);
+                          vtk_point_index_from_ijk<1>({{i1}},
+                                                      {{n_subdivisions}},
+                                                      legacy_format);
                         connectivity[connectivity_index] = local_index;
                       }
 
@@ -3110,8 +3100,10 @@ namespace DataOutBase
                         {
                           const unsigned int local_index = i2 * n + i1;
                           const unsigned int connectivity_index =
-                            vtk_point_index_from_ijk(
-                              i1, i2, 0, cell_order, legacy_format);
+                            vtk_point_index_from_ijk<2>({{i1, i2}},
+                                                        {{n_subdivisions,
+                                                          n_subdivisions}},
+                                                        legacy_format);
                           connectivity[connectivity_index] = local_index;
                         }
 
@@ -3126,8 +3118,11 @@ namespace DataOutBase
                             const unsigned int local_index =
                               i3 * n * n + i2 * n + i1;
                             const unsigned int connectivity_index =
-                              vtk_point_index_from_ijk(
-                                i1, i2, i3, cell_order, legacy_format);
+                              vtk_point_index_from_ijk<3>({{i1, i2, i3}},
+                                                          {{n_subdivisions,
+                                                            n_subdivisions,
+                                                            n_subdivisions}},
+                                                          legacy_format);
                             connectivity[connectivity_index] = local_index;
                           }
 
