@@ -212,7 +212,7 @@ these equations can be simplified to
   &=
   (\mathbf{f}, \varphi)_{\Omega(t_{n-1})}
   -(\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}
-  +(\mathbf{b}(\mathbf{x},t_n),t_{n-1}), \varphi)_{\Gamma_N}
+  +(\mathbf{b}(\mathbf{x},t_n), \varphi)_{\Gamma_N}
   \\
   &\qquad\qquad
   \forall \varphi \in \{\mathbf{v}\in H^1(\Omega(t_{n-1}))^d: \mathbf{v}|_{\Gamma_D}=0\}.
