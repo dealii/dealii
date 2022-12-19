@@ -464,7 +464,7 @@ we largely follow the paper D. Silvester and A. Wathen:
 "Fast iterative solution of stabilised Stokes systems part II. Using
 general block preconditioners." (SIAM J. Numer. Anal., 31 (1994),
 pp. 1352-1367), which is available online <a
-href="http://siamdl.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=SJNAAM000031000005001352000001&idtype=cvips&gifs=Yes" target="_top">here</a>.
+href="https://doi.org/10.1137/0731070">here</a>.
 Principally, the difference in the matrix at the heart of the Schur
 complement has two consequences:
 
