@@ -27,15 +27,21 @@ namespace internal
     std::size_t
     TriaLevel::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption(refine_flags) +
-              MemoryConsumption::memory_consumption(coarsen_flags) +
-              MemoryConsumption::memory_consumption(active_cell_indices) +
-              MemoryConsumption::memory_consumption(neighbors) +
-              MemoryConsumption::memory_consumption(subdomain_ids) +
-              MemoryConsumption::memory_consumption(level_subdomain_ids) +
-              MemoryConsumption::memory_consumption(parents) +
-              MemoryConsumption::memory_consumption(direction_flags) +
-              MemoryConsumption::memory_consumption(cells));
+      return (
+        MemoryConsumption::memory_consumption(refine_flags) +
+        MemoryConsumption::memory_consumption(coarsen_flags) +
+        MemoryConsumption::memory_consumption(active_cell_indices) +
+        MemoryConsumption::memory_consumption(global_active_cell_indices) +
+        MemoryConsumption::memory_consumption(global_level_cell_indices) +
+        MemoryConsumption::memory_consumption(neighbors) +
+        MemoryConsumption::memory_consumption(subdomain_ids) +
+        MemoryConsumption::memory_consumption(level_subdomain_ids) +
+        MemoryConsumption::memory_consumption(parents) +
+        MemoryConsumption::memory_consumption(direction_flags) +
+        MemoryConsumption::memory_consumption(cells) +
+        MemoryConsumption::memory_consumption(face_orientations) +
+        MemoryConsumption::memory_consumption(reference_cell) +
+        MemoryConsumption::memory_consumption(cell_vertex_indices_cache));
     }
   } // namespace TriangulationImplementation
 } // namespace internal

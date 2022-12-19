@@ -510,19 +510,30 @@ namespace Utilities
     std::size_t
     Partitioner::memory_consumption() const
     {
-      std::size_t memory = (3 * sizeof(types::global_dof_index) +
-                            4 * sizeof(unsigned int) + sizeof(MPI_Comm));
-      memory += MemoryConsumption::memory_consumption(locally_owned_range_data);
+      std::size_t memory = MemoryConsumption::memory_consumption(global_size);
+      memory += locally_owned_range_data.memory_consumption();
+      memory += MemoryConsumption::memory_consumption(local_range_data);
+      memory += ghost_indices_data.memory_consumption();
+      memory += sizeof(n_ghost_indices_data);
       memory += MemoryConsumption::memory_consumption(ghost_targets_data);
-      memory += MemoryConsumption::memory_consumption(import_targets_data);
       memory += MemoryConsumption::memory_consumption(import_indices_data);
+      memory += sizeof(import_indices_plain_dev) +
+                sizeof(*import_indices_plain_dev.begin()) *
+                  import_indices_plain_dev.capacity();
+      memory += MemoryConsumption::memory_consumption(n_import_indices_data);
+      memory += MemoryConsumption::memory_consumption(import_targets_data);
       memory += MemoryConsumption::memory_consumption(
         import_indices_chunks_by_rank_data);
+      memory +=
+        MemoryConsumption::memory_consumption(n_ghost_indices_in_larger_set);
       memory += MemoryConsumption::memory_consumption(
         ghost_indices_subset_chunks_by_rank_data);
       memory +=
         MemoryConsumption::memory_consumption(ghost_indices_subset_data);
-      memory += MemoryConsumption::memory_consumption(ghost_indices_data);
+      memory += MemoryConsumption::memory_consumption(my_pid);
+      memory += MemoryConsumption::memory_consumption(n_procs);
+      memory += MemoryConsumption::memory_consumption(communicator);
+      memory += MemoryConsumption::memory_consumption(have_ghost_indices);
       return memory;
     }
 
