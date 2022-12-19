@@ -108,6 +108,7 @@ pipeline
                     $WORKSPACE/
                   time ninja -j 10 # 12 gives OOM
                   time ninja test # quicktests
+                  time ctest --rerun-failed --output-on-failure -R quick_tests/
                   time ninja setup_tests
                   time ctest -R "all-headers|multigrid/transfer|matrix_free/matrix_" --output-on-failure -j $NP --no-compress-output -T test
                  '''
