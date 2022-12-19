@@ -168,11 +168,14 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
     COMMENT "Running quicktests..."
     )
 
-  # Depend on the library target to ensure that deal.II is actually
-  # compiled, as well as on the setup_tests_quick_tests target to ensure
+  # Depend on the library targets (to ensure that deal.II is actually
+  # compiled), as well as on the setup_tests_quick_tests target to ensure
   # that quick tests are actually available.
-  add_dependencies(test library)
   add_dependencies(test setup_tests_quick_tests)
+  foreach(_build ${DEAL_II_BUILD_TYPES})
+    string(TOLOWER ${_build} _build_lowercase)
+    add_dependencies(test ${DEAL_II_NAMESPACE}_${_build_lowercase})
+  endforeach()
 
   #
   # Add a dummy target to make files known to IDEs like qtcreator
