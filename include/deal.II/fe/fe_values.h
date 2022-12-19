@@ -34,6 +34,7 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_related_data.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -3950,7 +3951,7 @@ protected:
    * An object into which the Mapping::fill_fe_values() and similar functions
    * place their output.
    */
-  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     mapping_output;
 
 

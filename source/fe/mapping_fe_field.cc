@@ -1778,7 +1778,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
-  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
   AssertDimension(dim, spacedim);

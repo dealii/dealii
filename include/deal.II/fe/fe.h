@@ -24,6 +24,7 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_related_data.h>
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -2918,8 +2919,7 @@ protected:
     const Quadrature<dim> &                                     quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &                     mapping_data,
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
@@ -2975,8 +2975,7 @@ protected:
     const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &                     mapping_data,
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
@@ -3052,8 +3051,7 @@ protected:
     const Quadrature<dim - 1> &                                 quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                       spacedim>
+    const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &                     mapping_data,
     const InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,

@@ -65,6 +65,7 @@ set(_unity_include_src
   mapping_q.cc
   mapping_q_cache.cc
   mapping_manifold.cc
+  mapping_related_data.cc
   )
 
 set(_separate_src
@@ -142,6 +143,7 @@ set(_inst
   mapping_q_eulerian.inst.in
   mapping_q.inst.in
   mapping_manifold.inst.in
+  mapping_related_data.inst.in
   )
 
 file(GLOB _header
