@@ -19,6 +19,10 @@
 
 #include <deal.II/base/config.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <Kokkos_Core.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -29,15 +33,26 @@ namespace MemorySpace
    * Structure describing Host memory space.
    */
   struct Host
-  {};
+  {
+    using kokkos_space = ::Kokkos::HostSpace;
+  };
 
-
+  /**
+   * Structure describing the default memory space. If Kokkos was configured
+   * with a GPU backend, the default memory space is the one corresponding to
+   * that backend. Otherwise, the default memory space is the the same as the
+   * Host memory space.
+   */
+  struct Default
+  {
+    using kokkos_space = ::Kokkos::DefaultExecutionSpace::memory_space;
+  };
 
   /**
    * Structure describing CUDA memory space.
    */
-  struct CUDA
-  {};
+  // FIXME Only enable if CUDA is enabled in deal.II.
+  using CUDA = Default;
 
 } // namespace MemorySpace
 

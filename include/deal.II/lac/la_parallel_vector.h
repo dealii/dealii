@@ -1438,92 +1438,6 @@ namespace LinearAlgebra
 
 #ifndef DOXYGEN
 
-    namespace internal
-    {
-      template <typename Number, typename MemorySpace>
-      struct Policy
-      {
-        static inline typename Vector<Number, MemorySpace>::iterator
-        begin(::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
-        {
-          return nullptr;
-        }
-
-        static inline typename Vector<Number, MemorySpace>::const_iterator
-        begin(
-          const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
-        {
-          return nullptr;
-        }
-
-        static inline Number *
-        get_values(
-          ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &)
-        {
-          return nullptr;
-        }
-      };
-
-
-
-      template <typename Number>
-      struct Policy<Number, ::dealii::MemorySpace::Host>
-      {
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::Host>::iterator
-          begin(::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
-        {
-          return data.values.get();
-        }
-
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::Host>::const_iterator
-          begin(const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
-        {
-          return data.values.get();
-        }
-
-        static inline Number *
-        get_values(::dealii::MemorySpace::
-                     MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
-        {
-          return data.values.get();
-        }
-      };
-
-
-
-      template <typename Number>
-      struct Policy<Number, ::dealii::MemorySpace::CUDA>
-      {
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::CUDA>::iterator
-          begin(::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
-        {
-          return data.values_dev.get();
-        }
-
-        static inline
-          typename Vector<Number, ::dealii::MemorySpace::CUDA>::const_iterator
-          begin(const ::dealii::MemorySpace::
-                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
-        {
-          return data.values_dev.get();
-        }
-
-        static inline Number *
-        get_values(::dealii::MemorySpace::
-                     MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
-        {
-          return data.values_dev.get();
-        }
-      };
-    } // namespace internal
-
-
     template <typename Number, typename MemorySpace>
     inline bool
     Vector<Number, MemorySpace>::has_ghost_elements() const
@@ -1588,7 +1502,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::iterator
     Vector<Number, MemorySpace>::begin()
     {
-      return internal::Policy<Number, MemorySpace>::begin(data);
+      return data.values.data();
     }
 
 
@@ -1597,7 +1511,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::const_iterator
     Vector<Number, MemorySpace>::begin() const
     {
-      return internal::Policy<Number, MemorySpace>::begin(data);
+      return data.values.data();
     }
 
 
@@ -1606,8 +1520,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::iterator
     Vector<Number, MemorySpace>::end()
     {
-      return internal::Policy<Number, MemorySpace>::begin(data) +
-             partitioner->locally_owned_size();
+      return data.values.data() + partitioner->locally_owned_size();
     }
 
 
@@ -1616,8 +1529,7 @@ namespace LinearAlgebra
     inline typename Vector<Number, MemorySpace>::const_iterator
     Vector<Number, MemorySpace>::end() const
     {
-      return internal::Policy<Number, MemorySpace>::begin(data) +
-             partitioner->locally_owned_size();
+      return data.values.data() + partitioner->locally_owned_size();
     }
 
 
@@ -1744,7 +1656,7 @@ namespace LinearAlgebra
     inline Number *
     Vector<Number, MemorySpace>::get_values() const
     {
-      return internal::Policy<Number, MemorySpace>::get_values(data);
+      return data.values.data();
     }
 
 
