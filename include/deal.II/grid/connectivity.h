@@ -1130,7 +1130,7 @@ namespace internal
 
           std::sort(keys.begin(), keys.end());
 
-          ptr_0.reserve(n_unique_entities);
+          ptr_0.reserve(n_unique_entities + 1);
           col_0.reserve(n_unique_entity_vertices);
         }
 
