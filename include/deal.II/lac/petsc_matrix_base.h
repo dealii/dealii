@@ -305,8 +305,22 @@ namespace PETScWrappers
     MatrixBase();
 
     /**
-     * Initialize a Matrix from a PETSc Mat object. Note that we do not copy
-     * the matrix.
+     * Initialize a Matrix from a PETSc Mat object. Note that we do not copy the
+     * matrix. Any PETSc object (including the Mat type) is in fact a reference
+     * counted pointer.
+     *
+     * A reference counted pointer is a type of pointer that maintains a
+     * reference count for the object it points to. The reference count is
+     * incremented each time a new reference to the object is created, and
+     * decremented each time a reference is destroyed. When the reference count
+     * reaches zero, the object is automatically deleted, freeing up the memory
+     * it was using.
+     *
+     * In the context of PETSc, reference counted pointers are used to manage
+     * the memory of objects such as vectors, matrices, and solvers. By using
+     * reference counted pointers, PETSc ensures that memory is automatically
+     * released when it is no longer needed, without the need for explicit
+     * memory management.
      */
     explicit MatrixBase(const Mat &);
 

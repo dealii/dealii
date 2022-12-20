@@ -86,8 +86,7 @@ namespace PETScWrappers
   {
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(matrix));
-    AssertNothrow(ierr == 0, ExcPETScError(ierr));
-    (void)ierr;
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
