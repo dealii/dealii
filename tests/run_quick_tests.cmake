@@ -95,4 +95,7 @@ recent version or use a different MPI library like MPICH.\n"
         )
     endif()
   endforeach()
+
+  # ensure that this script exits with a non-zero exit code
+  message(FATAL_ERROR "quick tests failed")
 endif()
