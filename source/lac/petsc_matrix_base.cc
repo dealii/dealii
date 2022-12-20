@@ -639,7 +639,7 @@ namespace PETScWrappers
   MatrixBase::write_ascii(const PetscViewerFormat format)
   {
     assert_is_compressed();
-    MPI_Comm comm = PetscObjectComm((PetscObject)matrix);
+    MPI_Comm comm = PetscObjectComm(reinterpret_cast<PetscObject>(matrix));
 
     // Set options
     PetscErrorCode ierr =

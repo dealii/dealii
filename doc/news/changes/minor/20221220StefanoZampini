@@ -1,4 +1,4 @@
 Fixed: Small fixes to commnicator handling in PETSc classes. Move from 
 GetArray to GetArrayRead (threadsafe version).
 <br>
-(StefanZampini, 2022/12/20)
+(Stefano Zampini, 2022/12/20)
