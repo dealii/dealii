@@ -66,11 +66,12 @@ namespace internal
       TriaObjects quads;
 
       /**
-       * Orientation of each line of each quad.
+       * Orientation of each line of each quad. Like elsewhere, `true` refers to
+       * the standard orientation and `false` refers to the reverse orientation.
        *
        * @note Used only for dim=3.
        */
-      std::vector<unsigned char> quads_line_orientations;
+      std::vector<bool> quads_line_orientations;
 
       /**
        * Whether or not each quad is a Quadrilateral. Since, if dim = 3, faces
