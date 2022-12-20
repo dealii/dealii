@@ -2778,6 +2778,12 @@ namespace GridTools
      * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
      */
     FullMatrix<double> matrix;
+
+    /**
+     * Return an estimate, in bytes, for the memory consumption of the object.
+     */
+    std::size_t
+    memory_consumption() const;
   };
 
 
@@ -3844,6 +3850,15 @@ namespace GridTools
                 }
             }
         }
+  }
+
+
+
+  template <typename CellIterator>
+  std::size_t
+  PeriodicFacePair<CellIterator>::memory_consumption() const
+  {
+    return sizeof(*this) + matrix.memory_consumption();
   }
 
 

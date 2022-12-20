@@ -58,11 +58,21 @@ namespace internal
     std::size_t
     NumberCache<1>::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption(n_levels) +
-              MemoryConsumption::memory_consumption(n_lines) +
-              MemoryConsumption::memory_consumption(n_lines_level) +
-              MemoryConsumption::memory_consumption(n_active_lines) +
-              MemoryConsumption::memory_consumption(n_active_lines_level));
+      std::size_t mem =
+        MemoryConsumption::memory_consumption(n_levels) +
+        MemoryConsumption::memory_consumption(n_lines) +
+        MemoryConsumption::memory_consumption(n_lines_level) +
+        MemoryConsumption::memory_consumption(n_active_lines) +
+        MemoryConsumption::memory_consumption(n_active_lines_level);
+
+      if (active_cell_index_partitioner)
+        mem += active_cell_index_partitioner->memory_consumption();
+
+      for (const auto &partitioner : level_cell_index_partitioners)
+        if (partitioner)
+          mem += partitioner->memory_consumption();
+
+      return mem;
     }
 
 
@@ -16386,6 +16396,9 @@ std::size_t
 Triangulation<dim, spacedim>::memory_consumption() const
 {
   std::size_t mem = 0;
+  mem += sizeof(MeshSmoothing);
+  mem += MemoryConsumption::memory_consumption(reference_cells);
+  mem += MemoryConsumption::memory_consumption(periodic_face_pairs_level_0);
   mem += MemoryConsumption::memory_consumption(levels);
   for (const auto &level : levels)
     mem += MemoryConsumption::memory_consumption(*level);

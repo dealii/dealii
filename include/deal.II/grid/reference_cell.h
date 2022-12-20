@@ -681,6 +681,12 @@ public:
   serialize(Archive &archive, const unsigned int /*version*/);
 
   /**
+   * Return the number of bytes used by an instance of this class.
+   */
+  static constexpr std::size_t
+  memory_consumption();
+
+  /**
    * @}
    */
 
@@ -846,6 +852,14 @@ inline void
 ReferenceCell::serialize(Archive &archive, const unsigned int /*version*/)
 {
   archive &kind;
+}
+
+
+
+inline constexpr std::size_t
+ReferenceCell::memory_consumption()
+{
+  return sizeof(ReferenceCells::Invalid);
 }
 
 
