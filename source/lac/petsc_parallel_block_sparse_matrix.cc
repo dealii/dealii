@@ -176,7 +176,7 @@ namespace PETScWrappers
       return block(0, 0).get_mpi_communicator();
     }
 
-    BlockSparseMatrix::operator Mat() const
+    BlockSparseMatrix::operator const Mat &() const
     {
       return petsc_nest_matrix;
     }
