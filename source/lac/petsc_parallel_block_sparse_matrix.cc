@@ -35,7 +35,7 @@ namespace PETScWrappers
     BlockSparseMatrix::~BlockSparseMatrix()
     {
       PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
 
 #  ifndef DOXYGEN

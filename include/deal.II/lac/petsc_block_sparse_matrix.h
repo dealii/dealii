@@ -279,7 +279,7 @@ namespace PETScWrappers
        * particular, it should only be used for read-only operations into the
        * matrix.
        */
-      operator Mat() const;
+      operator const Mat &() const;
 
       /**
        * Return a reference to the underlying PETSc type. It can be used to
