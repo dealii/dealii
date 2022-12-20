@@ -76,6 +76,17 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    BlockVector<Number>::BlockVector(
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &             partitioners,
+      const MPI_Comm &comm_sm)
+    {
+      reinit(partitioners, comm_sm);
+    }
+
+
+
+    template <typename Number>
     BlockVector<Number>::BlockVector(const BlockVector<Number> &v)
       : BlockVectorBase<Vector<Number>>()
     {
@@ -181,6 +192,27 @@ namespace LinearAlgebra
       this->components.resize(this->n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->components[i].reinit(local_ranges[i], communicator);
+
+      // update block_indices content
+      this->collect_sizes();
+    }
+
+
+
+    template <typename Number>
+    void
+    BlockVector<Number>::reinit(
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &             partitioners,
+      const MPI_Comm &comm_sm)
+    {
+      // update the number of blocks
+      this->block_indices.reinit(partitioners.size(), 0);
+
+      // initialize each block
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(partitioners[i], comm_sm);
 
       // update block_indices content
       this->collect_sizes();
