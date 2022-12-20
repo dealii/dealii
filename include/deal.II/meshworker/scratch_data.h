@@ -1405,6 +1405,8 @@ namespace MeshWorker
     /**
      * Interface values on facets.
      */
+    // The FEInterfaceValues class supports initialization with hp objects
+    // as well.
     std::unique_ptr<FEInterfaceValues<dim, spacedim>> interface_fe_values;
 
     /** @} */ // non-hp data
