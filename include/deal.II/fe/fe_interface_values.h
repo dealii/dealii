@@ -1443,7 +1443,7 @@ public:
     const UpdateFlags                           update_flags);
 
   /**
-   * Same as above, but using a Q1 mapping.
+   * Same as above, but using the default linear mapping.
    */
   FEInterfaceValues(const hp::FECollection<dim, spacedim> &fe_collection,
                     const hp::QCollection<dim - 1> &quadrature_collection,
@@ -2246,6 +2246,20 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
 
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
+  const FiniteElement<dim, spacedim> &fe,
+  const Quadrature<dim - 1> &         quadrature,
+  const UpdateFlags                   update_flags)
+  : FEInterfaceValues(
+      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
+      fe,
+      quadrature,
+      update_flags)
+{}
+
+
+
+template <int dim, int spacedim>
+FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const Mapping<dim, spacedim> &      mapping,
   const FiniteElement<dim, spacedim> &fe,
   const hp::QCollection<dim - 1> &    quadrature,
@@ -2320,71 +2334,10 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const hp::FECollection<dim, spacedim> &fe_collection,
   const hp::QCollection<dim - 1> &       quadrature_collection,
   const UpdateFlags                      update_flags)
-  : n_quadrature_points(quadrature_collection.max_n_quadrature_points())
-  , fe_face_values(nullptr)
-  , fe_face_values_neighbor(nullptr)
-  , internal_hp_fe_face_values(
-      std::make_unique<hp::FEFaceValues<dim, spacedim>>(
-        fe_collection.get_reference_cell_default_linear_mapping(),
-        fe_collection,
-        quadrature_collection,
-        update_flags))
-  , internal_hp_fe_subface_values(
-      std::make_unique<hp::FESubfaceValues<dim, spacedim>>(
-        fe_collection.get_reference_cell_default_linear_mapping(),
-        fe_collection,
-        quadrature_collection,
-        update_flags))
-  , internal_hp_fe_face_values_neighbor(
-      std::make_unique<hp::FEFaceValues<dim, spacedim>>(
-        fe_collection.get_reference_cell_default_linear_mapping(),
-        fe_collection,
-        quadrature_collection,
-        update_flags))
-  , internal_hp_fe_subface_values_neighbor(
-      std::make_unique<hp::FESubfaceValues<dim, spacedim>>(
-        fe_collection.get_reference_cell_default_linear_mapping(),
-        fe_collection,
-        quadrature_collection,
-        update_flags))
-{
-  AssertDimension(dim, spacedim);
-}
-
-
-
-template <int dim, int spacedim>
-FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
-  const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature,
-  const UpdateFlags                   update_flags)
-  : n_quadrature_points(quadrature.size())
-  , internal_fe_face_values(std::make_unique<FEFaceValues<dim, spacedim>>(
-      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
-      fe,
-      quadrature,
-      update_flags))
-  , internal_fe_subface_values(std::make_unique<FESubfaceValues<dim, spacedim>>(
-      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
-      fe,
-      quadrature,
-      update_flags))
-  , internal_fe_face_values_neighbor(
-      std::make_unique<FEFaceValues<dim, spacedim>>(
-        fe.reference_cell()
-          .template get_default_linear_mapping<dim, spacedim>(),
-        fe,
-        quadrature,
-        update_flags))
-  , internal_fe_subface_values_neighbor(
-      std::make_unique<FESubfaceValues<dim, spacedim>>(
-        fe.reference_cell()
-          .template get_default_linear_mapping<dim, spacedim>(),
-        fe,
-        quadrature,
-        update_flags))
-  , fe_face_values(nullptr)
-  , fe_face_values_neighbor(nullptr)
+  : FEInterfaceValues(fe_collection.get_reference_cell_default_linear_mapping(),
+                      fe_collection,
+                      quadrature_collection,
+                      update_flags)
 {}
 
 
