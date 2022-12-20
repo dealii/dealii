@@ -204,7 +204,10 @@ public:
        */
       modified_gram_schmidt,
       /**
-       * Use classical Gram-Schmidt algorithm.
+       * Use classical Gram-Schmidt algorithm. Since this approach works on
+       * multi-vectors and performs a global reduction only once, it is
+       * more efficient than the modified Gram-Schmidt algorithm.
+       * However, it might be numerically unstable.
        */
       classical_gram_schmidt
     };
@@ -818,10 +821,10 @@ namespace internal
     {
       Assert(dim > 0, ExcInternalError());
 
-      for (unsigned int i = 0; i < dim - 1; ++i)
+      for (unsigned int i = 0; i < dim; ++i)
         vv.add(-h(i), orthogonal_vectors[i]);
 
-      return vv.add_and_dot(-h(dim - 1), orthogonal_vectors[dim - 1], vv);
+      return std::sqrt(vv.add_and_dot(-h(dim), orthogonal_vectors[dim], vv));
     }
 
 
@@ -891,10 +894,10 @@ namespace internal
 
       for (; j < vv.locally_owned_size(); ++j)
         {
-          double temp = vv(j);
+          double temp = vv.local_element(j);
           for (unsigned int i = 0; i < dim; ++i)
-            temp -= h(i) * orthogonal_vectors[i](j);
-          vv(j) = temp;
+            temp -= h(i) * orthogonal_vectors[i].local_element(j);
+          vv.local_element(j) = temp;
 
           norm_vv_temp += temp * temp;
         }

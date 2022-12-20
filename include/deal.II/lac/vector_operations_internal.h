@@ -1484,9 +1484,9 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
       {
         static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::Device>::value &&
+          std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value &&
             std::is_same<Number, Number2>::value,
-          "For the Device MemorySpace Number and Number2 should be the same type");
+          "For the Default MemorySpace Number and Number2 should be the same type");
       }
 
       static void
@@ -2110,7 +2110,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Device>::value,
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::Default>::value,
           int> = 0)
       {
         if (operation == VectorOperation::insert)
@@ -2131,16 +2131,16 @@ namespace internal
 
 
     template <typename Number>
-    struct functions<Number, Number, ::dealii::MemorySpace::Device>
+    struct functions<Number, Number, ::dealii::MemorySpace::Default>
     {
       static void
       copy(
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
         Kokkos::deep_copy(
@@ -2155,7 +2155,7 @@ namespace internal
           const size_type size,
           const Number    s,
           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Device>
+                                                 ::dealii::MemorySpace::Default>
             &data)
       {
         Kokkos::deep_copy(
@@ -2169,18 +2169,17 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(int i) { data.values(i) += v_data.values(i); });
         exec.fence();
       }
@@ -2190,18 +2189,17 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) { data.values(i) -= v_data.values(i); });
         exec.fence();
       }
@@ -2212,16 +2210,15 @@ namespace internal
         const size_type size,
         Number          a,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) { data.values(i) += a; });
         exec.fence();
       }
@@ -2232,18 +2229,17 @@ namespace internal
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
             data.values(i) += a * v_data.values(i);
           });
@@ -2257,20 +2253,19 @@ namespace internal
         const Number    a,
         const Number    b,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
             data.values(i) += a * v_data.values(i) + b * w_data.values(i);
           });
@@ -2283,18 +2278,17 @@ namespace internal
         const size_type size,
         const Number    x,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
             data.values(i) = x * data.values(i) + v_data.values(i);
           });
@@ -2308,18 +2302,17 @@ namespace internal
         const Number    x,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
             data.values(i) = x * data.values(i) + a * v_data.values(i);
           });
@@ -2334,20 +2327,19 @@ namespace internal
         const Number    a,
         const Number    b,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
             data.values(i) =
               x * data.values(i) + a * v_data.values(i) + b * w_data.values(i);
@@ -2361,16 +2353,15 @@ namespace internal
         const size_type size,
         const Number    factor,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) { data.values(i) *= factor; });
         exec.fence();
       }
@@ -2380,18 +2371,17 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) { data.values(i) *= v_data.values(i); });
         exec.fence();
       }
@@ -2402,18 +2392,17 @@ namespace internal
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
             data.values(i) = a * v_data.values(i);
           });
@@ -2427,20 +2416,19 @@ namespace internal
         const Number    a,
         const Number    b,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
             data.values(i) = a * v_data.values(i) + b * w_data.values(i);
           });
@@ -2451,20 +2439,19 @@ namespace internal
       dot(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
           const size_type size,
           const ::dealii::MemorySpace::
-            MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+            MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Device>
+                                                 ::dealii::MemorySpace::Default>
             &data)
       {
         Number result;
 
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
             update += data.values(i) * v_data.values(i);
           },
@@ -2481,7 +2468,7 @@ namespace internal
              const size_type size,
              real_type &     sum,
              ::dealii::MemorySpace::
-               MemorySpaceData<Number, ::dealii::MemorySpace::Device> &data)
+               MemorySpaceData<Number, ::dealii::MemorySpace::Default> &data)
       {
         sum = dot(thread_loop_partitioner, size, data, data);
       }
@@ -2491,17 +2478,16 @@ namespace internal
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &data)
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &data)
       {
         Number result;
 
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
             update += data.values(i);
           },
@@ -2518,16 +2504,15 @@ namespace internal
         const size_type size,
         real_type &     sum,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
 #if KOKKOS_VERSION < 30400
             update += fabs(data.values(i));
@@ -2548,16 +2533,15 @@ namespace internal
         real_type &     sum,
         real_type       exp,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
 #if KOKKOS_VERSION < 30400
             update += pow(fabs(data.values(i)), exp);
@@ -2577,22 +2561,21 @@ namespace internal
         const size_type size,
         const Number    a,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &v_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
         const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Device> &w_data,
+          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data)
       {
         Number res;
 
-        auto exec = typename ::dealii::MemorySpace::Device::kokkos_space::
+        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Device::kokkos_space::execution_space>(exec,
-                                                                          0,
-                                                                          size),
+            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+            exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
             data.values(i) += a * v_data.values(i);
             update +=
@@ -2614,10 +2597,10 @@ namespace internal
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
           &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Device>::value,
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::Default>::value,
           int> = 0)
       {
         if (operation == VectorOperation::insert)
@@ -2644,7 +2627,7 @@ namespace internal
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
           &v_data,
         ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Device>
+                                               ::dealii::MemorySpace::Default>
           &data,
         std::enable_if_t<
           std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,

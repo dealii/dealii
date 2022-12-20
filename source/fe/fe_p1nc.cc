@@ -250,7 +250,7 @@ FE_P1NC::fill_fe_face_values(
   const hp::QCollection<1> &                quadrature,
   const Mapping<2, 2> &                     mapping,
   const Mapping<2, 2>::InternalDataBase &,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<2, 2> &,
+  const internal::FEValuesImplementation::MappingRelatedData<2, 2> &,
   const InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const
@@ -298,7 +298,7 @@ FE_P1NC::fill_fe_subface_values(
   const Quadrature<1> &                     quadrature,
   const Mapping<2, 2> &                     mapping,
   const Mapping<2, 2>::InternalDataBase &,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<2, 2> &,
+  const internal::FEValuesImplementation::MappingRelatedData<2, 2> &,
   const InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const

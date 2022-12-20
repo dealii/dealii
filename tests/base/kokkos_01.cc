@@ -34,9 +34,11 @@ main()
   GrowingVectorMemory<
     LinearAlgebra::distributed::Vector<float, MemorySpace::Host>>{};
 
-  Impl::ensure_kokkos_initialized();
-  deallog << "Kokkos initialized by Kokkos: " << Impl::dealii_initialized_kokkos
-          << std::endl;
+  internal::ensure_kokkos_initialized();
+  deallog << "Kokkos initialized by Kokkos: "
+          << internal::dealii_initialized_kokkos << std::endl;
 
   Kokkos::finalize();
+
+  return 0;
 }

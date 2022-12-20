@@ -41,16 +41,16 @@ test()
   ghost_set.add_index(0);
   ghost_set.add_index(2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     locally_owned, ghost_set, MPI_COMM_WORLD);
 
   // create vector without actually setting the entries since they will be
   // overwritten soon anyway
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v2;
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v2;
   v2.reinit(v, true);
 
   // set locally owned range of v2 manually
-  Kokkos::View<double *, MemorySpace::Device::kokkos_space> v2_view(
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> v2_view(
     v2.get_values(), v2.local_size());
   Kokkos::deep_copy(v2_view, 1.);
 

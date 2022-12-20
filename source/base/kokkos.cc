@@ -22,7 +22,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Impl
+namespace internal
 {
   bool dealii_initialized_kokkos = false;
 
@@ -36,5 +36,5 @@ namespace Impl
         std::atexit(Kokkos::finalize);
       }
   }
-} // namespace Impl
+} // namespace internal
 DEAL_II_NAMESPACE_CLOSE

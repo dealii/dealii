@@ -98,9 +98,9 @@ public:
       return 0;
     };
 
-    time_stepper.solve_jacobian_system = [&](const VectorType &src,
-                                             VectorType &      dst) -> int {
-      Jinv.vmult(dst, src);
+    time_stepper.solve_with_jacobian =
+      [&](const VectorType &rhs, VectorType &dst, const double /*tol*/) -> int {
+      Jinv.vmult(dst, rhs);
       return 0;
     };
 

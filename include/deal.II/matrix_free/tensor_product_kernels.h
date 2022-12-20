@@ -3362,6 +3362,51 @@ namespace internal
 
 
   template <int dim, int n_points_1d_template, typename Number>
+  inline void
+  weight_fe_q_dofs_by_entity_shifted(const Number *     weights,
+                                     const unsigned int n_components,
+                                     const int n_points_1d_non_template,
+                                     Number *  data)
+  {
+    const int n_points_1d = n_points_1d_template != -1 ?
+                              n_points_1d_template :
+                              n_points_1d_non_template;
+
+    Assert((n_points_1d % 2) == 1,
+           ExcMessage("The function can only with add number of points"));
+    Assert(n_points_1d > 0, ExcNotImplemented());
+    Assert(n_points_1d < 100, ExcNotImplemented());
+
+    const unsigned int n_inside_1d = n_points_1d / 2;
+
+    unsigned int compressed_index[100];
+
+    unsigned int c = 0;
+    for (int i = 0; i < n_inside_1d; ++i)
+      compressed_index[c++] = 0;
+    compressed_index[c++] = 1;
+    for (int i = 0; i < n_inside_1d; ++i)
+      compressed_index[c++] = 2;
+
+    for (unsigned int c = 0; c < n_components; ++c)
+      for (int k = 0; k < (dim > 2 ? n_points_1d : 1); ++k)
+        for (int j = 0; j < (dim > 1 ? n_points_1d : 1); ++j)
+          {
+            const unsigned int shift =
+              9 * compressed_index[k] + 3 * compressed_index[j];
+
+            unsigned int c = 0;
+            for (int i = 0; i < n_inside_1d; ++i)
+              data[c++] *= weights[shift];
+            data[c++] *= weights[shift + 1];
+            for (int i = 0; i < n_inside_1d; ++i)
+              data[c++] *= weights[shift + 2];
+            data += n_points_1d;
+          }
+  }
+
+
+  template <int dim, int n_points_1d_template, typename Number>
   inline bool
   compute_weights_fe_q_dofs_by_entity(const Number *     data,
                                       const unsigned int n_components,
@@ -3416,6 +3461,78 @@ namespace internal
 
             if (!check_and_set(weights[shift + 2], data[n_points_1d - 1]))
               return false; // failure
+          }
+
+    return true; // success
+  }
+
+
+  template <int dim, int n_points_1d_template, typename Number>
+  inline bool
+  compute_weights_fe_q_dofs_by_entity_shifted(
+    const Number *     data,
+    const unsigned int n_components,
+    const int          n_points_1d_non_template,
+    Number *           weights)
+  {
+    const int n_points_1d = n_points_1d_template != -1 ?
+                              n_points_1d_template :
+                              n_points_1d_non_template;
+
+    Assert((n_points_1d % 2) == 1,
+           ExcMessage("The function can only with add number of points"));
+    Assert(n_points_1d > 0, ExcNotImplemented());
+    Assert(n_points_1d < 100, ExcNotImplemented());
+
+    const unsigned int n_inside_1d = n_points_1d / 2;
+
+    unsigned int compressed_index[100];
+
+    unsigned int c = 0;
+    for (int i = 0; i < n_inside_1d; ++i)
+      compressed_index[c++] = 0;
+    compressed_index[c++] = 1;
+    for (int i = 0; i < n_inside_1d; ++i)
+      compressed_index[c++] = 2;
+
+    // Insert the number data into a storage position for weight,
+    // ensuring that the array has either not been touched before
+    // or the previous content is the same. In case the previous
+    // content has a different value, we exit this function and
+    // signal to outer functions that the compression was not possible.
+    const auto check_and_set = [](Number &weight, const Number &data) {
+      if (weight == Number(-1.0) || weight == data)
+        {
+          weight = data;
+          return true; // success for the entry
+        }
+
+      return false; // failure for the entry
+    };
+
+    for (unsigned int c = 0; c < Utilities::pow<unsigned int>(3, dim); ++c)
+      weights[c] = Number(-1.0);
+
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      for (int k = 0; k < (dim > 2 ? n_points_1d : 1); ++k)
+        for (int j = 0; j < (dim > 1 ? n_points_1d : 1);
+             ++j, data += n_points_1d)
+          {
+            const unsigned int shift =
+              9 * compressed_index[k] + 3 * compressed_index[j];
+
+            unsigned int c = 0;
+
+            for (int i = 0; i < n_inside_1d; ++i)
+              if (!check_and_set(weights[shift], data[c++]))
+                return false; // failure
+
+            if (!check_and_set(weights[shift + 1], data[c++]))
+              return false; // failure
+
+            for (int i = 0; i < n_inside_1d; ++i)
+              if (!check_and_set(weights[shift + 2], data[c++]))
+                return false; // failure
           }
 
     return true; // success

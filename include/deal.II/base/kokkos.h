@@ -20,7 +20,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Impl
+namespace internal
 {
   /**
    * Records if Kokkos has been initialized by deal.II. The value stored is only
@@ -33,7 +33,7 @@ namespace Impl
    */
   void
   ensure_kokkos_initialized();
-} // namespace Impl
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

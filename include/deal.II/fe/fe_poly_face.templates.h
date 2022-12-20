@@ -84,9 +84,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_values(
   const Quadrature<dim> &,
   const Mapping<dim, spacedim> &,
   const typename Mapping<dim, spacedim>::InternalDataBase &,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                     spacedim>
-    &,
+  const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -115,9 +113,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
   const hp::QCollection<dim - 1> &quadrature,
   const Mapping<dim, spacedim> &,
   const typename Mapping<dim, spacedim>::InternalDataBase &,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                     spacedim>
-    &,
+  const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -211,9 +207,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_subface_values(
   const Quadrature<dim - 1> &quadrature,
   const Mapping<dim, spacedim> &,
   const typename Mapping<dim, spacedim>::InternalDataBase &,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                     spacedim>
-    &,
+  const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>

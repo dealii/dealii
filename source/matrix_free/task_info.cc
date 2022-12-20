@@ -24,6 +24,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/task_info.h>
+#include <deal.II/matrix_free/util.h>
 
 
 #ifdef DEAL_II_WITH_TBB
@@ -825,11 +826,7 @@ namespace internal
 
       // Give the compiler a chance to detect that vectorization_length is a
       // power of two, which allows it to replace integer divisions by shifts
-      unsigned int vectorization_length_bits = 0;
-      unsigned int my_length                 = vectorization_length;
-      while ((my_length >>= 1) != 0u)
-        ++vectorization_length_bits;
-      const unsigned int n_lanes = 1 << vectorization_length_bits;
+      const unsigned int n_lanes = indicate_power_of_two(vectorization_length);
 
       // Step 1: find tight map of categories for not taking exceeding amounts
       // of memory below. Sort the new categories by the numbers in the

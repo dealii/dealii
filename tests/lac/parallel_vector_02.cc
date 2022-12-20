@@ -47,7 +47,7 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
 
   // set local values and check them

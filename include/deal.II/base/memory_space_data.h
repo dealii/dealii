@@ -38,9 +38,10 @@ namespace MemorySpace
 {
   /**
    * Structure which stores data on the host or the device depending on the
-   * template parameter @p MemorySpace. The data is copied into the structure
-   * which then owns the data and will release the memory when the destructor is
-   * called.
+   * template parameter @p MemorySpace. Valid choices are MemorySpace::Host,
+   * MemorySpace::Default, and MemorySpace::CUDA (if CUDA was enabled in
+   * deal.II). The data is copied into the structure which then owns the data
+   * and will release the memory when the destructor is called.
    */
   template <typename T, typename MemorySpace>
   struct MemorySpaceData
@@ -48,38 +49,40 @@ namespace MemorySpace
     MemorySpaceData();
 
     /**
-     * Copy the active data (values for Host and values_dev for Device) to @p begin.
+     * Copy the class member values to @p begin.
      * If the data is on the device it is moved to the host.
      */
     void
     copy_to(T *begin, const std::size_t n_elements);
 
     /**
-     * Copy the data in @p begin to the active data of the structure (values for
-     * Host and values_dev for Device). The pointer @p begin must be on the host.
+     * Copy the data in @p begin to the class member values.
+     * The pointer @p begin must be on the host.
      */
     void
     copy_from(const T *begin, const std::size_t n_elements);
 
     /**
-     * Kokkos View to a host buffer used for MPI communication
+     * Kokkos View owning a host buffer used for MPI communication.
      */
+    // FIXME Should we move this somewhere else?
     Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
 
     /**
-     * Kokkos View to the data on the device
+     * Kokkos View owning the data on the device (unless @p values_sm_ptr is used).
      */
     Kokkos::View<T *, typename MemorySpace::kokkos_space> values;
 
     /**
      * Pointer to data on the host. The pointer points to the same data as
-     * values when using shared memory. Otherwise it is not set.
+     * @p values when using shared memory and the memory space is
+     * MemorySpace::Host. Otherwise it is not set.
      */
-    // The pointer is shared so that MemorySpaceData can be copied and
+    // This a shared pointer pointer so that MemorySpaceData can be copied and
     // MemorySpaceData::values can be used in Kokkos::parallel_for. This
     // pointer owns the data when using shared memory with MPI. In this case,
-    // the Kokkos::View in non-owning. When shared memory with MPI is not used,
-    // the pointer is not used.
+    // the Kokkos::View @p values is non-owning. When shared memory with MPI is
+    // not used, the @p values_sm_ptr is unused.
     std::shared_ptr<T> values_sm_ptr;
 
     /**
@@ -102,8 +105,9 @@ namespace MemorySpace
 
   template <typename T, typename MemorySpace>
   MemorySpaceData<T, MemorySpace>::MemorySpaceData()
-    : values_host_buffer((dealii::Impl::ensure_kokkos_initialized(),
-                          Kokkos::View<T *, Kokkos::HostSpace>("host data", 0)))
+    : values_host_buffer(
+        (dealii::internal::ensure_kokkos_initialized(),
+         Kokkos::View<T *, Kokkos::HostSpace>("host buffer", 0)))
     , values(Kokkos::View<T *, typename MemorySpace::kokkos_space>(
         "memoryspace data",
         0))
@@ -117,7 +121,8 @@ namespace MemorySpace
                                            const std::size_t n_elements)
   {
     Assert(n_elements <= values.extent(0),
-           ExcMessage("n_elements greater than the size of values."));
+           ExcMessage(
+             "n_elements is greater than the size of MemorySpaceData."));
     using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
     Kokkos::
       View<T *, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>
@@ -137,7 +142,8 @@ namespace MemorySpace
                                              const std::size_t n_elements)
   {
     Assert(n_elements <= values.extent(0),
-           ExcMessage("n_elements greater than the size of values."));
+           ExcMessage(
+             "n_elements is greater than the size of MemorySpaceData."));
     using ExecutionSpace = typename MemorySpace::kokkos_space::execution_space;
     Kokkos::View<const T *,
                  Kokkos::HostSpace,

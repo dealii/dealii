@@ -2605,7 +2605,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const Quadrature<dim> &                             quadrature,
   const Mapping<dim, dim> &                           mapping,
   const typename Mapping<dim, dim>::InternalDataBase &mapping_internal,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
+  const internal::FEValuesImplementation::MappingRelatedData<dim, dim>
     &                                                       mapping_data,
   const typename FiniteElement<dim, dim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
@@ -2786,7 +2786,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   const hp::QCollection<dim - 1> &                       quadrature,
   const Mapping<dim, dim> &                              mapping,
   const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
+  const internal::FEValuesImplementation::MappingRelatedData<dim, dim>
     &                                                       mapping_data,
   const typename FiniteElement<dim, dim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
@@ -2987,7 +2987,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
   const Quadrature<dim - 1> & /*quadrature*/,
   const Mapping<dim, dim> & /*mapping*/,
   const typename Mapping<dim, dim>::InternalDataBase & /*mapping_internal*/,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
+  const internal::FEValuesImplementation::MappingRelatedData<dim, dim>
     & /*mapping_data*/,
   const typename FiniteElement<dim, dim>::InternalDataBase & /*fe_internal*/,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>

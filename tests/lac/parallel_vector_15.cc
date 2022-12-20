@@ -51,7 +51,7 @@ test()
   if (numproc > 1)
     local_relevant.add_range(3, 4);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
 
   // set local values
@@ -67,7 +67,7 @@ test()
   if (myid == 0)
     deallog << "v has ghost elements: " << v.has_ghost_elements() << std::endl;
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> w, x;
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> w, x;
   w = v;
   if (myid == 0)
     deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;

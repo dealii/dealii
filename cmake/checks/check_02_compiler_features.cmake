@@ -330,11 +330,12 @@ reset_cmake_required()
 
 
 #
-# Use 'lld' or the 'gold' linker if possible, given that either of them is
-# substantially faster.
+# Use 'mold', 'lld' or the 'gold' linker if possible, given that either of them
+# is substantially faster.
 #
-# We have to try to link a full executable with -fuse-ld=lld or -fuse-ld=gold
-# to check whether "ld.lld" or "ld.gold" is actually available.
+# We have to try to link a full executable with -fuse-ld=mold, -fuse-ld=lld or
+# -fuse-ld=gold to check whether "ld.mold", "ld.lld" or "ld.gold" is actually
+# available.
 #
 # Clang always reports "argument unused during compilation", but fails at link
 # time for an unsupported linker.
@@ -368,8 +369,17 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   add_flags(CMAKE_REQUIRED_FLAGS "-fPIC")
 
   #
-  # Check for ld.lld and ld.gold support:
+  # Check for ld.mold, ld.lld and ld.gold support:
   #
+  add_flags(CMAKE_REQUIRED_FLAGS "-fuse-ld=mold")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <iostream>
+    void foo() { std::cout << \"Hello, world!\" << std::endl; }
+    "
+    DEAL_II_COMPILER_HAS_FUSE_LD_MOLD)
+
+  strip_flag(CMAKE_REQUIRED_FLAGS "-fuse-ld=mold")
   add_flags(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -387,7 +397,9 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     "
     DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
 
-  if(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+  if(DEAL_II_COMPILER_HAS_FUSE_LD_MOLD)
+    add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=mold")
+  elseif(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
   elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
     add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")

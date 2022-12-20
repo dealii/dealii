@@ -57,9 +57,9 @@ test()
   local_relevant.add_range(1, 2);
 
   // create vector
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
-  Kokkos::View<double *, MemorySpace::Device::kokkos_space> v_device(
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> v_device(
     v.get_values(), local_relevant.n_elements());
   const auto &partitioner = v.get_partitioner();
 

@@ -143,8 +143,6 @@ namespace LA
 #  include <TopoDS.hxx>
 #endif
 
-#include <boost/algorithm/string/case_conv.hpp>
-
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -837,8 +835,12 @@ namespace Step70
         const auto &manifold_id   = pair.first;
         const auto &cad_file_name = pair.second;
 
-        const auto extension = boost::algorithm::to_lower_copy(
-          cad_file_name.substr(cad_file_name.find_last_of('.') + 1));
+        std::string extension =
+          cad_file_name.substr(cad_file_name.find_last_of('.') + 1);
+        std::transform(extension.begin(),
+                       extension.end(),
+                       extension.begin(),
+                       [](const char c) -> char { return std::tolower(c); });
 
         TopoDS_Shape shape;
         if (extension == "iges" || extension == "igs")

@@ -109,8 +109,8 @@ namespace LinearAlgebra
 
         static_assert(
           std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-            std::is_same<MemorySpace, ::dealii::MemorySpace::Device>::value,
-          "MemorySpace should be Host or Device");
+            std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value,
+          "MemorySpace should be Host or Default");
       }
     };
 
@@ -161,7 +161,7 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    struct read_write_vector_functions<Number, ::dealii::MemorySpace::Device>
+    struct read_write_vector_functions<Number, ::dealii::MemorySpace::Default>
     {
       using size_type = types::global_dof_index;
 
@@ -181,7 +181,7 @@ namespace LinearAlgebra
           Kokkos::View<Number *, Kokkos::HostSpace>(tmp_vector.begin(),
                                                     n_elements),
           Kokkos::View<const Number *,
-                       ::dealii::MemorySpace::Device::kokkos_space>(
+                       ::dealii::MemorySpace::Default::kokkos_space>(
             values, n_elements));
         tmp_vector.update_ghost_values();
 

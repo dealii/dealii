@@ -549,7 +549,7 @@ MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points,
   const UpdateFlags                                           update_flags,
-  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
   if (update_flags == update_default)
@@ -699,7 +699,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
-  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
   AssertDimension(dim, spacedim);

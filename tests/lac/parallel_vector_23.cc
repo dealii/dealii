@@ -58,7 +58,7 @@ test()
   local_relevant.add_range(1, 2);
 
   // create vector
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
   const auto &partitioner = v.get_partitioner();
 

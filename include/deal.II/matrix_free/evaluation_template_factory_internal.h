@@ -45,6 +45,8 @@ namespace internal
         else if (n_q_points_1d == (3 * degree) / 2 + 1)
           return EvaluatorType::template run<degree, (3 * degree) / 2 + 1>(
             args...);
+        else if ((n_q_points_1d == (2 * degree)) && (degree <= 4))
+          return EvaluatorType::template run<degree, (2 * degree)>(args...);
         else
           // slow path
           return EvaluatorType::template run<-1, 0>(args...);

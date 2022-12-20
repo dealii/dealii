@@ -995,6 +995,18 @@ namespace
 
 
 
+  template <int dim>
+  int
+  lexicographic_to_vtk_point_index(const std::array<unsigned, dim> &,
+                                   const std::array<unsigned, dim> &,
+                                   const bool)
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
+
+
+
   /**
    * Given (i,j,k) coordinates within the Lagrange quadrilateral, return an
    * offset into the local connectivity array.
@@ -1002,15 +1014,18 @@ namespace
    * Modified from
    * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
    */
+  template <>
   int
-  vtk_point_index_from_ijk(const unsigned i,
-                           const unsigned j,
-                           const unsigned,
-                           const std::array<unsigned, 2> &order,
-                           const bool)
+  lexicographic_to_vtk_point_index<2>(
+    const std::array<unsigned, 2> &indices,
+    const std::array<unsigned, 2> &points_per_direction,
+    const bool)
   {
-    const bool ibdy = (i == 0 || i == order[0]);
-    const bool jbdy = (j == 0 || j == order[1]);
+    const unsigned int i = indices[0];
+    const unsigned int j = indices[1];
+
+    const bool ibdy = (i == 0 || i == points_per_direction[0]);
+    const bool jbdy = (j == 0 || j == points_per_direction[1]);
     // How many boundaries do we lie on at once?
     const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
 
@@ -1024,22 +1039,26 @@ namespace
       {
         if (!ibdy)
           { // On i axis
-            return (i - 1) + (j != 0u ? order[0] - 1 + order[1] - 1 : 0) +
+            return (i - 1) +
+                   (j != 0u ? points_per_direction[0] - 1 +
+                                points_per_direction[1] - 1 :
+                              0) +
                    offset;
           }
 
         if (!jbdy)
           { // On j axis
             return (j - 1) +
-                   (i != 0u ? order[0] - 1 :
-                              2 * (order[0] - 1) + order[1] - 1) +
+                   (i != 0u ? points_per_direction[0] - 1 :
+                              2 * (points_per_direction[0] - 1) +
+                                points_per_direction[1] - 1) +
                    offset;
           }
       }
 
-    offset += 2 * (order[0] - 1 + order[1] - 1);
+    offset += 2 * (points_per_direction[0] - 1 + points_per_direction[1] - 1);
     // nbdy == 0: Face DOF
-    return offset + (i - 1) + (order[0] - 1) * ((j - 1));
+    return offset + (i - 1) + (points_per_direction[0] - 1) * ((j - 1));
   }
 
 
@@ -1057,16 +1076,20 @@ namespace
    * https://github.com/Kitware/VTK/blob/7a0b92864c96680b1f42ee84920df556fc6ebaa3/Documentation/release/dev/node-numbering-change-for-VTK_LAGRANGE_HEXAHEDRON.md
    *
    */
+  template <>
   int
-  vtk_point_index_from_ijk(const unsigned                 i,
-                           const unsigned                 j,
-                           const unsigned                 k,
-                           const std::array<unsigned, 3> &order,
-                           const bool                     legacy_format)
+  lexicographic_to_vtk_point_index<3>(
+    const std::array<unsigned, 3> &indices,
+    const std::array<unsigned, 3> &points_per_direction,
+    const bool                     legacy_format)
   {
-    const bool ibdy = (i == 0 || i == order[0]);
-    const bool jbdy = (j == 0 || j == order[1]);
-    const bool kbdy = (k == 0 || k == order[2]);
+    const unsigned int i = indices[0];
+    const unsigned int j = indices[1];
+    const unsigned int k = indices[2];
+
+    const bool ibdy = (i == 0 || i == points_per_direction[0]);
+    const bool jbdy = (j == 0 || j == points_per_direction[1]);
+    const bool kbdy = (k == 0 || k == points_per_direction[2]);
     // How many boundaries do we lie on at once?
     const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
 
@@ -1081,82 +1104,81 @@ namespace
       {
         if (!ibdy)
           { // On i axis
-            return (i - 1) + (j != 0u ? order[0] - 1 + order[1] - 1 : 0) +
-                   (k != 0u ? 2 * (order[0] - 1 + order[1] - 1) : 0) + offset;
+            return (i - 1) +
+                   (j != 0u ? points_per_direction[0] - 1 +
+                                points_per_direction[1] - 1 :
+                              0) +
+                   (k != 0u ? 2 * (points_per_direction[0] - 1 +
+                                   points_per_direction[1] - 1) :
+                              0) +
+                   offset;
           }
         if (!jbdy)
           { // On j axis
             return (j - 1) +
-                   (i != 0u ? order[0] - 1 :
-                              2 * (order[0] - 1) + order[1] - 1) +
-                   (k != 0u ? 2 * (order[0] - 1 + order[1] - 1) : 0) + offset;
+                   (i != 0u ? points_per_direction[0] - 1 :
+                              2 * (points_per_direction[0] - 1) +
+                                points_per_direction[1] - 1) +
+                   (k != 0u ? 2 * (points_per_direction[0] - 1 +
+                                   points_per_direction[1] - 1) :
+                              0) +
+                   offset;
           }
         // !kbdy, On k axis
-        offset += 4 * (order[0] - 1) + 4 * (order[1] - 1);
+        offset +=
+          4 * (points_per_direction[0] - 1) + 4 * (points_per_direction[1] - 1);
         if (legacy_format)
           return (k - 1) +
-                 (order[2] - 1) *
+                 (points_per_direction[2] - 1) *
                    (i != 0u ? (j != 0u ? 3 : 1) : (j != 0u ? 2 : 0)) +
                  offset;
         else
           return (k - 1) +
-                 (order[2] - 1) *
+                 (points_per_direction[2] - 1) *
                    (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
                  offset;
       }
 
-    offset += 4 * (order[0] - 1 + order[1] - 1 + order[2] - 1);
+    offset += 4 * (points_per_direction[0] - 1 + points_per_direction[1] - 1 +
+                   points_per_direction[2] - 1);
     if (nbdy == 1) // Face DOF
       {
         if (ibdy) // On i-normal face
           {
-            return (j - 1) + ((order[1] - 1) * (k - 1)) +
-                   (i != 0u ? (order[1] - 1) * (order[2] - 1) : 0) + offset;
+            return (j - 1) + ((points_per_direction[1] - 1) * (k - 1)) +
+                   (i != 0u ? (points_per_direction[1] - 1) *
+                                (points_per_direction[2] - 1) :
+                              0) +
+                   offset;
           }
-        offset += 2 * (order[1] - 1) * (order[2] - 1);
+        offset +=
+          2 * (points_per_direction[1] - 1) * (points_per_direction[2] - 1);
         if (jbdy) // On j-normal face
           {
-            return (i - 1) + ((order[0] - 1) * (k - 1)) +
-                   (j != 0u ? (order[2] - 1) * (order[0] - 1) : 0) + offset;
+            return (i - 1) + ((points_per_direction[0] - 1) * (k - 1)) +
+                   (j != 0u ? (points_per_direction[2] - 1) *
+                                (points_per_direction[0] - 1) :
+                              0) +
+                   offset;
           }
-        offset += 2 * (order[2] - 1) * (order[0] - 1);
+        offset +=
+          2 * (points_per_direction[2] - 1) * (points_per_direction[0] - 1);
         // kbdy, On k-normal face
-        return (i - 1) + ((order[0] - 1) * (j - 1)) +
-               (k != 0u ? (order[0] - 1) * (order[1] - 1) : 0) + offset;
+        return (i - 1) + ((points_per_direction[0] - 1) * (j - 1)) +
+               (k != 0u ? (points_per_direction[0] - 1) *
+                            (points_per_direction[1] - 1) :
+                          0) +
+               offset;
       }
 
     // nbdy == 0: Body DOF
     offset +=
-      2 * ((order[1] - 1) * (order[2] - 1) + (order[2] - 1) * (order[0] - 1) +
-           (order[0] - 1) * (order[1] - 1));
+      2 * ((points_per_direction[1] - 1) * (points_per_direction[2] - 1) +
+           (points_per_direction[2] - 1) * (points_per_direction[0] - 1) +
+           (points_per_direction[0] - 1) * (points_per_direction[1] - 1));
     return offset + (i - 1) +
-           (order[0] - 1) * ((j - 1) + (order[1] - 1) * ((k - 1)));
-  }
-
-
-
-  int
-  vtk_point_index_from_ijk(const unsigned,
-                           const unsigned,
-                           const unsigned,
-                           const std::array<unsigned, 0> &,
-                           const bool)
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
-  }
-
-
-
-  int
-  vtk_point_index_from_ijk(const unsigned,
-                           const unsigned,
-                           const unsigned,
-                           const std::array<unsigned, 1> &,
-                           const bool)
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
+           (points_per_direction[0] - 1) *
+             ((j - 1) + (points_per_direction[1] - 1) * ((k - 1)));
   }
 
 
@@ -1551,8 +1573,7 @@ namespace
      */
     template <int dim>
     void
-    write_high_order_cell(const unsigned int           index,
-                          const unsigned int           start,
+    write_high_order_cell(const unsigned int           start,
                           const std::vector<unsigned> &connectivity);
   };
 
@@ -1571,8 +1592,7 @@ namespace
      */
     template <int dim>
     void
-    write_high_order_cell(const unsigned int           index,
-                          const unsigned int           start,
+    write_high_order_cell(const unsigned int           start,
                           const std::vector<unsigned> &connectivity);
 
     void
@@ -2032,8 +2052,7 @@ namespace
 
   template <int dim>
   void
-  VtkStream::write_high_order_cell(const unsigned int,
-                                   const unsigned int           start,
+  VtkStream::write_high_order_cell(const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
     stream << connectivity.size();
@@ -2052,8 +2071,7 @@ namespace
 
   template <int dim>
   void
-  VtuStream::write_high_order_cell(const unsigned int,
-                                   const unsigned int           start,
+  VtuStream::write_high_order_cell(const unsigned int           start,
                                    const std::vector<unsigned> &connectivity)
   {
     if (deal_ii_with_zlib &&
@@ -3059,11 +3077,8 @@ namespace DataOutBase
   {
     Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
-    unsigned int count                 = 0;
     // Array to hold all the node numbers of a cell
     std::vector<unsigned> connectivity;
-    // Array to hold cell order in each dimension
-    std::array<unsigned, dim> cell_order;
 
     for (const auto &patch : patches)
       {
@@ -3074,8 +3089,7 @@ namespace DataOutBase
             for (unsigned int i = 0; i < patch.data.n_cols(); ++i)
               connectivity[i] = i;
 
-            out.template write_high_order_cell<dim>(count++,
-                                                    first_vertex_of_patch,
+            out.template write_high_order_cell<dim>(first_vertex_of_patch,
                                                     connectivity);
 
             first_vertex_of_patch += patch.data.n_cols();
@@ -3085,34 +3099,76 @@ namespace DataOutBase
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
 
-            cell_order.fill(n_subdivisions);
             connectivity.resize(Utilities::fixed_power<dim>(n));
 
-            // Length of loops in all dimensons
-            const unsigned int n1 = (dim > 0) ? n_subdivisions : 0;
-            const unsigned int n2 = (dim > 1) ? n_subdivisions : 0;
-            const unsigned int n3 = (dim > 2) ? n_subdivisions : 0;
-            // Offsets of outer loops
-            constexpr unsigned int d1 = 1;
-            const unsigned int     d2 = n;
-            const unsigned int     d3 = n * n;
-            for (unsigned int i3 = 0; i3 <= n3; ++i3)
-              for (unsigned int i2 = 0; i2 <= n2; ++i2)
-                for (unsigned int i1 = 0; i1 <= n1; ++i1)
+            switch (dim)
+              {
+                case 0:
                   {
-                    const unsigned int local_index =
-                      i3 * d3 + i2 * d2 + i1 * d1;
-                    const unsigned int connectivity_index =
-                      vtk_point_index_from_ijk(
-                        i1, i2, i3, cell_order, legacy_format);
-                    connectivity[connectivity_index] = local_index;
+                    Assert(false,
+                           ExcMessage("Point-like cells should not be possible "
+                                      "when writing higher-order cells."));
+                    break;
                   }
+                case 1:
+                  {
+                    for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                      {
+                        const unsigned int local_index = i1;
+                        const unsigned int connectivity_index =
+                          lexicographic_to_vtk_point_index<1>(
+                            {{i1}}, {{n_subdivisions}}, legacy_format);
+                        connectivity[connectivity_index] = local_index;
+                      }
 
-            out.template write_high_order_cell<dim>(count++,
-                                                    first_vertex_of_patch,
+                    break;
+                  }
+                case 2:
+                  {
+                    for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                      for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                        {
+                          const unsigned int local_index = i2 * n + i1;
+                          const unsigned int connectivity_index =
+                            lexicographic_to_vtk_point_index<2>(
+                              {{i1, i2}},
+                              {{n_subdivisions, n_subdivisions}},
+                              legacy_format);
+                          connectivity[connectivity_index] = local_index;
+                        }
+
+                    break;
+                  }
+                case 3:
+                  {
+                    for (unsigned int i3 = 0; i3 < n_subdivisions + 1; ++i3)
+                      for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                        for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                          {
+                            const unsigned int local_index =
+                              i3 * n * n + i2 * n + i1;
+                            const unsigned int connectivity_index =
+                              lexicographic_to_vtk_point_index<3>(
+                                {{i1, i2, i3}},
+                                {{n_subdivisions,
+                                  n_subdivisions,
+                                  n_subdivisions}},
+                                legacy_format);
+                            connectivity[connectivity_index] = local_index;
+                          }
+
+                    break;
+                  }
+                default:
+                  Assert(false, ExcNotImplemented());
+              }
+
+            // Having so set up the 'connectivity' data structure,
+            // output it:
+            out.template write_high_order_cell<dim>(first_vertex_of_patch,
                                                     connectivity);
 
-            // finally update the number of the first vertex of this patch
+            // Finally update the number of the first vertex of this patch
             first_vertex_of_patch += Utilities::fixed_power<dim>(n);
           }
       }
@@ -3660,6 +3716,12 @@ namespace DataOutBase
             const unsigned int n1              = (dim > 0) ? n : 1;
             const unsigned int n2              = (dim > 1) ? n : 1;
             const unsigned int n3              = (dim > 2) ? n : 1;
+            const unsigned int x_minus         = (dim > 0) ? 0 : 0;
+            const unsigned int x_plus          = (dim > 0) ? 1 : 0;
+            const unsigned int y_minus         = (dim > 1) ? 2 : 0;
+            const unsigned int y_plus          = (dim > 1) ? 3 : 0;
+            const unsigned int z_minus         = (dim > 2) ? 4 : 0;
+            const unsigned int z_plus          = (dim > 2) ? 5 : 0;
             unsigned int       cells_per_patch = Utilities::fixed_power<dim>(n);
             unsigned int       dx              = 1;
             unsigned int       dy              = n;
@@ -3686,7 +3748,7 @@ namespace DataOutBase
                     // Direction -x Last cell in row of other patch
                     if (i1 == 0)
                       {
-                        const unsigned int nn = patch.neighbors[0];
+                        const unsigned int nn = patch.neighbors[x_minus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out
@@ -3701,7 +3763,7 @@ namespace DataOutBase
                     // Direction +x First cell in row of other patch
                     if (i1 == n - 1)
                       {
-                        const unsigned int nn = patch.neighbors[1];
+                        const unsigned int nn = patch.neighbors[x_plus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + ny + nz);
@@ -3717,7 +3779,7 @@ namespace DataOutBase
                     // Direction -y
                     if (i2 == 0)
                       {
-                        const unsigned int nn = patch.neighbors[2];
+                        const unsigned int nn = patch.neighbors[y_minus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out
@@ -3732,7 +3794,7 @@ namespace DataOutBase
                     // Direction +y
                     if (i2 == n - 1)
                       {
-                        const unsigned int nn = patch.neighbors[3];
+                        const unsigned int nn = patch.neighbors[y_plus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + nx + nz);
@@ -3749,7 +3811,7 @@ namespace DataOutBase
                     // Direction -z
                     if (i3 == 0)
                       {
-                        const unsigned int nn = patch.neighbors[4];
+                        const unsigned int nn = patch.neighbors[z_minus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out
@@ -3764,7 +3826,7 @@ namespace DataOutBase
                     // Direction +z
                     if (i3 == n - 1)
                       {
-                        const unsigned int nn = patch.neighbors[5];
+                        const unsigned int nn = patch.neighbors[z_plus];
                         out << '\t';
                         if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + nx + ny);

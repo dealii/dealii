@@ -177,7 +177,7 @@ class TestTriangulationWrapper(unittest.TestCase):
                 triangulation.generate_cheese(holes)
                 n_cells = triangulation.n_active_cells()
                 self.assertEqual(n_cells, 175)
-                
+
     def test_generate_general_cell(self):
         for dim in self.restricted_dim:
             triangulation = Triangulation(dim[0], dim[1])
@@ -462,6 +462,23 @@ class TestTriangulationWrapper(unittest.TestCase):
                 self.assertEqual(n_cells, 4)
             else:
                 self.assertEqual(n_cells, 8)
+
+
+    def test_mesh_smoothing(self):
+        tria = Triangulation('2D')
+        self.assertEqual(tria.get_mesh_smoothing(), MeshSmoothing.none)
+        tria.set_mesh_smoothing(MeshSmoothing.maximum_smoothing)
+        self.assertEqual(tria.get_mesh_smoothing(), MeshSmoothing.maximum_smoothing)
+
+        tria = Triangulation('2D', MeshSmoothing.limit_level_difference_at_vertices)
+        self.assertEqual(tria.get_mesh_smoothing(), MeshSmoothing.limit_level_difference_at_vertices)
+
+        tria = Triangulation('2D', '3D', MeshSmoothing.none, False)
+        tria.set_mesh_smoothing(MeshSmoothing.limit_level_difference_at_vertices)
+        self.assertEqual(tria.get_mesh_smoothing(), MeshSmoothing.limit_level_difference_at_vertices)
+
+        tria = Triangulation('3D', MeshSmoothing.limit_level_difference_at_vertices | MeshSmoothing.do_not_produce_unrefined_islands)
+        self.assertEqual(tria.get_mesh_smoothing(), MeshSmoothing.limit_level_difference_at_vertices | MeshSmoothing.do_not_produce_unrefined_islands)
 
 
 if __name__ == '__main__':

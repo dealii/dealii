@@ -978,18 +978,6 @@ namespace Utilities
         }
 #endif
 
-// There is a similar issue with CUDA: The destructor of static objects might
-// run after the CUDA driver is unloaded. Hence, also release all memory
-// related to CUDA vectors.
-#ifdef DEAL_II_WITH_CUDA
-      GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>::
-        release_unused_memory();
-      GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>::
-        release_unused_memory();
-#endif
-
 #ifdef DEAL_II_WITH_P4EST
       // now end p4est and libsc
       // Note: p4est has no finalize function

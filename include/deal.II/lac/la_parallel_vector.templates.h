@@ -88,8 +88,8 @@ namespace LinearAlgebra
       {
         static_assert(
           std::is_same<MemorySpaceType, MemorySpace::Host>::value ||
-            std::is_same<MemorySpaceType, MemorySpace::Device>::value,
-          "MemorySpace should be Host or Device");
+            std::is_same<MemorySpaceType, MemorySpace::Default>::value,
+          "MemorySpace should be Host or Default");
 
         static void
         resize_val(
@@ -320,7 +320,7 @@ namespace LinearAlgebra
       template <typename Number>
       struct la_parallel_vector_templates_functions<
         Number,
-        ::dealii::MemorySpace::Device>
+        ::dealii::MemorySpace::Default>
       {
         using size_type = types::global_dof_index;
 
@@ -329,7 +329,7 @@ namespace LinearAlgebra
           const types::global_dof_index new_alloc_size,
           types::global_dof_index &     allocated_size,
           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Device>
+                                                 ::dealii::MemorySpace::Default>
             &             data,
           const MPI_Comm &comm_sm)
         {
@@ -338,7 +338,7 @@ namespace LinearAlgebra
           static_assert(
             std::is_same<Number, float>::value ||
               std::is_same<Number, double>::value,
-            "Number should be float or double for Device memory space");
+            "Number should be float or double for Default memory space");
 
           if (new_alloc_size > allocated_size)
             {
@@ -365,7 +365,7 @@ namespace LinearAlgebra
             &             communication_pattern,
           const IndexSet &locally_owned_elem,
           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Device>
+                                                 ::dealii::MemorySpace::Default>
             &data)
         {
           Assert(
@@ -375,7 +375,7 @@ namespace LinearAlgebra
               "Only VectorOperation::add and VectorOperation::insert are allowed"));
 
           ::dealii::LinearAlgebra::distributed::
-            Vector<Number, ::dealii::MemorySpace::Device>
+            Vector<Number, ::dealii::MemorySpace::Default>
               tmp_vector(communication_pattern);
 
           // fill entries from ReadWriteVector into the distributed vector,
@@ -398,14 +398,15 @@ namespace LinearAlgebra
           host_exec.fence();
 
           // Move the indices to the device
-          ::dealii::MemorySpace::Device::kokkos_space::execution_space exec;
-          Kokkos::View<size_type *, ::dealii::MemorySpace::Device::kokkos_space>
+          ::dealii::MemorySpace::Default::kokkos_space::execution_space exec;
+          Kokkos::View<size_type *,
+                       ::dealii::MemorySpace::Default::kokkos_space>
             indices_dev("indices_dev", n_elements);
           Kokkos::deep_copy(exec, indices_dev, indices);
           exec.fence();
 
           // Move the data to the device
-          Kokkos::View<Number *, ::dealii::MemorySpace::Device::kokkos_space>
+          Kokkos::View<Number *, ::dealii::MemorySpace::Default::kokkos_space>
             V_dev("V_dev", n_elements);
           Kokkos::deep_copy(
             exec,
@@ -416,7 +417,7 @@ namespace LinearAlgebra
           // Set the values in tmp_vector
           Kokkos::parallel_for(
             Kokkos::RangePolicy<
-              ::dealii::MemorySpace::Device::kokkos_space::execution_space>(
+              ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
               exec, 0, n_elements),
             KOKKOS_LAMBDA(size_type i) {
               tmp_vector(indices_dev(i)) = V_dev(i);
@@ -446,7 +447,7 @@ namespace LinearAlgebra
           if (operation == VectorOperation::add)
             Kokkos::parallel_for(
               Kokkos::RangePolicy<
-                ::dealii::MemorySpace::Device::kokkos_space::execution_space>(
+                ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
                 exec, 0, n_elements),
               KOKKOS_LAMBDA(size_type i) {
                 data.values(indices_dev(i)) += tmp_vector(i);
@@ -454,7 +455,7 @@ namespace LinearAlgebra
           else
             Kokkos::parallel_for(
               Kokkos::RangePolicy<
-                ::dealii::MemorySpace::Device::kokkos_space::execution_space>(
+                ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
                 exec, 0, n_elements),
               KOKKOS_LAMBDA(size_type i) {
                 data.values(indices_dev(i)) = tmp_vector(i);
@@ -466,18 +467,18 @@ namespace LinearAlgebra
         static void
         linfty_norm_local(const ::dealii::MemorySpace::MemorySpaceData<
                             Number,
-                            ::dealii::MemorySpace::Device> &data,
-                          const unsigned int                size,
-                          RealType &                        result)
+                            ::dealii::MemorySpace::Default> &data,
+                          const unsigned int                 size,
+                          RealType &                         result)
         {
           static_assert(std::is_same<Number, RealType>::value,
                         "RealType should be the same type as Number");
 
-          typename ::dealii::MemorySpace::Device::kokkos_space::execution_space
+          typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
             exec;
           Kokkos::parallel_reduce(
             Kokkos::RangePolicy<
-              ::dealii::MemorySpace::Device::kokkos_space::execution_space>(
+              ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
               exec, 0, size),
             KOKKOS_LAMBDA(size_type i, RealType & update) {
 #if KOKKOS_VERSION < 30400
@@ -979,7 +980,8 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          if (std::is_same<MemorySpaceType, dealii::MemorySpace::Device>::value)
+          if (std::is_same<MemorySpaceType,
+                           dealii::MemorySpace::Default>::value)
             {
               if (import_data.values_host_buffer.size() == 0)
                 Kokkos::resize(import_data.values_host_buffer,
@@ -995,7 +997,7 @@ namespace LinearAlgebra
         }
 
 #  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      if (std::is_same<MemorySpaceType, dealii::MemorySpace::Device>::value)
+      if (std::is_same<MemorySpaceType, dealii::MemorySpace::Default>::value)
         {
           // Move the data to the host and then move it back to the
           // device. We use values to store the elements because the function
@@ -1052,7 +1054,7 @@ namespace LinearAlgebra
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
 #  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      if (std::is_same<MemorySpaceType, MemorySpace::Device>::value)
+      if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
         {
           Assert(partitioner->n_import_indices() == 0 ||
                    import_data.values_host_buffer.size() != 0,
@@ -1096,7 +1098,6 @@ namespace LinearAlgebra
                 partitioner->n_ghost_indices()),
               compress_requests);
         }
-
 #else
       (void)operation;
 #endif
@@ -1123,7 +1124,7 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          if (std::is_same<MemorySpaceType, MemorySpace::Device>::value)
+          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
             {
               if (import_data.values_host_buffer.size() == 0)
                 Kokkos::resize(import_data.values_host_buffer,
@@ -1144,7 +1145,7 @@ namespace LinearAlgebra
         }
 
 #  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      if (std::is_same<MemorySpaceType, MemorySpace::Device>::value)
+      if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
         {
           // Move the data to the host and then move it back to the
           // device. We use values to store the elements because the function
@@ -1206,7 +1207,7 @@ namespace LinearAlgebra
           std::lock_guard<std::mutex> lock(mutex);
 
 #  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          if (std::is_same<MemorySpaceType, MemorySpace::Device>::value)
+          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
             {
               partitioner->export_to_ghosted_array_finish(
                 ArrayView<Number, MemorySpace::Host>(

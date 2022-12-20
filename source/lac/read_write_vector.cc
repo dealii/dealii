@@ -48,7 +48,7 @@ namespace LinearAlgebra
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
   ReadWriteVector<float>::import(
-    const distributed::Vector<float, ::dealii::MemorySpace::Device> &,
+    const distributed::Vector<float, ::dealii::MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 
@@ -59,7 +59,7 @@ namespace LinearAlgebra
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
   ReadWriteVector<double>::import(
-    const distributed::Vector<double, ::dealii::MemorySpace::Device> &,
+    const distributed::Vector<double, ::dealii::MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES

@@ -65,6 +65,9 @@
 #
 # The following variables must be set:
 #
+#  BASH
+#     - Complete path to the bash shell.
+#
 #   NUMDIFF_EXECUTABLE
 #     - Complete path to the numdiff binary.
 #
@@ -103,8 +106,22 @@
 #     deal_ii_add_test(category test_name comparison_file)
 #
 
-function(deal_ii_add_test _category _test_name _comparison_file)
+#
+# A small helper macro that is used below:
+#
 
+macro(item_matches _var _regex)
+  set(${_var})
+  foreach (_item ${ARGN})
+    if("${_item}" MATCHES ${_regex})
+      set(${_var} TRUE)
+      break()
+    endif()
+  endforeach()
+endmacro()
+
+
+function(deal_ii_add_test _category _test_name _comparison_file)
   if(NOT TARGET compile_test_executables)
     add_custom_target(compile_test_executables)
   endif()
@@ -450,9 +467,8 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       #
 
       add_custom_command(OUTPUT ${_test_directory}/output
-        COMMAND TEST_N_THREADS=${_n_threads}
-          sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          run "${_test_full}" ${_run_args}
+        COMMAND ${BASH} ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+          run "${_test_full}" TEST_N_THREADS=${_n_threads} ${_run_args}
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
           ${_test_directory}/output
@@ -478,7 +494,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         file(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
 
         add_custom_command(OUTPUT ${_test_directory}/diff
-          COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+          COMMAND ${BASH} ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
             diff "${_test_full}" "${NUMDIFF_EXECUTABLE}"
             "${_comparison_file}" ${_run_args}
           WORKING_DIRECTORY

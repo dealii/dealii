@@ -52,9 +52,9 @@ test()
   local_relevant.add_range(min_index + 38, min_index + 40);
   local_relevant.add_range(min_index + 41, min_index + 43);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
-  Kokkos::View<double *, MemorySpace::Device::kokkos_space> v_view(
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> v_view(
     v.get_values(), local_relevant.n_elements());
 
   deallog << "Local range of proc 0: "

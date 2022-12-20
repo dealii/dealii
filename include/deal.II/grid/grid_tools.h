@@ -607,11 +607,11 @@ namespace GridTools
    * stated there hold for this function as well; in particular,
    * this is true about the discussion about manifolds.
    *
-   * @note This function is only supported for dim=2.
+   * @note This function is only supported for spacedim=2.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  rotate(const double angle, Triangulation<dim> &triangulation);
+  rotate(const double angle, Triangulation<dim, spacedim> &triangulation);
 
   /**
    * Rotate all vertices of the given @p triangulation in counter-clockwise

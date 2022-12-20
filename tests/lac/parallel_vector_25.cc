@@ -53,15 +53,15 @@ test()
   vec_ref.compress(VectorOperation::insert);
 
   auto partitioner = vec_ref.get_partitioner();
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Device> vec_dev(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> vec_dev(
     partitioner);
   LinearAlgebra::distributed::Vector<double, MemorySpace::Host> vec_host(
     partitioner);
 
-  // Assignment from Host to Device
+  // Assignment from Host to Default
   vec_dev.import(vec_ref, VectorOperation::insert);
 
-  // Assignment from Device to Host
+  // Assignment from Default to Host
   vec_host.import(vec_dev, VectorOperation::insert);
 
   for (unsigned int i = 0; i < ghost_size; ++i)

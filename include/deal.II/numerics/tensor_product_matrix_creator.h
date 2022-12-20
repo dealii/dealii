@@ -100,6 +100,19 @@ namespace TensorProductMatrixCreator
   namespace internal
   {
     template <typename Number>
+    void
+    clear_row_and_column(const unsigned int  n_dofs_1D_with_overlap,
+                         const unsigned int  n,
+                         FullMatrix<Number> &matrix)
+    {
+      for (unsigned int i = 0; i < n_dofs_1D_with_overlap; ++i)
+        {
+          matrix[i][n] = 0.0;
+          matrix[n][i] = 0.0;
+        }
+    }
+
+    template <typename Number>
     std::tuple<FullMatrix<Number>, FullMatrix<Number>, bool>
     create_reference_mass_and_stiffness_matrices(
       const FiniteElement<1> &fe,
@@ -150,7 +163,8 @@ namespace TensorProductMatrixCreator
                  fe_values.JxW(q_index));
             }
 
-      return {mass_matrix_reference, derivative_matrix_reference, false};
+      return std::tuple<FullMatrix<Number>, FullMatrix<Number>, bool>{
+        mass_matrix_reference, derivative_matrix_reference, false};
     }
   } // namespace internal
 
@@ -191,14 +205,6 @@ namespace TensorProductMatrixCreator
     std::array<FullMatrix<Number>, dim> Ms;
     std::array<FullMatrix<Number>, dim> Ks;
 
-    const auto clear_row_and_column = [&](const unsigned int n, auto &matrix) {
-      for (unsigned int i = 0; i < n_dofs_1D_with_overlap; ++i)
-        {
-          matrix[i][n] = 0.0;
-          matrix[n][i] = 0.0;
-        }
-    };
-
     for (unsigned int d = 0; d < dim; ++d)
       {
         Ms[d].reinit(n_dofs_1D_with_overlap, n_dofs_1D_with_overlap);
@@ -235,8 +241,12 @@ namespace TensorProductMatrixCreator
               {
                 // left DBC
                 const unsigned i0 = n_overlap - 1;
-                clear_row_and_column(i0, Ms[d]);
-                clear_row_and_column(i0, Ks[d]);
+                internal::clear_row_and_column(n_dofs_1D_with_overlap,
+                                               i0,
+                                               Ms[d]);
+                internal::clear_row_and_column(n_dofs_1D_with_overlap,
+                                               i0,
+                                               Ks[d]);
               }
             else if (boundary_ids[d][0] == LaplaceBoundaryType::neumann)
               {
@@ -268,8 +278,12 @@ namespace TensorProductMatrixCreator
               {
                 // right DBC
                 const unsigned i0 = n_overlap + n_dofs_1D - 2;
-                clear_row_and_column(i0, Ms[d]);
-                clear_row_and_column(i0, Ks[d]);
+                internal::clear_row_and_column(n_dofs_1D_with_overlap,
+                                               i0,
+                                               Ms[d]);
+                internal::clear_row_and_column(n_dofs_1D_with_overlap,
+                                               i0,
+                                               Ks[d]);
               }
             else if (boundary_ids[d][1] == LaplaceBoundaryType::neumann)
               {
