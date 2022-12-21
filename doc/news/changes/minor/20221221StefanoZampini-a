@@ -1,0 +1,3 @@
+New: Allow the construction of a deal.II PETSc matrices from a PETSc Mat.
+<br>
+(Stefano Zampini, 2022/12/21)
