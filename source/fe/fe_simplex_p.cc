@@ -20,9 +20,11 @@
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/fe_wedge_p.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -668,22 +670,14 @@ FE_SimplexP<dim, spacedim>::compare_for_domination(
   // (if fe_other is not derived from FE_SimplexDGP)
   // & cell domination
   // ----------------------------------------
-  if (const FE_SimplexP<dim, spacedim> *fe_p_other =
-        dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
+  if (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other) ||
+      dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other) ||
+      dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other) ||
+      dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
     {
-      if (this->degree < fe_p_other->degree)
+      if (this->degree < fe_other.degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_p_other->degree)
-        return FiniteElementDomination::either_element_can_dominate;
-      else
-        return FiniteElementDomination::other_element_dominates;
-    }
-  else if (const FE_Q<dim, spacedim> *fe_q_other =
-             dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
-    {
-      if (this->degree < fe_q_other->degree)
-        return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_other->degree)
+      else if (this->degree == fe_other.degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -711,8 +705,6 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_SimplexP<dim, spacedim>::hp_vertex_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  AssertDimension(dim, 2);
-
   if (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other) != nullptr)
     {
       // there should be exactly one single DoF of each FE at a vertex, and
@@ -720,6 +712,19 @@ FE_SimplexP<dim, spacedim>::hp_vertex_dof_identities(
       return {{0U, 0U}};
     }
   else if (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other) != nullptr)
+    {
+      // there should be exactly one single DoF of each FE at a vertex, and
+      // they should have identical value
+      return {{0U, 0U}};
+    }
+  else if (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other) !=
+           nullptr)
+    {
+      // there should be exactly one single DoF of each FE at a vertex, and
+      // they should have identical value
+      return {{0U, 0U}};
+    }
+  else if (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other) != nullptr)
     {
       // there should be exactly one single DoF of each FE at a vertex, and
       // they should have identical value
@@ -756,40 +761,56 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  AssertDimension(dim, 2);
-
-  if (const FE_SimplexP<dim, spacedim> *fe_p_other =
+  if (const auto *fe_p_other =
         dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
     {
-      // dofs are located along lines, so two dofs are identical if they are
-      // located at identical positions.
-      // Therefore, read the points in unit_support_points for the
-      // first coordinate direction. For FE_SimplexP, they are currently
-      // hard-coded and we iterate over points on the first line which begin
-      // after the 3 vertex points in the complete list of unit support points
-
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
         for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
-          if (std::fabs(this->unit_support_points[i + 3][0] -
-                        fe_p_other->unit_support_points[i + 3][0]) < 1e-14)
+          if (std::fabs(this->unit_support_points[i + this->reference_cell()
+                                                        .n_vertices()][0] -
+                        fe_p_other->unit_support_points
+                          [i + this->reference_cell().n_vertices()][0]) < 1e-14)
             identities.emplace_back(i, j);
-          else
-            {
-              // If nodes are not located in the same place, we have to
-              // interpolate. This is then not handled through the
-              // current function, but via interpolation matrices that
-              // result in constraints, rather than identities. Since
-              // that happens in a different function, there is nothing
-              // for us to do here.
-            }
 
       return identities;
     }
-  else if (const FE_Q<dim, spacedim> *fe_q_other =
+  else if (const auto *fe_p_other =
+             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+    {
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+      for (unsigned int i = 0; i < this->degree - 1; ++i)
+        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
+          if (std::fabs(this->unit_support_points[i + this->reference_cell()
+                                                        .n_vertices()][0] -
+                        fe_p_other->get_unit_support_points()
+                          [i + this->reference_cell().n_vertices()][1]) < 1e-14)
+            identities.emplace_back(i, j);
+
+      return identities;
+    }
+  else if (const auto *fe_p_other =
+             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+    {
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+      for (unsigned int i = 0; i < this->degree - 1; ++i)
+        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
+          if (std::fabs(this->unit_support_points[i + this->reference_cell()
+                                                        .n_vertices()][0] -
+                        fe_p_other->get_unit_support_points()
+                          [i + this->reference_cell().n_vertices()][0]) < 1e-14)
+            identities.emplace_back(i, j);
+
+      return identities;
+    }
+  else if (const auto *fe_q_other =
              dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other))
     {
+      AssertDimension(dim, 2);
+
       // dofs are located along lines, so two dofs are identical if they are
       // located at identical positions. if we had only equidistant points, we
       // could simply check for similarity like (i+1)*q == (j+1)*p, but we
