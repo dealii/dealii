@@ -1224,13 +1224,8 @@ namespace internal
           if (tria_level.dim == 2 || tria_level.dim == 3)
             {
               const unsigned int max_faces_per_cell = 2 * dimension;
-              tria_level.face_orientations.reserve(total_cells *
-                                                   max_faces_per_cell);
-              tria_level.face_orientations.insert(
-                tria_level.face_orientations.end(),
-                total_cells * max_faces_per_cell -
-                  tria_level.face_orientations.size(),
-                1u);
+              tria_level.face_orientations.resize(total_cells *
+                                                  max_faces_per_cell);
 
               tria_level.reference_cell.reserve(total_cells);
               tria_level.reference_cell.insert(
@@ -2415,9 +2410,9 @@ namespace internal
                   // set face orientation if needed
                   if (orientation_needed)
                     {
-                      level.face_orientations
-                        [cell * GeometryInfo<dim>::faces_per_cell + j] =
-                        connectivity.entity_orientations(dim - 1)[i];
+                      level.face_orientations.set_raw_orientation(
+                        cell * GeometryInfo<dim>::faces_per_cell + j,
+                        connectivity.entity_orientations(dim - 1)[i]);
                     }
                 }
             }
@@ -2658,7 +2653,8 @@ namespace internal
         level.reference_cell.assign(size, dealii::ReferenceCells::Invalid);
 
         if (orientation_needed)
-          level.face_orientations.assign(size * max_faces_per_cell, -1);
+          level.face_orientations.reinit(size * max_faces_per_cell);
+
 
         level.global_active_cell_indices.assign(size,
                                                 numbers::invalid_dof_index);
@@ -4340,9 +4336,11 @@ namespace internal
                   if (new_lines[line_no]->vertex_index(1) !=
                       new_vertices[vertex_no])
                     triangulation.levels[subcells[subcell_no]->level()]
-                      ->face_orientations[subcells[subcell_no]->index() *
-                                            GeometryInfo<2>::faces_per_cell +
-                                          subcell_line_no] = 0;
+                      ->face_orientations.set_raw_orientation(
+                        subcells[subcell_no]->index() *
+                            GeometryInfo<2>::faces_per_cell +
+                          subcell_line_no,
+                        0u);
                 };
 
               fix_line_orientation(0, 3, 0, 0);
@@ -5824,10 +5822,10 @@ namespace internal
                                   ->line(
                                     table[triangulation.levels[hex->level()]
                                             ->face_orientations
-                                              [hex->index() *
-                                                 GeometryInfo<
-                                                   dim>::faces_per_cell +
-                                               f]][l]);
+                                            .get_raw_orientation(
+                                              hex->index() * GeometryInfo<dim>::
+                                                               faces_per_cell +
+                                              f)][l]);
                             }
 
                         relevant_lines[k++] = new_lines[0];
@@ -6012,10 +6010,10 @@ namespace internal
                                       c,
                                       f,
                                       triangulation.levels[hex->level()]
-                                        ->face_orientations
-                                          [hex->index() *
-                                             GeometryInfo<dim>::faces_per_cell +
-                                           f]));
+                                        ->face_orientations.get_raw_orientation(
+                                          hex->index() *
+                                            GeometryInfo<dim>::faces_per_cell +
+                                          f)));
                             }
                       }
                     else
@@ -14602,7 +14600,8 @@ Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                    face_iter->line(1)->vertex_index(line_orientations[1])}};
 
                 const unsigned char orientate =
-                  levels[l]->face_orientations[cell->index() * 6 + face];
+                  levels[l]->face_orientations.get_raw_orientation(
+                    cell->index() * 6 + face);
                 std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0, face, orientate),
                    ref_cell.standard_to_real_face_vertex(1, face, orientate),

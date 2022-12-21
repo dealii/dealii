@@ -23,6 +23,7 @@
 
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_objects.h>
+#include <deal.II/grid/tria_objects_orientations.h>
 
 #include <boost/serialization/utility.hpp>
 
@@ -215,7 +216,7 @@ namespace internal
        *
        * @note Only needed for dim=3.
        */
-      std::vector<unsigned char> face_orientations;
+      TriaObjectsOrientations face_orientations;
 
       /**
        * Reference cell type of each cell.
