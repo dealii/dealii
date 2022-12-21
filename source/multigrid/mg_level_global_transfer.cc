@@ -387,14 +387,20 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::clear()
 {
   sizes.resize(0);
   copy_indices.clear();
+  solution_copy_indices.clear();
   copy_indices_global_mine.clear();
+  solution_copy_indices_global_mine.clear();
   copy_indices_level_mine.clear();
+  solution_copy_indices_level_mine.clear();
   component_to_block_map.resize(0);
   mg_constrained_dofs = nullptr;
   ghosted_global_vector.reinit(0);
+  solution_ghosted_global_vector.reinit(0);
   ghosted_level_vector.resize(0, 0);
+  solution_ghosted_level_vector.resize(0, 0);
   perform_plain_copy            = false;
   perform_renumbered_plain_copy = false;
+  initialize_dof_vector         = nullptr;
 }
 
 

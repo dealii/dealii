@@ -109,10 +109,9 @@ MGTransferMatrixFree<dim, Number>::build(
            "probably close to where you already call distribute_dofs()."));
   if (external_partitioners.size() > 0)
     {
-      Assert(
-        this->initialize_dof_vector == nullptr,
-        ExcMessage(
-          "A initialize_dof_vector function has already been registered in the constructor!"));
+      Assert(this->initialize_dof_vector == nullptr,
+             ExcMessage("An initialize_dof_vector function has already "
+                        "been registered in the constructor!"));
 
       this->initialize_dof_vector =
         [external_partitioners](
