@@ -778,6 +778,14 @@ namespace PETScWrappers
     operator const Vec &() const;
 
     /**
+     * Return a reference to the underlying PETSc type. It can be used to
+     * modify the underlying data, so use it only when you know what you
+     * are doing.
+     */
+    Vec &
+    petsc_vector();
+
+    /**
      * Estimate for the memory consumption (not implemented for this class).
      */
     std::size_t
@@ -1197,8 +1205,8 @@ namespace PETScWrappers
         ierr = VecGetSize(locally_stored_elements, &lsize);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        PetscScalar *ptr;
-        ierr = VecGetArray(locally_stored_elements, &ptr);
+        const PetscScalar *ptr;
+        ierr = VecGetArrayRead(locally_stored_elements, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         for (PetscInt i = 0; i < n_idx; ++i)
@@ -1221,7 +1229,7 @@ namespace PETScWrappers
               }
           }
 
-        ierr = VecRestoreArray(locally_stored_elements, &ptr);
+        ierr = VecRestoreArrayRead(locally_stored_elements, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         ierr = VecGhostRestoreLocalForm(vector, &locally_stored_elements);
@@ -1236,8 +1244,8 @@ namespace PETScWrappers
         PetscErrorCode ierr = VecGetOwnershipRange(vector, &begin, &end);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        PetscScalar *ptr;
-        ierr = VecGetArray(vector, &ptr);
+        const PetscScalar *ptr;
+        ierr = VecGetArrayRead(vector, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         for (PetscInt i = 0; i < n_idx; ++i)
@@ -1258,7 +1266,7 @@ namespace PETScWrappers
             *(values_begin + i) = *(ptr + index - begin);
           }
 
-        ierr = VecRestoreArray(vector, &ptr);
+        ierr = VecRestoreArrayRead(vector, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
   }

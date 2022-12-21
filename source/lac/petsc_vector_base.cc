@@ -58,8 +58,8 @@ namespace PETScWrappers
           ierr = VecGetSize(locally_stored_elements, &lsize);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-          PetscScalar *ptr;
-          ierr = VecGetArray(locally_stored_elements, &ptr);
+          const PetscScalar *ptr;
+          ierr = VecGetArrayRead(locally_stored_elements, &ptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
           PetscScalar value;
@@ -85,7 +85,7 @@ namespace PETScWrappers
               value = *(ptr + ghostidx + end - begin);
             }
 
-          ierr = VecRestoreArray(locally_stored_elements, &ptr);
+          ierr = VecRestoreArrayRead(locally_stored_elements, &ptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
           ierr =
@@ -454,8 +454,8 @@ namespace PETScWrappers
 
     // get a representation of the vector and
     // loop over all the elements
-    PetscScalar *  start_ptr;
-    PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
+    const PetscScalar *start_ptr;
+    PetscErrorCode     ierr = VecGetArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     PetscScalar mean = 0;
@@ -483,7 +483,7 @@ namespace PETScWrappers
 
     // restore the representation of the
     // vector
-    ierr = VecRestoreArray(vector, &start_ptr);
+    ierr = VecRestoreArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return mean;
@@ -521,8 +521,8 @@ namespace PETScWrappers
   {
     // get a representation of the vector and
     // loop over all the elements
-    PetscScalar *  start_ptr;
-    PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
+    const PetscScalar *start_ptr;
+    PetscErrorCode     ierr = VecGetArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     real_type norm = 0;
@@ -550,7 +550,7 @@ namespace PETScWrappers
 
     // restore the representation of the
     // vector
-    ierr = VecRestoreArray(vector, &start_ptr);
+    ierr = VecRestoreArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return norm;
@@ -603,8 +603,8 @@ namespace PETScWrappers
   {
     // get a representation of the vector and
     // loop over all the elements
-    PetscScalar *  start_ptr;
-    PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
+    const PetscScalar *start_ptr;
+    PetscErrorCode     ierr = VecGetArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const PetscScalar *ptr  = start_ptr,
@@ -622,7 +622,7 @@ namespace PETScWrappers
 
     // restore the representation of the
     // vector
-    ierr = VecRestoreArray(vector, &start_ptr);
+    ierr = VecRestoreArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return flag;
@@ -657,8 +657,8 @@ namespace PETScWrappers
   {
     // get a representation of the vector and
     // loop over all the elements
-    PetscScalar *  start_ptr;
-    PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
+    const PetscScalar *start_ptr;
+    PetscErrorCode     ierr = VecGetArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const PetscScalar *ptr  = start_ptr,
@@ -676,7 +676,7 @@ namespace PETScWrappers
 
     // restore the representation of the
     // vector
-    ierr = VecRestoreArray(vector, &start_ptr);
+    ierr = VecRestoreArrayRead(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return flag;
@@ -845,14 +845,15 @@ namespace PETScWrappers
   VectorBase::write_ascii(const PetscViewerFormat format)
   {
     // TODO[TH]:assert(is_compressed())
+    MPI_Comm comm = PetscObjectComm((PetscObject)vector);
 
     // Set options
     PetscErrorCode ierr =
-      PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, format);
+      PetscViewerSetFormat(PETSC_VIEWER_STDOUT_(comm), format);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
-    ierr = VecView(vector, PETSC_VIEWER_STDOUT_WORLD);
+    ierr = VecView(vector, PETSC_VIEWER_STDOUT_(comm));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -868,8 +869,8 @@ namespace PETScWrappers
 
     // get a representation of the vector and
     // loop over all the elements
-    PetscScalar *  val;
-    PetscErrorCode ierr = VecGetArray(vector, &val);
+    const PetscScalar *val;
+    PetscErrorCode     ierr = VecGetArrayRead(vector, &val);
 
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -897,7 +898,7 @@ namespace PETScWrappers
 
     // restore the representation of the
     // vector
-    ierr = VecRestoreArray(vector, &val);
+    ierr = VecRestoreArrayRead(vector, &val);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     AssertThrow(out.fail() == false, ExcIO());
@@ -913,8 +914,14 @@ namespace PETScWrappers
   }
 
 
-
   VectorBase::operator const Vec &() const
+  {
+    return vector;
+  }
+
+
+  Vec &
+  VectorBase::petsc_vector()
   {
     return vector;
   }

@@ -149,7 +149,7 @@ namespace PETScWrappers
                      const unsigned int local_rows,
                      const unsigned int local_columns)
   {
-    reinit(MPI_COMM_WORLD, m, n, local_rows, local_columns);
+    reinit(this->communicator, m, n, local_rows, local_columns);
   }
 
 
@@ -161,7 +161,7 @@ namespace PETScWrappers
                      const std::vector<unsigned int> &local_columns_per_process,
                      const unsigned int               this_process)
   {
-    reinit(MPI_COMM_WORLD,
+    reinit(this->communicator,
            m,
            n,
            local_rows_per_process,

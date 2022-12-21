@@ -639,20 +639,33 @@ namespace PETScWrappers
   MatrixBase::write_ascii(const PetscViewerFormat format)
   {
     assert_is_compressed();
+    MPI_Comm comm = PetscObjectComm(reinterpret_cast<PetscObject>(matrix));
 
     // Set options
     PetscErrorCode ierr =
-      PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, format);
+      PetscViewerSetFormat(PETSC_VIEWER_STDOUT_(comm), format);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
-    ierr = MatView(matrix, PETSC_VIEWER_STDOUT_WORLD);
+    ierr = MatView(matrix, PETSC_VIEWER_STDOUT_(comm));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
   void
   MatrixBase::print(std::ostream &out, const bool /*alternative_output*/) const
   {
+    PetscBool has;
+
+    PetscErrorCode ierr = MatHasOperation(matrix, MATOP_GET_ROW, &has);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    Mat vmatrix = matrix;
+    if (!has)
+      {
+        ierr = MatConvert(matrix, MATAIJ, MAT_INITIAL_MATRIX, &vmatrix);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+
     std::pair<MatrixBase::size_type, MatrixBase::size_type> loc_range =
       local_range();
 
@@ -663,7 +676,7 @@ namespace PETScWrappers
     MatrixBase::size_type row;
     for (row = loc_range.first; row < loc_range.second; ++row)
       {
-        PetscErrorCode ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+        ierr = MatGetRow(vmatrix, row, &ncols, &colnums, &values);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         for (PetscInt col = 0; col < ncols; ++col)
@@ -672,10 +685,14 @@ namespace PETScWrappers
                 << std::endl;
           }
 
-        ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
+        ierr = MatRestoreRow(vmatrix, row, &ncols, &colnums, &values);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
-
+    if (vmatrix != matrix)
+      {
+        ierr = PETScWrappers::destroy_matrix(vmatrix);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
     AssertThrow(out.fail() == false, ExcIO());
   }
 

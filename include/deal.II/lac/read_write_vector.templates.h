@@ -557,16 +557,16 @@ namespace LinearAlgebra
            StandardExceptions::ExcInvalidState());
 
     // get a representation of the vector and copy it
-    PetscScalar *  start_ptr;
-    PetscErrorCode ierr =
-      VecGetArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
+    const PetscScalar *start_ptr;
+    PetscErrorCode     ierr =
+      VecGetArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const size_type vec_size = petsc_vec.locally_owned_size();
     internal::copy_petsc_vector(start_ptr, start_ptr + vec_size, begin());
 
     // restore the representation of the vector
-    ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
+    ierr = VecRestoreArrayRead(static_cast<const Vec &>(petsc_vec), &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 #endif
