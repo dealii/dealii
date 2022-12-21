@@ -1118,19 +1118,12 @@ namespace internal
       if (new_size > tria_faces.quads.n_objects())
         {
           // reserve the field of the derived class
-          tria_faces.quads_line_orientations.reserve(
-            new_size * GeometryInfo<2>::lines_per_cell);
-          tria_faces.quads_line_orientations.insert(
-            tria_faces.quads_line_orientations.end(),
-            new_size * GeometryInfo<2>::lines_per_cell -
-              tria_faces.quads_line_orientations.size(),
-            1u);
+          tria_faces.quads_line_orientations.resize(
+            new_size * GeometryInfo<2>::lines_per_cell, true);
 
-          tria_faces.quad_reference_cell.reserve(new_size);
-          tria_faces.quad_reference_cell.insert(
-            tria_faces.quad_reference_cell.end(),
-            new_size - tria_faces.quad_reference_cell.size(),
-            dealii::ReferenceCells::Quadrilateral);
+          auto &q_is_q = tria_faces.quad_is_quadrilateral;
+          q_is_q.reserve(new_size);
+          q_is_q.insert(q_is_q.end(), new_size - q_is_q.size(), true);
         }
     }
 
@@ -2347,7 +2340,7 @@ namespace internal
             for (unsigned int q = 0, k = 0; q < n_quads; ++q)
               {
                 // set entity type of quads
-                faces.quad_reference_cell[q] = connectivity.entity_types(2)[q];
+                faces.set_quad_type(q, connectivity.entity_types(2)[q]);
 
                 // loop over all its lines
                 for (unsigned int i = crs.ptr[q], j = 0; i < crs.ptr[q + 1];
@@ -2358,9 +2351,15 @@ namespace internal
                       crs.col[i];
 
                     // set line orientations
+                    const unsigned char raw_orientation =
+                      connectivity.entity_orientations(1)[k];
+                    // it doesn't make sense to set any flags except
+                    // orientation for a line
+                    Assert(raw_orientation == 0u || raw_orientation == 1u,
+                           ExcInternalError());
                     faces.quads_line_orientations
                       [q * GeometryInfo<2>::faces_per_cell + j] =
-                      connectivity.entity_orientations(1)[k];
+                      raw_orientation == 1u;
                   }
               }
           }
@@ -2622,11 +2621,11 @@ namespace internal
         if (dim == 3 && structdim == 2)
           {
             // quad entity types
-            faces.quad_reference_cell.assign(size,
-                                             dealii::ReferenceCells::Invalid);
+            faces.quad_is_quadrilateral.assign(size, true);
 
             // quad line orientations
-            faces.quads_line_orientations.assign(size * max_faces_per_cell, -1);
+            faces.quads_line_orientations.assign(size * max_faces_per_cell,
+                                                 true);
           }
       }
 
@@ -5477,8 +5476,8 @@ namespace internal
 
                   // TODO: we assume here that all children have the same type
                   // as the parent
-                  triangulation.faces->quad_reference_cell[new_quad->index()] =
-                    reference_face_type;
+                  triangulation.faces->set_quad_type(new_quad->index(),
+                                                     reference_face_type);
 
                   if (reference_face_type == ReferenceCells::Triangle)
                     new_quad->set_bounding_object_indices(
@@ -5634,11 +5633,9 @@ namespace internal
 
                     // TODO: faces of children have the same type as the faces
                     //  of the parent
-                    triangulation.faces
-                      ->quad_reference_cell[new_quad->index()] =
-                      (reference_cell_type == ReferenceCells::Hexahedron) ?
-                        ReferenceCells::Quadrilateral :
-                        ReferenceCells::Triangle;
+                    triangulation.faces->set_quad_type(
+                      new_quad->index(),
+                      reference_cell_type.face_reference_cell(0));
 
                     AssertIsNotUsed(new_quad);
                     new_quad->set_used_flag();
