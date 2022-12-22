@@ -86,7 +86,7 @@ namespace PETScWrappers
       /**
        * Default constructor. Generate an empty vector without any blocks.
        */
-      BlockVector() = default;
+      BlockVector();
 
       /**
        * Constructor. Generate a block vector with @p n_blocks blocks, each of
@@ -318,17 +318,24 @@ namespace PETScWrappers
       void
       setup_nest_vec();
 
-      Vec petsc_nest_vector = nullptr;
+      Vec petsc_nest_vector;
     };
 
     /** @} */
 
     /*--------------------- Inline functions --------------------------------*/
 
+    inline BlockVector::BlockVector()
+      : petsc_nest_vector(nullptr)
+    {}
+
+
+
     inline BlockVector::BlockVector(const unsigned int n_blocks,
                                     const MPI_Comm &   communicator,
                                     const size_type    block_size,
                                     const size_type    locally_owned_size)
+      : petsc_nest_vector(nullptr)
     {
       reinit(n_blocks, communicator, block_size, locally_owned_size);
     }
@@ -339,6 +346,7 @@ namespace PETScWrappers
       const std::vector<size_type> &block_sizes,
       const MPI_Comm &              communicator,
       const std::vector<size_type> &local_elements)
+      : petsc_nest_vector(nullptr)
     {
       reinit(block_sizes, communicator, local_elements, false);
     }
@@ -346,6 +354,7 @@ namespace PETScWrappers
 
     inline BlockVector::BlockVector(const BlockVector &v)
       : BlockVectorBase<Vector>()
+      , petsc_nest_vector(nullptr)
     {
       this->block_indices = v.block_indices;
 
@@ -359,6 +368,7 @@ namespace PETScWrappers
     inline BlockVector::BlockVector(
       const std::vector<IndexSet> &parallel_partitioning,
       const MPI_Comm &             communicator)
+      : petsc_nest_vector(nullptr)
     {
       reinit(parallel_partitioning, communicator);
     }
@@ -367,12 +377,14 @@ namespace PETScWrappers
       const std::vector<IndexSet> &parallel_partitioning,
       const std::vector<IndexSet> &ghost_indices,
       const MPI_Comm &             communicator)
+      : petsc_nest_vector(nullptr)
     {
       reinit(parallel_partitioning, ghost_indices, communicator);
     }
 
     inline BlockVector::BlockVector(Vec v)
       : BlockVectorBase<Vector>()
+      , petsc_nest_vector(nullptr)
     {
       this->assign_petsc_vector(v);
     }
