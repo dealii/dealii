@@ -155,8 +155,12 @@ namespace PETScWrappers
       operator=(const BlockVector &V);
 
       /**
-       * This method assigns the PETSc Vec to the instance of the class.
+       * This method assigns the given PETSc Vec to the instance of the class.
        *
+       * Note that the vector is not copied: instead, the instance of this class
+       * is initialized to use the given vector. This is useful if you want to
+       * interpret a PETSc vector as a deal.II vector, and you already have a
+       * BlockVector that you want to use for this purpose.
        */
       void
       assign_petsc_vector(Vec v);
