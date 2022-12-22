@@ -328,9 +328,9 @@ namespace PETScWrappers
     operator=(const PetscScalar s);
 
     /**
-     * This method assignes the PETSc Vec to the instance of the class.
-     * This is particularly useful when performing PETSc to Deal.II operations
-     * since it allows to reuse the Deal.II VectorBase and the PETSc Vec
+     * This method assigns the PETSc Vec to the instance of the class.
+     * This is particularly useful when performing PETSc to deal.II operations
+     * since it allows one to reuse the VectorBase and the PETSc Vec
      * without incurring in memory copies.
      */
     void

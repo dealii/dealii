@@ -155,7 +155,7 @@ namespace PETScWrappers
       operator=(const BlockVector &V);
 
       /**
-       * This method assignes the PETSc Vec to the instance of the class.
+       * This method assigns the PETSc Vec to the instance of the class.
        *
        */
       void
