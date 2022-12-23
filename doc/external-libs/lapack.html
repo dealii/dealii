@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+  <head>
+    <title>The deal.II Readme on interfacing to BLAS/LAPACK</title>
+    <link href="../screen.css" rel="StyleSheet">
+    <meta name="copyright" content="Copyright (C) 2010 - 2017 by the deal.II authors">
+    <meta name="keywords" content="deal.II">
+  </head>
+  <body>
+
+    <h2>Installation of <acronym>BLAS/LAPACK</acronym></h2>
+
+    <p>
+      <a href="https://netlib.org/lapack/">LAPACK</a>
+      is a library of Fortran subroutines for solving the most
+      commonly occurring problems in numerical linear algebra.
+      LAPACK reference implementation is available on
+      <a href="https://github.com/Reference-LAPACK/lapack">GitHub</a>,
+      corresponding releases are available on
+      <a href="https://netlib.org/lapack/">netlib</a>.
+      It is worth noting that there are further implementations of BLAS/LAPACK
+      libraries, such as <a href="https://github.com/xianyi/OpenBLAS">OpenBLAS</a> and
+      <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html#gs.m4jlqg">Intel MKL</a>,
+    </p>
+
+    <p>
+      <a href="https://netlib.org/lapack/">LAPACK</a> and
+      <a href="https://netlib.org/blas/">BLAS</a> are packaged and
+      distributed by distros such as Debian, Ubuntu, Pop!OS, CentOS and others.
+
+      It is recommended to install these packages using apt or yum package
+      managers. They can be installed on Debian or Ubuntu systems using
+      the following commands.
+      <pre>
+        sudo apt update && sudo apt upgrade
+        sudo apt install libblas3 libblas-dev
+        sudo apt install liblapack3 liblapack-dev
+      </pre>
+    </p>
+
+    <p>
+      Below is a short summary of instructions on how to compile and install
+      <acronym>LAPACK</acronym> by hand (for the case you wish to do so).
+    </p>
+
+    <h3>How to compile and install <acronym>LAPACK</acronym> by hand</h3>
+
+    <p>
+      First clone the <a href="https://github.com/Reference-LAPACK/lapack">LAPACK</a>
+      repository. And configure cmake to build lapack as a shared library.
+      The following commands will result in a set of .so files or shared library
+      files installed in the path specified with CMAKE_INSTALL_LIBDIR flag :
+
+      <pre>
+        cd lapack
+        mkdir build
+        cd build
+        cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=$HOME/.local/lapack ../
+        make install
+      </pre>
+
+      After successful execution of above set of commands, a list of .so files
+      such as libblas.so, libblas.so.3, liblapack.so, liblapack.so.3 are
+      generated.
+    </p>
+
+    <h2>Interfacing <acronym>deal.II</acronym>
+      to <acronym>LAPACK</acronym></h2>
+
+    <p>
+      Support for <acronym>LAPACK</acronym> will be
+      enabled automatically if a system wide installation of
+      <acronym>LAPACK</acronym> can be found.
+      To use a self compiled version, specify
+      <pre>
+    -DLAPACK_DIR=/path/to/lapack-installation
+      </pre>
+      when invoking <code>cmake</code>, for example,
+
+      <pre>
+        git clone https://github.com/dealii/dealii.git
+        cd dealii
+        mkdir build
+        cd build
+        cmake -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR=$HOME/.local/lapack/ ../
+        make
+      </pre>
+
+    </p>
+    <p>
+      You can override the autodetection by manually setting
+      <pre>
+    -DDEAL_II_WITH_LAPACK=OFF|ON
+      </pre>
+    </p>
+
+    <hr />
+    <div class="right">
+      <a href="http://validator.w3.org/check?uri=referer" target="_top">
+        <img style="border:0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"></a>
+      <a href="http://jigsaw.w3.org/css-validator/check/referer" target="_top">
+        <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!"></a>
+    </div>
+
+  </body>
+</html>
