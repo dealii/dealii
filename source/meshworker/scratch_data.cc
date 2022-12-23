@@ -438,6 +438,25 @@ namespace MeshWorker
   ScratchData<dim, spacedim>::reinit(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator
+      &                cell_neighbor,
+    const unsigned int face_no_neighbor)
+  {
+    return reinit(cell,
+                  face_no,
+                  numbers::invalid_unsigned_int,
+                  cell_neighbor,
+                  face_no_neighbor,
+                  numbers::invalid_unsigned_int);
+  }
+
+
+
+  template <int dim, int spacedim>
+  const FEInterfaceValues<dim, spacedim> &
+  ScratchData<dim, spacedim>::reinit(
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int                                              face_no,
     const unsigned int                                              sub_face_no,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
       &                cell_neighbor,
