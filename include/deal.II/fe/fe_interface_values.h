@@ -1574,6 +1574,31 @@ public:
   get_quadrature() const;
 
   /**
+   * Return a reference to the used mapping.
+   */
+  const hp::MappingCollection<dim, spacedim> &
+  get_mapping_collection() const;
+
+  /**
+   * Return a reference to the selected finite element object.
+   */
+  const hp::FECollection<dim, spacedim> &
+  get_fe_collection() const;
+
+  /**
+   * Return a reference to the face quadrature object in use.
+   */
+  const hp::QCollection<dim - 1> &
+  get_quadrature_collection() const;
+
+  /**
+   * Returns a boolean indicating whether or not this FEInterfaceValues object
+   * has hp-capabilities enabled.
+   */
+  bool
+  has_hp_capabilities() const;
+
+  /**
    * Return the update flags set.
    */
   UpdateFlags
@@ -2175,6 +2200,24 @@ private:
   std::vector<std::array<unsigned int, 2>> dofmap;
 
   /**
+   * Pointer to internal_fe_face_values or internal_fe_subface_values,
+   * respectively as determined in reinit().
+   */
+  FEFaceValuesBase<dim, spacedim> *fe_face_values;
+
+  /**
+   * Pointer to internal_fe_face_values_neighbor,
+   * internal_fe_subface_values_neighbor, or nullptr, respectively
+   * as determined in reinit().
+   */
+  FEFaceValuesBase<dim, spacedim> *fe_face_values_neighbor;
+
+  /**
+   * @name Data that supports the standard FE implementation
+   */
+  /** @{ */ // non-hp data
+
+  /**
    * The FEFaceValues object for the current cell.
    */
   std::unique_ptr<FEFaceValues<dim, spacedim>> internal_fe_face_values;
@@ -2195,18 +2238,12 @@ private:
   std::unique_ptr<FESubfaceValues<dim, spacedim>>
     internal_fe_subface_values_neighbor;
 
-  /**
-   * Pointer to internal_fe_face_values or internal_fe_subface_values,
-   * respectively as determined in reinit().
-   */
-  FEFaceValuesBase<dim, spacedim> *fe_face_values;
+  /** @} */ // non-hp data
 
   /**
-   * Pointer to internal_fe_face_values_neighbor,
-   * internal_fe_subface_values_neighbor, or nullptr, respectively
-   * as determined in reinit().
+   * @name Data that supports the hp-FE implementation
    */
-  FEFaceValuesBase<dim, spacedim> *fe_face_values_neighbor;
+  /** @{ */ // hp data
 
   /**
    * An hp::FEValues object for the FEFaceValues on the
@@ -2235,6 +2272,27 @@ private:
   std::unique_ptr<hp::FESubfaceValues<dim, spacedim>>
     internal_hp_fe_subface_values_neighbor;
 
+  /**
+   * Exception used when a certain feature doesn't make sense when
+   * FEInterfaceValues does has hp-capabilities enabled.
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcOnlyAvailableWithoutHP,
+                   "The current function doesn't make sense when used with a "
+                   "FEInterfaceValues object with hp-capabilities.");
+
+  /**
+   * Exception used when a certain feature doesn't make sense when
+   * FEInterfaceValues does not have hp-capabilities enabled.
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcOnlyAvailableWithHP,
+                   "The current function doesn't make sense when used with a "
+                   "FEInterfaceValues object without hp-capabilities.");
+
+  /** @} */ // hp data
 
   /*
    * Make the view classes friends of this class, since they
@@ -2259,6 +2317,8 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const Quadrature<dim - 1> &         quadrature,
   const UpdateFlags                   update_flags)
   : n_quadrature_points(quadrature.size())
+  , fe_face_values(nullptr)
+  , fe_face_values_neighbor(nullptr)
   , internal_fe_face_values(
       std::make_unique<FEFaceValues<dim, spacedim>>(mapping,
                                                     fe,
@@ -2279,8 +2339,6 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
                                                        fe,
                                                        quadrature,
                                                        update_flags))
-  , fe_face_values(nullptr)
-  , fe_face_values_neighbor(nullptr)
 {}
 
 
@@ -2306,7 +2364,8 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const hp::QCollection<dim - 1> &    quadrature,
   const UpdateFlags                   update_flags)
   : n_quadrature_points(quadrature.max_n_quadrature_points())
-
+  , fe_face_values(nullptr)
+  , fe_face_values_neighbor(nullptr)
   , internal_fe_face_values(
       std::make_unique<FEFaceValues<dim, spacedim>>(mapping,
                                                     fe,
@@ -2327,8 +2386,6 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
                                                        fe,
                                                        quadrature[0],
                                                        update_flags))
-  , fe_face_values(nullptr)
-  , fe_face_values_neighbor(nullptr)
 {}
 
 
@@ -2616,6 +2673,7 @@ template <int dim, int spacedim>
 const Mapping<dim, spacedim> &
 FEInterfaceValues<dim, spacedim>::get_mapping() const
 {
+  Assert(!has_hp_capabilities(), ExcOnlyAvailableWithoutHP());
   return internal_fe_face_values->get_mapping();
 }
 
@@ -2625,6 +2683,7 @@ template <int dim, int spacedim>
 const FiniteElement<dim, spacedim> &
 FEInterfaceValues<dim, spacedim>::get_fe() const
 {
+  Assert(!has_hp_capabilities(), ExcOnlyAvailableWithoutHP());
   return internal_fe_face_values->get_fe();
 }
 
@@ -2634,7 +2693,68 @@ template <int dim, int spacedim>
 const Quadrature<dim - 1> &
 FEInterfaceValues<dim, spacedim>::get_quadrature() const
 {
+  Assert(!has_hp_capabilities(), ExcOnlyAvailableWithoutHP());
   return internal_fe_face_values->get_quadrature();
+}
+
+
+
+template <int dim, int spacedim>
+const hp::MappingCollection<dim, spacedim> &
+FEInterfaceValues<dim, spacedim>::get_mapping_collection() const
+{
+  Assert(has_hp_capabilities(), ExcOnlyAvailableWithHP());
+  return internal_hp_fe_face_values->get_mapping_collection();
+}
+
+
+
+template <int dim, int spacedim>
+const hp::FECollection<dim, spacedim> &
+FEInterfaceValues<dim, spacedim>::get_fe_collection() const
+{
+  Assert(has_hp_capabilities(), ExcOnlyAvailableWithHP());
+  return internal_hp_fe_face_values->get_fe_collection();
+}
+
+
+
+template <int dim, int spacedim>
+const hp::QCollection<dim - 1> &
+FEInterfaceValues<dim, spacedim>::get_quadrature_collection() const
+{
+  Assert(has_hp_capabilities(), ExcOnlyAvailableWithHP());
+  return internal_hp_fe_face_values->get_quadrature_collection();
+}
+
+
+
+template <int dim, int spacedim>
+bool
+FEInterfaceValues<dim, spacedim>::has_hp_capabilities() const
+{
+  if (internal_hp_fe_face_values || internal_hp_fe_subface_values ||
+      internal_hp_fe_face_values_neighbor ||
+      internal_hp_fe_subface_values_neighbor)
+    {
+      Assert(!internal_fe_face_values, ExcInternalError());
+      Assert(!internal_fe_subface_values, ExcInternalError());
+      Assert(!internal_fe_face_values_neighbor, ExcInternalError());
+      Assert(!internal_fe_subface_values_neighbor, ExcInternalError());
+
+      return true;
+    }
+
+  Assert(internal_fe_face_values || internal_fe_subface_values ||
+           internal_fe_face_values_neighbor ||
+           internal_fe_subface_values_neighbor,
+         ExcInternalError());
+  Assert(!internal_hp_fe_face_values, ExcInternalError());
+  Assert(!internal_hp_fe_subface_values, ExcInternalError());
+  Assert(!internal_hp_fe_face_values_neighbor, ExcInternalError());
+  Assert(!internal_hp_fe_subface_values_neighbor, ExcInternalError());
+
+  return false;
 }
 
 
@@ -3194,7 +3314,11 @@ inline const FEInterfaceViews::Scalar<dim, spacedim>
 FEInterfaceValues<dim, spacedim>::operator[](
   const FEValuesExtractors::Scalar &scalar) const
 {
-  AssertIndexRange(scalar.component, this->get_fe().n_components());
+  const unsigned int n_components =
+    (this->has_hp_capabilities() ? this->get_fe_collection().n_components() :
+                                   this->get_fe().n_components());
+  (void)n_components;
+  AssertIndexRange(scalar.component, n_components);
   return FEInterfaceViews::Scalar<dim, spacedim>(*this, scalar.component);
 }
 
@@ -3205,11 +3329,14 @@ inline const FEInterfaceViews::Vector<dim, spacedim>
 FEInterfaceValues<dim, spacedim>::operator[](
   const FEValuesExtractors::Vector &vector) const
 {
-  const FiniteElement<dim, spacedim> &fe = this->get_fe();
-  const unsigned int                  n_vectors =
-    (fe.n_components() >= Tensor<1, spacedim>::n_independent_components ?
-       fe.n_components() - Tensor<1, spacedim>::n_independent_components + 1 :
+  const unsigned int n_components =
+    (this->has_hp_capabilities() ? this->get_fe_collection().n_components() :
+                                   this->get_fe().n_components());
+  const unsigned int n_vectors =
+    (n_components >= Tensor<1, spacedim>::n_independent_components ?
+       n_components - Tensor<1, spacedim>::n_independent_components + 1 :
        0);
+  (void)n_components;
   (void)n_vectors;
   AssertIndexRange(vector.first_vector_component, n_vectors);
   return FEInterfaceViews::Vector<dim, spacedim>(*this,
