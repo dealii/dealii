@@ -90,15 +90,12 @@ TridiagonalMatrix<number>::vmult(Vector<number> &      w,
   if (n() == 0)
     return;
 
-  // The actual loop skips the first
-  // and last row
+  // The actual loop skips the first and last row
   const size_type e = n() - 1;
-  // Let iterators point to the first
-  // entry of each diagonal
+  // Let iterators point to the first entry of each diagonal
   typename std::vector<number>::const_iterator d = diagonal.begin();
   typename std::vector<number>::const_iterator r = right.begin();
-  // The left diagonal starts one
-  // later or is equal to the right
+  // The left diagonal starts one later or is equal to the right
   // one for symmetric storage
   typename std::vector<number>::const_iterator l = left.begin();
   if (is_symmetric)
@@ -135,7 +132,7 @@ void
 TridiagonalMatrix<number>::vmult_add(Vector<number> &      w,
                                      const Vector<number> &v) const
 {
-  vmult(w, v, true);
+  vmult(w, v, /*adding = */ true);
 }
 
 
@@ -269,14 +266,6 @@ TridiagonalMatrix<number>::eigenvalue(const size_type i) const
 }
 
 
-/*
-template <typename number>
-TridiagonalMatrix<number>::
-{
-}
-
-
-*/
 
 template class TridiagonalMatrix<float>;
 template class TridiagonalMatrix<double>;
