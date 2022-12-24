@@ -4220,65 +4220,57 @@ namespace internal
               AssertIsNotUsed(new_lines[l]);
             }
 
-          if (true)
+          if (cell->reference_cell() == ReferenceCells::Triangle)
             {
-              if (cell->reference_cell() == ReferenceCells::Triangle)
-                {
-                  // add lines in the order implied by their orientation.
-                  const auto ref = [&](const unsigned int face_no,
-                                       const unsigned int vertex_no) {
-                    if (cell->line(face_no)->child(0)->vertex_index(0) ==
-                          static_cast<unsigned int>(new_vertices[vertex_no]) ||
-                        cell->line(face_no)->child(0)->vertex_index(1) ==
-                          static_cast<unsigned int>(new_vertices[vertex_no]))
-                      {
-                        new_lines[2 * face_no + 0] =
-                          cell->line(face_no)->child(0);
-                        new_lines[2 * face_no + 1] =
-                          cell->line(face_no)->child(1);
-                      }
-                    else
-                      {
-                        new_lines[2 * face_no + 0] =
-                          cell->line(face_no)->child(1);
-                        new_lines[2 * face_no + 1] =
-                          cell->line(face_no)->child(0);
-                      }
-                  };
+              // add lines in the order implied by their orientation.
+              const auto ref = [&](const unsigned int face_no,
+                                   const unsigned int vertex_no) {
+                if (cell->line(face_no)->child(0)->vertex_index(0) ==
+                      static_cast<unsigned int>(new_vertices[vertex_no]) ||
+                    cell->line(face_no)->child(0)->vertex_index(1) ==
+                      static_cast<unsigned int>(new_vertices[vertex_no]))
+                  {
+                    new_lines[2 * face_no + 0] = cell->line(face_no)->child(0);
+                    new_lines[2 * face_no + 1] = cell->line(face_no)->child(1);
+                  }
+                else
+                  {
+                    new_lines[2 * face_no + 0] = cell->line(face_no)->child(1);
+                    new_lines[2 * face_no + 1] = cell->line(face_no)->child(0);
+                  }
+              };
 
-                  ref(0, 0);
-                  ref(1, 1);
-                  ref(2, 2);
+              ref(0, 0);
+              ref(1, 1);
+              ref(2, 2);
 
-                  new_lines[6]->set_bounding_object_indices(
-                    {new_vertices[3], new_vertices[4]});
-                  new_lines[7]->set_bounding_object_indices(
-                    {new_vertices[4], new_vertices[5]});
-                  new_lines[8]->set_bounding_object_indices(
-                    {new_vertices[5], new_vertices[3]});
-                }
-              else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
-                {
-                  unsigned int l = 0;
-                  for (const unsigned int face_no : cell->face_indices())
-                    for (unsigned int c = 0; c < 2; ++c, ++l)
-                      new_lines[l] = cell->line(face_no)->child(c);
-
-                  new_lines[8]->set_bounding_object_indices(
-                    {new_vertices[6], new_vertices[8]});
-                  new_lines[9]->set_bounding_object_indices(
-                    {new_vertices[8], new_vertices[7]});
-                  new_lines[10]->set_bounding_object_indices(
-                    {new_vertices[4], new_vertices[8]});
-                  new_lines[11]->set_bounding_object_indices(
-                    {new_vertices[8], new_vertices[5]});
-                }
-              else
-                {
-                  AssertThrow(false, ExcNotImplemented());
-                }
+              new_lines[6]->set_bounding_object_indices(
+                {new_vertices[3], new_vertices[4]});
+              new_lines[7]->set_bounding_object_indices(
+                {new_vertices[4], new_vertices[5]});
+              new_lines[8]->set_bounding_object_indices(
+                {new_vertices[5], new_vertices[3]});
             }
+          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
+            {
+              unsigned int l = 0;
+              for (const unsigned int face_no : cell->face_indices())
+                for (unsigned int c = 0; c < 2; ++c, ++l)
+                  new_lines[l] = cell->line(face_no)->child(c);
 
+              new_lines[8]->set_bounding_object_indices(
+                {new_vertices[6], new_vertices[8]});
+              new_lines[9]->set_bounding_object_indices(
+                {new_vertices[8], new_vertices[7]});
+              new_lines[10]->set_bounding_object_indices(
+                {new_vertices[4], new_vertices[8]});
+              new_lines[11]->set_bounding_object_indices(
+                {new_vertices[8], new_vertices[5]});
+            }
+          else
+            {
+              AssertThrow(false, ExcNotImplemented());
+            }
 
           for (unsigned int l = lmin; l < lmax; ++l)
             {
