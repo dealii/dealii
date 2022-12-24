@@ -4223,21 +4223,24 @@ namespace internal
 
           if (cell->reference_cell() == ReferenceCells::Triangle)
             {
-              // add lines in the order implied by their orientation.
+              // add lines in the order implied by their orientation. Here,
+              // face_no is the cell (not subcell) face number and vertex_no is
+              // the first vertex on that face in the standard orientation.
               const auto ref = [&](const unsigned int face_no,
                                    const unsigned int vertex_no) {
-                if (cell->line(face_no)->child(0)->vertex_index(0) ==
-                      new_vertices[vertex_no] ||
-                    cell->line(face_no)->child(0)->vertex_index(1) ==
-                      new_vertices[vertex_no])
+                auto l = cell->line(face_no);
+                // if the vertex is on the first child then add the first child
+                // first
+                if (l->child(0)->vertex_index(0) == new_vertices[vertex_no] ||
+                    l->child(0)->vertex_index(1) == new_vertices[vertex_no])
                   {
-                    new_lines[2 * face_no + 0] = cell->line(face_no)->child(0);
-                    new_lines[2 * face_no + 1] = cell->line(face_no)->child(1);
+                    new_lines[2 * face_no + 0] = l->child(0);
+                    new_lines[2 * face_no + 1] = l->child(1);
                   }
                 else
                   {
-                    new_lines[2 * face_no + 0] = cell->line(face_no)->child(1);
-                    new_lines[2 * face_no + 1] = cell->line(face_no)->child(0);
+                    new_lines[2 * face_no + 0] = l->child(1);
+                    new_lines[2 * face_no + 1] = l->child(0);
                   }
               };
 
@@ -4245,6 +4248,7 @@ namespace internal
               ref(1, 1);
               ref(2, 2);
 
+              // set up lines which do not have parents:
               new_lines[6]->set_bounding_object_indices(
                 {new_vertices[3], new_vertices[4]});
               new_lines[7]->set_bounding_object_indices(
