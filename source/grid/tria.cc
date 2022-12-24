@@ -4224,7 +4224,7 @@ namespace internal
             {
               if (cell->reference_cell() == ReferenceCells::Triangle)
                 {
-                  // add lines in the right order [TODO: clean up]
+                  // add lines in the order implied by their orientation.
                   const auto ref = [&](const unsigned int face_no,
                                        const unsigned int vertex_no) {
                     if (cell->line(face_no)->child(0)->vertex_index(0) ==
@@ -4332,40 +4332,39 @@ namespace internal
                                                         new_lines[7]->index(),
                                                         new_lines[8]->index()});
 
-              // subcell 0
+              // Set subcell line orientations by checking the line's second
+              // vertex (from the subcell's perspective) to the line's actual
+              // second vertex.
+              const auto fix_line_orientation =
+                [&](const unsigned int line_no,
+                    const unsigned int vertex_no,
+                    const unsigned int subcell_no,
+                    const unsigned int subcell_line_no) {
+                  if (new_lines[line_no]->vertex_index(1) !=
+                      static_cast<unsigned int>(new_vertices[vertex_no]))
+                    triangulation.levels[subcells[subcell_no]->level()]
+                      ->face_orientations[subcells[subcell_no]->index() *
+                                            GeometryInfo<2>::faces_per_cell +
+                                          subcell_line_no] = 0;
+                };
 
-              const auto ref = [&](const unsigned int line_no,
-                                   const unsigned int vertex_no,
-                                   const unsigned int subcell_no,
-                                   const unsigned int subcell_line_no) {
-                if (new_lines[line_no]->vertex_index(1) !=
-                    static_cast<unsigned int>(new_vertices[vertex_no]))
-                  triangulation.levels[subcells[subcell_no]->level()]
-                    ->face_orientations[subcells[subcell_no]->index() *
-                                          GeometryInfo<2>::faces_per_cell +
-                                        subcell_line_no] = 0;
-              };
+              fix_line_orientation(0, 3, 0, 0);
+              fix_line_orientation(8, 5, 0, 1);
+              fix_line_orientation(5, 0, 0, 2);
 
-              ref(0, 3, 0, 0);
-              ref(8, 5, 0, 1);
-              ref(5, 0, 0, 2);
+              fix_line_orientation(1, 1, 1, 0);
+              fix_line_orientation(2, 4, 1, 1);
+              fix_line_orientation(6, 3, 1, 2);
 
-              ref(1, 1, 1, 0);
-              ref(2, 4, 1, 1);
-              ref(6, 3, 1, 2);
+              fix_line_orientation(7, 4, 2, 0);
+              fix_line_orientation(3, 2, 2, 1);
+              fix_line_orientation(4, 5, 2, 2);
 
-              ref(7, 4, 2, 0);
-              ref(3, 2, 2, 1);
-              ref(4, 5, 2, 2);
-
-              ref(6, 4, 3, 0);
-              ref(7, 5, 3, 1);
-              ref(8, 3, 3, 2);
-
-              // triangulation.levels[subcells[1]->level()]->face_orientations[subcells[1]->index()
-              // * GeometryInfo<2>::faces_per_cell + 2] = 0;
-              // triangulation.levels[subcells[2]->level()]->face_orientations[subcells[2]->index()
-              // * GeometryInfo<2>::faces_per_cell + 0] = 0;
+              // all lines of the new interior cell are oriented backwards so
+              // that it has positive area.
+              fix_line_orientation(6, 4, 3, 0);
+              fix_line_orientation(7, 5, 3, 1);
+              fix_line_orientation(8, 3, 3, 2);
             }
           else if ((dim == 2) &&
                    (cell->reference_cell() == ReferenceCells::Quadrilateral))
