@@ -4164,7 +4164,8 @@ namespace internal
           else
             AssertThrow(false, ExcNotImplemented());
 
-          std::vector<int> new_vertices(n_new_vertices);
+          std::vector<unsigned int> new_vertices(n_new_vertices,
+                                                 numbers::invalid_unsigned_int);
           for (unsigned int vertex_no = 0; vertex_no < cell->n_vertices();
                ++vertex_no)
             new_vertices[vertex_no] = cell->vertex_index(vertex_no);
@@ -4226,9 +4227,9 @@ namespace internal
               const auto ref = [&](const unsigned int face_no,
                                    const unsigned int vertex_no) {
                 if (cell->line(face_no)->child(0)->vertex_index(0) ==
-                      static_cast<unsigned int>(new_vertices[vertex_no]) ||
+                      new_vertices[vertex_no] ||
                     cell->line(face_no)->child(0)->vertex_index(1) ==
-                      static_cast<unsigned int>(new_vertices[vertex_no]))
+                      new_vertices[vertex_no])
                   {
                     new_lines[2 * face_no + 0] = cell->line(face_no)->child(0);
                     new_lines[2 * face_no + 1] = cell->line(face_no)->child(1);
@@ -4333,7 +4334,7 @@ namespace internal
                     const unsigned int subcell_no,
                     const unsigned int subcell_line_no) {
                   if (new_lines[line_no]->vertex_index(1) !=
-                      static_cast<unsigned int>(new_vertices[vertex_no]))
+                      new_vertices[vertex_no])
                     triangulation.levels[subcells[subcell_no]->level()]
                       ->face_orientations[subcells[subcell_no]->index() *
                                             GeometryInfo<2>::faces_per_cell +
