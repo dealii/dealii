@@ -4003,15 +4003,14 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
-                  if (cell->reference_cell() ==
-                      dealii::ReferenceCells::Triangle)
+                  if (cell->reference_cell() == ReferenceCells::Triangle)
                     {
                       needed_cells += 4;
                       needed_vertices += 0;
                       n_single_lines += 3;
                     }
                   else if (cell->reference_cell() ==
-                           dealii::ReferenceCells::Quadrilateral)
+                           ReferenceCells::Quadrilateral)
                     {
                       needed_cells += 4;
                       needed_vertices += 1;
@@ -4158,15 +4157,15 @@ namespace internal
 
           unsigned int n_new_vertices = 0;
 
-          if (cell->reference_cell() == dealii::ReferenceCells::Triangle)
+          if (cell->reference_cell() == ReferenceCells::Triangle)
             n_new_vertices = 6;
-          else if (cell->reference_cell() ==
-                   dealii::ReferenceCells::Quadrilateral)
+          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             n_new_vertices = 9;
           else
             AssertThrow(false, ExcNotImplemented());
 
-          std::vector<int> new_vertices(n_new_vertices);
+          std::vector<unsigned int> new_vertices(n_new_vertices,
+                                                 numbers::invalid_unsigned_int);
           for (unsigned int vertex_no = 0; vertex_no < cell->n_vertices();
                ++vertex_no)
             new_vertices[vertex_no] = cell->vertex_index(vertex_no);
@@ -4175,7 +4174,7 @@ namespace internal
               new_vertices[cell->n_vertices() + line_no] =
                 cell->line(line_no)->child(0)->vertex_index(1);
 
-          if (cell->reference_cell() == dealii::ReferenceCells::Quadrilateral)
+          if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
               while (triangulation.vertices_used[next_unused_vertex] == true)
                 ++next_unused_vertex;
@@ -4197,13 +4196,12 @@ namespace internal
           unsigned int lmin = 0;
           unsigned int lmax = 0;
 
-          if (cell->reference_cell() == dealii::ReferenceCells::Triangle)
+          if (cell->reference_cell() == ReferenceCells::Triangle)
             {
               lmin = 6;
               lmax = 9;
             }
-          else if (cell->reference_cell() ==
-                   dealii::ReferenceCells::Quadrilateral)
+          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
               lmin = 8;
               lmax = 12;
@@ -4223,66 +4221,61 @@ namespace internal
               AssertIsNotUsed(new_lines[l]);
             }
 
-          if (true)
+          if (cell->reference_cell() == ReferenceCells::Triangle)
             {
-              if (cell->reference_cell() == dealii::ReferenceCells::Triangle)
-                {
-                  // add lines in the right order [TODO: clean up]
-                  const auto ref = [&](const unsigned int face_no,
-                                       const unsigned int vertex_no) {
-                    if (cell->line(face_no)->child(0)->vertex_index(0) ==
-                          static_cast<unsigned int>(new_vertices[vertex_no]) ||
-                        cell->line(face_no)->child(0)->vertex_index(1) ==
-                          static_cast<unsigned int>(new_vertices[vertex_no]))
-                      {
-                        new_lines[2 * face_no + 0] =
-                          cell->line(face_no)->child(0);
-                        new_lines[2 * face_no + 1] =
-                          cell->line(face_no)->child(1);
-                      }
-                    else
-                      {
-                        new_lines[2 * face_no + 0] =
-                          cell->line(face_no)->child(1);
-                        new_lines[2 * face_no + 1] =
-                          cell->line(face_no)->child(0);
-                      }
-                  };
+              // add lines in the order implied by their orientation. Here,
+              // face_no is the cell (not subcell) face number and vertex_no is
+              // the first vertex on that face in the standard orientation.
+              const auto ref = [&](const unsigned int face_no,
+                                   const unsigned int vertex_no) {
+                auto l = cell->line(face_no);
+                // if the vertex is on the first child then add the first child
+                // first
+                if (l->child(0)->vertex_index(0) == new_vertices[vertex_no] ||
+                    l->child(0)->vertex_index(1) == new_vertices[vertex_no])
+                  {
+                    new_lines[2 * face_no + 0] = l->child(0);
+                    new_lines[2 * face_no + 1] = l->child(1);
+                  }
+                else
+                  {
+                    new_lines[2 * face_no + 0] = l->child(1);
+                    new_lines[2 * face_no + 1] = l->child(0);
+                  }
+              };
 
-                  ref(0, 0);
-                  ref(1, 1);
-                  ref(2, 2);
+              ref(0, 0);
+              ref(1, 1);
+              ref(2, 2);
 
-                  new_lines[6]->set_bounding_object_indices(
-                    {new_vertices[3], new_vertices[4]});
-                  new_lines[7]->set_bounding_object_indices(
-                    {new_vertices[4], new_vertices[5]});
-                  new_lines[8]->set_bounding_object_indices(
-                    {new_vertices[5], new_vertices[3]});
-                }
-              else if (cell->reference_cell() ==
-                       dealii::ReferenceCells::Quadrilateral)
-                {
-                  unsigned int l = 0;
-                  for (const unsigned int face_no : cell->face_indices())
-                    for (unsigned int c = 0; c < 2; ++c, ++l)
-                      new_lines[l] = cell->line(face_no)->child(c);
-
-                  new_lines[8]->set_bounding_object_indices(
-                    {new_vertices[6], new_vertices[8]});
-                  new_lines[9]->set_bounding_object_indices(
-                    {new_vertices[8], new_vertices[7]});
-                  new_lines[10]->set_bounding_object_indices(
-                    {new_vertices[4], new_vertices[8]});
-                  new_lines[11]->set_bounding_object_indices(
-                    {new_vertices[8], new_vertices[5]});
-                }
-              else
-                {
-                  AssertThrow(false, ExcNotImplemented());
-                }
+              // set up lines which do not have parents:
+              new_lines[6]->set_bounding_object_indices(
+                {new_vertices[3], new_vertices[4]});
+              new_lines[7]->set_bounding_object_indices(
+                {new_vertices[4], new_vertices[5]});
+              new_lines[8]->set_bounding_object_indices(
+                {new_vertices[5], new_vertices[3]});
             }
+          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
+            {
+              unsigned int l = 0;
+              for (const unsigned int face_no : cell->face_indices())
+                for (unsigned int c = 0; c < 2; ++c, ++l)
+                  new_lines[l] = cell->line(face_no)->child(c);
 
+              new_lines[8]->set_bounding_object_indices(
+                {new_vertices[6], new_vertices[8]});
+              new_lines[9]->set_bounding_object_indices(
+                {new_vertices[8], new_vertices[7]});
+              new_lines[10]->set_bounding_object_indices(
+                {new_vertices[4], new_vertices[8]});
+              new_lines[11]->set_bounding_object_indices(
+                {new_vertices[8], new_vertices[5]});
+            }
+          else
+            {
+              AssertThrow(false, ExcNotImplemented());
+            }
 
           for (unsigned int l = lmin; l < lmax; ++l)
             {
@@ -4303,10 +4296,9 @@ namespace internal
 
           unsigned int n_children = 0;
 
-          if (cell->reference_cell() == dealii::ReferenceCells::Triangle)
+          if (cell->reference_cell() == ReferenceCells::Triangle)
             n_children = 4;
-          else if (cell->reference_cell() ==
-                   dealii::ReferenceCells::Quadrilateral)
+          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             n_children = 4;
           else
             AssertThrow(false, ExcNotImplemented());
@@ -4322,7 +4314,7 @@ namespace internal
             }
 
           if ((dim == 2) &&
-              (cell->reference_cell() == dealii::ReferenceCells::Triangle))
+              (cell->reference_cell() == ReferenceCells::Triangle))
             {
               subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
                                                         new_lines[8]->index(),
@@ -4337,43 +4329,42 @@ namespace internal
                                                         new_lines[7]->index(),
                                                         new_lines[8]->index()});
 
-              // subcell 0
+              // Set subcell line orientations by checking the line's second
+              // vertex (from the subcell's perspective) to the line's actual
+              // second vertex.
+              const auto fix_line_orientation =
+                [&](const unsigned int line_no,
+                    const unsigned int vertex_no,
+                    const unsigned int subcell_no,
+                    const unsigned int subcell_line_no) {
+                  if (new_lines[line_no]->vertex_index(1) !=
+                      new_vertices[vertex_no])
+                    triangulation.levels[subcells[subcell_no]->level()]
+                      ->face_orientations[subcells[subcell_no]->index() *
+                                            GeometryInfo<2>::faces_per_cell +
+                                          subcell_line_no] = 0;
+                };
 
-              const auto ref = [&](const unsigned int line_no,
-                                   const unsigned int vertex_no,
-                                   const unsigned int subcell_no,
-                                   const unsigned int subcell_line_no) {
-                if (new_lines[line_no]->vertex_index(1) !=
-                    static_cast<unsigned int>(new_vertices[vertex_no]))
-                  triangulation.levels[subcells[subcell_no]->level()]
-                    ->face_orientations[subcells[subcell_no]->index() *
-                                          GeometryInfo<2>::faces_per_cell +
-                                        subcell_line_no] = 0;
-              };
+              fix_line_orientation(0, 3, 0, 0);
+              fix_line_orientation(8, 5, 0, 1);
+              fix_line_orientation(5, 0, 0, 2);
 
-              ref(0, 3, 0, 0);
-              ref(8, 5, 0, 1);
-              ref(5, 0, 0, 2);
+              fix_line_orientation(1, 1, 1, 0);
+              fix_line_orientation(2, 4, 1, 1);
+              fix_line_orientation(6, 3, 1, 2);
 
-              ref(1, 1, 1, 0);
-              ref(2, 4, 1, 1);
-              ref(6, 3, 1, 2);
+              fix_line_orientation(7, 4, 2, 0);
+              fix_line_orientation(3, 2, 2, 1);
+              fix_line_orientation(4, 5, 2, 2);
 
-              ref(7, 4, 2, 0);
-              ref(3, 2, 2, 1);
-              ref(4, 5, 2, 2);
-
-              ref(6, 4, 3, 0);
-              ref(7, 5, 3, 1);
-              ref(8, 3, 3, 2);
-
-              // triangulation.levels[subcells[1]->level()]->face_orientations[subcells[1]->index()
-              // * GeometryInfo<2>::faces_per_cell + 2] = 0;
-              // triangulation.levels[subcells[2]->level()]->face_orientations[subcells[2]->index()
-              // * GeometryInfo<2>::faces_per_cell + 0] = 0;
+              // all lines of the new interior cell are oriented backwards so
+              // that it has positive area.
+              fix_line_orientation(6, 4, 3, 0);
+              fix_line_orientation(7, 5, 3, 1);
+              fix_line_orientation(8, 3, 3, 2);
             }
-          else if ((dim == 2) && (cell->reference_cell() ==
-                                  dealii::ReferenceCells::Quadrilateral))
+          else if ((dim == 2) &&
+                   (cell->reference_cell() == ReferenceCells::Quadrilateral))
             {
               subcells[0]->set_bounding_object_indices(
                 {new_lines[0]->index(),
@@ -4450,8 +4441,7 @@ namespace internal
                                   next_unused_cell,
                                   cell);
 
-                  if (cell->reference_cell() ==
-                        dealii::ReferenceCells::Quadrilateral &&
+                  if (cell->reference_cell() == ReferenceCells::Quadrilateral &&
                       check_for_distorted_cells &&
                       has_distorted_children<dim, spacedim>(cell))
                     cells_with_distorted_children.distorted_cells.push_back(
