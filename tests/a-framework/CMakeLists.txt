@@ -2,25 +2,10 @@ cmake_minimum_required(VERSION 3.3.0)
 include(../setup_testsubproject.cmake)
 project(testsuite CXX)
 
-add_executable(dummy.release dummy.cc)
-add_executable(dummy.debug dummy.cc)
-set(TEST_TARGET_RELEASE dummy.release)
-set(TEST_TARGET_DEBUG dummy.debug)
+add_executable(dummy dummy.cc)
+set(TEST_TARGET dummy)
 
 deal_ii_pickup_tests()
-
-#
-# Limit concurrency between the two parameter file tests.
-#
-foreach(_build ${DEAL_II_BUILD_TYPES})
-  string(TOLOWER ${_build} _build)
-  if(TARGET parameter_file_2.${_build}.diff AND
-     TARGET parameter_file_1.${_build}.diff )
-    set_tests_properties(a-framework/parameter_file_2.${_build} PROPERTIES
-      DEPENDS a-framework/parameter_file_1.${_build}
-      )
-  endif()
-endforeach()
 
 
 #
