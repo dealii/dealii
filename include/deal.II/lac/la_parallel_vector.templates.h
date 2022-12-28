@@ -385,8 +385,9 @@ namespace LinearAlgebra
           const IndexSet &                  v_stored = V.get_stored_elements();
           const size_type                   n_elements = v_stored.n_elements();
           Kokkos::DefaultHostExecutionSpace host_exec;
-          Kokkos::View<size_type *, Kokkos::HostSpace> indices("indices",
-                                                               n_elements);
+          Kokkos::View<size_type *, Kokkos::HostSpace> indices(
+            Kokkos::view_alloc(Kokkos::WithoutInitializing, "indices"),
+            n_elements);
           Kokkos::parallel_for(
             "import_elements: fill indices",
             Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(host_exec,
@@ -400,11 +401,8 @@ namespace LinearAlgebra
 
           // Move the indices to the device
           ::dealii::MemorySpace::Default::kokkos_space::execution_space exec;
-          Kokkos::View<size_type *,
-                       ::dealii::MemorySpace::Default::kokkos_space>
-            indices_dev("indices_dev", n_elements);
-          Kokkos::deep_copy(exec, indices_dev, indices);
-          exec.fence();
+          auto indices_dev = Kokkos::create_mirror_view_and_copy(
+            ::dealii::MemorySpace::Default::kokkos_space{}, indices);
 
           // Move the data to the device
           Kokkos::View<Number *, ::dealii::MemorySpace::Default::kokkos_space>
