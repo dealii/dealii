@@ -2527,11 +2527,11 @@ namespace internal
             exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
 #if KOKKOS_VERSION < 30400
-            update += fabs(data.values(i));
+            update += abs(data.values(i));
 #elif KOKKOS_VERSION < 30700
-            update += Kokkos::Experimental::fabs(data.values(i));
+            update += Kokkos::Experimental::abs(data.values(i));
 #else
-            update += Kokkos::fabs(data.values(i));
+            update += Kokkos::abs(data.values(i));
 #endif
           },
           sum);
@@ -2559,9 +2559,9 @@ namespace internal
             update += pow(fabs(data.values(i)), exp);
 #elif KOKKOS_VERSION < 30700
             update += Kokkos::Experimental::pow(
-              Kokkos::Experimental::fabs(data.values(i)), exp);
+              Kokkos::Experimental::abs(data.values(i)), exp);
 #else
-            update += Kokkos::pow(Kokkos::fabs(data.values(i)), exp);
+            update += Kokkos::pow(Kokkos::abs(data.values(i)), exp);
 #endif
           },
           sum);
