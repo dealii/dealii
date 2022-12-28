@@ -28,7 +28,6 @@ set(_unity_include_src
   scalapack.cc
   la_vector.cc
   la_parallel_vector.cc
-  la_parallel_vector_cuda.cc
   la_parallel_block_vector.cc
   matrix_out.cc
   precondition_block.cc
