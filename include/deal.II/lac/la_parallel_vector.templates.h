@@ -405,13 +405,12 @@ namespace LinearAlgebra
             ::dealii::MemorySpace::Default::kokkos_space{}, indices);
 
           // Move the data to the device
-          Kokkos::View<Number *, ::dealii::MemorySpace::Default::kokkos_space>
-            V_dev("V_dev", n_elements);
-          Kokkos::deep_copy(
-            exec,
-            V_dev,
-            Kokkos::View<Number *, Kokkos::HostSpace>(V.begin(), n_elements));
-          exec.fence();
+          Kokkos::View<Number *, Kokkos::HostSpace> V_view(V.begin(),
+                                                           n_elements);
+          Kokkos::View<Number *,
+                       ::dealii::MemorySpace::Default::kokkos_space> auto
+            V_dev = Kokkos::create_mirror_view_and_copy(
+              ::dealii::MemorySpace::Default::kokkos_space{}, V_view);
 
           // Set the values in tmp_vector
           Kokkos::parallel_for(
