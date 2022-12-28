@@ -2634,7 +2634,7 @@ namespace internal
       import_elements(
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
           & /*thread_loop_partitioner*/,
-        const size_type,
+        const size_type         size,
         VectorOperation::values operation,
         const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
           &v_data,
