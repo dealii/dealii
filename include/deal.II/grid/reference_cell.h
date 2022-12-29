@@ -633,6 +633,25 @@ public:
   vtk_lagrange_type() const;
 
   /**
+   * Given a set of node indices of the form $(i)$ or $(i,j)$ or $(i,j,k)$
+   * (depending on whether the reference cell is in 1d, 2d, or 3d), return
+   * the index the VTK format uses for this node for cells that are
+   * subdivided as many times in each of the coordinate directions as
+   * described by the second argument. For a uniformly subdivided cell,
+   * the second argument is an array whose elements will all be equal.
+   *
+   * The last argument, @p legacy_format, indicates whether to use the
+   * old, VTK legacy format (when `true`) or the new, VTU format (when
+   * `false`).
+   */
+  template <int dim>
+  unsigned int
+  vtk_lexicographic_to_node_index(
+    const std::array<unsigned, dim> &node_indices,
+    const std::array<unsigned, dim> &nodes_per_direction,
+    const bool                       legacy_format) const;
+
+  /**
    * Return the GMSH element type code that corresponds to the reference cell.
    */
   unsigned int
@@ -2554,6 +2573,35 @@ ReferenceCell::permute_according_orientation(
   return temp_;
 }
 
+
+
+template <>
+unsigned int
+ReferenceCell::vtk_lexicographic_to_node_index<0>(
+  const std::array<unsigned, 0> &node_indices,
+  const std::array<unsigned, 0> &nodes_per_direction,
+  const bool                     legacy_format) const;
+
+template <>
+unsigned int
+ReferenceCell::vtk_lexicographic_to_node_index<1>(
+  const std::array<unsigned, 1> &node_indices,
+  const std::array<unsigned, 1> &nodes_per_direction,
+  const bool                     legacy_format) const;
+
+template <>
+unsigned int
+ReferenceCell::vtk_lexicographic_to_node_index<2>(
+  const std::array<unsigned, 2> &node_indices,
+  const std::array<unsigned, 2> &nodes_per_direction,
+  const bool                     legacy_format) const;
+
+template <>
+unsigned int
+ReferenceCell::vtk_lexicographic_to_node_index<3>(
+  const std::array<unsigned, 3> &node_indices,
+  const std::array<unsigned, 3> &nodes_per_direction,
+  const bool                     legacy_format) const;
 
 DEAL_II_NAMESPACE_CLOSE
 

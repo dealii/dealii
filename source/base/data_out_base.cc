@@ -995,193 +995,6 @@ namespace
 
 
 
-  template <int dim>
-  unsigned int
-  lexicographic_to_vtk_point_index(const std::array<unsigned, dim> &,
-                                   const std::array<unsigned, dim> &,
-                                   const bool)
-  {
-    Assert(false, ExcNotImplemented());
-    return 0;
-  }
-
-
-
-  /**
-   * Given (i,j,k) coordinates within the Lagrange quadrilateral, return an
-   * offset into the local connectivity array.
-   *
-   * Modified from
-   * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
-   */
-  template <>
-  unsigned int
-  lexicographic_to_vtk_point_index<2>(
-    const std::array<unsigned, 2> &node_indices,
-    const std::array<unsigned, 2> &nodes_per_direction,
-    const bool)
-  {
-    const unsigned int i = node_indices[0];
-    const unsigned int j = node_indices[1];
-
-    const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
-    const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
-    // How many boundaries do we lie on at once?
-    const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
-
-    if (nbdy == 2) // Vertex DOF
-      { // ijk is a corner node. Return the proper index (somewhere in [0,3]):
-        return (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0));
-      }
-
-    int offset = 4;
-    if (nbdy == 1) // Edge DOF
-      {
-        if (!ibdy)
-          { // On i axis
-            return (i - 1) +
-                   (j != 0u ?
-                      nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 :
-                      0) +
-                   offset;
-          }
-
-        if (!jbdy)
-          { // On j axis
-            return (j - 1) +
-                   (i != 0u ? nodes_per_direction[0] - 1 :
-                              2 * (nodes_per_direction[0] - 1) +
-                                nodes_per_direction[1] - 1) +
-                   offset;
-          }
-      }
-
-    offset += 2 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1);
-    // nbdy == 0: Face DOF
-    return offset + (i - 1) + (nodes_per_direction[0] - 1) * ((j - 1));
-  }
-
-
-
-  /**
-   * Given (i,j,k) coordinates within the Lagrange hexahedron, return an
-   * offset into the local connectivity array.
-   *
-   * Modified from
-   * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
-   * (legacy_format=true) and from
-   * https://github.com/Kitware/VTK/blob/256fe70de00e3441f126276ca4a8c5477d0bcb86/Common/DataModel/vtkHigherOrderHexahedron.cxx#L593
-   * (legacy_format=false). The two versions differ regarding the ordering of
-   * lines 10 and 11 (clockwise vs. anti-clockwise). See also:
-   * https://github.com/Kitware/VTK/blob/7a0b92864c96680b1f42ee84920df556fc6ebaa3/Documentation/release/dev/node-numbering-change-for-VTK_LAGRANGE_HEXAHEDRON.md
-   *
-   */
-  template <>
-  unsigned int
-  lexicographic_to_vtk_point_index<3>(
-    const std::array<unsigned, 3> &node_indices,
-    const std::array<unsigned, 3> &nodes_per_direction,
-    const bool                     legacy_format)
-  {
-    const unsigned int i = node_indices[0];
-    const unsigned int j = node_indices[1];
-    const unsigned int k = node_indices[2];
-
-    const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
-    const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
-    const bool kbdy = (k == 0 || k == nodes_per_direction[2]);
-    // How many boundaries do we lie on at once?
-    const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
-
-    if (nbdy == 3) // Vertex DOF
-      { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
-        return (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
-               (k != 0u ? 4 : 0);
-      }
-
-    int offset = 8;
-    if (nbdy == 2) // Edge DOF
-      {
-        if (!ibdy)
-          { // On i axis
-            return (i - 1) +
-                   (j != 0u ?
-                      nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 :
-                      0) +
-                   (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
-                                   nodes_per_direction[1] - 1) :
-                              0) +
-                   offset;
-          }
-        if (!jbdy)
-          { // On j axis
-            return (j - 1) +
-                   (i != 0u ? nodes_per_direction[0] - 1 :
-                              2 * (nodes_per_direction[0] - 1) +
-                                nodes_per_direction[1] - 1) +
-                   (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
-                                   nodes_per_direction[1] - 1) :
-                              0) +
-                   offset;
-          }
-        // !kbdy, On k axis
-        offset +=
-          4 * (nodes_per_direction[0] - 1) + 4 * (nodes_per_direction[1] - 1);
-        if (legacy_format)
-          return (k - 1) +
-                 (nodes_per_direction[2] - 1) *
-                   (i != 0u ? (j != 0u ? 3 : 1) : (j != 0u ? 2 : 0)) +
-                 offset;
-        else
-          return (k - 1) +
-                 (nodes_per_direction[2] - 1) *
-                   (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
-                 offset;
-      }
-
-    offset += 4 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 +
-                   nodes_per_direction[2] - 1);
-    if (nbdy == 1) // Face DOF
-      {
-        if (ibdy) // On i-normal face
-          {
-            return (j - 1) + ((nodes_per_direction[1] - 1) * (k - 1)) +
-                   (i != 0u ? (nodes_per_direction[1] - 1) *
-                                (nodes_per_direction[2] - 1) :
-                              0) +
-                   offset;
-          }
-        offset +=
-          2 * (nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1);
-        if (jbdy) // On j-normal face
-          {
-            return (i - 1) + ((nodes_per_direction[0] - 1) * (k - 1)) +
-                   (j != 0u ? (nodes_per_direction[2] - 1) *
-                                (nodes_per_direction[0] - 1) :
-                              0) +
-                   offset;
-          }
-        offset +=
-          2 * (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1);
-        // kbdy, On k-normal face
-        return (i - 1) + ((nodes_per_direction[0] - 1) * (j - 1)) +
-               (k != 0u ?
-                  (nodes_per_direction[0] - 1) * (nodes_per_direction[1] - 1) :
-                  0) +
-               offset;
-      }
-
-    // nbdy == 0: Body DOF
-    offset += 2 * ((nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1) +
-                   (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1) +
-                   (nodes_per_direction[0] - 1) * (nodes_per_direction[1] - 1));
-    return offset + (i - 1) +
-           (nodes_per_direction[0] - 1) *
-             ((j - 1) + (nodes_per_direction[1] - 1) * ((k - 1)));
-  }
-
-
-
   /**
    * Count the number of nodes and cells referenced by the given
    * argument, and return these numbers (in order nodes, then cells)
@@ -3115,8 +2928,9 @@ namespace DataOutBase
                       {
                         const unsigned int local_index = i1;
                         const unsigned int connectivity_index =
-                          lexicographic_to_vtk_point_index<1>(
-                            {{i1}}, {{n_subdivisions}}, legacy_format);
+                          patch.reference_cell
+                            .template vtk_lexicographic_to_node_index<1>(
+                              {{i1}}, {{n_subdivisions}}, legacy_format);
                         connectivity[connectivity_index] = local_index;
                       }
 
@@ -3129,10 +2943,11 @@ namespace DataOutBase
                         {
                           const unsigned int local_index = i2 * n + i1;
                           const unsigned int connectivity_index =
-                            lexicographic_to_vtk_point_index<2>(
-                              {{i1, i2}},
-                              {{n_subdivisions, n_subdivisions}},
-                              legacy_format);
+                            patch.reference_cell
+                              .template vtk_lexicographic_to_node_index<2>(
+                                {{i1, i2}},
+                                {{n_subdivisions, n_subdivisions}},
+                                legacy_format);
                           connectivity[connectivity_index] = local_index;
                         }
 
@@ -3147,12 +2962,13 @@ namespace DataOutBase
                             const unsigned int local_index =
                               i3 * n * n + i2 * n + i1;
                             const unsigned int connectivity_index =
-                              lexicographic_to_vtk_point_index<3>(
-                                {{i1, i2, i3}},
-                                {{n_subdivisions,
-                                  n_subdivisions,
-                                  n_subdivisions}},
-                                legacy_format);
+                              patch.reference_cell
+                                .template vtk_lexicographic_to_node_index<3>(
+                                  {{i1, i2, i3}},
+                                  {{n_subdivisions,
+                                    n_subdivisions,
+                                    n_subdivisions}},
+                                  legacy_format);
                             connectivity[connectivity_index] = local_index;
                           }
 
