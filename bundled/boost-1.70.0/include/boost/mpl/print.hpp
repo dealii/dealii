@@ -61,7 +61,7 @@ struct print
 # if defined(__EDG_VERSION__)
            aux::dependent_unsigned<T>::value > -1
 # else 
-           sizeof(T) > std::size_t(-1)
+           sizeof(T) > -1
 # endif 
         };
 #endif 
