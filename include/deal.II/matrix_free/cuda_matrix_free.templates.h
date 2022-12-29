@@ -21,7 +21,7 @@
 
 #include <deal.II/matrix_free/cuda_matrix_free.h>
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
 
 #  include <deal.II/base/cuda.h>
 #  include <deal.II/base/cuda_size.h>

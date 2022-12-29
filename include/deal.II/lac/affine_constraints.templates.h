@@ -2256,7 +2256,7 @@ namespace internal
       vec.zero_out_ghost_values();
     }
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
     template <typename Number>
     __global__ void
     set_zero_kernel(const size_type *  constrained_dofs,

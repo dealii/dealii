@@ -20,7 +20,7 @@
 
 #include <deal.II/lac/cuda_kernels.h>
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -22,7 +22,7 @@
 
 #include <iomanip>
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
 #  include <deal.II/base/cuda.h>
 
 #  include <deal.II/lac/cuda_vector.h>
