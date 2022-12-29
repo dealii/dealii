@@ -46,6 +46,7 @@ namespace LinearAlgebra
     template class Vector<float, ::dealii::MemorySpace::Default>;
     template class Vector<double, ::dealii::MemorySpace::Default>;
 
+#ifndef DOXYGEN
     template void
     Vector<float, ::dealii::MemorySpace::Host>::import<
       ::dealii::MemorySpace::Default>(
@@ -87,6 +88,7 @@ namespace LinearAlgebra
     Vector<double, ::dealii::MemorySpace::Default>::reinit<double>(
       const Vector<double, ::dealii::MemorySpace::Default> &,
       const bool);
+#endif
   } // namespace distributed
 } // namespace LinearAlgebra
 
