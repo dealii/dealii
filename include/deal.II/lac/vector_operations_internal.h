@@ -2529,7 +2529,7 @@ namespace internal
 #if KOKKOS_VERSION < 30400
             update += abs(data.values(i));
 #elif KOKKOS_VERSION < 30700
-            update += Kokkos::Experimental::abs(data.values(i));
+            update += Kokkos::Experimental::fabs(data.values(i));
 #else
             update += Kokkos::abs(data.values(i));
 #endif
@@ -2559,7 +2559,7 @@ namespace internal
             update += pow(fabs(data.values(i)), exp);
 #elif KOKKOS_VERSION < 30700
             update += Kokkos::Experimental::pow(
-              Kokkos::Experimental::abs(data.values(i)), exp);
+              Kokkos::Experimental::fabs(data.values(i)), exp);
 #else
             update += Kokkos::pow(Kokkos::abs(data.values(i)), exp);
 #endif
