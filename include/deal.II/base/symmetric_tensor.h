@@ -1953,6 +1953,8 @@ namespace internal
                           typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
   {
+    static_assert(dim <= 3, "The selected dimension is not yet supported.");
+
     // 1d is very simple and done first
     if (dim == 1)
       return data[0];
@@ -1989,7 +1991,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0];
   }
 
@@ -2001,6 +2002,8 @@ namespace internal
                           const typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
   {
+    static_assert(dim <= 3, "The selected dimension is not yet supported.");
+
     // 1d is very simple and done first
     if (dim == 1)
       return data[0];
@@ -2037,7 +2040,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0];
   }
 
@@ -2049,6 +2051,8 @@ namespace internal
                           typename SymmetricTensorAccessors::
                             StorageType<4, dim, Number>::base_tensor_type &data)
   {
+    static_assert(dim <= 3, "The selected dimension is not yet supported.");
+
     switch (dim)
       {
         case 1:
@@ -2087,7 +2091,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0][0];
   }
 
@@ -2098,6 +2101,8 @@ namespace internal
                           const typename SymmetricTensorAccessors::
                             StorageType<4, dim, Number>::base_tensor_type &data)
   {
+    static_assert(dim <= 3, "The selected dimension is not yet supported.");
+
     switch (dim)
       {
         case 1:
@@ -2136,7 +2141,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0][0];
   }
 
