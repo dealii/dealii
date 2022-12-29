@@ -2461,6 +2461,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
+          "dot",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2497,6 +2498,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
+          "mean_value",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2522,6 +2524,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
+          "norm_1",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2551,6 +2554,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
+          "norm_p",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2585,6 +2589,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
+          "add_and_dot",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),

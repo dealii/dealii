@@ -477,6 +477,7 @@ namespace LinearAlgebra
           typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
             exec;
           Kokkos::parallel_reduce(
+            "linfty_norm_local",
             Kokkos::RangePolicy<
               ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
               exec, 0, size),
