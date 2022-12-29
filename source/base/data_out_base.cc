@@ -996,7 +996,7 @@ namespace
 
 
   template <int dim>
-  int
+  unsigned int
   lexicographic_to_vtk_point_index(const std::array<unsigned, dim> &,
                                    const std::array<unsigned, dim> &,
                                    const bool)
@@ -1015,17 +1015,17 @@ namespace
    * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
    */
   template <>
-  int
+  unsigned int
   lexicographic_to_vtk_point_index<2>(
-    const std::array<unsigned, 2> &indices,
-    const std::array<unsigned, 2> &points_per_direction,
+    const std::array<unsigned, 2> &node_indices,
+    const std::array<unsigned, 2> &nodes_per_direction,
     const bool)
   {
-    const unsigned int i = indices[0];
-    const unsigned int j = indices[1];
+    const unsigned int i = node_indices[0];
+    const unsigned int j = node_indices[1];
 
-    const bool ibdy = (i == 0 || i == points_per_direction[0]);
-    const bool jbdy = (j == 0 || j == points_per_direction[1]);
+    const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
+    const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
     // How many boundaries do we lie on at once?
     const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
 
@@ -1040,25 +1040,25 @@ namespace
         if (!ibdy)
           { // On i axis
             return (i - 1) +
-                   (j != 0u ? points_per_direction[0] - 1 +
-                                points_per_direction[1] - 1 :
-                              0) +
+                   (j != 0u ?
+                      nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 :
+                      0) +
                    offset;
           }
 
         if (!jbdy)
           { // On j axis
             return (j - 1) +
-                   (i != 0u ? points_per_direction[0] - 1 :
-                              2 * (points_per_direction[0] - 1) +
-                                points_per_direction[1] - 1) +
+                   (i != 0u ? nodes_per_direction[0] - 1 :
+                              2 * (nodes_per_direction[0] - 1) +
+                                nodes_per_direction[1] - 1) +
                    offset;
           }
       }
 
-    offset += 2 * (points_per_direction[0] - 1 + points_per_direction[1] - 1);
+    offset += 2 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1);
     // nbdy == 0: Face DOF
-    return offset + (i - 1) + (points_per_direction[0] - 1) * ((j - 1));
+    return offset + (i - 1) + (nodes_per_direction[0] - 1) * ((j - 1));
   }
 
 
@@ -1077,19 +1077,19 @@ namespace
    *
    */
   template <>
-  int
+  unsigned int
   lexicographic_to_vtk_point_index<3>(
-    const std::array<unsigned, 3> &indices,
-    const std::array<unsigned, 3> &points_per_direction,
+    const std::array<unsigned, 3> &node_indices,
+    const std::array<unsigned, 3> &nodes_per_direction,
     const bool                     legacy_format)
   {
-    const unsigned int i = indices[0];
-    const unsigned int j = indices[1];
-    const unsigned int k = indices[2];
+    const unsigned int i = node_indices[0];
+    const unsigned int j = node_indices[1];
+    const unsigned int k = node_indices[2];
 
-    const bool ibdy = (i == 0 || i == points_per_direction[0]);
-    const bool jbdy = (j == 0 || j == points_per_direction[1]);
-    const bool kbdy = (k == 0 || k == points_per_direction[2]);
+    const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
+    const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
+    const bool kbdy = (k == 0 || k == nodes_per_direction[2]);
     // How many boundaries do we lie on at once?
     const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
 
@@ -1105,80 +1105,79 @@ namespace
         if (!ibdy)
           { // On i axis
             return (i - 1) +
-                   (j != 0u ? points_per_direction[0] - 1 +
-                                points_per_direction[1] - 1 :
-                              0) +
-                   (k != 0u ? 2 * (points_per_direction[0] - 1 +
-                                   points_per_direction[1] - 1) :
+                   (j != 0u ?
+                      nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 :
+                      0) +
+                   (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
+                                   nodes_per_direction[1] - 1) :
                               0) +
                    offset;
           }
         if (!jbdy)
           { // On j axis
             return (j - 1) +
-                   (i != 0u ? points_per_direction[0] - 1 :
-                              2 * (points_per_direction[0] - 1) +
-                                points_per_direction[1] - 1) +
-                   (k != 0u ? 2 * (points_per_direction[0] - 1 +
-                                   points_per_direction[1] - 1) :
+                   (i != 0u ? nodes_per_direction[0] - 1 :
+                              2 * (nodes_per_direction[0] - 1) +
+                                nodes_per_direction[1] - 1) +
+                   (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
+                                   nodes_per_direction[1] - 1) :
                               0) +
                    offset;
           }
         // !kbdy, On k axis
         offset +=
-          4 * (points_per_direction[0] - 1) + 4 * (points_per_direction[1] - 1);
+          4 * (nodes_per_direction[0] - 1) + 4 * (nodes_per_direction[1] - 1);
         if (legacy_format)
           return (k - 1) +
-                 (points_per_direction[2] - 1) *
+                 (nodes_per_direction[2] - 1) *
                    (i != 0u ? (j != 0u ? 3 : 1) : (j != 0u ? 2 : 0)) +
                  offset;
         else
           return (k - 1) +
-                 (points_per_direction[2] - 1) *
+                 (nodes_per_direction[2] - 1) *
                    (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
                  offset;
       }
 
-    offset += 4 * (points_per_direction[0] - 1 + points_per_direction[1] - 1 +
-                   points_per_direction[2] - 1);
+    offset += 4 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 +
+                   nodes_per_direction[2] - 1);
     if (nbdy == 1) // Face DOF
       {
         if (ibdy) // On i-normal face
           {
-            return (j - 1) + ((points_per_direction[1] - 1) * (k - 1)) +
-                   (i != 0u ? (points_per_direction[1] - 1) *
-                                (points_per_direction[2] - 1) :
+            return (j - 1) + ((nodes_per_direction[1] - 1) * (k - 1)) +
+                   (i != 0u ? (nodes_per_direction[1] - 1) *
+                                (nodes_per_direction[2] - 1) :
                               0) +
                    offset;
           }
         offset +=
-          2 * (points_per_direction[1] - 1) * (points_per_direction[2] - 1);
+          2 * (nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1);
         if (jbdy) // On j-normal face
           {
-            return (i - 1) + ((points_per_direction[0] - 1) * (k - 1)) +
-                   (j != 0u ? (points_per_direction[2] - 1) *
-                                (points_per_direction[0] - 1) :
+            return (i - 1) + ((nodes_per_direction[0] - 1) * (k - 1)) +
+                   (j != 0u ? (nodes_per_direction[2] - 1) *
+                                (nodes_per_direction[0] - 1) :
                               0) +
                    offset;
           }
         offset +=
-          2 * (points_per_direction[2] - 1) * (points_per_direction[0] - 1);
+          2 * (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1);
         // kbdy, On k-normal face
-        return (i - 1) + ((points_per_direction[0] - 1) * (j - 1)) +
-               (k != 0u ? (points_per_direction[0] - 1) *
-                            (points_per_direction[1] - 1) :
-                          0) +
+        return (i - 1) + ((nodes_per_direction[0] - 1) * (j - 1)) +
+               (k != 0u ?
+                  (nodes_per_direction[0] - 1) * (nodes_per_direction[1] - 1) :
+                  0) +
                offset;
       }
 
     // nbdy == 0: Body DOF
-    offset +=
-      2 * ((points_per_direction[1] - 1) * (points_per_direction[2] - 1) +
-           (points_per_direction[2] - 1) * (points_per_direction[0] - 1) +
-           (points_per_direction[0] - 1) * (points_per_direction[1] - 1));
+    offset += 2 * ((nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1) +
+                   (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1) +
+                   (nodes_per_direction[0] - 1) * (nodes_per_direction[1] - 1));
     return offset + (i - 1) +
-           (points_per_direction[0] - 1) *
-             ((j - 1) + (points_per_direction[1] - 1) * ((k - 1)));
+           (nodes_per_direction[0] - 1) *
+             ((j - 1) + (nodes_per_direction[1] - 1) * ((k - 1)));
   }
 
 
