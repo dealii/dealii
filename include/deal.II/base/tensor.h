@@ -3054,7 +3054,7 @@ l1_norm(const Tensor<2, dim, adouble> &t)
     {
       adouble sum = internal::NumberType<adouble>::value(0.0);
       for (unsigned int i = 0; i < dim; ++i)
-        sum += std::fabs(t[i][j]);
+        sum += fabs(t[i][j]);
 
       condassign(max, (sum > max), sum, max);
     }
@@ -3072,7 +3072,7 @@ linfty_norm(const Tensor<2, dim, adouble> &t)
     {
       adouble sum = internal::NumberType<adouble>::value(0.0);
       for (unsigned int j = 0; j < dim; ++j)
-        sum += std::fabs(t[i][j]);
+        sum += fabs(t[i][j]);
 
       condassign(max, (sum > max), sum, max);
     }

@@ -177,7 +177,7 @@ namespace internal
     /**
      * Implementation for triangles.
      */
-    struct CellTypeTri : public CellTypeBase
+    struct CellTypeTriangle : public CellTypeBase
     {
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
@@ -234,7 +234,7 @@ namespace internal
     /**
      * Implementation for quadrilaterals.
      */
-    struct CellTypeQuad : public CellTypeBase
+    struct CellTypeQuadrilateral : public CellTypeBase
     {
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
@@ -291,7 +291,7 @@ namespace internal
     /**
      * Implementation for tetrahedrons.
      */
-    struct CellTypeTet : public CellTypeBase
+    struct CellTypeTetrahedron : public CellTypeBase
     {
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
@@ -639,7 +639,7 @@ namespace internal
     /**
      * Implementation for hexahedra.
      */
-    struct CellTypeHex : public CellTypeBase
+    struct CellTypeHexahedron : public CellTypeBase
     {
       dealii::ArrayView<const unsigned int>
       vertices_of_entity(const unsigned int d,
@@ -1130,7 +1130,7 @@ namespace internal
 
           std::sort(keys.begin(), keys.end());
 
-          ptr_0.reserve(n_unique_entities);
+          ptr_0.reserve(n_unique_entities + 1);
           col_0.reserve(n_unique_entity_vertices);
         }
 
@@ -1450,26 +1450,23 @@ namespace internal
       std::vector<std::shared_ptr<CellTypeBase>> cell_types_impl(8);
 
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCells::Line)]
-        .reset(new CellTypeLine());
+        dealii::ReferenceCells::Line)] = std::make_shared<CellTypeLine>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCells::Triangle)]
-        .reset(new CellTypeTri());
+        dealii::ReferenceCells::Triangle)] =
+        std::make_shared<CellTypeTriangle>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCells::Quadrilateral)]
-        .reset(new CellTypeQuad());
+        dealii::ReferenceCells::Quadrilateral)] =
+        std::make_shared<CellTypeQuadrilateral>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCells::Tetrahedron)]
-        .reset(new CellTypeTet());
+        dealii::ReferenceCells::Tetrahedron)] =
+        std::make_shared<CellTypeTetrahedron>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCells::Pyramid)]
-        .reset(new CellTypePyramid());
+        dealii::ReferenceCells::Pyramid)] = std::make_shared<CellTypePyramid>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCells::Wedge)]
-        .reset(new CellTypeWedge());
+        dealii::ReferenceCells::Wedge)]   = std::make_shared<CellTypeWedge>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-                        dealii::ReferenceCells::Hexahedron)]
-        .reset(new CellTypeHex());
+        dealii::ReferenceCells::Hexahedron)] =
+        std::make_shared<CellTypeHexahedron>();
 
       // determine cell types and process vertices
       std::vector<T> cell_vertices;

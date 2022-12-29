@@ -1,0 +1,3 @@
+New: PETScWrappers:BlockSparseMatrix now is also a PETSc MATNEST type.
+<br>
+(Stefano Zampini, 2022/12/20)

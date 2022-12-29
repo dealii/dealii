@@ -22,10 +22,6 @@ jobs:
       run: |
         g++ -v
         cmake --version
-    - name: Install mold linker
-      uses: rui314/setup-mold@v1
-      with:
-        make-default: false
     - name: configure
       run: |
         cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON .
@@ -68,10 +64,6 @@ jobs:
         #export OMPI_CXX=g++
         #export OMPI_CC=gcc
         #export OMPI_FC=gfortran
-    - name: Install mold linker
-      uses: rui314/setup-mold@v1
-      with:
-        make-default: false
     - name: info
       run: |
         mpicxx -v

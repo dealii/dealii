@@ -108,8 +108,8 @@ namespace internal
       scatter_context, v, sequential_vector, INSERT_VALUES, SCATTER_FORWARD);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    PetscScalar *start_ptr;
-    ierr = VecGetArray(sequential_vector, &start_ptr);
+    const PetscScalar *start_ptr;
+    ierr = VecGetArrayRead(sequential_vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const PETScWrappers::VectorBase::size_type v_size = v.size();
@@ -119,7 +119,7 @@ namespace internal
     internal::VectorOperations::copy(start_ptr,
                                      start_ptr + out.size(),
                                      out.begin());
-    ierr = VecRestoreArray(sequential_vector, &start_ptr);
+    ierr = VecRestoreArrayRead(sequential_vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = VecScatterDestroy(&scatter_context);

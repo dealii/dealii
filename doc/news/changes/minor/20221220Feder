@@ -1,0 +1,3 @@
+Improved: FEInterfaceValues objects can now also be constructed using hp-collections.
+<br>
+(Marco Feder, 2022/12/20)

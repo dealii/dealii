@@ -571,11 +571,19 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         set_tests_properties(${_test_full} PROPERTIES PROCESSORS ${_slots})
       endif()
 
-      if(NOT "${_n_cpu}${_n_threads}" STREQUAL "00")
+      #
+      # Serialize all tests that share a common executable target. This
+      # involves tests with .threads=N. and .mpirun=N. annotation, as well
+      # as tests with parameter files (that might share a common executable
+      # target).
+      #
+      if( NOT "${_n_cpu}${_n_threads}" STREQUAL "00" OR
+          "${_source_file}" MATCHES "(prm|json)$" )
         #
-        # Running multiple variants in parallel triggers a race condition
-        # where the same (not yet existent) executable is built
-        # concurrently leading to undefined outcomes.
+        # Running multiple variants of tests with the same target
+        # executable in parallel triggers a race condition where the same
+        # (not yet existent) target is built concurrently leading to
+        # undefined outcomes.
         #
         # Luckily CMake has a mechanism to force a test to be run after
         # another has finished (and both are scheduled):

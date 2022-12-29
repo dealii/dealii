@@ -1358,7 +1358,7 @@ TriaAccessor<structdim, dim, spacedim>::reference_cell() const
     return this->tria->levels[this->present_level]
       ->reference_cell[this->present_index];
   else
-    return this->tria->faces->quad_reference_cell[this->present_index];
+    return this->tria->faces->get_quad_type(this->present_index);
 }
 
 

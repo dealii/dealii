@@ -345,10 +345,10 @@ namespace PETScWrappers
 
       // get a representation of the vector and
       // loop over all the elements
-      PetscScalar *val;
-      PetscInt     nlocal, istart, iend;
+      const PetscScalar *val;
+      PetscInt           nlocal, istart, iend;
 
-      PetscErrorCode ierr = VecGetArray(vector, &val);
+      PetscErrorCode ierr = VecGetArrayRead(vector, &val);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       ierr = VecGetLocalSize(vector, &nlocal);
@@ -404,7 +404,7 @@ namespace PETScWrappers
 
       // restore the representation of the
       // vector
-      ierr = VecRestoreArray(vector, &val);
+      ierr = VecRestoreArrayRead(vector, &val);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       AssertThrow(out.fail() == false, ExcIO());

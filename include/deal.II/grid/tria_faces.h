@@ -66,18 +66,34 @@ namespace internal
       TriaObjects quads;
 
       /**
-       * Orientation of each line of each quad.
+       * Orientation of each line of each quad. Like elsewhere, `true` refers to
+       * the standard orientation and `false` refers to the reverse orientation.
        *
        * @note Used only for dim=3.
        */
-      std::vector<unsigned char> quads_line_orientations;
+      std::vector<bool> quads_line_orientations;
 
       /**
-       * Reference cell type of each quad.
+       * Whether or not each quad is a Quadrilateral. Since, if dim = 3, faces
+       * are either Triangles or Quadrilaterals, it suffices to store a
+       * boolean.
        *
        * @note Used only for dim=3.
        */
-      std::vector<dealii::ReferenceCell> quad_reference_cell;
+      std::vector<bool> quad_is_quadrilateral;
+
+      /**
+       * Helper accessor function for quad_is_quadrilateral
+       */
+      dealii::ReferenceCell
+      get_quad_type(const std::size_t index) const;
+
+      /**
+       * Helper accessor function for quad_is_quadrilateral
+       */
+      void
+      set_quad_type(const std::size_t           index,
+                    const dealii::ReferenceCell face_type);
 
       /**
        * The TriaObject containing the data of lines.
@@ -105,12 +121,38 @@ namespace internal
 
 
 
+    inline dealii::ReferenceCell
+    TriaFaces::get_quad_type(const std::size_t index) const
+    {
+      AssertIndexRange(index, quad_is_quadrilateral.size());
+      return quad_is_quadrilateral[index] ? ReferenceCells::Quadrilateral :
+                                            ReferenceCells::Triangle;
+    }
+
+
+
+    inline void
+    TriaFaces::set_quad_type(const std::size_t           index,
+                             const dealii::ReferenceCell face_type)
+    {
+      AssertIndexRange(index, quad_is_quadrilateral.size());
+      Assert(face_type == ReferenceCells::Quadrilateral ||
+               face_type == ReferenceCells::Triangle,
+             ExcInternalError());
+      if (face_type == ReferenceCells::Quadrilateral)
+        quad_is_quadrilateral[index] = true;
+      else
+        quad_is_quadrilateral[index] = false;
+    }
+
+
+
     template <class Archive>
     void
     TriaFaces::serialize(Archive &ar, const unsigned int)
     {
       ar &dim;
-      ar &quads &lines &quads_line_orientations &quad_reference_cell;
+      ar &quads &lines &quads_line_orientations &quad_is_quadrilateral;
     }
   } // namespace TriangulationImplementation
 } // namespace internal

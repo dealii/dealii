@@ -3,7 +3,7 @@ DEAL::Exception: StandardExceptions::ExcMemoryLeak(current_alloc)
 DEAL::
 --------------------------------------------------------
 An error occurred in file <vector_memory.templates.h> in function
-    dealii::GrowingVectorMemory<VectorType>::~GrowingVectorMemory() [with VectorType = dealii::LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>]
+    dealii::GrowingVectorMemory<VectorType>::~GrowingVectorMemory() [with VectorType = dealii::LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::Default>]
 The violated condition was: 
     current_alloc == 0
 Additional information: 
@@ -14,7 +14,7 @@ DEAL::Exception: StandardExceptions::ExcMemoryLeak(current_alloc)
 DEAL::
 --------------------------------------------------------
 An error occurred in file <vector_memory.templates.h> in function
-    dealii::GrowingVectorMemory<VectorType>::~GrowingVectorMemory() [with VectorType = dealii::LinearAlgebra::distributed::Vector<float, dealii::MemorySpace::CUDA>]
+    dealii::GrowingVectorMemory<VectorType>::~GrowingVectorMemory() [with VectorType = dealii::LinearAlgebra::distributed::Vector<float, dealii::MemorySpace::Default>]
 The violated condition was: 
     current_alloc == 0
 Additional information: 

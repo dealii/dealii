@@ -105,7 +105,7 @@ namespace PETScWrappers
       /**
        * Destructor.
        */
-      ~BlockSparseMatrix() override = default;
+      ~BlockSparseMatrix() override;
 
       /**
        * Pseudo copy operator only copying empty objects. The sizes of the
@@ -271,6 +271,26 @@ namespace PETScWrappers
        * protected.
        */
       using BlockMatrixBase<SparseMatrix>::clear;
+
+      /**
+       * Conversion operator to gain access to the underlying PETSc type. If you
+       * do this, you cut this class off some information it may need, so this
+       * conversion operator should only be used if you know what you do. In
+       * particular, it should only be used for read-only operations into the
+       * matrix.
+       */
+      operator const Mat &() const;
+
+      /**
+       * Return a reference to the underlying PETSc type. It can be used to
+       * modify the underlying data, so use it only when you know what you
+       * are doing.
+       */
+      Mat &
+      petsc_matrix();
+
+    private:
+      Mat petsc_nest_matrix = nullptr;
     };
 
 

@@ -137,12 +137,12 @@ class TensorFunction;
  * @tparam dim The space dimension of the range space within which the domain
  *   $\Omega$ of the function lies. Consequently, the function will be
  *   evaluated at objects of type @p Point<dim>.
- * @tparam RangeNumberType The scalar type of the vector space that is the range
- *   (or image) of this function. As discussed above, objects of the current
- * type represent functions from ${\mathbb R}^\text{dim}$ to
- *   $S^{n_\text{components}}$ where $S$ is the underlying scalar type of
- *   the vector space. The type of $S$ is given by the @p RangeNumberType template
- *   argument.
+ * @tparam RangeNumberType The scalar type of the vector space that is
+ *   the range (or image) of this function. As discussed above,
+ *   objects of the current type represent functions from ${\mathbb
+ *   R}^\text{dim}$ to $S^{n_\text{components}}$ where $S$ is the
+ *   underlying scalar type of the vector space. The type of $S$ is
+ *   given by the @p RangeNumberType template argument.
  *
  * @ingroup functions
  */
