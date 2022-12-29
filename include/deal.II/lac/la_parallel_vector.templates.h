@@ -438,9 +438,9 @@ namespace LinearAlgebra
             });
           host_exec.fence();
           Kokkos::realloc(indices_dev, tmp_n_elements);
-          Kokkos::deep_copy(indices_dev,
-                            Kokkos::View<size_type *>(indices.data(),
-                                                      tmp_n_elements));
+          Kokkos::deep_copy(
+            indices_dev,
+            Kokkos::subview(indices, Kokkos::make_pair(0, tmp_n_elements)));
 
           if (operation == VectorOperation::add)
             Kokkos::parallel_for(
