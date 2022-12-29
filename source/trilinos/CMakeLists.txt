@@ -13,19 +13,19 @@
 ##
 ## ---------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+set(_src
   nox.cc
   )
 
-SET(_inst
+set(_inst
   nox.inst.in
   )
 
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/trilinos/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_trilinos OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_trilinos "${_inst}")
+deal_ii_add_library(obj_trilinos OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(obj_trilinos "${_inst}")

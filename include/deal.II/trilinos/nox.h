@@ -18,13 +18,15 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
 
 #  include <deal.II/base/exceptions.h>
 
 #  include <deal.II/lac/solver_control.h>
 
 #  include <Teuchos_ParameterList.hpp>
+
+#  include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,9 +37,31 @@ namespace TrilinosWrappers
 
 
   /**
-   * Wrapper around the non-linear solver from the NOX
+   * Wrapper around the nonlinear solver from the NOX
    * packge (https://docs.trilinos.org/dev/packages/nox/doc/html/index.html),
    * targeting deal.II data structures.
+   *
+   * The following code shows the steps how to use this class:
+   * @code
+   * // set configuration
+   * TrilinosWrappers::NOXSolver<VectorType>::AdditionalData additional_data;
+   *
+   * // create nonlinear solver
+   * TrilinosWrappers::NOXSolver<VectorType> solver(additional_data);
+   *
+   * // set user functions to compute residual,
+   * // set up Jacobian, and to apply the inverse of
+   * // Jacobian; note that there are more functions that
+   * // can be set
+   * solver.residual = [](const auto &src, auto &dst) {...};
+   * solver.setup_jacobian = [](const auto &src) {...};
+   * solver.solve_with_jacobian =
+   *   [](const auto &src, auto &dst, const auto) {...};
+   *
+   * // solver nonlinear system with solution containing the intial guess and
+   * // the final solution
+   * solver.solve(solution);
+   * @endcode
    */
   template <typename VectorType>
   class NOXSolver
@@ -62,22 +86,28 @@ namespace TrilinosWrappers
                      const bool         reuse_solver                   = false);
 
       /**
-       * Max number of non-linear iterations.
+       * Max number of nonlinear iterations.
        */
       unsigned int max_iter;
 
       /**
-       * Absolute l2 tolerance to be reached.
+       * Absolute l2 tolerance of the residual to be reached.
+       *
+       * @note Solver terminates successfully if either the absolut or
+       * the relative tolerance has been reached.
        */
       double abs_tol;
 
       /**
-       * Relative l2 tolerance to be reached.
+       * Relative l2 tolerance of the residual to be reached.
+       *
+       * @note Solver terminates successfully if either the absolut or
+       * the relative tolerance has been reached.
        */
       double rel_tol;
 
       /**
-       * Number of non-linear iterations after which the preconditioner
+       * Number of nonlinear iterations after which the preconditioner
        * should be updated.
        */
       unsigned int threshold_nonlinear_iterations;
@@ -90,7 +120,10 @@ namespace TrilinosWrappers
       unsigned int threshold_n_linear_iterations;
 
       /**
-       * Reuse NOX solver instance in the next non-linear solution.
+       * Reuse nonlinear solver the next time solve() is called. In particular,
+       * this parameter allows to reuse the preconditioner from the last
+       * solution step, enabling preconditioner lagging over multiple nonlinear
+       * solutions.
        */
       bool reuse_solver;
     };
@@ -98,7 +131,7 @@ namespace TrilinosWrappers
     /**
      * Constructor.
      *
-     * If @p parameters is not filled, a Newton solver with full step is used.
+     * If @p parameters is not filled, a Newton solver with a full step is used.
      * An overview of possible parameters is given at
      * https://docs.trilinos.org/dev/packages/nox/doc/html/parameters.html.
      */
@@ -107,36 +140,39 @@ namespace TrilinosWrappers
                 Teuchos::rcp(new Teuchos::ParameterList));
 
     /**
-     * Clear internal state.
+     * Clear the internal state.
      */
     void
     clear();
 
     /**
-     * Solve non-linear problem and return number of iterations.
+     * Solve the nonlinear problem and return the number of nonlinear
+     * iterations executed.
      */
     unsigned int
     solve(VectorType &solution);
 
     /**
-     * User function that computes the residual.
+     * A user function that computes the residual @p f based on the
+     * current solution @p x.
      *
      * @note This function should return 0 in the case of success.
      */
     std::function<int(const VectorType &x, VectorType &f)> residual;
 
     /**
-     * User function that sets up the Jacobian.
+     * A user function that sets up the Jacobian, based on the
+     * current solution @p x.
      *
      * @note This function should return 0 in the case of success.
      */
     std::function<int(const VectorType &x)> setup_jacobian;
 
     /**
-     * User function that sets up the preconditioner for inverting
-     * the Jacobian.
+     * A user function that sets up the preconditioner for inverting
+     * the Jacobian, based on the current solution @p x.
      *
-     * @note The function is optional and is used when setup_jacobian is
+     * @note This function is optional and is used when setup_jacobian is
      * called and the preconditioner needs to be updated (see
      * update_preconditioner_predicate and
      * AdditionalData::threshold_nonlinear_iterations).
@@ -146,9 +182,10 @@ namespace TrilinosWrappers
     std::function<int(const VectorType &x)> setup_preconditioner;
 
     /**
-     * User function that applies the Jacobian.
+     * A user function that applies the Jacobian to @p x and writes
+     * the result in @p v.
      *
-     * @note The function is optional and is used in the case of certain
+     * @note This function is optional and is used in the case of certain
      * configurations. For instance, this function is required if the
      * polynomial line search (@p NOX::LineSearch::Polynomial) is
      * chosen, whereas for the full step case (@p NOX::LineSearch::FullStep)
@@ -159,9 +196,11 @@ namespace TrilinosWrappers
     std::function<int(const VectorType &x, VectorType &v)> apply_jacobian;
 
     /**
-     * User function that applies the inverse of the Jacobian.
+     * A user function that applies the inverse of the Jacobian to
+     * @p x and writes the result in @p x. The parameter @p tolerance
+     * species the error reduction if a interative solver is used.
      *
-     * @note The function is optional and is used in the case of certain
+     * @note This function is optional and is used in the case of certain
      * configurations.
      *
      * @note This function should return 0 in the case of success.
@@ -171,25 +210,29 @@ namespace TrilinosWrappers
       solve_with_jacobian;
 
     /**
-     * User function that applies the inverse of the Jacobian and
-     * returns the numer of linear iterations the linear solver needed.
+     * A user function that applies the inverse of the Jacobian to
+     * @p x, writes the result in @p x and returns the numer of
+     * linear iterations the linear solver needed.
+     * The parameter @p tolerance species the error reduction if a
+     * interative solver is used.
      *
-     * @note This function should return -1 in the case of failure.
+     * @note This function is optional and is used in the case of certain
+     * configurations.
      */
     std::function<
       int(const VectorType &f, VectorType &x, const double tolerance)>
       solve_with_jacobian_and_track_n_linear_iterations;
 
     /**
-     * User function that allows to check convergence in addition to
+     * A user function that allows to check convergence in addition to
      * ones checking the l2-norm and the number of iterations (see
-     * AdditionalData). It is run after each non-linear iteration.
+     * AdditionalData). It is run after each nonlinear iteration.
      *
      * The input are the current iteration number @p i, the l2-norm
      * @p norm_f of the residual vector, the current solution @p x,
      * and the current residual vector @p f.
      *
-     * @note The function is optional.
+     * @note This function is optional.
      */
     std::function<SolverControl::State(const unsigned int i,
                                        const double       norm_f,
@@ -198,12 +241,13 @@ namespace TrilinosWrappers
       check_iteration_status;
 
     /**
-     * Function that allows to force to update the preconditioner in
-     * addition to AdditionalData::threshold_nonlinear_iterations. A reason
+     * A user function that, in addition to
+     * AdditionalData::threshold_nonlinear_iterations,
+     * allows to force to update the preconditioner. A reason
      * for wanting to update the preconditioner is when the expected number
-     * of linear iterations exceeds.
+     * of linear iterations is exceeded.
      *
-     * @note The function is optional. If no function is attached, this
+     * @note This function is optional. If no function is attached, this
      * means implicitly a return value of false.
      */
     std::function<bool()> update_preconditioner_predicate;
@@ -222,22 +266,22 @@ namespace TrilinosWrappers
     const Teuchos::RCP<Teuchos::ParameterList> parameters;
 
     /**
-     * Counter for number of (accumulated) residual evaluations.
+     * A counter for the number of (accumulated) residual evaluations.
      */
     unsigned int n_residual_evaluations;
 
     /**
-     * Counter for number of (accumulated) Jacobi applications.
+     * A counter for the number of (accumulated) Jacobi applications.
      */
     unsigned int n_jacobian_applications;
 
     /**
-     * Counter for number of (accumulated) non-linear iterations.
+     * A counter for the number of (accumulated) nonlinear iterations.
      */
     unsigned int n_nonlinear_iterations;
 
     /**
-     * Number of linear iterations of the last Jacobian solve.
+     * The number of linear iterations of the last Jacobian solve.
      */
     unsigned int n_last_linear_iterations;
   };

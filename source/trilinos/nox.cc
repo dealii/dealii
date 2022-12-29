@@ -29,7 +29,7 @@
 
 #include <deal.II/trilinos/nox.templates.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
 
 DEAL_II_NAMESPACE_OPEN
 
