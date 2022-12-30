@@ -5900,169 +5900,120 @@ namespace DataOutBase
             }
           else // a hypercube cell
             {
+              const unsigned int n_subdivisions         = patch.n_subdivisions;
+              const unsigned int n_points_per_direction = n_subdivisions + 1;
+
+              std::vector<unsigned> local_vertex_order;
+
+              // Output the current state of the local_vertex_order array,
+              // then clear it:
+              const auto flush_current_cell = [&flags,
+                                               &o,
+                                               &cells,
+                                               first_vertex_of_patch,
+                                               &local_vertex_order]() {
+                if (deal_ii_with_zlib &&
+                    (flags.compression_level !=
+                     DataOutBase::CompressionLevel::plain_text))
+                  {
+                    for (const auto &c : local_vertex_order)
+                      cells.push_back(first_vertex_of_patch + c);
+                  }
+                else
+                  {
+                    for (const auto &c : local_vertex_order)
+                      o << '\t' << first_vertex_of_patch + c;
+                    o << '\n';
+                  }
+
+                local_vertex_order.clear();
+              };
+
               if (flags.write_higher_order_cells == false)
                 {
-                  const unsigned int n_subdivisions = patch.n_subdivisions;
-                  const unsigned int n_points_per_direction =
-                    n_subdivisions + 1;
+                  local_vertex_order.reserve(Utilities::fixed_power<dim>(2));
 
                   switch (dim)
                     {
                       case 0:
                         {
-                          auto write_cell =
-                            [&flags, &o, &cells](const unsigned int start) {
-                              if (deal_ii_with_zlib &&
-                                  (flags.compression_level !=
-                                   DataOutBase::CompressionLevel::plain_text))
-                                {
-                                  cells.push_back(start);
-                                }
-                              else
-                                {
-                                  o << start;
-                                  o << '\n';
-                                }
-                            };
-
-                          const unsigned int starting_offset =
-                            first_vertex_of_patch;
-                          write_cell(starting_offset);
+                          local_vertex_order.emplace_back(0);
+                          flush_current_cell();
                           break;
                         }
 
                       case 1:
                         {
-                          auto write_cell =
-                            [&flags, &o, &cells](const unsigned int start) {
-                              if (deal_ii_with_zlib &&
-                                  (flags.compression_level !=
-                                   DataOutBase::CompressionLevel::plain_text))
-                                {
-                                  cells.push_back(start);
-                                  cells.push_back(start + 1);
-                                }
-                              else
-                                {
-                                  o << start << '\t' << start + 1;
-                                  o << '\n';
-                                }
-                            };
-
                           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                             {
-                              const unsigned int starting_offset =
-                                first_vertex_of_patch + i1;
-                              write_cell(starting_offset);
+                              const unsigned int starting_offset = i1;
+                              local_vertex_order.emplace_back(starting_offset);
+                              local_vertex_order.emplace_back(starting_offset +
+                                                              1);
+                              flush_current_cell();
                             }
                           break;
                         }
 
                       case 2:
                         {
-                          auto write_cell =
-                            [&flags, &o, &cells, n_points_per_direction](
-                              const unsigned int start) {
-                              if (deal_ii_with_zlib &&
-                                  (flags.compression_level !=
-                                   DataOutBase::CompressionLevel::plain_text))
-                                {
-                                  cells.push_back(start);
-                                  cells.push_back(start + 1);
-                                  cells.push_back(start +
-                                                  n_points_per_direction + 1);
-                                  cells.push_back(start +
-                                                  n_points_per_direction);
-                                }
-                              else
-                                {
-                                  o << start << '\t' << start + 1 << '\t'
-                                    << start + n_points_per_direction + 1
-                                    << '\t' << start + n_points_per_direction;
-                                  o << '\n';
-                                }
-                            };
-
                           for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
                               {
                                 const unsigned int starting_offset =
-                                  first_vertex_of_patch +
                                   i2 * n_points_per_direction + i1;
-                                write_cell(starting_offset);
+                                local_vertex_order.emplace_back(
+                                  starting_offset);
+                                local_vertex_order.emplace_back(
+                                  starting_offset + 1);
+                                local_vertex_order.emplace_back(
+                                  starting_offset + n_points_per_direction + 1);
+                                local_vertex_order.emplace_back(
+                                  starting_offset + n_points_per_direction);
+                                flush_current_cell();
                               }
                           break;
                         }
 
                       case 3:
                         {
-                          auto write_cell = [&flags,
-                                             &o,
-                                             &cells,
-                                             n_points_per_direction](
-                                              const unsigned int start) {
-                            if (deal_ii_with_zlib &&
-                                (flags.compression_level !=
-                                 DataOutBase::CompressionLevel::plain_text))
-                              {
-                                cells.push_back(start);
-                                cells.push_back(start + 1);
-                                cells.push_back(start + n_points_per_direction +
-                                                1);
-                                cells.push_back(start + n_points_per_direction);
-                                cells.push_back(start +
-                                                n_points_per_direction *
-                                                  n_points_per_direction);
-                                cells.push_back(start +
-                                                n_points_per_direction *
-                                                  n_points_per_direction +
-                                                1);
-                                cells.push_back(start +
-                                                n_points_per_direction *
-                                                  n_points_per_direction +
-                                                n_points_per_direction + 1);
-                                cells.push_back(start +
-                                                n_points_per_direction *
-                                                  n_points_per_direction +
-                                                n_points_per_direction);
-                              }
-                            else
-                              {
-                                o << start << '\t' << start + 1 << '\t'
-                                  << start + n_points_per_direction + 1 << '\t'
-                                  << start + n_points_per_direction << '\t'
-                                  << start + n_points_per_direction *
-                                               n_points_per_direction
-                                  << '\t'
-                                  << start +
-                                       n_points_per_direction *
-                                         n_points_per_direction +
-                                       1
-                                  << '\t'
-                                  << start +
-                                       n_points_per_direction *
-                                         n_points_per_direction +
-                                       n_points_per_direction + 1
-                                  << '\t'
-                                  << start +
-                                       n_points_per_direction *
-                                         n_points_per_direction +
-                                       n_points_per_direction;
-                                o << '\n';
-                              }
-                          };
-
                           for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
                             for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
                               for (unsigned int i1 = 0; i1 < n_subdivisions;
                                    ++i1)
                                 {
                                   const unsigned int starting_offset =
-                                    first_vertex_of_patch +
                                     i3 * n_points_per_direction *
                                       n_points_per_direction +
                                     i2 * n_points_per_direction + i1;
-                                  write_cell(starting_offset);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset + 1);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset + n_points_per_direction +
+                                    1);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset + n_points_per_direction);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset + n_points_per_direction *
+                                                        n_points_per_direction);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset +
+                                    n_points_per_direction *
+                                      n_points_per_direction +
+                                    1);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset +
+                                    n_points_per_direction *
+                                      n_points_per_direction +
+                                    n_points_per_direction + 1);
+                                  local_vertex_order.emplace_back(
+                                    starting_offset +
+                                    n_points_per_direction *
+                                      n_points_per_direction +
+                                    n_points_per_direction);
+                                  flush_current_cell();
                                 }
                           break;
                         }
@@ -6073,11 +6024,7 @@ namespace DataOutBase
                 }
               else // use higher-order output
                 {
-                  const unsigned int n_subdivisions = patch.n_subdivisions;
-                  const unsigned int n_points_per_direction =
-                    n_subdivisions + 1;
-
-                  std::vector<unsigned> local_vertex_order(
+                  local_vertex_order.resize(
                     Utilities::fixed_power<dim>(n_points_per_direction));
 
                   switch (dim)
@@ -6104,6 +6051,7 @@ namespace DataOutBase
                                     /* use VTU, not VTK: */ false);
                               local_vertex_order[connectivity_index] =
                                 local_index;
+                              flush_current_cell();
                             }
 
                           break;
@@ -6126,6 +6074,7 @@ namespace DataOutBase
                                 local_vertex_order[connectivity_index] =
                                   local_index;
                               }
+                          flush_current_cell();
 
                           break;
                         }
@@ -6154,26 +6103,11 @@ namespace DataOutBase
                                     local_index;
                                 }
 
+                          flush_current_cell();
                           break;
                         }
                       default:
                         Assert(false, ExcNotImplemented());
-                    }
-
-                  // Having so set up the 'local_vertex_order' data structure,
-                  // output it:
-                  if (deal_ii_with_zlib &&
-                      (flags.compression_level !=
-                       DataOutBase::CompressionLevel::plain_text))
-                    {
-                      for (const auto &c : local_vertex_order)
-                        cells.push_back(first_vertex_of_patch + c);
-                    }
-                  else
-                    {
-                      for (const auto &c : local_vertex_order)
-                        o << '\t' << first_vertex_of_patch + c;
-                      o << '\n';
                     }
                 }
 
