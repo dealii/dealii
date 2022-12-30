@@ -61,7 +61,7 @@ test()
   if (numproc > 2)
     local_relevant0.add_index(8);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v0(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v0(
     local_owned0, local_relevant0, MPI_COMM_WORLD);
 
   // vector1: local size 4
@@ -83,7 +83,7 @@ test()
       local_relevant1.add_index(10);
     }
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v1(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v1(
     local_owned1, local_relevant1, MPI_COMM_WORLD);
 
   v0 = 1;
@@ -179,7 +179,7 @@ test()
     deallog << "Ghost values after re-set OK" << std::endl;
 
   // swap with an empty vector
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v2;
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v2;
   v2.swap(v0);
   AssertDimension(v0.size(), 0);
   AssertDimension(v2.size(), global_size1);
@@ -215,8 +215,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

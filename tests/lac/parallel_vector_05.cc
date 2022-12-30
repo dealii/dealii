@@ -14,9 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check that handling of ghost elements in parallel distributed vectors works
-// appropriately when creating a vector from a non-ghosted source vector using
-// the assignment operator
+// check that compress(add) with zero add does not change the vector entry
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
@@ -40,61 +38,50 @@ test()
   if (myid == 0)
     deallog << "numproc=" << numproc << std::endl;
 
-  // processor 0 and 1 own 2 indices each, higher processors nothing, all are
-  // ghosting global elements 1 and 3
-  IndexSet local_owned(std::min(numproc * 2, 4U));
-  if (myid < 2)
-    local_owned.add_range(myid * 2, myid * 2 + 2);
-  IndexSet local_relevant(local_owned.size());
+
+  // each processor owns 2 indices and all
+  // are ghosting element 1 (the second)
+  IndexSet local_owned(numproc * 2);
+  local_owned.add_range(myid * 2, myid * 2 + 2);
+  IndexSet local_relevant(numproc * 2);
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
-  if (numproc > 1)
-    local_relevant.add_range(3, 4);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
 
-  // set local values
+  // set local values and check them
   LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
-  if (myid < 2)
-    {
-      rw_vector(myid * 2)     = myid * 2.0;
-      rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
-    }
+  rw_vector(myid * 2)     = myid * 2.0;
+  rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
 
   v.import(rw_vector, VectorOperation::insert);
+  v *= 2.0;
 
-  if (myid == 0)
-    deallog << "v has ghost elements: " << v.has_ghost_elements() << std::endl;
+  rw_vector.import(v, VectorOperation::insert);
+  Assert(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+  Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> w, x;
-  w = v;
-  if (myid == 0)
-    deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;
+  // set ghost dof to zero on remote processors,
+  // compress
+  IndexSet                               ghost_set(numproc * 2);
+  LinearAlgebra::ReadWriteVector<double> ghost_vector;
+  if (myid > 0)
+    {
+      ghost_set.add_index(1);
+      ghost_vector.reinit(ghost_set);
+      ghost_vector(1) = 0;
+    }
+  else
+    ghost_vector.reinit(ghost_set);
 
-  v.update_ghost_values();
-  w = v;
-  if (myid == 0)
-    deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;
 
-  v.zero_out_ghost_values();
-  w = v;
-  if (myid == 0)
-    deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;
+  v.import(ghost_vector, VectorOperation::add);
 
-  w.zero_out_ghost_values();
-  w = v;
-  if (myid == 0)
-    deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;
-
-  v.update_ghost_values();
-  x = v;
-  if (myid == 0)
-    deallog << "x has ghost elements: " << x.has_ghost_elements() << std::endl;
-
-  x.zero_out_ghost_values();
-  if (myid == 0)
-    deallog << "x has ghost elements: " << x.has_ghost_elements() << std::endl;
+  // check that nothing has changed
+  rw_vector.import(v, VectorOperation::insert);
+  Assert(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+  Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -110,8 +97,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

@@ -15,7 +15,7 @@
 
 
 // Check for a bug where compress cannot be called for a LA::d::Vector<Host> in
-// a CUDA file
+// a Device file
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
@@ -67,8 +67,6 @@ main(int argc, char **argv)
 
   unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(rank));
-
-  init_cuda(true);
 
   if (rank == 0)
     {

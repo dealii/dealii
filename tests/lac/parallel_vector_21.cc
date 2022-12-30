@@ -29,12 +29,6 @@
 
 #include "../tests.h"
 
-__global__ void
-set(double *v)
-{
-  v[threadIdx.x] = 1.;
-}
-
 void
 test()
 {
@@ -47,17 +41,23 @@ test()
   ghost_set.add_index(0);
   ghost_set.add_index(2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     locally_owned, ghost_set, MPI_COMM_WORLD);
 
   // create vector without actually setting the entries since they will be
   // overwritten soon anyway
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v2;
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v2;
   v2.reinit(v, true);
 
   // set locally owned range of v2 manually
-  set<<<1, v2.local_size()>>>(v2.get_values());
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> v2_view(
+    v2.get_values(), v2.local_size());
+  Kokkos::deep_copy(v2_view, 1.);
 
+  Kokkos::parallel_for(
+    v2.local_size(), KOKKOS_LAMBDA(int i) {
+      KOKKOS_IMPL_DO_NOT_USE_PRINTF("%d: %f\n", i, v2_view(i));
+    });
   // add entries to ghost values
   // Because of limitation in import, the IndexSet of the ReadWriteVector needs
   // to have the local elements.
@@ -85,8 +85,6 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
-
-  init_cuda(true);
 
   MPILogInitAll log;
   test();

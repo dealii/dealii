@@ -53,15 +53,15 @@ test()
   vec_ref.compress(VectorOperation::insert);
 
   auto partitioner = vec_ref.get_partitioner();
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> vec_dev(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> vec_dev(
     partitioner);
   LinearAlgebra::distributed::Vector<double, MemorySpace::Host> vec_host(
     partitioner);
 
-  // Assignment from Host to CUDA
+  // Assignment from Host to Default
   vec_dev.import(vec_ref, VectorOperation::insert);
 
-  // Assignment from CUDA to Host
+  // Assignment from Default to Host
   vec_host.import(vec_dev, VectorOperation::insert);
 
   for (unsigned int i = 0; i < ghost_size; ++i)
@@ -83,8 +83,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

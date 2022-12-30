@@ -55,10 +55,10 @@ test()
   local_relevant = local_owned;
   local_relevant.add_index(2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
   AssertDimension(static_cast<unsigned int>(actual_local_size), v.local_size());
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> w(v), x(v),
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> w(v), x(v),
     y(v);
 
   // set local elements
@@ -236,8 +236,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

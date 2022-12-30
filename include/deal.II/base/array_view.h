@@ -345,45 +345,6 @@ private:
 //---------------------------------------------------------------------------
 
 
-namespace internal
-{
-  namespace ArrayViewHelper
-  {
-    template <typename MemorySpaceType>
-    inline bool
-    is_in_correct_memory_space(const void *const ptr)
-    {
-#ifndef DEAL_II_COMPILER_CUDA_AWARE
-      (void)ptr;
-      static_assert(std::is_same<MemorySpaceType, MemorySpace::Host>::value,
-                    "If the compiler doesn't understand CUDA code, "
-                    "the only possible memory space is 'MemorySpace::Host'!");
-      return true;
-#else
-      cudaPointerAttributes attributes;
-      const cudaError_t cuda_error = cudaPointerGetAttributes(&attributes, ptr);
-      if (cuda_error != cudaErrorInvalidValue)
-        {
-          AssertCuda(cuda_error);
-          if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
-            return (attributes.type == cudaMemoryTypeHost) ||
-                   (attributes.type == cudaMemoryTypeUnregistered);
-          else
-            return attributes.type == cudaMemoryTypeDevice;
-        }
-      else
-        {
-          // ignore and reset the error since host pointers produce an error
-          cudaGetLastError();
-          return std::is_same<MemorySpaceType, MemorySpace::Host>::value;
-        }
-#endif
-    }
-  } // namespace ArrayViewHelper
-} // namespace internal
-
-
-
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView()
   : starting_element(nullptr)
@@ -398,14 +359,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const std::size_t n_elements)
   : starting_element(starting_element)
   , n_elements(n_elements)
-{
-  Assert(
-    n_elements == 0 ||
-      internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
-        starting_element),
-    ExcMessage("The memory space indicated by the template parameter "
-               "and the one derived from the pointer value do not match!"));
-}
+{}
 
 
 

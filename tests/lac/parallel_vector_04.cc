@@ -30,12 +30,6 @@
 #include "../tests.h"
 
 
-__global__ void
-set_value(double *values_dev, unsigned int index, double val)
-{
-  values_dev[index] = val;
-}
-
 void
 test()
 {
@@ -54,7 +48,7 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
 
   // set local values and check them
@@ -76,12 +70,17 @@ test()
     {
       unsigned int local_index = partitioner->global_to_local(1);
       double *     values_dev  = v.get_values();
-      set_value<<<1, 1>>>(values_dev, local_index, 7);
+      Kokkos::deep_copy(
+        Kokkos::View<double, MemorySpace::Default::kokkos_space>(values_dev +
+                                                                 local_index),
+        7);
     }
 
-  unsigned int        allocated_size = local_relevant.n_elements();
-  std::vector<double> v_host(allocated_size);
-  Utilities::CUDA::copy_to_host(v.get_values(), v_host);
+  unsigned int allocated_size = local_relevant.n_elements();
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> v_device(
+    v.get_values(), allocated_size);
+  Kokkos::View<double *, Kokkos::HostSpace> v_host("v_host", allocated_size);
+  Kokkos::deep_copy(v_host, v_device);
 
   AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == myid * 4.0,
               ExcInternalError());
@@ -96,7 +95,7 @@ test()
   // reset to zero
   v = 0;
 
-  Utilities::CUDA::copy_to_host(v.get_values(), v_host);
+  Kokkos::deep_copy(v_host, v_device);
   AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == 0.,
               ExcInternalError());
   AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] == 0.,
@@ -106,7 +105,7 @@ test()
   // after compress
   v.compress(VectorOperation::add);
 
-  Utilities::CUDA::copy_to_host(v.get_values(), v_host);
+  Kokkos::deep_copy(v_host, v_device);
   AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == 0.,
               ExcInternalError());
   AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] == 0.,
@@ -118,11 +117,11 @@ test()
     {
       unsigned int local_index = partitioner->global_to_local(1);
       double *     values_dev  = v.get_values();
-      set_value<<<1, 1>>>(values_dev, local_index, 2);
+      Kokkos::deep_copy(Kokkos::subview(v_device, local_index), 2);
     }
   if (myid > 0)
     {
-      Utilities::CUDA::copy_to_host(v.get_values(), v_host);
+      Kokkos::deep_copy(v_host, v_device);
       AssertThrow(v_host[partitioner->global_to_local(1)] == 0.,
                   ExcInternalError());
     }
@@ -132,12 +131,12 @@ test()
   // operator=
   v.update_ghost_values();
 
-  Utilities::CUDA::copy_to_host(v.get_values(), v_host);
+  Kokkos::deep_copy(v_host, v_device);
   AssertThrow(v_host[partitioner->global_to_local(1)] == 2.,
               ExcInternalError());
 
   v = 0;
-  Utilities::CUDA::copy_to_host(v.get_values(), v_host);
+  Kokkos::deep_copy(v_host, v_device);
   AssertThrow(v_host[partitioner->global_to_local(1)] == 0.,
               ExcInternalError());
 
@@ -152,8 +151,6 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
-
-  init_cuda(true);
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));

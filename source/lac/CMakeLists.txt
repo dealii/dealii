@@ -169,7 +169,6 @@ if(DEAL_II_WITH_CUDA)
     cuda_solver_direct.cc
     cuda_sparse_matrix.cc
     cuda_vector.cc
-    la_parallel_vector_cuda.cc
     read_write_vector_cuda.cc
   )
 endif()

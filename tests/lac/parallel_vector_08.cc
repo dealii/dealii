@@ -66,9 +66,9 @@ test()
   // v has ghosts, w has none. set some entries
   // on w, copy into v and check if they are
   // there
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> w(
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> w(
     local_owned, local_owned, MPI_COMM_WORLD);
 
   // set a few of the local elements
@@ -125,8 +125,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

@@ -109,8 +109,8 @@ namespace LinearAlgebra
 
         static_assert(
           std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-            std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
-          "MemorySpace should be Host or CUDA");
+            std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value,
+          "MemorySpace should be Host or Default");
       }
     };
 
@@ -160,9 +160,8 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
     template <typename Number>
-    struct read_write_vector_functions<Number, ::dealii::MemorySpace::CUDA>
+    struct read_write_vector_functions<Number, ::dealii::MemorySpace::Default>
     {
       using size_type = types::global_dof_index;
 
@@ -178,11 +177,12 @@ namespace LinearAlgebra
 
         const unsigned int n_elements =
           communication_pattern->locally_owned_size();
-        cudaError_t cuda_error_code = cudaMemcpy(tmp_vector.begin(),
-                                                 values,
-                                                 n_elements * sizeof(Number),
-                                                 cudaMemcpyDeviceToHost);
-        AssertCuda(cuda_error_code);
+        Kokkos::deep_copy(
+          Kokkos::View<Number *, Kokkos::HostSpace>(tmp_vector.begin(),
+                                                    n_elements),
+          Kokkos::View<const Number *,
+                       ::dealii::MemorySpace::Default::kokkos_space>(
+            values, n_elements));
         tmp_vector.update_ghost_values();
 
         const IndexSet &stored = rw_vector.get_stored_elements();
@@ -205,7 +205,6 @@ namespace LinearAlgebra
             rw_vector.local_element(i) = tmp_vector(stored.nth_index_in_set(i));
       }
     };
-#endif
   } // namespace internal
 
 
@@ -894,7 +893,7 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
   template <typename Number>
   void
   ReadWriteVector<Number>::import(

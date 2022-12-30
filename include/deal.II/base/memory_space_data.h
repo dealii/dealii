@@ -39,7 +39,7 @@ namespace MemorySpace
   /**
    * Structure which stores data on the host or the device depending on the
    * template parameter @p MemorySpace. Valid choices are MemorySpace::Host,
-   * MemorySpace::Device, and MemorySpace::CUDA (if CUDA was enabled in
+   * MemorySpace::Default, and MemorySpace::CUDA (if CUDA was enabled in
    * deal.II). The data is copied into the structure which then owns the data
    * and will release the memory when the destructor is called.
    */

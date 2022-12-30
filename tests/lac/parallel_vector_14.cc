@@ -55,7 +55,7 @@ test()
   // and once where they have not
   for (unsigned int run = 0; run < 2; ++run)
     {
-      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
         local_owned, local_relevant, MPI_COMM_WORLD);
 
       // set local values
@@ -68,7 +68,8 @@ test()
 
       v.import(rw_vector, VectorOperation::insert);
 
-      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> w(v), u(v);
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default> w(v),
+        u(v);
       u = 0;
 
       v *= 2.0;
@@ -90,7 +91,7 @@ test()
         }
 
       // copy vector content to non-ghosted vectors, manually created.
-      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v_dist(
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v_dist(
         local_owned, MPI_COMM_WORLD),
         w_dist(v_dist), u_dist(v_dist);
 
@@ -160,8 +161,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

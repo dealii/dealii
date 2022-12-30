@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check addition into ghosts for parallel vector
+// check correct initialization of parallel vector without any ghosts
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
@@ -43,29 +43,17 @@ test()
   // are ghosting element 1 (the second)
   IndexSet local_owned(numproc * 2);
   local_owned.add_range(myid * 2, myid * 2 + 2);
-  IndexSet local_relevant(numproc * 2);
-  local_relevant = local_owned;
-  local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
-    local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
+    local_owned, local_owned, MPI_COMM_WORLD);
 
-  // set local values and check them
+  // set local values
   LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
   rw_vector(myid * 2)     = myid * 2.0;
   rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
-  v.import(rw_vector, VectorOperation::add);
+  v.import(rw_vector, VectorOperation::insert);
 
   v *= 2.0;
-
-  rw_vector.import(v, VectorOperation::insert);
-  AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
-  AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
-
-  // set ghost dof, compress
-  LinearAlgebra::ReadWriteVector<double> rw_relevant_vector(numproc * 2);
-  rw_relevant_vector(1) = 7;
-  v.import(rw_relevant_vector, VectorOperation::add);
 
   rw_vector.import(v, VectorOperation::insert);
   if (myid == 0)
@@ -74,8 +62,8 @@ test()
       deallog << myid * 2 + 1 << ":" << rw_vector(myid * 2 + 1) << std::endl;
     }
 
-  rw_relevant_vector.import(v, VectorOperation::insert);
-  AssertThrow(rw_relevant_vector(1) == 7. * numproc + 2, ExcInternalError());
+  Assert(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+  Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   // check l2 norm
   const double l2_norm = v.l2_norm();
@@ -96,8 +84,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

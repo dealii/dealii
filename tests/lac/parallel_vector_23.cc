@@ -8,15 +8,14 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
 
 
-// check operator= when we do some operations with ghosts
+// check LA::Vector::compress(VectorOperation::min/max) from ghosts
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
@@ -27,6 +26,17 @@
 #include <vector>
 
 #include "../tests.h"
+
+
+template <typename Number>
+double
+print_value(Number *values_dev, unsigned int index)
+{
+  static Kokkos::View<Number, Kokkos::HostSpace> cpu_value("cpu_value");
+  Kokkos::deep_copy(cpu_value, Kokkos::View<Number>(values_dev + index));
+  return cpu_value();
+}
+
 
 
 void
@@ -47,35 +57,37 @@ test()
   local_relevant = local_owned;
   local_relevant.add_range(1, 2);
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
+  // create vector
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> w(v);
+  const auto &partitioner = v.get_partitioner();
 
-  // set local values and check them
-  LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
-  rw_vector(myid * 2)     = myid * 2.0;
-  rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
-  v.import(rw_vector, VectorOperation::insert);
+  // the read write vector additionally has ghost elements
+  IndexSet                               read_write_owned(numproc * 2);
+  LinearAlgebra::ReadWriteVector<double> read_write_vector(local_relevant);
 
+  read_write_vector.local_element(0) = myid;
+  read_write_vector(1)               = 2. * myid;
+
+  v.import(read_write_vector, VectorOperation::max);
   v.update_ghost_values();
 
-  // check that the value of the ghost is 1.0
-  IndexSet ghost_set(numproc * 2);
-  ghost_set.add_index(1);
-  LinearAlgebra::ReadWriteVector<double> ghost_vector(ghost_set);
-  ghost_vector.import(v, VectorOperation::insert);
-  AssertThrow(ghost_vector(1) == 1., ExcInternalError());
+  deallog << myid << ":"
+          << "ghost entry after max: "
+          << print_value(v.get_values(), partitioner->global_to_local(1))
+          << std::endl;
 
-  // copy vector
-  w = v;
-  v *= 2.0;
+  if (myid == 0)
+    read_write_vector(1) = -1.0;
 
+  v.import(read_write_vector, VectorOperation::min);
   v.update_ghost_values();
-  w.update_ghost_values();
-  ghost_vector.import(v, VectorOperation::insert);
-  AssertThrow(ghost_vector(1) == 2., ExcInternalError());
-  ghost_vector.import(w, VectorOperation::insert);
-  AssertThrow(ghost_vector(1) == 1., ExcInternalError());
+
+  deallog << myid << ":"
+          << "ghost entry after min: "
+          << print_value(v.get_values(), partitioner->global_to_local(1))
+          << std::endl;
+
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -89,18 +101,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  deallog.push(Utilities::int_to_string(myid));
+  MPILogInitAll log;
 
-  init_cuda();
-
-  if (myid == 0)
-    {
-      initlog();
-      deallog << std::setprecision(4);
-
-      test();
-    }
-  else
-    test();
+  test();
 }
