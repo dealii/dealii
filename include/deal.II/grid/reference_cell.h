@@ -564,7 +564,16 @@ public:
 
   /**
    * Determine the orientation of the current entity described by its
-   * vertices @p var_1 relative to an entity described by @p var_0.
+   * vertices @p vertices_1 relative to an entity described by @p var_0.
+   * The two arrays given as arguments can be arrays of global vertex
+   * indices or local vertex indices, arrays of vertex locations, or
+   * arrays of any other objects identifying the vertices.
+   *
+   * The size of the arrays, i.e., the template argument `N`,
+   * must be equal to or larger than the number of vertices of the current
+   * entity. If it is larger, only those elements of the input and output
+   * arrays are read from or written to that correspond to valid vertex
+   * indices.
    */
   template <typename T, std::size_t N>
   unsigned char
@@ -572,7 +581,15 @@ public:
                       const std::array<T, N> &vertices_1) const;
 
   /**
-   * Inverse function of compute_orientation().
+   * Inverse function of compute_orientation(): Given a set of
+   * vertex-associated objects (such as vertex indices, locations, etc.)
+   * a desired orientation permutation, return the permuted vertex information.
+   *
+   * The size of the input and output arrays, i.e., the template argument `N`,
+   * must be equal to or larger than the number of vertices of the current
+   * entity. If it is larger, only those elements of the input and output
+   * arrays are read from or written to that correspond to valid vertex
+   * indices.
    */
   template <typename T, std::size_t N>
   std::array<T, N>
@@ -2392,7 +2409,11 @@ inline unsigned char
 ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
                                    const std::array<T, N> &vertices_1) const
 {
-  AssertIndexRange(n_vertices(), N + 1);
+  Assert(N >= n_vertices(),
+         ExcMessage("The number of array elements must be equal to or "
+                    "greater than the number of vertices of the cell "
+                    "referenced by this object."));
+
   if (*this == ReferenceCells::Line)
     {
       const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};
@@ -2488,8 +2509,12 @@ ReferenceCell::permute_according_orientation(
   const std::array<T, N> &vertices,
   const unsigned int      orientation) const
 {
-  std::array<T, 4> temp;
+  Assert(N >= n_vertices(),
+         ExcMessage("The number of array elements must be equal to or "
+                    "greater than the number of vertices of the cell "
+                    "referenced by this object."));
 
+  std::array<T, 4> temp;
   if (*this == ReferenceCells::Line)
     {
       switch (orientation)
