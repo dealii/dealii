@@ -618,7 +618,7 @@ struct MPILogInitAll
 };
 
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
 // By default, all the ranks will try to access the device 0.
 // If we are running with MPI support it is better to address different graphic
 // cards for different processes even if only one node is used. The choice below

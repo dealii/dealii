@@ -3386,7 +3386,7 @@ namespace internal
     }
 
 
-#  ifdef DEAL_II_COMPILER_CUDA_AWARE
+#  ifdef DEAL_II_WITH_CUDA
     template <typename Number>
     __global__ void
     set_initial_guess_kernel(const types::global_dof_index offset,
@@ -3425,7 +3425,7 @@ namespace internal
       const Number mean_value = vector.mean_value();
       vector.add(-mean_value);
     }
-#  endif // DEAL_II_COMPILER_CUDA_AWARE
+#  endif // DEAL_II_WITH_CUDA
 
     struct EigenvalueTracker
     {

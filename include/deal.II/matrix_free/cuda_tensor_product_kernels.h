@@ -23,7 +23,7 @@
 
 #include <deal.II/matrix_free/cuda_matrix_free.templates.h>
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
 
 DEAL_II_NAMESPACE_OPEN
 

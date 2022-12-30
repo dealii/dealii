@@ -21,7 +21,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
 #  include <cusolverDn.h>
 #  include <cusolverSp.h>
 #  include <cusparse.h>

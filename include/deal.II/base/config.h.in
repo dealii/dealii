@@ -103,14 +103,6 @@
 #cmakedefine DEAL_II_RESTRICT @DEAL_II_RESTRICT@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
 
-/*
- * A variable to tell if the compiler used in the current compilation process
- * understands CUDA code.
- */
-#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
-#  define DEAL_II_COMPILER_CUDA_AWARE
-#endif
-
 /***********************************************************************
  * CPU features:
  *

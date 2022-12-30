@@ -21,7 +21,7 @@
 
 #include <deal.II/base/types.h>
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
 #  include <cuComplex.h>
 #endif
 
@@ -809,7 +809,7 @@ namespace internal
     }
   };
 
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#ifdef DEAL_II_WITH_CUDA
   template <>
   struct NumberType<cuComplex>
   {
