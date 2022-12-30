@@ -6070,11 +6070,6 @@ namespace DataOutBase
                       default:
                         Assert(false, ExcNotImplemented());
                     }
-
-                  // Finally update the number of the first vertex of this
-                  // patch
-                  first_vertex_of_patch +=
-                    Utilities::fixed_power<dim>(n_subdivisions + 1);
                 }
               else // use higher-order output
                 {
@@ -6174,11 +6169,12 @@ namespace DataOutBase
                         o << '\t' << first_vertex_of_patch + c;
                       o << '\n';
                     }
-
-                  // Finally update the number of the first vertex of this
-                  // patch
-                  first_vertex_of_patch += Utilities::fixed_power<dim>(n);
                 }
+
+              // Finally update the number of the first vertex of this
+              // patch
+              first_vertex_of_patch +=
+                Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
             }
         }
 
