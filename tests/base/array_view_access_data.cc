@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// check that we detect that accessing CUDA memory in an ArrayView object
-// is not allowed.
+// check that we detect that accessing memory in MemorySpace::Default using an
+// ArrayView object is not allowed.
 
 #include <deal.II/base/array_view.h>
 
@@ -28,16 +28,14 @@ main(int argc, char **argv)
 
   initlog();
 
-  init_cuda();
-
-  std::unique_ptr<unsigned int[], void (*)(unsigned int *)> dummy_cuda(
-    Utilities::CUDA::allocate_device_data<unsigned int>(2),
-    Utilities::CUDA::delete_device_data<unsigned int>);
+  Kokkos::ScopeGuard                                               guard;
+  Kokkos::View<unsigned int *, MemorySpace::Default::kokkos_space> dummy(
+    "dummy", 2);
 
   try
     {
-      ArrayView<unsigned int, MemorySpace::CUDA> view(dummy_cuda.get(), 2);
-      const auto                                 dummy = view[0];
+      ArrayView<unsigned int, MemorySpace::Default> view(dummy.data(), 2);
+      const auto                                    dummy = view[0];
     }
   catch (const ExceptionBase &exc)
     {

@@ -29,15 +29,6 @@
 #include "../tests.h"
 
 
-__global__ void
-initialize_vector(double *vector, int local_size, int offset)
-{
-  const int index = threadIdx.x + blockIdx.x * blockDim.x;
-  if (index < local_size)
-    vector[index] = 1.0 + index + offset;
-}
-
-
 void
 test()
 {
@@ -56,15 +47,23 @@ test()
   deallog << "CM:" << std::endl;
   cm.print(deallog.get_file_stream());
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> ghosted;
+  using ExecutionSpace = MemorySpace::Default::kokkos_space::execution_space;
+  ExecutionSpace exec;
+
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> ghosted;
   {
     ghosted.reinit(local_active,
                    complete_index_set(2 * numproc),
                    MPI_COMM_WORLD);
+    auto ghosted_values = ghosted.get_values();
 
-    const int n_blocks = 1 + ghosted.size() / CUDAWrappers::block_size;
-    initialize_vector<<<n_blocks, CUDAWrappers::block_size>>>(
-      ghosted.get_values(), numproc, myid * numproc);
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<ExecutionSpace>(exec, 0, numproc),
+      KOKKOS_LAMBDA(int i) {
+        int offset        = myid * numproc;
+        ghosted_values[i] = 1.0 + i + offset;
+      });
+    exec.fence();
     ghosted.compress(VectorOperation::insert);
 
     deallog << "ghosted vector before:" << std::endl;
@@ -76,15 +75,22 @@ test()
     ghosted.print(deallog.get_file_stream());
   }
 
-  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> distributed;
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> distributed;
   {
     distributed.reinit(local_active,
                        complete_index_set(2 * numproc),
                        MPI_COMM_WORLD);
 
-    const int n_blocks = 1 + distributed.size() / CUDAWrappers::block_size;
-    initialize_vector<<<n_blocks, CUDAWrappers::block_size>>>(
-      distributed.get_values(), numproc, myid * numproc);
+    auto distributed_values = distributed.get_values();
+
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<ExecutionSpace>(exec, 0, numproc),
+      KOKKOS_LAMBDA(int i) {
+        int offset            = myid * numproc;
+        distributed_values[i] = 1.0 + i + offset;
+      });
+    exec.fence();
+
     distributed.compress(VectorOperation::insert);
 
     deallog << "distributed vector before:" << std::endl;
@@ -105,8 +111,6 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
-
-  init_cuda();
 
   test();
   return 0;

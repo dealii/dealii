@@ -112,7 +112,6 @@ main(int argc, char **argv)
     argc, argv, testing_max_num_threads());
 
   initlog();
-  init_cuda();
 
   do_test<
     LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>>();
