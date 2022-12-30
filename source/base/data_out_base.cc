@@ -5865,14 +5865,13 @@ namespace DataOutBase
         {
           Assert(dim <= 3 && dim > 1, ExcNotImplemented());
           unsigned int first_vertex_of_patch = 0;
-          // Array to hold all the node numbers of a cell
-          std::vector<unsigned> connectivity;
 
           for (const auto &patch : patches)
             {
               if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
                 {
-                  connectivity.resize(patch.data.n_cols());
+                  // Array to hold all the node numbers of a cell
+                  std::vector<unsigned> connectivity(patch.data.n_cols());
 
                   for (unsigned int i = 0; i < patch.data.n_cols(); ++i)
                     connectivity[i] = i;
@@ -5898,7 +5897,9 @@ namespace DataOutBase
                   const unsigned int n_subdivisions = patch.n_subdivisions;
                   const unsigned int n              = n_subdivisions + 1;
 
-                  connectivity.resize(Utilities::fixed_power<dim>(n));
+                  // Array to hold all the node numbers of a cell
+                  std::vector<unsigned> connectivity(
+                    Utilities::fixed_power<dim>(n));
 
                   switch (dim)
                     {
@@ -5997,7 +5998,7 @@ namespace DataOutBase
                 }
             }
         }
-      else
+      else // do not as higher-order cells
         {
           Assert(dim <= 3, ExcNotImplemented());
 
