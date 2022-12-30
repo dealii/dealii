@@ -1314,40 +1314,6 @@ namespace
   };
 
 
-  class VtuStream : public StreamBase<DataOutBase::VtkFlags>
-  {
-  public:
-    VtuStream(std::ostream &stream, const DataOutBase::VtkFlags &flags);
-
-    /**
-     * Write a high-order cell type, i.e., a Lagrange cell
-     * in the VTK terminology.
-     * The connectivity order of the points is given in the
-     * @p connectivity array, which are offset
-     * by the global index @p start.
-     */
-    template <int dim>
-    void
-    write_high_order_cell(const unsigned int           start,
-                          const std::vector<unsigned> &connectivity);
-
-    void
-    flush_cells();
-
-  private:
-    /**
-     * A list of vertices and cells, to be used in case we want to compress the
-     * data.
-     *
-     * The data types of these arrays needs to match what we print in the
-     * XML-preamble to the respective parts of VTU files (e.g. Float32 and
-     * Int32)
-     */
-    std::vector<float>   vertices;
-    std::vector<int32_t> cells;
-  };
-
-
   //----------------------------------------------------------------------//
 
   DXStream::DXStream(std::ostream &out, const DataOutBase::DXFlags &f)
@@ -1795,48 +1761,6 @@ namespace
     for (const auto &c : connectivity)
       stream << '\t' << start + c;
     stream << '\n';
-  }
-
-
-
-  VtuStream::VtuStream(std::ostream &out, const DataOutBase::VtkFlags &f)
-    : StreamBase<DataOutBase::VtkFlags>(out, f)
-  {}
-
-
-
-  template <int dim>
-  void
-  VtuStream::write_high_order_cell(const unsigned int           start,
-                                   const std::vector<unsigned> &connectivity)
-  {
-    if (deal_ii_with_zlib &&
-        (flags.compression_level != DataOutBase::CompressionLevel::plain_text))
-      {
-        for (const auto &c : connectivity)
-          cells.push_back(start + c);
-      }
-    else
-      {
-        for (const auto &c : connectivity)
-          stream << '\t' << start + c;
-        stream << '\n';
-      }
-  }
-
-  void
-  VtuStream::flush_cells()
-  {
-    if (deal_ii_with_zlib &&
-        (flags.compression_level != DataOutBase::CompressionLevel::plain_text))
-      {
-        // compress the data we have in memory and write them to the stream.
-        // then release the data
-        *this << vtu_stringize_array(cells,
-                                     flags.compression_level,
-                                     stream.precision());
-        cells.clear();
-      }
   }
 } // namespace
 
