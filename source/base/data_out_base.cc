@@ -5867,7 +5867,8 @@ namespace DataOutBase
 
       for (const auto &patch : patches)
         {
-          // special treatment of simplices since they are not subdivided
+          // First treat non-hypercubes since they can currently
+          // not be subdivided (into sub-cells, or into higher-order cells):
           if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
             {
               const unsigned int n_points = patch.data.n_cols();
