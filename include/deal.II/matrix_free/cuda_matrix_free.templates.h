@@ -526,26 +526,6 @@ namespace CUDAWrappers
 
 
 
-    template <typename Number>
-    __global__ void
-    copy_constrained_dofs(
-      const dealii::types::global_dof_index *constrained_dofs,
-      const unsigned int                     n_constrained_dofs,
-      const unsigned int                     size,
-      const Number *                         src,
-      Number *                               dst)
-    {
-      const unsigned int dof =
-        threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
-      // When working with distributed vectors, the constrained dofs are
-      // computed for ghosted vectors but we want to copy the values of the
-      // constrained dofs of non-ghosted vectors.
-      if ((dof < n_constrained_dofs) && (constrained_dofs[dof] < size))
-        dst[constrained_dofs[dof]] = src[constrained_dofs[dof]];
-    }
-
-
-
     template <int dim, typename Number, typename Functor>
     __global__ void
     apply_kernel_shmem(Functor                                      func,
@@ -753,10 +733,26 @@ namespace CUDAWrappers
     static_assert(
       std::is_same<Number, typename VectorType::value_type>::value,
       "VectorType::value_type and Number should be of the same type.");
-    if (partitioner)
-      distributed_copy_constrained_values(src, dst);
-    else
-      serial_copy_constrained_values(src, dst);
+    Assert(src.size() == dst.size(),
+           ExcMessage("src and dst vectors have different size."));
+    // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
+    // work-around can be removed.
+    types::global_dof_index *constr_dofs = constrained_dofs;
+    const unsigned int       size =
+      partitioner ? dst.locally_owned_size() : dst.size();
+    const Number *src_ptr = src.get_values();
+    Number *      dst_ptr = dst.get_values();
+    Kokkos::parallel_for(
+      "copy_constrained_values",
+      Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
+        0, n_constrained_dofs),
+      KOKKOS_LAMBDA(int dof) {
+        // When working with distributed vectors, the constrained dofs are
+        // computed for ghosted vectors but we want to copy the values of the
+        // constrained dofs of non-ghosted vectors.
+        if (constr_dofs[dof] < size)
+          dst_ptr[constr_dofs[dof]] = src_ptr[constr_dofs[dof]];
+      });
   }
 
 
@@ -781,8 +777,7 @@ namespace CUDAWrappers
       partitioner ? dst.locally_owned_size() : dst.size();
     Kokkos::parallel_for(
       "set_constrained_values",
-      Kokkos::RangePolicy<
-        ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+      Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
         0, n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
         if (constr_dofs[dof] < size)
@@ -1303,56 +1298,6 @@ namespace CUDAWrappers
   {
     Assert(false, ExcInternalError());
   }
-
-
-
-  template <int dim, typename Number>
-  template <typename VectorType>
-  void
-  MatrixFree<dim, Number>::serial_copy_constrained_values(const VectorType &src,
-                                                          VectorType &dst) const
-  {
-    Assert(src.size() == dst.size(),
-           ExcMessage("src and dst vectors have different size."));
-    internal::copy_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      src.size(),
-                                                      src.get_values(),
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_copy_constrained_values(
-    const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
-  {
-    Assert(src.size() == dst.size(),
-           ExcMessage("src and dst vectors have different local size."));
-    internal::copy_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      src.locally_owned_size(),
-                                                      src.get_values(),
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_copy_constrained_values(
-    const LinearAlgebra::CUDAWrappers::Vector<Number> &,
-    LinearAlgebra::CUDAWrappers::Vector<Number> &) const
-  {
-    Assert(false, ExcInternalError());
-  }
-
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE

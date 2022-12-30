@@ -454,35 +454,6 @@ namespace CUDAWrappers
       LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
 
     /**
-     * Helper function. Copy the values of the constrained entries of @p src to
-     * @p dst. This function is used when MPI is not used.
-     */
-    template <typename VectorType>
-    void
-    serial_copy_constrained_values(const VectorType &src,
-                                   VectorType &      dst) const;
-
-    /**
-     * Helper function. Copy the values of the constrained entries of @p src to
-     * @p dst. This function is used when MPI is used.
-     */
-    void
-    distributed_copy_constrained_values(
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
-
-    /**
-     * This function should never be called. Calling it results in an internal
-     * error. This function exists only because copy_constrained_values needs
-     * distributed_copy_constrained_values() to exist for
-     * LinearAlgebra::CUDAWrappers::Vector.
-     */
-    void
-    distributed_copy_constrained_values(
-      const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
-      LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
-
-    /**
      * Unique ID associated with the object.
      */
     int my_id;
