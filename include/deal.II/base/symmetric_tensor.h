@@ -1953,8 +1953,6 @@ namespace internal
                           typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
   {
-    static_assert(dim <= 3, "The selected dimension is not yet supported.");
-
     // 1d is very simple and done first
     if (dim == 1)
       return data[0];
@@ -2002,8 +2000,6 @@ namespace internal
                           const typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
   {
-    static_assert(dim <= 3, "The selected dimension is not yet supported.");
-
     // 1d is very simple and done first
     if (dim == 1)
       return data[0];
@@ -2051,8 +2047,6 @@ namespace internal
                           typename SymmetricTensorAccessors::
                             StorageType<4, dim, Number>::base_tensor_type &data)
   {
-    static_assert(dim <= 3, "The selected dimension is not yet supported.");
-
     switch (dim)
       {
         case 1:
@@ -2101,8 +2095,6 @@ namespace internal
                           const typename SymmetricTensorAccessors::
                             StorageType<4, dim, Number>::base_tensor_type &data)
   {
-    static_assert(dim <= 3, "The selected dimension is not yet supported.");
-
     switch (dim)
       {
         case 1:
