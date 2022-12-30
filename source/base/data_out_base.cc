@@ -6074,10 +6074,11 @@ namespace DataOutBase
               else // use higher-order output
                 {
                   const unsigned int n_subdivisions = patch.n_subdivisions;
-                  const unsigned int n              = n_subdivisions + 1;
+                  const unsigned int n_points_per_direction =
+                    n_subdivisions + 1;
 
-                  std::vector<unsigned> connectivity(
-                    Utilities::fixed_power<dim>(n));
+                  std::vector<unsigned> local_vertex_order(
+                    Utilities::fixed_power<dim>(n_points_per_direction));
 
                   switch (dim)
                     {
@@ -6101,7 +6102,8 @@ namespace DataOutBase
                                     {{i1}},
                                     {{n_subdivisions}},
                                     /* use VTU, not VTK: */ false);
-                              connectivity[connectivity_index] = local_index;
+                              local_vertex_order[connectivity_index] =
+                                local_index;
                             }
 
                           break;
@@ -6113,14 +6115,16 @@ namespace DataOutBase
                             for (unsigned int i1 = 0; i1 < n_subdivisions + 1;
                                  ++i1)
                               {
-                                const unsigned int local_index = i2 * n + i1;
+                                const unsigned int local_index =
+                                  i2 * n_points_per_direction + i1;
                                 const unsigned int connectivity_index =
                                   patch.reference_cell
                                     .template vtk_lexicographic_to_node_index<
                                       2>({{i1, i2}},
                                          {{n_subdivisions, n_subdivisions}},
                                          /* use VTU, not VTK: */ false);
-                                connectivity[connectivity_index] = local_index;
+                                local_vertex_order[connectivity_index] =
+                                  local_index;
                               }
 
                           break;
@@ -6135,7 +6139,9 @@ namespace DataOutBase
                                    ++i1)
                                 {
                                   const unsigned int local_index =
-                                    i3 * n * n + i2 * n + i1;
+                                    i3 * n_points_per_direction *
+                                      n_points_per_direction +
+                                    i2 * n_points_per_direction + i1;
                                   const unsigned int connectivity_index =
                                     patch.reference_cell
                                       .template vtk_lexicographic_to_node_index<
@@ -6144,7 +6150,7 @@ namespace DataOutBase
                                              n_subdivisions,
                                              n_subdivisions}},
                                            /* use VTU, not VTK: */ false);
-                                  connectivity[connectivity_index] =
+                                  local_vertex_order[connectivity_index] =
                                     local_index;
                                 }
 
@@ -6154,18 +6160,18 @@ namespace DataOutBase
                         Assert(false, ExcNotImplemented());
                     }
 
-                  // Having so set up the 'connectivity' data structure,
+                  // Having so set up the 'local_vertex_order' data structure,
                   // output it:
                   if (deal_ii_with_zlib &&
                       (flags.compression_level !=
                        DataOutBase::CompressionLevel::plain_text))
                     {
-                      for (const auto &c : connectivity)
+                      for (const auto &c : local_vertex_order)
                         cells.push_back(first_vertex_of_patch + c);
                     }
                   else
                     {
-                      for (const auto &c : connectivity)
+                      for (const auto &c : local_vertex_order)
                         o << '\t' << first_vertex_of_patch + c;
                       o << '\n';
                     }
