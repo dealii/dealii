@@ -483,34 +483,6 @@ namespace CUDAWrappers
       LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
 
     /**
-     * Helper function. Set the constrained entries of @p dst to @p val. This
-     * function is used when MPI is not used.
-     */
-    template <typename VectorType>
-    void
-    serial_set_constrained_values(const Number val, VectorType &dst) const;
-
-    /**
-     * Helper function. Set the constrained entries of @p dst to @p val. This
-     * function is used when MPI is used.
-     */
-    void
-    distributed_set_constrained_values(
-      const Number                                                   val,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
-
-    /**
-     * This function should never be called. Calling it results in an internal
-     * error. This function exists only because set_constrained_values needs
-     * distributed_set_constrained_values() to exist for
-     * LinearAlgebra::CUDAWrappers::Vector.
-     */
-    void
-    distributed_set_constrained_values(
-      const Number                                 val,
-      LinearAlgebra::CUDAWrappers::Vector<Number> &dst) const;
-
-    /**
      * Unique ID associated with the object.
      */
     int my_id;

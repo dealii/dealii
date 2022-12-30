@@ -36,6 +36,7 @@
 #  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
+#  include <Kokkos_Core.hpp>
 #  include <cuda_runtime_api.h>
 
 #  include <cmath>
@@ -545,26 +546,6 @@ namespace CUDAWrappers
 
 
 
-    template <typename Number>
-    __global__ void
-    set_constrained_dofs(
-      const dealii::types::global_dof_index *constrained_dofs,
-      const unsigned int                     n_constrained_dofs,
-      const unsigned int                     size,
-      Number                                 val,
-      Number *                               dst)
-    {
-      const unsigned int dof =
-        threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
-      // When working with distributed vectors, the constrained dofs are
-      // computed for ghosted vectors but we want to set the values of the
-      // constrained dofs of non-ghosted vectors.
-      if ((dof < n_constrained_dofs) && (constrained_dofs[dof] < size))
-        dst[constrained_dofs[dof]] = val;
-    }
-
-
-
     template <int dim, typename Number, typename Functor>
     __global__ void
     apply_kernel_shmem(Functor                                      func,
@@ -789,10 +770,24 @@ namespace CUDAWrappers
     static_assert(
       std::is_same<Number, typename VectorType::value_type>::value,
       "VectorType::value_type and Number should be of the same type.");
-    if (partitioner)
-      distributed_set_constrained_values(val, dst);
-    else
-      serial_set_constrained_values(val, dst);
+    Number *dst_ptr = dst.get_values();
+    // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
+    // work-around can be removed.
+    types::global_dof_index *constr_dofs = constrained_dofs;
+    // When working with distributed vectors, the constrained dofs are
+    // computed for ghosted vectors but we want to set the values of the
+    // constrained dofs of non-ghosted vectors.
+    const unsigned int size =
+      partitioner ? dst.locally_owned_size() : dst.size();
+    Kokkos::parallel_for(
+      "set_constrained_values",
+      Kokkos::RangePolicy<
+        ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+        0, n_constrained_dofs),
+      KOKKOS_LAMBDA(int dof) {
+        if (constr_dofs[dof] < size)
+          dst_ptr[constr_dofs[dof]] = val;
+      });
   }
 
 
@@ -1358,50 +1353,6 @@ namespace CUDAWrappers
     Assert(false, ExcInternalError());
   }
 
-
-
-  template <int dim, typename Number>
-  template <typename VectorType>
-  void
-  MatrixFree<dim, Number>::serial_set_constrained_values(const Number val,
-                                                         VectorType & dst) const
-  {
-    internal::set_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      dst.size(),
-                                                      val,
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_set_constrained_values(
-    const Number                                                   val,
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
-  {
-    internal::set_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      dst.locally_owned_size(),
-                                                      val,
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_set_constrained_values(
-    const Number,
-    LinearAlgebra::CUDAWrappers::Vector<Number> &) const
-  {
-    Assert(false, ExcInternalError());
-  }
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
