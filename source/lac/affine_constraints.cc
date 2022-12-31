@@ -150,6 +150,7 @@ dealii::AffineConstraints<double>::distribute<
 #  endif
 #endif
 
+#ifndef DOXYGEN
 namespace internal
 {
   namespace AffineConstraintsImplementation
@@ -175,5 +176,6 @@ template void
 AffineConstraints<double>::set_zero<
   LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>(
   LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &) const;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
