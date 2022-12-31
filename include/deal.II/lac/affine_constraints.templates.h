@@ -2256,24 +2256,12 @@ namespace internal
       vec.zero_out_ghost_values();
     }
 
-#ifdef DEAL_II_WITH_CUDA
-    template <typename Number>
-    __global__ void
-    set_zero_kernel(const size_type *  constrained_dofs,
-                    const unsigned int n_constrained_dofs,
-                    Number *           dst)
-    {
-      const unsigned int index = threadIdx.x + blockDim.x * blockIdx.x;
-      if (index < n_constrained_dofs)
-        dst[constrained_dofs[index]] = 0;
-    }
-
     template <typename number>
     void
     set_zero_parallel(
-      const std::vector<size_type> &                                 cm,
-      LinearAlgebra::distributed::Vector<number, MemorySpace::CUDA> &vec,
-      size_type                                                      shift = 0)
+      const std::vector<size_type> &                                    cm,
+      LinearAlgebra::distributed::Vector<number, MemorySpace::Default> &vec,
+      size_type shift = 0)
     {
       Assert(shift == 0, ExcNotImplemented());
       (void)shift;
@@ -2285,22 +2273,30 @@ namespace internal
           constrained_local_dofs_host.push_back(
             vec.get_partitioner()->global_to_local(global_index));
 
-      const int  n_constraints = constrained_local_dofs_host.size();
-      size_type *constrained_local_dofs_device;
-      Utilities::CUDA::malloc(constrained_local_dofs_device, n_constraints);
-      Utilities::CUDA::copy_to_dev(constrained_local_dofs_host,
-                                   constrained_local_dofs_device);
+      const int n_constraints = constrained_local_dofs_host.size();
+      Kokkos::View<size_type *, MemorySpace::Default::kokkos_space>
+        constrained_local_dofs_device(
+          Kokkos::view_alloc(Kokkos::WithoutInitializing,
+                             "constrained_local_dofs_device"),
+          n_constraints);
+      Kokkos::deep_copy(constrained_local_dofs_device,
+                        Kokkos::View<size_type *, Kokkos::HostSpace>(
+                          constrained_local_dofs_host.data(),
+                          constrained_local_dofs_host.size()));
 
-      const int n_blocks = 1 + (n_constraints - 1) / CUDAWrappers::block_size;
-      set_zero_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
-        constrained_local_dofs_device, n_constraints, vec.get_values());
-      AssertCudaKernel();
-
-      Utilities::CUDA::free(constrained_local_dofs_device);
+      using ExecutionSpace =
+        MemorySpace::Default::kokkos_space::execution_space;
+      ExecutionSpace exec;
+      auto           local_values = vec.get_values();
+      Kokkos::parallel_for(
+        Kokkos::RangePolicy<ExecutionSpace>(exec, 0, n_constraints),
+        KOKKOS_LAMBDA(int i) {
+          local_values[constrained_local_dofs_device[i]] = 0;
+        });
+      exec.fence();
 
       vec.zero_out_ghost_values();
     }
-#endif
 
     template <class VectorType>
     void
