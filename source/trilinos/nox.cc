@@ -17,19 +17,19 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/la_parallel_block_vector.h>
-#include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
-#include <deal.II/lac/petsc_block_vector.h>
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/vector_memory.h>
-
-#include <deal.II/trilinos/nox.templates.h>
-
 #ifdef DEAL_II_TRILINOS_WITH_NOX
+
+#  include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/la_parallel_block_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/la_vector.h>
+#  include <deal.II/lac/petsc_block_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/vector_memory.h>
+
+#  include <deal.II/trilinos/nox.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

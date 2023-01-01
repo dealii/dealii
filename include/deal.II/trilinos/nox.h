@@ -38,7 +38,7 @@ namespace TrilinosWrappers
 
   /**
    * Wrapper around the nonlinear solver from the NOX
-   * packge (https://docs.trilinos.org/dev/packages/nox/doc/html/index.html),
+   * package (https://docs.trilinos.org/dev/packages/nox/doc/html/index.html),
    * targeting deal.II data structures.
    *
    * The following code shows the steps how to use this class:
@@ -49,16 +49,15 @@ namespace TrilinosWrappers
    * // create nonlinear solver
    * TrilinosWrappers::NOXSolver<VectorType> solver(additional_data);
    *
-   * // set user functions to compute residual,
-   * // set up Jacobian, and to apply the inverse of
-   * // Jacobian; note that there are more functions that
-   * // can be set
+   * // Set user functions to compute residual, to set up the Jacobian, and to
+   * // apply the inverse of the Jacobian.
+   * // Note that there are more functions that can be set.
    * solver.residual = [](const auto &src, auto &dst) {...};
    * solver.setup_jacobian = [](const auto &src) {...};
    * solver.solve_with_jacobian =
    *   [](const auto &src, auto &dst, const auto) {...};
    *
-   * // solver nonlinear system with solution containing the intial guess and
+   * // solver nonlinear system with solution containing the initial guess and
    * // the final solution
    * solver.solve(solution);
    * @endcode
@@ -93,7 +92,7 @@ namespace TrilinosWrappers
       /**
        * Absolute l2 tolerance of the residual to be reached.
        *
-       * @note Solver terminates successfully if either the absolut or
+       * @note Solver terminates successfully if either the absolute or
        * the relative tolerance has been reached.
        */
       double abs_tol;
@@ -101,7 +100,7 @@ namespace TrilinosWrappers
       /**
        * Relative l2 tolerance of the residual to be reached.
        *
-       * @note Solver terminates successfully if either the absolut or
+       * @note Solver terminates successfully if either the absolute or
        * the relative tolerance has been reached.
        */
       double rel_tol;
@@ -114,8 +113,9 @@ namespace TrilinosWrappers
 
       /**
        * Max number of linear iterations after which the preconditioner
-       * should be updated. This is only used if a lambda is attached to
-       * solve_with_jacobian_and_track_n_linear_iterations.
+       * should be updated. This is only used if
+       * solve_with_jacobian_and_track_n_linear_iterations has been given
+       * a target (i.e., it is not empty).
        */
       unsigned int threshold_n_linear_iterations;
 
@@ -187,8 +187,8 @@ namespace TrilinosWrappers
      *
      * @note This function is optional and is used in the case of certain
      * configurations. For instance, this function is required if the
-     * polynomial line search (@p NOX::LineSearch::Polynomial) is
-     * chosen, whereas for the full step case (@p NOX::LineSearch::FullStep)
+     * polynomial line search (`NOX::LineSearch::Polynomial`) is
+     * chosen, whereas for the full step case (`NOX::LineSearch::FullStep`)
      * it won't be called.
      *
      * @note This function should return 0 in the case of success.
@@ -198,7 +198,7 @@ namespace TrilinosWrappers
     /**
      * A user function that applies the inverse of the Jacobian to
      * @p x and writes the result in @p x. The parameter @p tolerance
-     * species the error reduction if a interative solver is used.
+     * specifies the error reduction if an iterative solver is used.
      *
      * @note This function is optional and is used in the case of certain
      * configurations.
@@ -248,7 +248,7 @@ namespace TrilinosWrappers
      * of linear iterations is exceeded.
      *
      * @note This function is optional. If no function is attached, this
-     * means implicitly a return value of false.
+     * means implicitly a return value of `false`.
      */
     std::function<bool()> update_preconditioner_predicate;
 
