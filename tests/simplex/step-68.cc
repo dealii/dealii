@@ -253,7 +253,7 @@ namespace Step68
 
     std::vector<BoundingBox<dim>> all_boxes;
     all_boxes.reserve(background_triangulation.n_locally_owned_active_cells());
-    for (const auto cell : background_triangulation.active_cell_iterators())
+    for (const auto &cell : background_triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
         all_boxes.emplace_back(cell->bounding_box());
     const auto tree        = pack_rtree(all_boxes);

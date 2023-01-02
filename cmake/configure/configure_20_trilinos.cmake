@@ -185,6 +185,24 @@ macro(feature_trilinos_find_external var)
         set(${var} FALSE)
       endif()
 
+      #
+      # We require at least Trilinos 13.2
+      #
+      if(TRILINOS_VERSION VERSION_LESS 13.2)
+        message(STATUS "Could not find a sufficient Trilinos installation: "
+          "deal.II requires at least version 13.2 if the Trilinos installation includes Kokkos, "
+          "but version ${TRILINOS_VERSION} was found."
+          )
+        set(TRILINOS_ADDITIONAL_ERROR_STRING
+          ${TRILINOS_ADDITIONAL_ERROR_STRING}
+          "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+          "with version ${TRILINOS_VERSION} is too old.\n"
+          "deal.II requires at least version 13.2 if the Trilinos installation includes Kokkos.\n\n"
+          )
+        set(${var} FALSE)
+      endif()
+
+
       if(Kokkos_ENABLE_CUDA)
         # We need to disable SIMD vectorization for CUDA device code.
         # Otherwise, nvcc compilers from version 9 on will emit an error message like:
@@ -267,7 +285,7 @@ macro(feature_trilinos_find_external var)
         main()
         {
           Epetra_CrsMatrix *matrix;
-          const auto teuchos_wrapped_matrix = Teuchos::rcp(matrix, false);	
+          const auto teuchos_wrapped_matrix = Teuchos::rcp(matrix, false);
           Teuchos::ParameterList parameters;
           MueLu::CreateEpetraPreconditioner(teuchos_wrapped_matrix, parameters);
           return 0;
