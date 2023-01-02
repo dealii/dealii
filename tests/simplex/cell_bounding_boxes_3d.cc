@@ -40,7 +40,7 @@ template <int dim>
 void
 compute_bounding_boxes(Triangulation<dim> &tria)
 {
-  for (const auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     {
       const auto cell_bb = cell->bounding_box();
       deallog << "Center : " << cell_bb.center()
