@@ -150,7 +150,7 @@ macro(feature_trilinos_find_external var)
       #
       # Check for modules.
       #
-      foreach(_optional_module Belos EpetraExt Kokkos MueLu ROL Sacado SEACAS Tpetra Zoltan)
+      foreach(_optional_module Belos EpetraExt Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan)
         item_matches(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
         if(_module_found)
           message(STATUS "  Found ${_optional_module}")
