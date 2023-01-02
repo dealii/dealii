@@ -1989,7 +1989,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0];
   }
 
@@ -2037,7 +2036,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0];
   }
 
@@ -2087,7 +2085,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0][0];
   }
 
@@ -2136,7 +2133,6 @@ namespace internal
     // We cannot return a static variable, as this class must support number
     // types that require no instances of the number type to be in scope during
     // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    Assert(false, ExcInternalError());
     return data[0][0];
   }
 
