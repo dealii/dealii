@@ -564,7 +564,7 @@ public:
 
   /**
    * Determine the orientation of the current entity described by its
-   * vertices @p vertices_1 relative to an entity described by @p var_0.
+   * vertices @p vertices_1 relative to an entity described by @p vertices_0.
    * The two arrays given as arguments can be arrays of global vertex
    * indices or local vertex indices, arrays of vertex locations, or
    * arrays of any other objects identifying the vertices.
