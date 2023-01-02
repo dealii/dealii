@@ -75,8 +75,13 @@ case $STAGE in
     #    set it to 4,2,1 to set parallelization levels inside parallelized blocks
     # 2. OMP_THREAD_LIMIT limits the total number of threads, independent of
     #    nesting
+    #
+    # 3. In addition we set the OMP_PROC_BIND variable to false to allow
+    #    free movement of the two worker threads and silence a KOKKOS
+    #    warning (which might insist on this variable to be defined).
     export OMP_NUM_THREADS="2"
     export OMP_THREAD_LIMIT="2"
+    export OMP_PROC_BIND="false"
 
     # Allow oversubscription for MPI (needed for Openmpi@3.0)
     export OMPI_MCA_rmaps_base_oversubscribe=1
