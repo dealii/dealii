@@ -155,7 +155,7 @@ macro(feature_trilinos_find_external var)
         if(_module_found)
           message(STATUS "  Found ${_optional_module}")
           string(TOUPPER "${_optional_module}" _optional_module_upper)
-          set(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
+          set(TRILINOS_WITH_${_optional_module_upper} ON)
         else()
           message(STATUS "  Module ${_optional_module} not found!")
         endif()
@@ -169,21 +169,20 @@ macro(feature_trilinos_find_external var)
         if(_tpl_found)
           message(STATUS "  Found ${_optional_tpl}")
           string(TOUPPER "${_optional_tpl}" _optional_tpl_upper)
-          set(DEAL_II_TRILINOS_WITH_${_optional_tpl_upper} ON)
+          set(TRILINOS_WITH_${_optional_tpl_upper} ON)
         else()
           message(STATUS "  Module ${_optional_tpl} not found!")
         endif()
       endforeach()
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_KOKKOS)
+    if(TRILINOS_WITH_KOKKOS)
       if(DEAL_II_FORCE_BUNDLED_KOKKOS)
         set(TRILINOS_ADDITIONAL_ERROR_STRING
           ${TRILINOS_ADDITIONAL_ERROR_STRING}
           "The Trilinos installation (found at \"${TRILINOS_DIR}\")"
           "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
         set(${var} FALSE)
-        unset(DEAL_II_TRILINOS_WITH_KOKKOS)
       endif()
 
       #
@@ -201,11 +200,10 @@ macro(feature_trilinos_find_external var)
           "deal.II requires at least version 13.2 if the Trilinos installation includes Kokkos.\n\n"
           )
         set(${var} FALSE)
-        unset(DEAL_II_TRILINOS_WITH_KOKKOS)
       endif()
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)
+    if(TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)
         # We need to disable SIMD vectorization for CUDA device code.
         # Otherwise, nvcc compilers from version 9 on will emit an error message like:
         # "[...] contains a vector, which is not supported in device code". We
@@ -215,7 +213,7 @@ macro(feature_trilinos_find_external var)
         KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_TPETRA)
+    if(TRILINOS_WITH_TPETRA)
       #
       # Check if Tpetra is usable in fact.
       #
@@ -261,11 +259,11 @@ macro(feature_trilinos_find_external var)
           STATUS
           "Tpetra was found but is not usable! Disabling Tpetra support."
           )
-        set(DEAL_II_TRILINOS_WITH_TPETRA OFF)
+        set(TRILINOS_WITH_TPETRA OFF)
       endif()
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_MUELU)
+    if(TRILINOS_WITH_MUELU)
       #
       # Check if MueLu is actually usable.
       #
@@ -297,13 +295,13 @@ macro(feature_trilinos_find_external var)
           STATUS
           "MueLu was found but is not usable through Epetra! Disabling MueLu support."
           )
-        set(DEAL_II_TRILINOS_WITH_MUELU OFF)
+        set(TRILINOS_WITH_MUELU OFF)
       endif()
     endif()
 
     # the only thing we use from SEACAS right now is ExodusII, so just check
     # that it works
-    if(${DEAL_II_TRILINOS_WITH_SEACAS})
+    if(${TRILINOS_WITH_SEACAS})
       list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
       list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES})
       CHECK_CXX_SOURCE_COMPILES(
@@ -334,11 +332,11 @@ macro(feature_trilinos_find_external var)
           STATUS
           "SEACAS was found but doesn't seem to include ExodusII. Disabling SEACAS support."
           )
-        set(DEAL_II_TRILINOS_WITH_SEACAS OFF)
+        set(TRILINOS_WITH_SEACAS OFF)
       endif()
     endif()
 
-    if(${DEAL_II_TRILINOS_WITH_SACADO})
+    if(${TRILINOS_WITH_SACADO})
       #
       # Look for Sacado_config.h - we'll query it to determine C++11 support:
       #
