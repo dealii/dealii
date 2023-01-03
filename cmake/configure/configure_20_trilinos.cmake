@@ -19,6 +19,18 @@
 
 set(FEATURE_TRILINOS_DEPENDS MPI)
 
+#
+# A list of optional Trilinos modules we use:
+#
+set(_deal_ii_trilinos_optional_modules
+  Belos EpetraExt Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan
+  )
+
+#
+# A list of optional Trilinos TPLs we use:
+#
+set(_deal_ii_trilinos_optional_tpls MUMPS)
+
 macro(feature_trilinos_find_external var)
   find_package(DEAL_II_TRILINOS)
 
@@ -150,7 +162,7 @@ macro(feature_trilinos_find_external var)
       #
       # Check for modules.
       #
-      foreach(_optional_module Belos EpetraExt Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan)
+      foreach(_optional_module ${_deal_ii_trilinos_optional_modules})
         item_matches(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
         if(_module_found)
           message(STATUS "  Found ${_optional_module}")
@@ -164,7 +176,7 @@ macro(feature_trilinos_find_external var)
       #
       # Check for third-party libraries (tpl).
       #
-      foreach(_optional_tpl MUMPS)
+      foreach(_optional_tpl ${_deal_ii_trilinos_optional_tpls})
         item_matches(_tpl_found ${_optional_tpl} ${Trilinos_TPL_LIST})
         if(_tpl_found)
           message(STATUS "  Found ${_optional_tpl}")
@@ -387,36 +399,49 @@ endmacro()
 
 
 macro(feature_trilinos_configure_external)
+  #
+  # Propagate optional Trilinos modules and TPLs into DEAL_II namespace:
+  #
+
+  foreach(_module ${_deal_ii_trilinos_optional_modules} ${_deal_ii_trilinos_optional_tpls})
+    string(TOUPPER "${_module}" _module_upper)
+    if(${TRILINOS_WITH_${_module_upper}})
+      set(DEAL_II_TRILINOS_WITH_${_module_upper} ON)
+    endif()
+  endforeach()
+
+  #
+  # Figure out all the possible instantiations we need:
+  #
+
   set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
   set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
-  set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES 
-      "TrilinosWrappers::SparseMatrix"
-      "TrilinosWrappers::BlockSparseMatrix")
+  set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES "TrilinosWrappers::SparseMatrix" "TrilinosWrappers::BlockSparseMatrix")
   set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
   set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
-  if (${DEAL_II_TRILINOS_WITH_TPETRA})
+  if(${DEAL_II_TRILINOS_WITH_TPETRA})
     set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
     set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
-    if (${DEAL_II_WITH_COMPLEX_NUMBERS})
+    if(${DEAL_II_WITH_COMPLEX_NUMBERS})
       set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
       set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
     endif()
   endif()
-  if(${DEAL_II_TRILINOS_WITH_SACADO})
-    # Note: Only CMake 3.0 and greater support line continuation with the "\" character
-    #       Elements of string lists are naturally separated by a ";"
-    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
-        "Sacado::Fad::DFad<double>"
-        "Sacado::Fad::DFad<float>"
-        "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
-        "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
-    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
-        "Sacado::Rad::ADvar<double>"
-        "Sacado::Rad::ADvar<float>"
-        "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
-        "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>")
 
+  if(${DEAL_II_TRILINOS_WITH_SACADO})
+    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
+      "Sacado::Fad::DFad<double>"
+      "Sacado::Fad::DFad<float>"
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>"
+      )
+    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
+      "Sacado::Rad::ADvar<double>"
+      "Sacado::Rad::ADvar<float>"
+      "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
+      "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>"
+      )
     if (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
       set(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
     endif()
