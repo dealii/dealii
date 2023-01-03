@@ -19,6 +19,18 @@
 
 set(FEATURE_TRILINOS_DEPENDS MPI)
 
+#
+# A list of optional Trilinos modules we use:
+#
+set(_deal_ii_trilinos_optional_modules
+  Belos EpetraExt Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan
+  )
+
+#
+# A list of optional Trilinos TPLs we use:
+#
+set(_deal_ii_trilinos_optional_tpls MUMPS)
+
 macro(feature_trilinos_find_external var)
   find_package(DEAL_II_TRILINOS)
 
@@ -150,12 +162,12 @@ macro(feature_trilinos_find_external var)
       #
       # Check for modules.
       #
-      foreach(_optional_module Belos EpetraExt Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan)
+      foreach(_optional_module ${_deal_ii_trilinos_optional_modules})
         item_matches(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
         if(_module_found)
           message(STATUS "  Found ${_optional_module}")
           string(TOUPPER "${_optional_module}" _optional_module_upper)
-          set(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
+          set(TRILINOS_WITH_${_optional_module_upper} ON)
         else()
           message(STATUS "  Module ${_optional_module} not found!")
         endif()
@@ -164,26 +176,25 @@ macro(feature_trilinos_find_external var)
       #
       # Check for third-party libraries (tpl).
       #
-      foreach(_optional_tpl MUMPS)
+      foreach(_optional_tpl ${_deal_ii_trilinos_optional_tpls})
         item_matches(_tpl_found ${_optional_tpl} ${Trilinos_TPL_LIST})
         if(_tpl_found)
           message(STATUS "  Found ${_optional_tpl}")
           string(TOUPPER "${_optional_tpl}" _optional_tpl_upper)
-          set(DEAL_II_TRILINOS_WITH_${_optional_tpl_upper} ON)
+          set(TRILINOS_WITH_${_optional_tpl_upper} ON)
         else()
           message(STATUS "  Module ${_optional_tpl} not found!")
         endif()
       endforeach()
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_KOKKOS)
+    if(TRILINOS_WITH_KOKKOS)
       if(DEAL_II_FORCE_BUNDLED_KOKKOS)
         set(TRILINOS_ADDITIONAL_ERROR_STRING
           ${TRILINOS_ADDITIONAL_ERROR_STRING}
           "The Trilinos installation (found at \"${TRILINOS_DIR}\")"
           "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
         set(${var} FALSE)
-        unset(DEAL_II_TRILINOS_WITH_KOKKOS)
       endif()
 
       #
@@ -201,11 +212,10 @@ macro(feature_trilinos_find_external var)
           "deal.II requires at least version 13.2 if the Trilinos installation includes Kokkos.\n\n"
           )
         set(${var} FALSE)
-        unset(DEAL_II_TRILINOS_WITH_KOKKOS)
       endif()
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)
+    if(TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)
         # We need to disable SIMD vectorization for CUDA device code.
         # Otherwise, nvcc compilers from version 9 on will emit an error message like:
         # "[...] contains a vector, which is not supported in device code". We
@@ -215,7 +225,7 @@ macro(feature_trilinos_find_external var)
         KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_TPETRA)
+    if(TRILINOS_WITH_TPETRA)
       #
       # Check if Tpetra is usable in fact.
       #
@@ -261,11 +271,11 @@ macro(feature_trilinos_find_external var)
           STATUS
           "Tpetra was found but is not usable! Disabling Tpetra support."
           )
-        set(DEAL_II_TRILINOS_WITH_TPETRA OFF)
+        set(TRILINOS_WITH_TPETRA OFF)
       endif()
     endif()
 
-    if(DEAL_II_TRILINOS_WITH_MUELU)
+    if(TRILINOS_WITH_MUELU)
       #
       # Check if MueLu is actually usable.
       #
@@ -297,13 +307,13 @@ macro(feature_trilinos_find_external var)
           STATUS
           "MueLu was found but is not usable through Epetra! Disabling MueLu support."
           )
-        set(DEAL_II_TRILINOS_WITH_MUELU OFF)
+        set(TRILINOS_WITH_MUELU OFF)
       endif()
     endif()
 
     # the only thing we use from SEACAS right now is ExodusII, so just check
     # that it works
-    if(${DEAL_II_TRILINOS_WITH_SEACAS})
+    if(${TRILINOS_WITH_SEACAS})
       list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
       list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES})
       CHECK_CXX_SOURCE_COMPILES(
@@ -334,11 +344,11 @@ macro(feature_trilinos_find_external var)
           STATUS
           "SEACAS was found but doesn't seem to include ExodusII. Disabling SEACAS support."
           )
-        set(DEAL_II_TRILINOS_WITH_SEACAS OFF)
+        set(TRILINOS_WITH_SEACAS OFF)
       endif()
     endif()
 
-    if(${DEAL_II_TRILINOS_WITH_SACADO})
+    if(${TRILINOS_WITH_SACADO})
       #
       # Look for Sacado_config.h - we'll query it to determine C++11 support:
       #
@@ -389,36 +399,49 @@ endmacro()
 
 
 macro(feature_trilinos_configure_external)
+  #
+  # Propagate optional Trilinos modules and TPLs into DEAL_II namespace:
+  #
+
+  foreach(_module ${_deal_ii_trilinos_optional_modules} ${_deal_ii_trilinos_optional_tpls})
+    string(TOUPPER "${_module}" _module_upper)
+    if(${TRILINOS_WITH_${_module_upper}})
+      set(DEAL_II_TRILINOS_WITH_${_module_upper} ON)
+    endif()
+  endforeach()
+
+  #
+  # Figure out all the possible instantiations we need:
+  #
+
   set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
   set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
-  set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES 
-      "TrilinosWrappers::SparseMatrix"
-      "TrilinosWrappers::BlockSparseMatrix")
+  set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES "TrilinosWrappers::SparseMatrix" "TrilinosWrappers::BlockSparseMatrix")
   set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
   set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
-  if (${DEAL_II_TRILINOS_WITH_TPETRA})
+  if(${DEAL_II_TRILINOS_WITH_TPETRA})
     set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
     set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
-    if (${DEAL_II_WITH_COMPLEX_NUMBERS})
+    if(${DEAL_II_WITH_COMPLEX_NUMBERS})
       set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
       set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
     endif()
   endif()
-  if(${DEAL_II_TRILINOS_WITH_SACADO})
-    # Note: Only CMake 3.0 and greater support line continuation with the "\" character
-    #       Elements of string lists are naturally separated by a ";"
-    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
-        "Sacado::Fad::DFad<double>"
-        "Sacado::Fad::DFad<float>"
-        "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
-        "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
-    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
-        "Sacado::Rad::ADvar<double>"
-        "Sacado::Rad::ADvar<float>"
-        "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
-        "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>")
 
+  if(${DEAL_II_TRILINOS_WITH_SACADO})
+    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
+      "Sacado::Fad::DFad<double>"
+      "Sacado::Fad::DFad<float>"
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>"
+      )
+    set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
+      "Sacado::Rad::ADvar<double>"
+      "Sacado::Rad::ADvar<float>"
+      "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
+      "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>"
+      )
     if (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
       set(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
     endif()
