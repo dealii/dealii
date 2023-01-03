@@ -249,7 +249,7 @@ TridiagonalMatrix<number>::compute_eigenvalues()
        &one,
        static_cast<number *>(nullptr),
        &info);
-  Assert(info == 0, ExcInternalError());
+  AssertThrow(info == 0, ExcInternalError());
 
   state = LAPACKSupport::eigenvalues;
 #else
