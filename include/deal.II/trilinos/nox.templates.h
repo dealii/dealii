@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/trilinos/nox.h>
-
 #ifdef DEAL_II_TRILINOS_WITH_NOX
+
+#  include <deal.II/trilinos/nox.h>
 
 #  include <NOX_Abstract_Group.H>
 #  include <NOX_Abstract_Vector.H>
@@ -70,7 +70,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Initialize every element of this vector with gamma.
+         * Initialize every element of this vector with @p gamma .
          */
         NOX::Abstract::Vector &
         init(double gamma) override
@@ -94,7 +94,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Put element-wise absolute values of source vector y into this vector.
+         * Put element-wise absolute values of source vector @p y into this vector.
          */
         NOX::Abstract::Vector &
         abs(const NOX::Abstract::Vector &y) override
@@ -107,7 +107,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Copy source vector y into this vector.
+         * Copy source vector @p y into this vector.
          */
         NOX::Abstract::Vector &
         operator=(const NOX::Abstract::Vector &y) override
@@ -127,7 +127,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Put element-wise reciprocal of source vector y into this vector.
+         * Put element-wise reciprocal of source vector @p y into this vector.
          */
         NOX::Abstract::Vector &
         reciprocal(const NOX::Abstract::Vector &y) override
@@ -140,7 +140,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Scale each element of this vector by gamma.
+         * Scale each element of this vector by @p gamma .
          */
         NOX::Abstract::Vector &
         scale(double gamma) override
@@ -151,7 +151,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Scale this vector element-by-element by the vector a.
+         * Scale this vector element-by-element by the vector @p a.
          */
         NOX::Abstract::Vector &
         scale(const NOX::Abstract::Vector &a) override
@@ -166,7 +166,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Compute x = (alpha * a) + (gamma * x) where x is this vector.
+         * Compute `x = (alpha * a) + (gamma * x)` where `x` is this vector.
          */
         NOX::Abstract::Vector &
         update(double                       alpha,
@@ -185,8 +185,8 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Compute x = (alpha * a) + (beta * b) + (gamma * x) where x is this
-         * vector.
+         * Compute `x = (alpha * a) + (beta * b) + (gamma * x)` where `x` is
+         * this vector.
          */
         NOX::Abstract::Vector &
         update(double                       alpha,
@@ -250,7 +250,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Return the vector's weighted 2-Norm.
+         * Return the vector's weighted 2-norm.
          */
         double
         norm(const NOX::Abstract::Vector &weights) const override
@@ -410,7 +410,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Set the solution vector `x` to @y.
+         * Set the solution vector `x` to @p y.
          */
         void
         setX(const NOX::Abstract::Vector &y) override
@@ -458,7 +458,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Return true if the residual vector `F` is valid.
+         * Return `true` if the residual vector `F` is valid.
          */
         bool
         isF() const override
@@ -484,7 +484,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Return true if the Jacobian is valid.
+         * Return `true` if the Jacobian is valid.
          */
         bool
         isJacobian() const override
@@ -538,7 +538,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Return an `RCP` to solution vector.
+         * Return a reference counting pointer to solution vector.
          */
         Teuchos::RCP<const NOX::Abstract::Vector>
         getXPtr() const override
@@ -548,7 +548,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Return an RCP to the residual `F(x)`.
+         * Return a reference counting pointer to the residual `F(x)`.
          */
         Teuchos::RCP<const NOX::Abstract::Vector>
         getFPtr() const override
@@ -558,7 +558,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Return an `RCP` to gradient.
+         * Return a reference counting pointer to gradient.
          */
         Teuchos::RCP<const NOX::Abstract::Vector>
         getGradientPtr() const override
@@ -568,7 +568,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Return an `RCP` to the Newton descent direction.
+         * Return a reference counting pointer to the Newton descent direction.
          */
         Teuchos::RCP<const NOX::Abstract::Vector>
         getNewtonPtr() const override
@@ -579,8 +579,8 @@ namespace TrilinosWrappers
 
         /**
          * Create a new Group of the same derived type as this one by
-         * cloning this one, and return a reference counting
-         * pointer to the new group.
+         * cloning this one, and return a reference counting pointer to
+         * the new group.
          */
         Teuchos::RCP<NOX::Abstract::Group>
         clone(NOX::CopyType copy_type) const override
@@ -668,7 +668,7 @@ namespace TrilinosWrappers
         }
 
         /**
-         * Applies the Jacobian to the given input vector and assigns
+         * Applies the Jacobian to the given @p input vector and assigns
          * the output to the @p result.
          */
         NOX::Abstract::Group::ReturnType
@@ -693,7 +693,7 @@ namespace TrilinosWrappers
 
       private:
         /**
-         * Reset state.
+         * Reset the state of this object.
          */
         void
         reset()
@@ -702,36 +702,56 @@ namespace TrilinosWrappers
           is_valid_j = false;
         }
 
-        // internal vector for the current solution
+        /**
+         * An internal vector for the current solution.
+         */
         Vector<VectorType> x;
 
-        // internal vector for the residual
+        /**
+         * An internal vector for the residual.
+         */
         Vector<VectorType> f;
 
-        // internal vector for the solution gradient
+        /**
+         * An internal vector for the solution gradient.
+         */
         Vector<VectorType> gradient;
 
-        // internal vector for the newton step
+        /**
+         * An internal vector for the newton step.
+         */
         Vector<VectorType> newton;
 
-        // helper function to compute residual
+        /**
+         * A helper function to compute residual.
+         */
         std::function<int(const VectorType &x, VectorType &f)> residual;
 
-        // helper function to setup Jacobian
+        /**
+         * A helper function to setup Jacobian.
+         */
         std::function<int(const VectorType &x)> setup_jacobian;
 
-        // helper function to apply Jacobian
+        /**
+         * A helper function to apply Jacobian.
+         */
         std::function<int(const VectorType &x, VectorType &v)> apply_jacobian;
 
-        // helper function to solve jacobian
+        /**
+         * A helper function to solve Jacobian.
+         */
         std::function<
           int(const VectorType &f, VectorType &x, const double tolerance)>
           solve_with_jacobian;
 
-        // internal state (is residual computed?)
+        /**
+         * A flag that indicates if the has residual been computed.
+         */
         bool is_valid_f;
 
-        // internal state (is Jacobian computed?)
+        /**
+         * A flag that indicates if the Jacobian has been computed.
+         */
         bool is_valid_j;
       };
 
