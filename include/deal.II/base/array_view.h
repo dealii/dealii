@@ -575,10 +575,6 @@ inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
 ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
   AssertIndexRange(i, n_elements);
-  Assert(
-    (std::is_same<MemorySpaceType, MemorySpace::Host>::value),
-    ExcMessage(
-      "Accessing elements is only allowed if the data is stored in CPU memory!"));
 
   return *(starting_element + i);
 }
