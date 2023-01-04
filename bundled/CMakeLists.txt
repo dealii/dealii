@@ -44,9 +44,15 @@ endif()
 if(FEATURE_KOKKOS_BUNDLED_CONFIGURED)
   add_subdirectory(${KOKKOS_FOLDER})
 
-  install(DIRECTORY ${KOKKOS_BUNDLED_INCLUDE_DIRS}
+  install(DIRECTORY
+    ${KOKKOS_FOLDER}/algorithms/src/
+    ${KOKKOS_FOLDER}/containers/src/
+    ${KOKKOS_FOLDER}/core/src/
+    ${KOKKOS_FOLDER}/simd/src/
+    ${KOKKOS_FOLDER}/tpls/desul/include/
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
+    FILES_MATCHING PATTERN "*.hpp"
     )
 endif()
 
