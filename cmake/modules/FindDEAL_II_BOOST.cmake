@@ -53,6 +53,7 @@ endif()
 # and https://lists.boost.org/Archives/boost/2019/02/245016.php
 set(Boost_NO_BOOST_CMAKE ON)
 
+set(Boost_NO_WARN_NEW_VERSIONS TRUE)
 if(DEAL_II_WITH_ZLIB)
   find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
     iostreams serialization system thread
