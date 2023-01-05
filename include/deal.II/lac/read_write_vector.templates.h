@@ -339,7 +339,7 @@ namespace LinearAlgebra
     ExecutionSpace exec;
     Kokkos::parallel_for(
       Kokkos::RangePolicy<ExecutionSpace>(exec, 0, locally_owned_size()),
-      KOKKOS_LAMBDA(int i) { func(this->values[i]); });
+      [&, this](int i) { func(this->values[i]); });
     exec.fence();
   }
 
