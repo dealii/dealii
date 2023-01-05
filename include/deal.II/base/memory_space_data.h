@@ -48,6 +48,9 @@ namespace MemorySpace
   {
     MemorySpaceData();
 
+    MemorySpaceData(
+      Kokkos::View<T *, typename MemorySpace::kokkos_space> values);
+
     /**
      * Copy the class member values to @p begin.
      * If the data is on the device it is moved to the host.
@@ -113,7 +116,12 @@ namespace MemorySpace
         0))
   {}
 
-
+  template <typename T, typename MemorySpace>
+  MemorySpaceData<T, MemorySpace>::MemorySpaceData(
+    Kokkos::View<T *, typename MemorySpace::kokkos_space> new_values)
+    : values_host_buffer(Kokkos::View<T *, Kokkos::HostSpace>("host buffer", 0))
+    , values(new_values)
+  {}
 
   template <typename T, typename MemorySpace>
   void

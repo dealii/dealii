@@ -188,15 +188,10 @@ Vector<Number>::operator=(const Vector<Number> &v)
   if (size() != v.size())
     reinit(v, true);
 
-  if (0 < size())
-    {
-      dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
-        v.begin(), begin());
-      internal::VectorOperations::parallel_for(copier,
-                                               0,
-                                               size(),
-                                               thread_loop_partitioner);
-    }
+  auto vector_size = size();
+  Kokkos::deep_copy(
+    Kokkos::View<Number *, Kokkos::HostSpace>(begin(), vector_size),
+    Kokkos::View<const Number *, Kokkos::HostSpace>(v.begin(), vector_size));
 
   return *this;
 }
@@ -211,12 +206,10 @@ Vector<Number>::operator=(const Vector<Number2> &v)
   if (size() != v.size())
     reinit(v, true);
 
-  dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
-    v.begin(), begin());
-  internal::VectorOperations::parallel_for(copier,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  Kokkos::deep_copy(
+    Kokkos::View<Number *, Kokkos::HostSpace>(begin(), vector_size),
+    Kokkos::View<const Number2 *, Kokkos::HostSpace>(v.begin(), vector_size));
 
   return *this;
 }
@@ -280,14 +273,9 @@ Vector<Number>::operator=(const Number s)
   if (s != Number())
     Assert(size() != 0, ExcEmptyObject());
 
-  if (size() > 0)
-    {
-      internal::VectorOperations::Vector_set<Number> setter(s, values.begin());
-      internal::VectorOperations::parallel_for(setter,
-                                               0,
-                                               size(),
-                                               thread_loop_partitioner);
-    }
+  Kokkos::deep_copy(Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                              size()),
+                    s);
 
   return *this;
 }
@@ -302,13 +290,12 @@ Vector<Number>::operator*=(const Number factor)
 
   Assert(size() != 0, ExcEmptyObject());
 
-  internal::VectorOperations::Vectorization_multiply_factor<Number>
-    vector_multiply(values.begin(), factor);
-
-  internal::VectorOperations::parallel_for(vector_multiply,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    multiply_factor(thread_loop_partitioner,
+                    size(),
+                    factor,
+                    Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                              size()));
 
   return *this;
 }
@@ -324,12 +311,15 @@ Vector<Number>::add(const Number a, const Vector<Number> &v)
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-  internal::VectorOperations::Vectorization_add_av<Number> vector_add_av(
-    values.begin(), v.values.begin(), a);
-  internal::VectorOperations::parallel_for(vector_add_av,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    add_av(thread_loop_partitioner,
+           size(),
+           a,
+           Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
+                                                           vector_size),
+           Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                     vector_size));
 }
 
 
@@ -344,12 +334,16 @@ Vector<Number>::sadd(const Number x, const Number a, const Vector<Number> &v)
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-  internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd_xav(
-    values.begin(), v.values.begin(), a, x);
-  internal::VectorOperations::parallel_for(vector_sadd_xav,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    sadd_xav(thread_loop_partitioner,
+             size(),
+             x,
+             a,
+             Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
+                                                             vector_size),
+             Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                       vector_size));
 }
 
 
@@ -543,13 +537,17 @@ Vector<Number>::add_and_dot(const Number          a,
   AssertDimension(size(), V.size());
   AssertDimension(size(), W.size());
 
-  Number                                        sum;
-  internal::VectorOperations::AddAndDot<Number> adder(values.begin(),
-                                                      V.values.begin(),
-                                                      W.values.begin(),
-                                                      a);
-  internal::VectorOperations::parallel_reduce(
-    adder, 0, size(), sum, thread_loop_partitioner);
+  auto   vector_size = size();
+  Number sum         = internal::VectorOperations::
+    functions<Number, Number, MemorySpace::Host>::add_and_dot(
+      thread_loop_partitioner,
+      size(),
+      a,
+      Kokkos::View<const Number *, Kokkos::HostSpace>(V.values.begin(),
+                                                      vector_size),
+      Kokkos::View<const Number *, Kokkos::HostSpace>(W.values.begin(),
+                                                      vector_size),
+      Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(), vector_size));
   AssertIsFinite(sum);
 
   return sum;
@@ -564,12 +562,15 @@ Vector<Number>::operator+=(const Vector<Number> &v)
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-  internal::VectorOperations::Vectorization_add_v<Number> vector_add(
-    values.begin(), v.values.begin());
-  internal::VectorOperations::parallel_for(vector_add,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    add_vector(thread_loop_partitioner,
+               size(),
+               Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
+                                                               vector_size),
+               Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                         vector_size));
+
   return *this;
 }
 
@@ -582,12 +583,14 @@ Vector<Number>::operator-=(const Vector<Number> &v)
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-  internal::VectorOperations::Vectorization_subtract_v<Number> vector_subtract(
-    values.begin(), v.values.begin());
-  internal::VectorOperations::parallel_for(vector_subtract,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    subtract_vector(
+      thread_loop_partitioner,
+      size(),
+      Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
+                                                      vector_size),
+      Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(), vector_size));
 
   return *this;
 }
@@ -600,12 +603,13 @@ Vector<Number>::add(const Number v)
 {
   Assert(size() != 0, ExcEmptyObject());
 
-  internal::VectorOperations::Vectorization_add_factor<Number> vector_add(
-    values.begin(), v);
-  internal::VectorOperations::parallel_for(vector_add,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    add_factor(thread_loop_partitioner,
+               size(),
+               v,
+               Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                         vector_size));
 }
 
 
@@ -624,12 +628,18 @@ Vector<Number>::add(const Number          a,
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
   Assert(size() == w.size(), ExcDimensionMismatch(size(), w.size()));
 
-  internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(
-    values.begin(), v.values.begin(), w.values.begin(), a, b);
-  internal::VectorOperations::parallel_for(vector_add,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    add_avpbw(thread_loop_partitioner,
+              size(),
+              a,
+              b,
+              Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
+                                                              vector_size),
+              Kokkos::View<const Number *, Kokkos::HostSpace>(w.values.begin(),
+                                                              vector_size),
+              Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                        vector_size));
 }
 
 
@@ -643,12 +653,15 @@ Vector<Number>::sadd(const Number x, const Vector<Number> &v)
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-  internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(
-    values.begin(), v.values.begin(), x);
-  internal::VectorOperations::parallel_for(vector_sadd,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    sadd_xv(thread_loop_partitioner,
+            size(),
+            x,
+            Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
+                                                            vector_size),
+            Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                      vector_size));
 }
 
 
@@ -660,12 +673,14 @@ Vector<Number>::scale(const Vector<Number> &s)
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == s.size(), ExcDimensionMismatch(size(), s.size()));
 
-  internal::VectorOperations::Vectorization_scale<Number> vector_scale(
-    values.begin(), s.values.begin());
-  internal::VectorOperations::parallel_for(vector_scale,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    scale(thread_loop_partitioner,
+          size(),
+          Kokkos::View<const Number *, Kokkos::HostSpace>(s.values.begin(),
+                                                          vector_size),
+          Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                    vector_size));
 }
 
 
@@ -693,12 +708,15 @@ Vector<Number>::equ(const Number a, const Vector<Number> &u)
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == u.size(), ExcDimensionMismatch(size(), u.size()));
 
-  internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(
-    values.begin(), u.values.begin(), a);
-  internal::VectorOperations::parallel_for(vector_equ,
-                                           0,
-                                           size(),
-                                           thread_loop_partitioner);
+  auto vector_size = size();
+  internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+    equ_au(thread_loop_partitioner,
+           size(),
+           a,
+           Kokkos::View<const Number *, Kokkos::HostSpace>(u.values.begin(),
+                                                           vector_size),
+           Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(),
+                                                     vector_size));
 }
 
 

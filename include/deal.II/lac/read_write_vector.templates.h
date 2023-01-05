@@ -335,11 +335,12 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::apply(const Functor &func)
   {
-    FunctorTemplate<Functor> functor(*this, func);
-    dealii::internal::VectorOperations::parallel_for(functor,
-                                                     0,
-                                                     locally_owned_size(),
-                                                     thread_loop_partitioner);
+    using ExecutionSpace = Kokkos::HostSpace::execution_space;
+    ExecutionSpace exec;
+    Kokkos::parallel_for(
+      Kokkos::RangePolicy<ExecutionSpace>(exec, 0, locally_owned_size()),
+      KOKKOS_LAMBDA(int i) { func(this->values[i]); });
+    exec.fence();
   }
 
 
@@ -357,10 +358,11 @@ namespace LinearAlgebra
 
     if (locally_owned_size() > 0)
       {
-        dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
-          in_vector.values.get(), values.get());
-        dealii::internal::VectorOperations::parallel_for(
-          copier, 0, locally_owned_size(), thread_loop_partitioner);
+        Kokkos::deep_copy(
+          Kokkos::View<Number *, Kokkos::HostSpace>(values.get(),
+                                                    locally_owned_size()),
+          Kokkos::View<Number *, Kokkos::HostSpace>(in_vector.values.get(),
+                                                    locally_owned_size()));
       }
 
     return *this;
@@ -377,13 +379,10 @@ namespace LinearAlgebra
     if (locally_owned_size() != in_vector.locally_owned_size())
       reinit(in_vector, true);
 
-    if (locally_owned_size() > 0)
-      {
-        dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
-          in_vector.values.get(), values.get());
-        dealii::internal::VectorOperations::parallel_for(
-          copier, 0, locally_owned_size(), thread_loop_partitioner);
-      }
+    auto size = locally_owned_size();
+    Kokkos::deep_copy(
+      Kokkos::View<Number *, Kokkos::HostSpace>(values.get(), size),
+      Kokkos::View<Number2 *, Kokkos::HostSpace>(in_vector.values.get(), size));
 
     return *this;
   }
@@ -398,14 +397,9 @@ namespace LinearAlgebra
            ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    const size_type this_size = locally_owned_size();
-    if (this_size > 0)
-      {
-        dealii::internal::VectorOperations::Vector_set<Number> setter(
-          Number(), values.get());
-        dealii::internal::VectorOperations::parallel_for(
-          setter, 0, this_size, thread_loop_partitioner);
-      }
+    Kokkos::deep_copy(Kokkos::View<Number *, Kokkos::HostSpace>(
+                        values.get(), locally_owned_size()),
+                      s);
 
     return *this;
   }

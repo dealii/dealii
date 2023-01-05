@@ -90,13 +90,11 @@ namespace LinearAlgebra
     if (this->size() != in_vector.size())
       this->reinit(in_vector, true);
 
-    dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
-      in_vector.values.get(), this->values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      copier,
-      static_cast<size_type>(0),
-      this->size(),
-      this->thread_loop_partitioner);
+    Kokkos::deep_copy(
+      Kokkos::View<Number *, Kokkos::HostSpace>(this->values.get(),
+                                                this->size()),
+      Kokkos::View<Number *, Kokkos::HostSpace>(in_vector.values.get(),
+                                                this->size()));
 
     return *this;
   }
@@ -112,13 +110,11 @@ namespace LinearAlgebra
     if (this->size() != in_vector.size())
       ReadWriteVector<Number>::reinit(in_vector, true);
 
-    dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
-      in_vector.values.get(), this->values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      copier,
-      static_cast<size_type>(0),
-      this->size(),
-      this->thread_loop_partitioner);
+    Kokkos::deep_copy(
+      Kokkos::View<Number *, Kokkos::HostSpace>(this->values.get(),
+                                                this->size()),
+      Kokkos::View<Number2 *, Kokkos::HostSpace>(in_vector.values.get(),
+                                                 this->size()));
 
     return *this;
   }
@@ -133,10 +129,9 @@ namespace LinearAlgebra
            ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    dealii::internal::VectorOperations::Vector_set<Number> setter(
-      Number(), this->values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      setter, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::deep_copy(Kokkos::View<Number *, Kokkos::HostSpace>(
+                        this->values.get(), this->size()),
+                      s);
 
     return *this;
   }
@@ -149,13 +144,13 @@ namespace LinearAlgebra
   {
     AssertIsFinite(factor);
 
-    dealii::internal::VectorOperations::Vectorization_multiply_factor<Number>
-      vector_multiply(this->values.get(), factor);
-    dealii::internal::VectorOperations::parallel_for(
-      vector_multiply,
-      static_cast<size_type>(0),
-      this->size(),
-      this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      multiply_factor(this->thread_loop_partitioner,
+                      this->size(),
+                      factor,
+                      this_view);
 
     return *this;
   }
@@ -188,11 +183,15 @@ namespace LinearAlgebra
     Assert(down_V.size() == this->size(),
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
-
-    dealii::internal::VectorOperations::Vectorization_add_v<Number> vector_add(
-      this->values.get(), down_V.values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      vector_add, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
+                                                     down_V.size());
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      add_vector(this->thread_loop_partitioner,
+                 this->size(),
+                 V_view,
+                 this_view);
 
     return *this;
   }
@@ -212,10 +211,15 @@ namespace LinearAlgebra
     Assert(down_V.size() == this->size(),
            ExcMessage(
              "Cannot subtract two vectors with different numbers of elements"));
-    dealii::internal::VectorOperations::Vectorization_subtract_v<Number>
-      vector_subtract(this->values.get(), down_V.values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      vector_subtract, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
+                                                     down_V.size());
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      subtract_vector(this->thread_loop_partitioner,
+                      this->size(),
+                      V_view,
+                      this_view);
 
     return *this;
   }
@@ -264,10 +268,10 @@ namespace LinearAlgebra
   {
     AssertIsFinite(a);
 
-    dealii::internal::VectorOperations::Vectorization_add_factor<Number>
-      vector_add(this->values.get(), a);
-    dealii::internal::VectorOperations::parallel_for(
-      vector_add, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      add_factor(this->thread_loop_partitioner, this->size(), a, this_view);
   }
 
 
@@ -287,10 +291,12 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    dealii::internal::VectorOperations::Vectorization_add_av<Number>
-      vector_add_av(this->values.get(), down_V.values.get(), a);
-    dealii::internal::VectorOperations::parallel_for(
-      vector_add_av, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
+                                                     down_V.size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      add_av(this->thread_loop_partitioner, this->size(), a, V_view, this_view);
   }
 
 
@@ -322,11 +328,20 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    dealii::internal::VectorOperations::Vectorization_add_avpbw<Number>
-      vector_add(
-        this->values.get(), down_V.values.get(), down_W.values.get(), a, b);
-    dealii::internal::VectorOperations::parallel_for(
-      vector_add, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
+                                                     down_V.size());
+    Kokkos::View<Number *, Kokkos::HostSpace> W_view(down_W.values.get(),
+                                                     down_W.size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      add_avpbw(this->thread_loop_partitioner,
+                this->size(),
+                a,
+                b,
+                V_view,
+                W_view,
+                this_view);
   }
 
 
@@ -346,10 +361,13 @@ namespace LinearAlgebra
 
     // Downcast V. It fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    dealii::internal::VectorOperations::Vectorization_sadd_xav<Number>
-      vector_sadd_xav(this->values.get(), down_V.values.get(), a, s);
-    dealii::internal::VectorOperations::parallel_for(
-      vector_sadd_xav, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
+                                                     down_V.size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      sadd_xav(
+        this->thread_loop_partitioner, this->size(), s, a, V_view, this_view);
   }
 
 
@@ -369,10 +387,15 @@ namespace LinearAlgebra
            ExcMessage(
              "Cannot add two vectors with different numbers of elements"));
 
-    dealii::internal::VectorOperations::Vectorization_scale<Number>
-      vector_scale(this->values.get(), down_scaling_factors.values.get());
-    dealii::internal::VectorOperations::parallel_for(
-      vector_scale, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    Kokkos::View<Number *, Kokkos::HostSpace> down_scaling_factors_view(
+      down_scaling_factors.values.get(), down_scaling_factors.size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      scale(this->thread_loop_partitioner,
+            this->size(),
+            down_scaling_factors_view,
+            this_view);
   }
 
 
@@ -389,10 +412,12 @@ namespace LinearAlgebra
 
     // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    dealii::internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(
-      this->values.get(), down_V.values.get(), a);
-    dealii::internal::VectorOperations::parallel_for(
-      vector_equ, 0, this->size(), this->thread_loop_partitioner);
+    Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
+                                                        this->size());
+    Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
+                                                     down_V.size());
+    internal::VectorOperations::functions<Number, Number, MemorySpace::Host>::
+      equ_au(this->thread_loop_partitioner, this->size(), a, V_view, this_view);
   }
 
 
