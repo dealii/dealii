@@ -1690,7 +1690,8 @@ namespace internal
             typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
           KOKKOS_LAMBDA(size_type i, real_type & update) {
 #if KOKKOS_VERSION < 30400
-            update += pow(numbers::NumberTraits<Number>::abs(data(i)), exp);
+            update +=
+              std::pow(numbers::NumberTraits<Number>::abs(data(i)), exp);
 #elif KOKKOS_VERSION < 30700
             update += Kokkos::Experimental::pow(
               numbers::NumberTraits<Number>::abs(data(i)), exp);
