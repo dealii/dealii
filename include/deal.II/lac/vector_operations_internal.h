@@ -1372,12 +1372,10 @@ namespace internal
     {
       template <typename MemorySpace2>
       static void
-      copy(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Kokkos::View<const Number2 *, typename MemorySpace2::kokkos_space>
-          &                                                        v_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      copy(const size_type                                            size,
+           const Kokkos::View<const Number2 *,
+                              typename MemorySpace2::kokkos_space> &  v_data,
+           Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         Kokkos::deep_copy(
           Kokkos::subview(data, Kokkos::pair<size_type, size_type>(0, size)),
@@ -1385,8 +1383,7 @@ namespace internal
       }
 
       static void
-      set(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-          const size_type                                            size,
+      set(const size_type                                            size,
           const Number                                               s,
           Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
@@ -1397,7 +1394,6 @@ namespace internal
 
       static void
       add_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
           &                                                        v_data,
@@ -1414,7 +1410,6 @@ namespace internal
 
       static void
       subtract_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
           &                                                        v_data,
@@ -1431,7 +1426,6 @@ namespace internal
 
       static void
       add_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type                                            size,
         Number                                                     a,
         Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
@@ -1446,13 +1440,11 @@ namespace internal
       }
 
       static void
-      add_av(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &                                                        v_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      add_av(const size_type                                            size,
+             const Number                                               a,
+             const Kokkos::View<const Number *,
+                                typename MemorySpace::kokkos_space> &   v_data,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
@@ -1464,16 +1456,14 @@ namespace internal
       }
 
       static void
-      add_avpbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const Number    b,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &v_data,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &                                                        w_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      add_avpbw(const size_type                                         size,
+                const Number                                            a,
+                const Number                                            b,
+                const Kokkos::View<const Number *,
+                                   typename MemorySpace::kokkos_space> &v_data,
+                const Kokkos::View<const Number *,
+                                   typename MemorySpace::kokkos_space> &w_data,
+                Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
@@ -1487,13 +1477,11 @@ namespace internal
       }
 
       static void
-      sadd_xv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    x,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &                                                        v_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      sadd_xv(const size_type                                            size,
+              const Number                                               x,
+              const Kokkos::View<const Number *,
+                                 typename MemorySpace::kokkos_space> &   v_data,
+              Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
@@ -1505,14 +1493,12 @@ namespace internal
       }
 
       static void
-      sadd_xav(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    x,
-        const Number    a,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &                                                        v_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      sadd_xav(const size_type                                         size,
+               const Number                                            x,
+               const Number                                            a,
+               const Kokkos::View<const Number *,
+                                  typename MemorySpace::kokkos_space> &v_data,
+               Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
@@ -1527,7 +1513,6 @@ namespace internal
 
       static void
       sadd_xavbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Number    x,
         const Number    a,
@@ -1551,7 +1536,6 @@ namespace internal
 
       static void
       multiply_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type                                            size,
         const Number                                               factor,
         Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
@@ -1566,12 +1550,10 @@ namespace internal
       }
 
       static void
-      scale(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &                                                        v_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      scale(const size_type                                            size,
+            const Kokkos::View<const Number *,
+                               typename MemorySpace::kokkos_space> &   v_data,
+            Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
@@ -1583,13 +1565,11 @@ namespace internal
       }
 
       static void
-      equ_au(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &                                                        v_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      equ_au(const size_type                                            size,
+             const Number                                               a,
+             const Kokkos::View<const Number *,
+                                typename MemorySpace::kokkos_space> &   v_data,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
@@ -1601,16 +1581,14 @@ namespace internal
       }
 
       static void
-      equ_aubv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const Number    b,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &v_data,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &                                                        w_data,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      equ_aubv(const size_type                                         size,
+               const Number                                            a,
+               const Number                                            b,
+               const Kokkos::View<const Number *,
+                                  typename MemorySpace::kokkos_space> &v_data,
+               const Kokkos::View<const Number *,
+                                  typename MemorySpace::kokkos_space> &w_data,
+               Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
@@ -1624,8 +1602,7 @@ namespace internal
       }
 
       static Number
-      dot(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-          const size_type size,
+      dot(const size_type size,
           const Kokkos::View<Number2 *, typename MemorySpace::kokkos_space>
             &                                                        v_data,
           Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
@@ -1648,11 +1625,9 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_2(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type                                            size,
-        real_type &                                                sum,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      norm_2(const size_type                                            size,
+             real_type &                                                sum,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
@@ -1666,11 +1641,9 @@ namespace internal
       }
 
       static Number
-      mean_value(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
-          &data)
+      mean_value(const size_type                                         size,
+                 const Kokkos::View<const Number *,
+                                    typename MemorySpace::kokkos_space> &data)
       {
         Number result;
 
@@ -1688,11 +1661,9 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_1(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type                                            size,
-        real_type &                                                sum,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      norm_1(const size_type                                            size,
+             real_type &                                                sum,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
@@ -1707,12 +1678,10 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_p(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type                                            size,
-        real_type &                                                sum,
-        real_type                                                  exp,
-        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
+      norm_p(const size_type                                            size,
+             real_type &                                                sum,
+             real_type                                                  exp,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
@@ -1735,7 +1704,6 @@ namespace internal
 
       static Number
       add_and_dot(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Number    a,
         const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
@@ -1765,8 +1733,6 @@ namespace internal
       template <typename MemorySpace2>
       static void
       import_elements(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &                     thread_loop_partitioner,
         const size_type         size,
         VectorOperation::values operation,
         const Kokkos::View<const Number *, typename MemorySpace2::kokkos_space>
@@ -1777,11 +1743,11 @@ namespace internal
       {
         if (operation == VectorOperation::insert)
           {
-            copy<MemorySpace2>(thread_loop_partitioner, size, v_data, data);
+            copy<MemorySpace2>(size, v_data, data);
           }
         else if (operation == VectorOperation::add)
           {
-            add_vector(thread_loop_partitioner, size, v_data, data);
+            add_vector(size, v_data, data);
           }
         else
           {
@@ -1792,8 +1758,6 @@ namespace internal
       template <typename MemorySpace2>
       static void
       import_elements(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &                     thread_loop_partitioner,
         const size_type         size,
         VectorOperation::values operation,
         const Kokkos::View<const Number *, typename MemorySpace2::kokkos_space>
@@ -1804,7 +1768,7 @@ namespace internal
       {
         if (operation == VectorOperation::insert)
           {
-            copy<MemorySpace2>(thread_loop_partitioner, size, v_data, data);
+            copy<MemorySpace2>(size, v_data, data);
           }
         else
           {

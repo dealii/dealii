@@ -148,7 +148,7 @@ namespace LinearAlgebra
                                                         this->size());
     dealii::internal::VectorOperations::
       functions<Number, Number, MemorySpace::Host>::multiply_factor(
-        this->thread_loop_partitioner, this->size(), factor, this_view);
+        this->size(), factor, this_view);
 
     return *this;
   }
@@ -186,8 +186,9 @@ namespace LinearAlgebra
     Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
                                                         this->size());
     dealii::internal::VectorOperations::
-      functions<Number, Number, MemorySpace::Host>::add_vector(
-        this->thread_loop_partitioner, this->size(), V_view, this_view);
+      functions<Number, Number, MemorySpace::Host>::add_vector(this->size(),
+                                                               V_view,
+                                                               this_view);
 
     return *this;
   }
@@ -213,7 +214,7 @@ namespace LinearAlgebra
                                                         this->size());
     dealii::internal::VectorOperations::
       functions<Number, Number, MemorySpace::Host>::subtract_vector(
-        this->thread_loop_partitioner, this->size(), V_view, this_view);
+        this->size(), V_view, this_view);
 
     return *this;
   }
@@ -265,8 +266,9 @@ namespace LinearAlgebra
     Kokkos::View<Number *, Kokkos::HostSpace> this_view(this->values.get(),
                                                         this->size());
     dealii::internal::VectorOperations::
-      functions<Number, Number, MemorySpace::Host>::add_factor(
-        this->thread_loop_partitioner, this->size(), a, this_view);
+      functions<Number, Number, MemorySpace::Host>::add_factor(this->size(),
+                                                               a,
+                                                               this_view);
   }
 
 
@@ -291,8 +293,10 @@ namespace LinearAlgebra
     Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
                                                      down_V.size());
     dealii::internal::VectorOperations::
-      functions<Number, Number, MemorySpace::Host>::add_av(
-        this->thread_loop_partitioner, this->size(), a, V_view, this_view);
+      functions<Number, Number, MemorySpace::Host>::add_av(this->size(),
+                                                           a,
+                                                           V_view,
+                                                           this_view);
   }
 
 
@@ -332,13 +336,7 @@ namespace LinearAlgebra
                                                      down_W.size());
     dealii::internal::VectorOperations::
       functions<Number, Number, MemorySpace::Host>::add_avpbw(
-        this->thread_loop_partitioner,
-        this->size(),
-        a,
-        b,
-        V_view,
-        W_view,
-        this_view);
+        this->size(), a, b, V_view, W_view, this_view);
   }
 
 
@@ -364,7 +362,7 @@ namespace LinearAlgebra
                                                      down_V.size());
     dealii::internal::VectorOperations::
       functions<Number, Number, MemorySpace::Host>::sadd_xav(
-        this->thread_loop_partitioner, this->size(), s, a, V_view, this_view);
+        this->size(), s, a, V_view, this_view);
   }
 
 
@@ -390,10 +388,7 @@ namespace LinearAlgebra
       down_scaling_factors.values.get(), down_scaling_factors.size());
     dealii::internal::VectorOperations::
       functions<Number, Number, MemorySpace::Host>::scale(
-        this->thread_loop_partitioner,
-        this->size(),
-        down_scaling_factors_view,
-        this_view);
+        this->size(), down_scaling_factors_view, this_view);
   }
 
 
@@ -415,8 +410,10 @@ namespace LinearAlgebra
     Kokkos::View<Number *, Kokkos::HostSpace> V_view(down_V.values.get(),
                                                      down_V.size());
     dealii::internal::VectorOperations::
-      functions<Number, Number, MemorySpace::Host>::equ_au(
-        this->thread_loop_partitioner, this->size(), a, V_view, this_view);
+      functions<Number, Number, MemorySpace::Host>::equ_au(this->size(),
+                                                           a,
+                                                           V_view,
+                                                           this_view);
   }
 
 

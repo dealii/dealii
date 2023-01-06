@@ -292,7 +292,6 @@ Vector<Number>::operator*=(const Number factor)
 
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::multiply_factor(
-      thread_loop_partitioner,
       size(),
       factor,
       Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(), size()));
@@ -314,7 +313,6 @@ Vector<Number>::add(const Number a, const Vector<Number> &v)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::add_av(
-      thread_loop_partitioner,
       size(),
       a,
       Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
@@ -337,7 +335,6 @@ Vector<Number>::sadd(const Number x, const Number a, const Vector<Number> &v)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::sadd_xav(
-      thread_loop_partitioner,
       size(),
       x,
       a,
@@ -540,7 +537,6 @@ Vector<Number>::add_and_dot(const Number          a,
   auto   vector_size = size();
   Number sum         = internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::add_and_dot(
-      thread_loop_partitioner,
       size(),
       a,
       Kokkos::View<const Number *, Kokkos::HostSpace>(V.values.begin(),
@@ -565,7 +561,6 @@ Vector<Number>::operator+=(const Vector<Number> &v)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::add_vector(
-      thread_loop_partitioner,
       size(),
       Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
                                                       vector_size),
@@ -586,7 +581,6 @@ Vector<Number>::operator-=(const Vector<Number> &v)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::subtract_vector(
-      thread_loop_partitioner,
       size(),
       Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
                                                       vector_size),
@@ -606,7 +600,6 @@ Vector<Number>::add(const Number v)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::add_factor(
-      thread_loop_partitioner,
       size(),
       v,
       Kokkos::View<Number *, Kokkos::HostSpace>(values.begin(), vector_size));
@@ -631,7 +624,6 @@ Vector<Number>::add(const Number          a,
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::add_avpbw(
-      thread_loop_partitioner,
       size(),
       a,
       b,
@@ -656,7 +648,6 @@ Vector<Number>::sadd(const Number x, const Vector<Number> &v)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::sadd_xv(
-      thread_loop_partitioner,
       size(),
       x,
       Kokkos::View<const Number *, Kokkos::HostSpace>(v.values.begin(),
@@ -676,7 +667,6 @@ Vector<Number>::scale(const Vector<Number> &s)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::scale(
-      thread_loop_partitioner,
       size(),
       Kokkos::View<const Number *, Kokkos::HostSpace>(s.values.begin(),
                                                       vector_size),
@@ -711,7 +701,6 @@ Vector<Number>::equ(const Number a, const Vector<Number> &u)
   auto vector_size = size();
   dealii::internal::VectorOperations::
     functions<Number, Number, MemorySpace::Host>::equ_au(
-      thread_loop_partitioner,
       size(),
       a,
       Kokkos::View<const Number *, Kokkos::HostSpace>(u.values.begin(),
