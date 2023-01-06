@@ -63,7 +63,6 @@ test()
         int offset        = myid * numproc;
         ghosted_values[i] = 1.0 + i + offset;
       });
-    exec.fence();
     ghosted.compress(VectorOperation::insert);
 
     deallog << "ghosted vector before:" << std::endl;

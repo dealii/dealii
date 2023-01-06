@@ -28,7 +28,7 @@ struct InitFunctor<0, dim, Number>
   Kokkos::View<Tensor<0, dim, Number>, MemorySpace::Default::kokkos_space> t;
 
   KOKKOS_FUNCTION void
-  operator()(int k) const
+  operator()(int) const
   {
     t() = 1.;
   }

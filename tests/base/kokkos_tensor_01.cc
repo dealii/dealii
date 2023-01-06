@@ -65,7 +65,6 @@ test_gpu()
       norm_dev()        = t_dev().norm();
       norm_square_dev() = t_dev().norm_square();
     });
-  exec.fence();
 
   // Copy the result to the host
   Kokkos::deep_copy(norm_host, norm_dev);

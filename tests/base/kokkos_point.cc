@@ -28,7 +28,6 @@ test_gpu()
   Kokkos::View<Number *, MemorySpace::Default::kokkos_space> check("check",
                                                                    n_tests);
 
-  // Miscellaneous
   using ExecutionSpace = MemorySpace::Default::kokkos_space::execution_space;
   ExecutionSpace exec;
   Kokkos::parallel_for(
@@ -82,8 +81,6 @@ test_gpu()
       auto s_4  = p_4.distance_square(p_1);
       check[15] = s_4;
     });
-
-  exec.fence();
 
   auto check_host =
     Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, check);
