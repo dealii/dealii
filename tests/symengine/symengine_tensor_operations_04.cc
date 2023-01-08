@@ -104,10 +104,12 @@ test_tensor()
   using Tensor_t           = Tensor<rank, dim, double>;
 
   Tensor_t t_a, t_b;
-  for (auto it = t_a.begin_raw(); it != t_a.end_raw(); ++it)
-    *it = 1.0;
-  for (auto it = t_b.begin_raw(); it != t_b.end_raw(); ++it)
-    *it = 2.0;
+  for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+    {
+      const auto index = t_a.unrolled_to_component_index(i);
+      t_a[index]       = 1.0;
+      t_b[index]       = 2.0;
+    }
 
   const Tensor_SD_number_t symb_t_a =
     SD::make_tensor_of_symbols<rank, dim>("a");
@@ -128,10 +130,13 @@ test_symmetric_tensor()
   using Tensor_t           = SymmetricTensor<rank, dim, double>;
 
   Tensor_t t_a, t_b;
-  for (auto it = t_a.begin_raw(); it != t_a.end_raw(); ++it)
-    *it = 1.0;
-  for (auto it = t_b.begin_raw(); it != t_b.end_raw(); ++it)
-    *it = 2.0;
+  for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+    {
+      const auto index = t_a.unrolled_to_component_index(i);
+      t_a[index]       = 1.0;
+      t_b[index]       = 2.0;
+    }
+
 
   const Tensor_SD_number_t symb_t_a =
     SD::make_symmetric_tensor_of_symbols<rank, dim>("a");

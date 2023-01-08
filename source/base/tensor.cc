@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/lac/exceptions.h>
@@ -45,22 +46,32 @@ namespace
     const types::blas_int     lwork = 5 * dim;
     std::array<Number, lwork> work;
     types::blas_int           info;
+    constexpr std::size_t     size =
+      Tensor<2, dim, Number>::n_independent_components;
+    std::array<Number, size> A_array;
+    A_in_VT_out.unroll(A_array.begin(), A_array.end());
+    std::array<Number, size> U_array;
+    U.unroll(U_array.begin(), U_array.end());
     gesvd(&LAPACKSupport::O, // replace VT in place
           &LAPACKSupport::A,
           &N,
           &N,
-          A_in_VT_out.begin_raw(),
+          A_array.data(),
           &N,
           S.data(),
-          A_in_VT_out.begin_raw(),
+          A_array.data(),
           &N,
-          U.begin_raw(),
+          U_array.data(),
           &N,
           work.data(),
           &lwork,
           &info);
     Assert(info == 0, LAPACKSupport::ExcErrorCode("gesvd", info));
     Assert(S.back() / S.front() > 1.e-10, LACExceptions::ExcSingular());
+
+    A_in_VT_out =
+      Tensor<2, dim, Number>(make_array_view(A_array.begin(), A_array.end()));
+    U = Tensor<2, dim, Number>(make_array_view(U_array.begin(), U_array.end()));
   }
 } // namespace
 
