@@ -1800,9 +1800,7 @@ namespace Particles
           AssertThrowMPI(ierr);
         }
       const int ierr =
-        MPI_Waitall(2 * n_neighbors,
-                    n_requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(2 * n_neighbors, n_requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
     }
 
@@ -1857,9 +1855,7 @@ namespace Particles
             recv_ops++;
           }
       const int ierr =
-        MPI_Waitall(send_ops + recv_ops,
-                    requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(send_ops + recv_ops, requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
     }
 
@@ -2017,9 +2013,7 @@ namespace Particles
             recv_ops++;
           }
       const int ierr =
-        MPI_Waitall(send_ops + recv_ops,
-                    requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(send_ops + recv_ops, requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
     }
 

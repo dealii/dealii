@@ -1339,11 +1339,10 @@ namespace LinearAlgebra
           int flag = 1;
           if (update_ghost_values_requests.size() > 0)
             {
-              const int ierr =
-                MPI_Testall(update_ghost_values_requests.size(),
-                            update_ghost_values_requests.data(),
-                            &flag,
-                            static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+              const int ierr = MPI_Testall(update_ghost_values_requests.size(),
+                                           update_ghost_values_requests.data(),
+                                           &flag,
+                                           MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
               Assert(flag == 1,
                      ExcMessage(
@@ -1352,11 +1351,10 @@ namespace LinearAlgebra
             }
           if (compress_requests.size() > 0)
             {
-              const int ierr =
-                MPI_Testall(compress_requests.size(),
-                            compress_requests.data(),
-                            &flag,
-                            static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+              const int ierr = MPI_Testall(compress_requests.size(),
+                                           compress_requests.data(),
+                                           &flag,
+                                           MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
               Assert(flag == 1,
                      ExcMessage("MPI found unfinished compress() requests "

@@ -252,16 +252,15 @@ namespace parallel
                               it,
                               mpi_tag,
                               this->mpi_communicator,
-                              static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                              MPI_STATUS_IGNORE);
               AssertThrowMPI(ierr);
             }
 
           if (requests.size() > 0)
             {
-              ierr =
-                MPI_Waitall(requests.size(),
-                            requests.data(),
-                            static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+              ierr = MPI_Waitall(requests.size(),
+                                 requests.data(),
+                                 MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
 
@@ -1450,7 +1449,7 @@ namespace parallel
             sizes_fixed_cumulative.data(),
             sizes_fixed_cumulative.size(),
             MPI_UNSIGNED,
-            static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+            MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
 
@@ -1470,8 +1469,7 @@ namespace parallel
                                                     src_data_fixed.data(),
                                                     src_data_fixed.size(),
                                                     MPI_BYTE,
-                                                    static_cast<MPI_Status *>(
-                                                      MPI_STATUS_IGNORE));
+                                                    MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
       ierr = MPI_File_close(&fh);
@@ -1527,7 +1525,7 @@ namespace parallel
             src_sizes_variable.data(),
             src_sizes_variable.size(),
             MPI_INT,
-            static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+            MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
 
@@ -1555,8 +1553,7 @@ namespace parallel
                                                       src_data_variable.data(),
                                                       src_data_variable.size(),
                                                       MPI_BYTE,
-                                                      static_cast<MPI_Status *>(
-                                                        MPI_STATUS_IGNORE));
+                                                      MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
 
@@ -1624,7 +1621,7 @@ namespace parallel
         sizes_fixed_cumulative.data(),
         sizes_fixed_cumulative.size(),
         MPI_UNSIGNED,
-        static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+        MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
       // Allocate sufficient memory.
@@ -1642,14 +1639,12 @@ namespace parallel
         size_header +
         static_cast<MPI_Offset>(global_first_cell) * bytes_per_cell;
 
-      ierr =
-        Utilities::MPI::LargeCount::File_read_at_c(fh,
-                                                   my_global_file_position,
-                                                   dest_data_fixed.data(),
-                                                   dest_data_fixed.size(),
-                                                   MPI_BYTE,
-                                                   static_cast<MPI_Status *>(
-                                                     MPI_STATUS_IGNORE));
+      ierr = Utilities::MPI::LargeCount::File_read_at_c(fh,
+                                                        my_global_file_position,
+                                                        dest_data_fixed.data(),
+                                                        dest_data_fixed.size(),
+                                                        MPI_BYTE,
+                                                        MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
 
@@ -1689,7 +1684,7 @@ namespace parallel
           dest_sizes_variable.data(),
           dest_sizes_variable.size(),
           MPI_INT,
-          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
 
@@ -1721,8 +1716,7 @@ namespace parallel
                                                      dest_data_variable.data(),
                                                      dest_data_variable.size(),
                                                      MPI_BYTE,
-                                                     static_cast<MPI_Status *>(
-                                                       MPI_STATUS_IGNORE));
+                                                     MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);

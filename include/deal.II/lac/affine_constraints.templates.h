@@ -352,7 +352,7 @@ namespace internal
                           status.MPI_SOURCE,
                           tag,
                           mpi_communicator,
-                          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                          MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
           const auto data =
@@ -363,9 +363,7 @@ namespace internal
         }
 
       const int ierr =
-        MPI_Waitall(requests.size(),
-                    requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 
       sort_constraints();
@@ -473,7 +471,7 @@ namespace internal
                           status.MPI_SOURCE,
                           tag,
                           mpi_communicator,
-                          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                          MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
           const auto received_locally_relevant_constrain =
@@ -485,9 +483,7 @@ namespace internal
         }
 
       const int ierr =
-        MPI_Waitall(requests.size(),
-                    requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 
       sort_constraints();

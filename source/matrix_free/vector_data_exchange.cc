@@ -603,9 +603,7 @@ namespace internal
             }
 
           const int ierr =
-            MPI_Waitall(requests.size(),
-                        requests.data(),
-                        static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
 
@@ -642,9 +640,7 @@ namespace internal
             }
 
           const int ierr =
-            MPI_Waitall(requests.size(),
-                        requests.data(),
-                        static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
 
@@ -980,7 +976,7 @@ namespace internal
               MPI_Waitany(sm_ghost_ranks.size() + ghost_targets_data.size(),
                           requests.data() + sm_import_ranks.size(),
                           &i,
-                          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                          MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
 
             const auto s = split(i);
@@ -1068,9 +1064,7 @@ namespace internal
           }
 
         const int ierr =
-          MPI_Waitall(requests.size(),
-                      requests.data(),
-                      static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
 
 #endif
@@ -1262,7 +1256,7 @@ namespace internal
                             ghost_targets_data.size(),
                           requests.data() + sm_ghost_ranks.size(),
                           &i,
-                          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                          MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
 
             const auto &s = split(i);
@@ -1325,9 +1319,7 @@ namespace internal
           }
 
         const int ierr =
-          MPI_Waitall(requests.size(),
-                      requests.data(),
-                      static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
 #endif
       }

@@ -3754,7 +3754,7 @@ namespace GridTools
                         source,
                         mpi_tag,
                         triangulation.get_communicator(),
-                        static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                        MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
 
@@ -3818,7 +3818,7 @@ namespace GridTools
                         source,
                         mpi_tag2,
                         triangulation.get_communicator(),
-                        static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                        MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
 

@@ -310,7 +310,7 @@ namespace Utilities
                                   status.MPI_SOURCE,
                                   status.MPI_TAG,
                                   comm,
-                                  static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                                  MPI_STATUS_IGNORE);
                   AssertThrowMPI(ierr);
                   // process message: loop over all intervals
                   for (auto interval : buffer)
@@ -414,10 +414,9 @@ namespace Utilities
           // 5) make sure that all messages have been sent
           if (request.size() > 0)
             {
-              const int ierr =
-                MPI_Waitall(request.size(),
-                            request.data(),
-                            static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+              const int ierr = MPI_Waitall(request.size(),
+                                           request.data(),
+                                           MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
 
@@ -710,10 +709,9 @@ namespace Utilities
 
           if (send_requests.size() > 0)
             {
-              const auto ierr =
-                MPI_Waitall(send_requests.size(),
-                            send_requests.data(),
-                            static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+              const auto ierr = MPI_Waitall(send_requests.size(),
+                                            send_requests.data(),
+                                            MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
 

@@ -184,9 +184,7 @@ namespace Utilities
 
       // wait that all data packages have been sent
       const int ierr =
-        MPI_Waitall(send_ranks.size(),
-                    requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(send_ranks.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 #endif
     }

@@ -560,7 +560,7 @@ namespace parallel
           &buffer_size,
           1,
           Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
-          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         // global position in file
@@ -574,7 +574,7 @@ namespace parallel
           buffer.data(),
           buffer.size(), // local buffer
           MPI_CHAR,
-          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
@@ -666,7 +666,7 @@ namespace parallel
           &buffer_size,
           1,
           Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
-          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         std::uint64_t offset = 0;
@@ -692,7 +692,7 @@ namespace parallel
           buffer.data(),
           buffer.size(), // local buffer
           MPI_CHAR,
-          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);

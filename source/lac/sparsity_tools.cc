@@ -1239,9 +1239,7 @@ namespace SparsityTools
     if (requests.size() > 0)
       {
         const int ierr =
-          MPI_Waitall(requests.size(),
-                      requests.data(),
-                      static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
       }
   }

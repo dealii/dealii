@@ -445,14 +445,13 @@ namespace Utilities
 
                   std::vector<char> temp(amount);
 
-                  const auto ierr_3 =
-                    MPI_Recv(temp.data(),
-                             amount,
-                             MPI_CHAR,
-                             status.MPI_SOURCE,
-                             status.MPI_TAG,
-                             comm,
-                             static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                  const auto ierr_3 = MPI_Recv(temp.data(),
+                                               amount,
+                                               MPI_CHAR,
+                                               status.MPI_SOURCE,
+                                               status.MPI_TAG,
+                                               comm,
+                                               MPI_STATUS_IGNORE);
                   AssertThrowMPI(ierr_3);
 
                   result = combiner(result, Utilities::unpack<T>(temp, false));

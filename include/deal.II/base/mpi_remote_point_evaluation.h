@@ -393,7 +393,7 @@ namespace Utilities
                           status.MPI_SOURCE,
                           internal::Tags::remote_point_evaluation,
                           tria->get_communicator(),
-                          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                          MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
           temp_recv_map[status.MPI_SOURCE] =
@@ -402,9 +402,7 @@ namespace Utilities
 
       // make sure all messages have been sent
       const int ierr =
-        MPI_Waitall(requests.size(),
-                    requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 
       // copy received data into output vector
@@ -553,7 +551,7 @@ namespace Utilities
                           status.MPI_SOURCE,
                           internal::Tags::remote_point_evaluation,
                           tria->get_communicator(),
-                          static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
+                          MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
           const auto recv_buffer_unpacked =
@@ -579,9 +577,7 @@ namespace Utilities
         }
 
       const int ierr =
-        MPI_Waitall(requests.size(),
-                    requests.data(),
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 
       // sort for easy access during function call

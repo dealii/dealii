@@ -382,11 +382,10 @@ namespace Utilities
                                     requests);
       export_to_ghosted_array_finish(make_array_view(ghost_indices), requests);
       int       flag = 0;
-      const int ierr =
-        MPI_Testall(requests.size(),
-                    requests.data(),
-                    &flag,
-                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
+      const int ierr = MPI_Testall(requests.size(),
+                                   requests.data(),
+                                   &flag,
+                                   MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
       Assert(flag == 1,
              ExcMessage(
