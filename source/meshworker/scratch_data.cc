@@ -438,6 +438,25 @@ namespace MeshWorker
   ScratchData<dim, spacedim>::reinit(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator
+      &                cell_neighbor,
+    const unsigned int face_no_neighbor)
+  {
+    return reinit(cell,
+                  face_no,
+                  numbers::invalid_unsigned_int,
+                  cell_neighbor,
+                  face_no_neighbor,
+                  numbers::invalid_unsigned_int);
+  }
+
+
+
+  template <int dim, int spacedim>
+  const FEInterfaceValues<dim, spacedim> &
+  ScratchData<dim, spacedim>::reinit(
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int                                              face_no,
     const unsigned int                                              sub_face_no,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
       &                cell_neighbor,
@@ -450,26 +469,48 @@ namespace MeshWorker
           interface_fe_values =
             std::make_unique<FEInterfaceValues<dim, spacedim>>(
               *mapping, *fe, face_quadrature, face_update_flags);
+
         interface_fe_values->reinit(cell,
                                     face_no,
                                     sub_face_no,
                                     cell_neighbor,
                                     face_no_neighbor,
                                     sub_face_no_neighbor);
-
-        current_fe_values = &interface_fe_values->get_fe_face_values(0);
-        current_neighbor_fe_values =
-          &interface_fe_values->get_fe_face_values(1);
-
-        cell_neighbor->get_dof_indices(neighbor_dof_indices);
-        local_dof_indices = interface_fe_values->get_interface_dof_indices();
-        return *interface_fe_values;
       }
     else
       {
-        AssertThrow(false, ExcOnlyAvailableWithoutHP());
-        return *interface_fe_values;
+        if (!interface_fe_values)
+          interface_fe_values =
+            std::make_unique<FEInterfaceValues<dim, spacedim>>(
+              *mapping_collection,
+              *fe_collection,
+              face_quadrature_collection,
+              face_update_flags);
+
+        // When we want to ensure some agreement between the cell face and
+        // its neighbor on the quadrature order and mapping to use on this
+        // face, then we defer to the dominance of one FE over another. This
+        // should ensure that the optimal integration order and mapping
+        // order are selected for this situation.
+        const unsigned int dominated_fe_index =
+          fe_collection->find_dominated_fe(
+            {cell->active_fe_index(), cell_neighbor->active_fe_index()});
+
+        interface_fe_values->reinit(cell,
+                                    face_no,
+                                    sub_face_no,
+                                    cell_neighbor,
+                                    face_no_neighbor,
+                                    sub_face_no_neighbor,
+                                    dominated_fe_index,
+                                    dominated_fe_index);
       }
+
+    current_fe_values          = &interface_fe_values->get_fe_face_values(0);
+    current_neighbor_fe_values = &interface_fe_values->get_fe_face_values(1);
+
+    local_dof_indices = interface_fe_values->get_interface_dof_indices();
+    return *interface_fe_values;
   }
 
 
