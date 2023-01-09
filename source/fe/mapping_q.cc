@@ -123,7 +123,7 @@ MappingQ<dim, spacedim>::InternalData::initialize(
       // in all directions
       if (tensor_product_quadrature)
         {
-          const std::array<Quadrature<1>, dim> quad_array =
+          const std::array<Quadrature<1>, dim> &quad_array =
             q.get_tensor_basis();
           for (unsigned int i = 1; i < dim && tensor_product_quadrature; ++i)
             {

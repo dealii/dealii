@@ -2757,7 +2757,7 @@ namespace DoFTools
     // all duplicates are ignored
     for (unsigned int i = 0; i < patch.size(); ++i)
       {
-        const typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
+        const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell =
           patch[i];
         Assert(cell->is_artificial() == false,
                ExcMessage("This function can not be called with cells that are "
@@ -2788,7 +2788,7 @@ namespace DoFTools
     // all duplicates are ignored
     for (unsigned int i = 0; i < patch.size(); ++i)
       {
-        const typename DoFHandler<dim, spacedim>::active_cell_iterator cell =
+        const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell =
           patch[i];
         Assert(cell->is_artificial() == false,
                ExcMessage("This function can not be called with cells that are "

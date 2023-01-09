@@ -2299,6 +2299,7 @@ ParameterHandler::save(Archive &ar, const unsigned int) const
 
   std::vector<std::string> descriptions;
 
+  descriptions.reserve(patterns.size());
   for (const auto &pattern : patterns)
     descriptions.push_back(pattern->description());
 

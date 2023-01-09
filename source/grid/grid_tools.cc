@@ -5043,7 +5043,7 @@ namespace GridTools
          cell_ptr != distorted_cells.distorted_cells.end();
          ++cell_ptr)
       {
-        const typename Triangulation<dim, spacedim>::cell_iterator cell =
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell =
           *cell_ptr;
 
         Assert(!cell->is_active(),
