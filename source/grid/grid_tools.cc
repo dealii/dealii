@@ -3012,6 +3012,7 @@ namespace GridTools
           }
         else
           {
+#if !defined(__INTEL_LLVM_COMPILER) || BOOST_VERSION >= 108100
             if (!used_vertices_rtree.empty())
               {
                 // If we have an rtree at our disposal, use it.
@@ -3040,6 +3041,7 @@ namespace GridTools
                     closest_vertex_index = res[0].second;
               }
             else
+#endif
               {
                 closest_vertex_index = GridTools::find_closest_vertex(
                   mapping, mesh, p, marked_vertices);

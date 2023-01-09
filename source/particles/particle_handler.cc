@@ -1393,6 +1393,7 @@ namespace Particles
                 }
             }
 
+#if !defined(__INTEL_LLVM_COMPILER) || BOOST_VERSION >= 108100
           if (!found_cell)
             {
               // The particle is not in a neighbor of the old cell.
@@ -1427,6 +1428,7 @@ namespace Particles
                     }
                 }
             }
+#endif
 
           if (!found_cell)
             {
