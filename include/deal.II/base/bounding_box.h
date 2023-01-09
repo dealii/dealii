@@ -432,12 +432,11 @@ inline BoundingBox<spacedim, Number>::BoundingBox(const Container &points)
     {
       auto &min = boundary_points.first;
       auto &max = boundary_points.second;
-      std::fill(min.begin_raw(),
-                min.end_raw(),
-                std::numeric_limits<Number>::infinity());
-      std::fill(max.begin_raw(),
-                max.end_raw(),
-                -std::numeric_limits<Number>::infinity());
+      for (unsigned int d = 0; d < spacedim; ++d)
+        {
+          min[d] = std::numeric_limits<Number>::infinity();
+          max[d] = -std::numeric_limits<Number>::infinity();
+        }
 
       for (const Point<spacedim, Number> &point : points)
         for (unsigned int d = 0; d < spacedim; ++d)

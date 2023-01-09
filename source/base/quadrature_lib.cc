@@ -615,13 +615,11 @@ template <>
 unsigned int
 QGaussOneOverR<2>::quad_size(const Point<2> &singularity, const unsigned int n)
 {
-  const double eps = 1e-8;
-  const bool   on_edge =
-    std::any_of(singularity.begin_raw(),
-                singularity.end_raw(),
-                [eps](double coord) {
-                  return std::abs(coord) < eps || std::abs(coord - 1.) < eps;
-                });
+  const double eps     = 1e-8;
+  bool         on_edge = false;
+  for (unsigned int d = 0; d < 2; ++d)
+    on_edge = on_edge || (std::abs(singularity[d]) < eps ||
+                          std::abs(singularity[d] - 1.0) < eps);
   const bool on_vertex =
     on_edge &&
     std::abs((singularity - Point<2>(.5, .5)).norm_square() - .5) < eps;
@@ -2022,9 +2020,8 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
           const double volume = (dim == 2 ? 1.0 / 2.0 : 1.0 / 6.0);
           this->weights.emplace_back(volume * b_weights[permutation_n]);
           Point<dim> c_point;
-          std::copy(b_point.begin(),
-                    b_point.begin() + dim,
-                    c_point.begin_raw());
+          for (int d = 0; d < dim; ++d)
+            c_point[d] = b_point[d];
           this->quadrature_points.emplace_back(c_point);
         }
     }

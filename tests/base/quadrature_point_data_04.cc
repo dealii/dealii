@@ -66,13 +66,15 @@ struct Mat1 : MaterialBase
   pack_values(std::vector<double> &values) const final
   {
     AssertDimension(values.size(), number_of_values());
-    std::copy(pt.begin_raw(), pt.end_raw(), values.begin());
+    for (unsigned int d = 0; d < 2; ++d)
+      values[d] = pt[d];
   }
   virtual void
   unpack_values(const std::vector<double> &values) final
   {
     AssertDimension(values.size(), number_of_values());
-    std::copy(values.cbegin(), values.cend(), pt.begin_raw());
+    for (unsigned int d = 0; d < 2; ++d)
+      pt[d] = values[d];
   }
 };
 

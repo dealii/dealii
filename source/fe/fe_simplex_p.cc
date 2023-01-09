@@ -95,11 +95,8 @@ namespace
     // centroid and only the centroid
     if (degree == 0)
       {
-        Point<dim> centroid;
-        std::fill(centroid.begin_raw(),
-                  centroid.end_raw(),
-                  1.0 / double(dim + 1));
-        unit_points.emplace_back(centroid);
+        unit_points.emplace_back(
+          ReferenceCells::get_simplex<dim>().template barycenter<dim>());
         return unit_points;
       }
 
