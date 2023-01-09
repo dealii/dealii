@@ -19,7 +19,6 @@
 Checks: >
   -*,
   cppcoreguidelines-pro-type-static-cast-downcast,
-  cppcoreguidelines-pro-type-cstyle-cast,
   modernize-*,
   -modernize-avoid-c-arrays,
   -modernize-concat-nested-namespaces,
