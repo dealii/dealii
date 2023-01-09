@@ -621,7 +621,7 @@ namespace SparsityTools
     DynamicSparsityPattern::size_type next_free_number = 0;
 
     // enumerate the first round dofs
-    for (unsigned int last_round_dof : last_round_dofs)
+    for (const auto &last_round_dof : last_round_dofs)
       new_indices[last_round_dof] = next_free_number++;
 
     // now do as many steps as needed to renumber all dofs
