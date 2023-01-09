@@ -1561,7 +1561,7 @@ namespace Utilities
           // MPI deadlock. Abort with a reasonable error message instead.
           try
             {
-              std::rethrow_exception(std::move(exception));
+              std::rethrow_exception(exception);
             }
           catch (ExceptionBase &exc)
             {

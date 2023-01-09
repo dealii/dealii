@@ -2,5 +2,5 @@
 # bundled/. Clang-tidy fails if nothing is chosen, so we just enable a single
 # harmless warning:
 
-Checks: "-*,misc-sizeof-container"
+Checks: "-*,misc-definitions-in-headers"
 

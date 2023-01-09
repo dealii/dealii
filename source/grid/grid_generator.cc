@@ -5505,14 +5505,14 @@ namespace GridGenerator
       {
         const double height = initial_height + height_increment * rep;
 
-        vertices.emplace_back(Point<3>(-d, height, -d));
-        vertices.emplace_back(Point<3>(d, height, -d));
-        vertices.emplace_back(Point<3>(-a, height, -a));
-        vertices.emplace_back(Point<3>(a, height, -a));
-        vertices.emplace_back(Point<3>(-a, height, a));
-        vertices.emplace_back(Point<3>(a, height, a));
-        vertices.emplace_back(Point<3>(-d, height, d));
-        vertices.emplace_back(Point<3>(d, height, d));
+        vertices.emplace_back(-d, height, -d);
+        vertices.emplace_back(d, height, -d);
+        vertices.emplace_back(-a, height, -a);
+        vertices.emplace_back(a, height, -a);
+        vertices.emplace_back(-a, height, a);
+        vertices.emplace_back(a, height, a);
+        vertices.emplace_back(-d, height, d);
+        vertices.emplace_back(d, height, d);
       }
 
     // Turn cylinder such that y->x

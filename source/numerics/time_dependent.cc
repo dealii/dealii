@@ -928,11 +928,11 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
           (sweep_no >= refinement_flags.correction_relaxations.size() ?
              refinement_flags.correction_relaxations.back() :
              refinement_flags.correction_relaxations[sweep_no]);
-        for (unsigned int r = 0; r != relaxations.size(); ++r)
-          if (n_active_cells < relaxations[r].first)
+        for (const auto &relaxation : relaxations)
+          if (n_active_cells < relaxation.first)
             {
-              delta_up *= relaxations[r].second;
-              delta_down *= relaxations[r].second;
+              delta_up *= relaxation.second;
+              delta_down *= relaxation.second;
               break;
             }
 

@@ -19,12 +19,12 @@
 Checks: >
   -*,
   cppcoreguidelines-pro-type-static-cast-downcast,
-  google-readability-casting,
   modernize-*,
   -modernize-avoid-c-arrays,
   -modernize-concat-nested-namespaces,
   -modernize-pass-by-value,
   -modernize-raw-string-literal,
+  -modernize-return-braced-init-list,
   -modernize-use-auto,
   -modernize-use-default-member-init,
   -modernize-use-nodiscard,

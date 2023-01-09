@@ -24,6 +24,8 @@
 
 #include <deal.II/multigrid/mg_transfer_internal.h>
 
+#include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -449,8 +451,10 @@ namespace internal
                 ghosted_dofs.index_within_set(
                   target_partitioner->local_to_global(
                     copy_indices_global_mine(1, i)));
-          target_partitioner.reset(new Utilities::MPI::Partitioner(
-            locally_owned, ghosted_dofs, communicator));
+          target_partitioner =
+            std::make_shared<Utilities::MPI::Partitioner>(locally_owned,
+                                                          ghosted_dofs,
+                                                          communicator);
         }
     }
 

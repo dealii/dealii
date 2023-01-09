@@ -891,7 +891,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
         {
           SubQuadrature mutation;
 
-          const auto quadrature_f =
+          const auto &quadrature_f =
             quadrature[quadrature.size() == 1 ? 0 : face];
           switch (i)
             {
