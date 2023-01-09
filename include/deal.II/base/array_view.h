@@ -239,6 +239,14 @@ public:
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
    * equal if they have the same size and the same starting pointer.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * same. If they are, then of course the elements represented by the view
+   * are also the same. But the converse is not true: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for equality will return `false` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the const value_type.
    */
   bool
@@ -248,6 +256,14 @@ public:
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
    * equal if they have the same size and the same starting pointer.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * same. If they are, then of course the elements represented by the view
+   * are also the same. But the converse is not true: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for equality will return `false` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the non-const value_type.
    */
   bool
@@ -256,7 +272,18 @@ public:
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
-   * equal if they have the same size and the same starting pointer.
+   * equal if they have the same size and the same starting pointer, and the
+   * current operation therefore returns `true` if the two views being compared
+   * point to different memory locations, or if they point to the same memory
+   * location but represent different sizes.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * not the same. But this does not mean that the elements pointed to by
+   * the view are not equal: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for inequality will return `true` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the const value_type.
    */
   bool
@@ -266,6 +293,14 @@ public:
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
    * equal if they have the same size and the same starting pointer.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * not the same. But this does not mean that the elements pointed to by
+   * the view are not equal: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for inequality will return `true` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the non-const value_type.
    */
   bool
