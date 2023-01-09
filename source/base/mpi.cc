@@ -398,21 +398,23 @@ namespace Utilities
       std::vector<unsigned int> origins(n_recv_from);
       for (auto &el : origins)
         {
-          const int ierr = MPI_Recv(&el,
-                                    1,
-                                    MPI_UNSIGNED,
-                                    MPI_ANY_SOURCE,
-                                    mpi_tag,
-                                    mpi_comm,
-                                    MPI_STATUS_IGNORE);
+          const int ierr =
+            MPI_Recv(&el,
+                     1,
+                     MPI_UNSIGNED,
+                     MPI_ANY_SOURCE,
+                     mpi_tag,
+                     mpi_comm,
+                     static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
           AssertThrowMPI(ierr);
         }
 
       if (destinations.size() > 0)
         {
-          const int ierr = MPI_Waitall(destinations.size(),
-                                       send_requests.data(),
-                                       MPI_STATUSES_IGNORE);
+          const int ierr =
+            MPI_Waitall(destinations.size(),
+                        send_requests.data(),
+                        static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
           AssertThrowMPI(ierr);
         }
 
@@ -933,7 +935,8 @@ namespace Utilities
       // Before exiting, wait for nonblocking communication to complete:
       for (auto request : requests)
         {
-          const int ierr = MPI_Wait(request, MPI_STATUS_IGNORE);
+          const int ierr =
+            MPI_Wait(request, static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
           AssertThrowMPI(ierr);
         }
 
@@ -1153,7 +1156,7 @@ namespace Utilities
 #  if 0
       // wait for non-blocking barrier to finish. This is a noop the
       // first time we lock().
-      const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
+      const int ierr = MPI_Wait(&request, static_cast<MPI_Status*>(MPI_STATUS_IGNORE));
       AssertThrowMPI(ierr);
 #  else
       // nothing to do as blocking barrier already completed

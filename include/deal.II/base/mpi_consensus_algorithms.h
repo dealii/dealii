@@ -1908,13 +1908,14 @@ namespace Utilities
                   const int tag_deliver = Utilities::MPI::internal::Tags::
                     consensus_algorithm_nbx_process_deliver;
 
-                  const int ierr = MPI_Recv(recv_buffer.data(),
-                                            recv_buffer.size(),
-                                            MPI_CHAR,
-                                            target,
-                                            tag_deliver,
-                                            comm,
-                                            MPI_STATUS_IGNORE);
+                  const int ierr =
+                    MPI_Recv(recv_buffer.data(),
+                             recv_buffer.size(),
+                             MPI_CHAR,
+                             target,
+                             tag_deliver,
+                             comm,
+                             static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
                   AssertThrowMPI(ierr);
                 }
 
@@ -2000,7 +2001,7 @@ namespace Utilities
                             other_rank,
                             tag_request,
                             comm,
-                            MPI_STATUS_IGNORE);
+                            static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
             AssertThrowMPI(ierr);
 
             // Allocate memory for an answer message to the current request,
@@ -2054,9 +2055,10 @@ namespace Utilities
       {
 #  ifdef DEAL_II_WITH_MPI
         int        all_ranks_reached_barrier;
-        const auto ierr = MPI_Test(&barrier_request,
-                                   &all_ranks_reached_barrier,
-                                   MPI_STATUS_IGNORE);
+        const auto ierr =
+          MPI_Test(&barrier_request,
+                   &all_ranks_reached_barrier,
+                   static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
         AssertThrowMPI(ierr);
         return all_ranks_reached_barrier != 0;
 #  else
@@ -2077,18 +2079,21 @@ namespace Utilities
         {
           if (send_requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(send_requests.size(),
-                                           send_requests.data(),
-                                           MPI_STATUSES_IGNORE);
+              const int ierr =
+                MPI_Waitall(send_requests.size(),
+                            send_requests.data(),
+                            static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
               AssertThrowMPI(ierr);
             }
 
-          int ierr = MPI_Wait(&barrier_request, MPI_STATUS_IGNORE);
+          int ierr = MPI_Wait(&barrier_request,
+                              static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
           AssertThrowMPI(ierr);
 
           for (auto &i : request_requests)
             {
-              ierr = MPI_Wait(i.get(), MPI_STATUS_IGNORE);
+              ierr =
+                MPI_Wait(i.get(), static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
               AssertThrowMPI(ierr);
             }
 
@@ -2333,13 +2338,14 @@ namespace Utilities
             // above blocks until we have a message, we know that the
             // following MPI_Recv call will immediately succeed.
             {
-              const int ierr = MPI_Recv(recv_buffer.data(),
-                                        recv_buffer.size(),
-                                        MPI_CHAR,
-                                        other_rank,
-                                        tag_deliver,
-                                        comm,
-                                        MPI_STATUS_IGNORE);
+              const int ierr =
+                MPI_Recv(recv_buffer.data(),
+                         recv_buffer.size(),
+                         MPI_CHAR,
+                         other_rank,
+                         tag_deliver,
+                         comm,
+                         static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
               AssertThrowMPI(ierr);
             }
 
@@ -2365,18 +2371,20 @@ namespace Utilities
         // send-request and receive-answer operations.
         if (send_request_requests.size() > 0)
           {
-            const int ierr = MPI_Waitall(send_request_requests.size(),
-                                         send_request_requests.data(),
-                                         MPI_STATUSES_IGNORE);
+            const int ierr =
+              MPI_Waitall(send_request_requests.size(),
+                          send_request_requests.data(),
+                          static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
             AssertThrowMPI(ierr);
           }
 
         // Then also check the send-answer requests.
         if (send_answer_requests.size() > 0)
           {
-            const int ierr = MPI_Waitall(send_answer_requests.size(),
-                                         send_answer_requests.data(),
-                                         MPI_STATUSES_IGNORE);
+            const int ierr =
+              MPI_Waitall(send_answer_requests.size(),
+                          send_answer_requests.data(),
+                          static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
             AssertThrowMPI(ierr);
           }
 #  endif

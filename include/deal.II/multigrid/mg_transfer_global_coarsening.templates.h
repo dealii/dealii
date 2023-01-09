@@ -730,7 +730,7 @@ namespace internal
               status.MPI_SOURCE,
               Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
               communicator,
-              MPI_STATUS_IGNORE);
+              static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
             AssertThrowMPI(ierr_3);
 
             for (unsigned int i = 0; i < buffer.size();)
@@ -766,7 +766,9 @@ namespace internal
           }
 
         const int ierr_1 =
-          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+          MPI_Waitall(requests.size(),
+                      requests.data(),
+                      static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
         AssertThrowMPI(ierr_1);
       }
 

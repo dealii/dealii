@@ -1159,7 +1159,7 @@ namespace Utilities
        * {
        *   static MPI_Request request = MPI_REQUEST_NULL;
        *   MPI_InitFinalize::register_request(request);
-       *   MPI_Wait(&request, MPI_STATUS_IGNORE);
+       *   MPI_Wait(&request, static_cast<MPI_Status*>(MPI_STATUS_IGNORE));
        *   // [some algorithm that is not safe to be executed twice in a row.]
        *   MPI_IBarrier(comm, &request);
        * }
@@ -1944,7 +1944,7 @@ namespace Utilities
                             status.MPI_SOURCE,
                             status.MPI_TAG,
                             comm,
-                            MPI_STATUS_IGNORE);
+                            static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
             AssertThrowMPI(ierr);
             Assert(received_objects.find(rank) == received_objects.end(),
                    ExcInternalError(
@@ -1956,9 +1956,10 @@ namespace Utilities
       }
 
       // Wait to have sent all objects.
-      const int ierr = MPI_Waitall(send_to.size(),
-                                   buffer_send_requests.data(),
-                                   MPI_STATUSES_IGNORE);
+      const int ierr =
+        MPI_Waitall(send_to.size(),
+                    buffer_send_requests.data(),
+                    static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
       AssertThrowMPI(ierr);
 
       return received_objects;
@@ -2357,7 +2358,8 @@ namespace Utilities
       // buffer itself as early as possible, and so we clear the
       // buffer when the Future::get() function is called.
       auto wait = [request]() mutable {
-        const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
+        const int ierr =
+          MPI_Wait(&request, static_cast<MPI_Status *>(MPI_STATUS_IGNORE));
         AssertThrowMPI(ierr);
       };
       auto cleanup = [send_buffer = std::move(send_buffer)]() {

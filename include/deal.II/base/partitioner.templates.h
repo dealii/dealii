@@ -195,7 +195,9 @@ namespace Utilities
       if (requests.size() > 0)
         {
           const int ierr =
-            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+            MPI_Waitall(requests.size(),
+                        requests.data(),
+                        static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
           AssertThrowMPI(ierr);
         }
       requests.resize(0);
@@ -575,7 +577,9 @@ namespace Utilities
         {
           AssertDimension(locally_owned_array.size(), locally_owned_size());
           const int ierr =
-            MPI_Waitall(n_import_targets, requests.data(), MPI_STATUSES_IGNORE);
+            MPI_Waitall(n_import_targets,
+                        requests.data(),
+                        static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
           AssertThrowMPI(ierr);
 
           const Number *read_position = temporary_storage.data();
@@ -711,9 +715,10 @@ namespace Utilities
       // wait for the send operations to complete
       if (requests.size() > 0 && n_ghost_targets > 0)
         {
-          const int ierr = MPI_Waitall(n_ghost_targets,
-                                       &requests[n_import_targets],
-                                       MPI_STATUSES_IGNORE);
+          const int ierr =
+            MPI_Waitall(n_ghost_targets,
+                        &requests[n_import_targets],
+                        static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
           AssertThrowMPI(ierr);
         }
       else

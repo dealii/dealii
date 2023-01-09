@@ -362,9 +362,10 @@ namespace internal
           // * wait for all MPI_Isend to complete
           if (requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(requests.size(),
-                                           requests.data(),
-                                           MPI_STATUSES_IGNORE);
+              const int ierr =
+                MPI_Waitall(requests.size(),
+                            requests.data(),
+                            static_cast<MPI_Status *>(MPI_STATUSES_IGNORE));
               AssertThrowMPI(ierr);
               requests.clear();
             }
