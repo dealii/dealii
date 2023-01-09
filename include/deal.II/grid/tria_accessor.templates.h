@@ -1074,8 +1074,8 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(cell.index() * 6 +
-                                                            f);
+                    ->face_orientations.get_raw_orientation(
+                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
 
                 // It might seem superfluous to spell out the four indices
                 // that get later consumed by a for loop over these four
@@ -1098,8 +1098,8 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(cell.index() * 6 +
-                                                            f);
+                    ->face_orientations.get_raw_orientation(
+                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
@@ -1192,8 +1192,8 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(cell.index() * 6 +
-                                                            f);
+                    ->face_orientations.get_raw_orientation(
+                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
 
                 // It might seem superfluous to spell out the four indices and
                 // orientations that get later consumed by a for loop over
@@ -1224,8 +1224,8 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(cell.index() * 6 +
-                                                            f);
+                    ->face_orientations.get_raw_orientation(
+                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};

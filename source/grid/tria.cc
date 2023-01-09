@@ -14601,7 +14601,7 @@ Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 
                 const unsigned char orientate =
                   levels[l]->face_orientations.get_raw_orientation(
-                    cell->index() * 6 + face);
+                    cell->index() * GeometryInfo<3>::faces_per_cell + face);
                 std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0, face, orientate),
                    ref_cell.standard_to_real_face_vertex(1, face, orientate),
