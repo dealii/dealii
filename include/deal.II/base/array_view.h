@@ -23,6 +23,7 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
+#include <array>
 #include <type_traits>
 #include <vector>
 
@@ -1061,6 +1062,52 @@ make_array_view(const std::vector<ElementType> &vector,
                     "create would lead to a view that extends beyond the end "
                     "of the given vector."));
   return ArrayView<const ElementType>(&vector[starting_index], size_of_view);
+}
+
+
+
+/**
+ * Create a view to an entire std::array object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element and
+ * the size of the given argument.
+ *
+ * This function is used for non-@p const references to objects of array
+ * type. Such objects contain elements that can be written to. Consequently,
+ * the return type of this function is a view to a set of writable objects.
+ *
+ * @param[in] array The std::array object for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> array.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType, std::size_t N>
+inline ArrayView<ElementType>
+make_array_view(std::array<ElementType, N> &array)
+{
+  return ArrayView<ElementType>(array);
+}
+
+
+
+/**
+ * Create a view to an entire std::array object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element and
+ * the size of the given argument.
+ *
+ * This function is used for @p const references to objects of array type
+ * because they contain immutable elements. Consequently, the return type of
+ * this function is a view to a set of @p const objects.
+ *
+ * @param[in] array The std::array object for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> array.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType, std::size_t N>
+inline ArrayView<const ElementType>
+make_array_view(const std::array<ElementType, N> &array)
+{
+  return ArrayView<const ElementType>(array);
 }
 
 
