@@ -995,10 +995,10 @@ namespace internal
      * Furthermore, the function determines for each cell of which d-dimensional
      * entity it consists of and its orientation relative to the cell.
      */
-    template <int key_length, typename FU>
+    template <int max_n_vertices, typename FU>
     void
     build_entity_templated(
-      const unsigned int                                d,
+      const unsigned int                                face_dimensionality,
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
       const std::vector<dealii::ReferenceCell> &        cell_types_index,
       const CRS<unsigned int> &                         crs,
@@ -1028,7 +1028,7 @@ namespace internal
       for (const auto &c : cell_types_index)
         n_entities +=
           cell_types[static_cast<types::geometric_entity_type>(c)]->n_entities(
-            d);
+            face_dimensionality);
 
       // step 1: store each d-dimensional entity of a cell (described by their
       // vertices) into a vector and create a key for them
@@ -1036,12 +1036,12 @@ namespace internal
       // note: it turned out to be more efficient to have a vector of tuples
       // than to have two vectors (sorting becomes inefficient)
       std::vector<
-        std::tuple<std::array<unsigned int, key_length>, unsigned int>>
+        std::tuple<std::array<unsigned int, max_n_vertices>, unsigned int>>
         keys; // key (sorted vertices), cell-entity index
 
-      std::vector<std::array<unsigned int, key_length>> ad_entity_vertices;
-      std::vector<dealii::ReferenceCell>                ad_entity_types;
-      std::vector<std::array<unsigned int, key_length>> ad_compatibility;
+      std::vector<std::array<unsigned int, max_n_vertices>> ad_entity_vertices;
+      std::vector<dealii::ReferenceCell>                    ad_entity_types;
+      std::vector<std::array<unsigned int, max_n_vertices>> ad_compatibility;
 
       keys.reserve(n_entities);
       ad_entity_vertices.reserve(n_entities);
@@ -1059,20 +1059,22 @@ namespace internal
           const auto &cell_type =
             cell_types[static_cast<types::geometric_entity_type>(
               cell_types_index[c])];
-          ptr_d[c + 1] = ptr_d[c] + cell_type->n_entities(d);
+          ptr_d[c + 1] = ptr_d[c] + cell_type->n_entities(face_dimensionality);
 
           // ... collect vertices of cell
           const dealii::ArrayView<const unsigned int> cell_vertice(
             cell_vertices.data() + cell_ptr[c], cell_ptr[c + 1] - cell_ptr[c]);
 
           // ... loop over all its entities
-          for (unsigned int e = 0; e < cell_type->n_entities(d); ++e)
+          for (unsigned int e = 0;
+               e < cell_type->n_entities(face_dimensionality);
+               ++e)
             {
               // ... determine global entity vertices
               const auto &local_entity_vertices =
-                cell_type->vertices_of_entity(d, e);
+                cell_type->vertices_of_entity(face_dimensionality, e);
 
-              std::array<unsigned int, key_length> entity_vertices;
+              std::array<unsigned int, max_n_vertices> entity_vertices;
               std::fill(entity_vertices.begin(), entity_vertices.end(), 0);
 
               for (unsigned int i = 0; i < local_entity_vertices.size(); ++i)
@@ -1080,13 +1082,14 @@ namespace internal
                   cell_vertice[local_entity_vertices[i]] + offset;
 
               // ... create key
-              std::array<unsigned int, key_length> key = entity_vertices;
+              std::array<unsigned int, max_n_vertices> key = entity_vertices;
               std::sort(key.begin(), key.end());
               keys.emplace_back(key, counter++);
 
               ad_entity_vertices.emplace_back(entity_vertices);
 
-              ad_entity_types.emplace_back(cell_type->type_of_entity(d, e));
+              ad_entity_types.emplace_back(
+                cell_type->type_of_entity(face_dimensionality, e));
 
               if (compatibility_mode)
                 ad_compatibility.emplace_back(
@@ -1107,7 +1110,7 @@ namespace internal
           unsigned int n_unique_entities        = 0;
           unsigned int n_unique_entity_vertices = 0;
 
-          std::array<unsigned int, key_length> ref_key, new_key;
+          std::array<unsigned int, max_n_vertices> ref_key, new_key;
           std::fill(ref_key.begin(), ref_key.end(), 0);
           for (unsigned int i = 0; i < keys.size(); ++i)
             {
@@ -1136,8 +1139,8 @@ namespace internal
         }
 
 
-      std::array<unsigned int, key_length> ref_key;
-      std::array<unsigned int, key_length> ref_indices;
+      std::array<unsigned int, max_n_vertices> ref_key;
+      std::array<unsigned int, max_n_vertices> ref_indices;
       std::fill(ref_key.begin(), ref_key.end(), 0);
 
       unsigned int counter = dealii::numbers::invalid_unsigned_int;
@@ -1185,7 +1188,7 @@ namespace internal
      */
     template <typename FU>
     void
-    build_entity(const unsigned int                                d,
+    build_entity(const unsigned int face_dimensionality,
                  const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
                  const std::vector<dealii::ReferenceCell> &cell_types_index,
                  const CRS<unsigned int> &                 crs,
@@ -1194,19 +1197,22 @@ namespace internal
                  TriaObjectsOrientations &                 orientations,
                  const FU &                                second_key_function)
     {
-      std::size_t key_length = 0;
+      std::size_t max_n_vertices = 0;
 
       for (const auto &c : cell_types_index)
         {
           const auto &cell_type =
             cell_types[static_cast<types::geometric_entity_type>(c)];
-          for (unsigned int e = 0; e < cell_type->n_entities(d); ++e)
-            key_length =
-              std::max(key_length, cell_type->vertices_of_entity(d, e).size());
+          for (unsigned int e = 0;
+               e < cell_type->n_entities(face_dimensionality);
+               ++e)
+            max_n_vertices = std::max(
+              max_n_vertices,
+              cell_type->vertices_of_entity(face_dimensionality, e).size());
         }
 
-      if (key_length == 2)
-        build_entity_templated<2>(d,
+      if (max_n_vertices == 2)
+        build_entity_templated<2>(face_dimensionality,
                                   cell_types,
                                   cell_types_index,
                                   crs,
@@ -1214,8 +1220,8 @@ namespace internal
                                   crs_0,
                                   orientations,
                                   second_key_function);
-      else if (key_length == 3)
-        build_entity_templated<3>(d,
+      else if (max_n_vertices == 3)
+        build_entity_templated<3>(face_dimensionality,
                                   cell_types,
                                   cell_types_index,
                                   crs,
@@ -1223,8 +1229,8 @@ namespace internal
                                   crs_0,
                                   orientations,
                                   second_key_function);
-      else if (key_length == 4)
-        build_entity_templated<4>(d,
+      else if (max_n_vertices == 4)
+        build_entity_templated<4>(face_dimensionality,
                                   cell_types,
                                   cell_types_index,
                                   crs,
