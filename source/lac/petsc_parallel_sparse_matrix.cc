@@ -508,7 +508,7 @@ namespace PETScWrappers
       ierr = ISDestroy(&is_glob_row);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       ierr =
-        ISLocalToGlobalMappingViewFromOptions(l2gmap_row, NULL, "-view_map");
+        ISLocalToGlobalMappingViewFromOptions(l2gmap_row, nullptr, "-view_map");
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // Create column index set
@@ -524,7 +524,7 @@ namespace PETScWrappers
       ierr = ISDestroy(&is_glob_col);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       ierr =
-        ISLocalToGlobalMappingViewFromOptions(l2gmap_col, NULL, "-view_map");
+        ISLocalToGlobalMappingViewFromOptions(l2gmap_col, nullptr, "-view_map");
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // create the matrix with the IS constructor.

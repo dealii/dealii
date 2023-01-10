@@ -520,8 +520,7 @@ namespace VectorTools
       hp::FEFaceValues<dim, spacedim> &   x_fe_face_values,
       const IndexSet &                    refinement_edge_indices,
       const unsigned int                  level,
-      std::map<internal::FaceDoFInfo, std::array<unsigned int, dim>>
-        &dof_to_vector_dof)
+      std::map<FaceDoFInfo, std::array<unsigned int, dim>> &dof_to_vector_dof)
     {
       std::set<types::boundary_id>::iterator b_id;
       for (const unsigned int face_no : cell->face_indices())
@@ -556,8 +555,8 @@ namespace VectorTools
                   if (level == numbers::invalid_unsigned_int ||
                       !refinement_edge_indices.is_element(face_dofs[i]))
                     {
-                      local_vector_indices[0]                         = i;
-                      const internal::FaceDoFInfo local_face_dof_info = {
+                      local_vector_indices[0]               = i;
+                      const FaceDoFInfo local_face_dof_info = {
                         {cell->active_fe_index(), face_no, i}};
                       for (unsigned int k = 0; k < fe.n_dofs_per_face(face_no);
                            ++k)
@@ -603,26 +602,23 @@ namespace VectorTools
       const IndexSet &                 refinement_edge_indices,
       const unsigned int               level,
       std::multimap<
-        internal::VectorDoFTuple<dim>,
+        VectorDoFTuple<dim>,
         std::pair<Tensor<1, dim>,
                   typename DoFHandler<dim, spacedim>::cell_iterator>>
-        &dof_to_normals_map,
-      std::map<internal::VectorDoFTuple<dim>, Vector<double>>
-        &dof_vector_to_b_values)
+        &                                            dof_to_normals_map,
+      std::map<VectorDoFTuple<dim>, Vector<double>> &dof_vector_to_b_values)
     {
       // mapping from (active_fe_index, face_no and local
       // dof index) to dim vector indices of the same
       // supporting point.
-      std::map<internal::FaceDoFInfo, std::array<unsigned int, dim>>
-        dof_to_vector_dof;
-      internal::map_face_dof_to_vector_dof<dim, spacedim>(
-        cell,
-        first_vector_component,
-        boundary_ids,
-        x_fe_face_values,
-        refinement_edge_indices,
-        level,
-        dof_to_vector_dof);
+      std::map<FaceDoFInfo, std::array<unsigned int, dim>> dof_to_vector_dof;
+      map_face_dof_to_vector_dof<dim, spacedim>(cell,
+                                                first_vector_component,
+                                                boundary_ids,
+                                                x_fe_face_values,
+                                                refinement_edge_indices,
+                                                level,
+                                                dof_to_vector_dof);
 
 
       std::set<types::boundary_id>::iterator b_id;
@@ -660,7 +656,7 @@ namespace VectorTools
                 if (level == numbers::invalid_unsigned_int ||
                     !refinement_edge_indices.is_element(face_dofs[i]))
                   {
-                    const internal::FaceDoFInfo face_dof_info = {
+                    const FaceDoFInfo face_dof_info = {
                       {cell->active_fe_index(), face_no, i}};
                     const auto it = dof_to_vector_dof.find(face_dof_info);
                     Assert(it != dof_to_vector_dof.end(), ExcInternalError());
@@ -673,7 +669,7 @@ namespace VectorTools
                         "Error: the finite element does not have enough components "
                         "to define a normal direction."));
 
-                    internal::VectorDoFTuple<dim> vector_dofs;
+                    VectorDoFTuple<dim> vector_dofs;
                     for (unsigned int d = 0; d < dim; ++d)
                       {
                         vector_dofs.dof_indices[d] =
@@ -845,11 +841,10 @@ namespace VectorTools
       // directions* we find). consequently, we also have to store which cell a
       // normal vector was computed on
       using DoFToNormalsMap = std::multimap<
-        internal::VectorDoFTuple<dim>,
+        VectorDoFTuple<dim>,
         std::pair<Tensor<1, dim>,
                   typename DoFHandler<dim, spacedim>::cell_iterator>>;
-      std::map<internal::VectorDoFTuple<dim>, Vector<double>>
-        dof_vector_to_b_values;
+      std::map<VectorDoFTuple<dim>, Vector<double>> dof_vector_to_b_values;
 
       DoFToNormalsMap dof_to_normals_map;
 
@@ -861,7 +856,7 @@ namespace VectorTools
           for (const auto &cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial())
               {
-                internal::map_dofs_to_normal_vectors_and_normal_fluxes(
+                map_dofs_to_normal_vectors_and_normal_fluxes(
                   cell,
                   first_vector_component,
                   boundary_ids,
@@ -882,7 +877,7 @@ namespace VectorTools
                   numbers::artificial_subdomain_id &&
                 cell->level_subdomain_id() != numbers::invalid_subdomain_id)
               {
-                internal::map_dofs_to_normal_vectors_and_normal_fluxes(
+                map_dofs_to_normal_vectors_and_normal_fluxes(
                   cell,
                   first_vector_component,
                   boundary_ids,

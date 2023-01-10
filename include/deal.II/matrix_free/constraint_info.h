@@ -182,6 +182,7 @@ namespace internal
 
     // ------------------------- inline functions --------------------------
 
+    // NOLINTNEXTLINE(modernize-use-equals-default)
     template <typename Number>
     ConstraintValues<Number>::ConstraintValues()
       : constraints(FloatingPointComparator<Number>(

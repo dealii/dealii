@@ -1639,7 +1639,7 @@ namespace Step69
     /* We wire up the slot InitialValues<dim>::parse_parameters_callback to
        the ParameterAcceptor::parse_parameters_call_back signal: */
     ParameterAcceptor::parse_parameters_call_back.connect(
-      std::bind(&InitialValues<dim>::parse_parameters_callback, this));
+      [&]() { this->parse_parameters_callback(); });
 
     initial_direction[0] = 1.;
     add_parameter("initial direction",

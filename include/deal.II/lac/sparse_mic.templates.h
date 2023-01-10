@@ -27,15 +27,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
-SparseMIC<number>::SparseMIC()
-  : diag(0)
-  , inv_diag(0)
-  , inner_sums(0)
-{}
-
-
-
-template <typename number>
 SparseMIC<number>::~SparseMIC()
 {
   // virtual functions called in constructors and destructors never use the

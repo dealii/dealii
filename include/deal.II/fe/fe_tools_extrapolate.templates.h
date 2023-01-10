@@ -1128,6 +1128,7 @@ namespace FETools
       // the same process, so we have to only look at the unique set of
       // destinations:
       std::vector<types::subdomain_id> destinations;
+      destinations.reserve(cells_to_send.size());
       for (const auto &cell : cells_to_send)
         destinations.emplace_back(cell.receiver);
       std::sort(destinations.begin(), destinations.end());

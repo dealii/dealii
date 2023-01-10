@@ -615,7 +615,7 @@ namespace Step68
     Particles::DataOut<dim, dim> particle_output;
 
     std::vector<std::string> solution_names(dim, "velocity");
-    solution_names.push_back("process_id");
+    solution_names.emplace_back("process_id");
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       data_component_interpretation(
