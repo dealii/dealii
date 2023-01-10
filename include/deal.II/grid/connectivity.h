@@ -997,7 +997,7 @@ namespace internal
      */
     template <int max_n_vertices, typename FU>
     void
-    build_entity_templated(
+    build_face_entities_templated(
       const unsigned int                                face_dimensionality,
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
       const std::vector<dealii::ReferenceCell> &        cell_types_index,
@@ -1188,14 +1188,15 @@ namespace internal
      */
     template <typename FU>
     void
-    build_entity(const unsigned int face_dimensionality,
-                 const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-                 const std::vector<dealii::ReferenceCell> &cell_types_index,
-                 const CRS<unsigned int> &                 crs,
-                 CRS<unsigned int> &                       crs_d,
-                 CRS<unsigned int> &                       crs_0,
-                 TriaObjectsOrientations &                 orientations,
-                 const FU &                                second_key_function)
+    build_face_entities(
+      const unsigned int                                face_dimensionality,
+      const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
+      const std::vector<dealii::ReferenceCell> &        cell_types_index,
+      const CRS<unsigned int> &                         crs,
+      CRS<unsigned int> &                               crs_d,
+      CRS<unsigned int> &                               crs_0,
+      TriaObjectsOrientations &                         orientations,
+      const FU &                                        second_key_function)
     {
       std::size_t max_n_vertices = 0;
 
@@ -1212,32 +1213,32 @@ namespace internal
         }
 
       if (max_n_vertices == 2)
-        build_entity_templated<2>(face_dimensionality,
-                                  cell_types,
-                                  cell_types_index,
-                                  crs,
-                                  crs_d,
-                                  crs_0,
-                                  orientations,
-                                  second_key_function);
+        build_face_entities_templated<2>(face_dimensionality,
+                                         cell_types,
+                                         cell_types_index,
+                                         crs,
+                                         crs_d,
+                                         crs_0,
+                                         orientations,
+                                         second_key_function);
       else if (max_n_vertices == 3)
-        build_entity_templated<3>(face_dimensionality,
-                                  cell_types,
-                                  cell_types_index,
-                                  crs,
-                                  crs_d,
-                                  crs_0,
-                                  orientations,
-                                  second_key_function);
+        build_face_entities_templated<3>(face_dimensionality,
+                                         cell_types,
+                                         cell_types_index,
+                                         crs,
+                                         crs_d,
+                                         crs_0,
+                                         orientations,
+                                         second_key_function);
       else if (max_n_vertices == 4)
-        build_entity_templated<4>(face_dimensionality,
-                                  cell_types,
-                                  cell_types_index,
-                                  crs,
-                                  crs_d,
-                                  crs_0,
-                                  orientations,
-                                  second_key_function);
+        build_face_entities_templated<4>(face_dimensionality,
+                                         cell_types,
+                                         cell_types_index,
+                                         crs,
+                                         crs_d,
+                                         crs_0,
+                                         orientations,
+                                         second_key_function);
       else
         AssertThrow(false, dealii::StandardExceptions::ExcNotImplemented());
     }
@@ -1382,22 +1383,23 @@ namespace internal
         {
           TriaObjectsOrientations dummy;
 
-          build_entity(1,
-                       cell_t,
-                       connectivity.entity_types(dim),
-                       con_cv,
-                       dim == 2 ? connectivity.entity_to_entities(2, 1) : temp1,
-                       connectivity.entity_to_entities(1, 0),
-                       dim == 2 ? connectivity.entity_orientations(1) : dummy,
-                       [](auto key, const auto &, const auto &, const auto &) {
-                         //  to ensure same enumeration as in deal.II
-                         return key;
-                       });
+          build_face_entities(
+            1,
+            cell_t,
+            connectivity.entity_types(dim),
+            con_cv,
+            dim == 2 ? connectivity.entity_to_entities(2, 1) : temp1,
+            connectivity.entity_to_entities(1, 0),
+            dim == 2 ? connectivity.entity_orientations(1) : dummy,
+            [](auto key, const auto &, const auto &, const auto &) {
+              //  to ensure same enumeration as in deal.II
+              return key;
+            });
         }
 
       if (dim == 3) // build quads
         {
-          build_entity(
+          build_face_entities(
             2,
             cell_t,
             connectivity.entity_types(3),
