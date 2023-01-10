@@ -287,7 +287,7 @@ namespace DataOutBase
      *   For other kinds of cells (triangles, tetrahedra, etc.), only the
      *   first few elements of this array will be used.
      */
-    Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
+    std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
 
     /**
      * Patch indices of neighbors of the current patch. This is made available
