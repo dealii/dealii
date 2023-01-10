@@ -1,0 +1,4 @@
+New: There are now overloads of the make_array_view() function for objects of
+type std::array.
+<br>
+(Wolfgang Bangerth, 2023/01/09)
