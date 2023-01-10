@@ -3014,7 +3014,8 @@ namespace GridTools
           {
             // Fixed in
             // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
-#if !defined(__INTEL_LLVM_COMPILER) || BOOST_VERSION >= 108100
+#if defined(FEATURE_BOOST_BUNDLED_CONFIGURED) || \
+  !defined(__INTEL_LLVM_COMPILER) || BOOST_VERSION >= 108100
             if (!used_vertices_rtree.empty())
               {
                 // If we have an rtree at our disposal, use it.
