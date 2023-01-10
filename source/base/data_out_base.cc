@@ -730,6 +730,15 @@ namespace
   /**
    * Return the tuple (vtk cell type, number of cells, number of nodes)
    * for a patch.
+   *
+   * The logic used here is as follows:
+   * - If a cell is not subdivided or we don't use higher order cells,
+   *   then we use linear cells
+   * - For hypercubes, we support subdividing cells into sub-cells,
+   *   which are then treated as each being linear
+   * - For triangles and tetrahedra, we special-case the situation of
+   *   n_subdivisions==2, in which case we treat the cell as a single
+   *   quadratic cell (i.e., higher order)
    */
   template <int dim, int spacedim>
   std::array<unsigned int, 3>
@@ -753,12 +762,14 @@ namespace
     else if (patch.reference_cell == ReferenceCells::Triangle &&
              patch.data.n_cols() == 6)
       {
+        Assert(patch.n_subdivisions == 2, ExcInternalError());
         vtk_cell_id[0] = patch.reference_cell.vtk_quadratic_type();
         vtk_cell_id[2] = patch.data.n_cols();
       }
     else if (patch.reference_cell == ReferenceCells::Tetrahedron &&
              patch.data.n_cols() == 10)
       {
+        Assert(patch.n_subdivisions == 2, ExcInternalError());
         vtk_cell_id[0] = patch.reference_cell.vtk_quadratic_type();
         vtk_cell_id[2] = patch.data.n_cols();
       }
@@ -5867,10 +5878,44 @@ namespace DataOutBase
 
       for (const auto &patch : patches)
         {
-          // First treat non-hypercubes since they can currently
-          // not be subdivided (into sub-cells, or into higher-order cells):
-          if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
+          // First treat a slight oddball case: For triangles and tetrahedra,
+          // the case with n_subdivisions==2 is treated as if the cell was
+          // output as a single, quadratic, cell rather than as one would
+          // expect as 4 sub-cells (for triangles; and the corresponding
+          // number of sub-cells for tetrahedra). This is courtesy of some
+          // special-casing in the function extract_vtk_patch_info().
+          if ((dim >= 2) &&
+              (patch.reference_cell == ReferenceCells::get_simplex<dim>()) &&
+              (patch.n_subdivisions == 2))
             {
+              const unsigned int n_points = patch.data.n_cols();
+              Assert((dim == 2 && n_points == 6) ||
+                       (dim == 3 && n_points == 10),
+                     ExcInternalError());
+
+              if (deal_ii_with_zlib &&
+                  (flags.compression_level !=
+                   DataOutBase::CompressionLevel::plain_text))
+                {
+                  for (unsigned int i = 0; i < n_points; ++i)
+                    cells.push_back(first_vertex_of_patch + i);
+                }
+              else
+                {
+                  for (unsigned int i = 0; i < n_points; ++i)
+                    o << '\t' << first_vertex_of_patch + i;
+                  o << '\n';
+                }
+
+              first_vertex_of_patch += n_points;
+            }
+          // Then treat all of the other non-hypercube cases since they can
+          // currently not be subdivided (into sub-cells, or into higher-order
+          // cells):
+          else if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
+            {
+              Assert(patch.n_subdivisions == 1, ExcNotImplemented());
+
               const unsigned int n_points = patch.data.n_cols();
               static const std::array<unsigned int, 5>
                 pyramid_index_translation_table = {{0, 1, 3, 2, 4}};
