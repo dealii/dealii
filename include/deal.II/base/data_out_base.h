@@ -282,7 +282,7 @@ namespace DataOutBase
      * The order of points is the same as for cells in the
      * triangulation.
      */
-    Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
+    std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
 
     /**
      * Patch indices of neighbors of the current patch. This is made available
