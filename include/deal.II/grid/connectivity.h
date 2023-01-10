@@ -1140,9 +1140,8 @@ namespace internal
       std::array<unsigned int, key_length> ref_indices;
       std::fill(ref_key.begin(), ref_key.end(), 0);
 
-      for (unsigned int i = 0, counter = dealii::numbers::invalid_unsigned_int;
-           i < keys.size();
-           i++)
+      unsigned int counter = dealii::numbers::invalid_unsigned_int;
+      for (unsigned int i = 0; i < keys.size(); i++)
         {
           const auto offset_i = std::get<1>(keys[i]);
 
@@ -1164,8 +1163,14 @@ namespace internal
               // occurrence
               orientations.set_raw_orientation(
                 offset_i,
-                ad_entity_types[offset_i].compute_orientation(
-                  ad_entity_vertices[offset_i], ref_indices));
+                ad_entity_types[offset_i]
+                  .template get_orientation_index<unsigned int>(
+                    make_array_view(ad_entity_vertices[offset_i].begin(),
+                                    ad_entity_vertices[offset_i].begin() +
+                                      ad_entity_types[offset_i].n_vertices()),
+                    make_array_view(ref_indices.begin(),
+                                    ref_indices.begin() +
+                                      ad_entity_types[offset_i].n_vertices())));
             }
           col_d[offset_i] = counter;
         }
