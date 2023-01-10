@@ -3012,7 +3012,10 @@ namespace GridTools
           }
         else
           {
-            // Fixed in
+            // For some clang-based compilers and boost versions the call to
+            // RTree::query doesn't compile. Since using an rtree here is just a
+            // performance improvement disabling this branch is OK.
+            // This is fixed in boost in
             // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
 #if defined(FEATURE_BOOST_BUNDLED_CONFIGURED) ||          \
   !(defined(__clang_major__) && __clang_major__ >= 16) || \
