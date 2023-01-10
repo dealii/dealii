@@ -1393,6 +1393,8 @@ namespace Particles
                 }
             }
 
+            // Fixed in
+            // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
 #if !defined(__INTEL_LLVM_COMPILER) || BOOST_VERSION >= 108100
           if (!found_cell)
             {
