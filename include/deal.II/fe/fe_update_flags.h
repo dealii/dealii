@@ -211,6 +211,10 @@ enum UpdateFlags
    * pushed forward to the real cell coordinates.
    */
   update_jacobian_pushed_forward_3rd_derivatives = 0x1000000,
+  /**
+   * Update rescaling for Hermite elements.
+   */
+  update_rescale = 0x2000000,
   //! Values needed for Piola transform
   /**
    * Combination of the flags needed for Piola transform of Hdiv elements.
@@ -232,7 +236,9 @@ enum UpdateFlags
   update_covariant_transformation | update_contravariant_transformation |
   update_transformation_values | update_transformation_gradients |
   // Volume data
-  update_volume_elements
+  update_volume_elements |
+  // Hermite needs several DOFs to be rescaled each time
+  update_rescale
 };
 
 

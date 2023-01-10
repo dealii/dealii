@@ -26,6 +26,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_hermite.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -467,12 +468,20 @@ namespace DoFTools
     Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
              boundary_ids.end(),
            (typename DoFHandler<dim, spacedim>::ExcInvalidBoundaryIndicator()));
-    Assert(sparsity.n_rows() == dof.n_boundary_dofs(boundary_ids),
+
+    const bool fe_is_hermite = (dynamic_cast<const FE_Hermite<dim, spacedim> *>(
+                                  &(dof.get_fe())) != nullptr);
+
+    Assert(fe_is_hermite ||
+             sparsity.n_rows() == dof.n_boundary_dofs(boundary_ids),
            ExcDimensionMismatch(sparsity.n_rows(),
                                 dof.n_boundary_dofs(boundary_ids)));
-    Assert(sparsity.n_cols() == dof.n_boundary_dofs(boundary_ids),
+    Assert(fe_is_hermite ||
+             sparsity.n_cols() == dof.n_boundary_dofs(boundary_ids),
            ExcDimensionMismatch(sparsity.n_cols(),
                                 dof.n_boundary_dofs(boundary_ids)));
+    (void)fe_is_hermite;
+
 #ifdef DEBUG
     if (sparsity.n_rows() != 0)
       {
