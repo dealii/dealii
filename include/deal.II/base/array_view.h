@@ -655,10 +655,10 @@ make_array_view(const Iterator begin, const Iterator end)
   static_assert(
     std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
                  typename std::random_access_iterator_tag>::value,
-    "The provided iterator should be a random access iterator.");
+    "The provided iterator needs to be a random access iterator.");
   Assert(begin <= end,
          ExcMessage(
-           "The beginning of the array view should be before the end."));
+           "The beginning of the array view needs to be before the end."));
   Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
          ExcMessage("The provided range isn't contiguous in memory!"));
   // the reference type, not the value type, knows the constness of the iterator
@@ -684,7 +684,7 @@ make_array_view(ElementType *const begin, ElementType *const end)
 {
   Assert(begin <= end,
          ExcMessage(
-           "The beginning of the array view should be before the end."));
+           "The beginning of the array view needs to be before the end."));
   return ArrayView<ElementType, MemorySpaceType>(begin, end - begin);
 }
 

@@ -1,4 +1,4 @@
 
-DEAL::ExcMessage("The beginning of the array view should be before the end.")
-DEAL::ExcMessage("The beginning of the array view should be before the end.")
+DEAL::ExcMessage("The beginning of the array view needs to be before the end.")
+DEAL::ExcMessage("The beginning of the array view needs to be before the end.")
 DEAL::OK
