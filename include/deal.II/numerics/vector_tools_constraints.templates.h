@@ -1016,17 +1016,17 @@ namespace VectorTools
                   normal /= normal.norm();
 
                   // then construct constraints from this:
-                  const internal::VectorDoFTuple<dim> &dof_indices =
+                  const VectorDoFTuple<dim> &dof_indices =
                     same_dof_range[0]->first;
                   double               normal_value = 0.;
                   const Vector<double> b_values =
                     dof_vector_to_b_values[dof_indices];
                   for (unsigned int i = 0; i < dim; ++i)
                     normal_value += b_values[i] * normal[i];
-                  internal::add_constraint(dof_indices,
-                                           normal,
-                                           constraints,
-                                           normal_value);
+                  add_constraint(dof_indices,
+                                 normal,
+                                 constraints,
+                                 normal_value);
 
                   break;
                 }
@@ -1071,7 +1071,7 @@ namespace VectorTools
                   // this into the AffineConstraints object
                   //
                   // ignore dofs already constrained
-                  const internal::VectorDoFTuple<dim> &dof_indices =
+                  const VectorDoFTuple<dim> &dof_indices =
                     same_dof_range[0]->first;
                   const Vector<double> b_values =
                     dof_vector_to_b_values[dof_indices];
@@ -1240,14 +1240,14 @@ namespace VectorTools
 
                   // now all that is left is that we add the constraints that
                   // the vector is parallel to the tangent
-                  const internal::VectorDoFTuple<dim> &dof_indices =
+                  const VectorDoFTuple<dim> &dof_indices =
                     same_dof_range[0]->first;
                   const Vector<double> b_values =
                     dof_vector_to_b_values[dof_indices];
-                  internal::add_tangentiality_constraints(dof_indices,
-                                                          average_tangent,
-                                                          constraints,
-                                                          b_values);
+                  add_tangentiality_constraints(dof_indices,
+                                                average_tangent,
+                                                constraints,
+                                                b_values);
                 }
             }
         }
