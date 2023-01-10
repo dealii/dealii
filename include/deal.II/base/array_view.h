@@ -23,6 +23,7 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
+#include <array>
 #include <type_traits>
 #include <vector>
 
@@ -239,6 +240,14 @@ public:
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
    * equal if they have the same size and the same starting pointer.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * same. If they are, then of course the elements represented by the view
+   * are also the same. But the converse is not true: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for equality will return `false` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the const value_type.
    */
   bool
@@ -248,6 +257,14 @@ public:
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
    * equal if they have the same size and the same starting pointer.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * same. If they are, then of course the elements represented by the view
+   * are also the same. But the converse is not true: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for equality will return `false` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the non-const value_type.
    */
   bool
@@ -256,7 +273,18 @@ public:
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
-   * equal if they have the same size and the same starting pointer.
+   * equal if they have the same size and the same starting pointer, and the
+   * current operation therefore returns `true` if the two views being compared
+   * point to different memory locations, or if they point to the same memory
+   * location but represent different sizes.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * not the same. But this does not mean that the elements pointed to by
+   * the view are not equal: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for inequality will return `true` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the const value_type.
    */
   bool
@@ -266,6 +294,14 @@ public:
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
    * equal if they have the same size and the same starting pointer.
+   *
+   * Note that this means that the operation tests that the *views* are the
+   * not the same. But this does not mean that the elements pointed to by
+   * the view are not equal: Two ArrayView objects
+   * may point to different parts of the memory space and in that case the
+   * comparison for inequality will return `true` even if the *elements* the
+   * views point to are the same.
+   *
    * This version always compares with the non-const value_type.
    */
   bool
@@ -1026,6 +1062,52 @@ make_array_view(const std::vector<ElementType> &vector,
                     "create would lead to a view that extends beyond the end "
                     "of the given vector."));
   return ArrayView<const ElementType>(&vector[starting_index], size_of_view);
+}
+
+
+
+/**
+ * Create a view to an entire std::array object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element and
+ * the size of the given argument.
+ *
+ * This function is used for non-@p const references to objects of array
+ * type. Such objects contain elements that can be written to. Consequently,
+ * the return type of this function is a view to a set of writable objects.
+ *
+ * @param[in] array The std::array object for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> array.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType, std::size_t N>
+inline ArrayView<ElementType>
+make_array_view(std::array<ElementType, N> &array)
+{
+  return ArrayView<ElementType>(array);
+}
+
+
+
+/**
+ * Create a view to an entire std::array object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element and
+ * the size of the given argument.
+ *
+ * This function is used for @p const references to objects of array type
+ * because they contain immutable elements. Consequently, the return type of
+ * this function is a view to a set of @p const objects.
+ *
+ * @param[in] array The std::array object for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> array.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType, std::size_t N>
+inline ArrayView<const ElementType>
+make_array_view(const std::array<ElementType, N> &array)
+{
+  return ArrayView<const ElementType>(array);
 }
 
 
