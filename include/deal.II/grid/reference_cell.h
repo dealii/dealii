@@ -2336,7 +2336,7 @@ ReferenceCell::standard_vs_true_line_orientation(
 
 namespace internal
 {
-  template <typename T, std::size_t N>
+  template <typename T>
   class NoPermutation : public dealii::ExceptionBase
   {
   public:
@@ -2344,12 +2344,15 @@ namespace internal
      * Constructor.
      */
     NoPermutation(const dealii::ReferenceCell &entity_type,
-                  const std::array<T, N> &     vertices_0,
-                  const std::array<T, N> &     vertices_1)
+                  const ArrayView<const T> &   vertices_0,
+                  const ArrayView<const T> &   vertices_1)
       : entity_type(entity_type)
       , vertices_0(vertices_0)
       , vertices_1(vertices_1)
-    {}
+    {
+      Assert(vertices_0.size() >= entity_type.n_vertices(), ExcInternalError());
+      Assert(vertices_1.size() >= entity_type.n_vertices(), ExcInternalError());
+    }
 
     /**
      * Destructor.
@@ -2373,7 +2376,7 @@ namespace internal
             out << ',';
         }
 
-      out << "] is not a permutation of [";
+      out << "] is not a valid permutation of [";
 
       for (unsigned int i = 0; i < n_vertices; ++i)
         {
@@ -2393,12 +2396,12 @@ namespace internal
     /**
      * First set of values.
      */
-    const std::array<T, N> vertices_0;
+    const ArrayView<const T> vertices_0;
 
     /**
      * Second set of values.
      */
-    const std::array<T, N> vertices_1;
+    const ArrayView<const T> vertices_1;
   };
 } // namespace internal
 
@@ -2496,7 +2499,7 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
         return 6;
     }
 
-  Assert(false, (internal::NoPermutation<T, N>(*this, vertices_0, vertices_1)));
+  Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
 
   return -1;
 }
