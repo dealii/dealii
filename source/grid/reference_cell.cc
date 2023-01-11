@@ -656,6 +656,58 @@ ReferenceCell::vtk_lexicographic_to_node_index<3>(
 
 
 unsigned int
+ReferenceCell::vtk_vertex_to_deal_vertex(const unsigned int vertex_index) const
+{
+  AssertIndexRange(vertex_index, n_vertices());
+
+  // For some of the following, deal.II uses the same ordering as VTK
+  // and in that case, we only need to return 'vertex_index' (i.e.,
+  // use the identity mapping). For some others, we need to translate.
+  //
+  // For the ordering, see the VTK manual (for example at
+  // http://www.princeton.edu/~efeibush/viscourse/vtk.pdf, page 9).
+  if (*this == ReferenceCells::Vertex)
+    return vertex_index;
+  else if (*this == ReferenceCells::Line)
+    return vertex_index;
+  else if (*this == ReferenceCells::Triangle)
+    return vertex_index;
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      static constexpr std::array<unsigned int, 4> index_translation_table = {
+        {0, 1, 3, 2}};
+      return index_translation_table[vertex_index];
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    return vertex_index;
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      static constexpr std::array<unsigned int, 5> index_translation_table = {
+        {0, 1, 3, 2, 4}};
+      return index_translation_table[vertex_index];
+    }
+  else if (*this == ReferenceCells::Wedge)
+    return vertex_index;
+  else if (*this == ReferenceCells::Hexahedron)
+    {
+      static constexpr std::array<unsigned int, 8> index_translation_table = {
+        {0, 1, 3, 2, 4, 5, 7, 6}};
+      return index_translation_table[vertex_index];
+    }
+  else if (*this == ReferenceCells::Invalid)
+    {
+      Assert(false, ExcNotImplemented());
+      return numbers::invalid_unsigned_int;
+    }
+
+  Assert(false, ExcNotImplemented());
+
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+unsigned int
 ReferenceCell::gmsh_element_type() const
 {
   /*

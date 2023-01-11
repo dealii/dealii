@@ -2642,7 +2642,7 @@ namespace DataOutBase
                                   patch.reference_cell);
             first_vertex_of_patch += patch.data.n_cols();
           }
-        else
+        else // hypercube cell
           {
             const unsigned int n_subdivisions = patch.n_subdivisions;
             const unsigned int n              = n_subdivisions + 1;
@@ -5900,8 +5900,6 @@ namespace DataOutBase
               Assert(patch.n_subdivisions == 1, ExcNotImplemented());
 
               const unsigned int n_points = patch.data.n_cols();
-              static const std::array<unsigned int, 5>
-                pyramid_index_translation_table = {{0, 1, 3, 2, 4}};
 
               if (deal_ii_with_zlib &&
                   (flags.compression_level !=
@@ -5910,18 +5908,14 @@ namespace DataOutBase
                   for (unsigned int i = 0; i < n_points; ++i)
                     cells.push_back(
                       first_vertex_of_patch +
-                      (patch.reference_cell == ReferenceCells::Pyramid ?
-                         pyramid_index_translation_table[i] :
-                         i));
+                      patch.reference_cell.vtk_vertex_to_deal_vertex(i));
                 }
               else
                 {
                   for (unsigned int i = 0; i < n_points; ++i)
                     o << '\t'
-                      << first_vertex_of_patch +
-                           (patch.reference_cell == ReferenceCells::Pyramid ?
-                              pyramid_index_translation_table[i] :
-                              i);
+                      << (first_vertex_of_patch +
+                          patch.reference_cell.vtk_vertex_to_deal_vertex(i));
                   o << '\n';
                 }
 

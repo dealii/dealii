@@ -735,6 +735,12 @@ public:
     const bool                       legacy_format) const;
 
   /**
+   * Map a VTK vertex number to a deal.II vertex number.
+   */
+  unsigned int
+  vtk_vertex_to_deal_vertex(const unsigned int vertex_index) const;
+
+  /**
    * Return the GMSH element type code that corresponds to the reference cell.
    */
   unsigned int
