@@ -1,0 +1,5 @@
+New: The function ReferenceCell::contains_points() is now implemented
+for all reference cell kinds (it had been missing for wedges and
+pyramids before).
+<br>
+(Wolfgang Bangerth, 2023/01/11)
