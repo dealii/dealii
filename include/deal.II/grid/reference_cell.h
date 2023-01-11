@@ -2004,29 +2004,22 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
                                // ScalarLagrangePolynomialPyramid::compute_value
     {
       const double Q14 = 0.25;
-      double       ration;
 
       const double r = xi[std::min(0, dim - 1)];
       const double s = xi[std::min(1, dim - 1)];
       const double t = xi[std::min(2, dim - 1)];
 
-      if (fabs(t - 1.0) > 1.0e-14)
-        {
-          ration = (r * s * t) / (1.0 - t);
-        }
-      else
-        {
-          ration = 0.0;
-        }
+      const double ratio =
+        (std::fabs(t - 1.0) > 1.0e-14 ? (r * s * t) / (1.0 - t) : 0.0);
 
       if (i == 0)
-        return Q14 * ((1.0 - r) * (1.0 - s) - t + ration);
+        return Q14 * ((1.0 - r) * (1.0 - s) - t + ratio);
       if (i == 1)
-        return Q14 * ((1.0 + r) * (1.0 - s) - t - ration);
+        return Q14 * ((1.0 + r) * (1.0 - s) - t - ratio);
       if (i == 2)
-        return Q14 * ((1.0 - r) * (1.0 + s) - t - ration);
+        return Q14 * ((1.0 - r) * (1.0 + s) - t - ratio);
       if (i == 3)
-        return Q14 * ((1.0 + r) * (1.0 + s) - t + ration);
+        return Q14 * ((1.0 + r) * (1.0 + s) - t + ratio);
       else
         return t;
     }
