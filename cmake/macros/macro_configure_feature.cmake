@@ -221,7 +221,7 @@ macro(configure_feature _feature)
           evaluate_expression("feature_${_feature}_configure_bundled()")
           message(STATUS "")
           message(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
-          set(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
+          set(DEAL_II_FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
           set_cached_option(${_feature} ON)
         else()
           message(FATAL_ERROR "\n"
@@ -263,7 +263,7 @@ macro(configure_feature _feature)
             evaluate_expression("feature_${_feature}_configure_bundled()")
 
             message(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
-            set(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
+            set(DEAL_II_FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
             set_cached_option(${_feature} ON)
 
           else()

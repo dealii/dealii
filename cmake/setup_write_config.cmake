@@ -177,7 +177,7 @@ foreach(_feature ${_deal_ii_features_sorted})
     #
     if(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
       _both("#        ${_var} set up with external dependencies\n")
-    elseif(FEATURE_${_feature}_BUNDLED_CONFIGURED)
+    elseif(DEAL_II_FEATURE_${_feature}_BUNDLED_CONFIGURED)
       if(DEAL_II_FORCE_BUNDLED_${_feature})
         _both("#        ${_var} set up with bundled packages (forced)\n")
       else()

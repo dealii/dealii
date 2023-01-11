@@ -32,7 +32,7 @@ if(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   endif()
   include(FindPythonLibs)
 
-  if(FEATURE_BOOST_BUNDLED_CONFIGURED)
+  if(DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
     message(FATAL_ERROR
       "DEAL_II_COMPONENT_PYTHON_BINDINGS has unmet configuration requirements: "
       "Python bindings require an external boost library, but deal.II was "

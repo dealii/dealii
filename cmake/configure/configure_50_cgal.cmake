@@ -38,7 +38,7 @@ macro(feature_cgal_find_external var)
   # CGAL requires an full, externally installed Boost library. We can thus
   # not configure our internal boost and try to use CGAL at the same time.
   #
-  if(FEATURE_BOOST_BUNDLED_CONFIGURED)
+  if(DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
     message(STATUS
       "Could not find a sufficient CGAL installation: "
       "CGAL links against external Boost but deal.II was configured "
