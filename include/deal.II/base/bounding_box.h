@@ -39,15 +39,17 @@ enum class NeighborType
 
   /**
    * Simple neighbors: the boxes intersect with an intersection of dimension at
-   * most `spacedim - 2`. For example, in 2d this means that the two boxes
-   * touch at one corner of the each box.
+   * most `spacedim - 2`. For example, in 2d this means that the two rectangles
+   * touch at a single point, which must then be a vertex of each box. In 3d,
+   * this means that two boxes touch along an edge.
    */
   simple_neighbors = 1,
 
   /**
    * Attached neighbors: neighbors with an intersection of
    * `dimension > spacedim - 2`. For example, in 2d this means that the two
-   * boxes touch along an edge.
+   * rectangles touch along (parts of) their edges. In 3d, it would mean that
+   * two boxes touch along (parts of) their faces.
    */
   attached_neighbors = 2,
 
@@ -59,7 +61,9 @@ enum class NeighborType
    *  |  |  | =  |     |
    *  V--W--.    V-----.
    *  @endcode
-   * or one is inside the other
+   * or one is inside the other. This is a special case of `attached_neighbors`
+   * where the two bounding boxes touch along the entirety of their respective
+   * faces, or where they overlap in suitable ways.
    */
   mergeable_neighbors = 3
 };
