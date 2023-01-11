@@ -14,23 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-// TODO: Do neighbors for dx and povray smooth triangles
-
-//--------------------------------------------------------------------
-// Remarks on the implementations
-//
-// Variable names: in most functions, variable names have been
-// standardized in the following way:
-//
-// n1, n2, ni Number of points in coordinate direction 1, 2, i
-//    will be 1 if i>=dim
-//
-// i1, i2, ii Loop variable running up to ni
-//
-// d1, d2, di Multiplicators for ii to find positions in the
-//    array of nodes.
-//--------------------------------------------------------------------
-
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
