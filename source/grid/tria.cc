@@ -2347,7 +2347,8 @@ namespace internal
 
                     // set line orientations
                     const unsigned char raw_orientation =
-                      connectivity.entity_orientations(1)[k];
+                      connectivity.entity_orientations(1).get_raw_orientation(
+                        k);
                     // it doesn't make sense to set any flags except
                     // orientation for a line
                     Assert(raw_orientation == 0u || raw_orientation == 1u,
@@ -2370,12 +2371,19 @@ namespace internal
 
           // in 2D optional: since in in pure QUAD meshes same line
           // orientations can be guaranteed
-          const bool orientation_needed =
-            dim == 3 ||
-            (dim == 2 &&
-             std::any_of(connectivity.entity_orientations(1).begin(),
-                         connectivity.entity_orientations(1).end(),
-                         [](const auto &i) { return i == 0; }));
+          bool orientation_needed = false;
+          if (dim == 3)
+            orientation_needed = true;
+          else if (dim == 2)
+            {
+              const auto &orientations = connectivity.entity_orientations(1);
+              for (unsigned int i = 0; i < orientations.n_objects(); ++i)
+                if (orientations.get_raw_orientation(i) != 1u)
+                  {
+                    orientation_needed = true;
+                    break;
+                  }
+            }
 
           // allocate memory
           reserve_space_(cells_0, n_cell);
@@ -2412,7 +2420,8 @@ namespace internal
                     {
                       level.face_orientations.set_raw_orientation(
                         cell * GeometryInfo<dim>::faces_per_cell + j,
-                        connectivity.entity_orientations(dim - 1)[i]);
+                        connectivity.entity_orientations(dim - 1)
+                          .get_raw_orientation(i));
                     }
                 }
             }

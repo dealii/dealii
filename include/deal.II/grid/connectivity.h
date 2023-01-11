@@ -23,6 +23,7 @@
 
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_description.h>
+#include <deal.II/grid/tria_objects_orientations.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -827,7 +828,7 @@ namespace internal
         , cell_types(cell_types)
       {}
 
-      inline std::vector<unsigned char> &
+      inline TriaObjectsOrientations &
       entity_orientations(const unsigned int structdim)
       {
         if (structdim == 1)
@@ -838,7 +839,7 @@ namespace internal
         return quad_orientation;
       }
 
-      inline const std::vector<unsigned char> &
+      inline const TriaObjectsOrientations &
       entity_orientations(const unsigned int structdim) const
       {
         if (structdim == 1)
@@ -919,12 +920,12 @@ namespace internal
 
       CRS<T> line_vertices;
 
-      std::vector<unsigned char> line_orientation;
+      TriaObjectsOrientations line_orientation;
 
       CRS<T> quad_vertices;
       CRS<T> quad_lines;
 
-      std::vector<unsigned char> quad_orientation;
+      TriaObjectsOrientations quad_orientation;
 
       CRS<T> cell_entities;
       CRS<T> neighbors;
@@ -1003,7 +1004,7 @@ namespace internal
       const CRS<unsigned int> &                         crs,
       CRS<unsigned int> &                               crs_d,        // result
       CRS<unsigned int> &                               crs_0,        // result
-      std::vector<unsigned char> &                      orientations, // result
+      TriaObjectsOrientations &                         orientations, // result
       const FU &                                        second_key_function)
     {
       const bool compatibility_mode = true;
@@ -1094,7 +1095,7 @@ namespace internal
         }
 
       col_d.resize(keys.size());
-      orientations.resize(keys.size());
+      orientations.reinit(keys.size());
 
       // step 2: sort according to key so that entities with same key can be
       // merged
@@ -1147,7 +1148,7 @@ namespace internal
 
           if (ref_key != std::get<0>(keys[i]))
             {
-              // new key
+              // new key: default orientation is correct
               counter++;
               ref_key     = std::get<0>(keys[i]);
               ref_indices = ad_entity_vertices[offset_i];
@@ -1156,18 +1157,17 @@ namespace internal
               for (const auto j : ad_entity_vertices[offset_i])
                 if (j != 0)
                   col_0.push_back(j - offset);
-
-              // take its orientation as default
-              col_d[offset_i]        = counter;
-              orientations[offset_i] = 1;
             }
           else
             {
-              col_d[offset_i] = counter;
-              orientations[offset_i] =
+              // previously seen key: set orientation relative to the first
+              // occurrence
+              orientations.set_raw_orientation(
+                offset_i,
                 ad_entity_types[offset_i].compute_orientation(
-                  ad_entity_vertices[offset_i], ref_indices);
+                  ad_entity_vertices[offset_i], ref_indices));
             }
+          col_d[offset_i] = counter;
         }
       ptr_0.push_back(col_0.size());
     }
@@ -1186,7 +1186,7 @@ namespace internal
                  const CRS<unsigned int> &                 crs,
                  CRS<unsigned int> &                       crs_d,
                  CRS<unsigned int> &                       crs_0,
-                 std::vector<unsigned char> &              orientations,
+                 TriaObjectsOrientations &                 orientations,
                  const FU &                                second_key_function)
     {
       std::size_t key_length = 0;
@@ -1249,14 +1249,13 @@ namespace internal
       const CRS<unsigned int> &                         con_lv,
       const CRS<unsigned int> &                         con_cq,
       const CRS<unsigned int> &                         con_qv,
-      const std::vector<unsigned char> &                ori_cq,
+      const TriaObjectsOrientations &                   ori_cq,
       CRS<unsigned int> &                               con_ql,   // result
-      std::vector<unsigned char> &                      ori_ql,   // result
+      TriaObjectsOrientations &                         ori_ql,   // result
       std::vector<dealii::ReferenceCell> &              quad_t_id // result
     )
     {
       // reset output
-      ori_ql     = {};
       con_ql.ptr = {};
       con_ql.col = {};
 
@@ -1289,7 +1288,7 @@ namespace internal
 
       // allocate memory
       con_ql.col.resize(con_ql.ptr.back());
-      ori_ql.resize(con_ql.ptr.back());
+      ori_ql.reinit(con_ql.ptr.back());
 
       // loop over cells
       for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
@@ -1306,7 +1305,7 @@ namespace internal
               const unsigned int f = con_cq.col[f_];
 
               // only faces with default orientation have to do something
-              if (ori_cq[f_] != 1)
+              if (ori_cq.get_raw_orientation(f_) != 1u)
                 continue;
 
               // determine entity type of face
@@ -1338,7 +1337,7 @@ namespace internal
                       }
 
                   // ... comparison gives orientation
-                  ori_ql[con_ql.ptr[f] + l] = (same ? 1 : 0);
+                  ori_ql.set_raw_orientation(con_ql.ptr[f] + l, same ? 1u : 0u);
                 }
             }
         }
@@ -1370,7 +1369,7 @@ namespace internal
 
       if (dim == 2 || dim == 3) // build lines
         {
-          std::vector<unsigned char> dummy;
+          TriaObjectsOrientations dummy;
 
           build_entity(1,
                        cell_t,
