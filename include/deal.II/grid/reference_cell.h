@@ -2130,6 +2130,13 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
 {
   AssertDimension(dim, get_dimension());
 
+  // Introduce abbreviations to silence compiler warnings about invalid
+  // array accesses (that can't happen, of course, but the compiler
+  // doesn't know that).
+  constexpr unsigned int x_coordinate = 0;
+  constexpr unsigned int y_coordinate = (dim >= 2 ? 1 : 0);
+  constexpr unsigned int z_coordinate = (dim >= 3 ? 2 : 0);
+
   if (*this == ReferenceCells::Vertex)
     {
       // Vertices are special cases in that they do not actually
@@ -2177,17 +2184,16 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
       // triangles above (i.e., for the simplex above, using dim==2)
       // and then check the third dimension separately.
 
-      for (unsigned int d = 0; d < 2; ++d)
-        if (p[d] < -tolerance)
-          return false;
+      if ((p[x_coordinate] < -tolerance) || (p[y_coordinate] < -tolerance))
+        return false;
 
-      const double sum = p[0] + p[1];
+      const double sum = p[x_coordinate] + p[y_coordinate];
       if (sum > 1 + tolerance * std::sqrt(2.0))
         return false;
 
-      if (p[2] < -tolerance)
+      if (p[z_coordinate] < -tolerance)
         return false;
-      if (p[2] > 1 + tolerance)
+      if (p[z_coordinate] > 1 + tolerance)
         return false;
 
       return true;
@@ -2195,11 +2201,11 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
   else if (*this == ReferenceCells::Pyramid)
     {
       // A pyramid only lives in the upper half-space:
-      if (p[2] < -tolerance)
+      if (p[z_coordinate] < -tolerance)
         return false;
 
       // It also only lives in the space below z=1:
-      if (p[2] > 1 + tolerance)
+      if (p[z_coordinate] > 1 + tolerance)
         return false;
 
       // Within what's left of the space, a pyramid is a cone that tapers
@@ -2207,11 +2213,11 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
       // axis in the max norm (this is the right norm because the vertices
       // of the pyramid are at points +/-1, +/-1):
       const double distance_from_axis =
-        std::max(std::fabs(p[0]), std::fabs(p[1]));
+        std::max(std::fabs(p[x_coordinate]), std::fabs(p[y_coordinate]));
 
       // We are inside the pyramid if the distance from the axis is less than
       // (1-z)
-      return (distance_from_axis < 1 + tolerance - p[2]);
+      return (distance_from_axis < 1 + tolerance - p[z_coordinate]);
     }
 
   Assert(false, ExcNotImplemented());
