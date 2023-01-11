@@ -3017,7 +3017,7 @@ namespace GridTools
             // performance improvement disabling this branch is OK.
             // This is fixed in boost in
             // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
-#if defined(FEATURE_BOOST_BUNDLED_CONFIGURED) ||          \
+#if defined(DEAL_II_WITH_BOOST_BUNDLED) ||                \
   !(defined(__clang_major__) && __clang_major__ >= 16) || \
   BOOST_VERSION >= 108100
             if (!used_vertices_rtree.empty())
