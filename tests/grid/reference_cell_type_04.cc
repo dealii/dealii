@@ -35,16 +35,13 @@ test(const ReferenceCell &reference_cell)
   unsigned int       n_samples_inside = 0;
   const unsigned int n_samples        = 200000;
 
-  std::uniform_real_distribution<> uniform_distribution(-1., 1.);
-  std::mt19937                     rng;
-
   for (unsigned int n = 0; n < n_samples; ++n)
     {
       // Choose a random point in the box [-1,1]^d that contains all
       // of our reference cells:
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
-        p[d] = uniform_distribution(rng);
+        p[d] = random_value<double>(-1, 1);
 
       if (reference_cell.contains_point(p))
         ++n_samples_inside;
