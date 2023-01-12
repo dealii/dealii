@@ -5508,19 +5508,18 @@ namespace internal
                     {
                       for (const auto f : new_quad->line_indices())
                         {
-                          std::array<unsigned int, 2> vertices_0, vertices_1;
+                          const std::array<unsigned int, 2> vertices_0 = {
+                            {lines[quad_lines[i][f]]->vertex_index(0),
+                             lines[quad_lines[i][f]]->vertex_index(1)}};
 
-                          for (unsigned int v = 0; v < 2; ++v)
-                            vertices_0[v] =
-                              lines[quad_lines[i][f]]->vertex_index(v);
-
-                          for (unsigned int v = 0; v < 2; ++v)
-                            vertices_1[v] =
-                              vertex_indices[quad_line_vertices_tri[i][f][v]];
+                          const std::array<unsigned int, 2> vertices_1 = {
+                            {vertex_indices[quad_line_vertices_tri[i][f][0]],
+                             vertex_indices[quad_line_vertices_tri[i][f][1]]}};
 
                           const auto orientation =
-                            ReferenceCells::Line.compute_orientation(
-                              vertices_0, vertices_1);
+                            ReferenceCells::Line.get_orientation_index(
+                              make_array_view(vertices_0),
+                              make_array_view(vertices_1));
 
 #ifdef DEBUG
                           for (const auto i : vertices_0)
@@ -5956,19 +5955,21 @@ namespace internal
                                ReferenceCells::Hexahedron) ?
                                 representative_lines[q % 4][0] :
                                 line;
-                            std::array<unsigned int, 2> vertices_0, vertices_1;
 
-                            for (unsigned int v = 0; v < 2; ++v)
-                              vertices_0[v] =
-                                relevant_lines[new_quad_lines[q][l]]
-                                  ->vertex_index(v);
+                            const std::array<unsigned int, 2> vertices_0 = {
+                              {relevant_lines[new_quad_lines[q][l]]
+                                 ->vertex_index(0),
+                               relevant_lines[new_quad_lines[q][l]]
+                                 ->vertex_index(1)}};
 
-                            for (unsigned int v = 0; v < 2; ++v)
-                              vertices_1[v] = vertex_indices[table[q][l][v]];
+                            const std::array<unsigned int, 2> vertices_1 = {
+                              {vertex_indices[table[q][l][0]],
+                               vertex_indices[table[q][l][1]]}};
 
                             const auto orientation =
-                              ReferenceCells::Line.compute_orientation(
-                                vertices_0, vertices_1);
+                              ReferenceCells::Line.get_orientation_index(
+                                make_array_view(vertices_0),
+                                make_array_view(vertices_1));
 
                             new_quad->set_line_orientation(l, orientation);
 
@@ -6125,22 +6126,30 @@ namespace internal
                             // figure the orientation out the hard way
                             for (const auto f : new_hex->face_indices())
                               {
-                                std::array<unsigned int, 4> vertices_0,
-                                  vertices_1;
-
                                 const auto &face = new_hex->face(f);
 
-                                for (const auto i : face->vertex_indices())
-                                  vertices_0[i] = face->vertex_index(i);
+                                Assert(face->n_vertices() == 3,
+                                       ExcInternalError());
 
-                                for (const auto i : face->vertex_indices())
-                                  vertices_1[i] =
+                                const std::array<unsigned int, 3> vertices_0 = {
+                                  {face->vertex_index(0),
+                                   face->vertex_index(1),
+                                   face->vertex_index(2)}};
+
+                                const std::array<unsigned int, 3> vertices_1 = {
+                                  {
                                     vertex_indices[cell_face_vertices_tet[c][f]
-                                                                         [i]];
+                                                                         [0]],
+                                    vertex_indices[cell_face_vertices_tet[c][f]
+                                                                         [1]],
+                                    vertex_indices[cell_face_vertices_tet[c][f]
+                                                                         [2]],
+                                  }};
 
                                 const auto orientation =
-                                  face->reference_cell().compute_orientation(
-                                    vertices_1, vertices_0);
+                                  face->reference_cell().get_orientation_index(
+                                    make_array_view(vertices_1),
+                                    make_array_view(vertices_0));
 
                                 new_hex->set_face_orientation(
                                   f, Utilities::get_bit(orientation, 0));

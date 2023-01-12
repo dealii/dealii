@@ -25,6 +25,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <iosfwd>
 #include <string>
 
@@ -579,22 +581,56 @@ public:
    * vertices @p vertices_1 relative to an entity described by @p vertices_0.
    * The two arrays given as arguments can be arrays of global vertex
    * indices or local vertex indices, arrays of vertex locations, or
-   * arrays of any other objects identifying the vertices.
+   * arrays of any other objects identifying the vertices and the order
+   * in which they are encountered in a cell.
    *
    * The size of the arrays, i.e., the template argument `N`,
    * must be equal to or larger than the number of vertices of the current
    * entity. If it is larger, only those elements of the input and output
    * arrays are read from or written to that correspond to valid vertex
    * indices.
+   *
+   * @deprecated Use get_orientation_index() instead.
    */
   template <typename T, std::size_t N>
-  unsigned char
+  DEAL_II_DEPRECATED_EARLY unsigned char
   compute_orientation(const std::array<T, N> &vertices_0,
                       const std::array<T, N> &vertices_1) const;
 
   /**
+   * Determine the relative orientation of the current entity described by its
+   * vertices @p vertices_1 relative to an entity described by @p vertices_0.
+   * Relative orientations are special cases of permutations since every
+   * vertex has to appear in the list of vertices of a reoriented cell
+   * as well; however, not every permutation can denote the same cell:
+   * For example, a square's vertices can be rotated by 90, 180, or
+   * 270 degrees, and the cell can be inverted (in essence looking
+   * at it from the other side), but one can't just exchange the order of two
+   * adjacent vertices because then the resulting cell is no longer a square
+   * but an object with two edges that cross each other.
+   *
+   * The two arrays given as arguments can be arrays of global vertex
+   * indices or local vertex indices, arrays of vertex locations, or
+   * arrays of any other objects identifying the vertices and the order
+   * in which they are encountered in a cell.
+   *
+   * The size of the input arrays must be equal to the number of vertices of
+   * the current entity.
+   *
+   * @returns A number that describes a relative orientation. How exactly
+   *   this index is defined is not important, but it is consistent with the
+   *   understanding the reorient_based_on_orientation_index() has of
+   *   these orientation indices.
+   */
+  template <typename T>
+  unsigned int
+  get_orientation_index(const ArrayView<const T> &vertices_0,
+                        const ArrayView<const T> &vertices_1) const;
+
+
+  /**
    * Inverse function of compute_orientation(): Given a set of
-   * vertex-associated objects (such as vertex indices, locations, etc.)
+   * vertex-associated objects (such as vertex indices, locations, etc.) and
    * a desired orientation permutation, return the permuted vertex information.
    *
    * The size of the input and output arrays, i.e., the template argument `N`,
@@ -602,11 +638,29 @@ public:
    * entity. If it is larger, only those elements of the input and output
    * arrays are read from or written to that correspond to valid vertex
    * indices.
+   *
+   * @deprecated Use reorient_based_on_orientation_index() instead.
    */
   template <typename T, std::size_t N>
-  std::array<T, N>
+  DEAL_II_DEPRECATED_EARLY std::array<T, N>
   permute_according_orientation(const std::array<T, N> &vertices,
                                 const unsigned int      orientation) const;
+
+  /**
+   * This is the inverse function to get_orientation_index(): Given a set of
+   * vertex-associated objects (such as vertex indices, locations, etc.) and
+   * a desired orientation permutation, return the permuted vertex information.
+   *
+   * The size of the input array must be equal to the number of vertices of
+   * the current entity. The output is an array or permuted quantities of
+   * the same size. It is a vector that can store up to and including as many
+   * elements as cells can have vertices (namely eight, as in the case of
+   * hexahedra in 3d).
+   */
+  template <typename T>
+  boost::container::small_vector<T, 8>
+  reorient_based_on_orientation_index(const ArrayView<const T> &vertices,
+                                      const unsigned int orientation) const;
 
   /**
    * Return a vector of faces a given @p vertex_index belongs to.
@@ -2539,91 +2593,152 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
                     "greater than the number of vertices of the cell "
                     "referenced by this object."));
 
+  // Call the non-deprecated function, taking care of calling it only with
+  // those array elements that we actually care about (see the note
+  // in the documentation about the arguments potentially being
+  // larger arrays than necessary).
+  return get_orientation_index(
+    make_array_view(vertices_0.begin(), vertices_0.begin() + n_vertices()),
+    make_array_view(vertices_1.begin(), vertices_1.begin() + n_vertices()));
+}
+
+
+
+template <typename T>
+unsigned int
+ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
+                                     const ArrayView<const T> &vertices_1) const
+{
+  Assert(vertices_0.size() == n_vertices(),
+         ExcMessage("The number of array elements must be equal to "
+                    "the number of vertices of the cell "
+                    "referenced by this object."));
+  Assert(vertices_1.size() == n_vertices(),
+         ExcMessage("The number of array elements must be equal to "
+                    "the number of vertices of the cell "
+                    "referenced by this object."));
+
   if (*this == ReferenceCells::Line)
     {
-      const std::array<T, 2> i{{vertices_0[0], vertices_0[1]}};
-      const std::array<T, 2> j{{vertices_1[0], vertices_1[1]}};
-
       // line_orientation=true
-      if (i == std::array<T, 2>{{j[0], j[1]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[0], vertices_1[1]})))
         return 1;
 
       // line_orientation=false
-      if (i == std::array<T, 2>{{j[1], j[0]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[1], vertices_1[0]})))
         return 0;
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      const std::array<T, 3> i{{vertices_0[0], vertices_0[1], vertices_0[2]}};
-      const std::array<T, 3> j{{vertices_1[0], vertices_1[1], vertices_1[2]}};
-
       // face_orientation=true, face_rotation=false, face_flip=false
-      if (i == std::array<T, 3>{{j[0], j[1], j[2]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[0], vertices_1[1], vertices_1[2]})))
         return 1;
 
       // face_orientation=true, face_rotation=true, face_flip=false
-      if (i == std::array<T, 3>{{j[1], j[2], j[0]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[1], vertices_1[2], vertices_1[0]})))
         return 3;
 
       // face_orientation=true, face_rotation=false, face_flip=true
-      if (i == std::array<T, 3>{{j[2], j[0], j[1]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[2], vertices_1[0], vertices_1[1]})))
         return 5;
 
       // face_orientation=false, face_rotation=false, face_flip=false
-      if (i == std::array<T, 3>{{j[0], j[2], j[1]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[0], vertices_1[2], vertices_1[1]})))
         return 0;
 
       // face_orientation=false, face_rotation=true, face_flip=false
-      if (i == std::array<T, 3>{{j[2], j[1], j[0]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[2], vertices_1[1], vertices_1[0]})))
         return 2;
 
       // face_orientation=false, face_rotation=false, face_flip=true
-      if (i == std::array<T, 3>{{j[1], j[0], j[2]}})
+      if (std::equal(vertices_0.begin(),
+                     vertices_0.end(),
+                     std::begin({vertices_1[1], vertices_1[0], vertices_1[2]})))
         return 4;
     }
   else if (*this == ReferenceCells::Quadrilateral)
     {
-      const std::array<T, 4> i{
-        {vertices_0[0], vertices_0[1], vertices_0[2], vertices_0[3]}};
-      const std::array<T, 4> j{
-        {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}};
-
       // face_orientation=true, face_rotation=false, face_flip=false
-      if (i == std::array<T, 4>{{j[0], j[1], j[2], j[3]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]})))
         return 1;
 
       // face_orientation=true, face_rotation=true, face_flip=false
-      if (i == std::array<T, 4>{{j[2], j[0], j[3], j[1]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]})))
         return 3;
 
       // face_orientation=true, face_rotation=false, face_flip=true
-      if (i == std::array<T, 4>{{j[3], j[2], j[1], j[0]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[3], vertices_1[2], vertices_1[1], vertices_1[0]})))
         return 5;
 
       // face_orientation=true, face_rotation=true, face_flip=true
-      if (i == std::array<T, 4>{{j[1], j[3], j[0], j[2]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]})))
         return 7;
 
       // face_orientation=false, face_rotation=false, face_flip=false
-      if (i == std::array<T, 4>{{j[0], j[2], j[1], j[3]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[0], vertices_1[2], vertices_1[1], vertices_1[3]})))
         return 0;
 
       // face_orientation=false, face_rotation=true, face_flip=false
-      if (i == std::array<T, 4>{{j[2], j[3], j[0], j[1]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[2], vertices_1[3], vertices_1[0], vertices_1[1]})))
         return 2;
 
       // face_orientation=false, face_rotation=false, face_flip=true
-      if (i == std::array<T, 4>{{j[3], j[1], j[2], j[0]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[3], vertices_1[1], vertices_1[2], vertices_1[0]})))
         return 4;
 
       // face_orientation=false, face_rotation=true, face_flip=true
-      if (i == std::array<T, 4>{{j[1], j[0], j[3], j[2]}})
+      if (std::equal(
+            vertices_0.begin(),
+            vertices_0.end(),
+            std::begin(
+              {vertices_1[1], vertices_1[0], vertices_1[3], vertices_1[2]})))
         return 6;
     }
 
   Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
-
-  return -1;
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -2639,17 +2754,41 @@ ReferenceCell::permute_according_orientation(
                     "greater than the number of vertices of the cell "
                     "referenced by this object."));
 
-  std::array<T, 4> temp;
+  // Call the non-deprecated function, taking care of calling it only with
+  // those array elements that we actually care about (see the note
+  // in the documentation about the arguments potentially being
+  // larger arrays than necessary).
+  const auto permutation = reorient_based_on_orientation_index(
+    make_array_view(vertices.begin(), vertices.begin() + n_vertices()),
+    orientation);
+
+  std::array<T, N> temp;
+  std::copy(permutation.begin(), permutation.end(), temp.begin());
+
+  return temp;
+}
+
+
+
+template <typename T>
+boost::container::small_vector<T, 8>
+ReferenceCell::reorient_based_on_orientation_index(
+  const ArrayView<const T> &vertices,
+  const unsigned int        orientation) const
+{
+  Assert(vertices.size() == n_vertices(),
+         ExcMessage("The number of array elements must be equal to "
+                    "the number of vertices of the cell "
+                    "referenced by this object."));
+
   if (*this == ReferenceCells::Line)
     {
       switch (orientation)
         {
           case 1:
-            temp = {{vertices[0], vertices[1]}};
-            break;
+            return {vertices[0], vertices[1]};
           case 0:
-            temp = {{vertices[1], vertices[0]}};
-            break;
+            return {vertices[1], vertices[0]};
           default:
             Assert(false, ExcNotImplemented());
         }
@@ -2659,23 +2798,17 @@ ReferenceCell::permute_according_orientation(
       switch (orientation)
         {
           case 1:
-            temp = {{vertices[0], vertices[1], vertices[2]}};
-            break;
+            return {vertices[0], vertices[1], vertices[2]};
           case 3:
-            temp = {{vertices[1], vertices[2], vertices[0]}};
-            break;
+            return {vertices[1], vertices[2], vertices[0]};
           case 5:
-            temp = {{vertices[2], vertices[0], vertices[1]}};
-            break;
+            return {vertices[2], vertices[0], vertices[1]};
           case 0:
-            temp = {{vertices[0], vertices[2], vertices[1]}};
-            break;
+            return {vertices[0], vertices[2], vertices[1]};
           case 2:
-            temp = {{vertices[2], vertices[1], vertices[0]}};
-            break;
+            return {vertices[2], vertices[1], vertices[0]};
           case 4:
-            temp = {{vertices[1], vertices[0], vertices[2]}};
-            break;
+            return {vertices[1], vertices[0], vertices[2]};
           default:
             Assert(false, ExcNotImplemented());
         }
@@ -2685,29 +2818,21 @@ ReferenceCell::permute_according_orientation(
       switch (orientation)
         {
           case 1:
-            temp = {{vertices[0], vertices[1], vertices[2], vertices[3]}};
-            break;
+            return {vertices[0], vertices[1], vertices[2], vertices[3]};
           case 3:
-            temp = {{vertices[2], vertices[0], vertices[3], vertices[1]}};
-            break;
+            return {vertices[2], vertices[0], vertices[3], vertices[1]};
           case 5:
-            temp = {{vertices[3], vertices[2], vertices[1], vertices[0]}};
-            break;
+            return {vertices[3], vertices[2], vertices[1], vertices[0]};
           case 7:
-            temp = {{vertices[1], vertices[3], vertices[0], vertices[2]}};
-            break;
+            return {vertices[1], vertices[3], vertices[0], vertices[2]};
           case 0:
-            temp = {{vertices[0], vertices[2], vertices[1], vertices[3]}};
-            break;
+            return {vertices[0], vertices[2], vertices[1], vertices[3]};
           case 2:
-            temp = {{vertices[2], vertices[3], vertices[0], vertices[1]}};
-            break;
+            return {vertices[2], vertices[3], vertices[0], vertices[1]};
           case 4:
-            temp = {{vertices[3], vertices[1], vertices[2], vertices[0]}};
-            break;
+            return {vertices[3], vertices[1], vertices[2], vertices[0]};
           case 6:
-            temp = {{vertices[1], vertices[0], vertices[3], vertices[2]}};
-            break;
+            return {vertices[1], vertices[0], vertices[3], vertices[2]};
           default:
             Assert(false, ExcNotImplemented());
         }
@@ -2717,10 +2842,7 @@ ReferenceCell::permute_according_orientation(
       AssertThrow(false, ExcNotImplemented());
     }
 
-  std::array<T, N> temp_;
-  std::copy_n(temp.begin(), N, temp_.begin());
-
-  return temp_;
+  return {};
 }
 
 
