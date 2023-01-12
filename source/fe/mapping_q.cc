@@ -1680,10 +1680,10 @@ MappingQ<dim, spacedim>::add_line_support_points(
                cell->get_manifold() :
                line->get_manifold());
 
+          const auto reference_cell = ReferenceCells::get_hypercube<dim>();
           const std::array<Point<spacedim>, 2> vertices{
-            {cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 0)),
-             cell->vertex(
-               GeometryInfo<dim>::line_to_cell_vertices(line_no, 1))}};
+            {cell->vertex(reference_cell.line_to_cell_vertices(line_no, 0)),
+             cell->vertex(reference_cell.line_to_cell_vertices(line_no, 1))}};
 
           const std::size_t n_rows =
             support_point_weights_perimeter_to_interior[0].size(0);
