@@ -1,0 +1,22 @@
+
+DEAL:1D::ReferenceCell: Line
+DEAL:1D::  self-reported volume = 1.00000
+DEAL:1D::  computed approximate volume = 1.00076
+DEAL:2D::ReferenceCell: Quad
+DEAL:2D::  self-reported volume = 1.00000
+DEAL:2D::  computed approximate volume = 1.00358
+DEAL:2D::ReferenceCell: Tri
+DEAL:2D::  self-reported volume = 0.500000
+DEAL:2D::  computed approximate volume = 0.497740
+DEAL:3D::ReferenceCell: Tet
+DEAL:3D::  self-reported volume = 0.166667
+DEAL:3D::  computed approximate volume = 0.169240
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::  self-reported volume = 1.33333
+DEAL:3D::  computed approximate volume = 1.34152
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::  self-reported volume = 0.500000
+DEAL:3D::  computed approximate volume = 0.499080
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  self-reported volume = 1.00000
+DEAL:3D::  computed approximate volume = 1.00820
