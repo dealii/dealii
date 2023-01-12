@@ -32,12 +32,16 @@ namespace PETScWrappers
       return *this;
     }
 
+
+
     BlockSparseMatrix::~BlockSparseMatrix()
     {
       PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
       (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
+
+
 
 #  ifndef DOXYGEN
     void
@@ -64,6 +68,8 @@ namespace PETScWrappers
           }
     }
 #  endif
+
+
 
     void
     BlockSparseMatrix::reinit(const std::vector<IndexSet> &      rows,
@@ -138,6 +144,8 @@ namespace PETScWrappers
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
+
+
     std::vector<IndexSet>
     BlockSparseMatrix::locally_owned_domain_indices() const
     {
@@ -148,6 +156,8 @@ namespace PETScWrappers
 
       return index_sets;
     }
+
+
 
     std::vector<IndexSet>
     BlockSparseMatrix::locally_owned_range_indices() const
@@ -160,6 +170,8 @@ namespace PETScWrappers
       return index_sets;
     }
 
+
+
     std::uint64_t
     BlockSparseMatrix::n_nonzero_elements() const
     {
@@ -171,6 +183,8 @@ namespace PETScWrappers
       return n_nonzero;
     }
 
+
+
     const MPI_Comm &
     BlockSparseMatrix::get_mpi_communicator() const
     {
@@ -181,6 +195,8 @@ namespace PETScWrappers
     {
       return petsc_nest_matrix;
     }
+
+
 
     Mat &
     BlockSparseMatrix::petsc_matrix()

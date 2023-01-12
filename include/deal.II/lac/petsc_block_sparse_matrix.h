@@ -285,11 +285,22 @@ namespace PETScWrappers
        * Return a reference to the underlying PETSc type. It can be used to
        * modify the underlying data, so use it only when you know what you
        * are doing.
+       *
+       * The PETSc Mat object returned here describes the *entire* matrix,
+       * not just one of its blocks. Internally, this is done by creating
+       * a "nested" matrix using Petsc's MatCreateNest object whose individual
+       * blocks are the blocks of this matrix.
        */
       Mat &
       petsc_matrix();
 
     private:
+      /**
+       * A PETSc Mat object that describes the entire block matrix.
+       * Internally, this is done by creating
+       * a "nested" matrix using Petsc's MatCreateNest object whose individual
+       * blocks are the blocks of this matrix.
+       */
       Mat petsc_nest_matrix = nullptr;
     };
 
