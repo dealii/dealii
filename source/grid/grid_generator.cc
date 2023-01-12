@@ -1805,21 +1805,23 @@ namespace GridGenerator
 
     unsigned int offset = 0;
 
-    // This Triangulation is constructed using the UCD numbering scheme since,
-    // in that numbering, the front face is first and the back face is second,
-    // which is more convenient for creating a moebius
+    // This Triangulation is constructed using a numbering scheme in which
+    // the front face is first and the back face is second,
+    // which is more convenient for creating a Moebius loop
+    static constexpr std::array<unsigned int, 8> local_vertex_numbering{
+      {0, 1, 5, 4, 2, 3, 7, 6}};
     std::vector<CellData<dim>> cells(n_cells);
     for (unsigned int i = 0; i < n_cells; ++i)
       {
         for (unsigned int j = 0; j < 2; ++j)
           {
-            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[0 + 4 * j]] =
+            cells[i].vertices[local_vertex_numbering[0 + 4 * j]] =
               offset + 0 + 4 * j;
-            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[1 + 4 * j]] =
+            cells[i].vertices[local_vertex_numbering[1 + 4 * j]] =
               offset + 3 + 4 * j;
-            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[2 + 4 * j]] =
+            cells[i].vertices[local_vertex_numbering[2 + 4 * j]] =
               offset + 2 + 4 * j;
-            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[3 + 4 * j]] =
+            cells[i].vertices[local_vertex_numbering[3 + 4 * j]] =
               offset + 1 + 4 * j;
           }
         offset += 4;
@@ -1827,13 +1829,13 @@ namespace GridGenerator
       }
 
     // now correct the last four vertices
-    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[4]] =
+    cells[n_cells - 1].vertices[local_vertex_numbering[4]] =
       (0 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[5]] =
+    cells[n_cells - 1].vertices[local_vertex_numbering[5]] =
       (3 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[6]] =
+    cells[n_cells - 1].vertices[local_vertex_numbering[6]] =
       (2 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[7]] =
+    cells[n_cells - 1].vertices[local_vertex_numbering[7]] =
       (1 + n_rotations) % 4;
 
     GridTools::invert_all_negative_measure_cells(vertices, cells);
