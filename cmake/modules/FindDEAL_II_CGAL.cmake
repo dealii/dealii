@@ -36,7 +36,7 @@ endif()
 # call to find_package(CGAL) will fail. Guard the call to FIND_PACKAGE to
 # fail gracefully:
 #
-if(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
+if(DEAL_II_HAVE_CXX17 AND NOT DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
   set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON)
   find_package(CGAL QUIET)
 

@@ -3012,6 +3012,14 @@ namespace GridTools
           }
         else
           {
+            // For some clang-based compilers and boost versions the call to
+            // RTree::query doesn't compile. Since using an rtree here is just a
+            // performance improvement disabling this branch is OK.
+            // This is fixed in boost in
+            // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
+#if defined(DEAL_II_WITH_BOOST_BUNDLED) ||                \
+  !(defined(__clang_major__) && __clang_major__ >= 16) || \
+  BOOST_VERSION >= 108100
             if (!used_vertices_rtree.empty())
               {
                 // If we have an rtree at our disposal, use it.
@@ -3040,6 +3048,7 @@ namespace GridTools
                     closest_vertex_index = res[0].second;
               }
             else
+#endif
               {
                 closest_vertex_index = GridTools::find_closest_vertex(
                   mapping, mesh, p, marked_vertices);

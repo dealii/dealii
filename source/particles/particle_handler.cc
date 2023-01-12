@@ -1372,7 +1372,7 @@ namespace Particles
                     });
 
           // Search all of the cells adjacent to the closest vertex of the
-          // previous cell Most likely we will find the particle in them.
+          // previous cell. Most likely we will find the particle in them.
           for (unsigned int i = 0; i < n_neighbor_cells; ++i)
             {
               typename std::set<typename Triangulation<dim, spacedim>::
@@ -1395,6 +1395,14 @@ namespace Particles
 
           if (!found_cell)
             {
+              // For some clang-based compilers and boost versions the call to
+              // RTree::query doesn't compile. We use a slower implementation as
+              // workaround.
+              // This is fixed in boost in
+              // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
+#if defined(DEAL_II_WITH_BOOST_BUNDLED) ||                \
+  !(defined(__clang_major__) && __clang_major__ >= 16) || \
+  BOOST_VERSION >= 108100
               // The particle is not in a neighbor of the old cell.
               // Look for the new cell in the whole local domain.
               // This case is rare.
@@ -1409,6 +1417,12 @@ namespace Particles
               AssertDimension(closest_vertex_in_domain.size(), 1);
               const unsigned int closest_vertex_index_in_domain =
                 closest_vertex_in_domain[0].second;
+#else
+              const unsigned int closest_vertex_index_in_domain =
+                GridTools::find_closest_vertex(*mapping,
+                                               *triangulation,
+                                               out_particle->get_location());
+#endif
 
               // Search all of the cells adjacent to the closest vertex of the
               // domain. Most likely we will find the particle in them.

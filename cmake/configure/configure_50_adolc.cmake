@@ -32,7 +32,7 @@ macro(feature_adolc_find_external var)
     # If Adolc is configured to use the Boost allocator (of an external
     # boost library) we must not use a bundled Boost library for deal.II.
     #
-    if(ADOLC_WITH_BOOST_ALLOCATOR AND FEATURE_BOOST_BUNDLED_CONFIGURED)
+    if(ADOLC_WITH_BOOST_ALLOCATOR AND DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
       message(STATUS
         "Could not find a sufficient ADOL-C installation: "
         "ADOL-C links against external Boost but deal.II was configured "
