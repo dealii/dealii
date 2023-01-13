@@ -5811,23 +5811,17 @@ namespace DataOutBase
       const std::vector<Point<spacedim>> node_positions =
         get_node_positions(patches);
 
-      // note that according to the standard, we have to print d=1..3
-      // dimensions, even if we are in reality in 2d, for example
+      // VTK/VTU always wants to see three coordinates, even if we are
+      // in 1d or 2d. So pad node positions with zeros as appropriate.
       std::vector<float> node_coordinates_3d;
       node_coordinates_3d.reserve(node_positions.size() * 3);
       for (const auto &node_position : node_positions)
         {
-          node_coordinates_3d.emplace_back(node_position[0]);
-
-          if (spacedim >= 2)
-            node_coordinates_3d.emplace_back(node_position[1]);
-          else
-            node_coordinates_3d.emplace_back(0.0f);
-
-          if (spacedim >= 3)
-            node_coordinates_3d.emplace_back(node_position[2]);
-          else
-            node_coordinates_3d.emplace_back(0.0f);
+          for (unsigned int d = 0; d < 3; ++d)
+            if (d < spacedim)
+              node_coordinates_3d.emplace_back(node_position[d]);
+            else
+              node_coordinates_3d.emplace_back(0.0f);
         }
       o << vtu_stringize_array(node_coordinates_3d,
                                flags.compression_level,
