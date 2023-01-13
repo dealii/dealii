@@ -47,6 +47,12 @@ else()
       string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
       string(REPLACE ";" " " KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
 
+      # Kokkos links transitively with OpenMP so that we need to find OpenMP again.
+      # Since we are not using target_link_libraries, we have to extract the compile flag manually.
+      if(Kokkos_VERSION VERSION_GREATER_EQUAL 4.0.00 AND Kokkos_ENABLE_OPENMP)
+        string(APPEND KOKKOS_COMPILE_FLAGS " ${OpenMP_CXX_FLAGS}")
+      endif()
+
       # We need to disable SIMD vectorization for CUDA device code.
       # Otherwise, nvcc compilers from version 9 on will emit an error message like:
       # "[...] contains a vector, which is not supported in device code". We
