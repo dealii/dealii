@@ -1,0 +1,67 @@
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="6" NumberOfCells="1" >
+  <Points>
+    <DataArray type="Float32" NumberOfComponents="3" format="ascii">
+0 0 0 1 0 0 0 1 0 0.5 0 0 0.5 0.5 0 0 0.5 0 
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="ascii">
+	0	1	2	3	4	5
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="ascii">
+6 
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="ascii">
+22 
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float32" Name="solution" format="ascii">
+0 1 1 0.25 0.5 0.25 
+    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="10" NumberOfCells="1" >
+  <Points>
+    <DataArray type="Float32" NumberOfComponents="3" format="ascii">
+0 0 0 1 0 0 0 1 0 0 0 1 0.5 0 0 0.5 0.5 0 0 0.5 0 0 0 0.5 0.5 0 0.5 0 0.5 0.5 
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="ascii">
+	0	1	2	3	4	5	6	7	8	9
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="ascii">
+10 
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="ascii">
+24 
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float32" Name="solution" format="ascii">
+0 1 1 1 0.25 0.5 0.25 0.25 0.5 0.5 
+    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
