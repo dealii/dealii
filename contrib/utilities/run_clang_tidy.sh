@@ -43,7 +43,7 @@ echo "SRC-DIR=$SRC"
 
 # enable MPI (to get MPI warnings)
 # export compile commands (so that run-clang-tidy.py works)
-ARGS=("-D" "DEAL_II_WITH_MPI=ON" "-D" "CMAKE_EXPORT_COMPILE_COMMANDS=ON" "-D" "CMAKE_BUILD_TYPE=Debug" "$@")
+ARGS=("-D" "DEAL_II_WITH_MPI=ON" "-D" "CMAKE_BUILD_TYPE=Debug" "$@")
 
 # for a list of checks, see /.clang-tidy
 cat "$SRC/.clang-tidy"
@@ -53,7 +53,7 @@ if ! [ -x "$(command -v run-clang-tidy.py)" ] || ! [ -x "$(command -v clang++)" 
     exit 2
 fi
 
-CC=clang CXX=clang++ cmake "${ARGS[@]}" "$SRC" || (echo "cmake failed!"; false) || exit 2
+cmake "${ARGS[@]}" "$SRC" || (echo "cmake failed!"; false) || exit 2
 
 cmake --build . --target expand_all_instantiations || (echo "make expand_all_instantiations failed!"; false) || exit 3
 
@@ -64,7 +64,10 @@ cmake --build . --target expand_all_instantiations || (echo "make expand_all_ins
 #
 # pipe away stderr (just contains nonsensical "x warnings generated")
 # pipe output to output.txt
-run-clang-tidy.py -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
+run-clang-tidy.py  \
+  -extra-arg-before='-I/usr/include/x86_64-linux-gnu/mpich' \
+  -extra-arg='-DCLANG_TIDY' \
+  -p . -quiet -header-filter "$SRC/include/*" 2>error.txt >output.txt
 
 # grep interesting errors and make sure we remove duplicates:
 grep -E '(warning|error): ' output.txt | sort | uniq >clang-tidy.log
