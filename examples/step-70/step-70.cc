@@ -1721,7 +1721,7 @@ namespace Step70
                                    mpi_communicator);
 
     static std::vector<std::pair<double, std::string>> times_and_names;
-    times_and_names.push_back(std::make_pair(time, filename));
+    times_and_names.emplace_back(time, filename);
     std::ofstream ofile(par.output_directory + "/" + "solution.pvd");
     DataOutBase::write_pvd_record(ofile, times_and_names);
   }
@@ -1939,7 +1939,7 @@ int main(int argc, char *argv[])
           StokesImmersedProblem<2, 3> problem(par);
           problem.run();
         }
-      else if (prm_file.find("3") != std::string::npos)
+      else if (prm_file.find('3') != std::string::npos)
         {
           StokesImmersedProblemParameters<3> par;
           ParameterAcceptor::initialize(prm_file);

@@ -1083,7 +1083,7 @@ namespace PETScWrappers
     else
       {
         set_option_value("-pc_bddc_corner_selection", "false");
-        ierr = PCSetCoordinates(pc, 0, 0, NULL);
+        ierr = PCSetCoordinates(pc, 0, 0, nullptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 

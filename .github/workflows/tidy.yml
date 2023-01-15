@@ -1,0 +1,37 @@
+name: tidy
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
+jobs:
+  tidy:
+    name: tidy
+    runs-on: [ubuntu-22.04]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: modules
+      run: |
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:ginggs/deal.ii-9.4.0-backports
+        sudo apt-get update
+        sudo apt-get install -yq --no-install-recommends \
+            clang-12 \
+            clang-tidy-12 \
+            numdiff \
+            libboost-all-dev \
+            libcgal-dev \
+            libp4est-dev \
+            trilinos-all-dev \
+            petsc-dev \
+            libmetis-dev \
+            libhdf5-mpi-dev
+    - name: tidy
+      run: |
+        mkdir build
+        cd build
+        export PATH=/usr/lib/llvm-12/share/clang/:$PATH
+        ../contrib/utilities/run_clang_tidy.sh ..

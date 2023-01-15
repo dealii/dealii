@@ -55,7 +55,7 @@ public:
    * Constructor. Does nothing, so you have to call @p decompose sometimes
    * afterwards.
    */
-  SparseMIC();
+  SparseMIC() = default;
 
   /**
    * Destructor.

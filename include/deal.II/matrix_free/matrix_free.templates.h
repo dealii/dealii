@@ -516,6 +516,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       task_info.create_blocks_serial(
         dummy, 1, false, dummy, false, dummy, dummy, dummy2);
 
+      // NOLINTNEXTLINE(modernize-loop-convert)
       for (unsigned int i = 0; i < dof_info.size(); ++i)
         {
           Assert(dof_handler[i]->get_fe_collection().size() == 1,

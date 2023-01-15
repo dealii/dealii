@@ -137,6 +137,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
   // We will send all locally active dofs that are not locally owned for
   // checking. Note that we allow constraints to differ on locally_relevant (and
   // not active) DoFs.
+  // NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
   IndexSet non_owned = locally_active_dofs;
   non_owned.subtract_set(locally_owned_dofs[myid]);
   for (unsigned int owner = 0; owner < nproc; ++owner)

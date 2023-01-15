@@ -136,9 +136,9 @@ namespace PETScWrappers
           psub_objects[r * n + c] = this->sub_objects[r][c]->petsc_matrix();
       ierr = MatCreateNest(get_mpi_communicator(),
                            m,
-                           NULL,
+                           nullptr,
                            n,
-                           NULL,
+                           nullptr,
                            psub_objects.data(),
                            &petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));

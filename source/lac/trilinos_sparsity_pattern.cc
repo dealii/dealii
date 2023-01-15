@@ -117,7 +117,7 @@ namespace TrilinosWrappers
 
 
   SparsityPattern::SparsityPattern(SparsityPattern &&other) noexcept
-    : SparsityPatternBase(other)
+    : SparsityPatternBase(std::move(other))
     , column_space_map(std::move(other.column_space_map))
     , graph(std::move(other.graph))
     , nonlocal_graph(std::move(other.nonlocal_graph))
