@@ -1205,6 +1205,10 @@ namespace Utilities
        * Requests to MPI_Wait before finalizing
        */
       static std::set<MPI_Request *> requests;
+
+#ifdef DEAL_II_WITH_PETSC
+      bool finalize_petscslepc;
+#endif
     };
 
     /**
