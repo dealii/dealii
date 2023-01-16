@@ -531,6 +531,7 @@
  *       <td> Solving a Poisson problem discretized with an interior penalty DG
  *       method and a multilevel preconditioner in a matrix-free fashion using
  *       a massively parallel implementation.
+ *       <br/> Keywords: FEFaceEvaluation, FE_DGQHermite
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -566,6 +567,7 @@
  *       <td>step-64</td>
  *       <td> Solving a Helmholtz problem using matrix-free methods on the GPU
  *       with MPI parallelization.
+ *       <br/> Keywords: LinearAlgebra::CUDAWrappers, CUDAWrappers::MatrixFree
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -678,6 +680,7 @@
  *   <tr valign="top">
  *       <td>step-85</td>
  *       <td> Solving the Poisson equation using the cut finite element method.
+ *       <br/> Keywords: FEInterfaceValues, NonMatching, FEImmersedSurfaceValues
  *       </td></tr>
  *
  * </table>
