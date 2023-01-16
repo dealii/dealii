@@ -103,7 +103,11 @@ namespace PETScWrappers
       BlockSparseMatrix() = default;
 
       /**
-       * Create a BlockSparseMatrix with a PETSc Mat
+       * Create a BlockSparseMatrix with a PETSc Mat that describes the entire
+       * block matrix.
+       * It infers the number of blocks from the Mat if it is of type MATNEST,
+       * otherwise the block operator will only have a single block.
+       * Internally, we always store a MATNEST matrix.
        */
       explicit BlockSparseMatrix(const Mat &);
 
@@ -300,8 +304,8 @@ namespace PETScWrappers
        * are doing.
        *
        * The PETSc Mat object returned here describes the *entire* matrix,
-       * not just one of its blocks. Internally, this is done by creating
-       * a "nested" matrix using Petsc's MatCreateNest object whose individual
+       * not just one of its blocks. Internally, this is done using
+       * a "nested" matrix using PETSc's MATNEST object whose individual
        * blocks are the blocks of this matrix.
        */
       Mat &
@@ -311,7 +315,7 @@ namespace PETScWrappers
       /**
        * A PETSc Mat object that describes the entire block matrix.
        * Internally, this is done by creating
-       * a "nested" matrix using Petsc's MatCreateNest object whose individual
+       * a "nested" matrix using PETSc's MATNEST object whose individual
        * blocks are the blocks of this matrix.
        */
       Mat petsc_nest_matrix = nullptr;

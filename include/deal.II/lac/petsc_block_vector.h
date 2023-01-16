@@ -132,9 +132,11 @@ namespace PETScWrappers
 
       /**
        * Create a BlockVector with a PETSc Vec
+       * It infers the number of blocks from the Vec if it is of type VECNEST,
+       * otherwise the block vector will only have a single block.
+       * Internally, we always store a VECNEST vector.
        */
       explicit BlockVector(Vec v);
-
 
       /**
        * Destructor. Clears memory
