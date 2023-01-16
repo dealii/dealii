@@ -1011,8 +1011,13 @@ namespace PETScWrappers
   void
   VectorBase::swap(VectorBase &v)
   {
-    const PetscErrorCode ierr = VecSwap(vector, v.vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    std::swap(this->vector, v.vector);
+    std::swap(this->ghosted, v.ghosted);
+    std::swap(this->last_action, v.last_action);
+    // missing swap for IndexSet
+    IndexSet t(this->ghost_indices);
+    this->ghost_indices = v.ghost_indices;
+    v.ghost_indices     = t;
   }
 
 
