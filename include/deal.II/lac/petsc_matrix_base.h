@@ -345,7 +345,7 @@ namespace PETScWrappers
     virtual ~MatrixBase() override;
 
     /**
-     * This method assignes the PETSc Mat to the instance of the class.
+     * This method assigns the PETSc Mat to the instance of the class.
      *
      */
     void
