@@ -266,7 +266,7 @@ namespace PETScWrappers
 
       /**
        * Return a reference to the MPI communicator object in use with this
-       * vector.
+       * object.
        */
       const MPI_Comm &
       get_mpi_communicator() const;
@@ -330,7 +330,19 @@ namespace PETScWrappers
       void
       setup_nest_vec();
 
+      /**
+       * A PETSc Vec object that describes the entire block vector.
+       * Internally, this is done by creating
+       * a "nested" vector using PETSc's VECNEST object whose individual
+       * blocks are the blocks of this vector.
+       */
       Vec petsc_nest_vector;
+
+      /**
+       * Internal placeholder to return reference to MPI_Comm in
+       * get_mpi_communicator()
+       */
+      mutable MPI_Comm returncomm;
     };
 
     /** @} */
@@ -519,12 +531,9 @@ namespace PETScWrappers
     inline const MPI_Comm &
     BlockVector::get_mpi_communicator() const
     {
-      static MPI_Comm comm = PETSC_COMM_SELF;
-      MPI_Comm        pcomm =
+      this->returncomm =
         PetscObjectComm(reinterpret_cast<PetscObject>(petsc_nest_vector));
-      if (pcomm != MPI_COMM_NULL)
-        comm = pcomm;
-      return comm;
+      return this->returncomm;
     }
 
     inline bool

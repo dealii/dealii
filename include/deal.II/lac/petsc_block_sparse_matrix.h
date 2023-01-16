@@ -278,7 +278,7 @@ namespace PETScWrappers
 
       /**
        * Return a reference to the MPI communicator object in use with this
-       * matrix.
+       * object.
        */
       const MPI_Comm &
       get_mpi_communicator() const;
@@ -319,6 +319,12 @@ namespace PETScWrappers
        * blocks are the blocks of this matrix.
        */
       Mat petsc_nest_matrix = nullptr;
+
+      /**
+       * Internal placeholder to return reference to MPI_Comm in
+       * get_mpi_communicator()
+       */
+      mutable MPI_Comm returncomm;
     };
 
 

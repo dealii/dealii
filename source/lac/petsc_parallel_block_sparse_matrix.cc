@@ -32,16 +32,12 @@ namespace PETScWrappers
       return *this;
     }
 
-
-
     BlockSparseMatrix::~BlockSparseMatrix()
     {
       PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
       (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
-
-
 
 #  ifndef DOXYGEN
     void
@@ -68,8 +64,6 @@ namespace PETScWrappers
           }
     }
 #  endif
-
-
 
     void
     BlockSparseMatrix::reinit(const std::vector<IndexSet> &      rows,
@@ -118,8 +112,6 @@ namespace PETScWrappers
       reinit(sizes, sizes, bdsp, com);
     }
 
-
-
     void
     BlockSparseMatrix::collect_sizes()
     {
@@ -134,17 +126,16 @@ namespace PETScWrappers
       for (unsigned int r = 0; r < m; r++)
         for (unsigned int c = 0; c < n; c++)
           psub_objects[r * n + c] = this->sub_objects[r][c]->petsc_matrix();
-      ierr = MatCreateNest(get_mpi_communicator(),
-                           m,
-                           nullptr,
-                           n,
-                           nullptr,
-                           psub_objects.data(),
-                           &petsc_nest_matrix);
+
+      MPI_Comm comm =
+        psub_objects.size() > 0 ?
+          PetscObjectComm(reinterpret_cast<PetscObject>(psub_objects[0])) :
+          PETSC_COMM_SELF;
+
+      ierr = MatCreateNest(
+        comm, m, nullptr, n, nullptr, psub_objects.data(), &petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
-
-
 
     std::vector<IndexSet>
     BlockSparseMatrix::locally_owned_domain_indices() const
@@ -157,8 +148,6 @@ namespace PETScWrappers
       return index_sets;
     }
 
-
-
     std::vector<IndexSet>
     BlockSparseMatrix::locally_owned_range_indices() const
     {
@@ -169,8 +158,6 @@ namespace PETScWrappers
 
       return index_sets;
     }
-
-
 
     std::uint64_t
     BlockSparseMatrix::n_nonzero_elements() const
@@ -183,25 +170,18 @@ namespace PETScWrappers
       return n_nonzero;
     }
 
-
-
     const MPI_Comm &
     BlockSparseMatrix::get_mpi_communicator() const
     {
-      static MPI_Comm comm = PETSC_COMM_SELF;
-      MPI_Comm        pcomm =
+      this->returncomm =
         PetscObjectComm(reinterpret_cast<PetscObject>(petsc_nest_matrix));
-      if (pcomm != MPI_COMM_NULL)
-        comm = pcomm;
-      return comm;
+      return this->returncomm;
     }
 
     BlockSparseMatrix::operator const Mat &() const
     {
       return petsc_nest_matrix;
     }
-
-
 
     Mat &
     BlockSparseMatrix::petsc_matrix()

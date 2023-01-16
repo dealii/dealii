@@ -680,7 +680,7 @@ namespace PETScWrappers
 
     /**
      * Return a reference to the MPI communicator object in use with this
-     * matrix.
+     * object.
      */
     const MPI_Comm &
     get_mpi_communicator() const;
@@ -1099,6 +1099,11 @@ namespace PETScWrappers
      */
     mutable std::vector<PetscScalar> column_values;
 
+    /**
+     * Internal placeholder to return reference to MPI_Comm in
+     * get_mpi_communicator()
+     */
+    mutable MPI_Comm returncomm;
 
     // To allow calling protected prepare_add() and prepare_set().
     template <class>
@@ -1650,11 +1655,8 @@ namespace PETScWrappers
   inline const MPI_Comm &
   MatrixBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm = PETSC_COMM_SELF;
-    MPI_Comm pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(matrix));
-    if (pcomm != MPI_COMM_NULL)
-      comm = pcomm;
-    return comm;
+    this->returncomm = PetscObjectComm(reinterpret_cast<PetscObject>(matrix));
+    return this->returncomm;
   }
 
 #  endif // DOXYGEN

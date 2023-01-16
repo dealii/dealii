@@ -856,6 +856,13 @@ namespace PETScWrappers
      */
     void
     determine_ghost_indices();
+
+  private:
+    /**
+     * Internal placeholder to return reference to MPI_Comm in
+     * get_mpi_communicator()
+     */
+    mutable MPI_Comm returncomm;
   };
 
 
@@ -1171,11 +1178,8 @@ namespace PETScWrappers
   inline const MPI_Comm &
   VectorBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm = PETSC_COMM_SELF;
-    MPI_Comm pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(vector));
-    if (pcomm != MPI_COMM_NULL)
-      comm = pcomm;
-    return comm;
+    this->returncomm = PetscObjectComm(reinterpret_cast<PetscObject>(vector));
+    return this->returncomm;
   }
 
   inline void

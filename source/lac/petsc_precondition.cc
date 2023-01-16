@@ -93,11 +93,8 @@ namespace PETScWrappers
   const MPI_Comm &
   PreconditionBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm  = PETSC_COMM_SELF;
-    MPI_Comm        pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(pc));
-    if (pcomm != MPI_COMM_NULL)
-      comm = pcomm;
-    return comm;
+    this->returncomm = PetscObjectComm(reinterpret_cast<PetscObject>(pc));
+    return this->returncomm;
   }
 
   void
