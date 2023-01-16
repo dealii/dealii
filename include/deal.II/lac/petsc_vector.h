@@ -169,6 +169,11 @@ namespace PETScWrappers
       Vector();
 
       /**
+       * Import VectorBase constructors, including from a PETSc Vec object.
+       */
+      using VectorBase::VectorBase;
+
+      /**
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
        *
