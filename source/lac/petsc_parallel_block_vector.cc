@@ -123,7 +123,7 @@ namespace PETScWrappers
           PETSC_COMM_SELF;
 
       ierr =
-        VecCreateNest(comm, n, NULL, pcomponents.data(), &petsc_nest_vector);
+        VecCreateNest(comm, n, nullptr, pcomponents.data(), &petsc_nest_vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
   } // namespace MPI
