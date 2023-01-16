@@ -779,7 +779,7 @@ namespace PETScWrappers
         ierr = KSPSetConvergenceTest(solver_data->ksp,
                                      &convergence_test,
                                      reinterpret_cast<void *>(&solver_control),
-                                     PETSC_NULL);
+                                     nullptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /*

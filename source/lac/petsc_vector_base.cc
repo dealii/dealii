@@ -50,7 +50,7 @@ namespace PETScWrappers
             VecGetOwnershipRange(vector.vector, &begin, &end);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-          Vec locally_stored_elements = PETSC_NULL;
+          Vec locally_stored_elements = nullptr;
           ierr = VecGhostGetLocalForm(vector.vector, &locally_stored_elements);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -201,7 +201,7 @@ namespace PETScWrappers
 
     if (has_ghost_elements())
       {
-        Vec ghost = PETSC_NULL;
+        Vec ghost = nullptr;
         ierr      = VecGhostGetLocalForm(vector, &ghost);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
