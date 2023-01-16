@@ -149,11 +149,11 @@ namespace PETScWrappers
     , ghosted(false)
     , last_action(::dealii::VectorOperation::unknown)
   {
-    /* TODO GHOSTED */
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(vector));
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
     (void)ierr;
+    this->determine_ghost_indices();
   }
 
 
@@ -170,7 +170,6 @@ namespace PETScWrappers
   void
   VectorBase::reinit(Vec v)
   {
-    /* TODO GHOSTED */
     AssertThrow(last_action == ::dealii::VectorOperation::unknown,
                 ExcMessage("Cannot assign a new Vec"));
     PetscErrorCode ierr =
@@ -179,7 +178,74 @@ namespace PETScWrappers
     ierr = VecDestroy(&vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     vector = v;
+    this->determine_ghost_indices();
   }
+
+  void
+  VectorBase::determine_ghost_indices()
+  {
+    // Reset ghost data
+    ghosted = false;
+    ghost_indices.clear();
+
+    // There's no API to infer ghost indices from a PETSc Vec
+    PetscErrorCode ierr;
+    Vec            ghosted_vec;
+    ierr = VecGhostGetLocalForm(vector, &ghosted_vec);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    if (ghosted_vec && ghosted_vec != vector)
+      {
+        Vec          tvector;
+        PetscScalar *array;
+        PetscInt     st, en, N, ln;
+
+        ierr = VecGhostRestoreLocalForm(vector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecGetSize(vector, &N);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetOwnershipRange(vector, &st, &en);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecDuplicate(vector, &tvector);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetArray(tvector, &array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        for (PetscInt i = 0; i < en - st; i++)
+          array[i] = st + i;
+        ierr = VecRestoreArray(tvector, &array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostUpdateBegin(tvector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostUpdateEnd(tvector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostGetLocalForm(tvector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetLocalSize(ghosted_vec, &ln);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetArrayRead(ghosted_vec, (const PetscScalar **)&array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        // Populate ghosted and ghost_indices
+        ghosted = true;
+        ghost_indices.set_size(N);
+        for (PetscInt i = en - st; i < ln; i++)
+          ghost_indices.add_index(static_cast<IndexSet::size_type>(array[i]));
+        ghost_indices.compress();
+
+        ierr = VecRestoreArrayRead(ghosted_vec, (const PetscScalar **)&array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostRestoreLocalForm(tvector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecDestroy(&tvector);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+    else
+      {
+        ierr = VecGhostRestoreLocalForm(vector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+  }
+
 
   void
   VectorBase::clear()
@@ -444,6 +510,9 @@ namespace PETScWrappers
     // indicate that we're back to a
     // pristine state
     last_action = ::dealii::VectorOperation::unknown;
+
+    // update ghost values if needed
+    update_ghost_values();
   }
 
 
@@ -705,11 +774,13 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator*=(const PetscScalar a)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
 
     const PetscErrorCode ierr = VecScale(vector, a);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
 
     return *this;
   }
@@ -719,7 +790,6 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator/=(const PetscScalar a)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
 
     const PetscScalar factor = 1. / a;
@@ -727,6 +797,9 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = VecScale(vector, factor);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
 
     return *this;
   }
@@ -736,9 +809,11 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator+=(const VectorBase &v)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecAXPY(vector, 1, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
 
     return *this;
   }
@@ -748,10 +823,11 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator-=(const VectorBase &v)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecAXPY(vector, -1, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
+    // update ghost values if needed
+    update_ghost_values();
     return *this;
   }
 
@@ -760,11 +836,13 @@ namespace PETScWrappers
   void
   VectorBase::add(const PetscScalar s)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
 
     const PetscErrorCode ierr = VecShift(vector, s);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
   }
 
 
@@ -772,11 +850,13 @@ namespace PETScWrappers
   void
   VectorBase::add(const PetscScalar a, const VectorBase &v)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
 
     const PetscErrorCode ierr = VecAXPY(vector, a, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
   }
 
 
@@ -787,7 +867,6 @@ namespace PETScWrappers
                   const PetscScalar b,
                   const VectorBase &w)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
     AssertIsFinite(b);
 
@@ -796,6 +875,9 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = VecMAXPY(vector, 2, weights, addends);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
   }
 
 
@@ -803,11 +885,13 @@ namespace PETScWrappers
   void
   VectorBase::sadd(const PetscScalar s, const VectorBase &v)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
 
     const PetscErrorCode ierr = VecAYPX(vector, s, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
   }
 
 
@@ -817,12 +901,11 @@ namespace PETScWrappers
                    const PetscScalar a,
                    const VectorBase &v)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
     AssertIsFinite(a);
 
     // there is nothing like a AXPAY
-    // operation in Petsc, so do it in two
+    // operation in PETSc, so do it in two
     // steps
     *this *= s;
     add(a, v);
@@ -833,9 +916,11 @@ namespace PETScWrappers
   void
   VectorBase::scale(const VectorBase &factors)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecPointwiseMult(vector, factors, vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // update ghost values if needed
+    update_ghost_values();
   }
 
 
@@ -843,7 +928,6 @@ namespace PETScWrappers
   void
   VectorBase::equ(const PetscScalar a, const VectorBase &v)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(a);
 
     Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
@@ -979,7 +1063,7 @@ namespace PETScWrappers
     Assert((last_action == action) ||
              (last_action == ::dealii::VectorOperation::unknown),
            internal::VectorReference::ExcWrongMode(action, last_action));
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
+
     // VecSetValues complains if we
     // come with an empty
     // vector. however, it is not a

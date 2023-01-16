@@ -1140,9 +1140,8 @@
  * all other processors that have a copy of this value (the list of
  * such processors may be something which the current processor does not
  * know and has no way of finding out efficiently). Since you cannot
- * write into ghosted vectors, the only way to initialize such a vector
- * is by assignment from a non-ghosted vector. This implies having to
- * import those elements we locally want to store from other processors.
+ * write into ghosted elements, the only way to initialize those values
+ * is by importing them from other processors.
  *
  * The way ghosted vectors are actually stored is different between the
  * various implementations of parallel vectors. For PETSc (and the corresponding
