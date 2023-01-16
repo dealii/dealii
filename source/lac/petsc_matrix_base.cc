@@ -90,7 +90,7 @@ namespace PETScWrappers
   }
 
   void
-  MatrixBase::assign_petsc_matrix(Mat A)
+  MatrixBase::reinit(Mat A)
   {
     AssertThrow(last_action == ::dealii::VectorOperation::unknown,
                 ExcMessage("Cannot assign a new Mat."));

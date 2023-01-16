@@ -46,7 +46,7 @@ namespace PETScWrappers
     }
 
     void
-    BlockVector::assign_petsc_vector(Vec v)
+    BlockVector::reinit(Vec v)
     {
       PetscBool isnest;
 
@@ -81,7 +81,7 @@ namespace PETScWrappers
       this->components.resize(nb);
       for (unsigned int i = 0; i < nb; ++i)
         {
-          this->components[i].assign_petsc_vector(sv[i]);
+          this->components[i].reinit(sv[i]);
         }
 
       this->collect_sizes();

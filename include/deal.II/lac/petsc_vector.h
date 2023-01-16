@@ -289,6 +289,8 @@ namespace PETScWrappers
       Vector &
       operator=(const dealii::Vector<number> &v);
 
+      using VectorBase::reinit;
+
       /**
        * Change the dimension of the vector to @p N. It is unspecified how
        * resizing the vector affects the memory allocation of this object;

@@ -181,7 +181,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::assign_petsc_vector(Vec v)
+  VectorBase::reinit(Vec v)
   {
     /* TODO GHOSTED */
     AssertThrow(last_action == ::dealii::VectorOperation::unknown,
