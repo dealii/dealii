@@ -145,6 +145,8 @@ test()
   PETScWrappers::MPI::Vector v2(PETSC_COMM_WORLD, N * N, N * N);
   for (unsigned int i = 0; i < N * N; ++i)
     v1(i) = i;
+  v1.compress(VectorOperation::insert);
+
   matrix.vmult(v2, v1);
 
   deallog << v1 * v2 << std::endl;
