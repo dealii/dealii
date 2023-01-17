@@ -74,6 +74,8 @@ main(int argc, char *argv[])
           u[i] = 1;
         for (auto i : v.locally_owned_elements())
           v[i] = 1;
+        u.compress(VectorOperation::insert);
+        v.compress(VectorOperation::insert);
 
         op_a.vmult(v, u);
       }
