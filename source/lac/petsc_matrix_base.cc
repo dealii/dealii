@@ -93,7 +93,7 @@ namespace PETScWrappers
   MatrixBase::assign_petsc_matrix(Mat A)
   {
     AssertThrow(last_action == ::dealii::VectorOperation::unknown,
-                ExcMessage("Cannot assign a new Mat"));
+                ExcMessage("Cannot assign a new Mat."));
     PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(A));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
