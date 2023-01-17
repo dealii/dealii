@@ -68,7 +68,7 @@ namespace PETScWrappers
   {
     AssertThrow(pc != nullptr, StandardExceptions::ExcInvalidState());
 
-    const PetscErrorCode ierr = PCApply(pc, src, dst);
+    PetscErrorCode ierr = PCApply(pc, src, dst);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -77,7 +77,7 @@ namespace PETScWrappers
   {
     AssertThrow(pc != nullptr, StandardExceptions::ExcInvalidState());
 
-    const PetscErrorCode ierr = PCApplyTranspose(pc, src, dst);
+    PetscErrorCode ierr = PCApplyTranspose(pc, src, dst);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1115,13 +1115,14 @@ namespace PETScWrappers
     PetscErrorCode ierr = PCShellGetContext(ppc, &ctx);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
+    auto user = static_cast<PreconditionShell *>(ctx);
+    AssertThrow(user->vmult,
+                StandardExceptions::ExcFunctionNotProvided(
+                  "std::function vmult"));
+
     VectorBase src(x);
     VectorBase dst(y);
-    auto       user = static_cast<PreconditionShell *>(ctx);
-    if (user->apply)
-      user->apply(dst, src);
-    else
-      dst.sadd(0, src);
+    user->vmult(dst, src);
     PetscFunctionReturn(0);
   }
 
@@ -1134,15 +1135,14 @@ namespace PETScWrappers
     PetscErrorCode ierr = PCShellGetContext(ppc, &ctx);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    auto       user = static_cast<PreconditionShell *>(ctx);
+    auto user = static_cast<PreconditionShell *>(ctx);
+    AssertThrow(user->vmultT,
+                StandardExceptions::ExcFunctionNotProvided(
+                  "std::function vmultT"));
+
     VectorBase src(x);
     VectorBase dst(y);
-    if (user->applyT)
-      user->applyT(dst, src);
-    else if (user->apply)
-      user->apply(dst, src);
-    else
-      dst.sadd(0, src);
+    user->vmult(dst, src);
     PetscFunctionReturn(0);
   }
 

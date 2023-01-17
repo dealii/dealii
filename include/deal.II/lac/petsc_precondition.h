@@ -1099,18 +1099,15 @@ namespace PETScWrappers
      */
     PreconditionShell(const MPI_Comm &communicator);
 
-
     /**
-     * The callback for the application of the preconditioner. Defaults to
-     * a copy operation if not provided.
+     * The callback for the application of the preconditioner.
      */
-    std::function<int(VectorBase &dst, const VectorBase &src)> apply;
+    std::function<int(VectorBase &dst, const VectorBase &src)> vmult;
 
     /**
      * The callback for the application of the transposed preconditioner.
-     * Defaults to the non-transpose operation if not provided.
      */
-    std::function<int(VectorBase &dst, const VectorBase &src)> applyT;
+    std::function<int(VectorBase &dst, const VectorBase &src)> vmultT;
 
   protected:
     /**
