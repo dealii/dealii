@@ -5719,7 +5719,10 @@ namespace internal
                     const std::array<unsigned int, 12> line_indices =
                       TriaAccessorImplementation::Implementation::
                         get_line_indices_of_cell(*hex);
-                    for (unsigned int l = 0; l < hex->n_lines(); ++l)
+                    // avoid a compiler warning by fixing the max number of
+                    // loop iterations to 12
+                    const unsigned int n_lines = std::min(hex->n_lines(), 12u);
+                    for (unsigned int l = 0; l < n_lines; ++l)
                       {
                         raw_line_iterator line(&triangulation,
                                                0,
