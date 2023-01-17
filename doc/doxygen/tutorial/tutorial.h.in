@@ -680,7 +680,7 @@
  *   <tr valign="top">
  *       <td>step-85</td>
  *       <td> Solving the Poisson equation using the cut finite element method.
- *       <br/> Keywords: FEInterfaceValues, NonMatching, FEImmersedSurfaceValues
+ *       <br/> Keywords: FEInterfaceValues, NonMatching::FEImmersedSurfaceValues
  *       </td></tr>
  *
  * </table>
