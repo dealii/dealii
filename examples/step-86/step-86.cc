@@ -27,7 +27,7 @@
 // files. Compared to the step-15 and step-77 programs from which most
 // of what we do here is copied (including this comment), the only difference
 // is the include of the header files from which we import the needed PETSc
-// classes:
+// classes and the parallel partitioning tools:
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -61,7 +61,16 @@
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
 
-#include <fstream>
+// The following classes are used in parallel distributed computations and
+// have all already been introduced in step-40:
+#include <deal.II/grid/grid_tools.h>
+
+#include <deal.II/distributed/solution_transfer.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/grid_refinement.h>
+
+#include <deal.II/base/conditional_ostream.h>
+
 #include <iostream>
 
 
@@ -79,7 +88,8 @@ namespace Step86
   // @sect3{The <code>MinimalSurfaceProblem</code> class template}
 
   // The main class of this program is essentially a copy of the one
-  // in step-15 and step-77. This class does, however, split the computation of
+  // in step-15 and step-77. This class does, however, support parallel
+  // computation and split the computation of
   // the Jacobian (system) matrix (and its factorization using a direct solver)
   // and residual into separate functions for the reasons outlined in the
   // introduction.
@@ -103,7 +113,9 @@ namespace Step86
     void compute_residual(const VectorType &evaluation_point,
                           VectorType &      residual);
 
-    Triangulation<dim> triangulation;
+    MPI_Comm mpi_communicator;
+
+    parallel::distributed::Triangulation<dim> triangulation;
 
     DoFHandler<dim> dof_handler;
     FE_Q<dim>       fe;
@@ -114,9 +126,10 @@ namespace Step86
     PreconditionerType jacobian_matrix_factorization;
 
     VectorType current_solution;
-    VectorType work;
+    VectorType locally_relevant_solution;
 
-    TimerOutput computing_timer;
+    ConditionalOStream pcout;
+    TimerOutput        computing_timer;
   };
 
 
@@ -150,9 +163,16 @@ namespace Step86
   // The only difference is in using PETSc vectors and matrices.
   template <int dim>
   MinimalSurfaceProblem<dim>::MinimalSurfaceProblem()
-    : dof_handler(triangulation)
+    : mpi_communicator(MPI_COMM_WORLD)
+    , triangulation(mpi_communicator,
+                    typename Triangulation<dim>::MeshSmoothing(
+                      Triangulation<dim>::smoothing_on_refinement |
+                      Triangulation<dim>::smoothing_on_coarsening))
+    , dof_handler(triangulation)
     , fe(1)
-    , computing_timer(std::cout, TimerOutput::never, TimerOutput::wall_times)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , computing_timer(pcout, TimerOutput::never, TimerOutput::wall_times)
   {}
 
 
@@ -165,29 +185,40 @@ namespace Step86
     if (initial_step)
       {
         dof_handler.distribute_dofs(fe);
-        current_solution.reinit(MPI_COMM_SELF,
-                                dof_handler.n_dofs(),
-                                dof_handler.n_dofs());
-
-        hanging_node_constraints.clear();
-        DoFTools::make_hanging_node_constraints(dof_handler,
-                                                hanging_node_constraints);
-        hanging_node_constraints.close();
       }
 
-    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+    IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
+
+    hanging_node_constraints.clear();
+    hanging_node_constraints.reinit(locally_relevant_dofs);
+    DoFTools::make_hanging_node_constraints(dof_handler,
+                                            hanging_node_constraints);
+    hanging_node_constraints.close();
+
+
+    DynamicSparsityPattern dsp(locally_relevant_dofs);
     DoFTools::make_sparsity_pattern(dof_handler, dsp);
 
     hanging_node_constraints.condense(dsp);
 
-    const std::vector<IndexSet> locally_owned_dofs_per_proc =
-      DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
-    const IndexSet locally_owned_dofs = locally_owned_dofs_per_proc[0];
+    SparsityTools::distribute_sparsity_pattern(dsp,
+                                               locally_owned_dofs,
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
+
+    if (initial_step)
+      current_solution.reinit(locally_owned_dofs, mpi_communicator);
 
     jacobian_matrix.reinit(locally_owned_dofs,
                            locally_owned_dofs,
                            dsp,
-                           MPI_COMM_SELF);
+                           mpi_communicator);
+
+    locally_relevant_solution.reinit(locally_owned_dofs,
+                                     locally_relevant_dofs,
+                                     mpi_communicator);
   }
 
 
@@ -211,20 +242,22 @@ namespace Step86
     jacobian_matrix_factorization.initialize(jacobian_matrix);
   }
 
+  // The following function is the same as in step-77, except that it
+  // supports parallel computations and we use PETSc vectors for input.
   template <int dim>
   void MinimalSurfaceProblem<dim>::compute_jacobian(
     const VectorType &evaluation_point)
   {
     TimerOutput::Scope t(computing_timer, "assembling the Jacobian");
 
-    std::cout << "  Computing Jacobian matrix" << std::endl;
+    pcout << "  Computing Jacobian matrix" << std::endl;
     const QGauss<dim> quadrature_formula(fe.degree + 1);
 
     // Enforce boundary values
     // This should not be needed during our Newton solve but we do it
     // anyway to mirror what is done in the compute_residual function
-    work = evaluation_point;
-    set_boundary_values(work);
+    locally_relevant_solution = evaluation_point;
+    set_boundary_values(locally_relevant_solution);
 
     jacobian_matrix = 0;
 
@@ -248,11 +281,16 @@ namespace Step86
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
+        // skip unowned cells
+        if (!cell->is_locally_owned())
+          continue;
+
         cell_matrix = 0;
 
         fe_values.reinit(cell);
 
-        fe_values.get_function_gradients(work, evaluation_point_gradients);
+        fe_values.get_function_gradients(locally_relevant_solution,
+                                         evaluation_point_gradients);
 
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
@@ -284,10 +322,11 @@ namespace Step86
                                              0,
                                              Functions::ZeroFunction<dim>(),
                                              boundary_values);
-    MatrixTools::apply_boundary_values(boundary_values,
-                                       jacobian_matrix,
-                                       work, // dummy vectors
-                                       work);
+    MatrixTools::apply_boundary_values(
+      boundary_values,
+      jacobian_matrix,
+      locally_relevant_solution, // used ad dummy vector
+      locally_relevant_solution);
   }
 
 
@@ -302,7 +341,7 @@ namespace Step86
   {
     TimerOutput::Scope t(computing_timer, "assembling the residual");
 
-    std::cout << "  Computing residual vector " << std::endl;
+    pcout << "  Computing residual vector " << std::endl;
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
@@ -318,19 +357,23 @@ namespace Step86
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // This should not be needed during our Newton solve but we do it
-    // anyway, since this can be called when testing the Jacobian
-    // exactness
-    work = evaluation_point;
-    set_boundary_values(work);
+    // anyway, since this can be called when testing for the Jacobian
+    locally_relevant_solution = evaluation_point;
+    set_boundary_values(locally_relevant_solution);
 
     residual = 0;
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
+        // skip unowned cells
+        if (!cell->is_locally_owned())
+          continue;
+
         cell_residual = 0;
         fe_values.reinit(cell);
 
-        fe_values.get_function_gradients(work, evaluation_point_gradients);
+        fe_values.get_function_gradients(locally_relevant_solution,
+                                         evaluation_point_gradients);
 
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
@@ -385,7 +428,8 @@ namespace Step86
   // @sect4{Refining the mesh, setting boundary values, and generating graphical output}
 
   // The following three functions are again simply copies of the ones in
-  // step-15 with the exception of resizing PETSc vectors:
+  // step-15 with the exception of resizing PETSc vectors and using parallel
+  // functions:
   template <int dim>
   void MinimalSurfaceProblem<dim>::refine_mesh()
   {
@@ -395,18 +439,18 @@ namespace Step86
       dof_handler,
       QGauss<dim - 1>(fe.degree + 1),
       std::map<types::boundary_id, const Function<dim> *>(),
-      current_solution,
+      locally_relevant_solution,
       estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                    estimated_error_per_cell,
-                                                    0.3,
-                                                    0.03);
+    parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.3, 0.03);
 
     triangulation.prepare_coarsening_and_refinement();
 
-    SolutionTransfer<dim> solution_transfer(dof_handler);
-    Vector<double>        current_solution_tmp(current_solution);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
+      solution_transfer(dof_handler);
+
+    PETScWrappers::MPI::Vector current_solution_tmp(locally_relevant_solution);
     solution_transfer.prepare_for_coarsening_and_refinement(
       current_solution_tmp);
 
@@ -414,25 +458,15 @@ namespace Step86
 
     dof_handler.distribute_dofs(fe);
 
-    Vector<double> tmp(dof_handler.n_dofs());
-    solution_transfer.interpolate(current_solution_tmp, tmp);
+    const IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+    current_solution.reinit(locally_owned_dofs, mpi_communicator);
+    solution_transfer.interpolate(current_solution);
 
-    current_solution.reinit(MPI_COMM_SELF,
-                            dof_handler.n_dofs(),
-                            dof_handler.n_dofs());
-    current_solution = tmp;
-
-    hanging_node_constraints.clear();
-
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
-    hanging_node_constraints.close();
+    setup_system(/*initial_step=*/false);
 
     hanging_node_constraints.distribute(current_solution);
 
     set_boundary_values();
-
-    setup_system(/*initial_step=*/false);
   }
 
 
@@ -442,6 +476,8 @@ namespace Step86
   {
     set_boundary_values(current_solution);
   }
+
+
 
   template <int dim>
   void
@@ -468,15 +504,21 @@ namespace Step86
     TimerOutput::Scope t(computing_timer, "graphical output");
 
     DataOut<dim> data_out;
-
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(current_solution, "solution");
+    data_out.add_data_vector(locally_relevant_solution, "solution");
+
+    Vector<float> subdomain(triangulation.n_active_cells());
+    for (unsigned int i = 0; i < subdomain.size(); ++i)
+      subdomain(i) = triangulation.locally_owned_subdomain();
+    data_out.add_data_vector(subdomain, "subdomain");
+
     data_out.build_patches();
 
-    const std::string filename =
-      "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtu";
-    std::ofstream output(filename);
-    data_out.write_vtu(output);
+    // The final step is to write this data to disk. We write up to 8 VTU files
+    // in parallel with the help of MPI-IO. Additionally a PVTU record is
+    // generated, which groups the written VTU files.
+    data_out.write_vtu_with_pvtu_record(
+      "./", "solution", refinement_cycle, mpi_communicator, 2, 8);
   }
 
 
@@ -498,14 +540,14 @@ namespace Step86
          ++refinement_cycle)
       {
         computing_timer.reset();
-        std::cout << "Mesh refinement step " << refinement_cycle << std::endl;
+        pcout << "Mesh refinement step " << refinement_cycle << std::endl;
 
         if (refinement_cycle != 0)
           refine_mesh();
 
         const double target_tolerance = 1e-3 * std::pow(0.1, refinement_cycle);
-        std::cout << "  Target_tolerance: " << target_tolerance << std::endl
-                  << std::endl;
+        pcout << "  Target_tolerance: " << target_tolerance << std::endl
+              << std::endl;
 
         // This is where we create the nonlinear solver
         // and feed it with an object that encodes a number of additional
@@ -605,7 +647,7 @@ namespace Step86
           nonlinear_solver.monitor =
             [&](const VectorType &current_u, unsigned int step, double gnorm) {
               (void)current_u;
-              std::cout << step << " norm=" << gnorm << std::endl;
+              pcout << step << " norm=" << gnorm << std::endl;
               return 0;
             };
 
@@ -625,7 +667,7 @@ namespace Step86
 
         computing_timer.print_summary();
 
-        std::cout << std::endl;
+        pcout << std::endl;
       }
   }
 } // namespace Step86
@@ -639,8 +681,8 @@ int main(int argc, char **argv)
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      MinimalSurfaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run();
+      MinimalSurfaceProblem<2> problem;
+      problem.run();
     }
   catch (std::exception &exc)
     {
