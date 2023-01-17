@@ -447,13 +447,16 @@ namespace
                         SubCellData &             subcelldata)
   {
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
+    static constexpr std::array<unsigned int,
+                                GeometryInfo<3>::vertices_per_cell>
+      local_vertex_numbering{{0, 1, 5, 4, 2, 3, 7, 6}};
     for (auto &cell : cells)
       if (cell.vertices.size() == GeometryInfo<3>::vertices_per_cell)
         {
           for (const unsigned int i : GeometryInfo<3>::vertex_indices())
             tmp[i] = cell.vertices[i];
           for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-            cell.vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
+            cell.vertices[local_vertex_numbering[i]] = tmp[i];
         }
 
     // now points in boundary quads

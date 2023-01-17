@@ -40,6 +40,9 @@ namespace
    * do the reordering of their
    * arguments in-place.
    */
+  constexpr std::array<unsigned int, 8> local_vertex_numbering{
+    {0, 1, 5, 4, 2, 3, 7, 6}};
+
   void
   reorder_new_to_old_style(std::vector<CellData<1>> &)
   {}
@@ -62,7 +65,7 @@ namespace
         for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           tmp[i] = cell.vertices[i];
         for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-          cell.vertices[i] = tmp[GeometryInfo<3>::ucd_to_deal[i]];
+          cell.vertices[i] = tmp[local_vertex_numbering[i]];
       }
   }
 
@@ -93,7 +96,7 @@ namespace
         for (const unsigned int i : GeometryInfo<3>::vertex_indices())
           tmp[i] = cell.vertices[i];
         for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-          cell.vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
+          cell.vertices[local_vertex_numbering[i]] = tmp[i];
       }
   }
 } // namespace
