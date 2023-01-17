@@ -1027,9 +1027,11 @@ FE_Q_Base<dim, spacedim>::initialize_quad_dof_index_permutation()
   AssertDimension(this->n_unique_faces(), 1);
   const unsigned int face_no = 0;
 
-  Assert(this->adjust_quad_dof_index_for_face_orientation_table[0]
-             .n_elements() == 8 * this->n_dofs_per_quad(face_no),
-         ExcInternalError());
+  Assert(
+    this->adjust_quad_dof_index_for_face_orientation_table[0].n_elements() ==
+      this->reference_cell().n_face_orientations(face_no) *
+        this->n_dofs_per_quad(face_no),
+    ExcInternalError());
 
   const unsigned int n = q_degree - 1;
   Assert(n * n == this->n_dofs_per_quad(face_no), ExcInternalError());
