@@ -108,9 +108,12 @@ namespace PETScWrappers
                     (index < static_cast<size_type>(end)),
                   ExcAccessToNonlocalElement(index, begin, end - 1));
 
-      PetscInt    idx = index;
-      PetscScalar value;
-      ierr = VecGetValues(vector.vector, 1, &idx, &value);
+      const PetscScalar *ptr;
+      PetscScalar        value;
+      ierr = VecGetArrayRead(vector.vector, &ptr);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      value = *(ptr + index - begin);
+      ierr  = VecRestoreArrayRead(vector.vector, &ptr);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       return value;
