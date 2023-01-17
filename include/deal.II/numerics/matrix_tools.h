@@ -345,35 +345,7 @@ namespace MatrixTools
    * described in the general documentation of this namespace. This function
    * works on the classes that are used to wrap PETSc objects.
    *
-   * <b>Important:</b> This function is not very efficient: it needs to
-   * alternatingly read and write into the matrix, a situation that PETSc does
-   * not handle well. In addition, we only get rid of rows corresponding to
-   * boundary nodes, but the corresponding case of deleting the respective
-   * columns (i.e. if @p eliminate_columns is @p true) is not presently
-   * implemented, and probably will never because it is too expensive without
-   * direct access to the PETSc data structures. (This leads to the situation
-   * where the action indicated by the default value of the last argument is
-   * actually not implemented; that argument has <code>true</code> as its
-   * default value to stay consistent with the other functions of same name in
-   * this namespace.)
-   *
    * This function is used in step-17 and step-18.
-   *
-   * @note If the matrix is stored in parallel across multiple processors
-   * using MPI, this function only touches rows that are locally stored and
-   * simply ignores all other rows. In other words, each processor is
-   * responsible for its own rows, and the @p boundary_values argument needs
-   * to contain all locally owned rows of the matrix that you want to have
-   * treated. (But it can also contain entries for degrees of freedom not
-   * owned locally; these will simply be ignored.) Further, in the context of
-   * parallel computations, you will get into trouble if you treat a row while
-   * other processors still have pending writes or additions into the same
-   * row. In other words, if another processor still wants to add something to
-   * an element of a row and you call this function to zero out the row, then
-   * the next time you call compress() may add the remote value to the zero
-   * you just created. Consequently, you will want to call compress() after
-   * you made the last modifications to a matrix and before starting to clear
-   * rows.
    */
   void
   apply_boundary_values(
