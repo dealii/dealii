@@ -280,13 +280,6 @@ namespace PETScWrappers
     explicit VectorBase(const Vec &v);
 
     /**
-     * The copy assignment operator is deleted to avoid accidental usage with
-     * unexpected behavior.
-     */
-    VectorBase &
-    operator=(const VectorBase &) = delete;
-
-    /**
      * Destructor.
      */
     virtual ~VectorBase() override;
@@ -310,6 +303,12 @@ namespace PETScWrappers
      */
     void
     compress(const VectorOperation::values operation);
+
+    /**
+     * The copy assignment operator.
+     */
+    VectorBase &
+    operator=(const VectorBase &);
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass

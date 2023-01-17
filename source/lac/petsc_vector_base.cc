@@ -190,6 +190,19 @@ namespace PETScWrappers
 
 
   VectorBase &
+  VectorBase::operator=(const VectorBase &v)
+  {
+    Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+
+    PetscErrorCode ierr = VecCopy(v, vector);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return *this;
+  }
+
+
+
+  VectorBase &
   VectorBase::operator=(const PetscScalar s)
   {
     AssertIsFinite(s);
