@@ -29,6 +29,7 @@
 #     PETSC_WITH_64BIT_INDICES
 #     PETSC_WITH_COMPLEX
 #     PETSC_WITH_HYPRE
+#     PETSC_WITH_KOKKOS
 #     PETSC_WITH_MPIUNI
 #     PETSC_WITH_MUMPS
 #
@@ -69,6 +70,7 @@ if(EXISTS ${PETSC_PETSCCONF_H})
   _petsc_feature_check(64BIT_INDICES "#define.*PETSC_USE_64BIT_INDICES 1")
   _petsc_feature_check(COMPLEX "#define.*PETSC_USE_COMPLEX 1")
   _petsc_feature_check(HYPRE "#define.*PETSC_HAVE_HYPRE 1")
+  _petsc_feature_check(KOKKOS "#define.*PETSC_HAVE_KOKKOS 1")
   _petsc_feature_check(MPIUNI "#define.*PETSC_HAVE_MPIUNI 1")
   _petsc_feature_check(MUMPS "#define.*PETSC_HAVE_MUMPS 1")
 endif()
