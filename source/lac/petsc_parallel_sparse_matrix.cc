@@ -230,6 +230,9 @@ namespace PETScWrappers
                          sparsity_pattern.n_cols());
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
+      // Use MATAIJ which dispatches to SEQAIJ
+      // if the size of the communicator is 1,
+      // and to MPIAIJ otherwise.
       ierr = MatSetType(matrix, MATAIJ);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -293,9 +296,13 @@ namespace PETScWrappers
           }
 
 
-          // then call the petsc function
+          // then call the petsc functions
           // that summarily allocates these
-          // entries:
+          // entries.
+          // Here we both call the specific API since this is how
+          // PETSc polymorphism works. If the matrix is of type MPIAIJ,
+          // the second call is dummy. If the matrix is of type SEQAIJ,
+          // the first call is dummy.
           ierr = MatMPIAIJSetPreallocationCSR(matrix,
                                               rowstart_in_window.data(),
                                               colnums_in_window.data(),
@@ -365,6 +372,9 @@ namespace PETScWrappers
                          sparsity_pattern.n_cols());
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
+      // Use MATAIJ which dispatches to SEQAIJ
+      // if the size of the communicator is 1,
+      // and to MPIAIJ otherwise.
       ierr = MatSetType(matrix, MATAIJ);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -425,7 +435,11 @@ namespace PETScWrappers
 
           // then call the petsc function
           // that summarily allocates these
-          // entries:
+          // entries.
+          // Here we both call the specific API since this is how
+          // PETSc polymorphism works. If the matrix is of type MPIAIJ,
+          // the second call is dummy. If the matrix is of type SEQAIJ,
+          // the first call is dummy.
           ierr = MatSeqAIJSetPreallocationCSR(matrix,
                                               rowstart_in_window.data(),
                                               colnums_in_window.data(),
