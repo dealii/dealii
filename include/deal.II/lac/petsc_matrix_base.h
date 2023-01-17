@@ -572,10 +572,10 @@ namespace PETScWrappers
                const PetscScalar             new_diag_value = 0);
 
     /**
-     * Same as clear_rows(), except that zeros also the columns.
+     * Same as clear_rows(), except that the function also zeros the columns.
      */
     void
-    clear_rows_columns(const std::vector<size_type> &rows,
+    clear_rows_columns(const std::vector<size_type> &row_and_column_indices,
                        const PetscScalar             new_diag_value = 0);
 
     /**
