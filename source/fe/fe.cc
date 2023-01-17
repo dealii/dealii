@@ -679,18 +679,16 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   AssertIndexRange(index, this->n_dofs_per_quad(face));
   Assert(adjust_quad_dof_index_for_face_orientation_table
              [this->n_unique_quads() == 1 ? 0 : face]
-               .n_elements() == (this->reference_cell().face_reference_cell(
-                                   face) == ReferenceCells::Quadrilateral ?
-                                   8 :
-                                   6) *
-                                  this->n_dofs_per_quad(face),
+               .n_elements() ==
+           (this->reference_cell().n_face_orientations(face)) *
+             this->n_dofs_per_quad(face),
          ExcInternalError());
   return index +
          adjust_quad_dof_index_for_face_orientation_table
            [this->n_unique_quads() == 1 ? 0 : face](index,
-                                                    (face_orientation ? 4 : 0) +
-                                                      (face_flip ? 2 : 0) +
-                                                      (face_rotation ? 1 : 0));
+                                                    (face_orientation ? 1 : 0) +
+                                                      (face_rotation ? 2 : 0) +
+                                                      (face_flip ? 4 : 0));
 }
 
 
