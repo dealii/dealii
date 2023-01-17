@@ -278,7 +278,7 @@ There are a number of obvious extensions for this work:
 - The program has been developed for solving problems on single-node
   multicore machines. With a little effort, the program could be
   extended to a large-scale computing environment through the use of
-  Petsc or Trilinos, using a similar technique to that demonstrated in
+  PETSc or Trilinos, using a similar technique to that demonstrated in
   step-40. This would mostly involve changes to the setup, assembly,
   <code>PointHistory</code> and linear solver routines.
 - As this program assumes quasi-static equilibrium, extensions to

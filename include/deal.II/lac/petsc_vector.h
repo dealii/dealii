@@ -478,7 +478,7 @@ namespace PETScWrappers
       // in this case a) again takes up a whole lot of memory on the heap,
       // and b) is totally dumb since its content would simply be the
       // sequence 0,1,2,3,...,n. the best of all worlds would probably be a
-      // function in Petsc that would take a pointer to an array of
+      // function in PETSc that would take a pointer to an array of
       // PetscScalar values and simply copy n elements verbatim into the
       // vector...
       for (size_type i = 0; i < v.size(); ++i)
