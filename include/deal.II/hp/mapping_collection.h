@@ -191,6 +191,19 @@ namespace hp
   extern template struct StaticMappingQ1<2, 2>;
   extern template struct StaticMappingQ1<2, 3>;
   extern template struct StaticMappingQ1<3, 3>;
+
+  extern template MappingCollection<1, 1>
+    StaticMappingQ1<1, 1>::mapping_collection;
+  extern template MappingCollection<1, 2>
+    StaticMappingQ1<1, 2>::mapping_collection;
+  extern template MappingCollection<1, 3>
+    StaticMappingQ1<1, 3>::mapping_collection;
+  extern template MappingCollection<2, 2>
+    StaticMappingQ1<2, 2>::mapping_collection;
+  extern template MappingCollection<2, 3>
+    StaticMappingQ1<2, 3>::mapping_collection;
+  extern template MappingCollection<3, 3>
+    StaticMappingQ1<3, 3>::mapping_collection;
 #endif
 
 } // namespace hp
