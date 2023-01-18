@@ -168,6 +168,33 @@ namespace PETScWrappers
     ISDestroy(&index_set);
   }
 
+  void
+  MatrixBase::clear_rows_columns(const std::vector<size_type> &rows,
+                                 const PetscScalar             new_diag_value)
+  {
+    assert_is_compressed();
+
+    // now set all the entries of these rows
+    // to zero
+    const std::vector<PetscInt> petsc_rows(rows.begin(), rows.end());
+
+    // call the functions. note that we have
+    // to call them even if #rows is empty,
+    // since this is a collective operation
+    IS index_set;
+
+    ISCreateGeneral(get_mpi_communicator(),
+                    rows.size(),
+                    petsc_rows.data(),
+                    PETSC_COPY_VALUES,
+                    &index_set);
+
+    const PetscErrorCode ierr =
+      MatZeroRowsColumnsIS(matrix, index_set, new_diag_value, nullptr, nullptr);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ISDestroy(&index_set);
+  }
+
 
 
   PetscScalar
