@@ -22,6 +22,7 @@
 #include <deal.II/optimization/line_minimization.h>
 
 #include <fstream>
+#include <functional>
 #include <iostream>
 
 #include "../tests.h"
