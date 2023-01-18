@@ -350,6 +350,13 @@ public:
    */
 
   /**
+   * Return the default combined face orientation flag (i.e., the default set of
+   * orientations, defined by orientation, rotate, and flip for a face in 3D).
+   */
+  static constexpr unsigned char
+  default_combined_face_orientation();
+
+  /**
    * Return which child cells are adjacent to a certain face of the
    * mother cell.
    *
@@ -1385,6 +1392,14 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
     }
 
   return ReferenceCells::Invalid;
+}
+
+
+
+inline constexpr unsigned char
+ReferenceCell::default_combined_face_orientation()
+{
+  return 1u;
 }
 
 

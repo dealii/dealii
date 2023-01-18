@@ -3099,14 +3099,10 @@ namespace internal
             cell->child(child)->clear_user_flag();
 
             for (auto f : GeometryInfo<dim>::face_indices())
-              {
-                // set flags denoting deviations from
-                // standard orientation of faces back
-                // to initialization values
-                cell->child(child)->set_face_orientation(f, true);
-                cell->child(child)->set_face_flip(f, false);
-                cell->child(child)->set_face_rotation(f, false);
-              }
+              // set flags denoting deviations from standard orientation of
+              // faces back to initialization values
+              cell->child(child)->set_combined_face_orientation(
+                f, ReferenceCell::default_combined_face_orientation());
 
             cell->child(child)->clear_used_flag();
           }
@@ -5684,23 +5680,13 @@ namespace internal
                       if (i % 2)
                         new_hex->set_parent(hex->index());
 
-                      // set the face_orientation flag to true for all
-                      // faces initially, as this is the default value
-                      // which is true for all faces interior to the
-                      // hex. later on go the other way round and
-                      // reset faces that are at the boundary of the
-                      // mother cube
-                      //
-                      // the same is true for the face_flip and
-                      // face_rotation flags. however, the latter two
-                      // are set to false by default as this is the
-                      // standard value
+                      // set the orientation flag to its default state for all
+                      // faces initially. later on go the other way round and
+                      // reset faces that are at the boundary of the mother cube
                       for (const auto f : new_hex->face_indices())
-                        {
-                          new_hex->set_face_orientation(f, true);
-                          new_hex->set_face_flip(f, false);
-                          new_hex->set_face_rotation(f, false);
-                        }
+                        new_hex->set_combined_face_orientation(
+                          f,
+                          ReferenceCell::default_combined_face_orientation());
                     }
                   for (unsigned int i = 0; i < n_new_hexes / 2; ++i)
                     hex->set_children(2 * i, new_hexes[2 * i]->index());
@@ -6152,17 +6138,11 @@ namespace internal
                                                                          [2]],
                                   }};
 
-                                const auto orientation =
+                                new_hex->set_combined_face_orientation(
+                                  f,
                                   face->reference_cell().get_orientation_index(
                                     make_array_view(vertices_1),
-                                    make_array_view(vertices_0));
-
-                                new_hex->set_face_orientation(
-                                  f, Utilities::get_bit(orientation, 0));
-                                new_hex->set_face_flip(
-                                  f, Utilities::get_bit(orientation, 2));
-                                new_hex->set_face_rotation(
-                                  f, Utilities::get_bit(orientation, 1));
+                                    make_array_view(vertices_0)));
                               }
                           }
                         else if (new_hex->n_faces() == 6)
@@ -6191,18 +6171,12 @@ namespace internal
                     if (hex->n_faces() == 6)
                       for (const auto f : hex->face_indices())
                         {
-                          const unsigned int orientation =
-                            hex->face_orientation(f);
-                          const unsigned int flip     = hex->face_flip(f);
-                          const unsigned int rotation = hex->face_rotation(f);
+                          const unsigned char combined_orientation =
+                            hex->combined_face_orientation(f);
                           for (unsigned int c = 0; c < 4; ++c)
-                            {
-                              auto &new_hex =
-                                new_hexes[face_to_child_indices_hex[f][c]];
-                              new_hex->set_face_orientation(f, orientation);
-                              new_hex->set_face_flip(f, flip);
-                              new_hex->set_face_rotation(f, rotation);
-                            }
+                            new_hexes[face_to_child_indices_hex[f][c]]
+                              ->set_combined_face_orientation(
+                                f, combined_orientation);
                         }
                   }
                 }
@@ -7709,11 +7683,9 @@ namespace internal
                       // standard value
                       for (const unsigned int f :
                            GeometryInfo<dim>::face_indices())
-                        {
-                          new_hexes[i]->set_face_orientation(f, true);
-                          new_hexes[i]->set_face_flip(f, false);
-                          new_hexes[i]->set_face_rotation(f, false);
-                        }
+                        new_hexes[i]->set_combined_face_orientation(
+                          f,
+                          ReferenceCell::default_combined_face_orientation());
                     }
                   // note these hexes as children to the present cell
                   for (unsigned int i = 0; i < n_new_hexes / 2; ++i)
@@ -7746,6 +7718,15 @@ namespace internal
                                         hex->face_rotation(3),
                                         hex->face_rotation(4),
                                         hex->face_rotation(5)};
+
+                  // combined orientation
+                  const unsigned char f_co[6] = {
+                    hex->combined_face_orientation(0),
+                    hex->combined_face_orientation(1),
+                    hex->combined_face_orientation(2),
+                    hex->combined_face_orientation(3),
+                    hex->combined_face_orientation(4),
+                    hex->combined_face_orientation(5)};
 
                   // little helper table, indicating, whether the
                   // child with index 0 or with index 1 can be found
@@ -10535,10 +10516,8 @@ namespace internal
                             f_ro[f],
                             GeometryInfo<dim>::face_refinement_case(
                               ref_case, f, f_or[f], f_fl[f], f_ro[f]));
-                        new_hexes[current_child]->set_face_orientation(f,
-                                                                       f_or[f]);
-                        new_hexes[current_child]->set_face_flip(f, f_fl[f]);
-                        new_hexes[current_child]->set_face_rotation(f, f_ro[f]);
+                        new_hexes[current_child]->set_combined_face_orientation(
+                          f, f_co[f]);
                       }
 
                   // now see if we have created cells that are

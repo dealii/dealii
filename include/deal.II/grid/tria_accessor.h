@@ -1800,6 +1800,17 @@ private:
   set_face_rotation(const unsigned int face, const bool rotation) const;
 
   /**
+   * Set the combined face orientation (i.e., the integer that uniquely encodes
+   * the orientation, flip, and rotation).
+   *
+   * It is only possible to set the face_orientation of cells in 3d (i.e.
+   * <code>structdim==3 && dim==3</code>).
+   */
+  void
+  set_combined_face_orientation(const unsigned int  face,
+                                const unsigned char combined_orientation) const;
+
+  /**
    * Set the @p used flag. Only for internal use in the library.
    */
   void

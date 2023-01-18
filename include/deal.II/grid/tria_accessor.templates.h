@@ -929,6 +929,33 @@ namespace internal
       /**
        * Implementation of the function of some name in the mother class.
        */
+      template <int structdim, int dim, int spacedim>
+      inline static void
+      set_combined_face_orientation(
+        const TriaAccessor<structdim, dim, spacedim> &,
+        const unsigned int,
+        const unsigned char)
+      {
+        Assert(false, ExcInternalError());
+      }
+
+
+
+      inline static void
+      set_combined_face_orientation(const TriaAccessor<3, 3, 3> &accessor,
+                                    const unsigned int           face,
+                                    const unsigned char combined_orientation)
+      {
+        AssertIndexRange(face, accessor.n_faces());
+        accessor.tria->levels[accessor.present_level]
+          ->face_orientations.set_raw_orientation(
+            accessor.present_index * GeometryInfo<3>::faces_per_cell + face,
+            combined_orientation);
+      }
+
+      /**
+       * Implementation of the function of some name in the mother class.
+       */
       template <int dim, int spacedim>
       inline static void
       set_line_orientation(const TriaAccessor<1, dim, spacedim> &,
@@ -1539,6 +1566,21 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
 
   dealii::internal::TriaAccessorImplementation::Implementation::
     set_line_orientation(*this, line, value);
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+inline void
+TriaAccessor<structdim, dim, spacedim>::set_combined_face_orientation(
+  const unsigned int  face,
+  const unsigned char combined_orientation) const
+{
+  Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
+  AssertIndexRange(face, this->n_faces());
+
+  dealii::internal::TriaAccessorImplementation::Implementation::
+    set_combined_face_orientation(*this, face, combined_orientation);
 }
 
 
