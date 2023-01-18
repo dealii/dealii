@@ -56,15 +56,15 @@ foreach(_library ginkgo ${GINKGO_INTERFACE_LINK_LIBRARIES})
   if(_library MATCHES "ginkgo.*")
     list(APPEND _libraries GINKGO_LIBRARY_${_library})
     deal_ii_find_library(GINKGO_LIBRARY_${_library}
-      NAMES ${_library}
-      HINTS ${GINKGO_INSTALL_LIBRARY_DIR}
-      NO_DEFAULT_PATH
-      NO_CMAKE_ENVIRONMENT_PATH
-      NO_CMAKE_PATH
-      NO_SYSTEM_ENVIRONMENT_PATH
-      NO_CMAKE_SYSTEM_PATH
-      NO_CMAKE_FIND_ROOT_PATH
-      )
+        NAMES ${_library} ${_library}d
+        HINTS ${GINKGO_INSTALL_LIBRARY_DIR}
+        NO_DEFAULT_PATH
+        NO_CMAKE_ENVIRONMENT_PATH
+        NO_CMAKE_PATH
+        NO_SYSTEM_ENVIRONMENT_PATH
+        NO_CMAKE_SYSTEM_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+        )
   endif()
 endforeach()
 
