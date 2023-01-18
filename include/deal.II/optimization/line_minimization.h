@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <limits>
 #include <string>
 
