@@ -840,92 +840,6 @@ namespace internal
           accessor.quad(quad_index)->line_orientation(line_within_face_index));
       }
 
-
-
-      /**
-       * Implementation of the function of some name in the mother class.
-       */
-      template <int structdim, int dim, int spacedim>
-      inline static void
-      set_face_orientation(const TriaAccessor<structdim, dim, spacedim> &,
-                           const unsigned int,
-                           const bool)
-      {
-        Assert(false, ExcInternalError());
-      }
-
-
-      inline static void
-      set_face_orientation(const TriaAccessor<3, 3, 3> &accessor,
-                           const unsigned int           face,
-                           const bool                   value)
-      {
-        Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        AssertIndexRange(face, accessor.n_faces());
-
-        accessor.tria->levels[accessor.present_level]
-          ->face_orientations.set_orientation(
-            accessor.present_index * GeometryInfo<3>::faces_per_cell + face,
-            value);
-      }
-
-
-
-      /**
-       * Implementation of the function of some name in the mother class.
-       */
-      template <int structdim, int dim, int spacedim>
-      inline static void
-      set_face_flip(const TriaAccessor<structdim, dim, spacedim> &,
-                    const unsigned int,
-                    const bool)
-      {
-        Assert(false, ExcInternalError());
-      }
-
-
-      inline static void
-      set_face_flip(const TriaAccessor<3, 3, 3> &accessor,
-                    const unsigned int           face,
-                    const bool                   value)
-      {
-        AssertIndexRange(face, accessor.n_faces());
-
-        accessor.tria->levels[accessor.present_level]
-          ->face_orientations.set_flip(accessor.present_index *
-                                           GeometryInfo<3>::faces_per_cell +
-                                         face,
-                                       value);
-      }
-
-
-
-      /**
-       * Implementation of the function of some name in the mother class.
-       */
-      template <int structdim, int dim, int spacedim>
-      inline static void
-      set_face_rotation(const TriaAccessor<structdim, dim, spacedim> &,
-                        const unsigned int,
-                        const bool)
-      {
-        Assert(false, ExcInternalError());
-      }
-
-
-      inline static void
-      set_face_rotation(const TriaAccessor<3, 3, 3> &accessor,
-                        const unsigned int           face,
-                        const bool                   value)
-      {
-        AssertIndexRange(face, accessor.n_faces());
-        accessor.tria->levels[accessor.present_level]
-          ->face_orientations.set_rotation(accessor.present_index *
-                                               GeometryInfo<3>::faces_per_cell +
-                                             face,
-                                           value);
-      }
-
       /**
        * Implementation of the function of some name in the mother class.
        */
@@ -1511,46 +1425,6 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
 
   return dealii::internal::TriaAccessorImplementation::Implementation::
     line_orientation(*this, line);
-}
-
-
-
-template <int structdim, int dim, int spacedim>
-inline void
-TriaAccessor<structdim, dim, spacedim>::set_face_orientation(
-  const unsigned int face,
-  const bool         value) const
-{
-  Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
-
-  dealii::internal::TriaAccessorImplementation::Implementation::
-    set_face_orientation(*this, face, value);
-}
-
-
-
-template <int structdim, int dim, int spacedim>
-inline void
-TriaAccessor<structdim, dim, spacedim>::set_face_flip(const unsigned int face,
-                                                      const bool value) const
-{
-  Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
-
-  dealii::internal::TriaAccessorImplementation::Implementation::set_face_flip(
-    *this, face, value);
-}
-
-
-template <int structdim, int dim, int spacedim>
-inline void
-TriaAccessor<structdim, dim, spacedim>::set_face_rotation(
-  const unsigned int face,
-  const bool         value) const
-{
-  Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
-
-  dealii::internal::TriaAccessorImplementation::Implementation::
-    set_face_rotation(*this, face, value);
 }
 
 
