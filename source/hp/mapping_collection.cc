@@ -73,12 +73,6 @@ namespace hp
       return mapping;
     }
   } // namespace
-
-  template <int dim, int spacedim>
-  MappingCollection<dim, spacedim>
-    StaticMappingQ1<dim, spacedim>::mapping_collection =
-      MappingCollection<dim, spacedim>(get_static_mapping_q1<dim, spacedim>());
-
 } // namespace hp
 
 
