@@ -193,6 +193,7 @@ namespace hp
   extern template struct StaticMappingQ1<2, 3>;
   extern template struct StaticMappingQ1<3, 3>;
 
+#  ifndef _MSC_VER
   extern template MappingCollection<1, 1>
     StaticMappingQ1<1, 1>::mapping_collection;
   extern template MappingCollection<1, 2>
@@ -205,6 +206,7 @@ namespace hp
     StaticMappingQ1<2, 3>::mapping_collection;
   extern template MappingCollection<3, 3>
     StaticMappingQ1<3, 3>::mapping_collection;
+#  endif
 #endif
 
 } // namespace hp
