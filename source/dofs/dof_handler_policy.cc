@@ -820,7 +820,7 @@ namespace internal
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
                                   [cell->quad(q)->reference_cell() ==
-                                   dealii::ReferenceCells::Quadrilateral],
+                                   ReferenceCells::Quadrilateral],
                                 most_dominating_fe_index_face_no);
 
                             for (const auto &identity : identities)
@@ -1556,7 +1556,7 @@ namespace internal
                                 quad_dof_identities
                                   [most_dominating_fe_index][other_fe_index]
                                   [cell->quad(q)->reference_cell() ==
-                                   dealii::ReferenceCells::Quadrilateral],
+                                   ReferenceCells::Quadrilateral],
                                 most_dominating_fe_index_face_no);
 
                             for (const auto &identity : identities)

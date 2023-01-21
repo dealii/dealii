@@ -797,7 +797,7 @@ namespace internal
                         info.face_type =
                           is_mixed_mesh ?
                             (dcell->face(f)->reference_cell() !=
-                             dealii::ReferenceCells::get_hypercube<dim - 1>()) :
+                             ReferenceCells::get_hypercube<dim - 1>()) :
                             0;
                         info.subface_index =
                           GeometryInfo<dim>::max_children_per_cell;
@@ -986,7 +986,7 @@ namespace internal
 
       info.face_type = is_mixed_mesh ?
                          (cell->face(face_no)->reference_cell() !=
-                          dealii::ReferenceCells::get_hypercube<dim - 1>()) :
+                          ReferenceCells::get_hypercube<dim - 1>()) :
                          0;
 
       info.subface_index = GeometryInfo<dim>::max_children_per_cell;

@@ -178,7 +178,7 @@ namespace internal
                   face_data_by_cells[my_q].descriptor[hpq * scale].initialize(
                     quad_face);
                   reference_cell_types[my_q][hpq] =
-                    dealii::ReferenceCells::get_hypercube<dim>();
+                    ReferenceCells::get_hypercube<dim>();
                 }
             }
         }
@@ -1539,13 +1539,12 @@ namespace internal
       reorder_face_derivative_indices(
         const unsigned int  face_no,
         const unsigned int  index,
-        const ReferenceCell reference_cell = dealii::ReferenceCells::Invalid)
+        const ReferenceCell reference_cell = ReferenceCells::Invalid)
       {
         Assert(index < dim, ExcInternalError());
 
-        if ((reference_cell == dealii::ReferenceCells::Invalid ||
-             reference_cell == dealii::ReferenceCells::get_hypercube<dim>()) ==
-            false)
+        if ((reference_cell == ReferenceCells::Invalid ||
+             reference_cell == ReferenceCells::get_hypercube<dim>()) == false)
           {
             return index;
           }

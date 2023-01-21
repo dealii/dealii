@@ -315,7 +315,7 @@ namespace parallel
     this->reference_cells.clear();
     for (const auto &i : reference_cells_ui)
       this->reference_cells.emplace_back(
-        dealii::internal::ReferenceCell::make_reference_cell_from_int(i));
+        dealii::internal::make_reference_cell_from_int(i));
   }
 
 

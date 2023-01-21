@@ -348,10 +348,9 @@ namespace internal
                         quadrature.push_back(*quadrature_hypercube);
                       else if (reference_cell.is_simplex())
                         quadrature.push_back(*quadrature_simplex);
-                      else if (reference_cell == dealii::ReferenceCells::Wedge)
+                      else if (reference_cell == ReferenceCells::Wedge)
                         quadrature.push_back(*quadrature_wedge);
-                      else if (reference_cell ==
-                               dealii::ReferenceCells::Pyramid)
+                      else if (reference_cell == ReferenceCells::Pyramid)
                         quadrature.push_back(*quadrature_pyramid);
                       else
                         Assert(false, ExcNotImplemented());
@@ -434,16 +433,16 @@ namespace internal
                       // need hypercube quadratures.
                       if ((dim < 3) ||
                           (reference_cell.is_hyper_cube() ||
-                           (reference_cell == dealii::ReferenceCells::Wedge) ||
-                           (reference_cell == dealii::ReferenceCells::Pyramid)))
+                           (reference_cell == ReferenceCells::Wedge) ||
+                           (reference_cell == ReferenceCells::Pyramid)))
                         quadrature.push_back(*quadrature_hypercube);
 
                       // In 3d, if the element is for simplex/wedge/pyramid
                       // cells, then we also need simplex quadratures
                       if ((dim == 3) &&
                           (reference_cell.is_simplex() ||
-                           (reference_cell == dealii::ReferenceCells::Wedge) ||
-                           (reference_cell == dealii::ReferenceCells::Pyramid)))
+                           (reference_cell == ReferenceCells::Wedge) ||
+                           (reference_cell == ReferenceCells::Pyramid)))
                         quadrature.push_back(*quadrature_simplex);
                     }
 
@@ -2497,11 +2496,11 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_fes() const
             finite_elements.emplace_back(
               std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
                 FE_SimplexDGP<dim, spacedim>(1)));
-          else if (reference_cell == dealii::ReferenceCells::Wedge)
+          else if (reference_cell == ReferenceCells::Wedge)
             finite_elements.emplace_back(
               std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
                 FE_WedgeDGP<dim, spacedim>(1)));
-          else if (reference_cell == dealii::ReferenceCells::Pyramid)
+          else if (reference_cell == ReferenceCells::Pyramid)
             finite_elements.emplace_back(
               std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
                 FE_PyramidDGP<dim, spacedim>(1)));

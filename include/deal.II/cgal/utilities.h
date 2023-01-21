@@ -231,10 +231,10 @@ namespace CGALWrappers
     const unsigned int                                                   degree,
     const BooleanOperation &       bool_op,
     const Mapping<dim0, spacedim> &mapping0 =
-      (dealii::ReferenceCells::get_hypercube<dim0>()
+      (ReferenceCells::get_hypercube<dim0>()
          .template get_default_linear_mapping<dim0, spacedim>()),
     const Mapping<dim1, spacedim> &mapping1 =
-      (dealii::ReferenceCells::get_hypercube<dim1>()
+      (ReferenceCells::get_hypercube<dim1>()
          .template get_default_linear_mapping<dim1, spacedim>()));
 
   /**
