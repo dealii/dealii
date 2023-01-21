@@ -36,11 +36,11 @@ namespace internal
      * Class storing orientation information for various objects in a
      * Triangulation.
      *
-     * In deal.II, we express the orientation of an object with three
-     * Booleans: orientation, rotate, and flip. The default values for these
-     * are true, false, and false. These are represented either as individual
-     * booleans or as a 'raw' orientation: the raw format places orientation
-     * in the least significant bit, then rotate, then flip.
+     * In deal.II, we express the orientation of an object with three Booleans:
+     * orientation, rotate, and flip. The default values for these are true,
+     * false, and false. These are represented either as individual booleans or
+     * as a 'combined' orientation: the combined format places orientation in
+     * the least significant bit, then rotate, then flip.
      *
      * For a quadrilateral, these values correspond to
      * - *orientation* : `true` is the default orientation and `false` means
@@ -58,12 +58,12 @@ namespace internal
      * product of two lines in their standard orientation (which, e.g., points
      * into the hexahedron for face 0 but out of the hexahedron for face 1).
      *
-     * For triangles, to enable indexing from the raw orientation, we do not
-     * consider flip-rotate or flip-orient-rotate as those cases are
-     * equivalent, respectively, to the identity operation or the orientation
-     * = `true` case as flip-rotate is equal to the identity operation. This
-     * choice ensures that the integer value of the raw orientation is in $[0,
-     * 5]$.
+     * For triangles, to enable indexing from the combined orientation, we do
+     * not consider flip-rotate or flip-orient-rotate as those cases are
+     * equivalent, respectively, to the identity operation or the orientation =
+     * `true` case as flip-rotate is equal to the identity operation. This
+     * choice ensures that the integer value of the combined orientation is in
+     * $[0, 5]$.
      */
     class TriaObjectsOrientations
     {
@@ -105,11 +105,11 @@ namespace internal
       memory_consumption() const;
 
       /**
-       * Get the raw orientation of the object, as described in the class
+       * Get the combined orientation of the object, as described in the class
        * documentation.
        */
       unsigned char
-      get_raw_orientation(const unsigned int object) const;
+      get_combined_orientation(const unsigned int object) const;
 
       /**
        * Get the orientation bit of the object.
@@ -130,11 +130,12 @@ namespace internal
       get_flip(const unsigned int object) const;
 
       /**
-       * Set the raw orientation of the object, as described in the class
+       * Set the combined orientation of the object, as described in the class
        * documentation.
        */
       void
-      set_raw_orientation(const unsigned int object, const unsigned char value);
+      set_combined_orientation(const unsigned int  object,
+                               const unsigned char value);
 
       /**
        * Set the orientation bit of the object.
@@ -231,7 +232,7 @@ namespace internal
 
 
     inline unsigned char
-    TriaObjectsOrientations::get_raw_orientation(
+    TriaObjectsOrientations::get_combined_orientation(
       const unsigned int object) const
     {
       AssertIndexRange(object, n_stored_objects);
@@ -268,8 +269,8 @@ namespace internal
 
 
     inline void
-    TriaObjectsOrientations::set_raw_orientation(const unsigned int  object,
-                                                 const unsigned char value)
+    TriaObjectsOrientations::set_combined_orientation(const unsigned int object,
+                                                      const unsigned char value)
     {
       AssertIndexRange(object, n_stored_objects);
       flags[object] = value;

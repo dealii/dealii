@@ -627,7 +627,7 @@ namespace internal
         const auto quad_index = pair[0];
         const auto line_index =
           accessor.reference_cell().standard_to_real_face_line(
-            pair[1], pair[0], face_orientation_raw(accessor, quad_index));
+            pair[1], pair[0], combined_face_orientation(accessor, quad_index));
 
         return accessor.quad(quad_index)->line_index(line_index);
       }
@@ -698,12 +698,12 @@ namespace internal
 
 
       inline static unsigned int
-      face_orientation_raw(const TriaAccessor<3, 3, 3> &accessor,
-                           const unsigned int           face)
+      combined_face_orientation(const TriaAccessor<3, 3, 3> &accessor,
+                                const unsigned int           face)
       {
         AssertIndexRange(face, accessor.n_faces());
         return accessor.tria->levels[accessor.present_level]
-          ->face_orientations.get_raw_orientation(
+          ->face_orientations.get_combined_orientation(
             accessor.present_index * GeometryInfo<3>::faces_per_cell + face);
       }
 
@@ -831,12 +831,12 @@ namespace internal
         const auto quad_index = pair[0];
         const auto line_within_face_index =
           accessor.reference_cell().standard_to_real_face_line(
-            pair[1], pair[0], face_orientation_raw(accessor, quad_index));
+            pair[1], pair[0], combined_face_orientation(accessor, quad_index));
 
         // Then query how that line is oriented within that face:
         return accessor.reference_cell().standard_vs_true_line_orientation(
           pair[1],
-          face_orientation_raw(accessor, quad_index),
+          combined_face_orientation(accessor, quad_index),
           accessor.quad(quad_index)->line_orientation(line_within_face_index));
       }
 
@@ -862,7 +862,7 @@ namespace internal
       {
         AssertIndexRange(face, accessor.n_faces());
         accessor.tria->levels[accessor.present_level]
-          ->face_orientations.set_raw_orientation(
+          ->face_orientations.set_combined_orientation(
             accessor.present_index * GeometryInfo<3>::faces_per_cell + face,
             combined_orientation);
       }
@@ -964,7 +964,7 @@ namespace internal
         const auto face_index = pair[0];
         const auto vertex_index =
           accessor.reference_cell().standard_to_real_face_vertex(
-            pair[1], pair[0], face_orientation_raw(accessor, face_index));
+            pair[1], pair[0], combined_face_orientation(accessor, face_index));
 
         return accessor.quad(face_index)->vertex_index(vertex_index);
       }
@@ -1015,7 +1015,7 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(
+                    ->face_orientations.get_combined_orientation(
                       cell.index() * GeometryInfo<3>::faces_per_cell + f);
 
                 // It might seem superfluous to spell out the four indices
@@ -1039,7 +1039,7 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(
+                    ->face_orientations.get_combined_orientation(
                       cell.index() * GeometryInfo<3>::faces_per_cell + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
@@ -1052,9 +1052,9 @@ namespace internal
         else if (ref_cell == ReferenceCells::Tetrahedron)
           {
             std::array<unsigned int, 3> orientations{
-              {face_orientation_raw(cell, 0),
-               face_orientation_raw(cell, 1),
-               face_orientation_raw(cell, 2)}};
+              {combined_face_orientation(cell, 0),
+               combined_face_orientation(cell, 1),
+               combined_face_orientation(cell, 2)}};
             const std::array<unsigned int, 6> my_indices{
               {ref_cell.standard_to_real_face_line(0, 0, orientations[0]),
                ref_cell.standard_to_real_face_line(1, 0, orientations[0]),
@@ -1133,7 +1133,7 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(
+                    ->face_orientations.get_combined_orientation(
                       cell.index() * GeometryInfo<3>::faces_per_cell + f);
 
                 // It might seem superfluous to spell out the four indices and
@@ -1165,7 +1165,7 @@ namespace internal
                 const unsigned char orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_raw_orientation(
+                    ->face_orientations.get_combined_orientation(
                       cell.index() * GeometryInfo<3>::faces_per_cell + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
@@ -1183,9 +1183,9 @@ namespace internal
         else if (ref_cell == ReferenceCells::Tetrahedron)
           {
             std::array<unsigned int, 3> orientations{
-              {face_orientation_raw(cell, 0),
-               face_orientation_raw(cell, 1),
-               face_orientation_raw(cell, 2)}};
+              {combined_face_orientation(cell, 0),
+               combined_face_orientation(cell, 1),
+               combined_face_orientation(cell, 2)}};
             const std::array<unsigned int, 6> my_indices{
               {ref_cell.standard_to_real_face_line(0, 0, orientations[0]),
                ref_cell.standard_to_real_face_line(1, 0, orientations[0]),

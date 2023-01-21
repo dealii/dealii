@@ -1164,10 +1164,10 @@ namespace internal
             {
               // previously seen key: set orientation relative to the first
               // occurrence
-              orientations.set_raw_orientation(
+              orientations.set_combined_orientation(
                 offset_i,
                 ad_entity_types[offset_i]
-                  .template get_orientation_index<unsigned int>(
+                  .template get_combined_orientation<unsigned int>(
                     make_array_view(ad_entity_vertices[offset_i].begin(),
                                     ad_entity_vertices[offset_i].begin() +
                                       ad_entity_types[offset_i].n_vertices()),
@@ -1317,7 +1317,7 @@ namespace internal
               const unsigned int f = con_cq.col[f_];
 
               // only faces with default orientation have to do something
-              if (ori_cq.get_raw_orientation(f_) !=
+              if (ori_cq.get_combined_orientation(f_) !=
                   ReferenceCell::default_combined_face_orientation())
                 continue;
 
@@ -1350,7 +1350,7 @@ namespace internal
                       }
 
                   // ... comparison gives orientation
-                  ori_ql.set_raw_orientation(
+                  ori_ql.set_combined_orientation(
                     con_ql.ptr[f] + l,
                     same ? ReferenceCell::default_combined_face_orientation() :
                            ReferenceCell::reversed_combined_line_orientation());
