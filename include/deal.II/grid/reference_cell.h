@@ -879,7 +879,7 @@ namespace internal
 #ifndef DEAL_II_CXX14_CONSTEXPR_BUG
     // Make sure these are the only indices from which objects can be
     // created.
-    Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
+    Assert((kind == std::numeric_limits<std::uint8_t>::max()) || (kind < 8),
            ExcInternalError());
 #endif
 
@@ -917,7 +917,8 @@ namespace ReferenceCells
   constexpr const ReferenceCell Hexahedron =
     internal::make_reference_cell_from_int(7);
   constexpr const ReferenceCell Invalid =
-    internal::make_reference_cell_from_int(static_cast<std::uint8_t>(-1));
+    internal::make_reference_cell_from_int(
+      std::numeric_limits<std::uint8_t>::max());
 
   /**
    * Return the correct simplex reference cell type for the given dimension
@@ -2776,7 +2777,7 @@ ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
     }
 
   Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
-  return numbers::invalid_unsigned_int;
+  return std::numeric_limits<unsigned char>::max();
 }
 
 

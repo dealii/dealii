@@ -41,7 +41,7 @@ namespace
   {
     // Define VTK constants for linear, quadratic and
     // high-order Lagrange geometrices
-    enum
+    enum : unsigned int
     {
       VTK_VERTEX = 1,
       // Linear cells
@@ -69,7 +69,7 @@ namespace
       VTK_LAGRANGE_WEDGE         = 73,
       VTK_LAGRANGE_PYRAMID       = 74,
       // Invalid code
-      VTK_INVALID = static_cast<unsigned int>(-1)
+      VTK_INVALID = numbers::invalid_unsigned_int
     };
 
   } // namespace VTKCellType
