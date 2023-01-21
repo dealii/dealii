@@ -41,8 +41,8 @@ GrowingVectorMemory<VectorType>::get_pool()
   // finalized past program end together with static variables and we need to
   // make sure to empty the Pool when finalizing Kokkos so that the destruction
   // of the Pool doesn't call Kokkos functions.
-  internal::ensure_kokkos_initialized();
   static auto pool = []() {
+    internal::ensure_kokkos_initialized();
     if (!internal::dealii_initialized_kokkos)
       Kokkos::push_finalize_hook(
         GrowingVectorMemory<VectorType>::release_unused_memory);
