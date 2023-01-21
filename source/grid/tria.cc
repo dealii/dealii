@@ -1122,7 +1122,7 @@ namespace internal
         {
           // reserve the field of the derived class
           tria_faces.quads_line_orientations.resize(
-            new_size * GeometryInfo<2>::lines_per_cell, true);
+            new_size * GeometryInfo<3>::lines_per_face, true);
 
           auto &q_is_q = tria_faces.quad_is_quadrilateral;
           q_is_q.reserve(new_size);
@@ -2345,7 +2345,7 @@ namespace internal
                      ++i, ++j, ++k)
                   {
                     // set line index
-                    quads_0.cells[q * GeometryInfo<2>::faces_per_cell + j] =
+                    quads_0.cells[q * GeometryInfo<3>::lines_per_face + j] =
                       crs.col[i];
 
                     // set line orientations
@@ -2357,7 +2357,7 @@ namespace internal
                     Assert(raw_orientation == 0u || raw_orientation == 1u,
                            ExcInternalError());
                     faces.quads_line_orientations
-                      [q * GeometryInfo<2>::faces_per_cell + j] =
+                      [q * GeometryInfo<3>::lines_per_face + j] =
                       raw_orientation == 1u;
                   }
               }
@@ -2623,7 +2623,7 @@ namespace internal
       {
         const unsigned int dim = faces.dim;
 
-        const unsigned int max_faces_per_cell = 2 * structdim;
+        const unsigned int max_lines_per_face = 2 * structdim;
 
         if (dim == 3 && structdim == 2)
           {
@@ -2631,7 +2631,7 @@ namespace internal
             faces.quad_is_quadrilateral.assign(size, true);
 
             // quad line orientations
-            faces.quads_line_orientations.assign(size * max_faces_per_cell,
+            faces.quads_line_orientations.assign(size * max_lines_per_face,
                                                  true);
           }
       }
