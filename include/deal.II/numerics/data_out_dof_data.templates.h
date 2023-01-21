@@ -235,7 +235,7 @@ namespace internal
       // to test there if dim<3.
       static const auto has_fe_with_reference_cell =
         [](const dealii::hp::FECollection<dim, spacedim> &fe_collection,
-           const dealii::ReferenceCell &                  reference_cell) {
+           const ReferenceCell &                          reference_cell) {
           for (unsigned int i = 0; i < fe_collection.size(); ++i)
             if (fe_collection[i].reference_cell() == reference_cell)
               return true;
@@ -341,7 +341,7 @@ namespace internal
 
                   for (unsigned int j = 0; j < finite_elements[i]->size(); ++j)
                     {
-                      const dealii::ReferenceCell reference_cell =
+                      const ReferenceCell reference_cell =
                         (*finite_elements[i])[j].reference_cell();
 
                       if (reference_cell.is_hyper_cube())
@@ -427,7 +427,7 @@ namespace internal
 
                   for (unsigned int j = 0; j < finite_elements[i]->size(); ++j)
                     {
-                      const dealii::ReferenceCell reference_cell =
+                      const ReferenceCell reference_cell =
                         (*finite_elements[i])[j].reference_cell();
 
                       // In 1d/2d and for hypercube/wedge/pyramid elements, we

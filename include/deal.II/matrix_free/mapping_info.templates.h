@@ -1537,10 +1537,9 @@ namespace internal
       template <int dim>
       unsigned int
       reorder_face_derivative_indices(
-        const unsigned int          face_no,
-        const unsigned int          index,
-        const dealii::ReferenceCell reference_cell =
-          dealii::ReferenceCells::Invalid)
+        const unsigned int  face_no,
+        const unsigned int  index,
+        const ReferenceCell reference_cell = dealii::ReferenceCells::Invalid)
       {
         Assert(index < dim, ExcInternalError());
 

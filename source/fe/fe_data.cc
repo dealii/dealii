@@ -24,7 +24,7 @@ namespace internal
   internal::GenericDoFsPerObject
   expand(const unsigned int               dim,
          const std::vector<unsigned int> &dofs_per_object,
-         const dealii::ReferenceCell      cell_type)
+         const ReferenceCell              cell_type)
   {
     internal::GenericDoFsPerObject result;
 

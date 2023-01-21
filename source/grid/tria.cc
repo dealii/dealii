@@ -1234,8 +1234,8 @@ namespace internal
               tria_level.reference_cell.insert(
                 tria_level.reference_cell.end(),
                 total_cells - tria_level.reference_cell.size(),
-                tria_level.dim == 2 ? dealii::ReferenceCells::Quadrilateral :
-                                      dealii::ReferenceCells::Hexahedron);
+                tria_level.dim == 2 ? ReferenceCells::Quadrilateral :
+                                      ReferenceCells::Hexahedron);
             }
         }
     }
@@ -2662,7 +2662,7 @@ namespace internal
 
         level.neighbors.assign(size * max_faces_per_cell, {-1, -1});
 
-        level.reference_cell.assign(size, dealii::ReferenceCells::Invalid);
+        level.reference_cell.assign(size, ReferenceCells::Invalid);
 
         if (orientation_needed)
           level.face_orientations.reinit(size * max_faces_per_cell);

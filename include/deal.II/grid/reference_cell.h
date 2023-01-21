@@ -46,25 +46,20 @@ class ReferenceCell;
 
 namespace internal
 {
-  namespace ReferenceCell
-  {
-    /**
-     * A helper function to create a ReferenceCell object from an
-     * integer. ReferenceCell objects are "singletons" (actually,
-     * "multitons" -- there are multiple, but they are only a handful and
-     * these are all that can be used). What is then necessary is to
-     * have a way to create these with their internal id to distinguish
-     * the few possible ones in existence. We could do this via a public
-     * constructor of ReferenceCell, but that would allow users
-     * to create ones outside the range we envision, and we don't want to do
-     * that. Rather, the constructor that takes an integer is made `private`
-     * but we have this one function in an internal namespace that is a friend
-     * of the class and can be used to create the objects.
-     */
-    constexpr dealii::ReferenceCell
-    make_reference_cell_from_int(const std::uint8_t kind);
-
-  } // namespace ReferenceCell
+  /**
+   * A helper function to create a ReferenceCell object from an integer.
+   * ReferenceCell objects are "singletons" (actually, "multitons" -- there are
+   * multiple, but they are only a handful and these are all that can be used).
+   * What is then necessary is to have a way to create these with their internal
+   * id to distinguish the few possible ones in existence. We could do this via
+   * a public constructor of ReferenceCell, but that would allow users to create
+   * ones outside the range we envision, and we don't want to do that. Rather,
+   * the constructor that takes an integer is made `private` but we have this
+   * one function in an internal namespace that is a friend of the class and can
+   * be used to create the objects.
+   */
+  constexpr ReferenceCell
+  make_reference_cell_from_int(const std::uint8_t kind);
 } // namespace internal
 
 
@@ -816,7 +811,7 @@ private:
    * called by anyone, but at least hidden in an internal namespace.
    */
   friend constexpr ReferenceCell
-  internal::ReferenceCell::make_reference_cell_from_int(const std::uint8_t);
+  internal::make_reference_cell_from_int(const std::uint8_t);
 
   friend std::ostream &
   operator<<(std::ostream &out, const ReferenceCell &reference_cell);
@@ -878,23 +873,20 @@ ReferenceCell::operator!=(const ReferenceCell &type) const
 
 namespace internal
 {
-  namespace ReferenceCell
+  inline constexpr ReferenceCell
+  make_reference_cell_from_int(const std::uint8_t kind)
   {
-    inline constexpr dealii::ReferenceCell
-    make_reference_cell_from_int(const std::uint8_t kind)
-    {
 #ifndef DEAL_II_CXX14_CONSTEXPR_BUG
-      // Make sure these are the only indices from which objects can be
-      // created.
-      Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
-             ExcInternalError());
+    // Make sure these are the only indices from which objects can be
+    // created.
+    Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
+           ExcInternalError());
 #endif
 
-      // Call the private constructor, which we can from here because this
-      // function is a 'friend'.
-      return {kind};
-    }
-  } // namespace ReferenceCell
+    // Call the private constructor, which we can from here because this
+    // function is a 'friend'.
+    return {kind};
+  }
 } // namespace internal
 
 
@@ -909,24 +901,23 @@ namespace internal
 namespace ReferenceCells
 {
   constexpr const ReferenceCell Vertex =
-    internal::ReferenceCell::make_reference_cell_from_int(0);
+    internal::make_reference_cell_from_int(0);
   constexpr const ReferenceCell Line =
-    internal::ReferenceCell::make_reference_cell_from_int(1);
+    internal::make_reference_cell_from_int(1);
   constexpr const ReferenceCell Triangle =
-    internal::ReferenceCell::make_reference_cell_from_int(2);
+    internal::make_reference_cell_from_int(2);
   constexpr const ReferenceCell Quadrilateral =
-    internal::ReferenceCell::make_reference_cell_from_int(3);
+    internal::make_reference_cell_from_int(3);
   constexpr const ReferenceCell Tetrahedron =
-    internal::ReferenceCell::make_reference_cell_from_int(4);
+    internal::make_reference_cell_from_int(4);
   constexpr const ReferenceCell Pyramid =
-    internal::ReferenceCell::make_reference_cell_from_int(5);
+    internal::make_reference_cell_from_int(5);
   constexpr const ReferenceCell Wedge =
-    internal::ReferenceCell::make_reference_cell_from_int(6);
+    internal::make_reference_cell_from_int(6);
   constexpr const ReferenceCell Hexahedron =
-    internal::ReferenceCell::make_reference_cell_from_int(7);
+    internal::make_reference_cell_from_int(7);
   constexpr const ReferenceCell Invalid =
-    internal::ReferenceCell::make_reference_cell_from_int(
-      static_cast<std::uint8_t>(-1));
+    internal::make_reference_cell_from_int(static_cast<std::uint8_t>(-1));
 
   /**
    * Return the correct simplex reference cell type for the given dimension
@@ -2599,9 +2590,9 @@ namespace internal
     /**
      * Constructor.
      */
-    NoPermutation(const dealii::ReferenceCell &entity_type,
-                  const ArrayView<const T> &   vertices_0,
-                  const ArrayView<const T> &   vertices_1)
+    NoPermutation(const ReferenceCell &     entity_type,
+                  const ArrayView<const T> &vertices_0,
+                  const ArrayView<const T> &vertices_1)
       : entity_type(entity_type)
       , vertices_0(vertices_0)
       , vertices_1(vertices_1)
@@ -2647,7 +2638,7 @@ namespace internal
     /**
      * Entity type.
      */
-    const dealii::ReferenceCell entity_type;
+    const ReferenceCell entity_type;
 
     /**
      * First set of values.

@@ -55,8 +55,8 @@ namespace internal
                                            GeometryInfo<dim>::vertices_per_cell>
         vertices)
     {
-      const dealii::ReferenceCell reference_cell =
-        dealii::ReferenceCell::n_vertices_to_type(dim, vertices.size());
+      const ReferenceCell reference_cell =
+        ReferenceCell::n_vertices_to_type(dim, vertices.size());
 
       if (reference_cell == dealii::ReferenceCells::Line)
         // Return the distance between the two vertices
