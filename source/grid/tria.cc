@@ -2354,11 +2354,16 @@ namespace internal
                         k);
                     // it doesn't make sense to set any flags except
                     // orientation for a line
-                    Assert(raw_orientation == 0u || raw_orientation == 1u,
-                           ExcInternalError());
+                    Assert(
+                      raw_orientation ==
+                          ReferenceCell::default_combined_face_orientation() ||
+                        raw_orientation ==
+                          ReferenceCell::reversed_combined_line_orientation(),
+                      ExcInternalError());
                     faces.quads_line_orientations
                       [q * GeometryInfo<3>::lines_per_face + j] =
-                      raw_orientation == 1u;
+                      raw_orientation ==
+                      ReferenceCell::default_combined_face_orientation();
                   }
               }
           }
@@ -2381,7 +2386,8 @@ namespace internal
             {
               const auto &orientations = connectivity.entity_orientations(1);
               for (unsigned int i = 0; i < orientations.n_objects(); ++i)
-                if (orientations.get_raw_orientation(i) != 1u)
+                if (orientations.get_raw_orientation(i) !=
+                    ReferenceCell::default_combined_face_orientation())
                   {
                     orientation_needed = true;
                     break;

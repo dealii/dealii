@@ -1317,7 +1317,8 @@ namespace internal
               const unsigned int f = con_cq.col[f_];
 
               // only faces with default orientation have to do something
-              if (ori_cq.get_raw_orientation(f_) != 1u)
+              if (ori_cq.get_raw_orientation(f_) !=
+                  ReferenceCell::default_combined_face_orientation())
                 continue;
 
               // determine entity type of face
@@ -1349,7 +1350,10 @@ namespace internal
                       }
 
                   // ... comparison gives orientation
-                  ori_ql.set_raw_orientation(con_ql.ptr[f] + l, same ? 1u : 0u);
+                  ori_ql.set_raw_orientation(
+                    con_ql.ptr[f] + l,
+                    same ? ReferenceCell::default_combined_face_orientation() :
+                           ReferenceCell::reversed_combined_line_orientation());
                 }
             }
         }

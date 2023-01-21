@@ -357,6 +357,19 @@ public:
   default_combined_face_orientation();
 
   /**
+   * Return the reversed (non-default orientation) line orientation flag. As
+   * lines only have two possible orientations, this function and
+   * ReferenceCell::default_combined_face_orientation() encode all of its
+   * possible orientation states.
+   *
+   * @note Line orientations are typically stored as booleans, but to better
+   * enable dimension-independent programming relevant functions typically
+   * present these values as unsigned chars.
+   */
+  static constexpr unsigned char
+  reversed_combined_line_orientation();
+
+  /**
    * Return which child cells are adjacent to a certain face of the
    * mother cell.
    *
@@ -400,7 +413,8 @@ public:
   unsigned int
   child_cell_on_face(const unsigned int  face,
                      const unsigned int  subface,
-                     const unsigned char face_orientation = 1) const;
+                     const unsigned char face_orientation =
+                       default_combined_face_orientation()) const;
 
   /**
    * For a given vertex in a cell, return a pair of a face index and a
@@ -1432,6 +1446,14 @@ inline constexpr unsigned char
 ReferenceCell::default_combined_face_orientation()
 {
   return 1u;
+}
+
+
+
+inline constexpr unsigned char
+ReferenceCell::reversed_combined_line_orientation()
+{
+  return 0u;
 }
 
 

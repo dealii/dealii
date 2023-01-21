@@ -22,6 +22,8 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -195,7 +197,8 @@ namespace internal
     {
       n_stored_objects = n_objects;
       // Assign to the default orientation
-      flags.assign(n_objects, 1u);
+      flags.assign(n_objects,
+                   ReferenceCell::default_combined_face_orientation());
     }
 
 
@@ -203,7 +206,8 @@ namespace internal
     inline void
     TriaObjectsOrientations::resize(const unsigned int n_objects)
     {
-      flags.resize(n_objects, 1u);
+      flags.resize(n_objects,
+                   ReferenceCell::default_combined_face_orientation());
       n_stored_objects = n_objects;
     }
 
