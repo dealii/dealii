@@ -174,7 +174,7 @@ namespace Functions
                       std::vector<std::vector<double>> &values) const override;
 
   private:
-    const double radius;
+    const double inv_sqr_radius;
     const double Reynolds;
   };
 
