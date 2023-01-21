@@ -2689,127 +2689,86 @@ ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
                     "the number of vertices of the cell "
                     "referenced by this object."));
 
+  const auto v0_equals = [&](const std::initializer_list<const T> &list) {
+    Assert(list.size() == n_vertices(), ExcInternalError());
+    return std::equal(vertices_0.begin(), vertices_0.end(), std::begin(list));
+  };
+
   switch (this->kind)
     {
       case ReferenceCells::Line:
         // line_orientation=true
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin({vertices_1[0], vertices_1[1]})))
+        if (v0_equals({vertices_1[0], vertices_1[1]}))
           return 1;
 
         // line_orientation=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin({vertices_1[1], vertices_1[0]})))
+        if (v0_equals({vertices_1[1], vertices_1[0]}))
           return 0;
         break;
       case ReferenceCells::Triangle:
         // face_orientation=true, face_rotation=false, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[0], vertices_1[1], vertices_1[2]})))
+        if (v0_equals({vertices_1[0], vertices_1[1], vertices_1[2]}))
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[1], vertices_1[2], vertices_1[0]})))
+        if (v0_equals({vertices_1[1], vertices_1[2], vertices_1[0]}))
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[2], vertices_1[0], vertices_1[1]})))
+        if (v0_equals({vertices_1[2], vertices_1[0], vertices_1[1]}))
           return 5;
 
         // face_orientation=false, face_rotation=false, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[0], vertices_1[2], vertices_1[1]})))
+        if (v0_equals({vertices_1[0], vertices_1[2], vertices_1[1]}))
           return 0;
 
         // face_orientation=false, face_rotation=true, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[2], vertices_1[1], vertices_1[0]})))
+        if (v0_equals({vertices_1[2], vertices_1[1], vertices_1[0]}))
           return 2;
 
         // face_orientation=false, face_rotation=false, face_flip=true
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[1], vertices_1[0], vertices_1[2]})))
+        if (v0_equals({vertices_1[1], vertices_1[0], vertices_1[2]}))
           return 4;
         break;
       case ReferenceCells::Quadrilateral:
         // face_orientation=true, face_rotation=false, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]})))
+        if (v0_equals(
+              {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}))
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]})))
+        if (v0_equals(
+              {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]}))
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[3], vertices_1[2], vertices_1[1], vertices_1[0]})))
+        if (v0_equals(
+              {vertices_1[3], vertices_1[2], vertices_1[1], vertices_1[0]}))
           return 5;
 
         // face_orientation=true, face_rotation=true, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]})))
+        if (v0_equals(
+              {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]}))
           return 7;
 
         // face_orientation=false, face_rotation=false, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[0], vertices_1[2], vertices_1[1], vertices_1[3]})))
+        if (v0_equals(
+              {vertices_1[0], vertices_1[2], vertices_1[1], vertices_1[3]}))
           return 0;
 
         // face_orientation=false, face_rotation=true, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[2], vertices_1[3], vertices_1[0], vertices_1[1]})))
+        if (v0_equals(
+              {vertices_1[2], vertices_1[3], vertices_1[0], vertices_1[1]}))
           return 2;
 
         // face_orientation=false, face_rotation=false, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[3], vertices_1[1], vertices_1[2], vertices_1[0]})))
+        if (v0_equals(
+              {vertices_1[3], vertices_1[1], vertices_1[2], vertices_1[0]}))
           return 4;
 
         // face_orientation=false, face_rotation=true, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[1], vertices_1[0], vertices_1[3], vertices_1[2]})))
+        if (v0_equals(
+              {vertices_1[1], vertices_1[0], vertices_1[3], vertices_1[2]}))
           return 6;
         break;
       default:
