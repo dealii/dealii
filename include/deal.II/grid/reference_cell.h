@@ -617,7 +617,7 @@ public:
    *   these orientation indices.
    */
   template <typename T>
-  unsigned int
+  unsigned char
   get_orientation_index(const ArrayView<const T> &vertices_0,
                         const ArrayView<const T> &vertices_1) const;
 
@@ -654,7 +654,7 @@ public:
   template <typename T>
   boost::container::small_vector<T, 8>
   reorient_based_on_orientation_index(const ArrayView<const T> &vertices,
-                                      const unsigned int orientation) const;
+                                      const unsigned char orientation) const;
 
   /**
    * Return a vector of faces a given @p vertex_index belongs to.
@@ -2676,7 +2676,7 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
 
 
 template <typename T>
-unsigned int
+unsigned char
 ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
                                      const ArrayView<const T> &vertices_1) const
 {
@@ -2853,7 +2853,7 @@ template <typename T>
 boost::container::small_vector<T, 8>
 ReferenceCell::reorient_based_on_orientation_index(
   const ArrayView<const T> &vertices,
-  const unsigned int        orientation) const
+  const unsigned char       orientation) const
 {
   Assert(vertices.size() == n_vertices(),
          ExcMessage("The number of array elements must be equal to "
