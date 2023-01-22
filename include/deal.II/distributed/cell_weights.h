@@ -117,6 +117,13 @@ namespace parallel
     /**
      * Constructor.
      *
+     * No weighting function will be connected yet. Please call reinit().
+     */
+    CellWeights() = default;
+
+    /**
+     * Constructor.
+     *
      * @param[in] dof_handler The DoFHandler which will be used to
      *    determine each cell's finite element.
      * @param[in] weighting_function The function that determines each
