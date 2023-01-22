@@ -807,6 +807,37 @@ private:
   constexpr ReferenceCell(const std::uint8_t kind);
 
   /**
+   * Table containing all vertex permutations for a line.
+   */
+  static constexpr ndarray<unsigned int, 2, 2> line_vertex_permutations = {
+    {{{1, 0}}, {{0, 1}}}};
+
+
+  /**
+   * Table containing all vertex permutations for a triangle.
+   */
+  static constexpr ndarray<unsigned int, 6, 3> triangle_vertex_permutations = {
+    {{{0, 2, 1}},
+     {{0, 1, 2}},
+     {{2, 1, 0}},
+     {{1, 2, 0}},
+     {{1, 0, 2}},
+     {{2, 0, 1}}}};
+
+  /**
+   * Table containing all vertex permutations for a quadrilateral.
+   */
+  static constexpr ndarray<unsigned int, 8, 4>
+    quadrilateral_vertex_permutations = {{{{0, 2, 1, 3}},
+                                          {{0, 1, 2, 3}},
+                                          {{2, 3, 0, 1}},
+                                          {{2, 0, 3, 1}},
+                                          {{3, 1, 2, 0}},
+                                          {{3, 2, 1, 0}},
+                                          {{1, 0, 3, 2}},
+                                          {{1, 3, 0, 2}}}};
+
+  /**
    * A kind of constructor -- not quite private because it can be
    * called by anyone, but at least hidden in an internal namespace.
    */
@@ -1865,80 +1896,23 @@ ReferenceCell::standard_to_real_face_vertex(
         break;
       case ReferenceCells::Triangle:
       case ReferenceCells::Quadrilateral:
-        {
-          static constexpr ndarray<unsigned int, 2, 2> table = {
-            {{{1, 0}}, {{0, 1}}}};
-
-          return table[face_orientation][vertex];
-        }
+        return line_vertex_permutations[face_orientation][vertex];
       case ReferenceCells::Tetrahedron:
-        {
-          static constexpr ndarray<unsigned int, 6, 3> table = {{{{0, 2, 1}},
-                                                                 {{0, 1, 2}},
-                                                                 {{2, 1, 0}},
-                                                                 {{1, 2, 0}},
-                                                                 {{1, 0, 2}},
-                                                                 {{2, 0, 1}}}};
-
-          return table[face_orientation][vertex];
-        }
+        return triangle_vertex_permutations[face_orientation][vertex];
       case ReferenceCells::Pyramid:
-        {
-          if (face == 0) // The quadrilateral face
-            {
-              return GeometryInfo<3>::standard_to_real_face_vertex(
-                vertex,
-                Utilities::get_bit(face_orientation, 0),
-                Utilities::get_bit(face_orientation, 2),
-                Utilities::get_bit(face_orientation, 1));
-            }
-          else // One of the triangular faces
-            {
-              static const ndarray<unsigned int, 6, 3> table = {{{{0, 2, 1}},
-                                                                 {{0, 1, 2}},
-                                                                 {{2, 1, 0}},
-                                                                 {{1, 2, 0}},
-                                                                 {{1, 0, 2}},
-                                                                 {{2, 0, 1}}}};
-
-              return table[face_orientation][vertex];
-            }
-        }
+        // face 0 is a quadrilateral
+        if (face == 0)
+          return quadrilateral_vertex_permutations[face_orientation][vertex];
+        else
+          return triangle_vertex_permutations[face_orientation][vertex];
       case ReferenceCells::Wedge:
-        {
-          if (face > 1) // One of the quadrilateral faces
-            {
-              return GeometryInfo<3>::standard_to_real_face_vertex(
-                vertex,
-                Utilities::get_bit(face_orientation, 0),
-                Utilities::get_bit(face_orientation, 2),
-                Utilities::get_bit(face_orientation, 1));
-            }
-          else // One of the triangular faces
-            {
-              static const ndarray<unsigned int, 6, 3> table = {{{{0, 2, 1}},
-                                                                 {{0, 1, 2}},
-                                                                 {{2, 1, 0}},
-                                                                 {{1, 2, 0}},
-                                                                 {{1, 0, 2}},
-                                                                 {{2, 0, 1}}}};
-
-              return table[face_orientation][vertex];
-            }
-        }
+        // faces 0 and 1 are triangles
+        if (face > 1)
+          return quadrilateral_vertex_permutations[face_orientation][vertex];
+        else
+          return triangle_vertex_permutations[face_orientation][vertex];
       case ReferenceCells::Hexahedron:
-        {
-          static constexpr ndarray<unsigned int, 8, 4> table = {
-            {{{0, 2, 1, 3}},
-             {{0, 1, 2, 3}},
-             {{2, 3, 0, 1}},
-             {{2, 0, 3, 1}},
-             {{3, 1, 2, 0}},
-             {{3, 2, 1, 0}},
-             {{1, 0, 3, 2}},
-             {{1, 3, 0, 2}}}};
-          return table[face_orientation][vertex];
-        }
+        return quadrilateral_vertex_permutations[face_orientation][vertex];
       default:
         Assert(false, ExcNotImplemented());
     }
@@ -1958,6 +1932,14 @@ ReferenceCell::standard_to_real_face_line(
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
 
+  static constexpr ndarray<unsigned int, 6, 3> triangle_table = {{{{2, 1, 0}},
+                                                                  {{0, 1, 2}},
+                                                                  {{1, 0, 2}},
+                                                                  {{1, 2, 0}},
+                                                                  {{0, 2, 1}},
+                                                                  {{2, 0, 1}}}};
+
+
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -1967,62 +1949,31 @@ ReferenceCell::standard_to_real_face_line(
         Assert(false, ExcNotImplemented());
         break;
       case ReferenceCells::Tetrahedron:
-        {
-          static constexpr ndarray<unsigned int, 6, 3> table = {{{{2, 1, 0}},
-                                                                 {{0, 1, 2}},
-                                                                 {{1, 0, 2}},
-                                                                 {{1, 2, 0}},
-                                                                 {{0, 2, 1}},
-                                                                 {{2, 0, 1}}}};
-
-          return table[face_orientation][line];
-        }
+        return triangle_table[face_orientation][line];
       case ReferenceCells::Pyramid:
-        {
-          if (face == 0) // The quadrilateral face
-            {
-              return GeometryInfo<3>::standard_to_real_face_line(
-                line,
-                Utilities::get_bit(face_orientation, 0),
-                Utilities::get_bit(face_orientation, 2),
-                Utilities::get_bit(face_orientation, 1));
-            }
-          else // One of the triangular faces
-            {
-              static constexpr ndarray<unsigned int, 6, 3> table = {
-                {{{2, 1, 0}},
-                 {{0, 1, 2}},
-                 {{1, 0, 2}},
-                 {{1, 2, 0}},
-                 {{0, 2, 1}},
-                 {{2, 0, 1}}}};
-
-              return table[face_orientation][line];
-            }
-        }
+        if (face == 0) // The quadrilateral face
+          {
+            return GeometryInfo<3>::standard_to_real_face_line(
+              line,
+              Utilities::get_bit(face_orientation, 0),
+              Utilities::get_bit(face_orientation, 2),
+              Utilities::get_bit(face_orientation, 1));
+          }
+        else // One of the triangular faces
+          {
+            return triangle_table[face_orientation][line];
+          }
       case ReferenceCells::Wedge:
-        {
-          if (face > 1) // One of the quadrilateral faces
-            {
-              return GeometryInfo<3>::standard_to_real_face_line(
-                line,
-                Utilities::get_bit(face_orientation, 0),
-                Utilities::get_bit(face_orientation, 2),
-                Utilities::get_bit(face_orientation, 1));
-            }
-          else // One of the triangular faces
-            {
-              static constexpr ndarray<unsigned int, 6, 3> table = {
-                {{{2, 1, 0}},
-                 {{0, 1, 2}},
-                 {{1, 0, 2}},
-                 {{1, 2, 0}},
-                 {{0, 2, 1}},
-                 {{2, 0, 1}}}};
-
-              return table[face_orientation][line];
-            }
-        }
+        if (face > 1) // One of the quadrilateral faces
+          {
+            return GeometryInfo<3>::standard_to_real_face_line(
+              line,
+              Utilities::get_bit(face_orientation, 0),
+              Utilities::get_bit(face_orientation, 2),
+              Utilities::get_bit(face_orientation, 1));
+          }
+        else // One of the triangular faces
+          return triangle_table[face_orientation][line];
       case ReferenceCells::Hexahedron:
         {
           static constexpr ndarray<unsigned int, 8, 4> table = {

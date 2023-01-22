@@ -76,6 +76,13 @@ namespace
 
 } // namespace
 
+constexpr ndarray<unsigned int, 2, 2> ReferenceCell::line_vertex_permutations;
+
+constexpr ndarray<unsigned int, 6, 3>
+  ReferenceCell::triangle_vertex_permutations;
+
+constexpr ndarray<unsigned int, 8, 4>
+  ReferenceCell::quadrilateral_vertex_permutations;
 
 std::string
 ReferenceCell::to_string() const
