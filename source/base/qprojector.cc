@@ -382,7 +382,7 @@ QProjector<2>::project_to_face(const ReferenceCell &  reference_cell,
                 Point<dim>(1 - quadrature.point(p)(0), quadrature.point(p)(0));
               break;
             case 2:
-              q_points[p] = Point<dim>(0, 1 - quadrature.point(p)(0));
+              q_points[p] = Point<dim>(0, quadrature.point(p)(0));
               break;
             default:
               Assert(false, ExcInternalError());
@@ -547,11 +547,11 @@ QProjector<2>::project_to_subface(const ReferenceCell &  reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(0, 1 - quadrature.point(p)(0) / 2);
+                    q_points[p] = Point<dim>(0, quadrature.point(p)(0) / 2);
                     break;
                   case 1:
                     q_points[p] =
-                      Point<dim>(0, 0.5 - quadrature.point(p)(0) / 2);
+                      Point<dim>(0, 0.5 + quadrature.point(p)(0) / 2);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -783,7 +783,7 @@ QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
       const std::array<std::pair<std::array<Point<2>, 2>, double>, 3> faces = {
         {{{{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0)}}, 1.0},
          {{{Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}}, std::sqrt(2.0)},
-         {{{Point<2>(0.0, 1.0), Point<2>(0.0, 0.0)}}, 1.0}}};
+         {{{Point<2>(0.0, 0.0), Point<2>(0.0, 1.0)}}, 1.0}}};
 
       // linear polynomial to map the reference quadrature points correctly
       // on faces

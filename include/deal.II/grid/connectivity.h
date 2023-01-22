@@ -196,7 +196,7 @@ namespace internal
         if (d == 1)
           {
             static const dealii::ndarray<unsigned int, 3, 2> table = {
-              {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+              {{{0, 1}}, {{1, 2}}, {{0, 2}}}};
 
             return {table[e]};
           }
@@ -310,7 +310,7 @@ namespace internal
         if (d == 2)
           {
             static const dealii::ndarray<unsigned int, 4, 3> table = {
-              {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
+              {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
 
             return {table[e]};
           }
@@ -318,7 +318,7 @@ namespace internal
         if (d == 1)
           {
             static const dealii::ndarray<unsigned int, 6, 2> table = {
-              {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
+              {{{0, 1}}, {{1, 2}}, {{0, 2}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
 
             return {table[e]};
           }
@@ -366,7 +366,7 @@ namespace internal
                           const unsigned int face) const override
       {
         const static dealii::ndarray<unsigned int, 4, 3> table = {
-          {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
+          {{{0, 1, 2}}, {{0, 4, 3}}, {{2, 5, 3}}, {{1, 5, 4}}}};
 
         return table[face][line];
       }
@@ -376,10 +376,10 @@ namespace internal
                                       const unsigned int face) const override
       {
         const static dealii::ndarray<unsigned int, 4, 3, 2> table = {
-          {{{{{0, 1}}, {{1, 2}}, {{2, 0}}}},
-           {{{{1, 0}}, {{0, 3}}, {{3, 1}}}},
-           {{{{0, 2}}, {{2, 3}}, {{3, 0}}}},
-           {{{{2, 1}}, {{1, 3}}, {{3, 2}}}}}};
+          {{{{{0, 1}}, {{1, 2}}, {{0, 2}}}},
+           {{{{0, 1}}, {{1, 3}}, {{0, 3}}}},
+           {{{{0, 2}}, {{2, 3}}, {{0, 3}}}},
+           {{{{1, 2}}, {{2, 3}}, {{1, 3}}}}}};
 
         return table[face][line];
       }
