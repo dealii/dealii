@@ -1483,7 +1483,7 @@ ReferenceCell::child_cell_on_face(
       case ReferenceCells::Triangle:
         {
           static constexpr ndarray<unsigned int, 3, 2> subcells = {
-            {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+            {{{0, 1}}, {{1, 2}}, {{0, 2}}}};
 
           return subcells[face][subface];
         }
@@ -1618,7 +1618,7 @@ ReferenceCell::standard_line_to_face_and_line_index(
       case ReferenceCells::Tetrahedron:
         {
           static const std::array<unsigned int, 2> table[6] = {
-            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 1}}, {{1, 2}}, {{2, 1}}};
+            {{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 2}}, {{1, 1}}, {{2, 1}}};
 
           return table[line];
         }
@@ -1676,7 +1676,7 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
       case ReferenceCells::Triangle:
         {
           static constexpr ndarray<unsigned int, 3, 2> table = {
-            {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+            {{{0, 1}}, {{1, 2}}, {{0, 2}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Quadrilateral:
@@ -1688,7 +1688,7 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
       case ReferenceCells::Tetrahedron:
         {
           static constexpr ndarray<unsigned int, 6, 2> table = {
-            {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
+            {{{0, 1}}, {{1, 2}}, {{0, 2}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Pyramid:
@@ -1785,7 +1785,7 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
       case ReferenceCells::Tetrahedron:
         {
           static constexpr ndarray<unsigned int, 4, 3> table = {
-            {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
+            {{{0, 1, 2}}, {{0, 4, 3}}, {{2, 5, 3}}, {{1, 5, 4}}}};
 
           return table[face][standard_to_real_face_line(
             line, face, face_orientation)];
@@ -1859,7 +1859,7 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
       case ReferenceCells::Triangle:
         {
           static constexpr ndarray<unsigned int, 3, 2> table = {
-            {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+            {{{0, 1}}, {{1, 2}}, {{0, 2}}}};
 
           return table[face][face_orientation != 0u ? vertex : (1 - vertex)];
         }
@@ -1875,7 +1875,7 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
       case ReferenceCells::Tetrahedron:
         {
           static constexpr ndarray<unsigned int, 4, 3> table = {
-            {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
+            {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
 
           return table[face][standard_to_real_face_vertex(
             vertex, face, face_orientation)];
