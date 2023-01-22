@@ -816,7 +816,7 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
 #  else // DEAL_II_PETSC_WITH_HYPRE
-    (void)pc;
+    (void)matrix_;
     Assert(false,
            ExcMessage("Your PETSc installation does not include a copy of "
                       "the hypre package necessary for this preconditioner."));
