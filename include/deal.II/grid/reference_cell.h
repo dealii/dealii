@@ -2604,6 +2604,13 @@ ReferenceCell::standard_vs_true_line_orientation(
   const unsigned char combined_face_orientation,
   const bool          line_orientation) const
 {
+  // TODO: should be n_face_orientations(face_no) when we suport mixed meshes
+  // here
+  if (*this != ReferenceCells::Pyramid && *this != ReferenceCells::Wedge)
+    {
+      AssertIndexRange(line, face_reference_cell(0).n_lines());
+      AssertIndexRange(combined_face_orientation, n_face_orientations(0));
+    }
   if (*this == ReferenceCells::Hexahedron)
     {
       static constexpr dealii::ndarray<bool, 2, 8> bool_table{
@@ -2612,6 +2619,17 @@ ReferenceCell::standard_vs_true_line_orientation(
 
       return (line_orientation ==
               bool_table[line / 2][combined_face_orientation]);
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      static constexpr ndarray<bool, 6, 3> bool_table{{{{true, false, true}},
+                                                       {{true, true, true}},
+                                                       {{false, false, false}},
+                                                       {{true, false, false}},
+                                                       {{false, true, true}},
+                                                       {{false, true, false}}}};
+
+      return (line_orientation == bool_table[combined_face_orientation][line]);
     }
   else
     // TODO: This might actually be wrong for some of the other
