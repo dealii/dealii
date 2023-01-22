@@ -835,7 +835,8 @@ operator>>(std::istream &in, ReferenceCell &reference_cell)
       (reference_cell == ReferenceCells::Pyramid) ||
       (reference_cell == ReferenceCells::Invalid),
     ExcMessage(
-      "The reference cell kind just read does not correspond to one of the valid choices. There must be an error."));
+      "The reference cell kind just read does not correspond to one of the "
+      "valid choices. There must be an error."));
 
   return in;
 }
