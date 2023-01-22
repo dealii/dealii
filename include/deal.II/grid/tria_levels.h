@@ -223,7 +223,7 @@ namespace internal
        *
        * @note Used only for dim=2 and dim=3.
        */
-      std::vector<dealii::ReferenceCell> reference_cell;
+      std::vector<ReferenceCell> reference_cell;
 
       /**
        * A cache for the vertex indices of the cells (`structdim == dim`), in

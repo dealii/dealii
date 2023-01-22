@@ -72,14 +72,14 @@ namespace internal
       /**
        * Geometric entity type of the @p e-th sub-entity of dimension @p d.
        */
-      virtual dealii::ReferenceCell
+      virtual ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const
       {
         Assert(false, ExcNotImplemented());
         (void)d;
         (void)e;
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       /**
@@ -152,17 +152,17 @@ namespace internal
         return {};
       }
 
-      dealii::ReferenceCell
+      ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const override
       {
         (void)e;
 
         if (d == 1)
-          return dealii::ReferenceCells::Line;
+          return ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -206,20 +206,20 @@ namespace internal
         return {};
       }
 
-      virtual dealii::ReferenceCell
+      virtual ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const override
       {
         (void)e;
 
         if (d == 2)
-          return dealii::ReferenceCells::Triangle;
+          return ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCells::Line;
+          return ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -263,20 +263,20 @@ namespace internal
         return {};
       }
 
-      virtual dealii::ReferenceCell
+      virtual ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const override
       {
         (void)e;
 
         if (d == 2)
-          return dealii::ReferenceCells::Quadrilateral;
+          return ReferenceCells::Quadrilateral;
 
         if (d == 1)
-          return dealii::ReferenceCells::Line;
+          return ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -328,23 +328,23 @@ namespace internal
         return {};
       }
 
-      virtual dealii::ReferenceCell
+      virtual ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const override
       {
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCells::Tetrahedron;
+          return ReferenceCells::Tetrahedron;
 
         if (d == 2)
-          return dealii::ReferenceCells::Triangle;
+          return ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCells::Line;
+          return ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -439,25 +439,25 @@ namespace internal
         return {};
       }
 
-      virtual dealii::ReferenceCell
+      virtual ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const override
       {
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCells::Pyramid;
+          return ReferenceCells::Pyramid;
 
         if (d == 2 && e == 0)
-          return dealii::ReferenceCells::Quadrilateral;
+          return ReferenceCells::Quadrilateral;
         else if (d == 2)
-          return dealii::ReferenceCells::Triangle;
+          return ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCells::Line;
+          return ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -565,25 +565,25 @@ namespace internal
         return {};
       }
 
-      virtual dealii::ReferenceCell
+      virtual ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const override
       {
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCells::Wedge;
+          return ReferenceCells::Wedge;
 
         if (d == 2 && e > 1)
-          return dealii::ReferenceCells::Quadrilateral;
+          return ReferenceCells::Quadrilateral;
         else if (d == 2)
-          return dealii::ReferenceCells::Triangle;
+          return ReferenceCells::Triangle;
 
         if (d == 1)
-          return dealii::ReferenceCells::Line;
+          return ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -693,23 +693,23 @@ namespace internal
         return {};
       }
 
-      virtual dealii::ReferenceCell
+      virtual ReferenceCell
       type_of_entity(const unsigned int d, const unsigned int e) const override
       {
         (void)e;
 
         if (d == 3)
-          return dealii::ReferenceCells::Hexahedron;
+          return ReferenceCells::Hexahedron;
 
         if (d == 2)
-          return dealii::ReferenceCells::Quadrilateral;
+          return ReferenceCells::Quadrilateral;
 
         if (d == 1)
-          return dealii::ReferenceCells::Line;
+          return ReferenceCells::Line;
 
         Assert(false, ExcNotImplemented());
 
-        return dealii::ReferenceCells::Vertex;
+        return ReferenceCells::Vertex;
       }
 
       unsigned int
@@ -822,8 +822,8 @@ namespace internal
     template <typename T = unsigned int>
     struct Connectivity
     {
-      Connectivity(const unsigned int                        dim,
-                   const std::vector<dealii::ReferenceCell> &cell_types)
+      Connectivity(const unsigned int                dim,
+                   const std::vector<ReferenceCell> &cell_types)
         : dim(dim)
         , cell_types(cell_types)
       {}
@@ -850,7 +850,7 @@ namespace internal
         return quad_orientation;
       }
 
-      inline std::vector<dealii::ReferenceCell> &
+      inline std::vector<ReferenceCell> &
       entity_types(const unsigned int structdim)
       {
         if (structdim == dim)
@@ -863,7 +863,7 @@ namespace internal
         return quad_types;
       }
 
-      inline const std::vector<dealii::ReferenceCell> &
+      inline const std::vector<ReferenceCell> &
       entity_types(const unsigned int structdim) const
       {
         if (structdim == dim)
@@ -915,8 +915,8 @@ namespace internal
       }
 
     private:
-      const unsigned int                 dim;
-      std::vector<dealii::ReferenceCell> cell_types;
+      const unsigned int         dim;
+      std::vector<ReferenceCell> cell_types;
 
       CRS<T> line_vertices;
 
@@ -930,7 +930,7 @@ namespace internal
       CRS<T> cell_entities;
       CRS<T> neighbors;
 
-      std::vector<dealii::ReferenceCell> quad_types;
+      std::vector<ReferenceCell> quad_types;
     };
 
 
@@ -1000,7 +1000,7 @@ namespace internal
     build_face_entities_templated(
       const unsigned int                                face_dimensionality,
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<dealii::ReferenceCell> &        cell_types_index,
+      const std::vector<ReferenceCell> &                cell_types_index,
       const CRS<unsigned int> &                         crs,
       CRS<unsigned int> &                               crs_d,        // result
       CRS<unsigned int> &                               crs_0,        // result
@@ -1040,7 +1040,7 @@ namespace internal
         keys; // key (sorted vertices), cell-entity index
 
       std::vector<std::array<unsigned int, max_n_vertices>> ad_entity_vertices;
-      std::vector<dealii::ReferenceCell>                    ad_entity_types;
+      std::vector<ReferenceCell>                            ad_entity_types;
       std::vector<std::array<unsigned int, max_n_vertices>> ad_compatibility;
 
       keys.reserve(n_entities);
@@ -1191,7 +1191,7 @@ namespace internal
     build_face_entities(
       const unsigned int                                face_dimensionality,
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<dealii::ReferenceCell> &        cell_types_index,
+      const std::vector<ReferenceCell> &                cell_types_index,
       const CRS<unsigned int> &                         crs,
       CRS<unsigned int> &                               crs_d,
       CRS<unsigned int> &                               crs_0,
@@ -1255,7 +1255,7 @@ namespace internal
     inline void
     build_intersection(
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<dealii::ReferenceCell> &        cell_types_index,
+      const std::vector<ReferenceCell> &                cell_types_index,
       const CRS<unsigned int> &                         con_cv,
       const CRS<unsigned int> &                         con_cl,
       const CRS<unsigned int> &                         con_lv,
@@ -1264,7 +1264,7 @@ namespace internal
       const TriaObjectsOrientations &                   ori_cq,
       CRS<unsigned int> &                               con_ql,   // result
       TriaObjectsOrientations &                         ori_ql,   // result
-      std::vector<dealii::ReferenceCell> &              quad_t_id // result
+      std::vector<ReferenceCell> &                      quad_t_id // result
     )
     {
       // reset output
@@ -1369,8 +1369,8 @@ namespace internal
     Connectivity<T>
     build_connectivity(const unsigned int                                dim,
                        const std::vector<std::shared_ptr<CellTypeBase>> &cell_t,
-                       const std::vector<dealii::ReferenceCell> &cell_t_id,
-                       const CRS<T> &                            con_cv)
+                       const std::vector<ReferenceCell> &cell_t_id,
+                       const CRS<T> &                    con_cv)
     {
       Connectivity<T> connectivity(dim, cell_t_id);
 
@@ -1462,23 +1462,20 @@ namespace internal
       std::vector<std::shared_ptr<CellTypeBase>> cell_types_impl(8);
 
       cell_types_impl[static_cast<types::geometric_entity_type>(
-        dealii::ReferenceCells::Line)] = std::make_shared<CellTypeLine>();
+        ReferenceCells::Line)]     = std::make_shared<CellTypeLine>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-        dealii::ReferenceCells::Triangle)] =
-        std::make_shared<CellTypeTriangle>();
+        ReferenceCells::Triangle)] = std::make_shared<CellTypeTriangle>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-        dealii::ReferenceCells::Quadrilateral)] =
+        ReferenceCells::Quadrilateral)] =
         std::make_shared<CellTypeQuadrilateral>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-        dealii::ReferenceCells::Tetrahedron)] =
-        std::make_shared<CellTypeTetrahedron>();
+        ReferenceCells::Tetrahedron)] = std::make_shared<CellTypeTetrahedron>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-        dealii::ReferenceCells::Pyramid)] = std::make_shared<CellTypePyramid>();
+        ReferenceCells::Pyramid)]     = std::make_shared<CellTypePyramid>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-        dealii::ReferenceCells::Wedge)]   = std::make_shared<CellTypeWedge>();
+        ReferenceCells::Wedge)]       = std::make_shared<CellTypeWedge>();
       cell_types_impl[static_cast<types::geometric_entity_type>(
-        dealii::ReferenceCells::Hexahedron)] =
-        std::make_shared<CellTypeHexahedron>();
+        ReferenceCells::Hexahedron)]  = std::make_shared<CellTypeHexahedron>();
 
       // determine cell types and process vertices
       std::vector<T> cell_vertices;
@@ -1494,7 +1491,7 @@ namespace internal
       cell_vertices_ptr.reserve(cells.size() + 1);
       cell_vertices_ptr.push_back(0);
 
-      std::vector<dealii::ReferenceCell> cell_types_indices;
+      std::vector<ReferenceCell> cell_types_indices;
       cell_types_indices.reserve(cells.size());
 
       // loop over cells and create CRS
@@ -1517,11 +1514,10 @@ namespace internal
                    "CellData."));
 #endif
 
-          const dealii::ReferenceCell reference_cell =
-            dealii::ReferenceCell::n_vertices_to_type(dim,
-                                                      cell.vertices.size());
+          const ReferenceCell reference_cell =
+            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
 
-          Assert(reference_cell != dealii::ReferenceCells::Invalid,
+          Assert(reference_cell != ReferenceCells::Invalid,
                  ExcNotImplemented());
           AssertIndexRange(static_cast<types::geometric_entity_type>(
                              reference_cell),

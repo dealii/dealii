@@ -700,7 +700,7 @@ namespace internal
   internal::GenericDoFsPerObject
   expand(const unsigned int               dim,
          const std::vector<unsigned int> &dofs_per_object,
-         const dealii::ReferenceCell      reference_cell);
+         const ReferenceCell              reference_cell);
 } // namespace internal
 
 

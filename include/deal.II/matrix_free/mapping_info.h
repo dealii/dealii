@@ -199,7 +199,7 @@ namespace internal
        * Reference-cell type related to each quadrature and active quadrature
        * index.
        */
-      std::vector<std::vector<dealii::ReferenceCell>> reference_cell_types;
+      std::vector<std::vector<ReferenceCell>> reference_cell_types;
 
       /**
        * Internal function to compute the geometry for the case the mapping is

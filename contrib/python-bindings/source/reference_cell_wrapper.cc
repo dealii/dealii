@@ -35,7 +35,7 @@ namespace python
 
   ReferenceCellWrapper::ReferenceCellWrapper(const std::uint8_t &kind)
   {
-    cell_type = internal::ReferenceCell::make_reference_cell_from_int(kind);
+    cell_type = internal::make_reference_cell_from_int(kind);
   }
 
 

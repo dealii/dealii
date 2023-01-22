@@ -4234,7 +4234,7 @@ namespace internal
           Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
 
           q_projector = QProjector<dim>::project_to_all_faces(
-            dealii::ReferenceCells::get_hypercube<dim>(), quadrature);
+            ReferenceCells::get_hypercube<dim>(), quadrature);
         }
 
       for (const auto &cell : tria.active_cell_iterators())
