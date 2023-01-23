@@ -4259,15 +4259,15 @@ namespace internal
 
               ref(0, 0);
               ref(1, 1);
-              ref(2, 2);
+              ref(2, 0);
 
               // set up lines which do not have parents:
               new_lines[6]->set_bounding_object_indices(
                 {new_vertices[3], new_vertices[4]});
               new_lines[7]->set_bounding_object_indices(
-                {new_vertices[4], new_vertices[5]});
+                {new_vertices[5], new_vertices[4]});
               new_lines[8]->set_bounding_object_indices(
-                {new_vertices[5], new_vertices[3]});
+                {new_vertices[3], new_vertices[5]});
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -4331,16 +4331,16 @@ namespace internal
             {
               subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
                                                         new_lines[8]->index(),
-                                                        new_lines[5]->index()});
+                                                        new_lines[4]->index()});
               subcells[1]->set_bounding_object_indices({new_lines[1]->index(),
                                                         new_lines[2]->index(),
                                                         new_lines[6]->index()});
               subcells[2]->set_bounding_object_indices({new_lines[7]->index(),
                                                         new_lines[3]->index(),
-                                                        new_lines[4]->index()});
-              subcells[3]->set_bounding_object_indices({new_lines[6]->index(),
-                                                        new_lines[7]->index(),
-                                                        new_lines[8]->index()});
+                                                        new_lines[5]->index()});
+              subcells[3]->set_bounding_object_indices({new_lines[7]->index(),
+                                                        new_lines[8]->index(),
+                                                        new_lines[6]->index()});
 
               // Set subcell line orientations by checking the line's second
               // vertex (from the subcell's perspective) to the line's actual
@@ -4362,21 +4362,21 @@ namespace internal
 
               fix_line_orientation(0, 3, 0, 0);
               fix_line_orientation(8, 5, 0, 1);
-              fix_line_orientation(5, 0, 0, 2);
+              fix_line_orientation(4, 5, 0, 2);
 
               fix_line_orientation(1, 1, 1, 0);
               fix_line_orientation(2, 4, 1, 1);
-              fix_line_orientation(6, 3, 1, 2);
+              fix_line_orientation(6, 4, 1, 2);
 
               fix_line_orientation(7, 4, 2, 0);
               fix_line_orientation(3, 2, 2, 1);
-              fix_line_orientation(4, 5, 2, 2);
+              fix_line_orientation(5, 2, 2, 2);
 
-              // all lines of the new interior cell are oriented backwards so
-              // that it has positive area.
-              fix_line_orientation(6, 4, 3, 0);
-              fix_line_orientation(7, 5, 3, 1);
-              fix_line_orientation(8, 3, 3, 2);
+              // Instead of picking one line to be inversed, invert all the
+              // lines to avoid preferentially picking one direction
+              fix_line_orientation(7, 5, 3, 0);
+              fix_line_orientation(8, 3, 3, 1);
+              fix_line_orientation(6, 3, 3, 2);
             }
           else if ((dim == 2) &&
                    (cell->reference_cell() == ReferenceCells::Quadrilateral))
