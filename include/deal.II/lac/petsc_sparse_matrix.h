@@ -212,14 +212,6 @@ namespace PETScWrappers
            const bool                 preset_nonzero_locations = true);
 
     /**
-     * Return a reference to the MPI communicator object in use with this
-     * matrix. Since this is a sequential matrix, it returns the MPI_COMM_SELF
-     * communicator.
-     */
-    virtual const MPI_Comm &
-    get_mpi_communicator() const override;
-
-    /**
      * Return the number of rows of this matrix.
      */
     size_t
@@ -257,8 +249,7 @@ namespace PETScWrappers
   private:
     /**
      * Do the actual work for the respective reinit() function and the
-     * matching constructor, i.e. create a matrix. Getting rid of the previous
-     * matrix is left to the caller.
+     * matching constructor, i.e. create a matrix.
      */
     void
     do_reinit(const size_type m,
@@ -481,6 +472,18 @@ namespace PETScWrappers
              const bool                    preset_nonzero_locations = true);
 
       /**
+       * Create a square matrix where the size() of the IndexSet determines the
+       * global number of rows and columns and the entries of the IndexSet
+       * give the rows and columns for the calling processor. Note that only
+       * ascending, 1:1 IndexSets are supported.
+       */
+      template <typename SparsityPatternType>
+      void
+      reinit(const IndexSet &           local_partitioning,
+             const SparsityPatternType &sparsity_pattern,
+             const MPI_Comm &           communicator);
+
+      /**
        * Create a matrix where the size() of the IndexSets determine the
        * global number of rows and columns and the entries of the IndexSet
        * give the rows and columns for the calling processor. Note that only
@@ -518,13 +521,6 @@ namespace PETScWrappers
              const IndexSet &           local_active_columns,
              const SparsityPatternType &sparsity_pattern,
              const MPI_Comm &           communicator);
-
-      /**
-       * Return a reference to the MPI communicator object in use with this
-       * matrix.
-       */
-      virtual const MPI_Comm &
-      get_mpi_communicator() const override;
 
       /**
        * @addtogroup Exceptions
@@ -610,16 +606,12 @@ namespace PETScWrappers
 
     private:
       /**
-       * Copy of the communicator object to be used for this parallel vector.
-       */
-      MPI_Comm communicator;
-
-      /**
        * Same as previous functions.
        */
       template <typename SparsityPatternType>
       void
-      do_reinit(const SparsityPatternType &   sparsity_pattern,
+      do_reinit(const MPI_Comm &              comm,
+                const SparsityPatternType &   sparsity_pattern,
                 const std::vector<size_type> &local_rows_per_process,
                 const std::vector<size_type> &local_columns_per_process,
                 const unsigned int            this_process,
@@ -630,7 +622,8 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      do_reinit(const IndexSet &           local_rows,
+      do_reinit(const MPI_Comm &           comm,
+                const IndexSet &           local_rows,
                 const IndexSet &           local_columns,
                 const SparsityPatternType &sparsity_pattern);
 
@@ -640,7 +633,8 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      do_reinit(const IndexSet &           local_rows,
+      do_reinit(const MPI_Comm &           comm,
+                const IndexSet &           local_rows,
                 const IndexSet &           local_active_rows,
                 const IndexSet &           local_columns,
                 const IndexSet &           local_active_columns,
@@ -650,15 +644,6 @@ namespace PETScWrappers
       friend class BlockMatrixBase<SparseMatrix>;
     };
 
-
-
-    // -------- template and inline functions ----------
-
-    inline const MPI_Comm &
-    SparseMatrix::get_mpi_communicator() const
-    {
-      return communicator;
-    }
   } // namespace MPI
 } // namespace PETScWrappers
 

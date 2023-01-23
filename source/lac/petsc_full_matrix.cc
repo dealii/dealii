@@ -56,13 +56,6 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
-
-  const MPI_Comm &
-  FullMatrix::get_mpi_communicator() const
-  {
-    static const MPI_Comm communicator = MPI_COMM_SELF;
-    return communicator;
-  }
 } // namespace PETScWrappers
 
 

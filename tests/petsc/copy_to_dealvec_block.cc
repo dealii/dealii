@@ -17,7 +17,7 @@
 
 // Test
 // LinearAlgebra::distributed::Vector::operator=(PETScWrappers::MPI::BlockVector&)
-
+// and PETScWrappers::MPI::BlockVector interaction with PETSc Vecs
 #include <deal.II/base/index_set.h>
 
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -114,6 +114,17 @@ test()
     {
       Assert(copied.block(bl)(myid * 2) == myid * 4.0, ExcInternalError());
       Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0,
+             ExcInternalError());
+    }
+
+  // Create new block vector from a PETSc VECNEST
+  PETScWrappers::MPI::BlockVector vb2(v.petsc_vector());
+  Assert(vb2.n_blocks() == v.n_blocks(), ExcInternalError());
+  Assert(vb2.size() == v.size(), ExcInternalError());
+  for (unsigned int bl = 0; bl < 2; ++bl)
+    {
+      Assert(vb2.block(bl).size() == v.block(bl).size(), ExcInternalError());
+      Assert(vb2.block(bl).petsc_vector() == v.block(bl).petsc_vector(),
              ExcInternalError());
     }
 

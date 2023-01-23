@@ -29,6 +29,10 @@
 #include "../../include/deal.II/sundials/n_vector.templates.h"
 #include <deal.II/sundials/n_vector.h>
 
+#ifdef DEAL_II_WITH_MPI
+#  include <mpi.h>
+#endif
+
 #include "../tests.h"
 
 using namespace SUNDIALS::internal;
@@ -371,9 +375,16 @@ test_get_communicator()
                                     global_nvector_context
 #endif
   );
-  Assert(*static_cast<MPI_Comm *>(N_VGetCommunicator(n_vector)) ==
-           MPI_COMM_WORLD,
-         NVectorTestError());
+  // PETSc duplicates the user communicator. It does not make sense to
+  // compare MPI_Comm using "==", which is equivalent to MPI_IDENT.
+  // MPI_CONGRUENT indicates same group but different context (e.g. tags,
+  // keyvals, etc.)
+#ifdef DEAL_II_WITH_MPI
+  int  result;
+  auto comm = static_cast<MPI_Comm *>(N_VGetCommunicator(n_vector));
+  MPI_Comm_compare(*comm, MPI_COMM_WORLD, &result);
+  Assert(result == MPI_IDENT || result == MPI_CONGRUENT, NVectorTestError());
+#endif
 
   deallog << "test_get_communicator OK" << std::endl;
 }

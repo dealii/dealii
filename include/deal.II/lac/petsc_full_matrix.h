@@ -76,14 +76,6 @@ namespace PETScWrappers
     reinit(const size_type m, const size_type n);
 
 
-    /**
-     * Return a reference to the MPI communicator object in use with this
-     * matrix. Since this is a sequential matrix, it returns the MPI_COMM_SELF
-     * communicator.
-     */
-    virtual const MPI_Comm &
-    get_mpi_communicator() const override;
-
   private:
     /**
      * Do the actual work for the respective reinit() function and the

@@ -671,10 +671,9 @@ namespace PETScWrappers
 
     /**
      * Return a reference to the MPI communicator object in use with this
-     * matrix. If not implemented, it returns the communicator used by the
-     * PETSc Mat.
+     * matrix.
      */
-    virtual const MPI_Comm &
+    const MPI_Comm &
     get_mpi_communicator() const;
 
     /**
@@ -1642,8 +1641,10 @@ namespace PETScWrappers
   inline const MPI_Comm &
   MatrixBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm;
-    PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
+    static MPI_Comm comm = PETSC_COMM_SELF;
+    MPI_Comm pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(matrix));
+    if (pcomm != MPI_COMM_NULL)
+      comm = pcomm;
     return comm;
   }
 
