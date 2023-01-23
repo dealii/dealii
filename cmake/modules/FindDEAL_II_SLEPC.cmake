@@ -40,7 +40,7 @@ set_if_empty(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
 deal_ii_find_library(SLEPC_LIBRARY
   NAMES slepc libslepc
-  HINTS ${SLEPC_DIR} ${SLEPC_DIR}/${PETSC_ARCH} ${PETSC_DIR}
+  HINTS ${SLEPC_DIR} ${SLEPC_DIR}/${PETSC_ARCH} ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
 )
 
@@ -50,6 +50,7 @@ deal_ii_find_path(SLEPC_INCLUDE_DIR_ARCH slepcconf.h
     ${SLEPC_DIR}/${PETSC_ARCH}
     ${SLEPC_INCLUDE_DIRS}
     ${PETSC_DIR}
+    ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES slepc include include/slepc
 )
 
@@ -59,6 +60,7 @@ deal_ii_find_path(SLEPC_INCLUDE_DIR_COMMON slepcversion.h
     ${SLEPC_DIR}/${PETSC_ARCH}
     ${SLEPC_INCLUDE_DIRS}
     ${PETSC_DIR}
+    ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES slepc include include/slepc
 )
 
