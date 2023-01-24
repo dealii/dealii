@@ -533,18 +533,18 @@ namespace Utilities
           else
 #      endif
             {
-#      ifdef DEAL_II_HAVE_CXX17
-              if constexpr (std::is_trivial<Number>::value)
-#      else
-            if (std::is_trivial<Number>::value)
-#      endif
-                std::memset(ghost_array.data(),
-                            0,
-                            sizeof(Number) * ghost_array.size());
+              DEAL_II_IF_CONSTEXPR ((std::is_trivial<Number>::value))
+                {
+                  std::memset(ghost_array.data(),
+                              0,
+                              sizeof(Number) * ghost_array.size());
+                }
               else
+              {
                 std::fill(ghost_array.data(),
                           ghost_array.data() + ghost_array.size(),
                           0);
+              }
             }
           return;
         }
@@ -736,20 +736,18 @@ namespace Utilities
           else
 #    endif
             {
-#    ifdef DEAL_II_HAVE_CXX17
-              if constexpr (std::is_trivial<Number>::value)
-#    else
-            if (std::is_trivial<Number>::value)
-#    endif
+              DEAL_II_IF_CONSTEXPR ((std::is_trivial<Number>::value))
                 {
                   std::memset(ghost_array.data(),
                               0,
                               sizeof(Number) * n_ghost_indices());
                 }
               else
+              {
                 std::fill(ghost_array.data(),
                           ghost_array.data() + n_ghost_indices(),
                           0);
+              }
             }
         }
 

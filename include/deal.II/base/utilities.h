@@ -1341,11 +1341,7 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-#ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#else
-    if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#endif
+    DEAL_II_IF_CONSTEXPR ((std::is_trivially_copyable<T>() && sizeof(T) < 256))
       {
         // Determine the size. There are places where we would like to use a
         // truly empty type, for which we use std::tuple<> (i.e., a tuple
@@ -1369,40 +1365,40 @@ namespace Utilities
     // the data.
     else if (internal::IsVectorOfTriviallyCopyable<T>::value &&
              (allow_compression == false))
-      {
-        const std::size_t previous_size = dest_buffer.size();
+    {
+      const std::size_t previous_size = dest_buffer.size();
 
-        // When we have DEAL_II_HAVE_CXX17 set by default, we can just
-        // inline the code of the following function here and make the 'if'
-        // above a 'if constexpr'. Without the 'constexpr', we need to keep
-        // the general template of the function that throws an exception.
-        internal::append_vector_of_trivially_copyable_to_buffer(object,
-                                                                dest_buffer);
+      // When we have DEAL_II_HAVE_CXX17 set by default, we can just
+      // inline the code of the following function here and make the 'if'
+      // above a 'if constexpr'. Without the 'constexpr', we need to keep
+      // the general template of the function that throws an exception.
+      internal::append_vector_of_trivially_copyable_to_buffer(object,
+                                                              dest_buffer);
 
-        size = dest_buffer.size() - previous_size;
-      }
+      size = dest_buffer.size() - previous_size;
+    }
     else
+    {
+      // use buffer as the target of a compressing
+      // stream into which we serialize the current object
+      const std::size_t previous_size = dest_buffer.size();
       {
-        // use buffer as the target of a compressing
-        // stream into which we serialize the current object
-        const std::size_t previous_size = dest_buffer.size();
-        {
-          boost::iostreams::filtering_ostreambuf fosb;
+        boost::iostreams::filtering_ostreambuf fosb;
 #ifdef DEAL_II_WITH_ZLIB
-          if (allow_compression)
-            fosb.push(boost::iostreams::gzip_compressor());
+        if (allow_compression)
+          fosb.push(boost::iostreams::gzip_compressor());
 #else
-          (void)allow_compression;
+        (void)allow_compression;
 #endif
-          fosb.push(boost::iostreams::back_inserter(dest_buffer));
+        fosb.push(boost::iostreams::back_inserter(dest_buffer));
 
-          boost::archive::binary_oarchive boa(fosb);
-          boa << object;
-          // the stream object has to be destroyed before the return statement
-          // to ensure that all data has been written in the buffer
-        }
-        size = dest_buffer.size() - previous_size;
+        boost::archive::binary_oarchive boa(fosb);
+        boa << object;
+        // the stream object has to be destroyed before the return statement
+        // to ensure that all data has been written in the buffer
       }
+      size = dest_buffer.size() - previous_size;
+    }
 
     return size;
   }
@@ -1428,11 +1424,7 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-#ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#else
-    if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#endif
+    DEAL_II_IF_CONSTEXPR ((std::is_trivially_copyable<T>() && sizeof(T) < 256))
       {
         // Determine the size. There are places where we would like to use a
         // truly empty type, for which we use std::tuple<> (i.e., a tuple
@@ -1460,35 +1452,35 @@ namespace Utilities
     // are not asked to compress the data.
     else if (internal::IsVectorOfTriviallyCopyable<T>::value &&
              (allow_compression == false))
-      {
-        // When we have DEAL_II_HAVE_CXX17 set by default, we can just
-        // inline the code of the following function here and make the 'if'
-        // above a 'if constexpr'. Without the 'constexpr', we need to keep
-        // the general template of the function that throws an exception.
-        T object;
-        internal::create_vector_of_trivially_copyable_from_buffer(cbegin,
-                                                                  cend,
-                                                                  object);
-        return object;
-      }
+    {
+      // When we have DEAL_II_HAVE_CXX17 set by default, we can just
+      // inline the code of the following function here and make the 'if'
+      // above a 'if constexpr'. Without the 'constexpr', we need to keep
+      // the general template of the function that throws an exception.
+      T object;
+      internal::create_vector_of_trivially_copyable_from_buffer(cbegin,
+                                                                cend,
+                                                                object);
+      return object;
+    }
     else
-      {
-        // decompress the buffer section into the object
-        boost::iostreams::filtering_istreambuf fisb;
+    {
+      // decompress the buffer section into the object
+      boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
-        if (allow_compression)
-          fisb.push(boost::iostreams::gzip_decompressor());
+      if (allow_compression)
+        fisb.push(boost::iostreams::gzip_decompressor());
 #else
-        (void)allow_compression;
+      (void)allow_compression;
 #endif
-        fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
+      fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
-        boost::archive::binary_iarchive bia(fisb);
+      boost::archive::binary_iarchive bia(fisb);
 
-        T object;
-        bia >> object;
-        return object;
-      }
+      T object;
+      bia >> object;
+      return object;
+    }
 
     return T();
   }
@@ -1512,31 +1504,28 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-#ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
-#else
-    if (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
-#endif
+    DEAL_II_IF_CONSTEXPR (
+      (std::is_trivially_copyable<T>() && sizeof(T) * N < 256))
       {
         Assert(std::distance(cbegin, cend) == sizeof(T) * N,
                ExcInternalError());
         std::memcpy(unpacked_object, &*cbegin, sizeof(T) * N);
       }
     else
-      {
-        // decompress the buffer section into the object
-        boost::iostreams::filtering_istreambuf fisb;
+    {
+      // decompress the buffer section into the object
+      boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
-        if (allow_compression)
-          fisb.push(boost::iostreams::gzip_decompressor());
+      if (allow_compression)
+        fisb.push(boost::iostreams::gzip_decompressor());
 #else
-        (void)allow_compression;
+      (void)allow_compression;
 #endif
-        fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
+      fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
-        boost::archive::binary_iarchive bia(fisb);
-        bia >> unpacked_object;
-      }
+      boost::archive::binary_iarchive bia(fisb);
+      bia >> unpacked_object;
+    }
   }
 
 

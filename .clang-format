@@ -65,6 +65,9 @@ DerivePointerAlignment: false
 
 FixNamespaceComments: true
 
+# Should be IfMacros in clang-format 13 and higher
+ForEachMacros: ['DEAL_II_IF_CONSTEXPR']
+
 IncludeBlocks: Regroup
 IncludeCategories:
 # config.h must always be first:
