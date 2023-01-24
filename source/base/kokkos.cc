@@ -31,9 +31,14 @@ namespace internal
   {
     if (!Kokkos::is_initialized())
       {
-        dealii_initialized_kokkos = true;
-        Kokkos::initialize();
-        std::atexit(Kokkos::finalize);
+        // only execute once
+        static bool dummy = [] {
+          dealii_initialized_kokkos = true;
+          Kokkos::initialize();
+          std::atexit(Kokkos::finalize);
+          return true;
+        }();
+        (void)dummy;
       }
   }
 } // namespace internal
