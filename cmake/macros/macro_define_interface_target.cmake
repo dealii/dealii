@@ -120,7 +120,7 @@ function(define_interface_target _feature)
       )
     if(NOT "${_link_options}" STREQUAL "")
       message(STATUS "    LINK_OPTIONS:        ${_link_options}")
-      target_link_options(${_interface_target} INTERFACE ${_link_options})
+      target_link_options(${_interface_target} INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${_link_options}>)
     endif()
 
     export(TARGETS ${_interface_target}
