@@ -46,8 +46,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 template <int dim>
 void
 test(unsigned int chunk_size)
@@ -124,9 +122,9 @@ test(unsigned int chunk_size)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(2);
 
   test<2>(1);
   test<2>(2);

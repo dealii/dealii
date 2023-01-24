@@ -34,9 +34,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void
 test()
@@ -94,8 +91,8 @@ test()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
 
   test<1>();
   test<2>();

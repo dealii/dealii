@@ -20,10 +20,6 @@
 // that things still work for very high order
 
 
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -41,6 +37,8 @@ std::ofstream logfile("output");
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/hp/fe_values.h>
+
+#include "../tests.h"
 
 
 const long double pi = 3.141592653589793238462643;
@@ -180,10 +178,10 @@ compute_pi_by_perimeter()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(16);
-  logfile << std::setprecision(16);
+  deallog.get_file_stream() << std::setprecision(16);
 
-  deallog.attach(logfile);
 
   compute_pi_by_area<2>();
   compute_pi_by_perimeter<2>();

@@ -79,10 +79,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
-
 /*
  * Generate a grid consisting of two disjoint cells, colorize the two
  * outermost faces. They will be matched via collect_periodic_faces
@@ -257,9 +253,9 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(4);
 
   {
     // Generate a triangulation and match:

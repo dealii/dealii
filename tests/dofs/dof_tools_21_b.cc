@@ -32,9 +32,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 //
 // Test
 //   DoFTools::
@@ -361,9 +358,9 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(4);
 
   deallog << "Test for 2D, Q1:" << std::endl << std::endl;
 
