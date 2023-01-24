@@ -100,12 +100,12 @@ SparseDirectUMFPACK::clear()
     }
 
   {
-    std::vector<long int> tmp;
+    std::vector<types::suitesparse_index> tmp;
     tmp.swap(Ap);
   }
 
   {
-    std::vector<long int> tmp;
+    std::vector<types::suitesparse_index> tmp;
     tmp.swap(Ai);
   }
 
