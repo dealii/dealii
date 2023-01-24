@@ -348,15 +348,15 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # Override target and run command for parameter file variants:
       #
       if("${_source_file}" MATCHES "(prm|json)$")
-        if(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
+        if(TARGET "${TEST_TARGET_${_build}}")
           set(_target ${TEST_TARGET_${_build}})
-        elseif(NOT "${TEST_TARGET}" STREQUAL "")
+        elseif(TARGET "${TEST_TARGET}")
           set(_target ${TEST_TARGET})
         else()
-          message(FATAL_ERROR "\n${_comparison_file}:\n"
-            "A parameter file \"${_test_name}.(prm|json)(|.in)\" has been "
-            "found, but neither \"\${TEST_TARGET}\", nor "
-            "\"\${TEST_TARGET_${_build}}\" have been defined.\n"
+          message(FATAL_ERROR
+            "The parameter file \"${_source_file}\" has been found, but neither "
+            "\"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}\" have been set to "
+            "valid target name.\n"
             )
         endif()
         set(_target_short ${_target})
@@ -454,8 +454,6 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
 
-        add_dependencies(compile_test_executables ${_target})
-
         set_target_properties(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
         deal_ii_setup_target(${_target} ${_build})
@@ -479,6 +477,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target_short}"
           )
 
+        add_dependencies(compile_test_executables ${_target})
       endif()
 
       #
@@ -500,6 +499,13 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         )
 
       if(_run_only)
+        #
+        # Only compile and run the test executable. Do not run a diff
+        # stage. We use this feature for performance tests (where comparing
+        # output does not make sense), or for tests that signal success or
+        # failure with a return code (such as our quick tests).
+        #
+
         add_custom_target(${_test_target}
           COMMAND echo "${_test_full}: BUILD successful."
           COMMAND echo "${_test_full}: RUN successful."
@@ -509,6 +515,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           )
 
       else()
+        #
+        # Add a diff rule and set up a test target that depends on a
+        # successful compilation, run and diff.
+        #
 
         file(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
 
