@@ -574,36 +574,23 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # And finally define the test:
       #
 
+      add_test(NAME ${_test_full}
+        COMMAND ${CMAKE_COMMAND}
+          -DTRGT=${_test_target}
+          -DTEST=${_test_full}
+          -DEXPECT=${_expect}
+          -DBINARY_DIR=${CMAKE_BINARY_DIR}
+          -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
+        WORKING_DIRECTORY ${_test_directory}
+        )
+      set_tests_properties(${_test_full} PROPERTIES
+        LABEL "${_category}"
+        TIMEOUT ${TEST_TIME_LIMIT}
+        )
+
       if(_shared_target)
-        add_test(NAME ${_test_full}
-          COMMAND ${CMAKE_COMMAND}
-            -DTRGT=${_test_target}
-            -DTEST=${_test_full}
-            -DEXPECT=${_expect}
-            -DBINARY_DIR=${CMAKE_BINARY_DIR}
-            -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
-          WORKING_DIRECTORY ${_test_directory}
-          )
         set_tests_properties(${_test_full} PROPERTIES
-          LABEL "${_category}"
-          TIMEOUT ${TEST_TIME_LIMIT}
           FIXTURES_REQUIRED ${_test_executable_full}
-          )
-
-      else()
-
-        add_test(NAME ${_test_full}
-          COMMAND ${CMAKE_COMMAND}
-            -DTRGT=${_test_target}
-            -DTEST=${_test_full}
-            -DEXPECT=${_expect}
-            -DBINARY_DIR=${CMAKE_BINARY_DIR}
-            -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
-          WORKING_DIRECTORY ${_test_directory}
-          )
-        set_tests_properties(${_test_full} PROPERTIES
-          LABEL "${_category}"
-          TIMEOUT ${TEST_TIME_LIMIT}
           )
       endif()
 
