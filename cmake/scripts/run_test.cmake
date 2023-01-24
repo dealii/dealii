@@ -27,26 +27,6 @@
 #            (return value 0)
 #            Possible values are CONFIGURE, BUILD, RUN, DIFF, PASSED
 #
-#   GUARD_FILE - used to detect a forced interruption of this script: On
-#                startup the backed up file ${GUARD_FILE}_bck is put back
-#                in place as ${GUARD_FILE} and on exit ${GUARD_FILE} is
-#                backed up as ${GUARD_FILE}_bck. If on startup a stale
-#                ${GUARD_FILE} is found, it is deleted.
-#
-
-if(NOT "${GUARD_FILE}" STREQUAL "" AND EXISTS ${GUARD_FILE})
-  #
-  # Guard file still exists, so this script must have been interrupted.
-  # Remove guard file to force a complete rerun:
-  #
-  execute_process(COMMAND rm -f ${GUARD_FILE})
-elseif(NOT "${GUARD_FILE}" STREQUAL "" AND EXISTS ${GUARD_FILE}_bck)
-  #
-  # A backed up guard file exists. Put it back in place:
-  #
-  execute_process(COMMAND mv ${GUARD_FILE}_bck ${GUARD_FILE})
-endif()
-
 
 if("${EXPECT}" STREQUAL "")
   set(EXPECT "PASSED")
@@ -126,14 +106,6 @@ else()
 endif()
 
 message("===============================    OUTPUT END   ===============================")
-
-#
-# Back up guard file:
-#
-
-if(NOT "${GUARD_FILE}" STREQUAL "" AND EXISTS ${GUARD_FILE})
-  execute_process(COMMAND mv ${GUARD_FILE} ${GUARD_FILE}_bck)
-endif()
 
 #
 # Bail out:

@@ -446,21 +446,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       #
 
       if(NOT TARGET ${_target})
-        #
-        # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
-        # force a complete rerun of this test (BUILD, RUN and DIFF stage)
-        # if interrupt_guard.cc is removed by run_test.cmake due to an
-        # interruption.
-        #
-        add_custom_command(
-          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
-          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
-          )
 
         add_executable(${_target} EXCLUDE_FROM_ALL
           ${_generated_files}
           ${_source_file}
-          ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
 
         set_target_properties(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
@@ -507,7 +496,6 @@ function(deal_ii_add_test _category _test_name _comparison_file)
             -DTEST=${_test_executable_full}
             -DEXPECT=PASSED
             -DBINARY_DIR=${CMAKE_BINARY_DIR}
-            -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/interrupt_guard.cc
             -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
           WORKING_DIRECTORY ${_test_directory}
           )
@@ -593,7 +581,6 @@ function(deal_ii_add_test _category _test_name _comparison_file)
             -DTEST=${_test_full}
             -DEXPECT=${_expect}
             -DBINARY_DIR=${CMAKE_BINARY_DIR}
-            # no guard file
             -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
           WORKING_DIRECTORY ${_test_directory}
           )
@@ -611,7 +598,6 @@ function(deal_ii_add_test _category _test_name _comparison_file)
             -DTEST=${_test_full}
             -DEXPECT=${_expect}
             -DBINARY_DIR=${CMAKE_BINARY_DIR}
-            -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/interrupt_guard.cc
             -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
           WORKING_DIRECTORY ${_test_directory}
           )
