@@ -942,13 +942,8 @@ namespace PETScWrappers
 
     Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-    // there is no simple operation for this
-    // in PETSc. there are multiple ways to
-    // emulate it, we choose this one:
-    const PetscErrorCode ierr = VecCopy(v.vector, vector);
+    const PetscErrorCode ierr = VecAXPBY(vector, a, 0.0, v.vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    *this *= a;
   }
 
 
