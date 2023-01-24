@@ -17,6 +17,8 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 
+#include <deal.II/lac/exceptions.h>
+
 #include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -846,6 +848,26 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
 #  endif
       );
     }
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_PETSC
+IS
+IndexSet::make_petsc_is(const MPI_Comm &communicator) const
+{
+  std::vector<size_type> indices;
+  fill_index_vector(indices);
+
+  PetscInt              n = indices.size();
+  std::vector<PetscInt> pindices(indices.begin(), indices.end());
+
+  IS             is;
+  PetscErrorCode ierr =
+    ISCreateGeneral(communicator, n, pindices.data(), PETSC_COPY_VALUES, &is);
+  AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+  return is;
 }
 #endif
 
