@@ -413,6 +413,25 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       file(MAKE_DIRECTORY ${_test_directory})
 
       #
+      # Determine whether the test shares a common executable target. This
+      # involves tests with .threads=N. and .mpirun=N. annotation, as well
+      # as tests with parameter files (that might share a common executable
+      # target).
+      #
+      # In this case we have to make sure that concurrently invoking the
+      # test does not accidentally trigger a concurrent build of the
+      # executable target. We ensure this by declaring an additional test
+      # that only builds the shared target / ensures the shared target is
+      # present. All run tests then requires this test target as a "setup
+      # fixture", see
+      # https://cmake.org/cmake/help/latest/prop_test/FIXTURES_REQUIRED.html#prop_test:FIXTURES_REQUIRED
+      #
+      set(_shared_target FALSE)
+      if(NOT "${_n_cpu}${_n_threads}" STREQUAL "00" OR "${_source_file}" MATCHES "(prm|json)$")
+        set(_shared_target TRUE)
+      endif()
+
+      #
       # Add an executable (for the first type of tests) and set up compile
       # definitions and the full link interface. Only add the target once.
       #
@@ -577,8 +596,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # as tests with parameter files (that might share a common executable
       # target).
       #
-      if( NOT "${_n_cpu}${_n_threads}" STREQUAL "00" OR
-          "${_source_file}" MATCHES "(prm|json)$" )
+      if(_shared_target)
         #
         # Running multiple variants of tests with the same target
         # executable in parallel triggers a race condition where the same
