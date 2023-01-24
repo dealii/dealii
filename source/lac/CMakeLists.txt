@@ -66,7 +66,6 @@ if(DEAL_II_WITH_CUDA)
   set(_separate_src
     ${_separate_src}
     vector_memory_cuda.cc
-    affine_constraints_cuda.cc
     )
 endif()
 
