@@ -26,7 +26,8 @@
 set(HDF5_DIR "" CACHE PATH "An optional hint to an hdf5 directory")
 set_if_empty(HDF5_DIR "$ENV{HDF5_DIR}")
 
-if(NOT "${HDF5_DIR}" STREQUAL "")
+if( NOT "${HDF5_DIR}" STREQUAL "" AND
+    NOT "${HDF5_DIR}" STREQUAL "HDF5_DIR-NOTFOUND" )
   set(HDF5_ROOT "${HDF5_DIR}")
 endif()
 
