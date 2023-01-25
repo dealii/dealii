@@ -56,6 +56,13 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
 
       template void
       get_position_vector(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        VEC &,
+        const ComponentMask &);
+
+      template void
+      get_position_vector(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         VEC &,
         const ComponentMask &);
