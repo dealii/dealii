@@ -625,6 +625,42 @@ namespace CGALWrappers
     return vertices;
   }
 
+  /**
+   * Get vertices of face in CGAL ordering
+   *
+   * @param cell A cell_iterator to a deal.II cell.
+   * @param face_no The face number within the given cell.
+   * @param mapping Mapping object for the cell.
+   * @return Array of vertices in CGAL order.
+   */
+  template <int dim, int spacedim>
+  std::vector<Point<spacedim>>
+  get_vertices_in_cgal_order(
+    const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                                  face_no,
+    const Mapping<dim, spacedim> &                                      mapping)
+  {
+    // Elements have to be rectangular or simplices
+    const unsigned int n_vertices = cell->face(face_no)->n_vertices();
+    Assert(
+      (n_vertices == ReferenceCells::get_hypercube<dim - 1>().n_vertices()) ||
+        (n_vertices == ReferenceCells::get_simplex<dim - 1>().n_vertices()),
+      ExcNotImplemented());
+
+    std::vector<Point<spacedim>> ordered_vertices(n_vertices);
+    std::copy_n(mapping.get_vertices(cell, face_no).begin(),
+                n_vertices,
+                ordered_vertices.begin());
+
+    if (ReferenceCell::n_vertices_to_type(dim - 1, n_vertices) ==
+        ReferenceCells::Quadrilateral)
+      std::swap(ordered_vertices[2], ordered_vertices[3]);
+
+    return ordered_vertices;
+  }
+
+
+
 } // namespace CGALWrappers
 #  endif
 
