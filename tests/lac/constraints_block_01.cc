@@ -61,15 +61,12 @@
 
 
 
-std::ofstream logfile("output");
-
-
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(2);
 
   // setting up some constants
   const unsigned int dim       = 2;

@@ -28,38 +28,37 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 int
 main(int argc, char **argv)
 {
-  deallog.attach(logfile);
+  initlog();
   deallog.depth_console(1);
 
   try
     {
-      logfile << "Initializing SLEPc (PETSc): " << std::flush;
+      deallog.get_file_stream() << "Initializing SLEPc (PETSc): " << std::flush;
 
       SlepcInitialize(&argc, &argv, nullptr, nullptr);
       {
-        logfile << "ok" << std::endl;
+        deallog.get_file_stream() << "ok" << std::endl;
 
         // Do something simple with PETSc
-        logfile << "Using PetscScalar:" << std::endl;
+        deallog.get_file_stream() << "Using PetscScalar:" << std::endl;
 
         const PetscScalar pi_1i = numbers::PI + 1. * PETSC_i;
         const PetscScalar two   = 2.;
 
-        logfile << "   pi+1i:           " << pi_1i << std::endl
-                << "   two:             " << two << std::endl
-                << "   two times pi+1i: " << two * pi_1i << std::endl;
+        deallog.get_file_stream()
+          << "   pi+1i:           " << pi_1i << std::endl
+          << "   two:             " << two << std::endl
+          << "   two times pi+1i: " << two * pi_1i << std::endl;
 
 
-        logfile << "Finalizing SLEPc (PETSc): " << std::flush;
+        deallog.get_file_stream() << "Finalizing SLEPc (PETSc): " << std::flush;
       }
       SlepcFinalize();
 
-      logfile << "ok" << std::endl << std::endl;
+      deallog.get_file_stream() << "ok" << std::endl << std::endl;
     }
 
   catch (std::exception &exc)

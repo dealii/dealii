@@ -41,9 +41,6 @@
 // 2: refinement of the circle at the boundary
 // 2: refinement of a wiggled area at the boundary
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 class Ball : public FlatManifold<dim>
 {
@@ -325,7 +322,7 @@ TestCases<dim>::run(const unsigned int test_case)
   int unconstrained_bandwidth = sparsity.bandwidth();
 
   deallog << "    Writing sparsity pattern..." << std::endl;
-  sparsity.print_gnuplot(logfile);
+  sparsity.print_gnuplot(deallog.get_file_stream());
 
 
   // computing constraints
@@ -336,7 +333,7 @@ TestCases<dim>::run(const unsigned int test_case)
   constraints.condense(sparsity);
 
   deallog << "    Writing condensed sparsity pattern..." << std::endl;
-  sparsity.print_gnuplot(logfile);
+  sparsity.print_gnuplot(deallog.get_file_stream());
 
 
   deallog << std::endl
@@ -364,7 +361,7 @@ TestCases<dim>::run(const unsigned int test_case)
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   for (unsigned int test_case = 1; test_case <= 2; ++test_case)
     {

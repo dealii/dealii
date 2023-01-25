@@ -29,8 +29,6 @@
 #define PRECISION 2
 
 
-std::ofstream logfile("output");
-
 char buf[1000];
 
 
@@ -428,9 +426,9 @@ TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
 int
 main()
 {
-  logfile.precision(PRECISION);
-  logfile.setf(std::ios::fixed);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(PRECISION);
+  deallog.get_file_stream().setf(std::ios::fixed);
 
   Triangulation<2> tria_test;
   DoFHandler<2> *  dof_handler, *dof_handler_def;

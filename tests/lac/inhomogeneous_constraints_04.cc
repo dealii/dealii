@@ -55,9 +55,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 void
 test(bool use_constraint_matrix)
 {
@@ -101,7 +98,7 @@ test(bool use_constraint_matrix)
       cm.set_inhomogeneity(4, 0.0);
 
       cm.close();
-      cm.print(logfile);
+      cm.print(deallog.get_file_stream());
 
       cm.distribute_local_to_global(
         local_mat, local_vec, local_dofs1, mat, rhs, true);
@@ -132,24 +129,24 @@ test(bool use_constraint_matrix)
       MatrixTools::apply_boundary_values(boundary_values, mat, solution, rhs);
     }
 
-  mat.print(logfile);
-  rhs.print(logfile);
+  mat.print(deallog.get_file_stream());
+  rhs.print(deallog.get_file_stream());
 
   for (unsigned int i = 0; i < 8; ++i)
     {
       solution(i) = rhs(i) / mat(i, i);
     }
 
-  solution.print(logfile);
+  solution.print(deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(2);
 
   // Use the constraints for the right-hand-side
   {

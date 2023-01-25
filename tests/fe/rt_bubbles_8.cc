@@ -41,8 +41,6 @@
 #define PRECISION 5
 
 
-std::ofstream logfile("output");
-
 template <int dim>
 void
 test(const unsigned int degree)
@@ -75,7 +73,7 @@ test(const unsigned int degree)
             (fe.shape_value_component(i, q_point, d) *
              fe.shape_value_component(j, q_point, d) * fe.JxW(q_point));
 
-  mass_matrix.print_formatted(logfile, 3, false, 0, "0", 1);
+  mass_matrix.print_formatted(deallog.get_file_stream(), 3, false, 0, "0", 1);
 
   SolverControl           solver_control(2 * dofs_per_cell, 1e-8);
   PrimitiveVectorMemory<> vector_memory;
@@ -98,9 +96,9 @@ test(const unsigned int degree)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   for (unsigned int i = 1; i < 4; ++i)
     {

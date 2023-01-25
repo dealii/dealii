@@ -38,9 +38,6 @@
 
 
 
-std::ofstream logfile("output");
-
-
 void
 make_tria(Triangulation<3> &tria, int step)
 {
@@ -251,9 +248,9 @@ make_tria(Triangulation<3> &tria, int step)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(2);
 
   FiniteElement<3> *fe = nullptr;
 
@@ -275,7 +272,7 @@ main()
 
           Triangulation<3> tria;
           make_tria(tria, step);
-          GridOut().write_gnuplot(tria, logfile);
+          GridOut().write_gnuplot(tria, deallog.get_file_stream());
 
           DoFHandler<3> dof(tria);
           dof.distribute_dofs(*fe);
@@ -284,7 +281,7 @@ main()
           DoFTools::make_hanging_node_constraints(dof, constraints);
           constraints.close();
 
-          constraints.print(logfile);
+          constraints.print(deallog.get_file_stream());
 
           // release FE
           dof.clear();

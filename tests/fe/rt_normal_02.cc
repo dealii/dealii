@@ -53,9 +53,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-std::ofstream logfile("output");
-
-
 /*
  * Check if the normal component is continuous over element edges.
  */
@@ -254,9 +251,9 @@ EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
 int
 main(int /*argc*/, char ** /*argv*/)
 {
+  initlog();
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   Triangulation<2>          tria_test;
   DoFHandler<2> *           dof_handler;

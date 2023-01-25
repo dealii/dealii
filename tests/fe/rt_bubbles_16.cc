@@ -26,8 +26,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 template <int dim>
 void
 test(const unsigned int degree)

@@ -27,9 +27,6 @@
 #define PRECISION 8
 
 
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -413,11 +410,11 @@ TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
-  logfile << std::setprecision(PRECISION);
-  logfile << std::fixed;
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(PRECISION);
+  deallog.get_file_stream() << std::fixed;
 
   Triangulation<2> tria_test;
   DoFHandler<2> *  dof_handler, *dof_handler_def;

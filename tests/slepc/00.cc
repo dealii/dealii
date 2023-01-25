@@ -26,36 +26,35 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
 int
 main(int argc, char **argv)
 {
-  deallog.attach(logfile);
+  initlog();
   try
     {
-      logfile << "Initializing SLEPc (PETSc): " << std::flush;
+      deallog.get_file_stream() << "Initializing SLEPc (PETSc): " << std::flush;
 
       SlepcInitialize(&argc, &argv, nullptr, nullptr);
       {
-        logfile << "ok" << std::endl;
+        deallog.get_file_stream() << "ok" << std::endl;
 
         // Do something simple with PETSc
-        logfile << "Using PetscScalar:" << std::endl;
+        deallog.get_file_stream() << "Using PetscScalar:" << std::endl;
 
         const PetscScalar pi  = numbers::PI;
         const PetscScalar two = 2.;
 
-        logfile << "   pi:           " << pi << std::endl
-                << "   two:          " << two << std::endl
-                << "   two times pi: " << two * pi << std::endl;
+        deallog.get_file_stream()
+          << "   pi:           " << pi << std::endl
+          << "   two:          " << two << std::endl
+          << "   two times pi: " << two * pi << std::endl;
 
 
-        logfile << "Finalizing SLEPc (PETSc): " << std::flush;
+        deallog.get_file_stream() << "Finalizing SLEPc (PETSc): " << std::flush;
       }
       SlepcFinalize();
 
-      logfile << "ok" << std::endl << std::endl;
+      deallog.get_file_stream() << "ok" << std::endl << std::endl;
     }
 
   catch (std::exception &exc)
