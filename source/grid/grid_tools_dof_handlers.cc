@@ -614,9 +614,10 @@ namespace GridTools
     // need to find all neighbors
     const Point<dim> unit_point = cells_and_points.front().second;
     const auto       my_cell    = cells_and_points.front().first;
-    Tensor<1, dim>   distance_to_center;
-    unsigned int     n_dirs_at_threshold     = 0;
-    unsigned int     last_point_at_threshold = numbers::invalid_unsigned_int;
+
+    Tensor<1, dim> distance_to_center;
+    unsigned int   n_dirs_at_threshold     = 0;
+    unsigned int   last_point_at_threshold = numbers::invalid_unsigned_int;
     for (unsigned int d = 0; d < dim; ++d)
       {
         distance_to_center[d] = std::abs(unit_point[d] - 0.5);
@@ -636,7 +637,18 @@ namespace GridTools
           2 * last_point_at_threshold +
           (unit_point[last_point_at_threshold] > 0.5 ? 1 : 0);
         if (!my_cell->at_boundary(neighbor_index))
-          cells_to_add.push_back(my_cell->neighbor(neighbor_index));
+          {
+            const auto neighbor_cell = my_cell->neighbor(neighbor_index);
+
+            if (neighbor_cell->is_active())
+              cells_to_add.push_back(neighbor_cell);
+            else
+              for (const auto &child_cell : neighbor_cell->child_iterators())
+                {
+                  if (child_cell->is_active())
+                    cells_to_add.push_back(child_cell);
+                }
+          }
       }
     // corner point -> use all neighbors
     else if (n_dirs_at_threshold == dim)
@@ -648,8 +660,10 @@ namespace GridTools
           cells = find_cells_adjacent_to_vertex(
             mesh, my_cell->vertex_index(local_vertex_index));
         for (const auto &cell : cells)
-          if (cell != my_cell)
-            cells_to_add.push_back(cell);
+          {
+            if (cell != my_cell)
+              cells_to_add.push_back(cell);
+          }
       }
     // point on line in 3D: We cannot simply take the intersection between
     // the two vertices of cells because of hanging nodes. So instead we
