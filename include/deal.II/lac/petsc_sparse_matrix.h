@@ -76,6 +76,12 @@ namespace PETScWrappers
     SparseMatrix();
 
     /**
+     * Initialize a Matrix from a PETSc Mat object. Note that we do not copy
+     * the matrix.
+     */
+    explicit SparseMatrix(const Mat &);
+
+    /**
      * Create a sparse matrix of dimensions @p m times @p n, with an initial
      * guess of @p n_nonzero_per_row nonzero elements per row. PETSc is able
      * to cope with the situation that more than this number of elements is
@@ -387,6 +393,12 @@ namespace PETScWrappers
        * Default constructor. Create an empty matrix.
        */
       SparseMatrix();
+
+      /**
+       * Initialize a SparseMatrix from a PETSc Mat object. Note that we do not
+       * copy the matrix.
+       */
+      explicit SparseMatrix(const Mat &);
 
       /**
        * Destructor to free the PETSc object.

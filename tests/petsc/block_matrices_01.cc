@@ -71,6 +71,26 @@ test()
   // Extract the PETSc MATNEST and use print from PETScWrappers::MatrixBase
   PETScWrappers::MatrixBase tmp(pbsm.petsc_matrix());
   tmp.print(deallog.get_file_stream());
+
+  // Extract the PETSc MATNEST and assign to a new BlockSparseMatrix
+  PETScWrappers::MPI::BlockSparseMatrix tmp2(pbsm.petsc_matrix());
+  Assert(tmp2.n_block_rows() == pbsm.n_block_rows(), ExcInternalError());
+  Assert(tmp2.n_block_cols() == pbsm.n_block_cols(), ExcInternalError());
+  Assert(tmp2.m() == pbsm.m(), ExcInternalError());
+  Assert(tmp2.n() == pbsm.n(), ExcInternalError());
+  for (unsigned int blr = 0; blr < 2; ++blr)
+    {
+      for (unsigned int blc = 0; blc < 2; ++blc)
+        {
+          Assert(tmp2.block(blr, blc).m() == pbsm.block(blr, blc).m(),
+                 ExcInternalError());
+          Assert(tmp2.block(blr, blc).n() == pbsm.block(blr, blc).n(),
+                 ExcInternalError());
+          Assert(tmp2.block(blr, blc).petsc_matrix() ==
+                   pbsm.block(blr, blc).petsc_matrix(),
+                 ExcInternalError());
+        }
+    }
 }
 
 

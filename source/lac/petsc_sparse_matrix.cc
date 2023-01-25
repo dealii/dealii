@@ -35,7 +35,9 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
-
+  SparseMatrix::SparseMatrix(const Mat &A)
+    : MatrixBase(A)
+  {}
 
   SparseMatrix::SparseMatrix(const size_type m,
                              const size_type n,
