@@ -25,21 +25,17 @@
 
 template <typename Number>
 void
-print_cuda_view(const ArrayView<Number, MemorySpace::CUDA> cuda_view)
+print_device_view(
+  const Kokkos::View<Number *, MemorySpace::Default::kokkos_space> device_view)
 {
-  std::vector<Number> cpu_values(cuda_view.size());
-  Utilities::CUDA::copy_to_host(cuda_view.data(), cpu_values);
+  std::vector<Number> cpu_values(device_view.size());
+  Kokkos::deep_copy(Kokkos::View<Number *, Kokkos::HostSpace>(
+                      cpu_values.data(), cpu_values.size()),
+                    device_view);
   for (Number value : cpu_values)
     deallog << value << " ";
   deallog << std::endl;
 }
-
-__global__ void
-set_value(double *values_dev, unsigned int index, double val)
-{
-  values_dev[index] = val;
-}
-
 
 template <typename Number = double>
 void
@@ -97,20 +93,20 @@ test()
   std::vector<Number> cpu_owned(rank == 0 ? 8 : 0);
   for (unsigned int i = 0; i < cpu_owned.size(); ++i)
     cpu_owned[i] = i;
-  std::unique_ptr<Number[], void (*)(Number *)> owned(
-    Utilities::CUDA::allocate_device_data<Number>(cpu_owned.size()),
-    Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number, MemorySpace::CUDA> owned_view(owned.get(),
-                                                  cpu_owned.size());
-  Utilities::CUDA::copy_to_dev(cpu_owned, owned.get());
+  Kokkos::View<Number *, MemorySpace::Default::kokkos_space> owned(
+    "owned", rank == 0 ? 8 : 0);
+  ArrayView<Number, MemorySpace::Default>             owned_view(owned.data(),
+                                                     owned.size());
+  MemorySpace::Default::kokkos_space::execution_space exec;
+  Kokkos::parallel_for(
+    Kokkos::RangePolicy<decltype(exec)>(exec, 0, owned.size()),
+    KOKKOS_LAMBDA(int i) { owned(i) = i; });
+  exec.fence();
 
-  std::vector<Number>                           cpu_ghost(4, 0);
-  std::unique_ptr<Number[], void (*)(Number *)> ghost(
-    Utilities::CUDA::allocate_device_data<Number>(cpu_ghost.size()),
-    Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number, MemorySpace::CUDA> ghost_view(ghost.get(),
-                                                  cpu_ghost.size());
-  Utilities::CUDA::copy_to_dev(cpu_ghost, ghost.get());
+  Kokkos::View<Number *, MemorySpace::Default::kokkos_space> ghost("ghost", 4);
+  ArrayView<Number, MemorySpace::Default> ghost_view(ghost.data(),
+                                                     ghost.size());
+  Kokkos::deep_copy(ghost, 0);
 
   // update ghost values
   // vector of requests
@@ -118,47 +114,45 @@ test()
   std::vector<MPI_Request> compress_requests;
 
   // allocate temporal array
-  std::unique_ptr<Number[], void (*)(Number *)> tmp_data(
-    Utilities::CUDA::allocate_device_data<Number>(
-      tight_partitioner->n_import_indices()),
-    Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number, MemorySpace::CUDA> tmp_data_view(
-    tmp_data.get(), tight_partitioner->n_import_indices());
+  Kokkos::View<Number *, MemorySpace::Default::kokkos_space> tmp_data(
+    "tmp_data", tight_partitioner->n_import_indices());
+  ArrayView<Number, MemorySpace::Default> tmp_data_view(tmp_data.data(),
+                                                        tmp_data.size());
 
   // begin exchange, and ...
-  tight_partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
-    0, owned_view, tmp_data_view, ghost_view, requests);
+  tight_partitioner
+    ->export_to_ghosted_array_start<Number, MemorySpace::Default>(
+      0, owned_view, tmp_data_view, ghost_view, requests);
 
   // ... finish exchange
-  tight_partitioner->export_to_ghosted_array_finish<Number, MemorySpace::CUDA>(
-    ghost_view, requests);
+  tight_partitioner
+    ->export_to_ghosted_array_finish<Number, MemorySpace::Default>(ghost_view,
+                                                                   requests);
 
   auto print = [&]() {
     deallog << "owned:" << std::endl;
-    print_cuda_view(owned_view);
+    print_device_view(owned);
     deallog << "ghost:" << std::endl;
-    print_cuda_view(ghost_view);
+    print_device_view(ghost);
   };
 
   deallog << "update ghosts()" << std::endl;
   print();
 
-  std::unique_ptr<Number[], void (*)(Number *)> import_data(
-    Utilities::CUDA::allocate_device_data<Number>(
-      tight_partitioner->n_import_indices()),
-    Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number, MemorySpace::CUDA> import_data_view(
-    tmp_data.get(), tight_partitioner->n_import_indices());
+  Kokkos::View<Number *, MemorySpace::Default::kokkos_space> import_data(
+    "import_data", tight_partitioner->n_import_indices());
+  ArrayView<Number, MemorySpace::Default> import_data_view(tmp_data.data(),
+                                                           import_data.size());
 
   // now do insert:
   auto compress = [&](VectorOperation::values operation) {
     const unsigned int counter = 0;
     tight_partitioner
-      ->import_from_ghosted_array_start<Number, MemorySpace::CUDA>(
+      ->import_from_ghosted_array_start<Number, MemorySpace::Default>(
         operation, counter, ghost_view, import_data_view, compress_requests);
 
     tight_partitioner
-      ->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
+      ->import_from_ghosted_array_finish<Number, MemorySpace::Default>(
         operation, import_data_view, owned_view, ghost_view, compress_requests);
   };
 
@@ -168,8 +162,8 @@ test()
 
   if (rank == 1)
     {
-      set_value<<<1, 1>>>(ghost.get(), 1, 10);
-      set_value<<<1, 1>>>(ghost.get(), 2, 20);
+      Kokkos::deep_copy(Kokkos::subview(ghost, 1), 10);
+      Kokkos::deep_copy(Kokkos::subview(ghost, 2), 20);
     }
 
   deallog << "compress(add)" << std::endl;
@@ -183,12 +177,11 @@ main(int argc, char **argv)
   using namespace dealii;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
+  Kokkos::initialize();
   MPILogInitAll log;
-
-  init_cuda(true);
 
   test();
 
+  Kokkos::finalize();
   return 0;
 }

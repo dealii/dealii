@@ -116,7 +116,6 @@ if(DEAL_II_WITH_CUDA)
   set(_separate_src
     ${_separate_src}
     cuda.cc
-    partitioner_cuda.cc
   )
 endif()
 
@@ -143,7 +142,6 @@ set(_inst
   mpi_noncontiguous_partitioner.inst.in
   mpi_remote_point_evaluation.inst.in
   partitioner.inst.in
-  partitioner_cuda.inst.in
   polynomials_rannacher_turek.inst.in
   symmetric_tensor.inst.in
   symbolic_function.inst.in

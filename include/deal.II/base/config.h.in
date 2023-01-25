@@ -448,7 +448,10 @@
 #  define DEAL_II_MPI_VERSION_GTE(major,minor) false
 #endif
 
+#cmakedefine DEAL_II_MPI_WITH_DEVICE_SUPPORT
+#ifdef DEAL_II_MPI_WITH_DEVICE_SUPPORT
 #cmakedefine DEAL_II_MPI_WITH_CUDA_SUPPORT
+#endif
 
 /***********************************************************************
  * Two macro names that we put at the top and bottom of all deal.II files
