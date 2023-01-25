@@ -487,6 +487,7 @@ _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")              \
 _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"")            \
 _Pragma("GCC diagnostic ignored \"-Winfinite-recursion\"")              \
 _Pragma("GCC diagnostic ignored \"-Wint-in-bool-context\"")             \
+_Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")             \
 _Pragma("GCC diagnostic ignored \"-Wmisleading-indentation\"")          \
 _Pragma("GCC diagnostic ignored \"-Wmissing-field-initializers\"")      \
 _Pragma("GCC diagnostic ignored \"-Wnested-anon-types\"")               \
