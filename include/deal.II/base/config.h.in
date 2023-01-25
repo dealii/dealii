@@ -267,9 +267,9 @@
  */
 
 /**
- * Returns true if the used deal.II version is greater or equal than the 
- * version specified by the three arguments. The internal implementation 
- * assumes that the number of minor and subminor versions is not larger 
+ * Returns true if the used deal.II version is greater or equal than the
+ * version specified by the three arguments. The internal implementation
+ * assumes that the number of minor and subminor versions is not larger
  * than 100.
  */
 #define DEAL_II_VERSION_GTE(major,minor,subminor) \
