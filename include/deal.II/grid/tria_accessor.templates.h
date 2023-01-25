@@ -959,13 +959,13 @@ namespace internal
       {
         Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
         AssertIndexRange(line, accessor.n_lines());
-        Assert(accessor.present_index * GeometryInfo<2>::lines_per_cell + line <
+        Assert(accessor.present_index * GeometryInfo<3>::lines_per_face + line <
                  accessor.tria->faces->quads_line_orientations.size(),
                ExcInternalError());
 
         // quads as part of 3d hexes can have non-standard orientation
         accessor.tria->faces->quads_line_orientations
-          [accessor.present_index * GeometryInfo<2>::lines_per_cell + line] =
+          [accessor.present_index * GeometryInfo<3>::lines_per_face + line] =
           value;
       }
 
