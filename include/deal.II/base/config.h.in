@@ -548,13 +548,14 @@ _Pragma("GCC diagnostic pop")
 /***********************************************************************
  * Some places in deal.II require or benefit from using "if constexpr".
  * However, this feature is only available in C++17 and above.
- * The macro defined here expands to "if constexpr(...)" when C++17 is supported
- * and to "if (...)" otherwise.
+ * The macro defined here can be used so that
+ * "if DEAL_II_CONSTEXPR_IN_CONDITIONAL (...)" expands to "if constexpr(...)"
+ * when C++17 is supported and to "if (...)" otherwise.
  */
 #ifdef DEAL_II_HAVE_CXX17
-  #define DEAL_II_IF_CONSTEXPR(x) if constexpr x
+  #define DEAL_II_CONSTEXPR_IN_CONDITIONAL constexpr
 #else
-  #define DEAL_II_IF_CONSTEXPR(x) if x
+  #define DEAL_II_CONSTEXPR_IN_CONDITIONAL
 #endif
 
 

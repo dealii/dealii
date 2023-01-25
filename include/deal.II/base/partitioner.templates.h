@@ -533,18 +533,15 @@ namespace Utilities
           else
 #      endif
             {
-              DEAL_II_IF_CONSTEXPR ((std::is_trivial<Number>::value))
-                {
-                  std::memset(ghost_array.data(),
-                              0,
-                              sizeof(Number) * ghost_array.size());
-                }
+              if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivial<
+                                                     Number>::value)
+                std::memset(ghost_array.data(),
+                            0,
+                            sizeof(Number) * ghost_array.size());
               else
-              {
                 std::fill(ghost_array.data(),
                           ghost_array.data() + ghost_array.size(),
                           0);
-              }
             }
           return;
         }
@@ -736,18 +733,17 @@ namespace Utilities
           else
 #    endif
             {
-              DEAL_II_IF_CONSTEXPR ((std::is_trivial<Number>::value))
+              if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivial<
+                                                     Number>::value)
                 {
                   std::memset(ghost_array.data(),
                               0,
                               sizeof(Number) * n_ghost_indices());
                 }
               else
-              {
                 std::fill(ghost_array.data(),
                           ghost_array.data() + n_ghost_indices(),
                           0);
-              }
             }
         }
 

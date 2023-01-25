@@ -214,7 +214,7 @@ namespace internal
 
         if (value == Number())
           {
-            DEAL_II_IF_CONSTEXPR ((std::is_trivial<Number>::value))
+            if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivial<Number>::value)
               {
                 std::memset(dst + begin, 0, sizeof(Number) * (end - begin));
                 return;
@@ -243,15 +243,17 @@ namespace internal
       {
         Assert(end >= begin, ExcInternalError());
 
-        DEAL_II_IF_CONSTEXPR ((std::is_trivially_copyable<Number>() &&
-                               std::is_same<Number, OtherNumber>::value))
+        if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivially_copyable<
+                                               Number>() &&
+                                             std::is_same<Number,
+                                                          OtherNumber>::value)
           std::memcpy(dst + begin, src + begin, (end - begin) * sizeof(Number));
         else
-        {
-          DEAL_II_OPENMP_SIMD_PRAGMA
-          for (size_type i = begin; i < end; ++i)
-            dst[i] = src[i];
-        }
+          {
+            DEAL_II_OPENMP_SIMD_PRAGMA
+            for (size_type i = begin; i < end; ++i)
+              dst[i] = src[i];
+          }
       }
 
       const OtherNumber *const src;
