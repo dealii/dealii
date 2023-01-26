@@ -1341,11 +1341,8 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-#ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#else
-    if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#endif
+    if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivially_copyable<T>() &&
+                                         sizeof(T) < 256)
       {
         // Determine the size. There are places where we would like to use a
         // truly empty type, for which we use std::tuple<> (i.e., a tuple
@@ -1428,11 +1425,8 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-#ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#else
-    if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#endif
+    if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivially_copyable<T>() &&
+                                         sizeof(T) < 256)
       {
         // Determine the size. There are places where we would like to use a
         // truly empty type, for which we use std::tuple<> (i.e., a tuple
@@ -1512,11 +1506,8 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-#ifdef DEAL_II_HAVE_CXX17
-    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
-#else
-    if (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
-#endif
+    if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivially_copyable<T>() &&
+                                         sizeof(T) * N < 256)
       {
         Assert(std::distance(cbegin, cend) == sizeof(T) * N,
                ExcInternalError());
