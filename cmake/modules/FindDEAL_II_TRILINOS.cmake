@@ -147,6 +147,13 @@ if(TARGET Kokkos::kokkos)
       add_flags(_kokkos_openmp_flags "${_entry}")
     endif()
   endforeach()
+
+  # Some Kokkos versions included in Trilinos before 13.2.0 add "-x cuda" when 
+  # using clang++ as compiler even if Kokkos has not been configured with Cuda
+  # support. Simply strip that flag from what we are using in that case.
+  if(NOT Kokkos_ENABLE_CUDA)
+    string(REPLACE "-x cuda" "" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
+  endif()
 endif()
 
 #
@@ -168,7 +175,6 @@ foreach(_library ${Trilinos_LIBRARIES})
     NO_CMAKE_FIND_ROOT_PATH
     )
 endforeach()
-
 
 process_feature(TRILINOS
   LIBRARIES
