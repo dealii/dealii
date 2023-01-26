@@ -684,12 +684,12 @@ IndexSet::at(const size_type global_index) const
 
 
 
-void
-IndexSet::fill_index_vector(std::vector<size_type> &indices) const
+std::vector<size_type>
+IndexSet::get_index_vector() const
 {
   compress();
 
-  indices.clear();
+  std::vector<size_type> indices;
   indices.reserve(n_elements());
 
   for (const auto &range : ranges)
@@ -697,6 +697,16 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
       indices.push_back(entry);
 
   Assert(indices.size() == n_elements(), ExcInternalError());
+
+  return indices;
+}
+
+
+
+void
+IndexSet::fill_index_vector(std::vector<size_type> &indices) const
+{
+  indices = get_index_vector();
 }
 
 
