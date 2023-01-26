@@ -1,0 +1,4 @@
+New: The function IndexSet::get_index_vector() returns a vector
+with all indices that are part of an index set.
+<br>
+(Wolfgang Bangerth, 2023/01/26)
