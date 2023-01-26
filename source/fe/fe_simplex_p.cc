@@ -91,71 +91,28 @@ namespace
         return unit_points;
       }
 
+    const auto reference_cell = ReferenceCells::get_simplex<dim>();
     // Piecewise constants are a special case: use a support point at the
     // centroid and only the centroid
     if (degree == 0)
       {
-        unit_points.emplace_back(
-          ReferenceCells::get_simplex<dim>().template barycenter<dim>());
+        unit_points.emplace_back(reference_cell.template barycenter<dim>());
         return unit_points;
       }
 
-    if (dim == 1)
-      {
-        // We don't really have dim = 1 support for simplex elements yet, but
-        // its convenient for populating the face array
-        Assert(degree <= 2, ExcNotImplemented());
-        if (degree >= 1)
-          {
-            unit_points.emplace_back(0.0);
-            unit_points.emplace_back(1.0);
+    Assert(degree <= 2, ExcNotImplemented());
+    for (const auto &vertex_no : reference_cell.vertex_indices())
+      unit_points.emplace_back(reference_cell.template vertex<dim>(vertex_no));
 
-            if (degree == 2)
-              unit_points.emplace_back(0.5);
-          }
-      }
-    else if (dim == 2)
-      {
-        Assert(degree <= 2, ExcNotImplemented());
-        if (degree >= 1)
-          {
-            unit_points.emplace_back(0.0, 0.0);
-            unit_points.emplace_back(1.0, 0.0);
-            unit_points.emplace_back(0.0, 1.0);
-
-            if (degree == 2)
-              {
-                unit_points.emplace_back(0.5, 0.0);
-                unit_points.emplace_back(0.5, 0.5);
-                unit_points.emplace_back(0.0, 0.5);
-              }
-          }
-      }
-    else if (dim == 3)
-      {
-        Assert(degree <= 2, ExcNotImplemented());
-        if (degree >= 1)
-          {
-            unit_points.emplace_back(0.0, 0.0, 0.0);
-            unit_points.emplace_back(1.0, 0.0, 0.0);
-            unit_points.emplace_back(0.0, 1.0, 0.0);
-            unit_points.emplace_back(0.0, 0.0, 1.0);
-
-            if (degree == 2)
-              {
-                unit_points.emplace_back(0.5, 0.0, 0.0);
-                unit_points.emplace_back(0.5, 0.5, 0.0);
-                unit_points.emplace_back(0.0, 0.5, 0.0);
-                unit_points.emplace_back(0.0, 0.0, 0.5);
-                unit_points.emplace_back(0.5, 0.0, 0.5);
-                unit_points.emplace_back(0.0, 0.5, 0.5);
-              }
-          }
-      }
-    else
-      {
-        Assert(false, ExcNotImplemented());
-      }
+    if (degree == 2)
+      for (const auto &line_no : reference_cell.line_indices())
+        {
+          const auto v0 = reference_cell.template vertex<dim>(
+            reference_cell.line_to_cell_vertices(line_no, 0));
+          const auto v1 = reference_cell.template vertex<dim>(
+            reference_cell.line_to_cell_vertices(line_no, 1));
+          unit_points.emplace_back((v0 + v1) / 2.0);
+        }
 
     return unit_points;
   }
