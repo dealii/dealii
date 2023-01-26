@@ -121,12 +121,9 @@ namespace Utilities
       for (unsigned int i = 0; i < n_import_targets; ++i)
         {
 #    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-#      ifdef DEAL_II_HAVE_CXX17
-          if constexpr (std::is_same<MemorySpaceType,
-                                     MemorySpace::Default>::value)
-#      else
-          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
-#      endif
+          if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_same<
+                                                 MemorySpaceType,
+                                                 MemorySpace::Default>::value)
             {
               const auto chunk_size = import_indices_plain_dev[i].size();
               using IndexType       = decltype(chunk_size);
@@ -224,12 +221,8 @@ namespace Utilities
                 {
                   const unsigned int chunk_size =
                     ghost_range.second - ghost_range.first;
-#    ifdef DEAL_II_HAVE_CXX17
-                  if constexpr (std::is_same<MemorySpaceType,
-                                             MemorySpace::Host>::value)
-#    else
-                  if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
-#    endif
+                  if DEAL_II_CONSTEXPR_IN_CONDITIONAL (
+                    std::is_same<MemorySpaceType, MemorySpace::Host>::value)
                     {
                       // If source and destination are overlapping, we must be
                       // careful to use an appropriate copy function.
@@ -400,13 +393,8 @@ namespace Utilities
                   if (ghost_array_ptr + offset !=
                       ghost_array.data() + my_ghosts->first)
                     {
-#    ifdef DEAL_II_HAVE_CXX17
-                      if constexpr (std::is_same<MemorySpaceType,
-                                                 MemorySpace::Host>::value)
-#    else
-                      if (std::is_same<MemorySpaceType,
-                                       MemorySpace::Host>::value)
-#    endif
+                      if DEAL_II_CONSTEXPR_IN_CONDITIONAL (
+                        std::is_same<MemorySpaceType, MemorySpace::Host>::value)
                         {
                           if (offset > my_ghosts->first)
                             std::copy_backward(ghost_array.data() +
@@ -611,12 +599,9 @@ namespace Utilities
 
           const Number *read_position = temporary_storage.data();
 #    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-#      ifdef DEAL_II_HAVE_CXX17
-          if constexpr (std::is_same<MemorySpaceType,
-                                     MemorySpace::Default>::value)
-#      else
-          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
-#      endif
+          if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_same<
+                                                 MemorySpaceType,
+                                                 MemorySpace::Default>::value)
             {
               if (vector_operation == dealii::VectorOperation::add)
                 {
@@ -794,12 +779,9 @@ namespace Utilities
           Assert(ghost_array.begin() != nullptr, ExcInternalError());
 
 #    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-#      ifdef DEAL_II_HAVE_CXX17
-          if constexpr (std::is_same<MemorySpaceType,
-                                     MemorySpace::Default>::value)
-#      else
-          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
-#      endif
+          if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_same<
+                                                 MemorySpaceType,
+                                                 MemorySpace::Default>::value)
             {
               Kokkos::deep_copy(
                 Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
