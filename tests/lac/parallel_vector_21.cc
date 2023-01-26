@@ -56,7 +56,7 @@ test()
 
   Kokkos::parallel_for(
     v2.local_size(), KOKKOS_LAMBDA(int i) {
-      KOKKOS_IMPL_DO_NOT_USE_PRINTF("%d: %f\n", i, v2_view(i));
+      printf("%d: %f\n", i, v2_view(i));
     });
   // add entries to ghost values
   // Because of limitation in import, the IndexSet of the ReadWriteVector needs
