@@ -45,8 +45,6 @@
 #define PRECISION 8
 
 
-std::ofstream logfile("output");
-
 template <int dim>
 void
 test(const unsigned int degree)
@@ -72,7 +70,7 @@ test(const unsigned int degree)
 
   MatrixTools::create_mass_matrix(dof, q, mass_matrix);
 
-  mass_matrix.print_formatted(logfile, 3, false, 0, " ", 1);
+  mass_matrix.print_formatted(deallog.get_file_stream(), 3, false, 0, " ", 1);
 
   SolverControl           solver_control(dofs_per_cell, 1e-8);
   PrimitiveVectorMemory<> vector_memory;
@@ -91,9 +89,9 @@ test(const unsigned int degree)
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   for (unsigned int i = 0; i < 4; ++i)
     test<2>(i);

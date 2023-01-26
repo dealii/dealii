@@ -32,6 +32,9 @@ if(DEAL_II_TRILINOS_WITH_KOKKOS OR DEAL_II_PETSC_WITH_KOKKOS)
   # Let deal.II know that we have found Kokkos
   set(KOKKOS_FOUND ON)
 else()
+
+  # silence a warning when including FindKOKKOS.cmake
+  set(CMAKE_CXX_EXTENSIONS OFF)
   find_package(Kokkos 3.7.0 QUIET
     HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
     )

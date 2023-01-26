@@ -26,9 +26,6 @@
 #define PRECISION 2
 
 
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/function.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -312,9 +309,9 @@ EvaluateArea(Mapping<2> &    mapping,
 int
 main(int /*argc*/, char ** /*argv*/)
 {
-  logfile.precision(PRECISION);
-  logfile.setf(std::ios::fixed);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(PRECISION);
+  deallog.get_file_stream().setf(std::ios::fixed);
 
   Triangulation<2> tria_test;
   DoFHandler<2> *  dof_handler, *dof_handler_def;

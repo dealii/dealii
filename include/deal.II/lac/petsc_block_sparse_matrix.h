@@ -103,6 +103,11 @@ namespace PETScWrappers
       BlockSparseMatrix() = default;
 
       /**
+       * Create a BlockSparseMatrix with a PETSc Mat
+       */
+      explicit BlockSparseMatrix(const Mat &);
+
+      /**
        * Destructor.
        */
       ~BlockSparseMatrix() override;
@@ -294,6 +299,17 @@ namespace PETScWrappers
       Mat &
       petsc_matrix();
 
+      /**
+       * This method assigns the PETSc Mat to the instance of the class.
+       *
+       * Note that the matrix is not copied: instead, the instance of this class
+       * is initialized to use the given matrix. This is useful if you want to
+       * interpret a PETSc Mat object as a deal.II BlockMatrix, and you already
+       * have a BlockMatrix object that you want to use for this purpose.
+       */
+      void
+      assign_petsc_matrix(Mat A);
+
     private:
       /**
        * A PETSc Mat object that describes the entire block matrix.
@@ -309,6 +325,12 @@ namespace PETScWrappers
     /** @} */
 
     // ------------- inline and template functions -----------------
+
+    inline BlockSparseMatrix::BlockSparseMatrix(const Mat &A)
+      : BlockSparseMatrix()
+    {
+      this->assign_petsc_matrix(A);
+    }
 
     inline BlockSparseMatrix &
     BlockSparseMatrix::operator=(const double d)

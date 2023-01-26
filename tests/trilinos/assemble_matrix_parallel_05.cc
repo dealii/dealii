@@ -57,10 +57,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
-
 namespace Assembly
 {
   namespace Scratch
@@ -469,12 +465,10 @@ LaplaceProblem<dim>::run()
 int
 main(int argc, char **argv)
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
-
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
+  mpi_initlog();
+  deallog << std::setprecision(2);
 
   {
     deallog.push("2d");

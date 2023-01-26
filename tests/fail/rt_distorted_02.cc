@@ -26,8 +26,6 @@
 #define PRECISION 2
 
 
-std::ofstream logfile("output");
-
 char buf[1000];
 
 
@@ -329,9 +327,9 @@ EvaluateDiver(Mapping<2> &    mapping,
 int
 main()
 {
-  logfile.precision(PRECISION);
-  logfile.setf(std::ios::fixed);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(PRECISION);
+  deallog.get_file_stream().setf(std::ios::fixed);
 
   Triangulation<2> tria_test;
   Point<2>         p1(0, 0), p2(1, 1);

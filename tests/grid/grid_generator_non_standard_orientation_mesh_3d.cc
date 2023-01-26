@@ -30,9 +30,6 @@
 // STL
 #include <map>
 
-std::ofstream logfile("output");
-
-
 using namespace dealii;
 
 template <int dim>
@@ -71,9 +68,9 @@ plot_all_info(const Triangulation<dim> &tria)
 int
 main(int /*argc*/, char ** /*argv*/)
 {
+  initlog();
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   /*
    * 3D test only

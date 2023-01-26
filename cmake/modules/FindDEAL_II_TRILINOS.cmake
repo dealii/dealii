@@ -32,6 +32,9 @@
 set(TRILINOS_DIR "" CACHE PATH "An optional hint to a Trilinos installation")
 set_if_empty(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 
+# silence a warning when including FindKOKKOS.cmake
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 #
 # Include the trilinos package configuration:
 #

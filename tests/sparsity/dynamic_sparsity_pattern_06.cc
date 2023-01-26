@@ -24,8 +24,6 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
-
 void
 test()
 {
@@ -36,7 +34,7 @@ test()
       csp.add(i, (i + (i + 1) * (j * j + i)) % N);
   csp.symmetrize();
 
-  csp.print_gnuplot(logfile);
+  csp.print_gnuplot(deallog.get_file_stream());
   deallog << "OK" << std::endl;
 }
 
@@ -45,7 +43,7 @@ test()
 int
 main()
 {
-  deallog.attach(logfile);
+  initlog();
 
   test();
   return 0;

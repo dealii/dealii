@@ -1769,35 +1769,15 @@ private:
   set_line_orientation(const unsigned int line, const bool orientation) const;
 
   /**
-   * Set whether the quad with index @p face has its normal pointing in the
-   * standard direction (@p true) or whether it is the opposite (@p false).
-   * Which is the standard direction is documented with the GeometryInfo
-   * class.
-   *
-   * This function is only for internal use in the library. Setting this flag
-   * to any other value than the one that the triangulation has already set is
-   * bound to bring you disaster.
-   */
-  void
-  set_face_orientation(const unsigned int face, const bool orientation) const;
-
-  /**
-   * Set the flag indicating, what <code>face_flip()</code> will return.
+   * Set the combined face orientation (i.e., the integer that uniquely encodes
+   * the orientation, flip, and rotation).
    *
    * It is only possible to set the face_orientation of cells in 3d (i.e.
    * <code>structdim==3 && dim==3</code>).
    */
   void
-  set_face_flip(const unsigned int face, const bool flip) const;
-
-  /**
-   * Set the flag indicating, what <code>face_rotation()</code> will return.
-   *
-   * It is only possible to set the face_orientation of cells in 3d (i.e.
-   * <code>structdim==3 && dim==3</code>).
-   */
-  void
-  set_face_rotation(const unsigned int face, const bool rotation) const;
+  set_combined_face_orientation(const unsigned int  face,
+                                const unsigned char combined_orientation) const;
 
   /**
    * Set the @p used flag. Only for internal use in the library.

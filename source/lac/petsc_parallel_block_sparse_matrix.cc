@@ -209,6 +209,56 @@ namespace PETScWrappers
       return petsc_nest_matrix;
     }
 
+    void
+    BlockSparseMatrix::assign_petsc_matrix(Mat A)
+    {
+      clear();
+
+      PetscBool isnest;
+      PetscInt  nr = 1, nc = 1;
+
+      PetscErrorCode ierr =
+        PetscObjectTypeCompare(reinterpret_cast<PetscObject>(A),
+                               MATNEST,
+                               &isnest);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      std::vector<Mat> mats;
+      if (isnest)
+        {
+          ierr = MatNestGetSize(A, &nr, &nc);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          for (PetscInt i = 0; i < nr; ++i)
+            {
+              for (PetscInt j = 0; j < nc; ++j)
+                {
+                  Mat sA;
+                  ierr = MatNestGetSubMat(A, i, j, &sA);
+                  mats.push_back(sA);
+                }
+            }
+        }
+      else
+        {
+          mats.push_back(A);
+        }
+
+      std::vector<size_type> r_block_sizes(nr, 0);
+      std::vector<size_type> c_block_sizes(nc, 0);
+      this->row_block_indices.reinit(r_block_sizes);
+      this->column_block_indices.reinit(c_block_sizes);
+      this->sub_objects.reinit(nr, nc);
+      for (PetscInt i = 0; i < nr; ++i)
+        {
+          for (PetscInt j = 0; j < nc; ++j)
+            {
+              // TODO: MATNEST supports NULL blocks
+              this->sub_objects[i][j] = new BlockType(mats[i * nc + j]);
+            }
+        }
+
+      collect_sizes();
+    }
+
   } // namespace MPI
 } // namespace PETScWrappers
 

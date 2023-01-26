@@ -267,9 +267,9 @@
  */
 
 /**
- * Returns true if the used deal.II version is greater or equal than the 
- * version specified by the three arguments. The internal implementation 
- * assumes that the number of minor and subminor versions is not larger 
+ * Returns true if the used deal.II version is greater or equal than the
+ * version specified by the three arguments. The internal implementation
+ * assumes that the number of minor and subminor versions is not larger
  * than 100.
  */
 #define DEAL_II_VERSION_GTE(major,minor,subminor) \
@@ -547,6 +547,20 @@ _Pragma("GCC diagnostic pop")
   #define DEAL_II_DO_PRAGMA(x) _Pragma(#x)
   #define DEAL_II_WARNING(desc) DEAL_II_DO_PRAGMA(message(#desc))
 #endif
+
+/***********************************************************************
+ * Some places in deal.II require or benefit from using "if constexpr".
+ * However, this feature is only available in C++17 and above.
+ * The macro defined here can be used so that
+ * "if DEAL_II_CONSTEXPR_IN_CONDITIONAL (...)" expands to "if constexpr(...)"
+ * when C++17 is supported and to "if (...)" otherwise.
+ */
+#ifdef DEAL_II_HAVE_CXX17
+  #define DEAL_II_CONSTEXPR_IN_CONDITIONAL constexpr
+#else
+  #define DEAL_II_CONSTEXPR_IN_CONDITIONAL
+#endif
+
 
 /***********************************************************************
  * Final inclusions:

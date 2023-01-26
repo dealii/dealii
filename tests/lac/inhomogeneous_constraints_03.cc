@@ -58,9 +58,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 void
 test(bool use_inhomogeneity_for_rhs)
 {
@@ -73,7 +70,7 @@ test(bool use_inhomogeneity_for_rhs)
   cm.set_inhomogeneity(4, 1.0);
 
   cm.close();
-  cm.print(logfile);
+  cm.print(deallog.get_file_stream());
 
 
   DynamicSparsityPattern csp(8, 8);
@@ -109,8 +106,8 @@ test(bool use_inhomogeneity_for_rhs)
     local_mat, local_vec, local_dofs2, mat, rhs, use_inhomogeneity_for_rhs);
 
 
-  mat.print(logfile);
-  rhs.print(logfile);
+  mat.print(deallog.get_file_stream());
+  rhs.print(deallog.get_file_stream());
 
   Vector<double> solution(8);
   for (unsigned int i = 0; i < 8; ++i)
@@ -118,18 +115,18 @@ test(bool use_inhomogeneity_for_rhs)
       solution(i) = rhs(i) / mat(i, i);
     }
 
-  solution.print(logfile);
+  solution.print(deallog.get_file_stream());
   cm.distribute(solution);
-  solution.print(logfile);
+  solution.print(deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(2);
 
   // Use the constraints for the right-hand-side
   {

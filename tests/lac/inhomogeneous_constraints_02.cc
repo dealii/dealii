@@ -54,9 +54,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
 void
 test(bool use_inhomogeneity_for_rhs)
 {
@@ -70,7 +67,7 @@ test(bool use_inhomogeneity_for_rhs)
   cm.add_entry(4, 2, 2.0);
 
   cm.close();
-  cm.print(logfile);
+  cm.print(deallog.get_file_stream());
 
 
   DynamicSparsityPattern csp(5, 5);
@@ -96,17 +93,17 @@ test(bool use_inhomogeneity_for_rhs)
   cm.distribute_local_to_global(
     local_mat, local_vec, local_dofs, mat, rhs, use_inhomogeneity_for_rhs);
 
-  mat.print(logfile);
-  rhs.print(logfile);
+  mat.print(deallog.get_file_stream());
+  rhs.print(deallog.get_file_stream());
 }
 
 
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(2);
 
   // Use the constraints for the right-hand-side
   {

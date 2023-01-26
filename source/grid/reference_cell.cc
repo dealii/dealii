@@ -41,7 +41,7 @@ namespace
   {
     // Define VTK constants for linear, quadratic and
     // high-order Lagrange geometrices
-    enum
+    enum : unsigned int
     {
       VTK_VERTEX = 1,
       // Linear cells
@@ -69,7 +69,7 @@ namespace
       VTK_LAGRANGE_WEDGE         = 73,
       VTK_LAGRANGE_PYRAMID       = 74,
       // Invalid code
-      VTK_INVALID = static_cast<unsigned int>(-1)
+      VTK_INVALID = numbers::invalid_unsigned_int
     };
 
   } // namespace VTKCellType
@@ -87,26 +87,29 @@ constexpr ndarray<unsigned int, 8, 4>
 std::string
 ReferenceCell::to_string() const
 {
-  if (*this == ReferenceCells::Vertex)
-    return "Vertex";
-  else if (*this == ReferenceCells::Line)
-    return "Line";
-  else if (*this == ReferenceCells::Triangle)
-    return "Tri";
-  else if (*this == ReferenceCells::Quadrilateral)
-    return "Quad";
-  else if (*this == ReferenceCells::Tetrahedron)
-    return "Tet";
-  else if (*this == ReferenceCells::Pyramid)
-    return "Pyramid";
-  else if (*this == ReferenceCells::Wedge)
-    return "Wedge";
-  else if (*this == ReferenceCells::Hexahedron)
-    return "Hex";
-  else if (*this == ReferenceCells::Invalid)
-    return "Invalid";
-
-  Assert(false, ExcNotImplemented());
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return "Vertex";
+      case ReferenceCells::Line:
+        return "Line";
+      case ReferenceCells::Triangle:
+        return "Tri";
+      case ReferenceCells::Quadrilateral:
+        return "Quad";
+      case ReferenceCells::Tetrahedron:
+        return "Tet";
+      case ReferenceCells::Pyramid:
+        return "Pyramid";
+      case ReferenceCells::Wedge:
+        return "Wedge";
+      case ReferenceCells::Hexahedron:
+        return "Hex";
+      case ReferenceCells::Invalid:
+        return "Invalid";
+      default:
+        Assert(false, ExcNotImplemented());
+    }
 
   return "Invalid";
 }
@@ -251,41 +254,38 @@ ReferenceCell::exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const
 {
   AssertIndexRange(vertex_n, n_vertices());
 
-  if (*this == ReferenceCells::Line)
+  switch (this->kind)
     {
-      return vertex_n;
+      case ReferenceCells::Line:
+      case ReferenceCells::Triangle:
+        return vertex_n;
+      case ReferenceCells::Quadrilateral:
+        {
+          constexpr std::array<unsigned int, 4> exodus_to_deal{{0, 1, 3, 2}};
+          return exodus_to_deal[vertex_n];
+        }
+      case ReferenceCells::Tetrahedron:
+        return vertex_n;
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr std::array<unsigned int, 8> exodus_to_deal{
+            {0, 1, 3, 2, 4, 5, 7, 6}};
+          return exodus_to_deal[vertex_n];
+        }
+      case ReferenceCells::Wedge:
+        {
+          constexpr std::array<unsigned int, 6> exodus_to_deal{
+            {2, 1, 0, 5, 4, 3}};
+          return exodus_to_deal[vertex_n];
+        }
+      case ReferenceCells::Pyramid:
+        {
+          constexpr std::array<unsigned int, 5> exodus_to_deal{{0, 1, 3, 2, 4}};
+          return exodus_to_deal[vertex_n];
+        }
+      default:
+        Assert(false, ExcNotImplemented());
     }
-  else if (*this == ReferenceCells::Triangle)
-    {
-      return vertex_n;
-    }
-  else if (*this == ReferenceCells::Quadrilateral)
-    {
-      constexpr std::array<unsigned int, 4> exodus_to_deal{{0, 1, 3, 2}};
-      return exodus_to_deal[vertex_n];
-    }
-  else if (*this == ReferenceCells::Tetrahedron)
-    {
-      return vertex_n;
-    }
-  else if (*this == ReferenceCells::Hexahedron)
-    {
-      constexpr std::array<unsigned int, 8> exodus_to_deal{
-        {0, 1, 3, 2, 4, 5, 7, 6}};
-      return exodus_to_deal[vertex_n];
-    }
-  else if (*this == ReferenceCells::Wedge)
-    {
-      constexpr std::array<unsigned int, 6> exodus_to_deal{{2, 1, 0, 5, 4, 3}};
-      return exodus_to_deal[vertex_n];
-    }
-  else if (*this == ReferenceCells::Pyramid)
-    {
-      constexpr std::array<unsigned int, 5> exodus_to_deal{{0, 1, 3, 2, 4}};
-      return exodus_to_deal[vertex_n];
-    }
-
-  Assert(false, ExcNotImplemented());
 
   return numbers::invalid_unsigned_int;
 }
@@ -297,45 +297,42 @@ ReferenceCell::exodusii_face_to_deal_face(const unsigned int face_n) const
 {
   AssertIndexRange(face_n, n_faces());
 
-  if (*this == ReferenceCells::Vertex)
+  switch (this->kind)
     {
-      return 0;
+      case ReferenceCells::Vertex:
+        return 0;
+      case ReferenceCells::Line:
+      case ReferenceCells::Triangle:
+        return face_n;
+      case ReferenceCells::Quadrilateral:
+        {
+          constexpr std::array<unsigned int, 4> exodus_to_deal{{2, 1, 3, 0}};
+          return exodus_to_deal[face_n];
+        }
+      case ReferenceCells::Tetrahedron:
+        {
+          constexpr std::array<unsigned int, 4> exodus_to_deal{{1, 3, 2, 0}};
+          return exodus_to_deal[face_n];
+        }
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr std::array<unsigned int, 6> exodus_to_deal{
+            {2, 1, 3, 0, 4, 5}};
+          return exodus_to_deal[face_n];
+        }
+      case ReferenceCells::Wedge:
+        {
+          constexpr std::array<unsigned int, 6> exodus_to_deal{{3, 4, 2, 0, 1}};
+          return exodus_to_deal[face_n];
+        }
+      case ReferenceCells::Pyramid:
+        {
+          constexpr std::array<unsigned int, 5> exodus_to_deal{{3, 2, 4, 1, 0}};
+          return exodus_to_deal[face_n];
+        }
+      default:
+        Assert(false, ExcNotImplemented());
     }
-  if (*this == ReferenceCells::Line)
-    {
-      return face_n;
-    }
-  else if (*this == ReferenceCells::Triangle)
-    {
-      return face_n;
-    }
-  else if (*this == ReferenceCells::Quadrilateral)
-    {
-      constexpr std::array<unsigned int, 4> exodus_to_deal{{2, 1, 3, 0}};
-      return exodus_to_deal[face_n];
-    }
-  else if (*this == ReferenceCells::Tetrahedron)
-    {
-      constexpr std::array<unsigned int, 4> exodus_to_deal{{1, 3, 2, 0}};
-      return exodus_to_deal[face_n];
-    }
-  else if (*this == ReferenceCells::Hexahedron)
-    {
-      constexpr std::array<unsigned int, 6> exodus_to_deal{{2, 1, 3, 0, 4, 5}};
-      return exodus_to_deal[face_n];
-    }
-  else if (*this == ReferenceCells::Wedge)
-    {
-      constexpr std::array<unsigned int, 6> exodus_to_deal{{3, 4, 2, 0, 1}};
-      return exodus_to_deal[face_n];
-    }
-  else if (*this == ReferenceCells::Pyramid)
-    {
-      constexpr std::array<unsigned int, 5> exodus_to_deal{{3, 2, 4, 1, 0}};
-      return exodus_to_deal[face_n];
-    }
-
-  Assert(false, ExcNotImplemented());
 
   return numbers::invalid_unsigned_int;
 }
@@ -381,26 +378,29 @@ ReferenceCell::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
 unsigned int
 ReferenceCell::vtk_linear_type() const
 {
-  if (*this == ReferenceCells::Vertex)
-    return VTKCellType::VTK_VERTEX;
-  else if (*this == ReferenceCells::Line)
-    return VTKCellType::VTK_LINE;
-  else if (*this == ReferenceCells::Triangle)
-    return VTKCellType::VTK_TRIANGLE;
-  else if (*this == ReferenceCells::Quadrilateral)
-    return VTKCellType::VTK_QUAD;
-  else if (*this == ReferenceCells::Tetrahedron)
-    return VTKCellType::VTK_TETRA;
-  else if (*this == ReferenceCells::Pyramid)
-    return VTKCellType::VTK_PYRAMID;
-  else if (*this == ReferenceCells::Wedge)
-    return VTKCellType::VTK_WEDGE;
-  else if (*this == ReferenceCells::Hexahedron)
-    return VTKCellType::VTK_HEXAHEDRON;
-  else if (*this == ReferenceCells::Invalid)
-    return VTKCellType::VTK_INVALID;
-
-  Assert(false, ExcNotImplemented());
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return VTKCellType::VTK_VERTEX;
+      case ReferenceCells::Line:
+        return VTKCellType::VTK_LINE;
+      case ReferenceCells::Triangle:
+        return VTKCellType::VTK_TRIANGLE;
+      case ReferenceCells::Quadrilateral:
+        return VTKCellType::VTK_QUAD;
+      case ReferenceCells::Tetrahedron:
+        return VTKCellType::VTK_TETRA;
+      case ReferenceCells::Pyramid:
+        return VTKCellType::VTK_PYRAMID;
+      case ReferenceCells::Wedge:
+        return VTKCellType::VTK_WEDGE;
+      case ReferenceCells::Hexahedron:
+        return VTKCellType::VTK_HEXAHEDRON;
+      case ReferenceCells::Invalid:
+        return VTKCellType::VTK_INVALID;
+      default:
+        Assert(false, ExcNotImplemented());
+    }
 
   return VTKCellType::VTK_INVALID;
 }
@@ -410,26 +410,29 @@ ReferenceCell::vtk_linear_type() const
 unsigned int
 ReferenceCell::vtk_quadratic_type() const
 {
-  if (*this == ReferenceCells::Vertex)
-    return VTKCellType::VTK_VERTEX;
-  else if (*this == ReferenceCells::Line)
-    return VTKCellType::VTK_QUADRATIC_EDGE;
-  else if (*this == ReferenceCells::Triangle)
-    return VTKCellType::VTK_QUADRATIC_TRIANGLE;
-  else if (*this == ReferenceCells::Quadrilateral)
-    return VTKCellType::VTK_QUADRATIC_QUAD;
-  else if (*this == ReferenceCells::Tetrahedron)
-    return VTKCellType::VTK_QUADRATIC_TETRA;
-  else if (*this == ReferenceCells::Pyramid)
-    return VTKCellType::VTK_QUADRATIC_PYRAMID;
-  else if (*this == ReferenceCells::Wedge)
-    return VTKCellType::VTK_QUADRATIC_WEDGE;
-  else if (*this == ReferenceCells::Hexahedron)
-    return VTKCellType::VTK_QUADRATIC_HEXAHEDRON;
-  else if (*this == ReferenceCells::Invalid)
-    return VTKCellType::VTK_INVALID;
-
-  Assert(false, ExcNotImplemented());
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return VTKCellType::VTK_VERTEX;
+      case ReferenceCells::Line:
+        return VTKCellType::VTK_QUADRATIC_EDGE;
+      case ReferenceCells::Triangle:
+        return VTKCellType::VTK_QUADRATIC_TRIANGLE;
+      case ReferenceCells::Quadrilateral:
+        return VTKCellType::VTK_QUADRATIC_QUAD;
+      case ReferenceCells::Tetrahedron:
+        return VTKCellType::VTK_QUADRATIC_TETRA;
+      case ReferenceCells::Pyramid:
+        return VTKCellType::VTK_QUADRATIC_PYRAMID;
+      case ReferenceCells::Wedge:
+        return VTKCellType::VTK_QUADRATIC_WEDGE;
+      case ReferenceCells::Hexahedron:
+        return VTKCellType::VTK_QUADRATIC_HEXAHEDRON;
+      case ReferenceCells::Invalid:
+        return VTKCellType::VTK_INVALID;
+      default:
+        Assert(false, ExcNotImplemented());
+    }
 
   return VTKCellType::VTK_INVALID;
 }
@@ -439,26 +442,29 @@ ReferenceCell::vtk_quadratic_type() const
 unsigned int
 ReferenceCell::vtk_lagrange_type() const
 {
-  if (*this == ReferenceCells::Vertex)
-    return VTKCellType::VTK_VERTEX;
-  else if (*this == ReferenceCells::Line)
-    return VTKCellType::VTK_LAGRANGE_CURVE;
-  else if (*this == ReferenceCells::Triangle)
-    return VTKCellType::VTK_LAGRANGE_TRIANGLE;
-  else if (*this == ReferenceCells::Quadrilateral)
-    return VTKCellType::VTK_LAGRANGE_QUADRILATERAL;
-  else if (*this == ReferenceCells::Tetrahedron)
-    return VTKCellType::VTK_LAGRANGE_TETRAHEDRON;
-  else if (*this == ReferenceCells::Pyramid)
-    return VTKCellType::VTK_LAGRANGE_PYRAMID;
-  else if (*this == ReferenceCells::Wedge)
-    return VTKCellType::VTK_LAGRANGE_WEDGE;
-  else if (*this == ReferenceCells::Hexahedron)
-    return VTKCellType::VTK_LAGRANGE_HEXAHEDRON;
-  else if (*this == ReferenceCells::Invalid)
-    return VTKCellType::VTK_INVALID;
-
-  Assert(false, ExcNotImplemented());
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return VTKCellType::VTK_VERTEX;
+      case ReferenceCells::Line:
+        return VTKCellType::VTK_LAGRANGE_CURVE;
+      case ReferenceCells::Triangle:
+        return VTKCellType::VTK_LAGRANGE_TRIANGLE;
+      case ReferenceCells::Quadrilateral:
+        return VTKCellType::VTK_LAGRANGE_QUADRILATERAL;
+      case ReferenceCells::Tetrahedron:
+        return VTKCellType::VTK_LAGRANGE_TETRAHEDRON;
+      case ReferenceCells::Pyramid:
+        return VTKCellType::VTK_LAGRANGE_PYRAMID;
+      case ReferenceCells::Wedge:
+        return VTKCellType::VTK_LAGRANGE_WEDGE;
+      case ReferenceCells::Hexahedron:
+        return VTKCellType::VTK_LAGRANGE_HEXAHEDRON;
+      case ReferenceCells::Invalid:
+        return VTKCellType::VTK_INVALID;
+      default:
+        Assert(false, ExcNotImplemented());
+    }
 
   return VTKCellType::VTK_INVALID;
 }
@@ -673,41 +679,44 @@ ReferenceCell::vtk_vertex_to_deal_vertex(const unsigned int vertex_index) const
   //
   // For the ordering, see the VTK manual (for example at
   // http://www.princeton.edu/~efeibush/viscourse/vtk.pdf, page 9).
-  if (*this == ReferenceCells::Vertex)
-    return vertex_index;
-  else if (*this == ReferenceCells::Line)
-    return vertex_index;
-  else if (*this == ReferenceCells::Triangle)
-    return vertex_index;
-  else if (*this == ReferenceCells::Quadrilateral)
+  switch (this->kind)
     {
-      static constexpr std::array<unsigned int, 4> index_translation_table = {
-        {0, 1, 3, 2}};
-      return index_translation_table[vertex_index];
+      case ReferenceCells::Vertex:
+        return vertex_index;
+      case ReferenceCells::Line:
+        return vertex_index;
+      case ReferenceCells::Triangle:
+        return vertex_index;
+      case ReferenceCells::Quadrilateral:
+        {
+          static constexpr std::array<unsigned int, 4> index_translation_table =
+            {{0, 1, 3, 2}};
+          return index_translation_table[vertex_index];
+        }
+      case ReferenceCells::Tetrahedron:
+        return vertex_index;
+      case ReferenceCells::Pyramid:
+        {
+          static constexpr std::array<unsigned int, 5> index_translation_table =
+            {{0, 1, 3, 2, 4}};
+          return index_translation_table[vertex_index];
+        }
+      case ReferenceCells::Wedge:
+        return vertex_index;
+      case ReferenceCells::Hexahedron:
+        {
+          static constexpr std::array<unsigned int, 8> index_translation_table =
+            {{0, 1, 3, 2, 4, 5, 7, 6}};
+          return index_translation_table[vertex_index];
+        }
+      case ReferenceCells::Invalid:
+        {
+          Assert(false, ExcNotImplemented());
+          return numbers::invalid_unsigned_int;
+        }
+      default:
+        Assert(false, ExcNotImplemented());
     }
-  else if (*this == ReferenceCells::Tetrahedron)
-    return vertex_index;
-  else if (*this == ReferenceCells::Pyramid)
-    {
-      static constexpr std::array<unsigned int, 5> index_translation_table = {
-        {0, 1, 3, 2, 4}};
-      return index_translation_table[vertex_index];
-    }
-  else if (*this == ReferenceCells::Wedge)
-    return vertex_index;
-  else if (*this == ReferenceCells::Hexahedron)
-    {
-      static constexpr std::array<unsigned int, 8> index_translation_table = {
-        {0, 1, 3, 2, 4, 5, 7, 6}};
-      return index_translation_table[vertex_index];
-    }
-  else if (*this == ReferenceCells::Invalid)
-    {
-      Assert(false, ExcNotImplemented());
-      return numbers::invalid_unsigned_int;
-    }
-
-  Assert(false, ExcNotImplemented());
 
   return numbers::invalid_unsigned_int;
 }
@@ -770,29 +779,28 @@ ReferenceCell::gmsh_element_type() const
     15 Point (1 node).
   */
 
-  if (*this == ReferenceCells::Vertex)
-    return 15;
-  else if (*this == ReferenceCells::Line)
-    return 1;
-  else if (*this == ReferenceCells::Triangle)
-    return 2;
-  else if (*this == ReferenceCells::Quadrilateral)
-    return 3;
-  else if (*this == ReferenceCells::Tetrahedron)
-    return 4;
-  else if (*this == ReferenceCells::Pyramid)
-    return 7;
-  else if (*this == ReferenceCells::Wedge)
-    return 6;
-  else if (*this == ReferenceCells::Hexahedron)
-    return 5;
-  else if (*this == ReferenceCells::Invalid)
+  switch (this->kind)
     {
-      Assert(false, ExcNotImplemented());
-      return numbers::invalid_unsigned_int;
+      case ReferenceCells::Vertex:
+        return 15;
+      case ReferenceCells::Line:
+        return 1;
+      case ReferenceCells::Triangle:
+        return 2;
+      case ReferenceCells::Quadrilateral:
+        return 3;
+      case ReferenceCells::Tetrahedron:
+        return 4;
+      case ReferenceCells::Pyramid:
+        return 7;
+      case ReferenceCells::Wedge:
+        return 6;
+      case ReferenceCells::Hexahedron:
+        return 5;
+      case ReferenceCells::Invalid:
+      default:
+        Assert(false, ExcNotImplemented());
     }
-
-  Assert(false, ExcNotImplemented());
 
   return numbers::invalid_unsigned_int;
 }
@@ -834,7 +842,8 @@ operator>>(std::istream &in, ReferenceCell &reference_cell)
       (reference_cell == ReferenceCells::Pyramid) ||
       (reference_cell == ReferenceCells::Invalid),
     ExcMessage(
-      "The reference cell kind just read does not correspond to one of the valid choices. There must be an error."));
+      "The reference cell kind just read does not correspond to one of the "
+      "valid choices. There must be an error."));
 
   return in;
 }

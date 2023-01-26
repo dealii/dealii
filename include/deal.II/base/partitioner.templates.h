@@ -809,11 +809,8 @@ namespace Utilities
           else
 #    endif
             {
-#    ifdef DEAL_II_HAVE_CXX17
-              if constexpr (std::is_trivial<Number>::value)
-#    else
-            if (std::is_trivial<Number>::value)
-#    endif
+              if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivial<
+                                                     Number>::value)
                 {
                   std::memset(ghost_array.data(),
                               0,

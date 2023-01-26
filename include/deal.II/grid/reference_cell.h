@@ -350,6 +350,13 @@ public:
    */
 
   /**
+   * Return the default combined face orientation flag (i.e., the default set of
+   * orientations, defined by orientation, rotate, and flip for a face in 3D).
+   */
+  static constexpr unsigned char
+  default_combined_face_orientation();
+
+  /**
    * Return which child cells are adjacent to a certain face of the
    * mother cell.
    *
@@ -617,7 +624,7 @@ public:
    *   these orientation indices.
    */
   template <typename T>
-  unsigned int
+  unsigned char
   get_orientation_index(const ArrayView<const T> &vertices_0,
                         const ArrayView<const T> &vertices_1) const;
 
@@ -654,7 +661,7 @@ public:
   template <typename T>
   boost::container::small_vector<T, 8>
   reorient_based_on_orientation_index(const ArrayView<const T> &vertices,
-                                      const unsigned int orientation) const;
+                                      const unsigned char orientation) const;
 
   /**
    * Return a vector of faces a given @p vertex_index belongs to.
@@ -910,7 +917,7 @@ namespace internal
 #ifndef DEAL_II_CXX14_CONSTEXPR_BUG
     // Make sure these are the only indices from which objects can be
     // created.
-    Assert((kind == static_cast<std::uint8_t>(-1)) || (kind < 8),
+    Assert((kind == std::numeric_limits<std::uint8_t>::max()) || (kind < 8),
            ExcInternalError());
 #endif
 
@@ -948,7 +955,8 @@ namespace ReferenceCells
   constexpr const ReferenceCell Hexahedron =
     internal::make_reference_cell_from_int(7);
   constexpr const ReferenceCell Invalid =
-    internal::make_reference_cell_from_int(static_cast<std::uint8_t>(-1));
+    internal::make_reference_cell_from_int(
+      std::numeric_limits<std::uint8_t>::max());
 
   /**
    * Return the correct simplex reference cell type for the given dimension
@@ -1416,6 +1424,14 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
     }
 
   return ReferenceCells::Invalid;
+}
+
+
+
+inline constexpr unsigned char
+ReferenceCell::default_combined_face_orientation()
+{
+  return 1u;
 }
 
 
@@ -2627,7 +2643,7 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
 
 
 template <typename T>
-unsigned int
+unsigned char
 ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
                                      const ArrayView<const T> &vertices_1) const
 {
@@ -2640,127 +2656,86 @@ ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
                     "the number of vertices of the cell "
                     "referenced by this object."));
 
+  const auto v0_equals = [&](const std::initializer_list<const T> &list) {
+    Assert(list.size() == n_vertices(), ExcInternalError());
+    return std::equal(vertices_0.begin(), vertices_0.end(), std::begin(list));
+  };
+
   switch (this->kind)
     {
       case ReferenceCells::Line:
         // line_orientation=true
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin({vertices_1[0], vertices_1[1]})))
+        if (v0_equals({vertices_1[0], vertices_1[1]}))
           return 1;
 
         // line_orientation=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin({vertices_1[1], vertices_1[0]})))
+        if (v0_equals({vertices_1[1], vertices_1[0]}))
           return 0;
         break;
       case ReferenceCells::Triangle:
         // face_orientation=true, face_rotation=false, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[0], vertices_1[1], vertices_1[2]})))
+        if (v0_equals({vertices_1[0], vertices_1[1], vertices_1[2]}))
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[1], vertices_1[2], vertices_1[0]})))
+        if (v0_equals({vertices_1[1], vertices_1[2], vertices_1[0]}))
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[2], vertices_1[0], vertices_1[1]})))
+        if (v0_equals({vertices_1[2], vertices_1[0], vertices_1[1]}))
           return 5;
 
         // face_orientation=false, face_rotation=false, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[0], vertices_1[2], vertices_1[1]})))
+        if (v0_equals({vertices_1[0], vertices_1[2], vertices_1[1]}))
           return 0;
 
         // face_orientation=false, face_rotation=true, face_flip=false
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[2], vertices_1[1], vertices_1[0]})))
+        if (v0_equals({vertices_1[2], vertices_1[1], vertices_1[0]}))
           return 2;
 
         // face_orientation=false, face_rotation=false, face_flip=true
-        if (std::equal(vertices_0.begin(),
-                       vertices_0.end(),
-                       std::begin(
-                         {vertices_1[1], vertices_1[0], vertices_1[2]})))
+        if (v0_equals({vertices_1[1], vertices_1[0], vertices_1[2]}))
           return 4;
         break;
       case ReferenceCells::Quadrilateral:
         // face_orientation=true, face_rotation=false, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]})))
+        if (v0_equals(
+              {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}))
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]})))
+        if (v0_equals(
+              {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]}))
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[3], vertices_1[2], vertices_1[1], vertices_1[0]})))
+        if (v0_equals(
+              {vertices_1[3], vertices_1[2], vertices_1[1], vertices_1[0]}))
           return 5;
 
         // face_orientation=true, face_rotation=true, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]})))
+        if (v0_equals(
+              {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]}))
           return 7;
 
         // face_orientation=false, face_rotation=false, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[0], vertices_1[2], vertices_1[1], vertices_1[3]})))
+        if (v0_equals(
+              {vertices_1[0], vertices_1[2], vertices_1[1], vertices_1[3]}))
           return 0;
 
         // face_orientation=false, face_rotation=true, face_flip=false
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[2], vertices_1[3], vertices_1[0], vertices_1[1]})))
+        if (v0_equals(
+              {vertices_1[2], vertices_1[3], vertices_1[0], vertices_1[1]}))
           return 2;
 
         // face_orientation=false, face_rotation=false, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[3], vertices_1[1], vertices_1[2], vertices_1[0]})))
+        if (v0_equals(
+              {vertices_1[3], vertices_1[1], vertices_1[2], vertices_1[0]}))
           return 4;
 
         // face_orientation=false, face_rotation=true, face_flip=true
-        if (std::equal(
-              vertices_0.begin(),
-              vertices_0.end(),
-              std::begin(
-                {vertices_1[1], vertices_1[0], vertices_1[3], vertices_1[2]})))
+        if (v0_equals(
+              {vertices_1[1], vertices_1[0], vertices_1[3], vertices_1[2]}))
           return 6;
         break;
       default:
@@ -2768,7 +2743,7 @@ ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
     }
 
   Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
-  return numbers::invalid_unsigned_int;
+  return std::numeric_limits<unsigned char>::max();
 }
 
 
@@ -2804,7 +2779,7 @@ template <typename T>
 boost::container::small_vector<T, 8>
 ReferenceCell::reorient_based_on_orientation_index(
   const ArrayView<const T> &vertices,
-  const unsigned int        orientation) const
+  const unsigned char       orientation) const
 {
   Assert(vertices.size() == n_vertices(),
          ExcMessage("The number of array elements must be equal to "

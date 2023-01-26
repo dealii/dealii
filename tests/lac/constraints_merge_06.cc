@@ -26,9 +26,6 @@
 
 
 
-std::ofstream logfile("output");
-
-
 void
 merge_check()
 {
@@ -78,7 +75,7 @@ merge_check()
           Assert(false, ExcInternalError());
         }
 
-      c1.print(logfile);
+      c1.print(deallog.get_file_stream());
     }
 }
 
@@ -86,9 +83,9 @@ merge_check()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  deallog.get_file_stream() << std::setprecision(2);
 
   merge_check();
 }

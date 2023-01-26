@@ -46,10 +46,6 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
-
-
-
 class LaplaceProblem
 {
 public:
@@ -217,10 +213,10 @@ LaplaceProblem::run()
 int
 main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
+  deallog.get_file_stream() << std::setprecision(2);
 
-  deallog.attach(logfile);
 
   LaplaceProblem laplace_problem;
   laplace_problem.run();
