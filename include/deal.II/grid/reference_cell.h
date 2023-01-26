@@ -1445,7 +1445,10 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
 inline constexpr unsigned char
 ReferenceCell::default_combined_face_orientation()
 {
-  return 1u;
+  // Our convention is that 'orientation' has a default value of true and
+  // occupies the least-significant bit while rotate and flip have default
+  // values of 'false' and occupy the second and third bits.
+  return 0b001;
 }
 
 
@@ -1453,7 +1456,9 @@ ReferenceCell::default_combined_face_orientation()
 inline constexpr unsigned char
 ReferenceCell::reversed_combined_line_orientation()
 {
-  return 0u;
+  // For a reversed line 'orientation' is false and neither flip nor rotate are
+  // defined.
+  return 0b000;
 }
 
 
