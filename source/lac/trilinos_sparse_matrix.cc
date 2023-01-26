@@ -648,14 +648,14 @@ namespace TrilinosWrappers
       // the owned rows. In that case, do not create the nonlocal graph and
       // fill the columns by demand
       const bool have_ghost_rows = [&]() {
-        std::vector<dealii::types::global_dof_index> indices;
-        relevant_rows.fill_index_vector(indices);
+        const std::vector<dealii::types::global_dof_index> indices =
+          relevant_rows.get_index_vector();
         Epetra_Map relevant_map(
           TrilinosWrappers::types::int_type(-1),
           TrilinosWrappers::types::int_type(relevant_rows.n_elements()),
           (indices.empty() ?
              nullptr :
-             reinterpret_cast<TrilinosWrappers::types::int_type *>(
+             reinterpret_cast<const TrilinosWrappers::types::int_type *>(
                indices.data())),
           0,
           row_space_map.Comm());

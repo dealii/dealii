@@ -686,7 +686,7 @@ void
 PArpackSolver<VectorType>::internal_reinit(const IndexSet &locally_owned_dofs)
 {
   // store local indices to write to vectors
-  locally_owned_dofs.fill_index_vector(local_indices);
+  local_indices = locally_owned_dofs.get_index_vector();
 
   // scalars
   nloc = locally_owned_dofs.n_elements();

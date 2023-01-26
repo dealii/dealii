@@ -684,7 +684,7 @@ IndexSet::at(const size_type global_index) const
 
 
 
-std::vector<size_type>
+std::vector<IndexSet::size_type>
 IndexSet::get_index_vector() const
 {
   compress();
@@ -762,8 +762,7 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
     );
   else
     {
-      std::vector<size_type> indices;
-      fill_index_vector(indices);
+      const std::vector<size_type>         indices = get_index_vector();
       std::vector<types::global_dof_index> int_indices(indices.size());
       std::copy(indices.begin(), indices.end(), int_indices.begin());
       const Teuchos::ArrayView<types::global_dof_index> arr_view(int_indices);
@@ -831,13 +830,12 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
     );
   else
     {
-      std::vector<size_type> indices;
-      fill_index_vector(indices);
+      const std::vector<size_type> indices = get_index_vector();
       return Epetra_Map(
         TrilinosWrappers::types::int_type(-1),
         TrilinosWrappers::types::int_type(n_elements()),
         (n_elements() > 0 ?
-           reinterpret_cast<TrilinosWrappers::types::int_type *>(
+           reinterpret_cast<const TrilinosWrappers::types::int_type *>(
              indices.data()) :
            nullptr),
         0,

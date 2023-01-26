@@ -365,13 +365,14 @@ namespace Utilities
       // exchange step and see whether the ghost indices sent to us by other
       // processes (ghost_indices) are the same as we hold locally
       // (ghost_indices_ref).
-      std::vector<types::global_dof_index> ghost_indices_ref;
-      ghost_indices_data.fill_index_vector(ghost_indices_ref);
+      const std::vector<types::global_dof_index> ghost_indices_ref =
+        ghost_indices_data.get_index_vector();
       AssertDimension(ghost_indices_ref.size(), n_ghost_indices());
       std::vector<types::global_dof_index> indices_to_send(n_import_indices());
       std::vector<types::global_dof_index> ghost_indices(n_ghost_indices());
-      std::vector<types::global_dof_index> my_indices;
-      locally_owned_range_data.fill_index_vector(my_indices);
+
+      const std::vector<types::global_dof_index> my_indices =
+        locally_owned_range_data.get_index_vector();
       std::vector<MPI_Request> requests;
       n_ghost_indices_in_larger_set = n_ghost_indices_data;
       export_to_ghosted_array_start(127,
