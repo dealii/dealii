@@ -348,15 +348,15 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # Override target and run command for parameter file variants:
       #
       if("${_source_file}" MATCHES "(prm|json)$")
-        if(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
+        if(TARGET "${TEST_TARGET_${_build}}")
           set(_target ${TEST_TARGET_${_build}})
-        elseif(NOT "${TEST_TARGET}" STREQUAL "")
+        elseif(TARGET "${TEST_TARGET}")
           set(_target ${TEST_TARGET})
         else()
-          message(FATAL_ERROR "\n${_comparison_file}:\n"
-            "A parameter file \"${_test_name}.(prm|json)(|.in)\" has been "
-            "found, but neither \"\${TEST_TARGET}\", nor "
-            "\"\${TEST_TARGET_${_build}}\" have been defined.\n"
+          message(FATAL_ERROR
+            "The parameter file \"${_source_file}\" has been found, but neither "
+            "\"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}\" have been set to "
+            "valid target name.\n"
             )
         endif()
         set(_target_short ${_target})
@@ -413,29 +413,44 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       file(MAKE_DIRECTORY ${_test_directory})
 
       #
+      # Determine whether the test shares a common executable target. This
+      # involves tests with .threads=N. and .mpirun=N. annotation, as well
+      # as tests with parameter files (that might share a common executable
+      # target).
+      #
+      # In this case we have to make sure that concurrently invoking the
+      # test does not accidentally trigger a concurrent build of the
+      # executable target. We ensure this by declaring an additional test
+      # that only builds the shared target / ensures the shared target is
+      # present. All run tests then requires this test target as a "setup
+      # fixture", see
+      # https://cmake.org/cmake/help/latest/prop_test/FIXTURES_REQUIRED.html#prop_test:FIXTURES_REQUIRED
+      #
+      set(_shared_target FALSE)
+      if(NOT "${_n_cpu}${_n_threads}" STREQUAL "00" OR "${_source_file}" MATCHES "(prm|json)$")
+        set(_shared_target TRUE)
+
+        #
+        # Build system-internal target name and final test name for the
+        # "executable" test. We have to make sure that the target and test
+        # names stay the same independent of test name and test category,
+        # thus the rather funny name:
+        #
+        set(_test_executable_target "test_dependency.${_target}.executable")
+        set(_test_executable_full   "test_dependency/${_target}.executable")
+      endif()
+
+      #
       # Add an executable (for the first type of tests) and set up compile
       # definitions and the full link interface. Only add the target once.
       #
 
       if(NOT TARGET ${_target})
-        #
-        # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
-        # force a complete rerun of this test (BUILD, RUN and DIFF stage)
-        # if interrupt_guard.cc is removed by run_test.cmake due to an
-        # interruption.
-        #
-        add_custom_command(
-          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
-          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
-          )
 
         add_executable(${_target} EXCLUDE_FROM_ALL
           ${_generated_files}
           ${_source_file}
-          ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
-
-        add_dependencies(compile_test_executables ${_target})
 
         set_target_properties(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
@@ -460,6 +475,35 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target_short}"
           )
 
+        add_dependencies(compile_test_executables ${_target})
+      endif()
+
+      #
+      # Add a top level target to compile the test:
+      #
+
+      if(_shared_target AND NOT TARGET ${_test_executable_target})
+        add_custom_target(${_test_executable_target}
+          COMMAND echo "${_test_executable_full}: BUILD successful."
+          COMMAND echo "${_test_executable_full}: RUN skipped."
+          COMMAND echo "${_test_executable_full}: DIFF skipped."
+          COMMAND echo "${_test_executable_full}: PASSED."
+          DEPENDS ${_target}
+          )
+        add_test(NAME ${_test_executable_full}
+          COMMAND ${CMAKE_COMMAND}
+            -DTRGT=${_test_executable_target}
+            -DTEST=${_test_executable_full}
+            -DEXPECT=PASSED
+            -DBINARY_DIR=${CMAKE_BINARY_DIR}
+            -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
+          WORKING_DIRECTORY ${_test_directory}
+          )
+        set_tests_properties(${_test_executable_full} PROPERTIES
+          LABEL "test_dependency"
+          TIMEOUT ${TEST_TIME_LIMIT}
+          FIXTURES_SETUP ${_test_executable_full}
+          )
       endif()
 
       #
@@ -481,6 +525,13 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         )
 
       if(_run_only)
+        #
+        # Only compile and run the test executable. Do not run a diff
+        # stage. We use this feature for performance tests (where comparing
+        # output does not make sense), or for tests that signal success or
+        # failure with a return code (such as our quick tests).
+        #
+
         add_custom_target(${_test_target}
           COMMAND echo "${_test_full}: BUILD successful."
           COMMAND echo "${_test_full}: RUN successful."
@@ -490,6 +541,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           )
 
       else()
+        #
+        # Add a diff rule and set up a test target that depends on a
+        # successful compilation, run and diff.
+        #
 
         file(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
 
@@ -525,7 +580,6 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           -DTEST=${_test_full}
           -DEXPECT=${_expect}
           -DBINARY_DIR=${CMAKE_BINARY_DIR}
-          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/interrupt_guard.cc
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
@@ -534,6 +588,12 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         TIMEOUT ${TEST_TIME_LIMIT}
         )
 
+      if(_shared_target)
+        set_tests_properties(${_test_full} PROPERTIES
+          FIXTURES_REQUIRED ${_test_executable_full}
+          )
+      endif()
+
       if(_exclusive)
         #
         # Ensure that the test is not executed concurrently with any other
@@ -541,25 +601,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         #
         set_tests_properties(${_test_full} PROPERTIES RUN_SERIAL TRUE)
 
-      elseif(NOT ENABLE_PERFORMANCE_TESTS)
-        #
-        # Limit concurrency of mpi tests. We can only set concurrency for
-        # the entire test, which includes the compiling and linking stages
-        # that are purely sequential. There is no good way to model this
-        # without unnecessarily restricting concurrency. Consequently, we
-        # just choose to model an "average" concurrency as one half of the
-        # number of MPI jobs.
-        #
-        if(_n_cpu GREATER 2)
-          math(EXPR _slots "${_n_cpu} / 2")
-          set_tests_properties(${_test_full} PROPERTIES PROCESSORS ${_slots})
-        endif()
-
       else()
         #
-        # In case ENABLE_PERFORMANCE_TESTS is set we limit the concurrency
-        # of performance tests to the number of specified mpi ranks times
-        # the number of specified threads.
+        # Limit concurrency of tests that run on multiple mpi ranks, or
+        # that explicitly spawn multiple worker threads.
         #
         set(_slots 1)
         if(_n_cpu GREATER 0)
@@ -570,32 +615,6 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         endif()
         set_tests_properties(${_test_full} PROPERTIES PROCESSORS ${_slots})
       endif()
-
-      #
-      # Serialize all tests that share a common executable target. This
-      # involves tests with .threads=N. and .mpirun=N. annotation, as well
-      # as tests with parameter files (that might share a common executable
-      # target).
-      #
-      if( NOT "${_n_cpu}${_n_threads}" STREQUAL "00" OR
-          "${_source_file}" MATCHES "(prm|json)$" )
-        #
-        # Running multiple variants of tests with the same target
-        # executable in parallel triggers a race condition where the same
-        # (not yet existent) target is built concurrently leading to
-        # undefined outcomes.
-        #
-        # Luckily CMake has a mechanism to force a test to be run after
-        # another has finished (and both are scheduled):
-        #
-        if(DEFINED TEST_DEPENDENCIES_${_target})
-          set_tests_properties(${_test_full} PROPERTIES
-            DEPENDS ${TEST_DEPENDENCIES_${_target}}
-            )
-        endif()
-        set(TEST_DEPENDENCIES_${_target} ${_test_full} PARENT_SCOPE)
-      endif()
-
     endif()
   endforeach()
 endfunction()
