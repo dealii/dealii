@@ -50,7 +50,7 @@ namespace PETScWrappers
             VecGetOwnershipRange(vector.vector, &begin, &end);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-          Vec locally_stored_elements = PETSC_NULL;
+          Vec locally_stored_elements = nullptr;
           ierr = VecGhostGetLocalForm(vector.vector, &locally_stored_elements);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
@@ -208,6 +208,19 @@ namespace PETScWrappers
 
 
   VectorBase &
+  VectorBase::operator=(const VectorBase &v)
+  {
+    Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+
+    PetscErrorCode ierr = VecCopy(v, vector);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return *this;
+  }
+
+
+
+  VectorBase &
   VectorBase::operator=(const PetscScalar s)
   {
     AssertIsFinite(s);
@@ -219,7 +232,7 @@ namespace PETScWrappers
 
     if (has_ghost_elements())
       {
-        Vec ghost = PETSC_NULL;
+        Vec ghost = nullptr;
         ierr      = VecGhostGetLocalForm(vector, &ghost);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 

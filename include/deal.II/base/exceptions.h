@@ -852,6 +852,14 @@ namespace StandardExceptions
     "implement the missing override in your class.");
 
   /**
+   * This exception is used if some user function is not provided.
+   */
+  DeclException1(ExcFunctionNotProvided,
+                 std::string,
+                 << "Please provide an implementation for the function \""
+                 << arg1 << "\"");
+
+  /**
    * This exception is used if some object is found uninitialized.
    */
   DeclException0(ExcNotInitialized);

@@ -86,15 +86,12 @@ namespace PETScWrappers
         ierr = KSPSetPC(solver_data->ksp, preconditioner.get_pc());
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        // make sure the preconditioner has an associated matrix set
-        const Mat B = preconditioner;
-        AssertThrow(B != nullptr,
-                    ExcMessage("PETSc preconditioner should have an "
-                               "associated matrix set to be used in solver."));
-
         // setting the preconditioner overwrites the used matrices.
         // hence, we need to set the matrices after the preconditioner.
-        ierr = KSPSetOperators(solver_data->ksp, A, preconditioner);
+        Mat B;
+        ierr = PCGetOperators(preconditioner.get_pc(), nullptr, &B);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = KSPSetOperators(solver_data->ksp, A, B);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         // then a convergence monitor
@@ -782,7 +779,7 @@ namespace PETScWrappers
         ierr = KSPSetConvergenceTest(solver_data->ksp,
                                      &convergence_test,
                                      reinterpret_cast<void *>(&solver_control),
-                                     PETSC_NULL);
+                                     nullptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /*
