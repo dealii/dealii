@@ -33,28 +33,18 @@
 message(STATUS "This is CMake ${CMAKE_VERSION}")
 message(STATUS "")
 
-cmake_minimum_required(VERSION 3.3.0)
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-
+cmake_minimum_required(VERSION 3.11.0)
 #
-# We support all policy changes up to version 3.3. Thus, explicitly set all
-# policies CMP0001 - CMP0054 to new for version 3.3 (and later) to avoid
-# some unnecessary warnings.
+# We support all policy changes up to version 3.11.
 #
-cmake_policy(VERSION 3.3.0)
-
-if("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
-  # Allow to override "test" target for quick tests.
-  cmake_policy(SET CMP0037 OLD)
-endif()
+cmake_policy(VERSION 3.11.0)
 
 if(POLICY CMP0075)
-  # Use CMAKE_REQUIRED_LIBRARIES also in include file checks. We set the
-  # policy to NEW explicitly in order to avoid spurious configure warnings.
+  # Introduced in CMake 3.12: Use CMAKE_REQUIRED_LIBRARIES also in include
+  # file checks. We set the policy to NEW explicitly in order to avoid
+  # spurious configure warnings.
   cmake_policy(SET CMP0075 NEW)
 endif()
-
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
@@ -146,6 +136,8 @@ verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_write_config.cmake)
 
 message(STATUS "")
 message(STATUS "Configuring done. Proceed to target definitions now.")
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 add_subdirectory(cmake/scripts)
 add_subdirectory(include)
