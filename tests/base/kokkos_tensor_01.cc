@@ -56,8 +56,7 @@ test_gpu()
 
   // Launch the kernels.
   Kokkos::parallel_for(
-    Kokkos::MDRangePolicy<ExecutionSpace, Kokkos::Rank<2>>(exec,
-                                                           {{0, 0}},
+    Kokkos::MDRangePolicy<ExecutionSpace, Kokkos::Rank<2>>({{0, 0}},
                                                            {{dim, dim}}),
     KOKKOS_LAMBDA(int i, int j) { t_dev()[i][j] = j + i * dim + 1.; });
   Kokkos::parallel_for(
