@@ -1,4 +1,4 @@
-FIND_PACKAGE(deal.II 9.5.0 REQUIRED
+find_package(deal.II 9.5.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.
@@ -6,7 +6,7 @@ FIND_PACKAGE(deal.II 9.5.0 REQUIRED
   )
 
 # Set the name of the project and target:
-SET(TARGET "step-1")
+set(TARGET "step-1")
 
 # Declare all source files the target consists of. Here, this is only
 # the one step-X.cc file, but as you expand your project you may wish
@@ -18,11 +18,11 @@ SET(TARGET "step-1")
 # or switch altogether to the large project CMakeLists.txt file discussed
 # in the "CMake in user projects" page accessible from the "User info"
 # page of the documentation.
-SET(TARGET_SRC
+set(TARGET_SRC
   ${TARGET}.cc
   )
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
-PROJECT(${TARGET} CXX)
-DEAL_II_INVOKE_AUTOPILOT()
+cmake_minimum_required(VERSION 3.13.4)
+deal_ii_initialize_cached_variables()
+project(${TARGET} CXX)
+deal_ii_invoke_autopilot()

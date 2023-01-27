@@ -1,11 +1,11 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.13.4)
 
-FIND_PACKAGE(deal.II 9.5.0 REQUIRED
+find_package(deal.II 9.5.0 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
+deal_ii_initialize_cached_variables()
 
-PROJECT(myproject)
+project(myproject)
 
-ADD_EXECUTABLE(mycode mycode.cc)
-DEAL_II_SETUP_TARGET(mycode)
+add_executable(mycode mycode.cc)
+deal_ii_setup_target(mycode)

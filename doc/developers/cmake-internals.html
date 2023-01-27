@@ -52,30 +52,30 @@
     <li>
       Indenting is done by two spaces; the usual indenting rules apply.
     <li>
-      The <code>ELSE()</code>, <code>ENDIF()</code>,
-      <code>ENDFOREACH()</code>, etc. statements shall not repeat the
-      corresponding condition in <code>IF()</code>,
-      <code>FOREACH()</code>, etc.
+      The <code>else()</code>, <code>endif()</code>,
+      <code>endforeach()</code>, etc. statements shall not repeat the
+      corresponding condition in <code>if()</code>,
+      <code>foreach()</code>, etc.
     <li>
       To emphasize a comment it may be enclosed by a leading and
       trailing empty comment line.
   </ul>
   An example:
 <pre class="cmake">
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
+foreach(_build ${DEAL_II_BUILD_TYPES})
   #
   # Set an appropriate keyword depending on target and build type:
   #
-  IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
-    SET(_keyword "general")
-  ELSE()
-    IF(_build MATCHES DEBUG)
-      SET(_keyword "debug")
-    ELSE()
-      SET(_keyword "optimized")
-    ENDIF()
-  ENDIF()
-ENDFOREACH()
+  if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+    set(_keyword "general")
+  else()
+    if(_build MATCHES DEBUG)
+      set(_keyword "debug")
+    else()
+      set(_keyword "optimized")
+    endif()
+  endif()
+endforeach()
 </pre>
 
 <ul>
@@ -91,12 +91,12 @@ ENDFOREACH()
     single line:
 </ul>
 <pre class="cmake">
-LIST(APPEND CONFIG_LIBRARIES
+list(APPEND CONFIG_LIBRARIES
   ${_keyword}
   ${CONFIG_LIBRARIES_${_build}}
   )
 
-SET_TARGET_PROPERTIES(${DEAL_II_NAMESPACE}_${build_lowercase}
+set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
   PROPERTIES
   VERSION ${VERSION}
   SOVERSION ${VERSION}
@@ -141,13 +141,13 @@ SET_TARGET_PROPERTIES(${DEAL_II_NAMESPACE}_${build_lowercase}
   <ul>
     <li> <code>setup_cached_variables.cmake</code>:
       This sets up all cached variables prior to the call to
-      <code>PROJECT(deal.II)</code>. For details see the comment at the
+      <code>project(deal.II)</code>. For details see the comment at the
       top. Furthermore, some bookkeeping for compiler and linker flags
       takes place, see <a href="../users/cmake_dealii.html#configurebuild">the section
         about compile flags</a>.
     <li> <code>setup_deal_ii.cmake</code>:
       This file is included immediately after the call to
-      <code>PROJECT(deal.II)</code> and will set up all <i>magic
+      <code>project(deal.II)</code> and will set up all <i>magic
         numbers</i> such as names, definitions, relative and absolute
       paths used in the build system. Most of the definitions are
       guarded with the help of the <code>SET_IF_EMPTY</code> macro so
@@ -179,15 +179,15 @@ SET_TARGET_PROPERTIES(${DEAL_II_NAMESPACE}_${build_lowercase}
 # All modifications shall be guarded with the ENABLE_IF_SUPPORTED
 # or ENABLE_IF_LINKS macro, e.g.
 #
-#   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
-#   ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
+#   enable_if_supported(DEAL_II_CXX_FLAGS "-fpic")
+#   enable_if_links(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 # Compiler flags for platform dependent optimization (such as
 # -march=native) must always be guarded with
 # DEAL_II_ALLOW_PLATFORM_INTROSPECTION:
 #
 #   IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-#     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-march=native")
+#     enable_if_supported(DEAL_II_CXX_FLAGS "-march=native")
 #   ENDIF()
 #
 # Checks for compiler features (such as C++14 support) and compiler
@@ -256,37 +256,37 @@ SET_TARGET_PROPERTIES(${DEAL_II_NAMESPACE}_${build_lowercase}
     There are a number of readily available platform check macros:
 
 <pre>
-CHECK_CXX_SOURCE_COMPILES(source variable)
+check_cxx_source_compiles(source variable)
   - Checks whether it is possible to compile _and_ link the code snippet
     &lt;source&gt;. If successful, variable is set to 1.
 
-CHECK_CXX_SOURCE_RUNS(source variable)
+check_cxx_source_runs(source variable)
   - variable is set to 1 if &lt;source&gt; could be successfully compiled and
     linked and the resulting program ran and exited without error.
     Avoid this macro outside of a DEAL_II_ALLOW_PLATFORM_INTROSPECTION
     guard. A sensible fallback should be provided if the check cannot
     be run (e.g. when cross compiling).
 
-CHECK_CXX_COMPILER_BUG(source variable)
+check_cxx_compiler_bug(source variable)
   - Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
     set to 1 if it was not possible to compile and link &lt;source&gt;.
 
-CHECK_INCLUDE_FILE_CXX(header variable)
+check_include_file_cxx(header variable)
   - Check whether it is possible to compile and link a dummy program
     including &lt;header&gt;.
 
-CHECK_FUNCTION_EXISTS(function variable)
+check_function_exists(function variable)
   - Check for the existence of a function prototype with name
     &lt;function&gt;. (Don't forget to specify the link libraries, see
     below.) Use CHECK_CXX_SYMBOL_EXISTS to search for C++ function
     definitions instead, if possible.
 
-CHECK_CXX_SYMBOL_EXISTS(symbol header_file variable)
+check_cxx_symbol_exists(symbol header_file variable)
   - Check for the existence of a symbol definition in the header_file
     as well as for the presence in the current link interface
     (Don't forget to specify the link libraries, see below.)
 
-CHECK_CXX_COMPILER_FLAG(flag variable)
+check_cxx_compiler_flag(flag variable)
   - Sets the variable to 1 if the compiler understands the flag.
 </pre>
 
@@ -295,9 +295,9 @@ CHECK_CXX_COMPILER_FLAG(flag variable)
     job nicely:
 
 <pre class="cmake">
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
-CHECK_CXX_SOURCE_COMPILES(...)
-RESET_CMAKE_REQUIRED()
+add_flags(CMAKE_REQUIRED_FLAGS "-Werror")
+check_cxx_source_compiles(...)
+reset_cmake_required()
 </pre>
 
   <li> Necessary include directories and libraries necessary for
@@ -308,10 +308,10 @@ RESET_CMAKE_REQUIRED()
     <code>CMAKE_REQUIRED_FLAGS</code>) to their default values:
 
 <pre class="cmake">
-LIST(APPEND CMAKE_REQUIRED_INCLUDES &lt;a list of includes&gt;)
-LIST(APPEND CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;)
-CHECK_CXX_SOURCE_COMPILES(...)
-RESET_CMAKE_REQUIRED()
+list(APPEND CMAKE_REQUIRED_INCLUDES &lt;a list of includes&gt;)
+list(APPEND CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;)
+check_cxx_source_compiles(...)
+reset_cmake_required()
 </pre>
 </ul>
 </p>
@@ -330,8 +330,8 @@ RESET_CMAKE_REQUIRED()
       library (no deal.II specific dependency checking, no
       compatibility checking).
     <li>
-      It should do so by appropriate <code>DEAL_II_FIND_LIBRARY</code>,
-      <code>DEAL_II_FIND_PATH</code> and <code>DEAL_II_FIND_FILE</code>
+      It should do so by appropriate <code>deal_ii_find_library</code>,
+      <code>deal_ii_find_path</code> and <code>deal_ii_find_file</code>
       calls (same syntax as the native CMake functions; just a small
       wrapper to provide some useful output). The results of this calls
       should be the only cached variables.
@@ -353,11 +353,11 @@ FEATURE_DEFINITIONS(|_DEBUG|_RELEASE)
 FEATURE_VERSION
 FEATURE_VERSION(_MAJOR|_MINOR|_SUBMINOR)
 </pre>
-      The <code>DEAL_II_PACKAGE_HANDLE</code> macro should be exclusively
+      The <code>process_feature</code> macro should be exclusively
       used for setting up these variables (except the version variants). An
       example invocation is
 <pre class="cmake">
-DEAL_II_PACKAGE_HANDLE(UMFPACK
+process_feature(UMFPACK
   LIBRARIES
     REQUIRED UMFPACK_LIBRARY
     OPTIONAL CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY CAMD_LIBRARY ${_suitesparse_config}
@@ -391,8 +391,8 @@ DEAL_II_PACKAGE_HANDLE(UMFPACK
       A hint with <code>FEATURE_DIR</code> can be set up for
       convenience. It is best to start the <code>Find</code> module by
 <pre class="cmake">
-SET(FEATURE_DIR "" CACHE PATH "short description")
-SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
+set(FEATURE_DIR "" CACHE PATH "short description")
+set_if_empty(FEATURE_DIR "$ENV{FEATURE_DIR}")
 </pre>
       and use <code>FEATURE_DIR</code> as a hint.
 </ul>
@@ -410,7 +410,7 @@ SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
 <p>
   At bare minimum <code>configure_&lt;feature&gt;.cmake</code>
   file for a feature just consists of a call to the
-  <code>CONFIGURE_FEATURE(&lt;FEATURE&gt;)</code> macro which is
+  <code>configure_feature(&lt;FEATURE&gt;)</code> macro which is
   implemented in
   <code>./cmake/macros/macro_configure_feature.cmake</code>.
   In this case the corresponding <code>Find&lt;FEATURE&gt;.cmake</code>
@@ -660,7 +660,7 @@ done by hand. Please note:
 # A list of source files that, if DEAL_II_UNITY_BUILD=ON, will be concatenated
 # into a few unity files:
 #
-SET(_unity_include_src
+set(_unity_include_src
   block_info.cc
   dof_faces.cc
   ...
@@ -669,7 +669,7 @@ SET(_unity_include_src
 #
 # A list of source files that are always compiled individually:
 #
-SET(_separate_src
+set(_separate_src
   dof_accessor.cc
   dof_accessor_get.cc
   ...
@@ -682,13 +682,13 @@ SET(_separate_src
 # files that each contain no more than _n_includes_per_unity_file files. If
 # DEAL_II_UNITY_BUILD=OFF then this variable is never read.
 #
-SET(_n_includes_per_unity_file 15)
+set(_n_includes_per_unity_file 15)
 
 #
 # A macro that handles setting up the list of source files to compile in the
 # _src variable and handles the unity build logic:
 #
-SETUP_SOURCE_LIST("${_unity_include_src}"
+setup_source_list("${_unity_include_src}"
   "${_separate_src}"
   ${_n_includes_per_unity_file}
   _src
@@ -697,7 +697,7 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
 #
 # A list of instantiations that must be expanded:
 #
-SET(_inst
+set(_inst
   block_info.inst.in
   ...
   )
@@ -710,18 +710,18 @@ SET(_inst
 # Header files and instantiation files (${_header}, ${_inst}) are added
 # for cosmetic reasons, so that they show up in IDEs.
 #
-FILE(GLOB _header
+file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
   )
 
-DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${_src} ${_header} ${_inst})
+deal_ii_add_library(obj_dofs OBJECT ${_src} ${_header} ${_inst})
 
 #
 # This macro will set up a target for each of the files listed in
 # ${_inst}. Appropriate target dependencies will be added to obj_dofs_debug and
 # obj_dofs_release.
 #
-EXPAND_INSTANTIATIONS(obj_dofs "${_inst}")
+expand_instantiations(obj_dofs "${_inst}")
 </pre>
 </p>
 

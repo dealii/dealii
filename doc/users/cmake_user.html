@@ -63,17 +63,17 @@
   version):
 
 <pre class="cmake">
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.13.4)
 
-FIND_PACKAGE(deal.II 9.4.0 REQUIRED
+find_package(deal.II 9.5.0 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
+deal_ii_initialize_cached_variables()
 
-PROJECT(myproject)
+project(myproject)
 
-ADD_EXECUTABLE(mycode mycode.cc)
-DEAL_II_SETUP_TARGET(mycode)
+add_executable(mycode mycode.cc)
+deal_ii_setup_target(mycode)
 </pre>
 
 <p>
@@ -100,7 +100,7 @@ DEAL_II_SETUP_TARGET(mycode)
 <p>
   After finding the deal.II project, we fetch a set of cached variables
   with the <a href="#cmakeadvanced.cached_variables">
-  <code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code></a> macro. You
+  <code>deal_ii_initialize_cached_variables</code></a> macro. You
   can inspect these for instance with <code>ccmake</code>.
 </p>
 
@@ -112,7 +112,7 @@ DEAL_II_SETUP_TARGET(mycode)
 <p>
   Finally, the last two lines define the executable that is to be produced
   and its source code. The <a href="#cmakeadvanced.setup_target">
-  <code>DEAL_II_SETUP_TARGET</code></a> macro will set up necessary include
+  <code>deal_ii_setup_target</code></a> macro will set up necessary include
   directories, compile flags, compile definitions, link flags and the link
   interface.
 </p>
@@ -126,11 +126,11 @@ DEAL_II_SETUP_TARGET(mycode)
 </p>
 
 <pre class="cmake">
-ADD_EXECUTABLE(mycode2 mycode2.cc)
-DEAL_II_SETUP_TARGET(mycode2)
+add_executable(mycode2 mycode2.cc)
+deal_ii_setup_target(mycode2)
 
-ADD_EXECUTABLE(mycode3 mycode3.cc)
-DEAL_II_SETUP_TARGET(mycode3)
+add_executable(mycode3 mycode3.cc)
+deal_ii_setup_target(mycode3)
 </pre>
 
 If the list gets longer, consider using
@@ -148,12 +148,12 @@ with <a href="#cmakeadvanced.globs">GLOB</a>.
     </p>
 
 <pre class="cmake">
-ADD_LIBRARY(mylib libsrc1.cc libsrc2.cc libsrc3.cc)
-DEAL_II_SETUP_TARGET(mylib)
+add_library(mylib libsrc1.cc libsrc2.cc libsrc3.cc)
+deal_ii_setup_target(mylib)
 
-ADD_EXECUTABLE(mycode mycode.cc)
-DEAL_II_SETUP_TARGET(mycode)
-TARGET_LINK_LIBRARIES(mycode mylib)
+add_executable(mycode mycode.cc)
+deal_ii_setup_target(mycode)
+target_link_libraries(mycode mylib)
 </pre>
 
 <p>When you have <a href="#cmakesimple.multiple">multiple targets</a>,
@@ -165,11 +165,11 @@ attractive.</p>
 code, an alternative to creating a library might be the option:</p>
 
 <pre class="cmake">
-ADD_EXECUTABLE(mycode mycode.cc common.cc)
-DEAL_II_SETUP_TARGET(mycode)
+add_executable(mycode mycode.cc common.cc)
+deal_ii_setup_target(mycode)
 
-ADD_EXECUTABLE(mycode2 mycode2.cc common.cc)
-DEAL_II_SETUP_TARGET(mycode2)
+add_executable(mycode2 mycode2.cc common.cc)
+deal_ii_setup_target(mycode2)
 </pre>
 
 <p>You should be aware though that in this case <code>common.cc</code> will
@@ -178,14 +178,14 @@ still don't want to use a shared library or static archive, another option
 is to create an <code>OBJECT</code> "library":</p>
 
 <pre class="cmake">
-ADD_LIBRARY(common OBJECT common.cc)
-DEAL_II_SETUP_TARGET(common)
+add_library(common OBJECT common.cc)
+deal_ii_setup_target(common)
 
-ADD_EXECUTABLE(mycode mycode.cc $&lt;TARGET_OBJECTS:common&gt;)
-DEAL_II_SETUP_TARGET(mycode)
+add_executable(mycode mycode.cc $&lt;TARGET_OBJECTS:common&gt;)
+deal_ii_setup_target(mycode)
 
-ADD_EXECUTABLE(mycode2 mycode2.cc $&lt;TARGET_OBJECTS:common&gt;)
-DEAL_II_SETUP_TARGET(mycode2)
+add_executable(mycode2 mycode2.cc $&lt;TARGET_OBJECTS:common&gt;)
+deal_ii_setup_target(mycode2)
 </pre>
 This will compile <code>common.cc</code> once for the object target
 <code>common</code> and link the resulting object file into the two
@@ -213,13 +213,13 @@ Alternatively, you can specify custom targets to switch the build type and
 compile automatically:
 
 <pre class="cmake">
-ADD_CUSTOM_TARGET(debug
+add_custom_target(debug
   COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
   COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
   )
 
-ADD_CUSTOM_TARGET(release
+add_custom_target(release
   COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
   COMMENT "Switch CMAKE_BUILD_TYPE to Release"
@@ -241,7 +241,7 @@ tutorial, specify one this way (obviously, a single "run" target can only
 run a single executable): </p>
 
 <pre class="cmake">
-ADD_CUSTOM_TARGET(run COMMAND mycode
+add_custom_target(run COMMAND mycode
   COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration"
   )
 </pre>
@@ -271,29 +271,29 @@ mycode/include/*.h
 In this case the top level <code>CMakeLists.txt</code> file may be:
 <pre class="cmake">
 # top level CMakeLists.txt
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-FIND_PACKAGE(deal.II 9.4.0 REQUIRED)
+cmake_minimum_required(VERSION 3.13.4)
+find_package(deal.II 9.5.0 REQUIRED)
 
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
-PROJECT(myproject)
+deal_ii_initialize_cached_variables()
+project(myproject)
 
-ADD_SUBDIRECTORY(mylib)
-ADD_SUBDIRECTORY(mycode)
+add_subdirectory(mylib)
+add_subdirectory(mycode)
 </pre>
-The <code>ADD_SUBDIRECTORY</code> statement will include the CMakeLists.txt
+The <code>add_subdirectory</code> statement will include the CMakeLists.txt
 file in the specified subdirectory. In our case:
 
 <pre class="cmake">
 # mylib/CMakeLists.txt
 
-INCLUDE_DIRECTORIES(include)
+include_directories(include)
 
-ADD_LIBRARY(mylib
+add_library(mylib
   source/mylib1.cc
   source/mylib2.cc
   )
 
-DEAL_II_SETUP_TARGET(mylib)
+deal_ii_setup_target(mylib)
 </pre>
 
 We have to add the directory <code>include</code> for the header files to
@@ -305,22 +305,22 @@ like:
 <pre class="cmake">
 # mycode/CMakeLists.txt
 
-INCLUDE_DIRECTORIES(
+include_directories(
   include
   ${CMAKE_SOURCE_DIR}/mylib/include
   )
 
-ADD_EXECUTABLE(mycode source/mycode.cc)
-DEAL_II_SETUP_TARGET(mycode)
+add_executable(mycode source/mycode.cc)
+deal_ii_setup_target(mycode)
 
-TARGET_LINK_LIBRARIES(mycode mylib)
+target_link_libraries(mycode mylib)
 </pre>
 
 <p>
 Please note that <code>CMakeLists.txt</code> files have directory scope.
 Any manipulation of properties and variables have only effect in the
 current directory (and subdirectories, included with
-<code>ADD_SUBDIRECTORY</code>. The level above will not be affected.
+<code>add_subdirectory</code>. The level above will not be affected.
 Therefore, we have to specify the include directories for "mylib" again in
 the subdirectory <code>mycode</code> - this time with full path
 <code>${CMAKE_SOURCE_DIR}/mylib/include</code>.
@@ -352,36 +352,36 @@ CMAKE_CURRENT_BINARY_DIR
 
 <p>Control statements in CMake take the following form:
 <pre class="cmake">
-IF(&lt;expression&gt;)
+if(&lt;expression&gt;)
   ...
-ENDIF()
+endif()
 </pre>
 or in long form:
 <pre class="cmake">
-IF(&lt;expression1&gt;)
+if(&lt;expression1&gt;)
   ...
-ELSEIF(&lt;expression2&gt;)
+elseif(&lt;expression2&gt;)
   ...
-ELSE()
+else()
   ...
-ENDIF()
+endif()
 </pre>
 Please note the (somehow uncommon) empty, opening and closing brackets
-behind <code>ELSE()</code> and <code>ENDIF()</code>.
+behind <code>else()</code> and <code>endif()</code>.
 <code>&lt;expression&gt;</code> can take a multitude of different forms,
 have a look at the
 <a href="http://cmake.org/cmake/help/v2.8.8/cmake.html">CMake
 documentation</a> for a complete list. Important examples are:
 <pre class="cmake">
-IF(${variable})
+if(${variable})
   - the body will be evaluated if the variable "variable" is defined and
     synonymous to true, e.g. 1, TRUE, ON, YES (modulo case insensitivity)
 
-IF(variable MATCHES &lt;regular expression&gt;)
+if(variable MATCHES &lt;regular expression&gt;)
   - the body will be evaluated if the variable "variable" is defined and
     matches the specified regular expression
 
-IF("${variable}" STREQUAL "foobar")
+if("${variable}" STREQUAL "foobar")
   - the body will be evaluated if both strings are equal. Note that
     "${variable}" will be replaced by the content of the (string)
     variable "variable"
@@ -398,23 +398,23 @@ ENDIF()
 <code>FOR</code> statements. The former takes the same
 <code>&lt;expression&gt;</code> as the <code>IF</code> statement:</p>
 <pre class="cmake">
-WHILE(&lt;expression&gt;)
+while(&lt;expression&gt;)
   ...
-ENDWHILE()
+endwhile()
 </pre>
 Given a variable <code>list</code> containing a list, the individual
 elements <code>element</code> can be accessed with a <code>FOREACH</code>
 statement:
 <pre class="cmake">
-FOREACH(element ${list})
+foreach(element ${list})
   ...
-ENDFOREACH()
+endforeach()
 </pre>
 Note: It is also possible to specify the list directly:
 <pre class="cmake">
-FOREACH(element foo bar baz)
+foreach(element foo bar baz)
   # The variable element will iterate through foo, bar and baz.
-ENDFOREACH
+endforeach
 </pre>
 
 
@@ -429,8 +429,8 @@ The following example will pick up every source file under
 <code>SOURCE_DIR/sources/</code> and add it to an executable:</p>
 
 <pre class="cmake">
-FILE(GLOB sources ${CMAKE_SOURCE_DIR}/source/*.cc)
-ADD_EXECUTABLE(mycode ${sources})
+file(GLOB sources ${CMAKE_SOURCE_DIR}/source/*.cc)
+add_executable(mycode ${sources})
 </pre>
 
 <p>Please be aware of one caveat of this approach: Due to the fact that
@@ -442,11 +442,11 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
 
 
 <a name="cmakeadvanced.setup_target"></a>
-<h3><code>DEAL_II_SETUP_TARGET</code> revisited</h3>
+<h3><code>deal_ii_setup_target</code> revisited</h3>
 <p>
-  The <code>DEAL_II_SETUP_TARGET</code> macro is responsible for setting up
+  The <code>deal_ii_setup_target</code> macro is responsible for setting up
   a target to compile and link against deal.II. It will <i>append</i> the
-  <code>INCLUDE_DIRECTORIES</code> property with the location of the
+  <code>include_directories</code> property with the location of the
   deal.II include directories, and <i>append</i> the properties
   <code>COMPILE_FLAGS</code>, <code>COMPILE_DEFINITIONS</code> and
   <code>LINK_FLAGS</code> by their respective values from the deal.II
@@ -460,7 +460,7 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
 </p>
 
 <p>
-  Optionally, the <code>DEAL_II_SETUP_TARGET</code> macro takes an
+  Optionally, the <code>deal_ii_setup_target</code> macro takes an
   additional argument <code>DEBUG</code>, or <code>RELEASE</code>, after
   the target name to explicitly state the library flavor the target should
   be set up for. If the parameter is omitted, the correct choice is deduced
@@ -500,11 +500,11 @@ The <code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> macro is responsible
 for setting up cached variables and has to invoked before the
 <code>PROJECT</code> call:
 <pre class="cmake">
-FIND_PACKAGE(deal.II 9.4.0 REQUIRED)
+find_package(deal.II 9.5.0 REQUIRED)
 
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
+deal_ii_initialize_cached_variables()
 
-PROJECT(myproject)
+project(myproject)
 </pre>
 The macro will set an uninitialized <code>CMAKE_BUILD_TYPE</code> variable
 to the build type of deal.II, i.e. <code>DEAL_II_BUILD_TYPE</code>. If
@@ -523,10 +523,10 @@ string.
 
 <p>
 Note: If you wish to override the flags and definitions set by the
-<code>DEAL_II_SETUP_TARGET</code> macro you have to override the
+<code>deal_ii_setup_target</code> macro you have to override the
 corresponding <code>DEAL_II_*</code> variable instead. See the
 documentation of <a
-href="#cmakeadvanced.setup_target"><code>DEAL_II_SETUP_TARGET</code></a>
+href="#cmakeadvanced.setup_target"><code>deal_ii_setup_target</code></a>
 for further details.
 </p>
 
@@ -540,11 +540,11 @@ href="http://cmake.org/cmake/help/v2.8.8/cmake.html">CMake
 documentation</a> for further details):
 
 <pre class="cmake">
-INCLUDE_DIRECTORIES(include1 include2)
+include_directories(include1 include2)
 
-ADD_DEFINITIONS(-DFOO -DBAR="BAZ")
+add_definitions(-DFOO -DBAR="BAZ")
 
-ADD_EXECUTABLE(...) # or ADD_LIBRARY(...)
+add_executable(...) # or add_library(...)
 </pre>
 </p>
 
@@ -557,7 +557,7 @@ a CMake find module is available, including this external library in your
 project is more or less straightforward. E.g. to require an external
 project "foo" at least of version 8.0 write:
 <pre class="cmake">
-FIND_PACKAGE(foo 8.0 REQUIRED)
+find_package(foo 8.0 REQUIRED)
 </pre>
 Alternatively, the version number and <code>REQUIRED</code> keyword can be
 omitted. Depending on the external library, the project configuration or
@@ -566,16 +566,16 @@ and <code>FOO_LIBRARIES</code> that can be directly used in your
 <code>CMakeLists.txt</code> file:
 
 <pre class="cmake">
-INCLUDE_DIRECTORIES(${FOO_INCLUDE_DIRS})
+include_directories(${FOO_INCLUDE_DIRS})
 
-ADD_EXECUTABLE(mycode mycode.cc)
-DEAL_II_SETUP_TARGET(mycode)
+add_executable(mycode mycode.cc)
+deal_ii_setup_target(mycode)
 
-TARGET_LINK_LIBRARIES(mycode ${FOO_LIBRARIES})
+target_link_libraries(mycode ${FOO_LIBRARIES})
 </pre>
 The first statement will set up the include directories for the following
 targets as explained above. The last statement with
-<code>TARGET_LINK_LIBRARIES</code> will <i>add</i> the libraries in the
+<code>target_link_libraries</code> will <i>add</i> the libraries in the
 <code>FOO_LIBRARIES</code> variable to the link interface of the target
 <code>mycode</code>.
 </p>
@@ -591,13 +591,13 @@ a copy of a skeleton <code>run</code> folder from the source directory:
 
 <pre class="cmake">
 # Copy folder run from the source to the build directory:
-FILE(COPY ${CMAKE_SOURCE_DIR}/run DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/run DESTINATION ${CMAKE_BINARY_DIR})
 
-ADD_EXECUTABLE(mycode mycode.cc)
-SET_PROPERTY(TARGET mycode
+add_executable(mycode mycode.cc)
+set_property(TARGET mycode
   PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/run
   )
-ADD_CUSTOM_TARGET(run
+add_custom_target(run
   COMMAND mycode
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/run
   )
@@ -639,12 +639,12 @@ INSTALL(DIRECTORY run DESTINATION share/mycode/run)
   write a <code>CMakeLists.txt</code> file may be to use
   an "autopilot" style macro. Here is a minimalistic example for the
   step-1 tutorial program (<a href="CMakeLists.txt.sample2"
-			      target="_top">plain text</a> version) that can be used for simple
+  target="_top">plain text</a> version) that can be used for simple
   projects:
 </p>
 
 <pre class="cmake">
-FIND_PACKAGE(deal.II 9.4.0 REQUIRED
+find_package(deal.II 9.5.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.
@@ -652,18 +652,18 @@ FIND_PACKAGE(deal.II 9.4.0 REQUIRED
 )
 
 # Set the name of the project and target:
-SET(TARGET "step-1")
+set(TARGET "step-1")
 
 # Declare all source files the target consists of:
-SET(TARGET_SRC
+set(TARGET_SRC
   step-1.cc
   # You can specify additional files here!
 )
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
-PROJECT(${TARGET} CXX)
-DEAL_II_INVOKE_AUTOPILOT()
+cmake_minimum_required(VERSION 3.13.4)
+deal_ii_initialize_cached_variables()
+project(${TARGET} CXX)
+deal_ii_invoke_autopilot()
 </pre>
 
 
@@ -721,14 +721,14 @@ $ cmake .
 # Specify a list of files (file globs) that will be removed
 # with the "make runclean" and "make distclean" targets.
 # (If empty, sensible default values will be used.)
-SET(CLEAN_UP_FILES
+set(CLEAN_UP_FILES
   # a custom list of globs, e.g. *.log *.vtk
 )
 
 # (Optional)
 # A custom command line that should be invoked by "make run".
 # (If empty, ./${TARGET} will be invoked.)
-SET(TARGET_RUN
+set(TARGET_RUN
   # a custom command line, e.g. mpirun -np 2 ${TARGET}
 )
 </pre>
