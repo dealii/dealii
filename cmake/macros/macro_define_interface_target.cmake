@@ -78,9 +78,13 @@ function(define_interface_target _feature)
 
     if(DEFINED ${_feature}_VERSION)
       message(STATUS "    VERSION:             ${${_feature}_VERSION}")
-      set_target_properties(${_interface_target}
-        PROPERTIES VERSION "${${_feature_}_VERSION}"
-        )
+      # CMake versions prior to 3.19 have a significantly more restrictive
+      # set of allowed interface target properties.
+      if(NOT CMAKE_VERSION VERSION_LESS 3.19)
+        set_target_properties(${_interface_target}
+          PROPERTIES VERSION "${${_feature_}_VERSION}"
+          )
+      endif()
     endif()
 
     set(_libraries)
