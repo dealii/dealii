@@ -80,9 +80,8 @@ public:
                  level,
                  std::vector<unsigned int>({0}));
 
-    std::vector<types::global_dof_index> interface_indices;
-    mg_constrained_dofs.get_refinement_edge_indices(level).fill_index_vector(
-      interface_indices);
+    const std::vector<types::global_dof_index> interface_indices =
+      mg_constrained_dofs.get_refinement_edge_indices(level).get_index_vector();
     vmult_edge_constrained_indices.clear();
     vmult_edge_constrained_indices.reserve(interface_indices.size());
     vmult_edge_constrained_values.resize(interface_indices.size());
