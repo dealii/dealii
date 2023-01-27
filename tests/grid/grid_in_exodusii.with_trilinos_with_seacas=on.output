@@ -415,4 +415,60 @@ LOOKUP_TABLE default
 -1 -1 -1 -1 
 1 2 5 3 4 1 5 1 4 3 1 4 6 3 
 
+DEAL::-------------
+DEAL::codim 1 lines
+DEAL::-------------
+DEAL::boundary id = 0 sideset ids = 
+DEAL::Number of vertices: 9
+DEAL::Number of cells: 8
+DEAL::cell 0 type = Line volume = 3.50000
+DEAL::cell 1 type = Line volume = 7.00000
+DEAL::cell 2 type = Line volume = 2.82843
+DEAL::cell 3 type = Line volume = 3.00000
+DEAL::cell 4 type = Line volume = 7.00000
+DEAL::cell 5 type = Line volume = 2.82843
+DEAL::cell 6 type = Line volume = 7.00000
+DEAL::cell 7 type = Line volume = 2.82843
+# vtk DataFile Version 3.0
+Triangulation generated with deal.II
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 9 double
+0.0 0.0 0
+7.0 0.0 0
+5.0 2.0 0
+2.0 2.0 0
+2.0 5.0 0
+0.0 7.0 0
+5.0 5.0 0
+7.0 3.5 0
+7.0 7.0 0
+
+CELLS 8 24
+2 7 1
+2 1 0
+2 0 3
+2 3 2
+2 0 5
+2 5 4
+2 5 8
+2 8 6
+
+CELL_TYPES 8
+3 3 3 3 3 3 3 3 
+
+
+
+CELL_DATA 8
+SCALARS MaterialID int 1
+LOOKUP_TABLE default
+1 1 1 1 1 1 1 1 
+
+
+
+SCALARS ManifoldID int 1
+LOOKUP_TABLE default
+-1 -1 -1 -1 -1 -1 -1 -1 
+
+
 DEAL::OK

@@ -45,18 +45,19 @@ read_and_print(const std::string &filename,
       deallog << std::endl;
     }
 
-  for (const auto &face : tria.active_face_iterators())
-    {
-      if (face->at_boundary())
-        {
-          deallog << "face center = " << face->center();
-          if (read_as_manifolds)
-            deallog << "   face manifold id = " << face->manifold_id();
-          else
-            deallog << "   face boundary id = " << face->boundary_id();
-          deallog << std::endl;
-        }
-    }
+  if (dim > 1)
+    for (const auto &face : tria.active_face_iterators())
+      {
+        if (face->at_boundary())
+          {
+            deallog << "face center = " << face->center();
+            if (read_as_manifolds)
+              deallog << "   face manifold id = " << face->manifold_id();
+            else
+              deallog << "   face boundary id = " << face->boundary_id();
+            deallog << std::endl;
+          }
+      }
 
   deallog << "Number of vertices: " << tria.get_vertices().size() << std::endl;
   deallog << "Number of cells: " << tria.n_cells() << std::endl;
@@ -106,6 +107,10 @@ main()
   deallog << "--------------------------------------" << std::endl;
   read_and_print<3>(SOURCE_DIR "/grids/exodusii/four-sidesets.e", true);
 
+  deallog << "-------------" << std::endl;
+  deallog << "codim 1 lines" << std::endl;
+  deallog << "-------------" << std::endl;
+  read_and_print<1, 2>(SOURCE_DIR "/grids/exodusii/lines.e");
 
   deallog << "OK" << std::endl;
 }
