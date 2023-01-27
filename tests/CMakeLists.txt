@@ -22,7 +22,7 @@
 #    test           - run all quick_tests
 #
 
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.13.4)
 
 macro(set_if_empty _variable)
   if("${${_variable}}" STREQUAL "")

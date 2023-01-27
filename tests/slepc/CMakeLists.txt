@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.13.4)
 include(../setup_testsubproject.cmake)
 project(testsuite CXX)
 if(DEAL_II_WITH_PETSC AND DEAL_II_WITH_SLEPC AND NOT DEAL_II_PETSC_WITH_COMPLEX)
