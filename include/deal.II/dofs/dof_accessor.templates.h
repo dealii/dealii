@@ -1085,10 +1085,11 @@ namespace internal
         if (structdim == 3 && fe.max_dofs_per_quad() > 0)
           for (const auto quad : accessor.face_indices())
             {
-              const unsigned int raw_orientation = TriaAccessorImplementation::
-                Implementation::face_orientation_raw(accessor, quad);
+              const auto combined_orientation = TriaAccessorImplementation::
+                Implementation::combined_face_orientation(accessor, quad);
               const unsigned int quad_index = accessor.quad_index(quad);
-              if (raw_orientation == 1)
+              if (combined_orientation ==
+                  ReferenceCell::default_combined_face_orientation())
                 dof_operation.process_dofs(
                   accessor.get_dof_handler(),
                   0,

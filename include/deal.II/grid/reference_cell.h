@@ -357,6 +357,19 @@ public:
   default_combined_face_orientation();
 
   /**
+   * Return the reversed (non-default orientation) line orientation flag. As
+   * lines only have two possible orientations, this function and
+   * ReferenceCell::default_combined_face_orientation() encode all of its
+   * possible orientation states.
+   *
+   * @note Line orientations are typically stored as booleans, but to better
+   * enable dimension-independent programming relevant functions typically
+   * present these values as unsigned chars.
+   */
+  static constexpr unsigned char
+  reversed_combined_line_orientation();
+
+  /**
    * Return which child cells are adjacent to a certain face of the
    * mother cell.
    *
@@ -400,7 +413,8 @@ public:
   unsigned int
   child_cell_on_face(const unsigned int  face,
                      const unsigned int  subface,
-                     const unsigned char face_orientation = 1) const;
+                     const unsigned char face_orientation =
+                       default_combined_face_orientation()) const;
 
   /**
    * For a given vertex in a cell, return a pair of a face index and a
@@ -591,7 +605,7 @@ public:
    * arrays are read from or written to that correspond to valid vertex
    * indices.
    *
-   * @deprecated Use get_orientation_index() instead.
+   * @deprecated Use get_combined_orientation() instead.
    */
   template <typename T, std::size_t N>
   DEAL_II_DEPRECATED_EARLY unsigned char
@@ -620,13 +634,13 @@ public:
    *
    * @returns A number that describes a relative orientation. How exactly
    *   this index is defined is not important, but it is consistent with the
-   *   understanding the reorient_based_on_orientation_index() has of
+   *   understanding the permute_by_combined_orientation() has of
    *   these orientation indices.
    */
   template <typename T>
   unsigned char
-  get_orientation_index(const ArrayView<const T> &vertices_0,
-                        const ArrayView<const T> &vertices_1) const;
+  get_combined_orientation(const ArrayView<const T> &vertices_0,
+                           const ArrayView<const T> &vertices_1) const;
 
 
   /**
@@ -640,7 +654,7 @@ public:
    * arrays are read from or written to that correspond to valid vertex
    * indices.
    *
-   * @deprecated Use reorient_based_on_orientation_index() instead.
+   * @deprecated Use permute_by_combined_orientation() instead.
    */
   template <typename T, std::size_t N>
   DEAL_II_DEPRECATED_EARLY std::array<T, N>
@@ -648,7 +662,7 @@ public:
                                 const unsigned int      orientation) const;
 
   /**
-   * This is the inverse function to get_orientation_index(): Given a set of
+   * This is the inverse function to get_combined_orientation(): Given a set of
    * vertex-associated objects (such as vertex indices, locations, etc.) and
    * a desired orientation permutation, return the permuted vertex information.
    *
@@ -660,8 +674,8 @@ public:
    */
   template <typename T>
   boost::container::small_vector<T, 8>
-  reorient_based_on_orientation_index(const ArrayView<const T> &vertices,
-                                      const unsigned char orientation) const;
+  permute_by_combined_orientation(const ArrayView<const T> &vertices,
+                                  const unsigned char       orientation) const;
 
   /**
    * Return a vector of faces a given @p vertex_index belongs to.
@@ -1431,7 +1445,20 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
 inline constexpr unsigned char
 ReferenceCell::default_combined_face_orientation()
 {
-  return 1u;
+  // Our convention is that 'orientation' has a default value of true and
+  // occupies the least-significant bit while rotate and flip have default
+  // values of 'false' and occupy the second and third bits.
+  return 0b001;
+}
+
+
+
+inline constexpr unsigned char
+ReferenceCell::reversed_combined_line_orientation()
+{
+  // For a reversed line 'orientation' is false and neither flip nor rotate are
+  // defined.
+  return 0b000;
 }
 
 
@@ -1440,7 +1467,7 @@ inline unsigned int
 ReferenceCell::child_cell_on_face(
   const unsigned int  face,
   const unsigned int  subface,
-  const unsigned char face_orientation_raw) const
+  const unsigned char combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(subface, face_reference_cell(face).n_isotropic_children());
@@ -1463,10 +1490,11 @@ ReferenceCell::child_cell_on_face(
       case ReferenceCells::Quadrilateral:
         {
           const bool face_orientation =
-            Utilities::get_bit(face_orientation_raw, 0);
-          const bool face_flip = Utilities::get_bit(face_orientation_raw, 2);
+            Utilities::get_bit(combined_face_orientation, 0);
+          const bool face_flip =
+            Utilities::get_bit(combined_face_orientation, 2);
           const bool face_rotation =
-            Utilities::get_bit(face_orientation_raw, 1);
+            Utilities::get_bit(combined_face_orientation, 1);
 
           return GeometryInfo<2>::child_cell_on_face(
             RefinementCase<2>(RefinementPossibilities<2>::isotropic_refinement),
@@ -1486,10 +1514,11 @@ ReferenceCell::child_cell_on_face(
       case ReferenceCells::Hexahedron:
         {
           const bool face_orientation =
-            Utilities::get_bit(face_orientation_raw, 0);
-          const bool face_flip = Utilities::get_bit(face_orientation_raw, 2);
+            Utilities::get_bit(combined_face_orientation, 0);
+          const bool face_flip =
+            Utilities::get_bit(combined_face_orientation, 2);
           const bool face_rotation =
-            Utilities::get_bit(face_orientation_raw, 1);
+            Utilities::get_bit(combined_face_orientation, 1);
 
           return GeometryInfo<3>::child_cell_on_face(
             RefinementCase<3>(RefinementPossibilities<3>::isotropic_refinement),
@@ -2529,7 +2558,7 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
 inline bool
 ReferenceCell::standard_vs_true_line_orientation(
   const unsigned int  line,
-  const unsigned char face_orientation_raw,
+  const unsigned char combined_face_orientation,
   const bool          line_orientation) const
 {
   if (*this == ReferenceCells::Hexahedron)
@@ -2538,7 +2567,8 @@ ReferenceCell::standard_vs_true_line_orientation(
         {{{true, true, false, true, false, false, true, false}},
          {{true, true, true, false, false, false, false, true}}}};
 
-      return (line_orientation == bool_table[line / 2][face_orientation_raw]);
+      return (line_orientation ==
+              bool_table[line / 2][combined_face_orientation]);
     }
   else
     // TODO: This might actually be wrong for some of the other
@@ -2635,7 +2665,7 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
   // those array elements that we actually care about (see the note
   // in the documentation about the arguments potentially being
   // larger arrays than necessary).
-  return get_orientation_index(
+  return get_combined_orientation(
     make_array_view(vertices_0.begin(), vertices_0.begin() + n_vertices()),
     make_array_view(vertices_1.begin(), vertices_1.begin() + n_vertices()));
 }
@@ -2644,8 +2674,9 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
 
 template <typename T>
 unsigned char
-ReferenceCell::get_orientation_index(const ArrayView<const T> &vertices_0,
-                                     const ArrayView<const T> &vertices_1) const
+ReferenceCell::get_combined_orientation(
+  const ArrayView<const T> &vertices_0,
+  const ArrayView<const T> &vertices_1) const
 {
   Assert(vertices_0.size() == n_vertices(),
          ExcMessage("The number of array elements must be equal to "
@@ -2763,7 +2794,7 @@ ReferenceCell::permute_according_orientation(
   // those array elements that we actually care about (see the note
   // in the documentation about the arguments potentially being
   // larger arrays than necessary).
-  const auto permutation = reorient_based_on_orientation_index(
+  const auto permutation = permute_by_combined_orientation(
     make_array_view(vertices.begin(), vertices.begin() + n_vertices()),
     orientation);
 
@@ -2777,7 +2808,7 @@ ReferenceCell::permute_according_orientation(
 
 template <typename T>
 boost::container::small_vector<T, 8>
-ReferenceCell::reorient_based_on_orientation_index(
+ReferenceCell::permute_by_combined_orientation(
   const ArrayView<const T> &vertices,
   const unsigned char       orientation) const
 {

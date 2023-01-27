@@ -2349,16 +2349,21 @@ namespace internal
                       crs.col[i];
 
                     // set line orientations
-                    const unsigned char raw_orientation =
-                      connectivity.entity_orientations(1).get_raw_orientation(
-                        k);
+                    const unsigned char combined_orientation =
+                      connectivity.entity_orientations(1)
+                        .get_combined_orientation(k);
                     // it doesn't make sense to set any flags except
                     // orientation for a line
-                    Assert(raw_orientation == 0u || raw_orientation == 1u,
-                           ExcInternalError());
+                    Assert(
+                      combined_orientation ==
+                          ReferenceCell::default_combined_face_orientation() ||
+                        combined_orientation ==
+                          ReferenceCell::reversed_combined_line_orientation(),
+                      ExcInternalError());
                     faces.quads_line_orientations
                       [q * GeometryInfo<3>::lines_per_face + j] =
-                      raw_orientation == 1u;
+                      combined_orientation ==
+                      ReferenceCell::default_combined_face_orientation();
                   }
               }
           }
@@ -2381,7 +2386,8 @@ namespace internal
             {
               const auto &orientations = connectivity.entity_orientations(1);
               for (unsigned int i = 0; i < orientations.n_objects(); ++i)
-                if (orientations.get_raw_orientation(i) != 1u)
+                if (orientations.get_combined_orientation(i) !=
+                    ReferenceCell::default_combined_face_orientation())
                   {
                     orientation_needed = true;
                     break;
@@ -2421,10 +2427,10 @@ namespace internal
                   // set face orientation if needed
                   if (orientation_needed)
                     {
-                      level.face_orientations.set_raw_orientation(
+                      level.face_orientations.set_combined_orientation(
                         cell * GeometryInfo<dim>::faces_per_cell + j,
                         connectivity.entity_orientations(dim - 1)
-                          .get_raw_orientation(i));
+                          .get_combined_orientation(i));
                     }
                 }
             }
@@ -4344,7 +4350,7 @@ namespace internal
                   if (new_lines[line_no]->vertex_index(1) !=
                       new_vertices[vertex_no])
                     triangulation.levels[subcells[subcell_no]->level()]
-                      ->face_orientations.set_raw_orientation(
+                      ->face_orientations.set_combined_orientation(
                         subcells[subcell_no]->index() *
                             GeometryInfo<2>::faces_per_cell +
                           subcell_line_no,
@@ -5516,7 +5522,7 @@ namespace internal
                              vertex_indices[quad_line_vertices_tri[i][f][1]]}};
 
                           const auto orientation =
-                            ReferenceCells::Line.get_orientation_index(
+                            ReferenceCells::Line.get_combined_orientation(
                               make_array_view(vertices_0),
                               make_array_view(vertices_1));
 
@@ -5822,7 +5828,7 @@ namespace internal
                                   ->line(
                                     table[triangulation.levels[hex->level()]
                                             ->face_orientations
-                                            .get_raw_orientation(
+                                            .get_combined_orientation(
                                               hex->index() * GeometryInfo<dim>::
                                                                faces_per_cell +
                                               f)][l]);
@@ -5959,7 +5965,7 @@ namespace internal
                                vertex_indices[table[q][l][1]]}};
 
                             const auto orientation =
-                              ReferenceCells::Line.get_orientation_index(
+                              ReferenceCells::Line.get_combined_orientation(
                                 make_array_view(vertices_0),
                                 make_array_view(vertices_1));
 
@@ -6012,7 +6018,8 @@ namespace internal
                                       c,
                                       f,
                                       triangulation.levels[hex->level()]
-                                        ->face_orientations.get_raw_orientation(
+                                        ->face_orientations
+                                        .get_combined_orientation(
                                           hex->index() *
                                             GeometryInfo<dim>::faces_per_cell +
                                           f)));
@@ -6140,9 +6147,10 @@ namespace internal
 
                                 new_hex->set_combined_face_orientation(
                                   f,
-                                  face->reference_cell().get_orientation_index(
-                                    make_array_view(vertices_1),
-                                    make_array_view(vertices_0)));
+                                  face->reference_cell()
+                                    .get_combined_orientation(
+                                      make_array_view(vertices_1),
+                                      make_array_view(vertices_0)));
                               }
                           }
                         else if (new_hex->n_faces() == 6)
@@ -14602,14 +14610,21 @@ Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                    face_iter->line(0)->vertex_index(line_orientations[0]),
                    face_iter->line(1)->vertex_index(line_orientations[1])}};
 
-                const unsigned char orientate =
-                  levels[l]->face_orientations.get_raw_orientation(
+                const unsigned char combined_orientation =
+                  levels[l]->face_orientations.get_combined_orientation(
                     cell->index() * GeometryInfo<3>::faces_per_cell + face);
                 std::array<unsigned int, 4> vertex_order{
-                  {ref_cell.standard_to_real_face_vertex(0, face, orientate),
-                   ref_cell.standard_to_real_face_vertex(1, face, orientate),
-                   ref_cell.standard_to_real_face_vertex(2, face, orientate),
-                   ref_cell.standard_to_real_face_vertex(3, face, orientate)}};
+                  {ref_cell.standard_to_real_face_vertex(0,
+                                                         face,
+                                                         combined_orientation),
+                   ref_cell.standard_to_real_face_vertex(1,
+                                                         face,
+                                                         combined_orientation),
+                   ref_cell.standard_to_real_face_vertex(2,
+                                                         face,
+                                                         combined_orientation),
+                   ref_cell.standard_to_real_face_vertex(
+                     3, face, combined_orientation)}};
 
                 const unsigned int index = my_index + 4 * (face - 4);
                 for (unsigned int i = 0; i < 4; ++i)
