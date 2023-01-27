@@ -345,11 +345,13 @@ namespace PETScWrappers
     virtual ~MatrixBase() override;
 
     /**
-     * This method assigns the PETSc Mat to the instance of the class.
-     *
+     * This method associates the PETSc Mat to the instance of the class.
+     * This is particularly useful when performing PETSc to Deal.II operations
+     * since it allows to reuse the Deal.II MatrixBase and the PETSc Mat
+     * without incurring in memory copies.
      */
     void
-    assign_petsc_matrix(Mat A);
+    reinit(Mat A);
 
     /**
      * This operator assigns a scalar to a matrix. Since this does usually not

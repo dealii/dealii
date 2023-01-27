@@ -37,7 +37,7 @@ namespace internal
   // below we use type-traits from matrix-free/type_traits.h
 
   // access to generic const vectors that have operator ().
-  // FIXME: this is wrong for Trilinos/Petsc MPI vectors
+  // FIXME: this is wrong for Trilinos/PETSc MPI vectors
   // where we should first do Partitioner::local_to_global()
   template <
     typename VectorType,
@@ -51,7 +51,7 @@ namespace internal
 
 
   // access to generic non-const vectors that have operator ().
-  // FIXME: this is wrong for Trilinos/Petsc MPI vectors
+  // FIXME: this is wrong for Trilinos/PETSc MPI vectors
   // where we should first do Partitioner::local_to_global()
   template <
     typename VectorType,

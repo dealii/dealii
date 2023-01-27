@@ -44,7 +44,7 @@ macro(feature_petsc_find_external var)
     endif()
 
     #
-    # Petsc has to be configured with the same MPI configuration as
+    # PETSc has to be configured with the same MPI configuration as
     # deal.II.
     #
     # petscconf.h should export PETSC_HAVE_MPIUNI 1 in case mpi support is
@@ -68,7 +68,7 @@ macro(feature_petsc_find_external var)
     endif()
 
     #
-    # Petsc has to be configured with the same number of bits for indices as
+    # PETSc has to be configured with the same number of bits for indices as
     # deal.II.
     #
     # petscconf.h should export PETSC_WITH_64BIT_INDICES 1 in case 64bits

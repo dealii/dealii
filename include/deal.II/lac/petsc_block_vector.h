@@ -132,9 +132,11 @@ namespace PETScWrappers
 
       /**
        * Create a BlockVector with a PETSc Vec
+       * It infers the number of blocks from the Vec if it is of type VECNEST,
+       * otherwise the block vector will only have a single block.
+       * Internally, we always store a VECNEST vector.
        */
       explicit BlockVector(Vec v);
-
 
       /**
        * Destructor. Clears memory
@@ -155,15 +157,12 @@ namespace PETScWrappers
       operator=(const BlockVector &V);
 
       /**
-       * This method assigns the given PETSc Vec to the instance of the class.
-       *
-       * Note that the vector is not copied: instead, the instance of this class
-       * is initialized to use the given vector. This is useful if you want to
-       * interpret a PETSc vector as a deal.II vector, and you already have a
-       * BlockVector that you want to use for this purpose.
+       * This method associates the PETSc Vec to the instance of the class.
+       * Infers the number of blocks from v if it is of type VECNEST, otherwise
+       * the block vector will only have a single block.
        */
       void
-      assign_petsc_vector(Vec v);
+      reinit(Vec v);
 
       /**
        * Reinitialize the BlockVector to contain @p n_blocks of size @p
@@ -399,7 +398,7 @@ namespace PETScWrappers
       : BlockVectorBase<Vector>()
       , petsc_nest_vector(nullptr)
     {
-      this->assign_petsc_vector(v);
+      this->reinit(v);
     }
 
     inline BlockVector &

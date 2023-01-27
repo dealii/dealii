@@ -210,7 +210,7 @@ namespace PETScWrappers
     }
 
     void
-    BlockSparseMatrix::assign_petsc_matrix(Mat A)
+    BlockSparseMatrix::reinit(Mat A)
     {
       clear();
 
