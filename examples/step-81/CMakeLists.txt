@@ -21,9 +21,9 @@ set(TARGET_SRC
 
 # Usually, you will not need to modify anything beyond this point...
 
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.13.4)
 
-find_package(deal.II 9.2.0
+find_package(deal.II 9.5.0
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 if(NOT ${deal.II_FOUND})

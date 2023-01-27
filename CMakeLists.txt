@@ -33,11 +33,11 @@
 message(STATUS "This is CMake ${CMAKE_VERSION}")
 message(STATUS "")
 
-cmake_minimum_required(VERSION 3.11.0)
+cmake_minimum_required(VERSION 3.13.4)
 #
 # We support all policy changes up to version 3.11.
 #
-cmake_policy(VERSION 3.11.0)
+cmake_policy(VERSION 3.13.4)
 
 if(POLICY CMP0075)
   # Introduced in CMake 3.12: Use CMAKE_REQUIRED_LIBRARIES also in include
