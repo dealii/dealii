@@ -386,8 +386,23 @@ public:
   pop_front();
 
   /**
-   * Fill the given vector with all indices contained in this IndexSet.
+   * Return a vector with all indices contained in this IndexSet. This
+   * vector may of course be quite large if the IndexSet stores many
+   * indices. (This may be true even if the IndexSet itself does not
+   * take up much memory: IndexSet stores indices in a compressed
+   * format in which contiguous ranges of indices are only stored using
+   * pairs of indices.)
    */
+  std::vector<size_type>
+  get_index_vector() const;
+
+  /**
+   * Fill the given vector with all indices contained in this IndexSet.
+   *
+   * This function is equivalent to calling get_index_vector() and
+   * assigning the result to the @p indices argument.
+   */
+  DEAL_II_DEPRECATED_EARLY
   void
   fill_index_vector(std::vector<size_type> &indices) const;
 

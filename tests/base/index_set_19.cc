@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test IndexSet::fill_index_vector
+// test IndexSet::get_index_vector()
 
 #include <deal.II/base/index_set.h>
 
@@ -34,8 +34,7 @@ test()
   for (unsigned int i = 0; i < 9 * is1.size() / 10; ++i)
     is1.add_index(Testing::rand() % is1.size());
 
-  std::vector<types::global_dof_index> indices;
-  is1.fill_index_vector(indices);
+  const std::vector<types::global_dof_index> indices = is1.get_index_vector();
 
   deallog << "Original index set: " << std::endl;
   is1.print(deallog);
