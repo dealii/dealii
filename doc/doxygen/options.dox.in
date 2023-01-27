@@ -209,7 +209,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_LAPACK_WITH_MKL=1 \
                          DEAL_II_WITH_METIS=1 \
                          DEAL_II_WITH_MPI=1 \
-                         DEAL_II_MPI_WITH_CUDA_SUPPORT=1 \
+                         DEAL_II_MPI_WITH_DEVICE_SUPPORT=1 \
                          DEAL_II_MPI_VERSION_MAJOR=3 \
                          DEAL_II_MPI_VERSION_MINOR=0 \
                          DEAL_II_WITH_MUPARSER=1 \

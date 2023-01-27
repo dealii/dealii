@@ -981,7 +981,7 @@ namespace LinearAlgebra
       // allocate import_data in case it is not set up yet
       if (partitioner->n_import_indices() > 0)
         {
-#  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
           if (std::is_same<MemorySpaceType,
                            dealii::MemorySpace::Default>::value)
             {
@@ -998,7 +998,7 @@ namespace LinearAlgebra
             }
         }
 
-#  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
       if (std::is_same<MemorySpaceType, dealii::MemorySpace::Default>::value)
         {
           // Move the data to the host and then move it back to the
@@ -1055,7 +1055,7 @@ namespace LinearAlgebra
 
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
-#  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
       if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
         {
           Assert(partitioner->n_import_indices() == 0 ||
@@ -1125,7 +1125,7 @@ namespace LinearAlgebra
       // allocate import_data in case it is not set up yet
       if (partitioner->n_import_indices() > 0)
         {
-#  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
           if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
             {
               if (import_data.values_host_buffer.size() == 0)
@@ -1141,7 +1141,7 @@ namespace LinearAlgebra
             }
         }
 
-#  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
       if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
         {
           // Move the data to the host and then move it back to the
@@ -1203,7 +1203,7 @@ namespace LinearAlgebra
           // make this function thread safe
           std::lock_guard<std::mutex> lock(mutex);
 
-#  if !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+#  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
           if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
             {
               partitioner->export_to_ghosted_array_finish(

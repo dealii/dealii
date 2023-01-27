@@ -45,3 +45,37 @@ for (SCALAR : MPI_SCALARS)
                          std::vector<MPI_Request> &) const;
 #endif
   }
+
+for (SCALAR : MPI_DEVICE_SCALARS)
+  {
+#ifdef DEAL_II_WITH_MPI
+    template void Utilities::MPI::Partitioner::
+      export_to_ghosted_array_start<SCALAR, dealii::MemorySpace::Default>(
+        const unsigned int,
+        const ArrayView<const SCALAR, MemorySpace::Default> &,
+        const ArrayView<SCALAR, MemorySpace::Default> &,
+        const ArrayView<SCALAR, MemorySpace::Default> &,
+        std::vector<MPI_Request> &) const;
+
+    template void Utilities::MPI::Partitioner::export_to_ghosted_array_finish<
+      SCALAR,
+      MemorySpace::Default>(const ArrayView<SCALAR, MemorySpace::Default> &,
+                            std::vector<MPI_Request> &) const;
+
+    template void Utilities::MPI::Partitioner::import_from_ghosted_array_start<
+      SCALAR,
+      MemorySpace::Default>(const VectorOperation::values,
+                            const unsigned int,
+                            const ArrayView<SCALAR, MemorySpace::Default> &,
+                            const ArrayView<SCALAR, MemorySpace::Default> &,
+                            std::vector<MPI_Request> &) const;
+
+    template void Utilities::MPI::Partitioner::
+      import_from_ghosted_array_finish<SCALAR, MemorySpace::Default>(
+        const VectorOperation::values,
+        const ArrayView<const SCALAR, MemorySpace::Default> &,
+        const ArrayView<SCALAR, MemorySpace::Default> &,
+        const ArrayView<SCALAR, MemorySpace::Default> &,
+        std::vector<MPI_Request> &) const;
+#endif
+  }

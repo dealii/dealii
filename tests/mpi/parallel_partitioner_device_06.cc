@@ -28,10 +28,13 @@
 
 template <typename Number>
 void
-print_cuda_view(const ArrayView<Number, MemorySpace::CUDA> cuda_view)
+print_device_view(
+  const Kokkos::View<Number *, MemorySpace::Default::kokkos_space> device_view)
 {
-  std::vector<Number> cpu_values(cuda_view.size());
-  Utilities::CUDA::copy_to_host(cuda_view.data(), cpu_values);
+  std::vector<Number> cpu_values(device_view.size());
+  Kokkos::deep_copy(Kokkos::View<Number *, Kokkos::HostSpace>(
+                      cpu_values.data(), cpu_values.size()),
+                    device_view);
   for (Number value : cpu_values)
     deallog << value << " ";
   deallog << std::endl;
@@ -106,104 +109,88 @@ test()
   std::vector<unsigned int> cpu_locally_owned_data(local_size);
   for (unsigned int i = 0; i < local_size; ++i)
     cpu_locally_owned_data[i] = my_start + i;
-  std::unique_ptr<unsigned int[], void (*)(unsigned int *)> locally_owned_data(
-    nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
-  locally_owned_data.reset(
-    Utilities::CUDA::allocate_device_data<unsigned int>(local_size));
-  ArrayView<unsigned int, MemorySpace::CUDA> locally_owned_data_view(
-    locally_owned_data.get(), local_size);
-  Utilities::CUDA::copy_to_dev(cpu_locally_owned_data,
-                               locally_owned_data.get());
+  Kokkos::View<unsigned *, MemorySpace::Default::kokkos_space>
+    locally_owned_data("locally_owned_data", local_size);
+  ArrayView<unsigned int, MemorySpace::Default> locally_owned_data_view(
+    locally_owned_data.data(), local_size);
+  Kokkos::deep_copy(
+    locally_owned_data,
+    Kokkos::View<unsigned *, Kokkos::HostSpace>(cpu_locally_owned_data.data(),
+                                                cpu_locally_owned_data.size()));
 
   // set up a ghost array
-  std::unique_ptr<unsigned int[], void (*)(unsigned int *)> ghosts(
-    nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
-  ghosts.reset(
-    Utilities::CUDA::allocate_device_data<unsigned int>(v.n_ghost_indices()));
-  ArrayView<unsigned int, MemorySpace::CUDA> ghosts_view(ghosts.get(),
-                                                         v.n_ghost_indices());
-
-  std::unique_ptr<unsigned int[], void (*)(unsigned int *)> temp_array(
-    nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
-  temp_array.reset(
-    Utilities::CUDA::allocate_device_data<unsigned int>(v.n_import_indices()));
-  ArrayView<unsigned int, MemorySpace::CUDA> temp_array_view(
-    temp_array.get(), v.n_import_indices());
+  Kokkos::View<unsigned *, MemorySpace::Default::kokkos_space> ghosts(
+    "ghosts", v.n_ghost_indices());
+  ArrayView<unsigned int, MemorySpace::Default> ghosts_view(ghosts.data(),
+                                                            ghosts.size());
+  Kokkos::View<unsigned *, MemorySpace::Default::kokkos_space> temp_array(
+    "temp_array", v.n_import_indices());
+  ArrayView<unsigned int, MemorySpace::Default> temp_array_view(
+    temp_array.data(), temp_array.size());
 
   std::vector<MPI_Request> requests;
 
   // send the full array
-  v.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
+  v.export_to_ghosted_array_start<unsigned int, MemorySpace::Default>(
     3, locally_owned_data_view, temp_array_view, ghosts_view, requests);
-  v.export_to_ghosted_array_finish<unsigned int, MemorySpace::CUDA>(ghosts_view,
-                                                                    requests);
+  v.export_to_ghosted_array_finish<unsigned int, MemorySpace::Default>(
+    ghosts_view, requests);
   deallog << "All ghosts: ";
-  print_cuda_view(ghosts_view);
+  print_device_view(ghosts);
 
   // send only the array in w
-  cudaError_t cuda_error =
-    cudaMemset(ghosts_view.data(),
-               0,
-               ghosts_view.size() * sizeof(unsigned int));
-  AssertCuda(cuda_error);
+  Kokkos::deep_copy(ghosts, 0);
 
   Assert(temp_array_view.size() >= w.n_import_indices(), ExcInternalError());
-  ArrayView<unsigned int, MemorySpace::CUDA> temp_array_view_w(
+  ArrayView<unsigned int, MemorySpace::Default> temp_array_view_w(
     temp_array_view.data(), w.n_import_indices());
-  w.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
+  w.export_to_ghosted_array_start<unsigned int, MemorySpace::Default>(
     3, locally_owned_data_view, temp_array_view_w, ghosts_view, requests);
 
   // start a second send operation for the x partitioner in parallel to make
   // sure communication does not get messed up
-  std::unique_ptr<unsigned int[], void (*)(unsigned int *)> temp_array2(
-    nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
-  temp_array2.reset(
-    Utilities::CUDA::allocate_device_data<unsigned int>(x.n_import_indices()));
-  ArrayView<unsigned int, MemorySpace::CUDA> temp_array2_view(
-    temp_array2.get(), x.n_import_indices());
+  Kokkos::View<unsigned *, MemorySpace::Default::kokkos_space> temp_array2(
+    "temp_array2", x.n_import_indices());
+  ArrayView<unsigned int, MemorySpace::Default> temp_array2_view(
+    temp_array2.data(), temp_array2.size());
 
-  std::unique_ptr<unsigned int[], void (*)(unsigned int *)> ghosts2(
-    nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
-  ghosts2.reset(
-    Utilities::CUDA::allocate_device_data<unsigned int>(x.n_ghost_indices()));
-  ArrayView<unsigned int, MemorySpace::CUDA> ghosts2_view(ghosts2.get(),
-                                                          x.n_ghost_indices());
+  Kokkos::View<unsigned *, MemorySpace::Default::kokkos_space> ghosts2(
+    "ghosts2", x.n_ghost_indices());
+  ArrayView<unsigned int, MemorySpace::Default> ghosts2_view(ghosts2.data(),
+                                                             ghosts2.size());
 
   std::vector<MPI_Request> requests2;
-  x.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
+  x.export_to_ghosted_array_start<unsigned int, MemorySpace::Default>(
     4, locally_owned_data_view, temp_array2_view, ghosts2_view, requests2);
 
-  w.export_to_ghosted_array_finish<unsigned int, MemorySpace::CUDA>(ghosts_view,
-                                                                    requests);
+  w.export_to_ghosted_array_finish<unsigned int, MemorySpace::Default>(
+    ghosts_view, requests);
   deallog << "Ghosts on reduced 1: ";
-  print_cuda_view(ghosts_view);
+  print_device_view(ghosts);
 
-  cuda_error = cudaMemset(ghosts_view.data(),
-                          0,
-                          ghosts_view.size() * sizeof(unsigned int));
-  AssertCuda(cuda_error);
+  Kokkos::deep_copy(ghosts, 0);
 
   Assert(temp_array_view.size() >= x.n_import_indices(), ExcInternalError());
-  ArrayView<unsigned int, MemorySpace::CUDA> temp_array_view_x(
+  ArrayView<unsigned int, MemorySpace::Default> temp_array_view_x(
     temp_array_view.data(), x.n_import_indices());
-  x.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
+  x.export_to_ghosted_array_start<unsigned int, MemorySpace::Default>(
     3, locally_owned_data_view, temp_array_view_x, ghosts_view, requests);
-  x.export_to_ghosted_array_finish<unsigned int, MemorySpace::CUDA>(ghosts_view,
-                                                                    requests);
+  x.export_to_ghosted_array_finish<unsigned int, MemorySpace::Default>(
+    ghosts_view, requests);
   deallog << "Ghosts on reduced 2: ";
-  print_cuda_view(ghosts_view);
+  print_device_view(ghosts);
 
-  x.export_to_ghosted_array_finish<unsigned int, MemorySpace::CUDA>(
+  x.export_to_ghosted_array_finish<unsigned int, MemorySpace::Default>(
     ghosts2_view, requests2);
   deallog << "Ghosts on reduced 2 without excess entries: ";
-  print_cuda_view(ghosts2_view);
+  print_device_view(ghosts2);
 
-  x.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
+  x.export_to_ghosted_array_start<unsigned int, MemorySpace::Default>(
     3, locally_owned_data_view, temp_array_view_x, ghosts_view, requests);
-  x.export_to_ghosted_array_finish<unsigned int, MemorySpace::CUDA>(ghosts_view,
-                                                                    requests);
+  x.export_to_ghosted_array_finish<unsigned int, MemorySpace::Default>(
+    ghosts_view, requests);
   deallog << "Ghosts on reduced 2: ";
-  print_cuda_view(ghosts_view);
+  print_device_view(ghosts);
 }
 
 
@@ -212,7 +199,8 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
-  MPILogInitAll                    log;
-  init_cuda(true);
+  Kokkos::initialize();
+  MPILogInitAll log;
   test();
+  Kokkos::finalize();
 }

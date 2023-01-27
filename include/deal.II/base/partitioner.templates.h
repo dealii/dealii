@@ -107,33 +107,40 @@ namespace Utilities
         }
 
       Number *temp_array_ptr = temporary_storage.data();
-#    if defined(DEAL_II_WITH_CUDA) && defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-      // When using CUDAs-aware MPI, the set of local indices that are ghosts
+#    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
+      // When using device-aware MPI, the set of local indices that are ghosts
       // indices on other processors is expanded in arrays. This is for
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value) &&
+      if ((std::is_same<MemorySpaceType, MemorySpace::Default>::value) &&
           (import_indices_plain_dev.size() == 0))
         initialize_import_indices_plain_dev();
 #    endif
 
       for (unsigned int i = 0; i < n_import_targets; ++i)
         {
-#    if defined(DEAL_II_WITH_CUDA) && defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+#    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
+          if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_same<
+                                                 MemorySpaceType,
+                                                 MemorySpace::Default>::value)
             {
-              const auto chunk_size = import_indices_plain_dev[i].second;
-              const int  n_blocks =
-                1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
-                                  ::dealii::CUDAWrappers::block_size);
-              ::dealii::LinearAlgebra::CUDAWrappers::kernel::
-                gather<<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
-                  temp_array_ptr,
-                  import_indices_plain_dev[i].first.get(),
-                  locally_owned_array.data(),
-                  chunk_size);
-              cudaDeviceSynchronize();
+              const auto chunk_size = import_indices_plain_dev[i].size();
+              using IndexType       = decltype(chunk_size);
+
+              auto import_indices           = import_indices_plain_dev[i];
+              auto locally_owned_array_data = locally_owned_array.data();
+              MemorySpace::Default::kokkos_space::execution_space exec;
+              Kokkos::parallel_for(
+                "fill temp_array_ptr",
+                Kokkos::RangePolicy<
+                  MemorySpace::Default::kokkos_space::execution_space>(
+                  exec, 0, chunk_size),
+                KOKKOS_LAMBDA(IndexType idx) {
+                  temp_array_ptr[idx] =
+                    locally_owned_array_data[import_indices[idx]];
+                });
+              exec.fence();
             }
           else
 #    endif
@@ -214,11 +221,21 @@ namespace Utilities
                 {
                   const unsigned int chunk_size =
                     ghost_range.second - ghost_range.first;
-                  if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
+                  if DEAL_II_CONSTEXPR_IN_CONDITIONAL (
+                    std::is_same<MemorySpaceType, MemorySpace::Host>::value)
                     {
-                      std::copy(ghost_array.data() + offset,
-                                ghost_array.data() + offset + chunk_size,
-                                ghost_array.data() + ghost_range.first);
+                      // If source and destination are overlapping, we must be
+                      // careful to use an appropriate copy function.
+                      if (ghost_range.first > offset)
+                        std::copy_backward(ghost_array.data() + offset,
+                                           ghost_array.data() + offset +
+                                             chunk_size,
+                                           ghost_array.data() +
+                                             ghost_range.first);
+                      else
+                        std::copy(ghost_array.data() + offset,
+                                  ghost_array.data() + offset + chunk_size,
+                                  ghost_array.data() + ghost_range.first);
                       std::fill(ghost_array.data() +
                                   std::max(ghost_range.second, offset),
                                 ghost_array.data() + offset + chunk_size,
@@ -226,27 +243,41 @@ namespace Utilities
                     }
                   else
                     {
-#    ifdef DEAL_II_WITH_CUDA
-                      cudaError_t cuda_error =
-                        cudaMemcpy(ghost_array.data() + ghost_range.first,
-                                   ghost_array.data() + offset,
-                                   chunk_size * sizeof(Number),
-                                   cudaMemcpyDeviceToDevice);
-                      AssertCuda(cuda_error);
-                      cuda_error =
-                        cudaMemset(ghost_array.data() +
-                                     std::max(ghost_range.second, offset),
-                                   0,
-                                   (offset + chunk_size -
-                                    std::max(ghost_range.second, offset)) *
-                                     sizeof(Number));
-                      AssertCuda(cuda_error);
-#    else
-                      Assert(
-                        false,
-                        ExcMessage(
-                          "If the compiler doesn't understand CUDA code, only MemorySpace::Host is allowed!"));
-#    endif
+                      Kokkos::View<const Number *,
+                                   MemorySpace::Default::kokkos_space>
+                        ghost_src_view(ghost_array.data() + offset, chunk_size);
+                      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+                        ghost_dst_view(ghost_array.data() + ghost_range.first,
+                                       chunk_size);
+
+                      // If source and destination are overlapping, we can't
+                      // just call deep_copy but must copy the data to a buffer
+                      // first.
+                      if ((offset < ghost_range.first &&
+                           ghost_range.first < offset + chunk_size) ||
+                          (ghost_range.first < offset &&
+                           offset < ghost_range.first + chunk_size))
+                        {
+                          Kokkos::View<Number *,
+                                       MemorySpace::Default::kokkos_space>
+                            copy(Kokkos::view_alloc(
+                                   "copy", Kokkos::WithoutInitializing),
+                                 chunk_size);
+                          Kokkos::deep_copy(copy, ghost_src_view);
+                          Kokkos::deep_copy(ghost_dst_view, copy);
+                        }
+                      else
+                        {
+                          Kokkos::deep_copy(ghost_dst_view, ghost_src_view);
+                        }
+                      Kokkos::deep_copy(
+                        Kokkos::View<Number *,
+                                     MemorySpace::Default::kokkos_space>(
+                          ghost_array.data() +
+                            std::max(ghost_range.second, offset),
+                          (offset + chunk_size -
+                           std::max(ghost_range.second, offset))),
+                        0);
                     }
                   offset += chunk_size;
                 }
@@ -362,12 +393,19 @@ namespace Utilities
                   if (ghost_array_ptr + offset !=
                       ghost_array.data() + my_ghosts->first)
                     {
-                      if (std::is_same<MemorySpaceType,
-                                       MemorySpace::Host>::value)
+                      if DEAL_II_CONSTEXPR_IN_CONDITIONAL (
+                        std::is_same<MemorySpaceType, MemorySpace::Host>::value)
                         {
-                          std::copy(ghost_array.data() + my_ghosts->first,
-                                    ghost_array.data() + my_ghosts->second,
-                                    ghost_array_ptr + offset);
+                          if (offset > my_ghosts->first)
+                            std::copy_backward(ghost_array.data() +
+                                                 my_ghosts->first,
+                                               ghost_array_ptr +
+                                                 my_ghosts->second,
+                                               ghost_array.data() + offset);
+                          else
+                            std::copy(ghost_array.data() + my_ghosts->first,
+                                      ghost_array.data() + my_ghosts->second,
+                                      ghost_array_ptr + offset);
                           std::fill(
                             std::max(ghost_array.data() + my_ghosts->first,
                                      ghost_array_ptr + offset + chunk_size),
@@ -376,28 +414,30 @@ namespace Utilities
                         }
                       else
                         {
-#    ifdef DEAL_II_WITH_CUDA
-                          cudaError_t cuda_error =
-                            cudaMemcpy(ghost_array_ptr + offset,
-                                       ghost_array.data() + my_ghosts->first,
-                                       chunk_size * sizeof(Number),
-                                       cudaMemcpyDeviceToDevice);
-                          AssertCuda(cuda_error);
-                          cuda_error = cudaMemset(
-                            std::max(ghost_array.data() + my_ghosts->first,
-                                     ghost_array_ptr + offset + chunk_size),
-                            0,
-                            (ghost_array.data() + my_ghosts->second -
-                             std::max(ghost_array.data() + my_ghosts->first,
-                                      ghost_array_ptr + offset + chunk_size)) *
-                              sizeof(Number));
-                          AssertCuda(cuda_error);
-#    else
-                          Assert(
-                            false,
-                            ExcMessage(
-                              "If the compiler doesn't understand CUDA code, only MemorySpace::Host is allowed!"));
-#    endif
+                          Kokkos::View<Number *,
+                                       MemorySpace::Default::kokkos_space>
+                            copy("copy", chunk_size);
+                          Kokkos::deep_copy(
+                            copy,
+                            Kokkos::View<Number *,
+                                         MemorySpace::Default::kokkos_space>(
+                              ghost_array.data() + my_ghosts->first,
+                              chunk_size));
+                          Kokkos::deep_copy(
+                            Kokkos::View<Number *,
+                                         MemorySpace::Default::kokkos_space>(
+                              ghost_array_ptr + offset, chunk_size),
+                            copy);
+                          Kokkos::deep_copy(
+                            Kokkos::View<Number *,
+                                         MemorySpace::Default::kokkos_space>(
+                              std::max(ghost_array.data() + my_ghosts->first,
+                                       ghost_array_ptr + offset + chunk_size),
+                              (ghost_array.data() + my_ghosts->second -
+                               std::max(ghost_array.data() + my_ghosts->first,
+                                        ghost_array_ptr + offset +
+                                          chunk_size))),
+                            0);
                         }
                     }
                   offset += chunk_size;
@@ -412,10 +452,8 @@ namespace Utilities
             ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
                        "The number of ghost entries times the size of 'Number' "
                        "exceeds this value. This is not supported."));
-#    if defined(DEAL_II_WITH_CUDA) && defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
-            cudaDeviceSynchronize();
-#    endif
+          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
+            Kokkos::fence();
           const int ierr =
             MPI_Isend(ghost_array_ptr,
                       ghost_targets_data[i].second * sizeof(Number),
@@ -458,7 +496,7 @@ namespace Utilities
       // straight forward for complex numbers. Therefore, comparison of complex
       // numbers is prohibited and throws an exception.
       template <typename Number>
-      Number
+      DEAL_II_HOST_DEVICE Number
       get_min(const Number a, const Number b)
       {
         return std::min(a, b);
@@ -475,7 +513,7 @@ namespace Utilities
       }
 
       template <typename Number>
-      Number
+      DEAL_II_HOST_DEVICE Number
       get_max(const Number a, const Number b)
       {
         return std::max(a, b);
@@ -523,26 +561,10 @@ namespace Utilities
                    "import_from_ghosted_array_start as is passed "
                    "to import_from_ghosted_array_finish."));
 
-#      ifdef DEAL_II_WITH_CUDA
-          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
-            {
-              cudaMemset(ghost_array.data(),
-                         0,
-                         sizeof(Number) * ghost_array.size());
-            }
-          else
-#      endif
-            {
-              if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivial<
-                                                     Number>::value)
-                std::memset(ghost_array.data(),
-                            0,
-                            sizeof(Number) * ghost_array.size());
-              else
-                std::fill(ghost_array.data(),
-                          ghost_array.data() + ghost_array.size(),
-                          0);
-            }
+          Kokkos::deep_copy(
+            Kokkos::View<Number *, typename MemorySpaceType::kokkos_space>(
+              ghost_array.data(), ghost_array.size()),
+            0);
           return;
         }
 #    endif
@@ -554,13 +576,13 @@ namespace Utilities
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
-#    if (defined(DEAL_II_WITH_CUDA) && defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
-      // When using CUDAs-aware MPI, the set of local indices that are ghosts
+#    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
+      // When using device-aware MPI, the set of local indices that are ghosts
       // indices on other processors is expanded in arrays. This is for
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value) &&
+      if ((std::is_same<MemorySpaceType, MemorySpace::Default>::value) &&
           (import_indices_plain_dev.size() == 0))
         initialize_import_indices_plain_dev();
 #    endif
@@ -576,131 +598,165 @@ namespace Utilities
           AssertThrowMPI(ierr);
 
           const Number *read_position = temporary_storage.data();
-#    if !(defined(DEAL_II_WITH_CUDA) && defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
-          // If the operation is no insertion, add the imported data to the
-          // local values. For insert, nothing is done here (but in debug mode
-          // we assert that the specified value is either zero or matches with
-          // the ones already present
-          if (vector_operation == dealii::VectorOperation::add)
-            for (const auto &import_range : import_indices_data)
-              for (unsigned int j = import_range.first; j < import_range.second;
-                   j++)
-                locally_owned_array[j] += *read_position++;
-          else if (vector_operation == dealii::VectorOperation::min)
-            for (const auto &import_range : import_indices_data)
-              for (unsigned int j = import_range.first; j < import_range.second;
-                   j++)
-                {
-                  locally_owned_array[j] =
-                    internal::get_min(*read_position, locally_owned_array[j]);
-                  read_position++;
-                }
-          else if (vector_operation == dealii::VectorOperation::max)
-            for (const auto &import_range : import_indices_data)
-              for (unsigned int j = import_range.first; j < import_range.second;
-                   j++)
-                {
-                  locally_owned_array[j] =
-                    internal::get_max(*read_position, locally_owned_array[j]);
-                  read_position++;
-                }
-          else
-            for (const auto &import_range : import_indices_data)
-              for (unsigned int j = import_range.first; j < import_range.second;
-                   j++, read_position++)
-                // Below we use relatively large precision in units in the last
-                // place (ULP) as this Assert can be easily triggered in
-                // p::d::SolutionTransfer. The rationale is that during
-                // interpolation on two elements sharing the face, values on
-                // this face obtained from each side might be different due to
-                // additions being done in different order. If the local
-                // value is zero, it indicates that the local process has not
-                // set the value during the cell loop and its value can be
-                // safely overridden.
-                Assert(*read_position == Number() ||
-                         internal::get_abs(locally_owned_array[j] -
-                                           *read_position) <=
-                           internal::get_abs(locally_owned_array[j] +
-                                             *read_position) *
-                             100000. *
-                             std::numeric_limits<typename numbers::NumberTraits<
-                               Number>::real_type>::epsilon(),
-                       typename dealii::LinearAlgebra::distributed::Vector<
-                         Number>::ExcNonMatchingElements(*read_position,
-                                                         locally_owned_array[j],
-                                                         my_pid));
-#    else
-          if (vector_operation == dealii::VectorOperation::add)
+#    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
+          if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_same<
+                                                 MemorySpaceType,
+                                                 MemorySpace::Default>::value)
             {
-              for (auto const &import_indices_plain : import_indices_plain_dev)
+              if (vector_operation == dealii::VectorOperation::add)
                 {
-                  const auto chunk_size = import_indices_plain.second;
-                  const int n_blocks =
-                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
-                                      ::dealii::CUDAWrappers::block_size);
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::
-                    masked_vector_bin_op<Number,
-                                         dealii::LinearAlgebra::CUDAWrappers::
-                                           kernel::Binop_Addition>
-                    <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
-                      import_indices_plain.first.get(),
-                      locally_owned_array.data(),
-                      read_position,
-                      chunk_size);
-                  read_position += chunk_size;
+                  for (auto const &import_indices_plain :
+                       import_indices_plain_dev)
+                    {
+                      const auto chunk_size = import_indices_plain.size();
+
+                      using IndexType = decltype(chunk_size);
+                      MemorySpace::Default::kokkos_space::execution_space exec;
+                      Kokkos::parallel_for(
+                        "fill locally_owned_array, add",
+                        Kokkos::RangePolicy<
+                          MemorySpace::Default::kokkos_space::execution_space>(
+                          exec, 0, chunk_size),
+                        KOKKOS_LAMBDA(IndexType idx) {
+                          locally_owned_array
+                            .data()[import_indices_plain(idx)] +=
+                            read_position[idx];
+                        });
+                      exec.fence();
+
+                      read_position += chunk_size;
+                    }
                 }
-            }
-          else if (vector_operation == dealii::VectorOperation::min)
-            {
-              for (auto const &import_indices_plain : import_indices_plain_dev)
+              else if (vector_operation == dealii::VectorOperation::min)
                 {
-                  const auto chunk_size = import_indices_plain.second;
-                  const int n_blocks =
-                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
-                                      ::dealii::CUDAWrappers::block_size);
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::
-                    masked_vector_bin_op<
-                      Number,
-                      dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Min>
-                    <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
-                      import_indices_plain.first.get(),
-                      locally_owned_array.data(),
-                      read_position,
-                      chunk_size);
-                  read_position += chunk_size;
+                  for (auto const &import_indices_plain :
+                       import_indices_plain_dev)
+                    {
+                      const auto chunk_size = import_indices_plain.size();
+
+                      using IndexType = decltype(chunk_size);
+                      MemorySpace::Default::kokkos_space::execution_space exec;
+                      Kokkos::parallel_for(
+                        "fill locally_owned_array, min",
+                        Kokkos::RangePolicy<
+                          MemorySpace::Default::kokkos_space::execution_space>(
+                          exec, 0, chunk_size),
+                        KOKKOS_LAMBDA(IndexType idx) {
+                          locally_owned_array
+                            .data()[import_indices_plain(idx)] =
+                            internal::get_min(
+                              locally_owned_array
+                                .data()[import_indices_plain(idx)],
+                              read_position[idx]);
+                        });
+                      exec.fence();
+
+                      read_position += chunk_size;
+                    }
                 }
-            }
-          else if (vector_operation == dealii::VectorOperation::max)
-            {
-              for (auto const &import_indices_plain : import_indices_plain_dev)
+              else if (vector_operation == dealii::VectorOperation::max)
                 {
-                  const auto chunk_size = import_indices_plain.second;
-                  const int n_blocks =
-                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
-                                      ::dealii::CUDAWrappers::block_size);
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::
-                    masked_vector_bin_op<
-                      Number,
-                      dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Max>
-                    <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
-                      import_indices_plain.first.get(),
-                      locally_owned_array.data(),
-                      read_position,
-                      chunk_size);
-                  read_position += chunk_size;
+                  for (auto const &import_indices_plain :
+                       import_indices_plain_dev)
+                    {
+                      const auto chunk_size = import_indices_plain.size();
+
+                      using IndexType = decltype(chunk_size);
+                      MemorySpace::Default::kokkos_space::execution_space exec;
+                      Kokkos::parallel_for(
+                        "fill locally_owned_array, max",
+                        Kokkos::RangePolicy<
+                          MemorySpace::Default::kokkos_space::execution_space>(
+                          exec, 0, chunk_size),
+                        KOKKOS_LAMBDA(IndexType idx) {
+                          locally_owned_array
+                            .data()[import_indices_plain(idx)] =
+                            internal::get_max(
+                              locally_owned_array
+                                .data()[import_indices_plain(idx)],
+                              read_position[idx]);
+                        });
+                      exec.fence();
+
+                      read_position += chunk_size;
+                    }
+                }
+              else
+                {
+                  for (auto const &import_indices_plain :
+                       import_indices_plain_dev)
+                    {
+                      // We can't easily assert here, so we just move the
+                      // pointer matching the host code.
+                      const auto chunk_size = import_indices_plain.size();
+                      read_position += chunk_size;
+                    }
                 }
             }
           else
-            {
-              for (auto const &import_indices_plain : import_indices_plain_dev)
-                {
-                  // We can't easily assert here, so we just move the pointer
-                  // matching the host code.
-                  const auto chunk_size = import_indices_plain.second;
-                  read_position += chunk_size;
-                }
-            }
 #    endif
+            {
+              // If the operation is no insertion, add the imported data to the
+              // local values. For insert, nothing is done here (but in debug
+              // mode we assert that the specified value is either zero or
+              // matches with the ones already present
+              if (vector_operation == dealii::VectorOperation::add)
+                for (const auto &import_range : import_indices_data)
+                  for (unsigned int j = import_range.first;
+                       j < import_range.second;
+                       j++)
+                    locally_owned_array[j] += *read_position++;
+              else if (vector_operation == dealii::VectorOperation::min)
+                for (const auto &import_range : import_indices_data)
+                  for (unsigned int j = import_range.first;
+                       j < import_range.second;
+                       j++)
+                    {
+                      locally_owned_array[j] =
+                        internal::get_min(*read_position,
+                                          locally_owned_array[j]);
+                      read_position++;
+                    }
+              else if (vector_operation == dealii::VectorOperation::max)
+                for (const auto &import_range : import_indices_data)
+                  for (unsigned int j = import_range.first;
+                       j < import_range.second;
+                       j++)
+                    {
+                      locally_owned_array[j] =
+                        internal::get_max(*read_position,
+                                          locally_owned_array[j]);
+                      read_position++;
+                    }
+              else
+                for (const auto &import_range : import_indices_data)
+                  for (unsigned int j = import_range.first;
+                       j < import_range.second;
+                       j++, read_position++)
+                    // Below we use relatively large precision in units in the
+                    // last place (ULP) as this Assert can be easily triggered
+                    // in p::d::SolutionTransfer. The rationale is that during
+                    // interpolation on two elements sharing the face, values on
+                    // this face obtained from each side might be different due
+                    // to additions being done in different order. If the local
+                    // value is zero, it indicates that the local process has
+                    // not set the value during the cell loop and its value can
+                    // be safely overridden.
+                    Assert(
+                      *read_position == Number() ||
+                        internal::get_abs(locally_owned_array[j] -
+                                          *read_position) <=
+                          internal::get_abs(locally_owned_array[j] +
+                                            *read_position) *
+                            100000. *
+                            std::numeric_limits<typename numbers::NumberTraits<
+                              Number>::real_type>::epsilon(),
+                      typename dealii::LinearAlgebra::distributed::Vector<
+                        Number>::ExcNonMatchingElements(*read_position,
+                                                        locally_owned_array[j],
+                                                        my_pid));
+            }
+
           AssertDimension(read_position - temporary_storage.data(),
                           n_import_indices());
         }
@@ -722,13 +778,15 @@ namespace Utilities
         {
           Assert(ghost_array.begin() != nullptr, ExcInternalError());
 
-#    if defined(DEAL_II_WITH_CUDA) && defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+#    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
+          if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_same<
+                                                 MemorySpaceType,
+                                                 MemorySpace::Default>::value)
             {
-              Assert(std::is_trivial<Number>::value, ExcNotImplemented());
-              cudaMemset(ghost_array.data(),
-                         0,
-                         sizeof(Number) * n_ghost_indices());
+              Kokkos::deep_copy(
+                Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                  ghost_array.data(), n_ghost_indices()),
+                0);
             }
           else
 #    endif

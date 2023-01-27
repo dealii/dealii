@@ -65,8 +65,12 @@ macro(feature_mpi_configure_external)
   # (in Modules/FindMPI.cmake) at some point. For the time being this is an
   # advanced configuration option.
   #
-  option(DEAL_II_MPI_WITH_CUDA_SUPPORT "Enable MPI Cuda support" OFF)
-  mark_as_advanced(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+  if(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+    option(DEAL_II_MPI_WITH_DEVICE_SUPPORT "Enable MPI Device support" ON)
+  else()
+    option(DEAL_II_MPI_WITH_DEVICE_SUPPORT "Enable MPI Device support" OFF)
+  endif()
+  mark_as_advanced(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
 endmacro()
 
 macro(feature_mpi_error_message)
@@ -90,8 +94,8 @@ configure_feature(MPI)
 
 if(NOT DEAL_II_WITH_MPI)
   #
-  # Disable and hide the DEAL_II_MPI_WITH_CUDA_SUPPORT option
+  # Disable and hide the DEAL_II_MPI_WITH_DEVICE_SUPPORT option
   #
-  set(DEAL_II_MPI_WITH_CUDA_SUPPORT)
-  unset(DEAL_II_MPI_WITH_CUDA_SUPPORT CACHE)
+  set(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
+  unset(DEAL_II_MPI_WITH_DEVICE_SUPPORT CACHE)
 endif()

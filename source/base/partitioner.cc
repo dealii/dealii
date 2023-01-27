@@ -537,6 +537,41 @@ namespace Utilities
       return memory;
     }
 
+
+
+    void
+    Partitioner::initialize_import_indices_plain_dev() const
+    {
+      const unsigned int n_import_targets = import_targets_data.size();
+      import_indices_plain_dev.reserve(n_import_targets);
+      for (unsigned int i = 0; i < n_import_targets; ++i)
+        {
+          // Expand the indices on the host
+          std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
+            my_imports = import_indices_data.begin() +
+                         import_indices_chunks_by_rank_data[i],
+            end_my_imports = import_indices_data.begin() +
+                             import_indices_chunks_by_rank_data[i + 1];
+          std::vector<unsigned int> import_indices_plain_host;
+          for (; my_imports != end_my_imports; ++my_imports)
+            {
+              const unsigned int chunk_size =
+                my_imports->second - my_imports->first;
+              for (unsigned int j = 0; j < chunk_size; ++j)
+                import_indices_plain_host.push_back(my_imports->first + j);
+            }
+
+          // Move the indices to the device
+          const auto chunk_size = import_indices_plain_host.size();
+          import_indices_plain_dev.emplace_back("import_indices_plain_dev" +
+                                                  std::to_string(i),
+                                                chunk_size);
+          Kokkos::deep_copy(import_indices_plain_dev.back(),
+                            Kokkos::View<unsigned int *, Kokkos::HostSpace>(
+                              import_indices_plain_host.data(), chunk_size));
+        }
+    }
+
   } // namespace MPI
 
 } // end of namespace Utilities

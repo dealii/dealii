@@ -194,6 +194,7 @@ jobs:
               -D DEAL_II_WITH_KOKKOS="ON" \
               -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
               -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_MPI_WITH_DEVICE_SUPPORT="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               ..
