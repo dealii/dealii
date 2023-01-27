@@ -402,6 +402,7 @@ public:
    * This function is equivalent to calling get_index_vector() and
    * assigning the result to the @p indices argument.
    */
+  DEAL_II_DEPRECATED_EARLY
   void
   fill_index_vector(std::vector<size_type> &indices) const;
 
