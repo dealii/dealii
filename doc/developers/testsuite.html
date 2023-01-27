@@ -350,15 +350,15 @@ xx: ===============================    OUTPUT END   ============================
       To run the testsuite in this mode, essentially, you have to do three
       things:
       <ol>
-	<li>
-	  build the library with appropriate profiling flags
-	</li>
-	<li>
-	  run all or some tests (built with the same profiling flags)
-	</li>
-	<li>
-	  gather all information and convert them to a viewable format.
-	</li>
+        <li>
+          build the library with appropriate profiling flags
+        </li>
+        <li>
+          run all or some tests (built with the same profiling flags)
+        </li>
+        <li>
+          gather all information and convert them to a viewable format.
+        </li>
       </ol>
       In order to achieve the first two, configure the library with
 <pre>
@@ -780,11 +780,11 @@ $ ctest -V -R "category/my_new_test"
       a <code>CMakeLists.txt</code> file into it containing
     </p>
 <pre>
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-INCLUDE(../setup_testsubproject.cmake)
-PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_TARGET_CONFIG})
-DEAL_II_PICKUP_TESTS()
+cmake_minimum_required(VERSION 3.13.4)
+include(../setup_testsubproject.cmake)
+project(testsuite CXX)
+include(${DEAL_II_TARGET_CONFIG})
+deal_ii_pickup_tests()
 </pre>
 
     <a name="submit"></a>
