@@ -65,6 +65,17 @@ test()
   vb_one *= 2.0;
   v_one = vb_one;
 
+  // Create a copy of v_one using the internal Vec
+  PETScWrappers::MPI::Vector v_one_from_vec(v_one.petsc_vector());
+  Assert(v_one.size() == v_one_from_vec.size(), ExcInternalError());
+  Assert(v_one.locally_owned_size() == v_one_from_vec.locally_owned_size(),
+         ExcInternalError());
+  Assert(v_one.has_ghost_elements() == v_one_from_vec.has_ghost_elements(),
+         ExcInternalError());
+  Assert(v_one.ghost_elements() == v_one_from_vec.ghost_elements(),
+         ExcInternalError());
+
+
   PETScWrappers::MPI::BlockVector vb, v;
   vb.reinit(2);
   v.reinit(2);
