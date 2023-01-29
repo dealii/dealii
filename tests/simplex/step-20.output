@@ -141,4 +141,4 @@ DEAL:cg::Convergence step 33 value 7.32840e-13
 DEAL::33 CG Schur complement iterations to obtain convergence.
 DEAL:cg::Starting value 0.143776
 DEAL:cg::Convergence step 19 value 1.12728e-11
-DEAL::Errors: ||e_p||_L2 = 0.00221522,   ||e_u||_L2 = 2.44171e-09
+DEAL::Errors: ||e_p||_L2 = 0.00156474,   ||e_u||_L2 = 2.49054e-09
