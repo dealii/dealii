@@ -1,0 +1,69 @@
+
+DEAL::FE = FE_SimplexP<2>(1)
+DEAL:cg::Starting value 0.182689
+DEAL:cg::Convergence step 3 value 1.61314e-16
+DEAL::max error = 0.332362
+DEAL::ratio = 3.00877
+DEAL:cg::Starting value 0.120259
+DEAL:cg::Convergence step 6 value 8.34824e-15
+DEAL::max error = 0.100426
+DEAL::ratio = 3.30953
+DEAL:cg::Starting value 0.0642334
+DEAL:cg::Convergence step 16 value 8.61654e-16
+DEAL::max error = 0.0271946
+DEAL::ratio = 3.69285
+DEAL:cg::Starting value 0.0327225
+DEAL:cg::Convergence step 29 value 1.73095e-14
+DEAL::max error = 0.00747939
+DEAL::ratio = 3.63594
+DEAL::FE = FE_SimplexP<2>(2)
+DEAL:cg::Starting value 0.138729
+DEAL:cg::Convergence step 6 value 1.31557e-14
+DEAL::max error = 0.0430400
+DEAL::ratio = 23.2342
+DEAL:cg::Starting value 0.0703013
+DEAL:cg::Convergence step 15 value 2.74632e-14
+DEAL::max error = 0.0116055
+DEAL::ratio = 3.70859
+DEAL:cg::Starting value 0.0358199
+DEAL:cg::Convergence step 34 value 2.46455e-14
+DEAL::max error = 0.00232162
+DEAL::ratio = 4.99887
+DEAL:cg::Starting value 0.0180074
+DEAL:cg::Convergence step 39 value 1.49710e-14
+DEAL::max error = 0.000336599
+DEAL::ratio = 6.89729
+DEAL::FE = FE_SimplexP<3>(1)
+DEAL:cg::Starting value 0.0947210
+DEAL:cg::Convergence step 3 value 1.02524e-16
+DEAL::max error = 0.620494
+DEAL::ratio = 1.61162
+DEAL:cg::Starting value 0.0539753
+DEAL:cg::Convergence step 11 value 9.24507e-17
+DEAL::max error = 0.259138
+DEAL::ratio = 2.39445
+DEAL:cg::Starting value 0.0215083
+DEAL:cg::Convergence step 30 value 9.85284e-15
+DEAL::max error = 0.0619310
+DEAL::ratio = 4.18431
+DEAL:cg::Starting value 0.00787414
+DEAL:cg::Convergence step 36 value 5.23340e-15
+DEAL::max error = 0.0151022
+DEAL::ratio = 4.10080
+DEAL::FE = FE_SimplexP<3>(2)
+DEAL:cg::Starting value 0.0708805
+DEAL:cg::Convergence step 12 value 6.64293e-14
+DEAL::max error = 0.0550999
+DEAL::ratio = 18.1489
+DEAL:cg::Starting value 0.0283477
+DEAL:cg::Convergence step 40 value 2.33379e-14
+DEAL::max error = 0.0466852
+DEAL::ratio = 1.18024
+DEAL:cg::Starting value 0.0107795
+DEAL:cg::Convergence step 58 value 7.67534e-15
+DEAL::max error = 0.00502563
+DEAL::ratio = 9.28942
+DEAL:cg::Starting value 0.00389641
+DEAL:cg::Convergence step 64 value 3.13822e-15
+DEAL::max error = 0.000810078
+DEAL::ratio = 6.20388
