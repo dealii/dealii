@@ -107,10 +107,39 @@ main()
           }
         deallog << std::endl;
       }
+    deallog << "Test with TRI6 - Success" << std::endl;
   }
 
   {
-    deallog << std::endl << "Test with TET4" << std::endl;
+    deallog << "Test with TRI10" << std::endl;
+    const auto tri10 = BarycentricPolynomials<2>::get_fe_p_basis(3);
+
+    FE_SimplexP<2> fe(3);
+    const auto &   points = fe.get_unit_support_points();
+    for (unsigned int i = 0; i < 10; ++i)
+      {
+        Assert(points.size() == 10, ExcInternalError());
+        for (unsigned int j = 0; j < 10; ++j)
+          {
+            Assert(std::abs(tri10.compute_value(i, points[j]) -
+                            double(i == j)) < 1e-12,
+                   ExcInternalError());
+
+            // third derivatives should be constant
+            Assert((tri10.compute_3rd_derivative(i, points[0]) -
+                    tri10.compute_3rd_derivative(i, points[j]))
+                       .norm() == 0.0,
+                   ExcInternalError());
+
+            Assert(tri10.compute_4th_derivative(i, points[j]).norm() == 0.0,
+                   ExcInternalError());
+          }
+      }
+    deallog << "Test with TRI10 - Success" << std::endl;
+  }
+
+  {
+    deallog << "Test with TET4" << std::endl;
     const auto tet4 = BarycentricPolynomials<3>::get_fe_p_basis(1);
 
     FE_SimplexP<3> fe(1);
@@ -168,5 +197,33 @@ main()
           }
       }
     deallog << "Test with TET10 - Success" << std::endl;
+  }
+
+  {
+    deallog << "Test with TET20" << std::endl;
+    const auto tet20 = BarycentricPolynomials<3>::get_fe_p_basis(3);
+
+    FE_SimplexP<3> fe(3);
+    const auto &   points = fe.get_unit_support_points();
+    for (unsigned int i = 0; i < 20; ++i)
+      {
+        Assert(points.size() == 20, ExcInternalError());
+        for (unsigned int j = 0; j < 20; ++j)
+          {
+            Assert(std::abs(tet20.compute_value(i, points[j]) -
+                            double(i == j)) < 1e-12,
+                   ExcInternalError());
+
+            // third derivatives should be constant
+            Assert((tet20.compute_3rd_derivative(i, points[0]) -
+                    tet20.compute_3rd_derivative(i, points[j]))
+                       .norm() == 0.0,
+                   ExcInternalError());
+
+            Assert(tet20.compute_4th_derivative(i, points[j]).norm() == 0.0,
+                   ExcInternalError());
+          }
+      }
+    deallog << "Test with TET20 - Success" << std::endl;
   }
 }
