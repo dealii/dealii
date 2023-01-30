@@ -33,7 +33,16 @@ namespace Utilities
   {
     /**
      * A flexible Partitioner class, which does not impose restrictions
-     * regarding the order of the underlying index sets.
+     * regarding the order of the underlying index sets. In other words,
+     * this class implements the interface of the
+     * Utilities::MPI::CommunicationPatternBase base class with no
+     * assumption that every process stores a contiguous part of the
+     * array of objects, but that indeed the locally owned indices
+     * can be an arbitrary subset of all indices of elements of the array
+     * to which they refer.
+     *
+     * If you want to store only contiguous parts of these arrays on
+     * each process, take a look at Utilities::MPI::Partitioner.
      */
     class NoncontiguousPartitioner
       : public Utilities::MPI::CommunicationPatternBase
@@ -185,20 +194,19 @@ namespace Utilities
       const MPI_Comm &
       get_mpi_communicator() const override;
 
-      /**
-       * Initialize the inner data structures.
-       */
       void
-      reinit(const IndexSet &indexset_locally_owned,
-             const IndexSet &indexset_ghost,
+      reinit(const IndexSet &locally_owned_indices,
+             const IndexSet &ghost_indices,
              const MPI_Comm &communicator) override;
 
       /**
-       * Initialize the inner data structures.
+       * Initialize the inner data structures using explicit sets of
+       * indices. See the documentation of the other reinit() function for
+       * what the function does.
        */
       void
-      reinit(const std::vector<types::global_dof_index> &indices_locally_owned,
-             const std::vector<types::global_dof_index> &indices_ghost,
+      reinit(const std::vector<types::global_dof_index> &locally_owned_indices,
+             const std::vector<types::global_dof_index> &ghost_indices,
              const MPI_Comm &                            communicator);
 
     private:

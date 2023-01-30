@@ -41,7 +41,13 @@ namespace Utilities
      * fact, any linear data structure) among processors using MPI.
      *
      * The partitioner stores the global vector size and the locally owned
-     * range as a half-open interval [@p lower, @p upper) on each process.
+     * range as a half-open interval [@p lower, @p upper) on each process. In
+     * other words, it assumes that every process stores a contiguous subset
+     * of the array mentioned in the documentation of the base class
+     * Utilities::MPI::CommunicationPatternBase. (If you want to store
+     * non-contiguous parts of these arrays on each process, take a look
+     * at Utilities::MPI::NoncontiguousPartitioner.)
+     *
      * Furthermore, it includes a structure for the point-to-point communication
      * patterns. It allows the inclusion of ghost indices (i.e. indices that a
      * current processor needs to have access to, but are owned by another
