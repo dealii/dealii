@@ -3517,7 +3517,11 @@ namespace
                                          numbers.end()),
                       type_name_2.end());
 
-    if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
+    // The manual specifies BAR, BEAM, and TRUSS: in practice people use EDGE
+    if (type_name_2 == "BAR" || type_name_2 == "BEAM" ||
+        type_name_2 == "EDGE" || type_name_2 == "TRUSS")
+      return ReferenceCells::Line;
+    else if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
       return ReferenceCells::Triangle;
     else if (type_name_2 == "QUAD" || type_name_2 == "QUADRILATERAL")
       return ReferenceCells::Quadrilateral;
@@ -3813,6 +3817,13 @@ GridIn<dim, spacedim>::read_exodusii(
       AssertThrowExodusII(ierr);
       const ReferenceCell type =
         exodusii_name_to_type(string_temp.data(), n_nodes_per_element);
+      AssertThrow(type.get_dimension() == dim,
+                  ExcMessage(
+                    "The ExodusII block " + std::to_string(element_block_id) +
+                    " with element type " + std::string(string_temp.data()) +
+                    " has dimension " + std::to_string(type.get_dimension()) +
+                    ", which does not match the topological mesh dimension " +
+                    std::to_string(dim) + "."));
 
       // The number of nodes per element may be larger than what we want to
       // read - for example, if the Exodus file contains a QUAD9 element, we
