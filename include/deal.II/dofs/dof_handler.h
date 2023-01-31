@@ -590,7 +590,8 @@ public:
    *
    * Active FE indices will only be set for locally owned cells. Ghost and
    * artificial cells will be ignored; no active FE index will be assigned to
-   * them.
+   * them. To exchange active FE indices on ghost cells, call distribute_dofs()
+   * afterwards.
    */
   void
   set_active_fe_indices(const std::vector<types::fe_index> &active_fe_indices);
