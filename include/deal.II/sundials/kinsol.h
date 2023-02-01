@@ -161,7 +161,9 @@ namespace SUNDIALS
    *
    * Specifying residual() allows the user to use Newton and Picard strategies
    * (i.e., $F(u)=0$ will be solved), while specifying iteration_function(), a
-   * fixed point iteration will be used (i.e., $G(u)=u$ will be solved).
+   * fixed point iteration will be used (i.e., $G(u)=u$ will be solved). An
+   * error will be thrown if iteration_function() is set for Picard or
+   * Newton.
    *
    * If the use of a Newton or Picard method is desired, then the user should
    * also supply
@@ -292,10 +294,10 @@ namespace SUNDIALS
       add_parameters(ParameterHandler &prm);
 
       /**
-       * The solution strategy to use. If you choose SolutionStrategy::newton
-       * or SolutionStrategy::linesearch, you have to provide also the function
-       * residual(). If you choose SolutionStrategy::picard or
-       * SolutionStrategy::fixed_point, you have to provide also the function
+       * The solution strategy to use. If you choose SolutionStrategy::newton,
+       * SolutionStrategy::linesearch, or SolutionStrategy::picard you have to
+       * provide the function residual(). If you choose
+       * SolutionStrategy::fixed_point, you have to provide the function
        * iteration_function().
        */
       SolutionStrategy strategy;
@@ -418,8 +420,8 @@ namespace SUNDIALS
     /**
      * A function object that users should supply and that is intended to
      * compute the residual `dst = F(src)`. This function is only used if the
-     * SolutionStrategy::newton or SolutionStrategy::linesearch strategies
-     * were selected.
+     * SolutionStrategy::newton, SolutionStrategy::linesearch, or
+     * SolutionStrategy::picard strategies were selected.
      *
      * This function should return:
      * - 0: Success
@@ -432,10 +434,9 @@ namespace SUNDIALS
 
     /**
      * A function object that users should supply and that is intended to
-     * compute the iteration function $G(u)$ for the fixed point and Picard
+     * compute the iteration function $G(u)$ for the fixed point
      * iteration. This function is only used if the
-     * SolutionStrategy::fixed_point or SolutionStrategy::picard strategies
-     * were selected.
+     * SolutionStrategy::fixed_point strategy is selected.
      *
      * This function should return:
      * - 0: Success
