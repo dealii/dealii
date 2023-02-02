@@ -69,9 +69,12 @@ public:
   DerivativeForm(const Tensor<order + 1, dim, Number> &);
 
   /**
-   * Constructor from a tensor.
+   * Constructor. This constructor initializes the data stored by this
+   * object from a `spacedim x dim^order` array that is represented
+   * by a Tensor with `spacedim` components each of which is a
+   * Tensor of rank `order` and size `dim`.
    */
-  DerivativeForm(const Tensor<order, spacedim, Tensor<1, dim, Number>> &);
+  DerivativeForm(const Tensor<1, spacedim, Tensor<order, dim, Number>> &);
 
   /**
    * Read-Write access operator.
@@ -199,7 +202,7 @@ inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(
 
 template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(
-  const Tensor<order, spacedim, Tensor<1, dim, Number>> &T)
+  const Tensor<1, spacedim, Tensor<order, dim, Number>> &T)
 {
   for (unsigned int j = 0; j < spacedim; ++j)
     (*this)[j] = T[j];
