@@ -1160,7 +1160,7 @@ namespace internal
     constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE void
     multiply_assign_scalar(std::complex<Number> &val, const OtherNumber &s)
     {
-#  ifdef KOKKOS_VERSION >= 30600
+#  if KOKKOS_VERSION >= 30600
       KOKKOS_IF_ON_HOST((val *= s;))
       KOKKOS_IF_ON_DEVICE(({
         (void)val;

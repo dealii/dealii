@@ -1508,7 +1508,7 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #ifdef DEBUG
-#  ifdef KOKKOS_VERSION >= 30600
+#  if KOKKOS_VERSION >= 30600
 #    ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #      define Assert(cond, exc)                                              \
         {                                                                    \
@@ -1550,7 +1550,7 @@ namespace deal_II_exceptions
           }))                                                                \
         }
 #    endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#  else    /*ifdef KOKKOS_VERSION >= 30600*/
+#  else    /*if KOKKOS_VERSION >= 30600*/
 #    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
 #      ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #        define Assert(cond, exc)                                            \
