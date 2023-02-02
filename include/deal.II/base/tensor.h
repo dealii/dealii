@@ -1326,9 +1326,11 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(
   const ArrayView<ElementType, MemorySpace> &initializer)
 {
-  AssertDimension(initializer.size(), n_independent_components);
+  // make nvcc happy
+  const int my_n_independent_components = n_independent_components;
+  AssertDimension(initializer.size(), my_n_independent_components);
 
-  for (unsigned int i = 0; i < n_independent_components; ++i)
+  for (unsigned int i = 0; i < my_n_independent_components; ++i)
     (*this)[unrolled_to_component_indices(i)] = initializer[i];
 }
 
