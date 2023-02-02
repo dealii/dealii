@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/kokkos.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
@@ -1165,7 +1166,7 @@ namespace internal
       KOKKOS_IF_ON_DEVICE(({
         (void)val;
         (void)s;
-        Kokkos::abort(
+        dealii::internal::kokkos_abort(
           "This function is not implemented for std::complex<Number>!\n");
       }))
 #  else
@@ -1174,7 +1175,7 @@ namespace internal
 #    else
       (void)val;
       (void)s;
-      Kokkos::abort(
+      dealii::internal::kokkos_abort(
         "This function is not implemented for std::complex<Number>!\n");
 #    endif
 #  endif
