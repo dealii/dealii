@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/kokkos.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
@@ -1039,11 +1040,8 @@ template <int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<0, dim, Number>::operator Number &()
 {
-  // We cannot use Assert inside a CUDA kernel
-#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#  endif
   return value;
 }
 
@@ -1052,11 +1050,8 @@ template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<0, dim, Number>::operator const Number &() const
 {
-  // We cannot use Assert inside a CUDA kernel
-#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#  endif
   return value;
 }
 
@@ -1162,15 +1157,29 @@ namespace internal
       val *= s;
     }
 
-#  ifdef __CUDA_ARCH__
     template <typename Number, typename OtherNumber>
     constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE void
-    multiply_assign_scalar(std::complex<Number> &, const OtherNumber &)
+    multiply_assign_scalar(std::complex<Number> &val, const OtherNumber &s)
     {
-      printf("This function is not implemented for std::complex<Number>!\n");
-      assert(false);
-    }
+#  if KOKKOS_VERSION >= 30600
+      KOKKOS_IF_ON_HOST((val *= s;))
+      KOKKOS_IF_ON_DEVICE(({
+        (void)val;
+        (void)s;
+        dealii::internal::kokkos_abort(
+          "This function is not implemented for std::complex<Number>!\n");
+      }))
+#  else
+#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
+      val *= s;
+#    else
+      (void)val;
+      (void)s;
+      dealii::internal::kokkos_abort(
+        "This function is not implemented for std::complex<Number>!\n");
+#    endif
 #  endif
+    }
   } // namespace ComplexWorkaround
 } // namespace internal
 
@@ -1219,11 +1228,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   typename Tensor<0, dim, Number>::real_type
   Tensor<0, dim, Number>::norm_square() const
 {
-  // We cannot use Assert inside a CUDA kernel
-#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
-#  endif
   return numbers::NumberTraits<Number>::abs_square(value);
 }
 
@@ -1321,12 +1327,11 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(
   const ArrayView<ElementType, MemorySpace> &initializer)
 {
-  // We cannot use Assert in a CUDA kernel
-#  ifndef __CUDA_ARCH__
-  AssertDimension(initializer.size(), n_independent_components);
-#  endif
+  // make nvcc happy
+  const int my_n_independent_components = n_independent_components;
+  AssertDimension(initializer.size(), my_n_independent_components);
 
-  for (unsigned int i = 0; i < n_independent_components; ++i)
+  for (unsigned int i = 0; i < my_n_independent_components; ++i)
     (*this)[unrolled_to_component_indices(i)] = initializer[i];
 }
 
@@ -1391,10 +1396,7 @@ namespace internal
               const unsigned int i,
               std::integral_constant<int, dim>)
     {
-      // We cannot use Assert in a CUDA kernel
-#  ifndef __CUDA_ARCH__
       AssertIndexRange(i, dim);
-#  endif
       return values[i];
     }
 
@@ -1404,13 +1406,10 @@ namespace internal
               const unsigned int,
               std::integral_constant<int, 0>)
     {
-      // We cannot use Assert in a CUDA kernel
-#  ifndef __CUDA_ARCH__
       Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
-#  endif
       return *dummy;
     }
   } // namespace TensorSubscriptor

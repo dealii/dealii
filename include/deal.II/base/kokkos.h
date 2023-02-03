@@ -33,6 +33,14 @@ namespace internal
    */
   void
   ensure_kokkos_initialized();
+
+  /**
+   * Calls Kokkos::abort. This wrapper avoids including Kokkos_Core.hpp, which
+   * provides all of Kokkos' functionalities, on the call side.
+   */
+  KOKKOS_FUNCTION void
+  kokkos_abort(const char *error);
+
 } // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

@@ -41,5 +41,11 @@ namespace internal
         (void)dummy;
       }
   }
+
+  KOKKOS_FUNCTION void
+  kokkos_abort(const char *error)
+  {
+    Kokkos::abort(error);
+  }
 } // namespace internal
 DEAL_II_NAMESPACE_CLOSE
