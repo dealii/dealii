@@ -177,11 +177,9 @@ main(int argc, char **argv)
   using namespace dealii;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  Kokkos::initialize();
-  MPILogInitAll log;
+  MPILogInitAll                    log;
 
   test();
 
-  Kokkos::finalize();
   return 0;
 }

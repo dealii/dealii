@@ -30,6 +30,8 @@
 
 #include <boost/serialization/utility.hpp>
 
+#include <Kokkos_Core.hpp>
+
 #include <iostream>
 #include <limits>
 #include <numeric>
@@ -773,6 +775,9 @@ namespace Utilities
       (void)ierr;
 #endif
 
+      // Initialize Kokkos
+      Kokkos::initialize(argc, argv);
+
       // we are allowed to call MPI_Init ourselves and PETScInitialize will
       // detect this. This allows us to use MPI_Init_thread instead.
 #ifdef DEAL_II_WITH_PETSC
@@ -986,6 +991,9 @@ namespace Utilities
       sc_finalize();
 #endif
 
+
+      // Finalize Kokkos
+      Kokkos::finalize();
 
       // only MPI_Finalize if we are running with MPI. We also need to do this
       // when running PETSc, because we initialize MPI ourselves before

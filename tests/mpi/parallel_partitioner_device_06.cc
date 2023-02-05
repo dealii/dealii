@@ -199,8 +199,6 @@ int
 main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv);
-  Kokkos::initialize();
-  MPILogInitAll log;
+  MPILogInitAll                    log;
   test();
-  Kokkos::finalize();
 }
