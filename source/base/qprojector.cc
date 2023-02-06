@@ -1330,10 +1330,13 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell &reference_cell,
                 n_quadrature_points};
       else if (dim == 3)
         {
-          const unsigned int orientation = (face_flip ? 4 : 0) +
-                                           (face_rotation ? 2 : 0) +
-                                           (face_orientation ? 1 : 0);
-          return {(6 * face_no + orientation) * n_quadrature_points};
+          const unsigned char orientation = (face_flip ? 4 : 0) +
+                                            (face_rotation ? 2 : 0) +
+                                            (face_orientation ? 1 : 0);
+          Assert(orientation < 6, ExcInternalError());
+          return {(reference_cell.n_face_orientations(face_no) * face_no +
+                   orientation) *
+                  n_quadrature_points};
         }
     }
 
