@@ -268,22 +268,6 @@ namespace numbers
   static constexpr double SQRT1_2 = 0.70710678118654752440;
 
   /**
-   * Check whether the given type can be used in CUDA device code.
-   * If not, DEAL_II_HOST_DEVICE needs to be disabled for functions
-   * that use this type.
-   */
-  template <typename Number, typename = void>
-  struct is_cuda_compatible : std::true_type
-  {};
-
-  /**
-   * std::complex cannot be used in CUDA device code.
-   */
-  template <typename Number>
-  struct is_cuda_compatible<std::complex<Number>, void> : std::false_type
-  {};
-
-  /**
    * Return @p true if the given value is a finite floating point number, i.e.
    * is neither plus or minus infinity nor NaN (not a number).
    *
@@ -468,17 +452,7 @@ namespace numbers
      * @note If the template type can be used in CUDA device code, the same holds true
      * for this function.
      */
-    template <typename Dummy = number>
-    static constexpr DEAL_II_HOST_DEVICE
-      std::enable_if_t<std::is_same<Dummy, number>::value &&
-                         is_cuda_compatible<Dummy>::value,
-                       real_type>
-      abs_square(const number &x);
-
-    template <typename Dummy = number>
-    static constexpr std::enable_if_t<std::is_same<Dummy, number>::value &&
-                                        !is_cuda_compatible<Dummy>::value,
-                                      real_type>
+    static constexpr DEAL_II_HOST_DEVICE real_type
     abs_square(const number &x);
 
     /**
@@ -595,23 +569,7 @@ namespace numbers
 
 
   template <typename number>
-  template <typename Dummy>
-  constexpr DEAL_II_HOST_DEVICE
-    std::enable_if_t<std::is_same<Dummy, number>::value &&
-                       is_cuda_compatible<Dummy>::value,
-                     typename NumberTraits<number>::real_type>
-    NumberTraits<number>::abs_square(const number &x)
-  {
-    return x * x;
-  }
-
-
-
-  template <typename number>
-  template <typename Dummy>
-  constexpr std::enable_if_t<std::is_same<Dummy, number>::value &&
-                               !is_cuda_compatible<Dummy>::value,
-                             typename NumberTraits<number>::real_type>
+  constexpr DEAL_II_HOST_DEVICE typename NumberTraits<number>::real_type
   NumberTraits<number>::abs_square(const number &x)
   {
     return x * x;
