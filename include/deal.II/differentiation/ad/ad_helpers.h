@@ -2837,8 +2837,7 @@ namespace Differentiation
        * @note For taped AD numbers, this operation is only valid in recording mode.
        */
       template <typename ExtractorType>
-      typename internal::Extractor<dim,
-                                   ExtractorType>::template tensor_type<ad_type>
+      auto
       get_sensitive_variables(const ExtractorType &extractor) const;
 
       /** @} */
@@ -3868,9 +3867,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     template <typename ExtractorType>
-    typename internal::Extractor<dim, ExtractorType>::template tensor_type<
-      typename PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
-        ad_type>
+    auto
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       get_sensitive_variables(const ExtractorType &extractor) const
     {
