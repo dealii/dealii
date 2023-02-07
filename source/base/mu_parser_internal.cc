@@ -308,8 +308,10 @@ namespace internal
           parser.DefineFun("log", mu_log, true);
           parser.DefineFun("pow", mu_pow, true);
           parser.DefineFun("erfc", mu_erfc, true);
-          parser.DefineFun("rand_seed", mu_rand_seed, true);
-          parser.DefineFun("rand", mu_rand, true);
+          // We need to set optimized=false, because rand will generate
+          // different number every time.
+          parser.DefineFun("rand_seed", mu_rand_seed, false);
+          parser.DefineFun("rand", mu_rand, false);
 
           try
             {
