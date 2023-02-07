@@ -819,7 +819,7 @@ FE_SimplexDGP<dim, spacedim>::FE_SimplexDGP(const unsigned int degree)
                              degree,
                              FiniteElementData<dim>::L2),
       unit_support_points_fe_p<dim>(degree),
-      unit_face_support_points_fe_p<dim>(degree, FiniteElementData<dim>::H1),
+      unit_face_support_points_fe_p<dim>(degree, FiniteElementData<dim>::L2),
       constraints_fe_p<dim>(degree))
 {}
 
