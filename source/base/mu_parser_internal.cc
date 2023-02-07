@@ -308,8 +308,8 @@ namespace internal
           parser.DefineFun("log", mu_log, true);
           parser.DefineFun("pow", mu_pow, true);
           parser.DefineFun("erfc", mu_erfc, true);
-          // We need to set optimized=false, because rand will generate
-          // different number every time.
+          // Disable optimizations (by passign false) that assume the functions 
+          // will always return the same value:
           parser.DefineFun("rand_seed", mu_rand_seed, false);
           parser.DefineFun("rand", mu_rand, false);
 
