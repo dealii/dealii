@@ -31,7 +31,7 @@ template <typename Number>
 double
 print_value(Number *values_dev, unsigned int index)
 {
-  static Kokkos::View<Number, Kokkos::HostSpace> cpu_value("cpu_value");
+  Kokkos::View<Number, Kokkos::HostSpace> cpu_value("cpu_value");
   Kokkos::deep_copy(cpu_value, Kokkos::View<Number>(values_dev + index));
   return cpu_value();
 }
