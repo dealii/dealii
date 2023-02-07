@@ -6179,6 +6179,9 @@ namespace GridTools
                     tolerance,
                     enforce_unique_mapping);
 
+                if (cell_hint.state() != IteratorState::valid)
+                  cell_hint = cache.get_triangulation().begin_active();
+
                 for (const auto &cell_and_reference_position :
                      cells_and_reference_positions)
                   {
