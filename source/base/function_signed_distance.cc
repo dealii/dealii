@@ -15,6 +15,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_signed_distance.h>
+#include <deal.II/base/utilities.h>
 
 #include <algorithm>
 
@@ -76,7 +77,7 @@ namespace Functions
       const SymmetricTensor<2, dim> hess =
         unit_symmetric_tensor<dim>() / distance -
         symmetrize(outer_product(center_to_point, center_to_point)) /
-          std::pow(distance, 3);
+          Utilities::fixed_power<3>(distance);
 
       return hess;
     }
@@ -201,7 +202,7 @@ namespace Functions
     {
       double val = 0.0;
       for (unsigned int d = 0; d < dim; ++d)
-        val += std::pow((point[d] - center[d]) / radii[d], 2);
+        val += Utilities::fixed_power<2>((point[d] - center[d]) / radii[d]);
       return val - 1.0;
     }
 
@@ -245,8 +246,10 @@ namespace Functions
       do
         {
           // compute the ellipse evolute (center of curvature) for the current t
-          const double ex = (a * a - b * b) * std::pow(std::cos(t), 3) / a;
-          const double ey = (b * b - a * a) * std::pow(std::sin(t), 3) / b;
+          const double ex =
+            (a * a - b * b) * Utilities::fixed_power<3>(std::cos(t)) / a;
+          const double ey =
+            (b * b - a * a) * Utilities::fixed_power<3>(std::sin(t)) / b;
           // compute distances from current point on ellipse to its evolute
           const double rx = x - ex;
           const double ry = y - ey;

@@ -1559,9 +1559,10 @@ TorusManifold<dim>::pull_back(const Point<3> &p) const
   double y     = p(2);
   double phi   = std::atan2(y, x);
   double theta = std::atan2(z, std::sqrt(x * x + y * y) - R);
-  double w     = std::sqrt(std::pow(y - std::sin(phi) * R, 2.0) +
-                       std::pow(x - std::cos(phi) * R, 2.0) + z * z) /
-             r;
+  double w =
+    std::sqrt(Utilities::fixed_power<2>(y - std::sin(phi) * R) +
+              Utilities::fixed_power<2>(x - std::cos(phi) * R) + z * z) /
+    r;
   return {phi, theta, w};
 }
 

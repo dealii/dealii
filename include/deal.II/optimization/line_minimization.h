@@ -22,6 +22,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/std_cxx17/optional.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/numerics/history.h>
 
@@ -419,14 +420,16 @@ namespace LineMinimization
     const NumberType r1       = f2 - f1 - g1 * x2_shift;
     const NumberType r2       = f3 - f1 - g1 * x3_shift;
     const NumberType denom =
-      std::pow(x2_shift * x3_shift, 2) * (x2_shift - x3_shift);
+      Utilities::fixed_power<2>(x2_shift * x3_shift) * (x2_shift - x3_shift);
     if (denom == 0.)
       return {};
 
-    const NumberType A =
-      (r1 * std::pow(x3_shift, 2) - r2 * std::pow(x2_shift, 2)) / denom;
-    const NumberType B =
-      (r2 * std::pow(x2_shift, 3) - r1 * std::pow(x3_shift, 3)) / denom;
+    const NumberType A = (r1 * Utilities::fixed_power<2>(x3_shift) -
+                          r2 * Utilities::fixed_power<2>(x2_shift)) /
+                         denom;
+    const NumberType B = (r2 * Utilities::fixed_power<3>(x2_shift) -
+                          r1 * Utilities::fixed_power<3>(x3_shift)) /
+                         denom;
     const NumberType &C = g1;
 
     // now get the minimizer:
