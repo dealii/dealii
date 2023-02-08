@@ -486,9 +486,9 @@ namespace PETScWrappers
 #    ifdef DEBUG
       {
         // check indexsets
-        types::global_dof_index row_owners =
+        const types::global_dof_index row_owners =
           Utilities::MPI::sum(local_rows.n_elements(), communicator);
-        types::global_dof_index col_owners =
+        const types::global_dof_index col_owners =
           Utilities::MPI::sum(local_columns.n_elements(), communicator);
         Assert(row_owners == sparsity_pattern.n_rows(),
                ExcMessage(
@@ -510,8 +510,9 @@ namespace PETScWrappers
       PetscErrorCode ierr;
 
       // create the local to global mappings as arrays.
-      IndexSet::size_type n_local_active_rows = local_active_rows.n_elements();
-      IndexSet::size_type n_local_active_cols =
+      const IndexSet::size_type n_local_active_rows =
+        local_active_rows.n_elements();
+      const IndexSet::size_type n_local_active_cols =
         local_active_columns.n_elements();
       std::vector<PetscInt> idx_glob_row(n_local_active_rows);
       std::vector<PetscInt> idx_glob_col(n_local_active_cols);
@@ -674,6 +675,7 @@ namespace PETScWrappers
 #  else
       {
         // Use this to avoid unused variables warning
+        (void)communicator;
         (void)local_rows;
         (void)local_active_rows;
         (void)local_columns;
