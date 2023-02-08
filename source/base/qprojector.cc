@@ -644,7 +644,8 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<2> &quadrature)
 {
   const auto support_points_tri =
-    [](const auto &face, const auto &orientation) -> std::vector<Point<3>> {
+    [](const auto &        face,
+       const unsigned char orientation) -> std::vector<Point<3>> {
     std::array<Point<3>, 3> vertices;
     std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
     const auto temp =
@@ -655,7 +656,8 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
   };
 
   const auto support_points_quad =
-    [](const auto &face, const auto &orientation) -> std::vector<Point<3>> {
+    [](const auto &        face,
+       const unsigned char orientation) -> std::vector<Point<3>> {
     std::array<Point<3>, 4> vertices;
     std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
     const auto temp =
@@ -688,8 +690,8 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
             static_cast<const ScalarPolynomialsBase<2> &>(poly_quad);
 
         // ... and over all possible orientations
-        for (unsigned int orientation = 0;
-             orientation < (n_shape_functions * 2);
+        for (unsigned char orientation = 0;
+             orientation < reference_cell.n_face_orientations(face_no);
              ++orientation)
           {
             const auto &face = faces[face_no];
