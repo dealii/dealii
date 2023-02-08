@@ -1166,7 +1166,7 @@ namespace internal
       KOKKOS_IF_ON_DEVICE(({
         (void)val;
         (void)s;
-        dealii::internal::kokkos_abort(
+        Kokkos::abort(
           "This function is not implemented for std::complex<Number>!\n");
       }))
 #  else
@@ -1175,7 +1175,7 @@ namespace internal
 #    else
       (void)val;
       (void)s;
-      dealii::internal::kokkos_abort(
+      Kokkos::abort(
         "This function is not implemented for std::complex<Number>!\n");
 #    endif
 #  endif
