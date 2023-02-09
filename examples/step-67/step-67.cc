@@ -67,7 +67,7 @@ namespace Euler_DG
   // want to use for the nonlinear terms in the Euler equations. Furthermore,
   // we specify the time interval for the time-dependent problem, and
   // implement two different test cases. The first one is an analytical
-  // solution in 2D, whereas the second is a channel flow around a cylinder as
+  // solution in 2d, whereas the second is a channel flow around a cylinder as
   // described in the introduction. Depending on the test case, we also change
   // the final time up to which we run the simulation, and a variable
   // `output_tick` that specifies in which intervals we want to write output
@@ -1748,7 +1748,7 @@ namespace Euler_DG
   // step-33. The interface of the DataPostprocessor class is intuitive,
   // requiring us to provide information about what needs to be evaluated
   // (typically only the values of the solution, except for the Schlieren plot
-  // that we only enable in 2D where it makes sense), and the names of what
+  // that we only enable in 2d where it makes sense), and the names of what
   // gets evaluated. Note that it would also be possible to extract most
   // information by calculator tools within visualization programs such as
   // ParaView, but it is so much more convenient to do it already when writing
@@ -1956,7 +1956,7 @@ namespace Euler_DG
   // choose a constant inflow profile, whereas we set a subsonic outflow at
   // the right. For the boundary around the cylinder (boundary id equal to 2)
   // as well as the channel walls (boundary id equal to 3) we use the wall
-  // boundary type, which is no-normal flow. Furthermore, for the 3D cylinder
+  // boundary type, which is no-normal flow. Furthermore, for the 3d cylinder
   // we also add a gravity force in vertical direction. Having the base mesh
   // in place (including the manifolds set by
   // GridGenerator::channel_with_cylinder()), we can then perform the

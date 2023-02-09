@@ -175,7 +175,7 @@ namespace Step65
   // ball should be compatible with the outer grid in the sense that their
   // vertices coincide so as to allow the two grid to be merged. The grid coming
   // out of GridGenerator::hyper_shell fulfills the requirements on the inner
-  // side in case it is created with $2d$ coarse cells (6 coarse cells in 3D
+  // side in case it is created with $2d$ coarse cells (6 coarse cells in 3d
   // which we are going to use) &ndash; this is the same number of cells as
   // there are boundary faces for the ball. For the outer surface, we use the
   // fact that the 6 faces on the surface of the shell without a manifold
@@ -349,7 +349,7 @@ namespace Step65
   //
   // The reason for choosing this somewhat unusual scheme is due to the heavy
   // work involved in computing the cell matrix for a relatively high
-  // polynomial degree in 3D. As we want to highlight the cost of the mapping
+  // polynomial degree in 3d. As we want to highlight the cost of the mapping
   // in this tutorial program, we better do the assembly in an optimized way
   // in order to not chase bottlenecks that have been solved by the community
   // already. Matrix-matrix multiplication is one of the best optimized

@@ -783,7 +783,7 @@ namespace Euler_DG
                 phi_m.reinit(cell, face);
 
                 // Interpolate the values from the cell quadrature points to the
-                // quadrature points of the current face via a simple 1D
+                // quadrature points of the current face via a simple 1d
                 // interpolation:
                 internal::FEFaceNormalEvaluationImpl<dim,
                                                      n_points_1d - 1,
@@ -886,7 +886,7 @@ namespace Euler_DG
                   }
 
                 // Evaluate local integrals related to cell by quadrature and
-                // add into cell contribution via a simple 1D interpolation:
+                // add into cell contribution via a simple 1d interpolation:
                 internal::FEFaceNormalEvaluationImpl<dim,
                                                      n_points_1d - 1,
                                                      VectorizedArrayType>::

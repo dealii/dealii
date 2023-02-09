@@ -330,7 +330,7 @@ void Step5<dim>::run()
   // two-dimensional triangulation, while this function is a template for
   // arbitrary dimension. Since this is only a demonstration program, we will
   // not use different input files for the different dimensions, but rather
-  // quickly kill the whole program if we are not in 2D. Of course, since the
+  // quickly kill the whole program if we are not in 2d. Of course, since the
   // main function below assumes that we are working in two dimensions we
   // could skip this check, in this version of the program, without any ill
   // effects.

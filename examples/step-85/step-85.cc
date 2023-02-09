@@ -331,9 +331,9 @@ namespace Step85
     // To make the assembly easier, we use the class NonMatching::FEValues,
     // which does the above steps 1 and 2 for us. The algorithm @cite saye_2015
     // that is used to generate the quadrature rules on the intersected cells
-    // uses a 1-dimensional quadrature rule as base. Thus, we pass a 1D
+    // uses a 1-dimensional quadrature rule as base. Thus, we pass a 1d
     // Gauss--Legendre quadrature to the constructor of NonMatching::FEValues.
-    // On the non-intersected cells, a tensor product of this 1D-quadrature will
+    // On the non-intersected cells, a tensor product of this 1d-quadrature will
     // be used.
     //
     // As stated in the introduction, each cell has 3 different regions: inside,

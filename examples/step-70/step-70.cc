@@ -854,7 +854,7 @@ namespace Step70
                                         "extension. Bailing out."));
 
         // Now we check how many faces are contained in the `Shape`. OpenCASCADE
-        // is intrinsically 3D, so if this number is zero, we interpret this as
+        // is intrinsically 3d, so if this number is zero, we interpret this as
         // a line manifold, otherwise as a
         // OpenCASCADE::NormalToMeshProjectionManifold in `spacedim` = 3, or
         // OpenCASCADE::NURBSPatchManifold in `spacedim` = 2.

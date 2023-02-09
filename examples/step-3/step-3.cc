@@ -261,8 +261,8 @@ void Step3::assemble_system()
   // Ok, let's start: we need a quadrature formula for the evaluation of the
   // integrals on each cell. Let's take a Gauss formula with two quadrature
   // points in each direction, i.e. a total of four points since we are in
-  // 2D. This quadrature formula integrates polynomials of degrees up to three
-  // exactly (in 1D). It is easy to check that this is sufficient for the
+  // 2d. This quadrature formula integrates polynomials of degrees up to three
+  // exactly (in 1d). It is easy to check that this is sufficient for the
   // present problem:
   QGauss<2> quadrature_formula(fe.degree + 1);
   // And we initialize the object which we have briefly talked about above. It
@@ -333,7 +333,7 @@ void Step3::assemble_system()
 
   // For use further down below, we define a shortcut for a value that will
   // be used very frequently. Namely, an abbreviation for the number of degrees
-  // of freedom on each cell (since we are in 2D and degrees of freedom are
+  // of freedom on each cell (since we are in 2d and degrees of freedom are
   // associated with vertices only, this number is four, but we rather want to
   // write the definition of this variable in a way that does not preclude us
   // from later choosing a different finite element that has a different

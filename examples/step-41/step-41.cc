@@ -188,7 +188,7 @@ namespace Step41
   // @sect4{ObstacleProblem::make_grid}
 
   // We solve our obstacle problem on the square $[-1,1]\times [-1,1]$ in
-  // 2D. This function therefore just sets up one of the simplest possible
+  // 2d. This function therefore just sets up one of the simplest possible
   // meshes.
   template <int dim>
   void ObstacleProblem<dim>::make_grid()

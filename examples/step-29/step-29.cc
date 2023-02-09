@@ -422,9 +422,9 @@ namespace Step29
     // Next, two points are defined for position and focal point of the
     // transducer lens, which is the center of the circle whose segment will
     // form the transducer part of the boundary. Notice that this is the only
-    // point in the program where things are slightly different in 2D and 3D.
-    // Even though this tutorial only deals with the 2D case, the necessary
-    // additions to make this program functional in 3D are so minimal that we
+    // point in the program where things are slightly different in 2d and 3d.
+    // Even though this tutorial only deals with the 2d case, the necessary
+    // additions to make this program functional in 3d are so minimal that we
     // opt for including them:
     const Point<dim> transducer =
       (dim == 2) ? Point<dim>(0.5, 0.0) : Point<dim>(0.5, 0.5, 0.0);
@@ -454,7 +454,7 @@ namespace Step29
             face->set_manifold_id(1);
           }
     // For the circle part of the transducer lens, a SphericalManifold object
-    // is used (which, of course, in 2D just represents a circle), with center
+    // is used (which, of course, in 2d just represents a circle), with center
     // computed as above.
     triangulation.set_manifold(1, SphericalManifold<dim>(focal_point));
 
@@ -738,7 +738,7 @@ namespace Step29
   // with an iterative solver and a preconditioner that do a good job on this
   // matrix.  We chose instead to go a different way and solve the linear
   // system with the sparse LU decomposition provided by UMFPACK. This is
-  // often a good first choice for 2D problems and works reasonably well even
+  // often a good first choice for 2d problems and works reasonably well even
   // for a large number of DoFs.  The deal.II interface to UMFPACK is given by
   // the SparseDirectUMFPACK class, which is very easy to use and allows us to
   // solve our linear system with just 3 lines of code.

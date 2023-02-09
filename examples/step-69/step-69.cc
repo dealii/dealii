@@ -325,7 +325,7 @@ namespace Step69
   //
   // For the purpose of this example step
   // we simply implement a homogeneous uniform flow field for which the
-  // direction and a 1D primitive state (density, velocity, pressure) are
+  // direction and a 1d primitive state (density, velocity, pressure) are
   // read from the parameter file.
   //
   // It would be desirable to initialize the class in a single shot:
@@ -1424,7 +1424,7 @@ namespace Step69
   // We start again by defining a couple of helper functions:
   //
   // The first function takes a state <code>U</code> and a unit vector
-  // <code>n_ij</code> and computes the <i>projected</i> 1D state in
+  // <code>n_ij</code> and computes the <i>projected</i> 1d state in
   // direction of the unit vector.
   namespace
   {
@@ -1445,7 +1445,7 @@ namespace Step69
       const auto perpendicular_m = m - projected_U[1] * n_ij;
       projected_U[2] = U[1 + dim] - 0.5 * perpendicular_m.norm_square() / U[0];
 
-      // We return the 1D state in <i>primitive</i> variables instead of
+      // We return the 1d state in <i>primitive</i> variables instead of
       // conserved quantities. The return array consists of density $\rho$,
       // velocity $u$, pressure $p$ and local speed of sound $a$:
 
