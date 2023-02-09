@@ -936,7 +936,7 @@ namespace CUDAWrappers
                        std::ceil(dim * std::log2(fe_degree + 1.)));
 
     dofs_per_cell     = fe.n_dofs_per_cell();
-    q_points_per_cell = static_cast<unsigned int>(std::pow(n_q_points_1d, dim));
+    q_points_per_cell = Utilities::fixed_power<dim>(n_q_points_1d);
 
     const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
       quad, fe);
