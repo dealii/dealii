@@ -120,8 +120,7 @@ namespace types
 
   /**
    * The type used to denote boundary indicators associated with every piece
-   * of the boundary and, in the case of meshes that describe manifolds in
-   * higher dimensions, associated with every cell.
+   * of the boundary of the domain.
    *
    * There is a special value, numbers::internal_face_boundary_id that is used
    * to indicate an invalid value of this type and that is used as the
