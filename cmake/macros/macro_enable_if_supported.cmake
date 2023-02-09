@@ -38,7 +38,7 @@ macro(enable_if_supported _variable _flag)
 
   if(NOT "${_flag_stripped}" STREQUAL "")
     string(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
-    string(REGEX REPLACE "\[-+,\]" "_" _flag_name "${_flag_name}")
+    string(REGEX REPLACE "\[-+,= \]" "_" _flag_name "${_flag_name}")
 
     CHECK_CXX_COMPILER_FLAG("${_flag_sanitized}" DEAL_II_HAVE_FLAG_${_flag_name})
 

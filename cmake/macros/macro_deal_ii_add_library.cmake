@@ -41,7 +41,12 @@ macro(deal_ii_add_library _library)
       )
 
     set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-    separate_arguments(_flags)
+
+    # Make sure some CUDA warning flags don't get deduplicated
+    string(REGEX REPLACE "(-Xcudafe --diag_suppress=[^ ]+)" "\"SHELL:\\1\"" _flags ${_flags})
+
+    separate_arguments(_flags UNIX_COMMAND ${_flags})
+
     target_compile_options(${_library}_${_build_lowercase} PUBLIC ${_flags})
 
     target_compile_definitions(${_library}_${_build_lowercase}
