@@ -968,17 +968,20 @@ namespace Utilities
   inline T
   fixed_power(const T x)
   {
-    Assert(
-      !std::is_integral<T>::value || (N >= 0),
-      ExcMessage(
-        "The non-type template parameter N must be a non-negative integer for integral type T"));
+    Assert(((std::is_integral<T>::value == true) && (N >= 0)) ||
+             (std::is_integral<T>::value == false),
+           ExcMessage("If the type of the argument, T, is an integer type, "
+                      "then the exponent N must be a non-negative integer "
+                      "because the result would otherwise not be an integer."));
 
     if (N == 0)
       return T(1.);
     else if (N < 0)
+      // For negative exponents, turn things into a positive exponent
       return T(1.) / fixed_power<-N>(x);
     else
-      // Use exponentiation by squaring:
+      // If we get here, we have a positive exponent. Compute the result
+      // by repeated squaring:
       return ((N % 2 == 1) ? x * fixed_power<N / 2>(x * x) :
                              fixed_power<N / 2>(x * x));
   }
