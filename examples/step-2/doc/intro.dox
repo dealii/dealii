@@ -3,8 +3,8 @@
 
 @dealiiVideoLecture{9}
 
-After we have created a grid in the previous example, we now show how
-to define degrees of freedom on this mesh. For this example, we
+After we have created a grid in the previous tutorial program (in step-1),
+we now show how to define degrees of freedom on this mesh. For this example, we
 will use the lowest order ($Q_1$) finite elements, for which the degrees
 of freedom are associated with the vertices of the mesh. Later
 examples will demonstrate higher order elements where degrees of freedom are
