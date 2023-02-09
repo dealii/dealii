@@ -643,24 +643,6 @@ Quadrature<3>
 QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<2> &quadrature)
 {
-  const auto support_points_tri =
-    [](const std::vector<Point<3>> &face,
-       const unsigned char          orientation) -> std::vector<Point<3>> {
-    const boost::container::small_vector<Point<3>, 8> temp =
-      ReferenceCells::Triangle.permute_by_combined_orientation<Point<3>>(
-        face, orientation);
-    return std::vector<Point<3>>(temp.begin(), temp.end());
-  };
-
-  const auto support_points_quad =
-    [](const std::vector<Point<3>> &face,
-       const unsigned char          orientation) -> std::vector<Point<3>> {
-    const boost::container::small_vector<Point<3>, 8> temp =
-      ReferenceCells::Quadrilateral.permute_by_combined_orientation<Point<3>>(
-        face, orientation);
-    return std::vector<Point<3>>(temp.begin(), temp.end());
-  };
-
   const auto process = [&](const std::vector<std::vector<Point<3>>> &faces) {
     // new (projected) quadrature points and weights
     std::vector<Point<3>> points;
@@ -691,10 +673,9 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
           {
             const auto &face = faces[face_no];
 
-            const auto support_points =
-              n_linear_shape_functions == 3 ?
-                support_points_tri(face, orientation) :
-                support_points_quad(face, orientation);
+            const boost::container::small_vector<Point<3>, 8> support_points =
+              reference_cell.face_reference_cell(face_no)
+                .permute_by_combined_orientation<Point<3>>(face, orientation);
 
             // the quadrature rule to be projected ...
             const auto &sub_quadrature_points =
