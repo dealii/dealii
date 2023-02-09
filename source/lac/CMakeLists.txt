@@ -80,6 +80,7 @@ set(_inst
   la_parallel_vector.inst.in
   la_parallel_block_vector.inst.in
   precondition_block.inst.in
+  petsc_communication_pattern.inst.in
   relaxation_block.inst.in
   read_write_vector.inst.in
   scalapack.inst.in
@@ -108,6 +109,7 @@ if(DEAL_II_WITH_PETSC)
     petsc_parallel_vector.cc
     petsc_precondition.cc
     petsc_solver.cc
+    petsc_communication_pattern.cc
     petsc_sparse_matrix.cc
     petsc_vector_base.cc
   )

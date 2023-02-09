@@ -37,6 +37,10 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  endif
 #endif
 
+#ifdef DEAL_II_WITH_PETSC
+#  include <petscis.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -496,6 +500,11 @@ public:
   make_tpetra_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
                   const bool      overlapping  = false) const;
 #  endif
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+  IS
+  make_petsc_is(const MPI_Comm &communicator = MPI_COMM_WORLD) const;
 #endif
 
 
