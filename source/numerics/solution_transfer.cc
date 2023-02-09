@@ -332,6 +332,7 @@ SolutionTransfer<dim, VectorType, spacedim>::
     if (!cell->is_active() && cell->child(0)->coarsen_flag_set())
       ++n_coarsen_fathers;
   Assert(n_cells_to_coarsen >= 2 * n_coarsen_fathers, ExcInternalError());
+  (void)n_cells_to_coarsen;
 
   // allocate the needed memory. initialize
   // the following arrays in an efficient

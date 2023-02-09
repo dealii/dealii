@@ -28,16 +28,16 @@ namespace
    */
   template <typename Number>
   cusparseStatus_t
-  cusparseXcsrilu02(cusparseHandle_t         handle,
-                    int                      m,
-                    int                      nnz,
-                    const cusparseMatDescr_t descrA,
-                    Number *                 csrValA_valM,
-                    const int *              csrRowPtrA,
-                    const int *              csrColIndA,
-                    csrilu02Info_t           info,
-                    cusparseSolvePolicy_t    policy,
-                    void *                   pBuffer)
+  cusparseXcsrilu02(cusparseHandle_t /*handle*/,
+                    int /*m*/,
+                    int /*nnz*/,
+                    const cusparseMatDescr_t /*descrA*/,
+                    Number * /*csrValA_valM*/,
+                    const int * /*csrRowPtrA*/,
+                    const int * /*csrColIndA*/,
+                    csrilu02Info_t /*info*/,
+                    cusparseSolvePolicy_t /*policy*/,
+                    void * /*pBuffer*/)
   {
     AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
@@ -1289,9 +1289,13 @@ namespace CUDAWrappers
     n_nonzero_elements = A.n_nonzero_elements();
     AssertDimension(A.m(), A.n());
 
-    matrix_pointer                      = &A;
-    const auto          cusparse_matrix = A.get_cusparse_matrix();
-    const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
+    matrix_pointer = &A;
+    const Number *A_val_dev;
+    std::tie(A_val_dev,
+             P_column_index_dev,
+             P_row_ptr_dev,
+             std::ignore,
+             std::ignore) = A.get_cusparse_matrix();
 
     // create a copy of the matrix entries since the algorithm works in-place.
     P_val_dev.reset(
@@ -1300,10 +1304,7 @@ namespace CUDAWrappers
                                          A_val_dev,
                                          n_nonzero_elements * sizeof(Number),
                                          cudaMemcpyDeviceToDevice);
-
-    P_column_index_dev                 = std::get<1>(cusparse_matrix);
-    P_row_ptr_dev                      = std::get<2>(cusparse_matrix);
-    const cusparseMatDescr_t mat_descr = std::get<3>(cusparse_matrix);
+    AssertCuda(cuda_status);
 
     // initialize an internal buffer we need later on
     tmp_dev.reset(Utilities::CUDA::allocate_device_data<Number>(n_rows));
@@ -1611,8 +1612,12 @@ namespace CUDAWrappers
     n_nonzero_elements = A.n_nonzero_elements();
     AssertDimension(A.m(), A.n());
 
-    const auto          cusparse_matrix = A.get_cusparse_matrix();
-    const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
+    const Number *A_val_dev;
+    std::tie(A_val_dev,
+             P_column_index_dev,
+             P_row_ptr_dev,
+             std::ignore,
+             std::ignore) = A.get_cusparse_matrix();
 
     // create a copy of the matrix entries since the algorithm works in-place.
     P_val_dev.reset(
@@ -1621,10 +1626,7 @@ namespace CUDAWrappers
                                          A_val_dev,
                                          n_nonzero_elements * sizeof(Number),
                                          cudaMemcpyDeviceToDevice);
-
-    P_column_index_dev                 = std::get<1>(cusparse_matrix);
-    P_row_ptr_dev                      = std::get<2>(cusparse_matrix);
-    const cusparseMatDescr_t mat_descr = std::get<3>(cusparse_matrix);
+    AssertCuda(cuda_status);
 
     // initialize an internal buffer we need later on
     tmp_dev.reset(Utilities::CUDA::allocate_device_data<Number>(n_rows));
