@@ -220,6 +220,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
       template double
+      volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+      template double
       volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
              const Mapping<deal_II_dimension, deal_II_space_dimension> &);
 
