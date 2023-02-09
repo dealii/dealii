@@ -45,7 +45,7 @@ print_result(const Mapping<dim, spacedim> &      mapping,
 
 template <int dim, int spacedim>
 void
-test()
+test(const bool flip_refinement = false)
 {
   Triangulation<dim, spacedim> tria;
   GridGenerator::subdivided_hyper_cube(
@@ -55,7 +55,7 @@ test()
   for (unsigned int i = 1; i < 3; ++i)
     {
       for (const auto &cell : tria.active_cell_iterators())
-        if (cell->at_boundary(0))
+        if (cell->at_boundary(static_cast<int>(flip_refinement)))
           cell->set_refine_flag();
 
       tria.execute_coarsening_and_refinement();
@@ -63,17 +63,28 @@ test()
 
   MappingQ<dim> mapping(2);
 
-  // Point at the edge between cells of different levels
   Point<dim> point_at_edge;
 
-  point_at_edge[dim - 1] = 0.25;
+  // boundary face
+  point_at_edge[dim - 1] = flip_refinement ? 0.75 : 0.25;
   print_result(mapping, tria, point_at_edge);
 
   if (dim > 1)
     {
+      // interior face
       for (unsigned d = 0; d < dim; ++d)
-        point_at_edge[d] = 0.25;
+        point_at_edge[d] = flip_refinement ? 0.75 : 0.25;
+      print_result(mapping, tria, point_at_edge);
 
+      // hanging node
+      for (unsigned d = 0; d < dim - 1; ++d)
+        point_at_edge[d] = 0.5;
+      print_result(mapping, tria, point_at_edge);
+    }
+  else
+    {
+      // interior face
+      point_at_edge[0] = 0.5;
       print_result(mapping, tria, point_at_edge);
     }
 
@@ -94,5 +105,8 @@ main()
   test<1, 1>();
   test<2, 2>();
   test<3, 3>();
+  test<1, 1>(true);
+  test<2, 2>(true);
+  test<3, 3>(true);
   return 0;
 }
