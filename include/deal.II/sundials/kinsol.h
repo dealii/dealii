@@ -517,9 +517,9 @@ namespace SUNDIALS
      * that this may not converge, or may converge very slowly.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `rhs`, i.e., `J*dst = rhs`. It is the user's responsibility
-     * to set up proper solvers and preconditioners inside this function
-     * (or in the `setup_jacobian` callback above).
+     * applied to `rhs`, i.e., $J \cdot dst = rhs$. It is the user's
+     * responsibility to set up proper solvers and preconditioners inside this
+     * function (or in the `setup_jacobian` callback above).
      *
      *
      * Arguments to the function are:
@@ -569,7 +569,7 @@ namespace SUNDIALS
      * the Jacobian, then KINSOL does not call setup_jacobian() again. If, on
      * the contrary, internal KINSOL convergence tests fail, then KINSOL calls
      * setup_jacobian() again with updated vectors and coefficients so that
-     * successive calls to solve_jacobian_systems() lead to better convergence
+     * successive calls to solve_jacobian_system() lead to better convergence
      * in the Newton process.
      *
      * If you do not specify a `solve_with_jacobian` function, then only a
@@ -577,13 +577,13 @@ namespace SUNDIALS
      * converge, or may converge very slowly.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `rhs`, i.e., `J*dst = rhs`. It is the user's responsibility
-     * to set up proper solvers and preconditioners inside this function
-     * (or in the `setup_jacobian` callback above). The function attached
-     * to this callback is also provided with a tolerance to the linear solver,
-     * indicating that it is not necessary to solve the linear system with
-     * the Jacobian matrix exactly, but only to a tolerance that KINSOL will
-     * adapt over time.
+     * applied to `rhs`, i.e., $J \cdot dst = rhs$. It is the user's
+     * responsibility to set up proper solvers and preconditioners inside this
+     * function (or in the `setup_jacobian` callback above). The function
+     * attached to this callback is also provided with a tolerance to the linear
+     * solver, indicating that it is not necessary to solve the linear system
+     * with the Jacobian matrix exactly, but only to a tolerance that KINSOL
+     * will adapt over time.
      *
      * Arguments to the function are:
      *
