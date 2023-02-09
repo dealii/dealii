@@ -609,9 +609,9 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
             continue;
 
           auto components_expr = zero_components;
-          for (unsigned int i = 0; i < n_components; ++i)
-            if (mask[i] == true)
-              components_expr[i] = weight_components[i];
+          for (unsigned int j = 0; j < n_components; ++j)
+            if (mask[j] == true)
+              components_expr[j] = weight_components[j];
 
           FunctionFromFunctionObjects<spacedim> select_component(
             components_expr);
