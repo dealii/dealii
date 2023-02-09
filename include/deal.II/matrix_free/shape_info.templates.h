@@ -660,7 +660,7 @@ namespace internal
         Assert(fe.n_dofs_per_cell() == 0 ||
                  std::abs(fe.shape_value(scalar_lexicographic[0], unit_point) -
                           1) < 1e-13,
-               ExcInternalError("Could not decode 1D shape functions for the "
+               ExcInternalError("Could not decode 1d shape functions for the "
                                 "element " +
                                 fe.get_name()));
       }

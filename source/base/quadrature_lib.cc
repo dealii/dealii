@@ -1266,7 +1266,7 @@ QSimplex<dim>::mapped_quadrature(
   const std::vector<std::array<Point<spacedim>, dim + 1>> &simplices) const
 {
   Assert(!(dim == 1 && spacedim == 1),
-         ExcMessage("This function is not supposed to work in 1D-1D case."));
+         ExcMessage("This function is not supposed to work in 1D-1d case."));
   Assert(dim <= spacedim,
          ExcMessage("Invalid combination of dim and spacedim ."));
 

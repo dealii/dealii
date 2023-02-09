@@ -441,7 +441,7 @@ namespace CGALWrappers
     const Mapping<dim1, spacedim> &mapping1)
   {
     Assert(dim0 == 3 && dim1 == 3 && spacedim == 3,
-           ExcNotImplemented("2D geometries are not yet supported."));
+           ExcNotImplemented("2d geometries are not yet supported."));
     if (dim1 > dim0)
       {
         return compute_quadrature_on_boolean_operation(
@@ -492,7 +492,7 @@ namespace CGALWrappers
     const Mapping<dim1, spacedim> &mapping1)
   {
     Assert(dim0 == 3 && dim1 == 3 && spacedim == 3,
-           ExcNotImplemented("2D geometries are not yet supported."));
+           ExcNotImplemented("2d geometries are not yet supported."));
     using K         = CGAL::Exact_predicates_inexact_constructions_kernel;
     using CGALPoint = CGAL::Point_3<K>;
     using CGALTriangulation = CGAL::Triangulation_3<K>;

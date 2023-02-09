@@ -683,12 +683,12 @@ namespace
                           face_rotation == false),
            ExcMessage("The supplied orientation "
                       "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 1D"));
+                      "is invalid for 1d"));
 
     Assert((dim != 2) || (face_orientation == true && face_rotation == false),
            ExcMessage("The supplied orientation "
                       "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 2D"));
+                      "is invalid for 2d"));
 
     Assert(face_1 != face_2, ExcMessage("face_1 and face_2 are equal!"));
 

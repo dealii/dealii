@@ -746,7 +746,7 @@ FE_FaceQ<1, spacedim>::fill_fe_subface_values(
                                                                      spacedim>
     &) const
 {
-  Assert(false, ExcMessage("There are no sub-face values to fill in 1D!"));
+  Assert(false, ExcMessage("There are no sub-face values to fill in 1d!"));
 }
 
 

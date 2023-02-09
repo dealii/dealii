@@ -297,12 +297,12 @@ namespace GridOutFlags
     param.declare_entry("Cell number",
                         "false",
                         Patterns::Bool(),
-                        "(2D only) Write cell numbers"
+                        "(2d only) Write cell numbers"
                         " into the centers of cells");
     param.declare_entry("Level number",
                         "false",
                         Patterns::Bool(),
-                        "(2D only) if \"Cell number\" is true, write "
+                        "(2d only) if \"Cell number\" is true, write "
                         "numbers in the form level.number");
     param.declare_entry("Vertex number",
                         "false",
