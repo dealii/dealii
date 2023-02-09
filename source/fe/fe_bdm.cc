@@ -114,7 +114,7 @@ template <int dim>
 void
 FE_BDM<dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // for 1D and 2D, do nothing
+  // for 1d and 2d, do nothing
   if (dim < 3)
     return;
 
@@ -176,7 +176,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
   unsigned int pbase = 0;
   for (auto f : GeometryInfo<dim>::face_indices())
     {
-      // Old version with no moments in 2D. See comment below in
+      // Old version with no moments in 2d. See comment below in
       // initialize_support_points()
       if (test_values_face.size() == 0)
         {
@@ -359,7 +359,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // cell. First on the faces, we have to test polynomials of degree
   // up to deg, which means we need dg+1 points in each direction. The
   // fact that we do not have tensor product polynomials will be
-  // considered later. In 2D, we can use point values.
+  // considered later. In 2d, we can use point values.
   QGauss<dim - 1> face_points(deg + 1);
 
   // TODO: the implementation makes the assumption that all faces have the
@@ -399,7 +399,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
                                                this->n_dofs_per_face(face_no)));
 
   // Currently, for backward compatibility, we do not use moments, but
-  // point values on faces in 2D. In 3D, this is impossible, since the
+  // point values on faces in 2d. In 3d, this is impossible, since the
   // moments are only taken with respect to PolynomialsP.
   if (dim > 2)
     internal::FE_BDM::initialize_test_values(test_values_face,

@@ -36,7 +36,7 @@ namespace FunctionTools
     const SymmetricTensor<2, dim> hessian = function.hessian(center, component);
 
     // Deviation from function value at the center, based on the
-    // Taylor-expansion: |f'| * dx + 1/2 * |f''| * dx^2,   (in 1D). dx is half
+    // Taylor-expansion: |f'| * dx + 1/2 * |f''| * dx^2,   (in 1d). dx is half
     // the side-length of the box.
     double taylor_bound_f = 0;
 
@@ -47,7 +47,7 @@ namespace FunctionTools
         taylor_bound_f += std::abs(gradient[i]) * dx_i;
 
         // Deviation from value of df/dx_i at the center,
-        // |f''| * dx,  (in 1D).
+        // |f''| * dx,  (in 1d).
         double taylor_bound_dfdxi = 0;
 
         for (unsigned int j = 0; j < dim; ++j)

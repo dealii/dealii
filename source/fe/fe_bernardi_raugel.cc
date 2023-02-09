@@ -89,7 +89,7 @@ template <int dim>
 void
 FE_BernardiRaugel<dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // for 1D and 2D, do nothing
+  // for 1d and 2d, do nothing
   if (dim < 3)
     return;
 
@@ -154,7 +154,7 @@ FE_BernardiRaugel<dim>::get_dpo_vector()
   // compute the number of unknowns per cell interior/face/edge
   //
   // there are <tt>dim</tt> degrees of freedom per vertex and there
-  // is 1 degree of freedom per edge in 2D (face in 3D)
+  // is 1 degree of freedom per edge in 2d (face in 3d)
   std::vector<unsigned int> dpo(dim + 1, 0u);
   dpo[0]       = dim;
   dpo[dim - 1] = 1u;

@@ -659,7 +659,7 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   const bool         face_flip,
   const bool         face_rotation) const
 {
-  // general template for 1D and 2D: not
+  // general template for 1d and 2d: not
   // implemented. in fact, the function
   // shouldn't even be called unless we are
   // in 3d, so throw an internal error
@@ -697,10 +697,10 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   const unsigned int index,
   const bool         line_orientation) const
 {
-  // general template for 1D and 2D: do
+  // general template for 1d and 2d: do
   // nothing. Do not throw an Assertion,
   // however, in order to allow to call this
-  // function in 2D as well
+  // function in 2d as well
   if (dim < 3)
     return index;
 

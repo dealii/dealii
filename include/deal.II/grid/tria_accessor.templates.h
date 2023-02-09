@@ -985,7 +985,7 @@ namespace internal
       static std::array<unsigned int, 4>
       get_line_indices_of_cell(const TriaAccessor<2, dim, spacedim> &cell)
       {
-        // For 2D cells the access cell->line_orientation() is already
+        // For 2d cells the access cell->line_orientation() is already
         // efficient
         std::array<unsigned int, 4> line_indices = {};
         for (unsigned int line : cell.line_indices())
@@ -1102,7 +1102,7 @@ namespace internal
       static std::array<bool, 4>
       get_line_orientations_of_cell(const TriaAccessor<2, dim, spacedim> &cell)
       {
-        // For 2D cells the access cell->line_orientation() is already
+        // For 2d cells the access cell->line_orientation() is already
         // efficient
         std::array<bool, 4> line_orientations = {};
         for (unsigned int line : cell.line_indices())
@@ -1630,7 +1630,7 @@ TriaAccessor<structdim, dim, spacedim>::isotropic_child(
   switch (structdim)
     {
       case 1:
-        // no anisotropic refinement in 1D
+        // no anisotropic refinement in 1d
         return child(i);
 
       case 2:

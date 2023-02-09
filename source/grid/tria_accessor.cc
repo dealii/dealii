@@ -151,7 +151,7 @@ namespace
         // the evaluation of the formulae
         // is a bit tricky when done dimension
         // independently, so we write this function
-        // for 2D and 3D separately
+        // for 2d and 3d separately
         /*
           Get the computation of the barycenter by this little Maple script. We
           use the bilinear mapping of the unit quad to the real quad. However,

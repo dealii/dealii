@@ -156,7 +156,7 @@ MappingQ<dim, spacedim>::InternalData::initialize(
 
           if (tensor_product_quadrature)
             {
-              // use a 1D FE_DGQ and adjust the hierarchic -> lexicographic
+              // use a 1d FE_DGQ and adjust the hierarchic -> lexicographic
               // numbering manually (building an FE_Q<dim> is relatively
               // expensive due to constraints)
               const FE_DGQ<1> fe(polynomial_degree);
@@ -639,16 +639,16 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
       ((dim == 1) || ((dim == 2) && (dim == spacedim))))
     {
       // The dimension-dependent algorithms are much faster (about 25-45x in
-      // 2D) but fail most of the time when the given point (p) is not in the
+      // 2d) but fail most of the time when the given point (p) is not in the
       // cell. The dimension-independent Newton algorithm given below is
       // slower, but more robust (though it still sometimes fails). Therefore
       // this function implements the following strategy based on the
       // p's dimension:
       //
-      // * In 1D this mapping is linear, so the mapping is always invertible
+      // * In 1d this mapping is linear, so the mapping is always invertible
       //   (and the exact formula is known) as long as the cell has non-zero
       //   length.
-      // * In 2D the exact (quadratic) formula is called first. If either the
+      // * In 2d the exact (quadratic) formula is called first. If either the
       //   exact formula does not succeed (negative discriminant in the
       //   quadratic formula) or succeeds but finds a solution outside of the
       //   unit cell, then the Newton solver is called. The rationale for the
@@ -657,7 +657,7 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
       //   Newton solver (if it converges) will only return one answer.
       //   Otherwise the exact formula successfully found a point in the unit
       //   cell and that value is returned.
-      // * In 3D there is no (known to the authors) exact formula, so the Newton
+      // * In 3d there is no (known to the authors) exact formula, so the Newton
       //   algorithm is used.
       const auto vertices_ = this->get_vertices(cell);
 
@@ -1067,8 +1067,8 @@ MappingQ<dim, spacedim>::fill_fe_values(
 
                 // check for distorted cells.
 
-                // TODO: this allows for anisotropies of up to 1e6 in 3D and
-                // 1e12 in 2D. might want to find a finer
+                // TODO: this allows for anisotropies of up to 1e6 in 3d and
+                // 1e12 in 2d. might want to find a finer
                 // (dimension-independent) criterion
                 Assert(det >
                          1e-12 * Utilities::fixed_power<dim>(
@@ -1349,8 +1349,8 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
 
           // check for distorted cells.
 
-          // TODO: this allows for anisotropies of up to 1e6 in 3D and
-          // 1e12 in 2D. might want to find a finer
+          // TODO: this allows for anisotropies of up to 1e6 in 3d and
+          // 1e12 in 2d. might want to find a finer
           // (dimension-independent) criterion
           Assert(det > 1e-12 * Utilities::fixed_power<dim>(
                                  cell->diameter() / std::sqrt(double(dim))),

@@ -66,7 +66,7 @@ namespace internal
     template <int>
     struct types;
 
-    // these struct mimics p4est for 1D
+    // these struct mimics p4est for 1d
     template <>
     struct types<1>
     {

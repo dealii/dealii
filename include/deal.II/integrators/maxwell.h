@@ -221,7 +221,7 @@ namespace LocalIntegrators
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
       AssertDimension(fe.get_fe().n_components(), dim);
-      // There should be the right number of components (3 in 3D, otherwise 1)
+      // There should be the right number of components (3 in 3d, otherwise 1)
       // for the curl.
       AssertDimension(fetest.get_fe().n_components(), (dim == 3) ? dim : 1);
       AssertDimension(M.m(), t_dofs);

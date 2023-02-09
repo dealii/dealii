@@ -117,7 +117,7 @@ template <int dim>
 void
 FE_RT_Bubbles<dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // for 1D and 2D, do nothing
+  // for 1d and 2d, do nothing
   if (dim < 3)
     return;
 

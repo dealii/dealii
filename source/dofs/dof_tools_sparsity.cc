@@ -894,12 +894,12 @@ namespace DoFTools
                               cell->neighbor_face_no(face_n);
 
 
-                          // In 1D, go straight to the cell behind this
+                          // In 1d, go straight to the cell behind this
                           // particular cell's most terminal cell. This makes us
                           // skip the if (neighbor->has_children()) section
                           // below. We need to do this since we otherwise
                           // iterate over the children of the face, which are
-                          // always 0 in 1D.
+                          // always 0 in 1d.
                           if (dim == 1)
                             while (neighbor->has_children())
                               neighbor = neighbor->child(face_n == 0 ? 1 : 0);
@@ -1229,12 +1229,12 @@ namespace DoFTools
                               neighbor->is_locally_owned())
                             continue; // (the neighbor is finer)
 
-                          // In 1D, go straight to the cell behind this
+                          // In 1d, go straight to the cell behind this
                           // particular cell's most terminal cell. This makes us
                           // skip the if (neighbor->has_children()) section
                           // below. We need to do this since we otherwise
                           // iterate over the children of the face, which are
-                          // always 0 in 1D.
+                          // always 0 in 1d.
                           if (dim == 1)
                             while (neighbor->has_children())
                               neighbor = neighbor->child(face == 0 ? 1 : 0);

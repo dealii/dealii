@@ -1546,8 +1546,8 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
 
               // check for distorted cells.
 
-              // TODO: this allows for anisotropies of up to 1e6 in 3D and
-              // 1e12 in 2D. might want to find a finer
+              // TODO: this allows for anisotropies of up to 1e6 in 3d and
+              // 1e12 in 2d. might want to find a finer
               // (dimension-independent) criterion
               Assert(det > 1e-12 * Utilities::fixed_power<dim>(
                                      cell->diameter() / std::sqrt(double(dim))),
@@ -1826,8 +1826,8 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
 
           // check for distorted cells.
 
-          // TODO: this allows for anisotropies of up to 1e6 in 3D and
-          // 1e12 in 2D. might want to find a finer
+          // TODO: this allows for anisotropies of up to 1e6 in 3d and
+          // 1e12 in 2d. might want to find a finer
           // (dimension-independent) criterion
           Assert(det > 1e-12 * Utilities::fixed_power<dim>(
                                  cell->diameter() / std::sqrt(double(dim))),

@@ -566,7 +566,7 @@ namespace internal
       elem_info.element_is_continuous = fe.n_dofs_per_vertex() > 0;
       Assert(fe.n_dofs_per_vertex() < 2, ExcNotImplemented());
 
-      // step 1.2: get renumbering of 1D basis functions to lexicographic
+      // step 1.2: get renumbering of 1d basis functions to lexicographic
       // numbers. The distinction according to fe.n_dofs_per_vertex() is to
       // support both continuous and discontinuous bases.
       std::vector<unsigned int> renumbering(fe.n_dofs_per_cell());
@@ -581,7 +581,7 @@ namespace internal
             fe.n_dofs_per_vertex();
       }
 
-      // step 1.3: create a dummy 1D quadrature formula to extract the
+      // step 1.3: create a dummy 1d quadrature formula to extract the
       // lexicographic numbering for the elements
       Assert(fe.n_dofs_per_vertex() == 0 || fe.n_dofs_per_vertex() == 1,
              ExcNotImplemented());
@@ -644,8 +644,8 @@ namespace internal
 
       const dealii::Triangulation<dim> &tria = dof_handler.get_triangulation();
 
-      // ---------------------------- 1. Extract 1D info about the finite
-      // element step 1.1: create a 1D copy of the finite element from FETools
+      // ---------------------------- 1. Extract 1d info about the finite
+      // element step 1.1: create a 1d copy of the finite element from FETools
       // where we substitute the template argument
       AssertDimension(dof_handler.get_fe().n_base_elements(), 1);
       std::string fe_name = dof_handler.get_fe().base_element(0).get_name();

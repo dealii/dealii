@@ -58,7 +58,7 @@ class Vector;
  * std::map<std::string,double> constants;
  * constants["pi"] = numbers::PI;
  *
- * // TensorFunctionParser with 2+1 variables (space + time) in 2D of rank 2.
+ * // TensorFunctionParser with 2+1 variables (space + time) in 2d of rank 2.
  * // It is necessary to tell the parser that there is an additional variable
  * // to be taken into account (t).
  * TensorFunctionParser<2,2> tfp;

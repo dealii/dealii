@@ -663,7 +663,7 @@ namespace DataOutBase
   {
     unsigned int new_dim;
 
-    // HDF5/XDMF output only supports 1D or 3D output, so force rearrangement if
+    // HDF5/XDMF output only supports 1d or 3d output, so force rearrangement if
     // needed
     if (flags.xdmf_hdf5_output && dimension != 1)
       new_dim = 3;
@@ -5036,7 +5036,7 @@ namespace DataOutBase
 
 #else
 
-    // Tecplot binary output only good for 2D & 3D
+    // Tecplot binary output only good for 2d & 3d
     if (dim == 1)
       {
         write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
@@ -6344,12 +6344,12 @@ namespace DataOutBase
 
                 const unsigned int size = last_component - first_component + 1;
                 if (size == 1)
-                  // 1D, 1 element
+                  // 1d, 1 element
                   {
                     vtk_data[0][0] = data_vectors(first_component, n);
                   }
                 else if (size == 4)
-                  // 2D, 4 elements
+                  // 2d, 4 elements
                   {
                     for (unsigned int c = 0; c < size; ++c)
                       {
@@ -6360,7 +6360,7 @@ namespace DataOutBase
                       }
                   }
                 else if (size == 9)
-                  // 3D 9 elements
+                  // 3d 9 elements
                   {
                     for (unsigned int c = 0; c < size; ++c)
                       {
@@ -8819,7 +8819,7 @@ namespace
     for (i = 0; i < data_filter.n_data_sets(); ++i)
       {
         // Allocate space for the point data
-        // Must be either 1D or 3D
+        // Must be either 1d or 3d
         const unsigned int pt_data_vector_dim = data_filter.get_data_set_dim(i);
         vector_name = data_filter.get_data_set_name(i);
 
@@ -10020,7 +10020,7 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
          << attribute_dim.first << "\" AttributeType=\""
          << (attribute_dim.second > 1 ? "Vector" : "Scalar")
          << "\" Center=\"Node\">\n";
-      // Vectors must have 3 elements even for 2D models
+      // Vectors must have 3 elements even for 2d models
       ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_nodes
          << " " << (attribute_dim.second > 1 ? 3 : 1)
          << "\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">\n";

@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
 // don't iterate over all cells and if cell data is requested. in that
 // case, we need to calculate cell_number as in the DataOut class
 
-// Not implemented for 3D
+// Not implemented for 3d
 
 
 namespace internal

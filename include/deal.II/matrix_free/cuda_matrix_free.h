@@ -706,8 +706,8 @@ namespace CUDAWrappers
     /* clang-format off */
     // We are limiting the number of threads according to the
     // following formulas:
-    //  - in 2D: `threads = cells * (k+1)^d <= 4*CUDAWrappers::warp_size`
-    //  - in 3D: `threads = cells * (k+1)^d <= 2*CUDAWrappers::warp_size`
+    //  - in 2d: `threads = cells * (k+1)^d <= 4*CUDAWrappers::warp_size`
+    //  - in 3d: `threads = cells * (k+1)^d <= 2*CUDAWrappers::warp_size`
     return dim==2 ? (fe_degree==1 ? CUDAWrappers::warp_size :    // 128
                      fe_degree==2 ? CUDAWrappers::warp_size/4 :  //  72
                      fe_degree==3 ? CUDAWrappers::warp_size/8 :  //  64

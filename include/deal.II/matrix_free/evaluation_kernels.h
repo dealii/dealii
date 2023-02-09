@@ -342,7 +342,7 @@ namespace internal
                 eval0.template hessians<0, true, false>(values_dofs,
                                                         hessians_quad);
 
-              // advance the next component in 1D array
+              // advance the next component in 1d array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += n_q_points;
@@ -391,7 +391,7 @@ namespace internal
               if (evaluation_flag & EvaluationFlags::values)
                 eval1.template values<1, true, false>(temp1, values_quad);
 
-              // advance to the next component in 1D array
+              // advance to the next component in 1d array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += 2 * n_q_points;
@@ -481,7 +481,7 @@ namespace internal
               if (evaluation_flag & EvaluationFlags::values)
                 eval2.template values<2, true, false>(temp2, values_quad);
 
-              // advance to the next component in 1D array
+              // advance to the next component in 1d array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += 3 * n_q_points;
@@ -611,7 +611,7 @@ namespace internal
                                                              values_dofs);
                 }
 
-              // advance to the next component in 1D array
+              // advance to the next component in 1d array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += n_q_points;
@@ -671,7 +671,7 @@ namespace internal
                   eval0.template gradients<0, false, true>(temp1, values_dofs);
                 }
 
-              // advance to the next component in 1D array
+              // advance to the next component in 1d array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += 2 * n_q_points;
@@ -762,7 +762,7 @@ namespace internal
                   eval0.template values<0, false, true>(temp2, values_dofs);
                 }
 
-              // advance to the next component in 1D array
+              // advance to the next component in 1d array
               values_dofs += dofs_per_comp;
               values_quad += n_q_points;
               gradients_quad += 3 * n_q_points;

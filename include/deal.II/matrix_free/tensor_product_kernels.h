@@ -535,7 +535,7 @@ namespace internal
                 case 1:
                   ++in;
                   ++out;
-                  // faces 2 and 3 in 3D use local coordinate system zx, which
+                  // faces 2 and 3 in 3d use local coordinate system zx, which
                   // is the other way around compared to the tensor
                   // product. Need to take that into account.
                   if (dim == 3)
@@ -959,7 +959,7 @@ namespace internal
                 case 1:
                   ++in;
                   ++out;
-                  // faces 2 and 3 in 3D use local coordinate system zx, which
+                  // faces 2 and 3 in 3d use local coordinate system zx, which
                   // is the other way around compared to the tensor
                   // product. Need to take that into account.
                   if (dim == 3)
@@ -1079,8 +1079,8 @@ namespace internal
 
 
 
-  // In this case, the 1D shape values read (sorted lexicographically, rows
-  // run over 1D dofs, columns over quadrature points):
+  // In this case, the 1d shape values read (sorted lexicographically, rows
+  // run over 1d dofs, columns over quadrature points):
   // Q2 --> [ 0.687  0 -0.087 ]
   //        [ 0.4    1  0.4   ]
   //        [-0.087  0  0.687 ]
@@ -1267,8 +1267,8 @@ namespace internal
 
 
   // For the specialized loop used for the gradient computation in
-  // here, the 1D shape values read (sorted lexicographically, rows
-  // run over 1D dofs, columns over quadrature points):
+  // here, the 1d shape values read (sorted lexicographically, rows
+  // run over 1d dofs, columns over quadrature points):
   // Q2 --> [-2.549 -1  0.549 ]
   //        [ 3.098  0 -3.098 ]
   //        [-0.549  1  2.549 ]
@@ -2879,7 +2879,7 @@ namespace internal
                 case 1:
                   ++in;
                   ++out;
-                  // faces 2 and 3 in 3D use local coordinate system zx, which
+                  // faces 2 and 3 in 3d use local coordinate system zx, which
                   // is the other way around compared to the tensor
                   // product. Need to take that into account.
                   if (dim == 3)
@@ -3092,7 +3092,7 @@ namespace internal
     AssertIndexRange(n_shapes, 200);
     dealii::ndarray<Number2, 200, 2, dim> shapes;
 
-    // Evaluate 1D polynomials and their derivatives
+    // Evaluate 1d polynomials and their derivatives
     std::array<Number2, dim> point;
     for (unsigned int d = 0; d < dim; ++d)
       point[d] = p[d];
@@ -3183,7 +3183,7 @@ namespace internal
     AssertIndexRange(n_shapes, 200);
     dealii::ndarray<Number2, 200, 3, dim> shapes;
 
-    // Evaluate 1D polynomials and their derivatives
+    // Evaluate 1d polynomials and their derivatives
     std::array<Number2, dim> point;
     for (unsigned int d = 0; d < dim; ++d)
       point[d] = p[d];
@@ -3284,7 +3284,7 @@ namespace internal
     AssertIndexRange(n_shapes, 200);
     dealii::ndarray<Number, 200, 2, dim> shapes;
 
-    // Evaluate 1D polynomials and their derivatives
+    // Evaluate 1d polynomials and their derivatives
     std::array<Number, dim> point;
     for (unsigned int d = 0; d < dim; ++d)
       point[d] = p[d];

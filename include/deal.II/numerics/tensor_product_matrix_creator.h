@@ -196,7 +196,7 @@ namespace TensorProductMatrixCreator
     AssertIndexRange(0, n_overlap);
     AssertThrow(is_dg == false, ExcNotImplemented());
 
-    // 2) loop over all dimensions and create 1D mass and stiffness
+    // 2) loop over all dimensions and create 1d mass and stiffness
     // matrices so that boundary conditions and overlap are considered
 
     const unsigned int n_dofs_1D              = M_ref.n();

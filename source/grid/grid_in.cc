@@ -1424,7 +1424,7 @@ GridIn<dim, spacedim>::read_xda(std::istream &in)
         in >> vertex[d];
       for (unsigned int d = spacedim; d < 3; ++d)
         {
-          // file is always in 3D
+          // file is always in 3d
           double dummy;
           in >> dummy;
         }
@@ -4386,8 +4386,8 @@ namespace
             // of which we're not particularly interested in except
             // whether they represent quads or hexahedrals.
             // *ELEMENT, TYPE=S4R, ELSET=EB<material id>
-            // *ELEMENT, TYPE=C3D8R, ELSET=EB<material id>
-            // *ELEMENT, TYPE=C3D8
+            // *ELEMENT, TYPE=C3d8R, ELSET=EB<material id>
+            // *ELEMENT, TYPE=C3d8
             // Elements itself (n=4 or n=8):
             // Index, i[0], ..., i[n]
 

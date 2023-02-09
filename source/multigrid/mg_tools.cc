@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MGTools
 {
-  // specializations for 1D
+  // specializations for 1d
   template <>
   void
   compute_row_length_vector(const DoFHandler<1, 1> &,
@@ -101,7 +101,7 @@ namespace MGTools
 
 
 
-  // Template for 2D and 3D. For 1D see specialization above
+  // Template for 2d and 3d. For 1d see specialization above
   template <int dim, int spacedim>
   void
   compute_row_length_vector(const DoFHandler<dim, spacedim> &dofs,
@@ -185,7 +185,7 @@ namespace MGTools
         while (i < fe.get_first_quad_index(face_no))
           row_lengths[cell_indices[i++]] += increment;
 
-        // Now quads in 2D and 3D
+        // Now quads in 2d and 3d
         increment =
           (dim > 2) ?
             fe.n_dofs_per_cell() - (dim - 2) * fe.n_dofs_per_face(face_no) :
@@ -193,7 +193,7 @@ namespace MGTools
               GeometryInfo<dim>::faces_per_cell * fe.n_dofs_per_face(face_no);
         while (i < fe.get_first_hex_index())
           row_lengths[cell_indices[i++]] += increment;
-        // Finally, cells in 3D
+        // Finally, cells in 3d
         increment = fe.n_dofs_per_cell() - GeometryInfo<dim>::faces_per_cell *
                                              fe.n_dofs_per_face(face_no);
         while (i < fe.n_dofs_per_cell())
@@ -286,7 +286,7 @@ namespace MGTools
   }
 
 
-  // This is the template for 2D and 3D. See version for 1D above
+  // This is the template for 2d and 3d. See version for 1d above
   template <int dim, int spacedim>
   void
   compute_row_length_vector(const DoFHandler<dim, spacedim> &   dofs,
@@ -417,7 +417,7 @@ namespace MGTools
             ++i;
           }
 
-        // Now quads in 2D and 3D
+        // Now quads in 2d and 3d
         while (i < fe.get_first_hex_index())
           {
             for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
@@ -437,7 +437,7 @@ namespace MGTools
             ++i;
           }
 
-        // Finally, cells in 3D
+        // Finally, cells in 3d
         while (i < fe.n_dofs_per_cell())
           {
             for (unsigned int base = 0; base < fe.n_base_elements(); ++base)

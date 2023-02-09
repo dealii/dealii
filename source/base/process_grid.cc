@@ -49,7 +49,7 @@ namespace
     // optimal for Cholesky factorization. LQ and RQ factorizations take
     // advantage of “tall” grids (Pr > Pc )
 
-    // Below we always try to create 2D processor grids:
+    // Below we always try to create 2d processor grids:
 
     const int n_processes = Utilities::MPI::n_mpi_processes(mpi_comm);
 

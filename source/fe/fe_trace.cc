@@ -107,8 +107,8 @@ FE_TraceQ<dim, spacedim>::has_support_on_face(
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   // FE_TraceQ shares the numbering of elemental degrees of freedom with FE_Q
-  // except for the missing interior ones (quad dofs in 2D and hex dofs in
-  // 3D). Therefore, it is safe to ask fe_q for the corresponding
+  // except for the missing interior ones (quad dofs in 2d and hex dofs in
+  // 3d). Therefore, it is safe to ask fe_q for the corresponding
   // information. The assertion 'shape_index < this->n_dofs_per_cell()' will
   // make sure that we only access the trace dofs.
   return fe_q.has_support_on_face(shape_index, face_index);
@@ -153,8 +153,8 @@ std::vector<unsigned int>
 FE_TraceQ<dim, spacedim>::get_dpo_vector(const unsigned int deg)
 {
   // This constructs FE_TraceQ in exactly the same way as FE_Q except for the
-  // interior degrees of freedom that are not present here (line in 1D, quad
-  // in 2D, hex in 3D).
+  // interior degrees of freedom that are not present here (line in 1d, quad
+  // in 2d, hex in 3d).
   AssertThrow(deg > 0, ExcMessage("FE_TraceQ needs to be of degree > 0."));
   std::vector<unsigned int> dpo(dim + 1, 1U);
   dpo[dim] = 0;

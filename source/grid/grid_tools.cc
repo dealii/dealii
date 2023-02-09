@@ -405,7 +405,7 @@ namespace GridTools
 
 
 
-  // Generic functions for appending face data in 2D or 3D. TODO: we can
+  // Generic functions for appending face data in 2d or 3d. TODO: we can
   // remove these once we have 'if constexpr'.
   namespace internal
   {
@@ -550,7 +550,7 @@ namespace GridTools
 
     internal::FaceDataHelper<dim> face_data;
     std::set<CellData<1>, internal::CellDataComparator<1>>
-      line_data; // only used in 3D
+      line_data; // only used in 3d
 
     for (const auto &cell : tria.cell_iterators_on_level(0))
       {
@@ -930,12 +930,12 @@ namespace GridTools
               {
                 if (dim == 2)
                   {
-                    // flip the cell across the y = x line in 2D
+                    // flip the cell across the y = x line in 2d
                     std::swap(cell.vertices[1], cell.vertices[2]);
                   }
                 else if (dim == 3)
                   {
-                    // swap the front and back faces in 3D
+                    // swap the front and back faces in 3d
                     std::swap(cell.vertices[0], cell.vertices[2]);
                     std::swap(cell.vertices[1], cell.vertices[3]);
                     std::swap(cell.vertices[4], cell.vertices[6]);
@@ -2053,7 +2053,7 @@ namespace GridTools
     };
 
 
-    // Transformation to rotate around one of the cartesian z-axis in 2D.
+    // Transformation to rotate around one of the cartesian z-axis in 2d.
     class Rotate2d
     {
     public:
@@ -4356,7 +4356,7 @@ namespace GridTools
     namespace
     {
       // Split get_subdomain_association() for p::d::T since we want to compile
-      // it in 1D but none of the p4est stuff is available in 1D.
+      // it in 1d but none of the p4est stuff is available in 1d.
       template <int dim, int spacedim>
       void
       get_subdomain_association(

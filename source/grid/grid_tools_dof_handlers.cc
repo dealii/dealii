@@ -665,7 +665,7 @@ namespace GridTools
               cells_to_add.push_back(cell);
           }
       }
-    // point on line in 3D: We cannot simply take the intersection between
+    // point on line in 3d: We cannot simply take the intersection between
     // the two vertices of cells because of hanging nodes. So instead we
     // list the vertices around both points and then select the
     // appropriate cells according to the result of read_to_unit_cell
@@ -2343,7 +2343,7 @@ namespace GridTools
     static inline std::bitset<3>
     lookup(const MATCH_T &)
     {
-      // The 1D case is trivial
+      // The 1d case is trivial
       return 1; // [true ,false,false]
     }
   };
@@ -2356,7 +2356,7 @@ namespace GridTools
     static inline std::bitset<3>
     lookup(const MATCH_T &matching)
     {
-      // In 2D matching faces (=lines) results in two cases: Either
+      // In 2d matching faces (=lines) results in two cases: Either
       // they are aligned or flipped. We store this "line_flip"
       // property somewhat sloppy as "face_flip"
       // (always: face_orientation = true, face_rotation = false)
@@ -2383,7 +2383,7 @@ namespace GridTools
     static inline std::bitset<3>
     lookup(const MATCH_T &matching)
     {
-      // The full fledged 3D case. *Yay*
+      // The full fledged 3d case. *Yay*
       // See the documentation in include/deal.II/base/geometry_info.h
       // as well as the actual implementation in source/grid/tria.cc
       // for more details...

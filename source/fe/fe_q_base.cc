@@ -366,7 +366,7 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
             // difference could be attributed to FP errors, as it was in the
             // range of 1.0e-16. These errors originate in the loss of
             // symmetry in the FP approximation of the shape-functions.
-            // Considering a 3rd order shape function in 1D, we have
+            // Considering a 3rd order shape function in 1d, we have
             // N0(x)=N3(1-x) and N1(x)=N2(1-x).  For higher order polynomials
             // the FP approximations of the shape functions do not satisfy
             // these equations any more!  Thus in the following code
@@ -668,7 +668,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
       // support points.
       // TODO: Verify that all faces are the same with respect to
       // these support points. Furthermore, check if something has to
-      // be done for the face orientation flag in 3D.
+      // be done for the face orientation flag in 3d.
       const Quadrature<dim> subface_quadrature =
         subface == numbers::invalid_unsigned_int ?
           QProjector<dim>::project_to_face(this->reference_cell(),
@@ -988,7 +988,7 @@ FE_Q_Base<dim, spacedim>::initialize_unit_face_support_points(
   this->unit_face_support_points[face_no].resize(
     Utilities::fixed_power<dim - 1>(q_degree + 1));
 
-  // In 1D, there is only one 0-dimensional support point, so there is nothing
+  // In 1d, there is only one 0-dimensional support point, so there is nothing
   // more to be done.
   if (dim == 1)
     return;
@@ -1018,7 +1018,7 @@ template <int dim, int spacedim>
 void
 FE_Q_Base<dim, spacedim>::initialize_quad_dof_index_permutation()
 {
-  // for 1D and 2D, do nothing
+  // for 1d and 2d, do nothing
   if (dim < 3)
     return;
 
@@ -1303,7 +1303,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
 #endif
 
       // to efficiently evaluate the polynomial at the subcell, make use of
-      // the tensor product structure of this element and only evaluate 1D
+      // the tensor product structure of this element and only evaluate 1d
       // information from the polynomial. This makes the cost of this function
       // almost negligible also for high order elements
       const unsigned int            dofs1d = q_degree + 1;
@@ -1371,7 +1371,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
               }
         }
 
-      // now expand from 1D info. block innermost dimension (x_0) in order to
+      // now expand from 1d info. block innermost dimension (x_0) in order to
       // avoid difficult checks at innermost loop
       unsigned int j_indices[dim];
       internal::FE_Q_Base::zero_indices<dim>(j_indices);
@@ -1510,7 +1510,7 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
               // same logic as in initialize_embedding to evaluate the
               // polynomial faster than from the tensor product: since we
               // evaluate all polynomials, it is much faster to just compute
-              // the 1D values for all polynomials before and then get the
+              // the 1d values for all polynomials before and then get the
               // dim-data.
               for (unsigned int j = 0; j < dofs1d; ++j)
                 for (unsigned int d = 0; d < dim; ++d)
