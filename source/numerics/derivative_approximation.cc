@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -436,9 +437,11 @@ namespace DerivativeApproximation
                          s[2][2] * s[2][2] + 2 * (ss01 + ss02 + ss12)) /
                         2.;
       const double J3 =
-        (std::pow(s[0][0], 3) + std::pow(s[1][1], 3) + std::pow(s[2][2], 3) +
-         3. * s[0][0] * (ss01 + ss02) + 3. * s[1][1] * (ss01 + ss12) +
-         3. * s[2][2] * (ss02 + ss12) + 6. * s[0][1] * s[0][2] * s[1][2]) /
+        (Utilities::fixed_power<3>(s[0][0]) +
+         Utilities::fixed_power<3>(s[1][1]) +
+         Utilities::fixed_power<3>(s[2][2]) + 3. * s[0][0] * (ss01 + ss02) +
+         3. * s[1][1] * (ss01 + ss12) + 3. * s[2][2] * (ss02 + ss12) +
+         6. * s[0][1] * s[0][2] * s[1][2]) /
         3.;
 
       const double R = std::sqrt(4. * J2 / 3.);

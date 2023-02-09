@@ -470,11 +470,12 @@ namespace Functions
     if (d >= r)
       return Tensor<1, dim>();
     const double e = -d * d / (r - d) / (r + d);
-    return ((e < -50) ? Point<dim>() :
-                        (p - this->center) / d *
-                          (-2.0 * r * r / std::pow(-r * r + d * d, 2.0) * d *
-                           std::exp(e)) *
-                          this->rescaling);
+    return ((e < -50) ?
+              Point<dim>() :
+              (p - this->center) / d *
+                (-2.0 * r * r / Utilities::fixed_power<2>(-r * r + d * d) * d *
+                 std::exp(e)) *
+                this->rescaling);
   }
 
 

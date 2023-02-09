@@ -16,6 +16,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
@@ -946,7 +947,7 @@ QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity)
   for (unsigned int q = 0; q < quadrature_points.size(); ++q)
     {
       double gamma = quadrature_points[q][0] * 2 - 1;
-      double eta   = (std::pow(gamma - gamma_bar, 3.0) +
+      double eta   = (Utilities::fixed_power<3>(gamma - gamma_bar) +
                     gamma_bar * (gamma_bar * gamma_bar + 3)) /
                    (1 + 3 * gamma_bar * gamma_bar);
 

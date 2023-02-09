@@ -667,8 +667,10 @@ namespace GridGenerator
                 const double y_t =
                   5 * t *
                   (0.2969 * std::pow(x, 0.5) - 0.126 * x -
-                   0.3516 * std::pow(x, 2) + 0.2843 * std::pow(x, 3) -
-                   0.1036 * std::pow(x, 4)); // half thickness at a position x
+                   0.3516 * Utilities::fixed_power<2>(x) +
+                   0.2843 * Utilities::fixed_power<3>(x) -
+                   0.1036 * Utilities::fixed_power<4>(
+                              x)); // half thickness at a position x
 
                 if (is_upper)
                   naca_points.emplace_back(x, +y_t);
@@ -683,19 +685,23 @@ namespace GridGenerator
                 const double x = i * 1 / (1.0 * number_points - 1);
 
                 const double y_c =
-                  (x <= p) ? m / std::pow(p, 2) * (2 * p * x - std::pow(x, 2)) :
-                             m / std::pow(1 - p, 2) *
-                               ((1 - 2 * p) + 2 * p * x - std::pow(x, 2));
+                  (x <= p) ?
+                    m / Utilities::fixed_power<2>(p) *
+                      (2 * p * x - Utilities::fixed_power<2>(x)) :
+                    m / Utilities::fixed_power<2>(1 - p) *
+                      ((1 - 2 * p) + 2 * p * x - Utilities::fixed_power<2>(x));
 
-                const double dy_c = (x <= p) ?
-                                      2 * m / std::pow(p, 2) * (p - x) :
-                                      2 * m / std::pow(1 - p, 2) * (p - x);
+                const double dy_c =
+                  (x <= p) ? 2 * m / Utilities::fixed_power<2>(p) * (p - x) :
+                             2 * m / Utilities::fixed_power<2>(1 - p) * (p - x);
 
                 const double y_t =
                   5 * t *
                   (0.2969 * std::pow(x, 0.5) - 0.126 * x -
-                   0.3516 * std::pow(x, 2) + 0.2843 * std::pow(x, 3) -
-                   0.1036 * std::pow(x, 4)); // half thickness at a position x
+                   0.3516 * Utilities::fixed_power<2>(x) +
+                   0.2843 * Utilities::fixed_power<3>(x) -
+                   0.1036 * Utilities::fixed_power<4>(
+                              x)); // half thickness at a position x
 
                 const double theta = std::atan(dy_c);
 
