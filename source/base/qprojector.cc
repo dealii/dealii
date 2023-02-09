@@ -832,97 +832,99 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
 
       return process(face_vertex_locations);
     }
-
-
-  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
-
-  const unsigned int dim = 3;
-
-  unsigned int n_points_total = 0;
-
-  if (quadrature.size() == 1)
-    n_points_total = quadrature[0].size() * GeometryInfo<dim>::faces_per_cell;
   else
     {
-      AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
-      for (unsigned int i = 0; i < quadrature.size(); ++i)
-        n_points_total += quadrature[i].size();
-    }
+      Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
-  n_points_total *= 8;
+      const unsigned int dim = 3;
 
-  // first fix quadrature points
-  std::vector<Point<dim>> q_points;
-  q_points.reserve(n_points_total);
-  std::vector<Point<dim>> help;
-  help.reserve(quadrature.max_n_quadrature_points());
+      unsigned int n_points_total = 0;
 
-  std::vector<double> weights;
-  weights.reserve(n_points_total);
-
-  // do the following for all possible
-  // mutations of a face (mutation==0
-  // corresponds to a face with standard
-  // orientation, no flip and no rotation)
-  for (unsigned int i = 0; i < 8; ++i)
-    {
-      // project to each face and append
-      // results
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      if (quadrature.size() == 1)
+        n_points_total =
+          quadrature[0].size() * GeometryInfo<dim>::faces_per_cell;
+      else
         {
-          SubQuadrature mutation;
-
-          const auto &quadrature_f =
-            quadrature[quadrature.size() == 1 ? 0 : face];
-          switch (i)
-            {
-              case 0:
-                mutation = quadrature_f;
-                break;
-              case 1:
-                mutation = internal::QProjector::rotate(quadrature_f, 1);
-                break;
-              case 2:
-                mutation = internal::QProjector::rotate(quadrature_f, 2);
-                break;
-              case 3:
-                mutation = internal::QProjector::rotate(quadrature_f, 3);
-                break;
-              case 4:
-                mutation = internal::QProjector::reflect(quadrature_f);
-                break;
-              case 5:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 3);
-                break;
-              case 6:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 2);
-                break;
-              case 7:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 1);
-                break;
-              default:
-                Assert(false, ExcInternalError())
-            }
-
-          help.resize(quadrature[quadrature.size() == 1 ? 0 : face].size());
-          project_to_face(reference_cell, mutation, face, help);
-          std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-
-          std::copy(mutation.get_weights().begin(),
-                    mutation.get_weights().end(),
-                    std::back_inserter(weights));
+          AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
+          for (unsigned int i = 0; i < quadrature.size(); ++i)
+            n_points_total += quadrature[i].size();
         }
+
+      n_points_total *= 8;
+
+      // first fix quadrature points
+      std::vector<Point<dim>> q_points;
+      q_points.reserve(n_points_total);
+      std::vector<Point<dim>> help;
+      help.reserve(quadrature.max_n_quadrature_points());
+
+      std::vector<double> weights;
+      weights.reserve(n_points_total);
+
+      // do the following for all possible
+      // mutations of a face (mutation==0
+      // corresponds to a face with standard
+      // orientation, no flip and no rotation)
+      for (unsigned int i = 0; i < 8; ++i)
+        {
+          // project to each face and append
+          // results
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+               ++face)
+            {
+              SubQuadrature mutation;
+
+              const auto &quadrature_f =
+                quadrature[quadrature.size() == 1 ? 0 : face];
+              switch (i)
+                {
+                  case 0:
+                    mutation = quadrature_f;
+                    break;
+                  case 1:
+                    mutation = internal::QProjector::rotate(quadrature_f, 1);
+                    break;
+                  case 2:
+                    mutation = internal::QProjector::rotate(quadrature_f, 2);
+                    break;
+                  case 3:
+                    mutation = internal::QProjector::rotate(quadrature_f, 3);
+                    break;
+                  case 4:
+                    mutation = internal::QProjector::reflect(quadrature_f);
+                    break;
+                  case 5:
+                    mutation = internal::QProjector::rotate(
+                      internal::QProjector::reflect(quadrature_f), 3);
+                    break;
+                  case 6:
+                    mutation = internal::QProjector::rotate(
+                      internal::QProjector::reflect(quadrature_f), 2);
+                    break;
+                  case 7:
+                    mutation = internal::QProjector::rotate(
+                      internal::QProjector::reflect(quadrature_f), 1);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError())
+                }
+
+              help.resize(quadrature[quadrature.size() == 1 ? 0 : face].size());
+              project_to_face(reference_cell, mutation, face, help);
+              std::copy(help.begin(), help.end(), std::back_inserter(q_points));
+
+              std::copy(mutation.get_weights().begin(),
+                        mutation.get_weights().end(),
+                        std::back_inserter(weights));
+            }
+        }
+
+
+      Assert(q_points.size() == n_points_total, ExcInternalError());
+      Assert(weights.size() == n_points_total, ExcInternalError());
+
+      return Quadrature<dim>(q_points, weights);
     }
-
-
-  Assert(q_points.size() == n_points_total, ExcInternalError());
-  Assert(weights.size() == n_points_total, ExcInternalError());
-
-  return Quadrature<dim>(q_points, weights);
 }
 
 
