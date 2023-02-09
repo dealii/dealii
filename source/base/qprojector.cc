@@ -698,7 +698,6 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
 
                 // scale quadrature weight
                 const double scaling = [&]() {
-                  const auto &       supp_pts = support_points;
                   const unsigned int dim_     = 2;
                   const unsigned int spacedim = 3;
 
@@ -713,12 +712,13 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
 
                   for (unsigned int i = 0; i < spacedim; ++i)
                     for (unsigned int j = 0; j < dim_; ++j)
-                      result[i][j] = shape_derivatives[0][j] * supp_pts[0][i];
+                      result[i][j] =
+                        shape_derivatives[0][j] * support_points[0][i];
                   for (unsigned int k = 1; k < n_linear_shape_functions; ++k)
                     for (unsigned int i = 0; i < spacedim; ++i)
                       for (unsigned int j = 0; j < dim_; ++j)
                         result[i][j] +=
-                          shape_derivatives[k][j] * supp_pts[k][i];
+                          shape_derivatives[k][j] * support_points[k][i];
 
                   DerivativeForm<1, dim_, spacedim> contravariant;
 
