@@ -675,14 +675,16 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
       // loop over all faces (triangles) ...
       for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
         {
-          // linear polynomial to map the reference quadrature points correctly
-          // on faces
-          const unsigned int n_shape_functions = faces[face_no].first.size();
+          // We will use linear polynomials to map the reference quadrature
+          // points correctly to on faces. There are as many linear shape
+          // functions as there are vertices in the face.
+          const unsigned int n_linear_shape_functions =
+            faces[face_no].first.size();
 
           const auto &poly =
-            n_shape_functions == 3 ?
-              static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
-              static_cast<const ScalarPolynomialsBase<2> &>(poly_quad);
+            (n_linear_shape_functions == 3 ?
+               static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
+               static_cast<const ScalarPolynomialsBase<2> &>(poly_quad));
 
           // ... and over all possible orientations
           for (unsigned char orientation = 0;
@@ -692,8 +694,9 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
               const auto &face = faces[face_no];
 
               const auto support_points =
-                n_shape_functions == 3 ? support_points_tri(face, orientation) :
-                                         support_points_quad(face, orientation);
+                n_linear_shape_functions == 3 ?
+                  support_points_tri(face, orientation) :
+                  support_points_quad(face, orientation);
 
               // the quadrature rule to be projected ...
               const auto &sub_quadrature_points =
@@ -707,7 +710,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                   Point<3> mapped_point;
 
                   // map reference quadrature point
-                  for (unsigned int i = 0; i < n_shape_functions; ++i)
+                  for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
                     mapped_point +=
                       support_points[i] *
                       poly.compute_value(i, sub_quadrature_points[j]);
@@ -723,9 +726,9 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                     double result[spacedim][dim_];
 
                     std::vector<Tensor<1, dim_>> shape_derivatives(
-                      n_shape_functions);
+                      n_linear_shape_functions);
 
-                    for (unsigned int i = 0; i < n_shape_functions; ++i)
+                    for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
                       shape_derivatives[i] =
                         poly.compute_1st_derivative(i,
                                                     sub_quadrature_points[j]);
@@ -733,7 +736,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                     for (unsigned int i = 0; i < spacedim; ++i)
                       for (unsigned int j = 0; j < dim_; ++j)
                         result[i][j] = shape_derivatives[0][j] * supp_pts[0][i];
-                    for (unsigned int k = 1; k < n_shape_functions; ++k)
+                    for (unsigned int k = 1; k < n_linear_shape_functions; ++k)
                       for (unsigned int i = 0; i < spacedim; ++i)
                         for (unsigned int j = 0; j < dim_; ++j)
                           result[i][j] +=
@@ -772,81 +775,82 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
     {
       // reference faces (defined by its support points and its area)
       // note: the area is later not used as a scaling factor but recomputed
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0)}},
-          0.5},
-         {{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 1.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5 * sqrt(3.0) /*equilateral triangle*/}}};
+      const std::vector<std::pair<std::vector<Point<3>>, double>>
+        face_vertex_locations_and_area = {
+          {{{{Point<3>(0.0, 0.0, 0.0),
+              Point<3>(1.0, 0.0, 0.0),
+              Point<3>(0.0, 1.0, 0.0)}},
+            0.5},
+           {{{Point<3>(1.0, 0.0, 0.0),
+              Point<3>(0.0, 0.0, 0.0),
+              Point<3>(0.0, 0.0, 1.0)}},
+            0.5},
+           {{{Point<3>(0.0, 0.0, 0.0),
+              Point<3>(0.0, 1.0, 0.0),
+              Point<3>(0.0, 0.0, 1.0)}},
+            0.5},
+           {{{Point<3>(0.0, 1.0, 0.0),
+              Point<3>(1.0, 0.0, 0.0),
+              Point<3>(0.0, 0.0, 1.0)}},
+            0.5 * sqrt(3.0) /*equilateral triangle*/}}};
 
-      return process(faces);
+      return process(face_vertex_locations_and_area);
     }
   else if (reference_cell == ReferenceCells::Wedge)
     {
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 1.0),
-            Point<3>(1.0, 0.0, 1.0),
-            Point<3>(0.0, 1.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0),
-            Point<3>(1.0, 0.0, 1.0)}},
-          1.0},
-         {{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0),
-            Point<3>(1.0, 0.0, 1.0),
-            Point<3>(0.0, 1.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(0.0, 1.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 1.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          1.0}}};
+      const std::vector<std::pair<std::vector<Point<3>>, double>>
+        face_vertex_locations_and_area = {{{{{Point<3>(1.0, 0.0, 0.0),
+                                              Point<3>(0.0, 0.0, 0.0),
+                                              Point<3>(0.0, 1.0, 0.0)}},
+                                            0.5},
+                                           {{{Point<3>(0.0, 0.0, 1.0),
+                                              Point<3>(1.0, 0.0, 1.0),
+                                              Point<3>(0.0, 1.0, 1.0)}},
+                                            0.5},
+                                           {{{Point<3>(0.0, 0.0, 0.0),
+                                              Point<3>(1.0, 0.0, 0.0),
+                                              Point<3>(0.0, 0.0, 1.0),
+                                              Point<3>(1.0, 0.0, 1.0)}},
+                                            1.0},
+                                           {{{Point<3>(1.0, 0.0, 0.0),
+                                              Point<3>(0.0, 1.0, 0.0),
+                                              Point<3>(1.0, 0.0, 1.0),
+                                              Point<3>(0.0, 1.0, 1.0)}},
+                                            std::sqrt(2.0)},
+                                           {{{Point<3>(0.0, 1.0, 0.0),
+                                              Point<3>(0.0, 0.0, 0.0),
+                                              Point<3>(0.0, 1.0, 1.0),
+                                              Point<3>(0.0, 0.0, 1.0)}},
+                                            1.0}}};
 
-      return process(faces);
+      return process(face_vertex_locations_and_area);
     }
   else if (reference_cell == ReferenceCells::Pyramid)
     {
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+1.0, +1.0, 0.0)}},
-          4.0},
-         {{{Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(+1.0, +1.0, 0.0),
-            Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+1.0, +1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)}}};
+      const std::vector<std::pair<std::vector<Point<3>>, double>>
+        face_vertex_locations_and_area = {{{{{Point<3>(-1.0, -1.0, 0.0),
+                                              Point<3>(+1.0, -1.0, 0.0),
+                                              Point<3>(-1.0, +1.0, 0.0),
+                                              Point<3>(+1.0, +1.0, 0.0)}},
+                                            4.0},
+                                           {{{Point<3>(-1.0, -1.0, 0.0),
+                                              Point<3>(-1.0, +1.0, 0.0),
+                                              Point<3>(+0.0, +0.0, 1.0)}},
+                                            std::sqrt(2.0)},
+                                           {{{Point<3>(+1.0, +1.0, 0.0),
+                                              Point<3>(+1.0, -1.0, 0.0),
+                                              Point<3>(+0.0, +0.0, 1.0)}},
+                                            std::sqrt(2.0)},
+                                           {{{Point<3>(+1.0, -1.0, 0.0),
+                                              Point<3>(-1.0, -1.0, 0.0),
+                                              Point<3>(+0.0, +0.0, 1.0)}},
+                                            std::sqrt(2.0)},
+                                           {{{Point<3>(-1.0, +1.0, 0.0),
+                                              Point<3>(+1.0, +1.0, 0.0),
+                                              Point<3>(+0.0, +0.0, 1.0)}},
+                                            std::sqrt(2.0)}}};
 
-      return process(faces);
+      return process(face_vertex_locations_and_area);
     }
 
 
