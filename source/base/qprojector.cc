@@ -644,213 +644,193 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<2> &quadrature)
 {
   const auto support_points_tri =
-    [](const std::pair<std::vector<Point<3>>, double> &face,
-       const unsigned char orientation) -> std::vector<Point<3>> {
+    [](const std::vector<Point<3>> &face,
+       const unsigned char          orientation) -> std::vector<Point<3>> {
     const boost::container::small_vector<Point<3>, 8> temp =
       ReferenceCells::Triangle.permute_by_combined_orientation<Point<3>>(
-        face.first, orientation);
+        face, orientation);
     return std::vector<Point<3>>(temp.begin(), temp.end());
   };
 
   const auto support_points_quad =
-    [](const std::pair<std::vector<Point<3>>, double> &face,
-       const unsigned char orientation) -> std::vector<Point<3>> {
+    [](const std::vector<Point<3>> &face,
+       const unsigned char          orientation) -> std::vector<Point<3>> {
     const boost::container::small_vector<Point<3>, 8> temp =
       ReferenceCells::Quadrilateral.permute_by_combined_orientation<Point<3>>(
-        face.first, orientation);
+        face, orientation);
     return std::vector<Point<3>>(temp.begin(), temp.end());
   };
 
-  const auto process =
-    [&](const std::vector<std::pair<std::vector<Point<3>>, double>> &faces) {
-      // new (projected) quadrature points and weights
-      std::vector<Point<3>> points;
-      std::vector<double>   weights;
+  const auto process = [&](const std::vector<std::vector<Point<3>>> &faces) {
+    // new (projected) quadrature points and weights
+    std::vector<Point<3>> points;
+    std::vector<double>   weights;
 
-      const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
-      const TensorProductPolynomials<2> poly_quad(
-        Polynomials::generate_complete_Lagrange_basis(
-          {Point<1>(0.0), Point<1>(1.0)}));
+    const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
+    const TensorProductPolynomials<2> poly_quad(
+      Polynomials::generate_complete_Lagrange_basis(
+        {Point<1>(0.0), Point<1>(1.0)}));
 
-      // loop over all faces (triangles) ...
-      for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
-        {
-          // We will use linear polynomials to map the reference quadrature
-          // points correctly to on faces. There are as many linear shape
-          // functions as there are vertices in the face.
-          const unsigned int n_linear_shape_functions =
-            faces[face_no].first.size();
+    // loop over all faces (triangles) ...
+    for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
+      {
+        // We will use linear polynomials to map the reference quadrature
+        // points correctly to on faces. There are as many linear shape
+        // functions as there are vertices in the face.
+        const unsigned int n_linear_shape_functions = faces[face_no].size();
 
-          const auto &poly =
-            (n_linear_shape_functions == 3 ?
-               static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
-               static_cast<const ScalarPolynomialsBase<2> &>(poly_quad));
+        const auto &poly =
+          (n_linear_shape_functions == 3 ?
+             static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
+             static_cast<const ScalarPolynomialsBase<2> &>(poly_quad));
 
-          // ... and over all possible orientations
-          for (unsigned char orientation = 0;
-               orientation < reference_cell.n_face_orientations(face_no);
-               ++orientation)
-            {
-              const auto &face = faces[face_no];
+        // ... and over all possible orientations
+        for (unsigned char orientation = 0;
+             orientation < reference_cell.n_face_orientations(face_no);
+             ++orientation)
+          {
+            const auto &face = faces[face_no];
 
-              const auto support_points =
-                n_linear_shape_functions == 3 ?
-                  support_points_tri(face, orientation) :
-                  support_points_quad(face, orientation);
+            const auto support_points =
+              n_linear_shape_functions == 3 ?
+                support_points_tri(face, orientation) :
+                support_points_quad(face, orientation);
 
-              // the quadrature rule to be projected ...
-              const auto &sub_quadrature_points =
-                quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
-              const auto &sub_quadrature_weights =
-                quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
+            // the quadrature rule to be projected ...
+            const auto &sub_quadrature_points =
+              quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
+            const auto &sub_quadrature_weights =
+              quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
 
-              // loop over all quadrature points
-              for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
-                {
-                  Point<3> mapped_point;
+            // loop over all quadrature points
+            for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
+              {
+                Point<3> mapped_point;
 
-                  // map reference quadrature point
+                // map reference quadrature point
+                for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
+                  mapped_point +=
+                    support_points[i] *
+                    poly.compute_value(i, sub_quadrature_points[j]);
+
+                points.push_back(mapped_point);
+
+                // scale quadrature weight
+                const double scaling = [&]() {
+                  const auto &       supp_pts = support_points;
+                  const unsigned int dim_     = 2;
+                  const unsigned int spacedim = 3;
+
+                  double result[spacedim][dim_];
+
+                  std::vector<Tensor<1, dim_>> shape_derivatives(
+                    n_linear_shape_functions);
+
                   for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
-                    mapped_point +=
-                      support_points[i] *
-                      poly.compute_value(i, sub_quadrature_points[j]);
+                    shape_derivatives[i] =
+                      poly.compute_1st_derivative(i, sub_quadrature_points[j]);
 
-                  points.push_back(mapped_point);
-
-                  // scale quadrature weight
-                  const double scaling = [&]() {
-                    const auto &       supp_pts = support_points;
-                    const unsigned int dim_     = 2;
-                    const unsigned int spacedim = 3;
-
-                    double result[spacedim][dim_];
-
-                    std::vector<Tensor<1, dim_>> shape_derivatives(
-                      n_linear_shape_functions);
-
-                    for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
-                      shape_derivatives[i] =
-                        poly.compute_1st_derivative(i,
-                                                    sub_quadrature_points[j]);
-
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      result[i][j] = shape_derivatives[0][j] * supp_pts[0][i];
+                  for (unsigned int k = 1; k < n_linear_shape_functions; ++k)
                     for (unsigned int i = 0; i < spacedim; ++i)
                       for (unsigned int j = 0; j < dim_; ++j)
-                        result[i][j] = shape_derivatives[0][j] * supp_pts[0][i];
-                    for (unsigned int k = 1; k < n_linear_shape_functions; ++k)
-                      for (unsigned int i = 0; i < spacedim; ++i)
-                        for (unsigned int j = 0; j < dim_; ++j)
-                          result[i][j] +=
-                            shape_derivatives[k][j] * supp_pts[k][i];
+                        result[i][j] +=
+                          shape_derivatives[k][j] * supp_pts[k][i];
 
-                    DerivativeForm<1, dim_, spacedim> contravariant;
+                  DerivativeForm<1, dim_, spacedim> contravariant;
 
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        contravariant[i][j] = result[i][j];
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      contravariant[i][j] = result[i][j];
 
 
-                    Tensor<1, spacedim> DX_t[dim_];
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        DX_t[j][i] = contravariant[i][j];
+                  Tensor<1, spacedim> DX_t[dim_];
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      DX_t[j][i] = contravariant[i][j];
 
-                    Tensor<2, dim_> G;
-                    for (unsigned int i = 0; i < dim_; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        G[i][j] = DX_t[i] * DX_t[j];
+                  Tensor<2, dim_> G;
+                  for (unsigned int i = 0; i < dim_; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      G[i][j] = DX_t[i] * DX_t[j];
 
-                    return std::sqrt(determinant(G));
-                  }();
+                  return std::sqrt(determinant(G));
+                }();
 
-                  weights.push_back(sub_quadrature_weights[j] * scaling);
-                }
-            }
-        }
+                weights.push_back(sub_quadrature_weights[j] * scaling);
+              }
+          }
+      }
 
-      // construct new quadrature rule
-      return Quadrature<3>(points, weights);
-    };
+    // construct new quadrature rule
+    return Quadrature<3>(points, weights);
+  };
 
   if (reference_cell == ReferenceCells::Tetrahedron)
     {
-      // reference faces (defined by its support points and its area)
-      // note: the area is later not used as a scaling factor but recomputed
-      const std::vector<std::pair<std::vector<Point<3>>, double>>
-        face_vertex_locations_and_area = {
-          {{{{Point<3>(0.0, 0.0, 0.0),
-              Point<3>(1.0, 0.0, 0.0),
-              Point<3>(0.0, 1.0, 0.0)}},
-            0.5},
-           {{{Point<3>(1.0, 0.0, 0.0),
-              Point<3>(0.0, 0.0, 0.0),
-              Point<3>(0.0, 0.0, 1.0)}},
-            0.5},
-           {{{Point<3>(0.0, 0.0, 0.0),
-              Point<3>(0.0, 1.0, 0.0),
-              Point<3>(0.0, 0.0, 1.0)}},
-            0.5},
-           {{{Point<3>(0.0, 1.0, 0.0),
-              Point<3>(1.0, 0.0, 0.0),
-              Point<3>(0.0, 0.0, 1.0)}},
-            0.5 * sqrt(3.0) /*equilateral triangle*/}}};
+      const std::vector<std::vector<Point<3>>> face_vertex_locations = {
+        {{Point<3>(0.0, 0.0, 0.0),
+          Point<3>(1.0, 0.0, 0.0),
+          Point<3>(0.0, 1.0, 0.0)}},
+        {{Point<3>(1.0, 0.0, 0.0),
+          Point<3>(0.0, 0.0, 0.0),
+          Point<3>(0.0, 0.0, 1.0)}},
+        {{Point<3>(0.0, 0.0, 0.0),
+          Point<3>(0.0, 1.0, 0.0),
+          Point<3>(0.0, 0.0, 1.0)}},
+        {{Point<3>(0.0, 1.0, 0.0),
+          Point<3>(1.0, 0.0, 0.0),
+          Point<3>(0.0, 0.0, 1.0)}}};
 
-      return process(face_vertex_locations_and_area);
+      return process(face_vertex_locations);
     }
   else if (reference_cell == ReferenceCells::Wedge)
     {
-      const std::vector<std::pair<std::vector<Point<3>>, double>>
-        face_vertex_locations_and_area = {{{{{Point<3>(1.0, 0.0, 0.0),
-                                              Point<3>(0.0, 0.0, 0.0),
-                                              Point<3>(0.0, 1.0, 0.0)}},
-                                            0.5},
-                                           {{{Point<3>(0.0, 0.0, 1.0),
-                                              Point<3>(1.0, 0.0, 1.0),
-                                              Point<3>(0.0, 1.0, 1.0)}},
-                                            0.5},
-                                           {{{Point<3>(0.0, 0.0, 0.0),
-                                              Point<3>(1.0, 0.0, 0.0),
-                                              Point<3>(0.0, 0.0, 1.0),
-                                              Point<3>(1.0, 0.0, 1.0)}},
-                                            1.0},
-                                           {{{Point<3>(1.0, 0.0, 0.0),
-                                              Point<3>(0.0, 1.0, 0.0),
-                                              Point<3>(1.0, 0.0, 1.0),
-                                              Point<3>(0.0, 1.0, 1.0)}},
-                                            std::sqrt(2.0)},
-                                           {{{Point<3>(0.0, 1.0, 0.0),
-                                              Point<3>(0.0, 0.0, 0.0),
-                                              Point<3>(0.0, 1.0, 1.0),
-                                              Point<3>(0.0, 0.0, 1.0)}},
-                                            1.0}}};
+      const std::vector<std::vector<Point<3>>> face_vertex_locations = {
+        {{Point<3>(1.0, 0.0, 0.0),
+          Point<3>(0.0, 0.0, 0.0),
+          Point<3>(0.0, 1.0, 0.0)}},
+        {{Point<3>(0.0, 0.0, 1.0),
+          Point<3>(1.0, 0.0, 1.0),
+          Point<3>(0.0, 1.0, 1.0)}},
+        {{Point<3>(0.0, 0.0, 0.0),
+          Point<3>(1.0, 0.0, 0.0),
+          Point<3>(0.0, 0.0, 1.0),
+          Point<3>(1.0, 0.0, 1.0)}},
+        {{Point<3>(1.0, 0.0, 0.0),
+          Point<3>(0.0, 1.0, 0.0),
+          Point<3>(1.0, 0.0, 1.0),
+          Point<3>(0.0, 1.0, 1.0)}},
+        {{Point<3>(0.0, 1.0, 0.0),
+          Point<3>(0.0, 0.0, 0.0),
+          Point<3>(0.0, 1.0, 1.0),
+          Point<3>(0.0, 0.0, 1.0)}}};
 
-      return process(face_vertex_locations_and_area);
+      return process(face_vertex_locations);
     }
   else if (reference_cell == ReferenceCells::Pyramid)
     {
-      const std::vector<std::pair<std::vector<Point<3>>, double>>
-        face_vertex_locations_and_area = {{{{{Point<3>(-1.0, -1.0, 0.0),
-                                              Point<3>(+1.0, -1.0, 0.0),
-                                              Point<3>(-1.0, +1.0, 0.0),
-                                              Point<3>(+1.0, +1.0, 0.0)}},
-                                            4.0},
-                                           {{{Point<3>(-1.0, -1.0, 0.0),
-                                              Point<3>(-1.0, +1.0, 0.0),
-                                              Point<3>(+0.0, +0.0, 1.0)}},
-                                            std::sqrt(2.0)},
-                                           {{{Point<3>(+1.0, +1.0, 0.0),
-                                              Point<3>(+1.0, -1.0, 0.0),
-                                              Point<3>(+0.0, +0.0, 1.0)}},
-                                            std::sqrt(2.0)},
-                                           {{{Point<3>(+1.0, -1.0, 0.0),
-                                              Point<3>(-1.0, -1.0, 0.0),
-                                              Point<3>(+0.0, +0.0, 1.0)}},
-                                            std::sqrt(2.0)},
-                                           {{{Point<3>(-1.0, +1.0, 0.0),
-                                              Point<3>(+1.0, +1.0, 0.0),
-                                              Point<3>(+0.0, +0.0, 1.0)}},
-                                            std::sqrt(2.0)}}};
+      const std::vector<std::vector<Point<3>>> face_vertex_locations = {
+        {{Point<3>(-1.0, -1.0, 0.0),
+          Point<3>(+1.0, -1.0, 0.0),
+          Point<3>(-1.0, +1.0, 0.0),
+          Point<3>(+1.0, +1.0, 0.0)}},
+        {{Point<3>(-1.0, -1.0, 0.0),
+          Point<3>(-1.0, +1.0, 0.0),
+          Point<3>(+0.0, +0.0, 1.0)}},
+        {{Point<3>(+1.0, +1.0, 0.0),
+          Point<3>(+1.0, -1.0, 0.0),
+          Point<3>(+0.0, +0.0, 1.0)}},
+        {{Point<3>(+1.0, -1.0, 0.0),
+          Point<3>(-1.0, -1.0, 0.0),
+          Point<3>(+0.0, +0.0, 1.0)}},
+        {{Point<3>(-1.0, +1.0, 0.0),
+          Point<3>(+1.0, +1.0, 0.0),
+          Point<3>(+0.0, +0.0, 1.0)}}};
 
-      return process(face_vertex_locations_and_area);
+      return process(face_vertex_locations);
     }
 
 
