@@ -377,7 +377,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline SparseMatrix<Number>::size_type
+  inline typename SparseMatrix<Number>::size_type
   SparseMatrix<Number>::m() const
   {
     return n_rows;
@@ -386,7 +386,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  inline SparseMatrix<Number>::size_type
+  inline typename SparseMatrix<Number>::size_type
   SparseMatrix<Number>::n() const
   {
     return n_cols;

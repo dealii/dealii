@@ -261,15 +261,15 @@ namespace CUDAWrappers
       const DoFHandler<dim> &dof_handler,
       const UpdateFlags &    update_flags)
       : data(data)
-      , fe_degree(data->fe_degree)
-      , dofs_per_cell(data->dofs_per_cell)
-      , q_points_per_cell(data->q_points_per_cell)
       , fe_values(mapping,
                   fe,
                   Quadrature<dim>(quad),
                   update_inverse_jacobians | update_quadrature_points |
                     update_values | update_gradients | update_JxW_values)
       , lexicographic_inv(shape_info.lexicographic_numbering)
+      , fe_degree(data->fe_degree)
+      , dofs_per_cell(data->dofs_per_cell)
+      , q_points_per_cell(data->q_points_per_cell)
       , update_flags(update_flags)
       , padding_length(data->get_padding_length())
       , hanging_nodes(dof_handler.get_triangulation())
@@ -323,10 +323,10 @@ namespace CUDAWrappers
       // Setup kernel parameters
       const double apply_n_blocks = std::ceil(
         static_cast<double>(n_cells) / static_cast<double>(cells_per_block));
-      const unsigned int apply_x_n_blocks =
-        std::round(std::sqrt(apply_n_blocks));
-      const unsigned int apply_y_n_blocks =
-        std::ceil(apply_n_blocks / static_cast<double>(apply_x_n_blocks));
+      const auto apply_x_n_blocks =
+        static_cast<unsigned int>(std::round(std::sqrt(apply_n_blocks)));
+      const auto apply_y_n_blocks = static_cast<unsigned int>(
+        std::ceil(apply_n_blocks / static_cast<double>(apply_x_n_blocks)));
 
       data->grid_dim[color] = dim3(apply_x_n_blocks, apply_y_n_blocks);
 
@@ -621,10 +621,10 @@ namespace CUDAWrappers
 
   template <int dim, typename Number>
   MatrixFree<dim, Number>::MatrixFree()
-    : n_dofs(0)
+    : my_id(-1)
+    , n_dofs(0)
     , constrained_dofs(nullptr)
     , padding_length(0)
-    , my_id(-1)
     , dof_handler(nullptr)
   {}
 
@@ -708,7 +708,7 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  MatrixFree<dim, Number>::Data
+  typename MatrixFree<dim, Number>::Data
   MatrixFree<dim, Number>::get_data(unsigned int color) const
   {
     Data data_copy;
@@ -936,7 +936,7 @@ namespace CUDAWrappers
                        std::ceil(dim * std::log2(fe_degree + 1.)));
 
     dofs_per_cell     = fe.n_dofs_per_cell();
-    q_points_per_cell = std::pow(n_q_points_1d, dim);
+    q_points_per_cell = static_cast<unsigned int>(std::pow(n_q_points_1d, dim));
 
     const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
       quad, fe);
@@ -1106,14 +1106,14 @@ namespace CUDAWrappers
 
     if (n_constrained_dofs != 0)
       {
-        const unsigned int constraint_n_blocks =
+        const auto constraint_n_blocks = static_cast<unsigned int>(
           std::ceil(static_cast<double>(n_constrained_dofs) /
-                    static_cast<double>(block_size));
-        const unsigned int constraint_x_n_blocks =
-          std::round(std::sqrt(constraint_n_blocks));
-        const unsigned int constraint_y_n_blocks =
+                    static_cast<double>(block_size)));
+        const auto constraint_x_n_blocks =
+          static_cast<unsigned int>(std::round(std::sqrt(constraint_n_blocks)));
+        const auto constraint_y_n_blocks = static_cast<unsigned int>(
           std::ceil(static_cast<double>(constraint_n_blocks) /
-                    static_cast<double>(constraint_x_n_blocks));
+                    static_cast<double>(constraint_x_n_blocks)));
 
         constraint_grid_dim =
           dim3(constraint_x_n_blocks, constraint_y_n_blocks);

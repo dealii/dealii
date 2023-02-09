@@ -265,9 +265,9 @@ namespace CUDAWrappers
     __global__ void
     linfty_norm(const typename SparseMatrix<Number>::size_type n_rows,
                 const Number *                                 val_dev,
-                const int *                                    column_index_dev,
-                const int *                                    row_ptr_dev,
-                Number *                                       sums)
+                const int * /*column_index_dev*/,
+                const int *row_ptr_dev,
+                Number *   sums)
     {
       const typename SparseMatrix<Number>::size_type row =
         threadIdx.x + blockIdx.x * blockDim.x;
@@ -668,6 +668,7 @@ namespace CUDAWrappers
                                         val_dev.get(),
                                         nnz * sizeof(Number),
                                         cudaMemcpyDeviceToDevice);
+    AssertCuda(cuda_error);
 
     return matrix_values.l2_norm();
   }

@@ -1108,6 +1108,7 @@ namespace internal
       Assert(n_quads + 2 * n_unused_pairs + n_unused_singles ==
                tria_faces.quads.used.size(),
              ExcInternalError());
+      (void)n_quads;
 
       // how many single quads are needed in addition to n_unused_quads?
       const int additional_single_quads = new_quads_single - n_unused_singles;
@@ -1330,6 +1331,7 @@ namespace internal
           Assert(n_objects + 2 * n_unused_pairs + n_unused_singles ==
                    tria_objects.used.size(),
                  ExcInternalError());
+          (void)n_objects;
 
           // how many single objects are needed in addition to
           // n_unused_objects?
@@ -2618,6 +2620,7 @@ namespace internal
         // make sure that all subcelldata entries have been processed
         // TODO: this is not guaranteed, why?
         // AssertDimension(counter, boundary_objects_in.size());
+        (void)counter;
       }
 
 
