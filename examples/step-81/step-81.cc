@@ -258,7 +258,7 @@ namespace Step81
   {
   public:
     static_assert(dim == 2,
-                  "The perfectly matched layer is only implemented in 2D.");
+                  "The perfectly matched layer is only implemented in 2d.");
 
     Parameters<dim> parameters;
 

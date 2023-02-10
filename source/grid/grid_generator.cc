@@ -1185,7 +1185,7 @@ namespace GridGenerator
     void
     create_triangulation(Triangulation<1, 1> &, const AdditionalData &)
     {
-      Assert(false, ExcMessage("Airfoils only exist for 2D and 3D!"));
+      Assert(false, ExcMessage("Airfoils only exist for 2D and 3d!"));
     }
 
 
@@ -1197,7 +1197,7 @@ namespace GridGenerator
                            typename Triangulation<1, 1>::cell_iterator>> &,
                          const AdditionalData &)
     {
-      Assert(false, ExcMessage("Airfoils only exist for 2D and 3D!"));
+      Assert(false, ExcMessage("Airfoils only exist for 2D and 3d!"));
     }
 
 
@@ -1233,7 +1233,7 @@ namespace GridGenerator
         typename Triangulation<3, 3>::cell_iterator>> &periodic_faces,
       const AdditionalData &                           additional_data)
     {
-      Assert(false, ExcMessage("3D airfoils are not implemented yet!"));
+      Assert(false, ExcMessage("3d airfoils are not implemented yet!"));
       (void)tria;
       (void)additional_data;
       (void)periodic_faces;
@@ -2335,11 +2335,11 @@ namespace GridGenerator
         "The triangulation you are trying to create will consist of cells"
         " with negative measures. This is usually the result of input data"
         " that does not define a right-handed coordinate system. The usual"
-        " fix for this is to ensure that in 1D the given point is to the"
-        " right of the origin (or the given edge tensor is positive), in 2D"
+        " fix for this is to ensure that in 1d the given point is to the"
+        " right of the origin (or the given edge tensor is positive), in 2d"
         " that the two edges (and their cross product) obey the right-hand"
         " rule (which may usually be done by switching the order of the"
-        " points or edge tensors), or in 3D that the edges form a"
+        " points or edge tensors), or in 3d that the edges form a"
         " right-handed coordinate system (which may also be accomplished by"
         " switching the order of the first two points or edge tensors)."));
 

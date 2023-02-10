@@ -1173,7 +1173,7 @@ namespace VectorTools
       // Sanity check:
       const unsigned int n_associated_edge_dofs = associated_edge_dof_index;
       Assert(n_associated_edge_dofs == degree + 1,
-             ExcMessage("Error: Unexpected number of 3D edge DoFs"));
+             ExcMessage("Error: Unexpected number of 3d edge DoFs"));
 
       // Matrix and RHS vectors to store linear system:
       // We have (degree+1) basis functions for an edge
@@ -1419,7 +1419,7 @@ namespace VectorTools
               const unsigned int associated_edge_dofs =
                 associated_edge_dof_index;
               Assert(associated_edge_dofs == degree + 1,
-                     ExcMessage("Error: Unexpected number of 2D edge DoFs"));
+                     ExcMessage("Error: Unexpected number of 2d edge DoFs"));
 
               // Matrix and RHS vectors to store:
               // We have (degree+1) edge basis functions
@@ -1659,7 +1659,7 @@ namespace VectorTools
               const unsigned int associated_face_dofs =
                 associated_face_dof_index;
               Assert(associated_face_dofs == 2 * degree * (degree + 1),
-                     ExcMessage("Error: Unexpected number of 3D face DoFs"));
+                     ExcMessage("Error: Unexpected number of 3d face DoFs"));
 
               // Storage for the linear system.
               // There are 2*degree*(degree+1) DoFs associated with a face in

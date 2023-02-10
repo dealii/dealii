@@ -79,7 +79,7 @@ DEAL_II_NAMESPACE_OPEN
  * @image html rtbubbles.png
  * </td></tr>
  *
- * <tr> <td align="center"> Left - $2D,\,k=3$,
+ * <tr> <td align="center"> Left - $2d,\,k=3$,
  * right - $3D,\,k=2$.</td></tr> </table>
  *
  * @todo Implement restriction matrices

@@ -154,7 +154,7 @@ public:
    *
    * @warning This class accepts the following types:
    * "std::array<Table<2, Number>, dim>", "std::array<FullMatrix<Number>, dim>",
-   * and "Table<2, Number>". In the latter case, we consider the same 1D
+   * and "Table<2, Number>". In the latter case, we consider the same 1d
    * mass matrix @p mass_matrix and the same 1D derivative matrix
    * @p derivative_matrix for each tensor direction.
    */

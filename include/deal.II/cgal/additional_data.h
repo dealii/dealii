@@ -144,7 +144,7 @@ namespace CGALWrappers
       AssertThrow(
         dim == 3,
         ExcMessage(
-          "These struct can be instantiated with 3D Triangulations only."));
+          "These struct can be instantiated with 3d Triangulations only."));
       edge_size              = edge_s;
       facet_angle            = facet_a;
       facet_size             = facet_s;

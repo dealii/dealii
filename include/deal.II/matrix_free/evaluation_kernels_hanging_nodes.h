@@ -102,7 +102,7 @@ namespace internal
       static constexpr unsigned int max_n_points_1D = 40;
 
       static_assert(structdim == 1 || structdim == 2,
-                    "Only 1D and 2D interpolation implemented");
+                    "Only 1D and 2d interpolation implemented");
       Number temp[fe_degree != -1 ? fe_degree + 1 : max_n_points_1D];
 
       const unsigned int points =
