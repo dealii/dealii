@@ -276,7 +276,7 @@ SolverBFGS<VectorType>::solve(
           Assert(a1 > 0., ExcInternalError());
           f_prev = f;
 
-          // 1D line-search function
+          // 1d line-search function
           const auto line_func =
             [&](const Number &x_line) -> std::pair<Number, Number> {
             x = x0;

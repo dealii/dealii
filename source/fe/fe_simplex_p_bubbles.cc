@@ -150,11 +150,11 @@ namespace FE_P_BubblesImplementation
           {
             const auto fe_p =
               BarycentricPolynomials<dim>::get_fe_p_basis(degree);
-            // no further work is needed in 1D
+            // no further work is needed in 1d
             if (dim == 1)
               return fe_p;
 
-            // in 2D and 3D we add a centroid bubble function
+            // in 2d and 3d we add a centroid bubble function
             auto c_bubble = BarycentricPolynomial<dim>() + 1;
             for (const auto &vertex : reference_cell.vertex_indices())
               c_bubble = c_bubble * M(vertex);

@@ -3673,7 +3673,7 @@ namespace GridTools
 
 
   // This specialization is defined here so that the general template in the
-  // source file doesn't need to have further 1D overloads for the internal
+  // source file doesn't need to have further 1d overloads for the internal
   // functions it calls.
   template <>
   inline Triangulation<1, 1>::DistortedCellList
@@ -4133,7 +4133,7 @@ namespace GridTools
       {
         using namespace internal::ProjectToObject;
         // Try to use the special flat algorithm for quads (this is better
-        // than the general algorithm in 3D). This does not take into account
+        // than the general algorithm in 3d). This does not take into account
         // whether projected_point is outside the quad, but we optimize along
         // lines below anyway:
         const int                      dim = Iterator::AccessorType::dimension;
@@ -4185,7 +4185,7 @@ namespace GridTools
             // function we can use gradient descent to minimize it.
             //
             // Of course, this is much simpler in the structdim = 1 case (we
-            // could rewrite the projection as a 1D optimization problem), but
+            // could rewrite the projection as a 1d optimization problem), but
             // to reduce the potential for bugs we use the same code in both
             // cases.
             const double step_size = object->diameter() / 64.0;

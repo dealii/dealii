@@ -666,8 +666,8 @@ template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::copy_to(FullMatrix<NumberType> &matrix) const
 {
-  // FIXME: use PDGEMR2D for copying?
-  // PDGEMR2D copies a submatrix of A on a submatrix of B.
+  // FIXME: use PDGEMR2d for copying?
+  // PDGEMR2d copies a submatrix of A on a submatrix of B.
   // A and B can have different distributions
   // see http://icl.cs.utk.edu/lapack-forum/viewtopic.php?t=50
   Assert(n_rows == int(matrix.m()), ExcDimensionMismatch(n_rows, matrix.m()));

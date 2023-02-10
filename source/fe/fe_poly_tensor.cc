@@ -47,13 +47,13 @@ namespace internal
         const std::vector<MappingKind> &,
         std::vector<double> &)
       {
-        // Nothing to do in 1D.
+        // Nothing to do in 1d.
       }
 
 
 
       // TODO: This function is not a consistent fix of the orientation issue
-      // like in 3D. It is rather kept not to break legacy behavior in 2D but
+      // like in 3d. It is rather kept not to break legacy behavior in 2d but
       // should be replaced. See also the implementation of
       // FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
       // or other H(div) conforming elements such as FE_ABF<dim> and
@@ -118,7 +118,7 @@ namespace internal
         const std::vector<MappingKind> & /*mapping_kind*/,
         std::vector<double> & /*face_sign*/)
       {
-        // Nothing to do. In 3D we take care of it through the
+        // Nothing to do. In 3d we take care of it through the
         // adjust_quad_dof_sign_for_face_orientation_table
       }
 
@@ -243,7 +243,7 @@ FE_PolyTensor<dim, spacedim>::adjust_quad_dof_sign_for_face_orientation(
   const bool         face_flip,
   const bool         face_rotation) const
 {
-  // do nothing in 1D and 2D
+  // do nothing in 1d and 2d
   if (dim < 3)
     return false;
 
@@ -469,9 +469,9 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                                                        this->mapping_kind,
                                                        fe_data.dof_sign_change);
 
-  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
-  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
-  // Also nothing in 3D since we take care of it by using the
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2d
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1d.
+  // Also nothing in 3d since we take care of it by using the
   // adjust_quad_dof_sign_for_face_orientation_table.
   internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
                                                      *this,
@@ -1098,9 +1098,9 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                                                        this->mapping_kind,
                                                        fe_data.dof_sign_change);
 
-  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
-  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
-  // Also nothing in 3D since we take care of it by using the
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2d
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1d.
+  // Also nothing in 3d since we take care of it by using the
   // adjust_quad_dof_sign_for_face_orientation_table.
   internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
                                                      *this,
@@ -1783,9 +1783,9 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                                                        this->mapping_kind,
                                                        fe_data.dof_sign_change);
 
-  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
-  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
-  // Also nothing in 3D since we take care of it by using the
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2d
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1d.
+  // Also nothing in 3d since we take care of it by using the
   // adjust_quad_dof_sign_for_face_orientation_table.
   internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
                                                      *this,

@@ -1144,7 +1144,7 @@ namespace DoFTools
 
     // now add the DoF on the adjacent ghost cells to the IndexSet
 
-    // Note: For certain meshes (in particular in 3D and with many
+    // Note: For certain meshes (in particular in 3d and with many
     // processors), it is really necessary to cache intermediate data. After
     // trying several objects such as std::set, a vector that is always kept
     // sorted, and a vector that is initially unsorted and sorted once at the
@@ -1196,7 +1196,7 @@ namespace DoFTools
 
     // add the DoF on the adjacent ghost cells to the IndexSet
 
-    // Note: For certain meshes (in particular in 3D and with many
+    // Note: For certain meshes (in particular in 3d and with many
     // processors), it is really necessary to cache intermediate data. After
     // trying several objects such as std::set, a vector that is always kept
     // sorted, and a vector that is initially unsorted and sorted once at the

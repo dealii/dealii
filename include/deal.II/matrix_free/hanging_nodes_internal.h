@@ -103,7 +103,7 @@ namespace internal
       if (dim == 2)
         {
           if (edge > 0)
-            return false; // in 2D there are no edge constraints
+            return false; // in 2d there are no edge constraints
 
           if (subcell == 0 && face == 0)
             return true; // no constraints
@@ -405,7 +405,7 @@ namespace internal
       const unsigned int n_raw_lines = triangulation.n_raw_lines();
       this->line_to_cells.resize(n_raw_lines);
 
-      // In 3D, we can have DoFs on only an edge being constrained (e.g. in a
+      // In 3d, we can have DoFs on only an edge being constrained (e.g. in a
       // cartesian 2x2x2 grid, where only the upper left 2 cells are refined).
       // This sets up a helper data structure in the form of a mapping from
       // edges (i.e. lines) to neighboring cells.

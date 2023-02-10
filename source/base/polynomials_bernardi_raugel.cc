@@ -41,10 +41,10 @@ PolynomialsBernardiRaugel<dim>::create_polynomials_bubble()
 
   for (unsigned int d = 0; d < dim; ++d)
     pols.push_back(bubble_shapes);
-  // In 2D, the only q_ij polynomials we will use are 31,32,13,23
+  // In 2d, the only q_ij polynomials we will use are 31,32,13,23
   // where ij corresponds to index (i-1)+3*(j-1) (2,5,6,7)
 
-  // In 3D, the only q_ijk polynomials we will use are 331,332,313,323,133,233
+  // In 3d, the only q_ijk polynomials we will use are 331,332,313,323,133,233
   // where ijk corresponds to index (i-1)+3*(j-1)+9*(k-1)  (8,17,20,23,24,25)
   return pols;
 }
@@ -244,7 +244,7 @@ PolynomialsBernardiRaugel<dim>::n_polynomials(const unsigned int k)
   if (dim == 2 || dim == 3)
     return dim * GeometryInfo<dim>::vertices_per_cell +
            GeometryInfo<dim>::faces_per_cell;
-  // 2*4+4=12 polynomials in 2D and 3*8+6=30 polynomials in 3D
+  // 2*4+4=12 polynomials in 2d and 3*8+6=30 polynomials in 3d
 
   Assert(false, ExcNotImplemented());
   return 0;

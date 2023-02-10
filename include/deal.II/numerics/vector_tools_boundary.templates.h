@@ -1003,7 +1003,7 @@ namespace VectorTools
                                std::vector<bool> &  dofs_processed)
     {
       // This function computes the L2-projection of the given
-      // boundary function on 3D edges and returns the constraints
+      // boundary function on 3d edges and returns the constraints
       // associated with the edge functions for the given cell.
       //
       // In the context of this function, by associated DoFs we mean:
@@ -1310,7 +1310,7 @@ namespace VectorTools
       std::vector<bool> &          dofs_processed)
     {
       // This function computes the L2-projection of the boundary
-      // function on the interior of faces only. In 3D, this should only be
+      // function on the interior of faces only. In 3d, this should only be
       // called after first calling compute_edge_projection_l2, as it relies on
       // edge constraints which are found.
 
@@ -1383,7 +1383,7 @@ namespace VectorTools
         {
           case 2:
             // NOTE: This is very similar to compute_edge_projection as used in
-            // 3D,
+            // 3d,
             //       and contains a lot of overlap with that function.
             {
               // Find the DoFs we want to constrain. There are degree+1 in
@@ -1449,7 +1449,7 @@ namespace VectorTools
                   // \int_{edge} (tangential* boundary_value) * (tangential *
                   // edge_shape_function_i) dS.
                   //
-                  // In 2D, tangential*vector is equivalent to
+                  // In 2d, tangential*vector is equivalent to
                   // cross_product_3d(normal, vector), so we use this instead.
                   // This avoids possible issues with the computation of the
                   // tangent.
@@ -1663,7 +1663,7 @@ namespace VectorTools
 
               // Storage for the linear system.
               // There are 2*degree*(degree+1) DoFs associated with a face in
-              // 3D. Note this doesn't include the DoFs associated with edges on
+              // 3d. Note this doesn't include the DoFs associated with edges on
               // that face.
               FullMatrix<number> face_matrix(2 * degree * (degree + 1));
               FullMatrix<number> face_matrix_inv(2 * degree * (degree + 1));
@@ -1801,19 +1801,19 @@ namespace VectorTools
       AffineConstraints<number> &            constraints,
       const hp::MappingCollection<dim, dim> &mapping_collection)
     {
-      // L2-projection based interpolation formed in one (in 2D) or two (in 3D)
+      // L2-projection based interpolation formed in one (in 2d) or two (in 3d)
       // steps.
       //
-      // In 2D we only need to constrain edge DoFs.
+      // In 2d we only need to constrain edge DoFs.
       //
-      // In 3D we need to constrain both edge and face DoFs. This is done in two
+      // In 3d we need to constrain both edge and face DoFs. This is done in two
       // parts.
       //
       // For edges, since the face shape functions are zero here ("bubble
       // functions"), we project the tangential component of the boundary
       // function and compute the L2-projection. This returns the values for the
-      // DoFs associated with each edge shape function. In 3D, this is computed
-      // by internals::compute_edge_projection_l2, in 2D, it is handled by
+      // DoFs associated with each edge shape function. In 3d, this is computed
+      // by internals::compute_edge_projection_l2, in 2d, it is handled by
       // compute_face_projection_curl_conforming_l2.
       //
       // For faces we compute the residual of the boundary function which is
@@ -1908,7 +1908,7 @@ namespace VectorTools
                                 }
 
                               // Compute the projection of the boundary function
-                              // on the edge. In 2D this is all that's required.
+                              // on the edge. In 2d this is all that's required.
                               compute_face_projection_curl_conforming_l2(
                                 cell,
                                 face,

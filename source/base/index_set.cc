@@ -407,7 +407,7 @@ IndexSet::add_ranges_internal(
   // we add ranges in a consecutive way, so fast), otherwise, we work with
   // add_range(). the number 9 is chosen heuristically given the fact that
   // there are typically up to 8 independent ranges when adding the degrees of
-  // freedom on a 3D cell or 9 when adding degrees of freedom of faces. if
+  // freedom on a 3d cell or 9 when adding degrees of freedom of faces. if
   // doing cell-by-cell additions, we want to avoid repeated calls to
   // IndexSet::compress() which gets called upon merging two index sets, so we
   // want to be in the other branch then.

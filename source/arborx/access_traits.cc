@@ -160,7 +160,7 @@ namespace ArborXWrappers
     for (unsigned int i = 0; i < size; ++i)
       {
         // ArborX assumes that the center coordinates and the radius use float
-        // and the sphere is 3D
+        // and the sphere is 3d
         spheres.emplace_back(std::make_pair(
           dealii::Point<3, float>(
             static_cast<float>(dim_spheres[i].first[0]),
@@ -235,7 +235,7 @@ namespace ArborX
     std::size_t                                    i)
   {
     // ArborX assumes that the point coordinates use float and that the point
-    // is 3D
+    // is 3d
     return {static_cast<float>(v[i][0]),
             static_cast<float>(v[i][1]),
             dim == 2 ? 0 : static_cast<float>(v[i][2])};
@@ -263,7 +263,7 @@ namespace ArborX
     const dealii::Point<dim, Number> min_corner = boundary_points.first;
     const dealii::Point<dim, Number> max_corner = boundary_points.second;
     // ArborX assumes that the bounding box coordinates use float and that the
-    // bounding box is 3D
+    // bounding box is 3d
     return {{static_cast<float>(min_corner[0]),
              static_cast<float>(min_corner[1]),
              dim == 2 ? 0.f : static_cast<float>(min_corner[2])},
@@ -294,7 +294,7 @@ namespace ArborX
         std::size_t                                                       i)
   {
     // ArborX assumes that the center coordinates and the radius use float and
-    // the sphere is 3D
+    // the sphere is 3d
     return {{static_cast<float>(v[i].first[0]),
              static_cast<float>(v[i].first[1]),
              dim == 2 ? 0 : static_cast<float>(v[i].first[2])},

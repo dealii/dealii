@@ -871,7 +871,7 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
         // steps for the previous grid
         //
         // use a double value since for each
-        // four cells (in 2D) that we flagged
+        // four cells (in 2d) that we flagged
         // for coarsening we result in one
         // new. but since we loop over flagged
         // cells, we have to subtract 3/4 of

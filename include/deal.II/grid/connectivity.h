@@ -1378,7 +1378,7 @@ namespace internal
     {
       Connectivity<T> connectivity(dim, cell_t_id);
 
-      CRS<T> temp1; // needed for 3D
+      CRS<T> temp1; // needed for 3d
 
       if (dim == 1)
         connectivity.entity_to_entities(1, 0) = con_cv;

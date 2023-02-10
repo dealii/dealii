@@ -349,7 +349,7 @@ namespace internal
                                                      q_point,
                                                      0)[direction][direction];
 
-                      // evaluate basis functions on the two 1D subfaces (i.e.,
+                      // evaluate basis functions on the two 1d subfaces (i.e.,
                       // at the positions divided by one half and shifted by one
                       // half, respectively) for hanging nodes
                       q_point[direction] *= 0.5;
@@ -371,7 +371,7 @@ namespace internal
                                                      q_point,
                                                      0)[direction][direction];
                     }
-                  // evaluate basis functions on the 1D faces, i.e., in zero and
+                  // evaluate basis functions on the 1d faces, i.e., in zero and
                   // one
                   Point<dim> q_point = unit_point;
                   q_point[direction] = 0;
@@ -431,7 +431,7 @@ namespace internal
 
           // note: we cannot write `univariate_shape_data.quadrature = quad`,
           // since the quadrature rule within UnivariateShapeData expects
-          // a 1D quadrature rule. However, in this case we are not able to
+          // a 1d quadrature rule. However, in this case we are not able to
           // define that rule anyway so other code cannot use this information.
 
           univariate_shape_data.fe_degree     = fe.degree;
@@ -651,9 +651,9 @@ namespace internal
                                               scalar_lexicographic,
                                               lexicographic_numbering);
 
-        // to evaluate 1D polynomials, evaluate along the line with the first
+        // to evaluate 1d polynomials, evaluate along the line with the first
         // unit support point, assuming that fe.shape_value(0,unit_point) ==
-        // 1. otherwise, need other entry point (e.g. generating a 1D element
+        // 1. otherwise, need other entry point (e.g. generating a 1d element
         // by reading the name, as done before r29356)
         if (fe.has_support_points())
           unit_point = fe.get_unit_support_points()[scalar_lexicographic[0]];
@@ -703,7 +703,7 @@ namespace internal
               shape_hessians[i * n_q_points_1d + q] =
                 fe.shape_grad_grad(my_i, q_point)[0][0];
 
-              // evaluate basis functions on the two 1D subfaces (i.e., at the
+              // evaluate basis functions on the two 1d subfaces (i.e., at the
               // positions divided by one half and shifted by one half,
               // respectively)
               q_point[0] *= 0.5;
@@ -722,7 +722,7 @@ namespace internal
                 fe.shape_grad_grad(my_i, q_point)[0][0];
             }
 
-          // evaluate basis functions on the 1D faces, i.e., in zero and one
+          // evaluate basis functions on the 1d faces, i.e., in zero and one
           Point<dim> q_point       = unit_point;
           q_point[0]               = 0;
           shape_data_on_face[0][i] = fe.shape_value(my_i, q_point);
@@ -999,7 +999,7 @@ namespace internal
                     }
             }
 
-          // face orientation for faces in 3D
+          // face orientation for faces in 3d
           // (similar to MappingInfoStorage::QuadratureDescriptor::initialize)
           if (dim == 3)
             {

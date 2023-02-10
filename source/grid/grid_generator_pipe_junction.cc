@@ -374,7 +374,7 @@ namespace GridGenerator
                ExcMessage("Invalid input."));
       }
 
-    // Create a hyperball domain in 2D that will act as the reference cross
+    // Create a hyperball domain in 2d that will act as the reference cross
     // section for each pipe segment.
     Triangulation<dim - 1, spacedim - 1> tria_base;
     GridGenerator::hyper_ball_balanced(tria_base,

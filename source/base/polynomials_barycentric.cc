@@ -30,7 +30,7 @@ namespace internal
   get_degree(
     const std::vector<typename BarycentricPolynomials<dim>::PolyType> &polys)
   {
-    // Since the first variable in a simplex polynomial is, e.g., in 2D,
+    // Since the first variable in a simplex polynomial is, e.g., in 2d,
     //
     // t0 = 1 - x - y
     //

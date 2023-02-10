@@ -273,7 +273,7 @@ namespace Utilities
     // (Zoltan_HSFC_InvHilbertXd)
     // https://github.com/aditi137/Hilbert/blob/master/Hilbert/hilbert.cpp
 
-    // now we can map to 1D coordinate stored in Transpose format
+    // now we can map to 1d coordinate stored in Transpose format
     // adopt AxestoTranspose function from the paper, that
     // transforms in-place between geometrical axes and Hilbert transpose.
     // Example:   b=5 bits for each of n=3 coordinates.

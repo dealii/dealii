@@ -2518,7 +2518,7 @@ namespace DoFTools
             Assert(!face_1->has_children(), ExcInternalError());
 
             // Important note:
-            // In 3D we have to take care of the fact that face_rotation gives
+            // In 3d we have to take care of the fact that face_rotation gives
             // the relative rotation of face_1 to face_2, i.e. we have to invert
             // the rotation when constraining face_2 to face_1. Therefore
             // face_flip has to be toggled if face_rotation is true: In case of

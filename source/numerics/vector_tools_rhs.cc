@@ -21,7 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace VectorTools
 {
-  // separate implementation for 1D because otherwise we get linker errors since
+  // separate implementation for 1d because otherwise we get linker errors since
   // (hp::)FEFaceValues<1> is not compiled
   template <>
   void

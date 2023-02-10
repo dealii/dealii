@@ -255,10 +255,10 @@ template <int dim>
 void
 FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // For 1D do nothing.
+  // For 1d do nothing.
   //
-  // TODO: For 2D we simply keep the legacy behavior for now. This should be
-  // changed in the future and can be taken care of by similar means as the 3D
+  // TODO: For 2d we simply keep the legacy behavior for now. This should be
+  // changed in the future and can be taken care of by similar means as the 3d
   // case below. The legacy behavior can be found in fe_poly_tensor.cc in the
   // function internal::FE_PolyTensor::get_dof_sign_change_h_div(...)
   if (dim < 3)
@@ -275,7 +275,7 @@ FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
         this->n_dofs_per_quad(face_no),
     ExcInternalError());
 
-  // The 3D RaviartThomas space has tensor_degree*tensor_degree face dofs
+  // The 3d RaviartThomas space has tensor_degree*tensor_degree face dofs
   const unsigned int n = this->tensor_degree();
   Assert(n * n == this->n_dofs_per_quad(face_no), ExcInternalError());
 

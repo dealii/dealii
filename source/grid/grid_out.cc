@@ -4670,7 +4670,7 @@ namespace internal
     {
       using LineList = std::list<LineEntry>;
 
-      // We should never get here in 1D since this function is overloaded for
+      // We should never get here in 1d since this function is overloaded for
       // all dim == 1 cases.
       Assert(dim == 2 || dim == 3, ExcInternalError());
 

@@ -63,7 +63,7 @@ namespace NonMatching
                            level_set,
                            additional_data)
   {
-    // Tensor products of each quadrature in q_collection_1D. Used on the
+    // Tensor products of each quadrature in q_collection_1d. Used on the
     // non-intersected cells.
     hp::QCollection<dim> q_collection;
     for (unsigned int i = 0; i < q_collection_1D.size(); ++i)
@@ -289,7 +289,7 @@ namespace NonMatching
                                 level_set,
                                 additional_data)
   {
-    // Tensor products of each quadrature in q_collection_1D. Used on the
+    // Tensor products of each quadrature in q_collection_1d. Used on the
     // non-intersected cells.
     hp::QCollection<dim - 1> q_collection;
     for (unsigned int i = 0; i < q_collection_1D.size(); ++i)

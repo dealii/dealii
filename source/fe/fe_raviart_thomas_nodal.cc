@@ -42,7 +42,7 @@ namespace
   // vector refer to:
   // 0 = vertex
   // 1 = edge
-  // 2 = face (which is a cell in 2D)
+  // 2 = face (which is a cell in 2d)
   // 3 = cell
   std::vector<unsigned int>
   get_rt_dpo_vector(const unsigned int dim, const unsigned int degree)
@@ -157,7 +157,7 @@ void
 FE_RaviartThomasNodal<
   dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // for 1D and 2D, do nothing
+  // for 1d and 2d, do nothing
   if (dim < 3)
     return;
 

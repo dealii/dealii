@@ -395,7 +395,7 @@ namespace internal
       if (polynomial_degree <= 1)
         return output;
 
-      // fill the 1D interior weights
+      // fill the 1d interior weights
       QGaussLobatto<1> quadrature(polynomial_degree + 1);
       output[0].reinit(polynomial_degree - 1,
                        GeometryInfo<1>::vertices_per_cell);

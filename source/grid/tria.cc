@@ -2379,7 +2379,7 @@ namespace internal
           const auto &crs = connectivity.entity_to_entities(dim, dim - 1);
           const auto &nei = connectivity.entity_to_entities(dim, dim);
 
-          // in 2D optional: since in in pure QUAD meshes same line
+          // in 2d optional: since in in pure QUAD meshes same line
           // orientations can be guaranteed
           bool orientation_needed = false;
           if (dim == 3)
@@ -2468,14 +2468,14 @@ namespace internal
                 if (dim != 3)
                   continue;
 
-                // ... and the lines of quads in 3D
+                // ... and the lines of quads in 3d
                 const auto &crs = connectivity.entity_to_entities(2, 1);
                 for (unsigned int i = crs.ptr[face]; i < crs.ptr[face + 1]; ++i)
                   tria.faces->lines.boundary_or_material_id[crs.col[i]]
                     .boundary_id = 0;
               }
           }
-        else // 1D
+        else // 1d
           {
             static const unsigned int t_tba   = static_cast<unsigned int>(-1);
             static const unsigned int t_inner = static_cast<unsigned int>(-2);
@@ -4421,7 +4421,7 @@ namespace internal
               subcells[i]->set_subdomain_id(subdomainid);
 
               // TODO: here we assume that all children have the same reference
-              // cell type as the parent! This is justified for 2D.
+              // cell type as the parent! This is justified for 2d.
               triangulation.levels[subcells[i]->level()]
                 ->reference_cell[subcells[i]->index()] = cell->reference_cell();
 

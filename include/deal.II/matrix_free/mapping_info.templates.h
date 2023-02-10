@@ -264,7 +264,7 @@ namespace internal
     // the gradient of the inverse is given by (multidimensional calculus) -
     // J * (J * L) * J (the third J is because we need to transform the
     // gradient L from the unit to the real cell, and then apply the inverse
-    // Jacobian). Compare this with 1D with j(x) = 1/k(phi(x)), where j =
+    // Jacobian). Compare this with 1d with j(x) = 1/k(phi(x)), where j =
     // phi' is the inverse of the jacobian and k is the derivative of the
     // jacobian on the unit cell. Then j' = phi' k'/k^2 = j k' j^2.
     template <int dim, typename Number>

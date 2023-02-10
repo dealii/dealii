@@ -2540,7 +2540,7 @@ namespace parallel
         // periodicity, e.g. when finding the maximum cell level around a
         // vertex.
         //
-        // Example: On a 3D cell with vertices numbered from 0 to 7 and
+        // Example: On a 3d cell with vertices numbered from 0 to 7 and
         // periodic boundary conditions in x direction, the vector
         // topological_vertex_numbering will contain the numbers
         // {0,0,2,2,4,4,6,6} (because the vertex pairs {0,1}, {2,3}, {4,5},

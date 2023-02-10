@@ -221,7 +221,7 @@ namespace CGALWrappers
     // Collection of utilities that compute intersection between simplices
     // identified by array of points. The return type is the one of
     // CGAL::intersection(), i.e. a std_cxx17::optional<std_cxx17::variant<>>.
-    // Intersection between 2D and 3D objects and 1D/3D objects are available
+    // Intersection between 2d and 3d objects and 1d/3d objects are available
     // only with CGAL versions greater or equal than 5.5, hence the
     // corresponding functions are guarded by #ifdef directives. All the
     // signatures follow the convection that the first entity has an intrinsic

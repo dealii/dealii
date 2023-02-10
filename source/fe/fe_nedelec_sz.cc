@@ -331,8 +331,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
           // For a given cell we have:
           //      n_line_dofs = dofs_per_line*lines_per_cell.
           //      n_face_dofs = dofs_per_face*faces_per_cell.
-          //      n_cell_dofs = dofs_per_quad (2D)
-          //                  = dofs_per_hex (3D)
+          //      n_cell_dofs = dofs_per_quad (2d)
+          //                  = dofs_per_hex (3d)
           //
           // i.e. For the local dof numbering:
           //      the first line dof is 0,
@@ -353,7 +353,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
           //      This is simple enough as there is only 1 lowest order and
           //      degree higher orders DoFs per line.
           //
-          // On a 2D cell, we have 3 types: Type 1/2/3:
+          // On a 2d cell, we have 3 types: Type 1/2/3:
           //    - The ordering done by type:
           //      - Type 1: 0 <= i1,j1 < degree. degree^2 in total.
           //        Numbered: ij1 = i1 + j1*(degree).        i.e. cell_dof_index
@@ -678,7 +678,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
           //   sigma_imj_sign[i][j].
           //
           // Note that not every i,j combination is a valid edge (there are only
-          // 12 valid edges in 3D), but we compute them all as it simplifies
+          // 12 valid edges in 3d), but we compute them all as it simplifies
           // things.
 
           // store the sign of each component x, y, z in the sigma list.
@@ -1477,7 +1477,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   // This function handles the cell-dependent construction of the EDGE-based
   // shape functions.
   //
-  // Note it will handle both 2D and 3D, in 2D, the edges are faces, but we
+  // Note it will handle both 2d and 3d, in 2d, the edges are faces, but we
   // handle them here.
   //
   // It will fill in the missing parts of fe_data which were not possible to
@@ -2029,7 +2029,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
   // This function handles the cell-dependent construction of the FACE-based
   // shape functions.
   //
-  // Note that it should only be called in 3D.
+  // Note that it should only be called in 3d.
   Assert(dim == 3, ExcDimensionMismatch(dim, 3));
   //
   // It will fill in the missing parts of fe_data which were not possible to
@@ -2795,7 +2795,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   AssertDimension(quadrature.size(), 1);
 
   // Note for future improvement:
-  // We don't have the full quadrature - should use QProjector to create the 2D
+  // We don't have the full quadrature - should use QProjector to create the 2d
   // quadrature.
   //
   // For now I am effectively generating all of the shape function vals/grads,
@@ -3056,7 +3056,7 @@ FE_NedelecSZ<dim, spacedim>::get_dpo_vector(const unsigned int degree)
   // where the objects inside the vector refer to:
   // 0 = vertex
   // 1 = edge
-  // 2 = face (which is a cell in 2D)
+  // 2 = face (which is a cell in 2d)
   // 3 = cell
   std::vector<unsigned int> dpo;
 

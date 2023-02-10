@@ -969,7 +969,7 @@ namespace NonMatching
         std::sort(side_lengths.begin(), side_lengths.end());
 
         // Check if the two largest side lengths have the same length. This
-        // function isn't called in 1D, so the (dim - 2)-element exists.
+        // function isn't called in 1d, so the (dim - 2)-element exists.
         if (boost::math::epsilon_difference(side_lengths[dim - 1].first,
                                             side_lengths[dim - 2].first) < 100)
           return std_cxx17::optional<unsigned int>();
@@ -1239,7 +1239,7 @@ namespace NonMatching
 
         for (const double root : roots)
           {
-            // A surface integral in 1D is just a point evaluation,
+            // A surface integral in 1d is just a point evaluation,
             // so the weight is always 1.
             const double   weight = 1;
             const Point<1> point(root);
@@ -1813,7 +1813,7 @@ namespace NonMatching
   {
     AssertIndexRange(face_index, GeometryInfo<1>::faces_per_cell);
 
-    // The only vertex the 1D-face has.
+    // The only vertex the 1d-face has.
     const Point<1> vertex =
       box.vertex(GeometryInfo<1>::face_to_cell_vertices(face_index, 0));
 

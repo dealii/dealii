@@ -2741,7 +2741,7 @@ namespace DoFRenumbering
                     {
                       const auto &r = dofs_on_objects[a];
                       if (a == 10 || a == 16)
-                        // switch order x-z for y faces in 3D to lexicographic
+                        // switch order x-z for y faces in 3d to lexicographic
                         // layout
                         for (unsigned int i1 = 0; i1 < nn; ++i1)
                           for (unsigned int i0 = 0; i0 < nn; ++i0)

@@ -683,7 +683,7 @@ SphericalManifold<dim, spacedim>::get_new_points(
           continue;
         }
 
-      // If not in 3D, just use the implementation from PolarManifold
+      // If not in 3d, just use the implementation from PolarManifold
       // after we verified that the candidate is not the center.
       if (spacedim < 3)
         new_points[row] = polar_manifold.get_new_point(
@@ -1724,7 +1724,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
 
 namespace
 {
-  // version for 1D
+  // version for 1d
   template <typename AccessorType>
   Point<AccessorType::space_dimension>
   compute_transfinite_interpolation(const AccessorType &cell,
@@ -1735,7 +1735,7 @@ namespace
            cell.vertex(1) * chart_point[0];
   }
 
-  // version for 2D
+  // version for 2d
   template <typename AccessorType>
   Point<AccessorType::space_dimension>
   compute_transfinite_interpolation(const AccessorType &cell,
@@ -1773,7 +1773,7 @@ namespace
         // contribution of the vertices.  If a line employs the same manifold
         // as the cell, we can merge the weights of the line with the weights
         // of the vertex with a negative sign while going through the faces
-        // (this is a bit artificial in 2D but it becomes clear in 3D where we
+        // (this is a bit artificial in 2d but it becomes clear in 3d where we
         // avoid looking at the faces' orientation and other complications).
 
         // add the contribution from the lines around the cell (first line in
@@ -1850,7 +1850,7 @@ namespace
                                                                {0, 1, 2, 3},
                                                                {4, 5, 6, 7}};
 
-  // version for 3D
+  // version for 3d
   template <typename AccessorType>
   Point<AccessorType::space_dimension>
   compute_transfinite_interpolation(const AccessorType &cell,
@@ -1862,7 +1862,7 @@ namespace
     const types::manifold_id my_manifold_id  = cell.manifold_id();
     const Triangulation<dim, spacedim> &tria = cell.get_triangulation();
 
-    // Same approach as in 2D, but adding the faces, subtracting the edges, and
+    // Same approach as in 2d, but adding the faces, subtracting the edges, and
     // adding the vertices
     const std::array<Point<spacedim>, 8> vertices{{cell.vertex(0),
                                                    cell.vertex(1),
@@ -2132,7 +2132,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
       // method usually does not need more than 5-8 iterations, but sometimes
       // we might have had a bad initial guess and then we can accelerate
       // convergence considerably with getting the actual Jacobian rather than
-      // using secant-like methods (one gradient calculation in 3D costs as
+      // using secant-like methods (one gradient calculation in 3d costs as
       // much as 3 more iterations). this usually happens close to convergence
       // and one more step with the finite-differenced Jacobian leads to
       // convergence
@@ -2345,7 +2345,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
 
   // Function that can guess the location of a chart point by assuming that
   // the eight surrounding points are points on a two-dimensional object
-  // (either a cell in 2D or the face of a hexahedron in 3D), arranged like
+  // (either a cell in 2d or the face of a hexahedron in 3d), arranged like
   //
   //     2 - 7 - 3
   //     |       |
@@ -2438,7 +2438,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         use_structdim_2_guesses = true;
       else if (spacedim == 3)
         // otherwise these vectors are roughly orthogonal: enable the
-        // structdim 3 optimization if we are in 3D
+        // structdim 3 optimization if we are in 3d
         use_structdim_3_guesses = true;
     }
   // we should enable at most one of the optimizations
