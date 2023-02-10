@@ -256,7 +256,7 @@ namespace Step48
   // We define a time-dependent function that is used as initial
   // value. Different solutions can be obtained by varying the starting
   // time. This function, taken from step-25, would represent an analytic
-  // solution in 1D for all times, but is merely used for setting some
+  // solution in 1d for all times, but is merely used for setting some
   // starting solution of interest here. More elaborate choices that could
   // test the convergence of this program are given in step-25.
   template <int dim>

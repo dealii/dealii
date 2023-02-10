@@ -191,8 +191,8 @@ namespace Step51
 
 
   // Next comes the implementation of the convection velocity. As described in
-  // the introduction, we choose a velocity field that is $(y, -x)$ in 2D and
-  // $(y, -x, 1)$ in 3D. This gives a divergence-free velocity field.
+  // the introduction, we choose a velocity field that is $(y, -x)$ in 2d and
+  // $(y, -x, 1)$ in 3d. This gives a divergence-free velocity field.
   template <int dim>
   class ConvectionVelocity : public TensorFunction<1, dim>
   {

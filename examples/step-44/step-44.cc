@@ -2272,7 +2272,7 @@ namespace Step44
         // in displacement is non-constant between each time step.
         constraints.clear();
 
-        // The boundary conditions for the indentation problem in 3D are as
+        // The boundary conditions for the indentation problem in 3d are as
         // follows: On the -x, -y and -z faces (IDs 0,2,4) we set up a symmetry
         // condition to allow only planar movement while the +x and +z faces
         // (IDs 1,5) are traction free. In this contrived problem, part of the

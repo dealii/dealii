@@ -139,7 +139,7 @@ namespace Step25
   // @sect3{Initial conditions}
 
   // In the following two classes, we first implement the exact solution for
-  // 1D, 2D, and 3D mentioned in the introduction to this program. This
+  // 1D, 2d, and 3d mentioned in the introduction to this program. This
   // space-time solution may be of independent interest if one wanted to test
   // the accuracy of the program by comparing the numerical against the
   // analytic solution (note however that the program uses a finite domain,

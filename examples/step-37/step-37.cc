@@ -1141,7 +1141,7 @@ namespace Step37
   // @sect4{LaplaceProblem::run}
 
   // The function that runs the program is very similar to the one in
-  // step-16. We do few refinement steps in 3D compared to 2D, but that's
+  // step-16. We do few refinement steps in 3d compared to 2d, but that's
   // it.
   //
   // Before we run the program, we output some information about the detected

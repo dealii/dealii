@@ -894,7 +894,7 @@ namespace Step63
   // for degree 1 and degree 3 finite elements. If the user wants to change to
   // another degree, they may need to adjust these numbers. For block smoothers,
   // this parameter has a more straightforward interpretation, namely that for
-  // additive methods in 2D, a DoF can have a repeated contribution from up to 4
+  // additive methods in 2d, a DoF can have a repeated contribution from up to 4
   // cells, therefore we must relax these methods by 0.25 to compensate. This is
   // not an issue for multiplicative methods as each cell's inverse application
   // carries new information to all its DoFs.

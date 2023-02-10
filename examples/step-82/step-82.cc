@@ -1467,7 +1467,7 @@ namespace Step82
 // This is the <code>main</code> function. We define here the number of mesh
 // refinements, the polynomial degree for the two finite element spaces
 // (for the solution and the two liftings) and the two penalty coefficients.
-// We can also change the dimension to run the code in 3D.
+// We can also change the dimension to run the code in 3d.
 int main()
 {
   try

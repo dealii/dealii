@@ -541,7 +541,7 @@ namespace Step8
   // The reason for refining is a bit accidental: we use the QGauss
   // quadrature formula with two points in each direction for integration of the
   // right hand side; that means that there are four quadrature points on each
-  // cell (in 2D). If we only refine the initial grid once globally, then there
+  // cell (in 2d). If we only refine the initial grid once globally, then there
   // will be only four quadrature points in each direction on the
   // domain. However, the right hand side function was chosen to be rather
   // localized and in that case, by pure chance, it happens that all quadrature

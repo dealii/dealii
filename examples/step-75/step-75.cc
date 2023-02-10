@@ -208,7 +208,7 @@ namespace Step75
   // We will use the FEEvaluation class to evaluate the solution vector
   // at the quadrature points and to perform the integration. In contrast to
   // other tutorials, the template arguments `degree` is set to $-1$ and
-  // `number of quadrature in 1D` to $0$. In this case, FEEvaluation selects
+  // `number of quadrature in 1d` to $0$. In this case, FEEvaluation selects
   // dynamically the correct polynomial degree and number of quadrature
   // points. Here, we introduce an alias to FEEvaluation with the correct
   // template parameters so that we do not have to worry about them later on.
@@ -1028,12 +1028,12 @@ namespace Step75
   // @sect4{LaplaceProblem::initialize_grid}
 
   // For a L-shaped domain, we could use the function GridGenerator::hyper_L()
-  // as demonstrated in step-50. However in the 2D case, that particular
+  // as demonstrated in step-50. However in the 2d case, that particular
   // function removes the first quadrant, while we need the fourth quadrant
   // removed in our scenario. Thus, we will use a different function
   // GridGenerator::subdivided_hyper_L() which gives us more options to create
   // the mesh. Furthermore, we formulate that function in a way that it also
-  // generates a 3D mesh: the 2D L-shaped domain will basically elongated by 1
+  // generates a 3d mesh: the 2d L-shaped domain will basically elongated by 1
   // in the positive z-direction.
   //
   // We first pretend to build a GridGenerator::subdivided_hyper_rectangle().

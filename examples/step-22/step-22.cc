@@ -58,7 +58,7 @@
 #include <deal.II/lac/sparse_direct.h>
 
 // This includes the library for the incomplete LU factorization that will be
-// used as a preconditioner in 3D:
+// used as a preconditioner in 3d:
 #include <deal.II/lac/sparse_ilu.h>
 
 // This is C++:
@@ -83,14 +83,14 @@ namespace Step22
   template <int dim>
   struct InnerPreconditioner;
 
-  // In 2D, we are going to use a sparse direct solver as preconditioner:
+  // In 2d, we are going to use a sparse direct solver as preconditioner:
   template <>
   struct InnerPreconditioner<2>
   {
     using type = SparseDirectUMFPACK;
   };
 
-  // And the ILU preconditioning in 3D, called by SparseILU:
+  // And the ILU preconditioning in 3d, called by SparseILU:
   template <>
   struct InnerPreconditioner<3>
   {
@@ -413,7 +413,7 @@ namespace Step22
   // pattern objects.
   //
   // We then proceed with distributing degrees of freedom and renumbering
-  // them: In order to make the ILU preconditioner (in 3D) work efficiently,
+  // them: In order to make the ILU preconditioner (in 3d) work efficiently,
   // it is important to enumerate the degrees of freedom in such a way that it
   // reduces the bandwidth of the matrix, or maybe more importantly: in such a
   // way that the ILU is as close as possible to a real LU decomposition. On
@@ -515,12 +515,12 @@ namespace Step22
     // the same way as in step-20, i.e. directly build an object of type
     // SparsityPattern through DoFTools::make_sparsity_pattern. However, there
     // is a major reason not to do so:
-    // In 3D, the function DoFTools::max_couplings_between_dofs yields a
+    // In 3d, the function DoFTools::max_couplings_between_dofs yields a
     // conservative but rather large number for the coupling between the
     // individual dofs, so that the memory initially provided for the creation
     // of the sparsity pattern of the matrix is far too much -- so much actually
     // that the initial sparsity pattern won't even fit into the physical memory
-    // of most systems already for moderately-sized 3D problems, see also the
+    // of most systems already for moderately-sized 3d problems, see also the
     // discussion in step-18. Instead, we first build temporary objects that use
     // a different data structure that doesn't require allocating more memory
     // than necessary but isn't suitable for use as a basis of SparseMatrix or
@@ -1007,7 +1007,7 @@ namespace Step22
 
 
     // We then apply an initial refinement before solving for the first
-    // time. In 3D, there are going to be more degrees of freedom, so we
+    // time. In 3d, there are going to be more degrees of freedom, so we
     // refine less there:
     triangulation.refine_global(4 - dim);
 

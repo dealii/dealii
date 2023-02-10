@@ -166,9 +166,9 @@ public:
 //
 // But back to the concrete case here:
 // For this tutorial, we choose as right hand side the function
-// $4(x^4+y^4)$ in 2D, or $4(x^4+y^4+z^4)$ in 3D. We could write this
+// $4(x^4+y^4)$ in 2d, or $4(x^4+y^4+z^4)$ in 3d. We could write this
 // distinction using an if-statement on the space dimension, but here is a
-// simple way that also allows us to use the same function in 1D (or in 4D, if
+// simple way that also allows us to use the same function in 1d (or in 4D, if
 // you should desire to do so), by using a short loop.  Fortunately, the
 // compiler knows the size of the loop at compile time (remember that at the
 // time when you define the template, the compiler doesn't know the value of
@@ -197,7 +197,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
 }
 
 
-// As boundary values, we choose $x^2+y^2$ in 2D, and $x^2+y^2+z^2$ in 3D. This
+// As boundary values, we choose $x^2+y^2$ in 2d, and $x^2+y^2+z^2$ in 3d. This
 // happens to be equal to the square of the vector from the origin to the
 // point at which we would like to evaluate the function, irrespective of the
 // dimension. So that is what we return:
@@ -250,10 +250,10 @@ Step4<dim>::Step4()
 // @sect4{Step4::make_grid}
 
 // Grid creation is something inherently dimension dependent. However, as long
-// as the domains are sufficiently similar in 2D or 3D, the library can
+// as the domains are sufficiently similar in 2d or 3d, the library can
 // abstract for you. In our case, we would like to again solve on the square
-// $[-1,1]\times [-1,1]$ in 2D, or on the cube $[-1,1] \times [-1,1] \times
-// [-1,1]$ in 3D; both can be termed GridGenerator::hyper_cube(), so we may
+// $[-1,1]\times [-1,1]$ in 2d, or on the cube $[-1,1] \times [-1,1] \times
+// [-1,1]$ in 3d; both can be termed GridGenerator::hyper_cube(), so we may
 // use the same function in whatever dimension we are. Of course, the
 // functions that create a hypercube in two and three dimensions are very much
 // different, but that is something you need not care about. Let the library
@@ -348,7 +348,7 @@ void Step4<dim>::assemble_system()
 
   // Next, we again have to loop over all cells and assemble local
   // contributions.  Note, that a cell is a quadrilateral in two space
-  // dimensions, but a hexahedron in 3D. In fact, the
+  // dimensions, but a hexahedron in 3d. In fact, the
   // <code>active_cell_iterator</code> data type is something different,
   // depending on the dimension we are in, but to the outside world they look
   // alike and you will probably never see a difference. In any case, the real

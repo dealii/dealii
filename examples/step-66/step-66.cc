@@ -399,7 +399,7 @@ namespace Step66
 
     // For the parallel computation we define a
     // parallel::distributed::Triangulation. As the computational domain is a
-    // circle in 2D and a ball in 3D, we assign in addition to the
+    // circle in 2d and a ball in 3d, we assign in addition to the
     // SphericalManifold for boundary cells a TransfiniteInterpolationManifold
     // object for the mapping of the inner cells, which takes care of the inner
     // cells. In this example we use an isoparametric finite element approach
@@ -1154,7 +1154,7 @@ namespace Step66
 // framework and disable shared-memory parallelization by limiting the number of
 // threads to one. Finally to run the solver for the <i>Gelfand problem</i> we
 // create an object of the <code>GelfandProblem</code> class and call the run
-// function. Exemplarily we solve the problem once in 2D and once in 3D each
+// function. Exemplarily we solve the problem once in 2d and once in 3d each
 // with fourth-order Lagrangian finite elements.
 int main(int argc, char *argv[])
 {

@@ -995,7 +995,7 @@ int main()
     {
       using namespace Step30;
 
-      // If you want to run the program in 3D, simply change the following
+      // If you want to run the program in 3d, simply change the following
       // line to <code>const unsigned int dim = 3;</code>.
       const unsigned int dim = 2;
 

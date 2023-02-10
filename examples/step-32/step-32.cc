@@ -2860,7 +2860,7 @@ namespace Step32
 
 
     // Now let's turn to the temperature part: First, we compute the time step
-    // size. We found that we need smaller time steps for 3D than for 2D for
+    // size. We found that we need smaller time steps for 3d than for 2d for
     // the shell geometry. This is because the cells are more distorted in
     // that case (it is the smallest edge length that determines the CFL
     // number). Instead of computing the time step from maximum velocity and
