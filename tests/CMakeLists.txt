@@ -155,11 +155,6 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   # Define a top-level "test" target that runs our quick tests wrapper.
   #
 
-  if("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
-    # allow to override "test" target for quick tests
-    cmake_policy(SET CMP0037 OLD)
-  endif()
-
   # Use the first available build type (this prefers debug mode if available):
   list(GET DEAL_II_BUILD_TYPES 0 _my_build)
   add_custom_target(test

@@ -53,19 +53,6 @@ macro(feature_cuda_find_external var)
       set(${var} TRUE)
 
       #
-      # CUDA support requires CMake version 3.9 or newer
-      #
-      if(CMAKE_VERSION VERSION_LESS 3.9)
-        set(${var} FALSE)
-        message(STATUS "deal.II requires CMake version 3.9, or newer for CUDA support")
-        set(CUDA_ADDITIONAL_ERROR_STRING
-          ${CUDA_ADDITIONAL_ERROR_STRING}
-          "deal.II requires CMake version 3.9, or newer for CUDA support.\n"
-          "Reconfigure with a sufficient cmake version."
-          )
-      endif()
-
-      #
       # disable CUDA support older than 10.2:
       #
       if(CUDA_VERSION VERSION_LESS 10.2)

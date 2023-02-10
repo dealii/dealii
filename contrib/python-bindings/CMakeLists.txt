@@ -21,15 +21,10 @@ if(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   #
   # Find Python:
   #
-  # Since CMake 3.12, FindPythonInterp is deprecated.
-  if (CMAKE_VERSION VERSION_LESS 3.12)
-    include(FindPythonInterp)
-  else()
-    find_package(Python3)
-    set(PYTHON_VERSION_MAJOR ${Python3_VERSION_MAJOR})
-    set(PYTHON_VERSION_MINOR ${Python3_VERSION_MINOR})
-    set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
-  endif()
+  find_package(Python3)
+  set(PYTHON_VERSION_MAJOR ${Python3_VERSION_MAJOR})
+  set(PYTHON_VERSION_MINOR ${Python3_VERSION_MINOR})
+  set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
   include(FindPythonLibs)
 
   if(DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
