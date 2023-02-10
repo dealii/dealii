@@ -518,7 +518,7 @@ public:
   /**
    * The same as above but instead of passing a vector containing the degrees
    * of freedoms per object a struct of type GenericDoFsPerObject. This allows
-   * that 2D objects might have different number of degrees of freedoms, which
+   * that 2d objects might have different number of degrees of freedoms, which
    * is particular useful for cells with triangles and quadrilaterals as faces.
    */
   FiniteElementData(const internal::GenericDoFsPerObject &data,

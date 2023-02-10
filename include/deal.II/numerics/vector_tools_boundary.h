@@ -566,9 +566,9 @@ namespace VectorTools
    * <h4>Computing constraints</h4>
    *
    * To compute the constraints we use a projection method based upon the
-   * paper mentioned above. In 2D this is done in a single stage for the edge-
+   * paper mentioned above. In 2d this is done in a single stage for the edge-
    * based shape functions, regardless of the order of the finite element. In
-   * 3D this is done in two stages, edges first and then faces.
+   * 3d this is done in two stages, edges first and then faces.
    *
    * For each cell, each edge, $e$, is projected by solving the linear system
    * $Ax=b$ where $x$ is the vector of constraints on degrees of freedom on the
@@ -621,7 +621,7 @@ namespace VectorTools
    * The second argument of this function denotes the first vector component
    * of the finite element which corresponds to the vector function that you
    * wish to constrain. For example, if we are solving Maxwell's equations in
-   * 3D and have components $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the
+   * 3d and have components $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the
    * boundary conditions $\vec{n}\times\vec{B}=\vec{n}\times\vec{f}$, then @p
    * first_vector_component would be 3. The @p boundary_function must return 6
    * components in this example, with the first 3 corresponding to $\vec{E}$

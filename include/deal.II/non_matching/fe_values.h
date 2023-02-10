@@ -184,7 +184,7 @@ namespace NonMatching
      * @param q_collection Collection of Quadrature rules over $[0, 1]^{dim}$
      * that should be used when a cell is not intersected and we do not need to
      * generate immersed quadrature rules.
-     * @param q_collection_1D Collection of 1-dimensional quadrature rules used
+     * @param q_collection_1d Collection of 1-dimensional quadrature rules used
      * to generate the immersed quadrature rules. See the QuadratureGenerator
      * class.
      * @param mesh_classifier Object used to determine when the immersed
@@ -206,7 +206,7 @@ namespace NonMatching
     FEValues(const hp::MappingCollection<dim> &mapping_collection,
              const hp::FECollection<dim> &     fe_collection,
              const hp::QCollection<dim> &      q_collection,
-             const hp::QCollection<1> &        q_collection_1D,
+             const hp::QCollection<1> &        q_collection_1d,
              const RegionUpdateFlags           region_update_flags,
              const MeshClassifier<dim> &       mesh_classifier,
              const DoFHandler<dim> &           dof_handler,
@@ -478,7 +478,7 @@ namespace NonMatching
      * @param q_collection Collection of Quadrature rules over $[0, 1]^{dim-1}$
      * that should be used when a face is not intersected and we do not need to
      * generate immersed quadrature rules.
-     * @param q_collection_1D Collection of 1-dimensional quadrature rules used
+     * @param q_collection_1d Collection of 1-dimensional quadrature rules used
      * to generate the immersed quadrature rules. See the QuadratureGenerator
      * class.
      * @param mesh_classifier Object used to determine when the immersed
@@ -500,7 +500,7 @@ namespace NonMatching
     FEInterfaceValues(const hp::MappingCollection<dim> &mapping_collection,
                       const hp::FECollection<dim> &     fe_collection,
                       const hp::QCollection<dim - 1> &  q_collection,
-                      const hp::QCollection<1> &        q_collection_1D,
+                      const hp::QCollection<1> &        q_collection_1d,
                       const RegionUpdateFlags           region_update_flags,
                       const MeshClassifier<dim> &       mesh_classifier,
                       const DoFHandler<dim> &           dof_handler,

@@ -40,22 +40,22 @@ DEAL_II_NAMESPACE_OPEN
  * @f]
  *
  * where each value $c_i$ is the relative weight of each vertex (so the
- * centroid is, in 2D, where each $c_i = 1/3$). Since we only consider convex
+ * centroid is, in 2d, where each $c_i = 1/3$). Since we only consider convex
  * combinations we can rewrite this equation as
  *
  * @f[
  *   (x, y) = (1 - c_1 - c_2) (x_0, y_0) + c_1 (x_1, y_1) + c_2 (x_2, y_2).
  * @f]
  *
- * This results in three polynomials that are equivalent to $P^1$ in 2D. More
+ * This results in three polynomials that are equivalent to $P^1$ in 2d. More
  * exactly, this class implements a polynomial space defined with the basis,
- * in 2D, of
+ * in 2d, of
  * @f{align*}{
  * t_0(x, y) &= 1 - x - y \\
  * t_1(x, y) &= x \\
  * t_2(x, y) &= y
  * @f}
- * and, in 3D,
+ * and, in 3d,
  * @f{align*}{
  * t_0(x, y) &= 1 - x - y - z \\
  * t_1(x, y) &= x             \\

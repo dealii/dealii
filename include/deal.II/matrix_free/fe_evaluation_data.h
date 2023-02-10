@@ -314,7 +314,7 @@ public:
    * Return a read-only pointer to the first field of function hessians on
    * quadrature points. First comes the xx-component of the hessian for the
    * first component on all quadrature points, then the yy-component,
-   * zz-component in (3D), then the xy-component, and so on. Next comes the xx-
+   * zz-component in (3d), then the xy-component, and so on. Next comes the xx-
    * component of the second component, and so on. This is related to the
    * internal data structures used in this class. The raw data after a call to
    * @p evaluate only contains unit cell operations, so possible
@@ -329,7 +329,7 @@ public:
    * Return a read and write pointer to the first field of function hessians
    * on quadrature points. First comes the xx-component of the hessian for the
    * first component on all quadrature points, then the yy-component,
-   * zz-component in (3D), then the xy-component, and so on. Next comes the
+   * zz-component in (3d), then the xy-component, and so on. Next comes the
    * xx-component of the second component, and so on. This is related to the
    * internal data structures used in this class. The raw data after a call to
    * @p evaluate only contains unit cell operations, so possible
@@ -672,7 +672,7 @@ protected:
 
   /**
    * A pointer to the unit cell shape data, i.e., values, gradients and
-   * Hessians in 1D at the quadrature points that constitute the tensor
+   * Hessians in 1d at the quadrature points that constitute the tensor
    * product. Also contained in matrix_info, but it simplifies code if we
    * store a reference to it.
    */

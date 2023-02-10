@@ -69,8 +69,8 @@ namespace GridGenerator
   //** @{ */
 
   /**
-   * Initialize the given triangulation with a hypercube (line in 1D, square
-   * in 2D, etc) consisting of exactly one cell. The hypercube volume is the
+   * Initialize the given triangulation with a hypercube (line in 1d, square
+   * in 2d, etc) consisting of exactly one cell. The hypercube volume is the
    * tensor product interval $[left,right]^{\text{dim}}$ in the present number
    * of dimensions, where the limits are given as arguments. They default to
    * zero and unity, then producing the unit hypercube.
@@ -357,8 +357,8 @@ namespace GridGenerator
    * The first is a square region with length @p outer_radius and a hole of radius @p inner_radius .
    * Cells in this region will have TransfiniteInterpolationManifold with
    * manifold id @p tfi_manifold_id attached to them. Additionally, the boundary
-   * faces of the hole will be associated with a PolarManifold (in 2D) or
-   * CylindricalManifold (in 3D). The center of this
+   * faces of the hole will be associated with a PolarManifold (in 2d) or
+   * CylindricalManifold (in 3d). The center of this
    * region can be prescribed via @p center , namely the axis of the hole will
    * be located at @p center .
    * The second region describes the remainder of the bulk material. It is
@@ -370,7 +370,7 @@ namespace GridGenerator
    * 2*outer_radius + padding_bottom</code>.
    *
    * Here is the non-symmetric grid (after one global refinement, colored
-   * according to manifold id) in 2D and 3D, respectively:
+   * according to manifold id) in 2d and 3d, respectively:
    *
    * \htmlonly <style>div.image
    * img[src="plate_with_a_hole.png"]{width:25%;}</style> \endhtmlonly
@@ -379,7 +379,7 @@ namespace GridGenerator
    * img[src="plate_with_a_hole_3D.png"]{width:25%;}</style> \endhtmlonly
    * @image html plate_with_a_hole_3D.png
    *
-   * In 3D, triangulation will be extruded in the z-direction by the total
+   * In 3d, triangulation will be extruded in the z-direction by the total
    * height of @p L using @p n_slices slices (minimum is 2).
    *
    * If the @p colorize flag is <code>true</code>, the boundary_ids of the
@@ -412,7 +412,7 @@ namespace GridGenerator
    * Generate a grid consisting of a channel with a cylinder. This is a common
    * benchmark for Navier-Stokes solvers. The geometry consists of a channel
    * of size $[0, 2.2] \times [0, 0.41] \times [0, 0.41] $ (where the $z$
-   * dimension is omitted in 2D) with a cylinder, parallel to the $z$ axis
+   * dimension is omitted in 2d) with a cylinder, parallel to the $z$ axis
    * with diameter $0.1$, centered at $(0.2, 0.2, 0)$. The channel has three
    * distinct regions:
    * <ol>
@@ -424,16 +424,16 @@ namespace GridGenerator
    * </ol>
    * Since the cylinder is slightly offset from the center of the channel,
    * this geometry results in vortex shedding at moderate Reynolds
-   * numbers. Here is the grid (without additional global refinement) in 2D:
+   * numbers. Here is the grid (without additional global refinement) in 2d:
    *
    * @image html channel_with_cylinder_2d.png
    *
-   * and in 3D:
+   * and in 3d:
    *
    * @image html channel_with_cylinder_3d.png
    *
-   * The resulting Triangulation uses three manifolds: a PolarManifold (in 2D)
-   * or CylindricalManifold (in 3D) with manifold id $0$, a
+   * The resulting Triangulation uses three manifolds: a PolarManifold (in 2d)
+   * or CylindricalManifold (in 3d) with manifold id $0$, a
    * TransfiniteInterpolationManifold with manifold id $1$, and a FlatManifold
    * everywhere else. For more information on this topic see
    * @ref GlossManifoldIndicator "the glossary entry on manifold indicators".
@@ -448,7 +448,7 @@ namespace GridGenerator
    * numbers::flat_manifold_id are rectangular prisms aligned with the
    * coordinate axes.
    *
-   * The picture below shows part of the 2D grid (using all default arguments
+   * The picture below shows part of the 2d grid (using all default arguments
    * to this function) after two global refinements. The cells with manifold
    * id $0$ are orange (the polar manifold id), cells with manifold id $1$ are
    * yellow (the transfinite interpolation manifold id), and the ones with
@@ -753,7 +753,7 @@ namespace GridGenerator
    * based on the cells used by GridGenerator::quarter_hyper_ball() with
    * appropriate copies and rotations to fill the whole ball.
    *
-   * The following pictures show the resulting mesh in 2D (left) and 3D:
+   * The following pictures show the resulting mesh in 2d (left) and 3d:
    * <table align="center" class="doxtable">
    *   <tr>
    *     <td>
@@ -785,7 +785,7 @@ namespace GridGenerator
                       const double        radius = 1.);
 
   /**
-   * Generate a 2D mesh consisting of five squares arranged in a plus-shape.
+   * Generate a 2d mesh consisting of five squares arranged in a plus-shape.
    * Depending on the number <code>n_rotate_middle_square</code> passed the
    * middle square is rotated by a degree of
    * <code>n_rotate_middle_square</code>$\pi/2$. This way one can generate a
@@ -807,7 +807,7 @@ namespace GridGenerator
                                 const unsigned int n_rotate_middle_square);
 
   /**
-   * Generate a 3D mesh consisting of the unit cube joined with a copy shifted
+   * Generate a 3d mesh consisting of the unit cube joined with a copy shifted
    * by $s = (1,0,0)$. Depending on the flags passed either the right or the
    * left cube (when looking at the positively oriented (x,z)-plane) contains a
    * face that is either not in standard orientation and/or is rotated by either
@@ -878,7 +878,7 @@ namespace GridGenerator
    * boundary and 1 for the cut plane. The manifold id for the curved boundary
    * is set to zero, and a SphericalManifold is attached to it.
    *
-   * The resulting grid in 2D and 3D looks as follows:
+   * The resulting grid in 2d and 3d looks as follows:
    * <table align="center" class="doxtable">
    *   <tr>
    *     <td>
@@ -1016,7 +1016,7 @@ namespace GridGenerator
    * In three dimensions, the manifold id of the hull is set to zero, and a
    * CylindricalManifold is attached to it.
    *
-   * Here are the grids in 2D and 3D after two mesh refinements:
+   * Here are the grids in 2d and 3d after two mesh refinements:
    *
    * @image html truncated_cone_2d.png
    * @image html truncated_cone_3d.png
@@ -1236,7 +1236,7 @@ namespace GridGenerator
           const bool          colorize = false);
 
   /**
-   * Initialize the given triangulation in 2D or 3D with a generalized
+   * Initialize the given triangulation in 2d or 3d with a generalized
    * subdivided hyper-L.
    *
    * This function produces a subdivided hyper rectangle with dimensions given
@@ -1255,16 +1255,16 @@ namespace GridGenerator
    *
    * This function may be used to generate a mesh for a backward
    * facing step, a useful domain for benchmark problems in fluid dynamics.
-   * The first image is a backward facing step in 3D, generated by
+   * The first image is a backward facing step in 3d, generated by
    * removing all cells in the z-direction, and 2 cells in the
    * positive x- and y-directions:
    * @image html subdivided_hyper_L_3d.png
-   * And in 2D, we can cut away 1 cell in the negative x-direction, and 2 cells
+   * And in 2d, we can cut away 1 cell in the negative x-direction, and 2 cells
    * in the negative y-direction:
    * @image html subdivided_hyper_L_2d.png
    *
    * @note This function is declared to exist for triangulations of all space
-   * dimensions, but throws an error if called in 1D.
+   * dimensions, but throws an error if called in 1d.
    */
   template <int dim, int spacedim>
   void
@@ -1492,7 +1492,7 @@ namespace GridGenerator
    * have the least aspect ratio. The same holds for @p n_axial_cells.
    *
    * @note Although this function is declared as a template, it does not make
-   * sense in 1D and 2D. Also keep in mind that this object is rotated
+   * sense in 1d and 2d. Also keep in mind that this object is rotated
    * and positioned differently than the one created by cylinder().
    *
    * All manifold ids are set to zero, and a CylindricalManifold is attached
@@ -1947,7 +1947,7 @@ namespace GridGenerator
    * This function creates a new Triangulation equal to a
    * <tt>dim</tt>-dimensional array of copies of @p input. Copies of @p input
    * are created by translating @p input along the coordinate axes. Boundary
-   * ids of faces (but not lines in 3D) and all manifold ids are copied but
+   * ids of faces (but not lines in 3d) and all manifold ids are copied but
    * Manifold objects are not since most Manifold objects do not work
    * correctly when a Triangulation has been translated.
    *
@@ -1962,7 +1962,7 @@ namespace GridGenerator
    *
    * @image html replicated_tria_2d.png
    *
-   * And, similarly, in 3D:
+   * And, similarly, in 3d:
    * @code
    * Triangulation<3> input;
    * GridGenerator::hyper_cross(1, 1, 1, 2, 1, 2);
@@ -2276,7 +2276,7 @@ namespace GridGenerator
                                     Triangulation<dim, spacedim> &out_tria);
 
   /**
-   * Specialization of the above function for 1D: simply copy triangulation.
+   * Specialization of the above function for 1d: simply copy triangulation.
    */
   template <int spacedim>
   void
@@ -2429,7 +2429,7 @@ namespace GridGenerator
      *       vertices in the final mesh are moved by this function to the
      *       right position.
      *
-     * @note This function is currently only implemented for 2D but the mesh
+     * @note This function is currently only implemented for 2d but the mesh
      *       can of course be extruded into the third dimension using
      *       GridGenerator::extrude().
      *
@@ -2455,7 +2455,7 @@ namespace GridGenerator
      * The same as above but periodic boundary conditions on the
      * upper and lower faces of the far field are applied.
      *
-     * @note This function is currently only implemented for 2D.
+     * @note This function is currently only implemented for 2d.
      *
      * @param[out] tria The triangulation to be created. It needs to be empty
      * upon calling this function.
@@ -2496,8 +2496,8 @@ namespace GridGenerator
     const bool                       colorize = false);
 
   /**
-   * Initialize the given triangulation with a hypercube (square in 2D and
-   * cube in 3D) consisting of @p repetitions cells in each direction.
+   * Initialize the given triangulation with a hypercube (square in 2d and
+   * cube in 3d) consisting of @p repetitions cells in each direction.
    * The hypercube volume is the tensor product interval
    * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
    * the limits are given as arguments. They default to zero and unity, then

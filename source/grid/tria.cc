@@ -472,7 +472,7 @@ namespace
    * in the middle of this object,
    * if it exists. In order to
    * exist, the object needs to be
-   * refined - for 2D and 3D it
+   * refined - for 2d and 3d it
    * needs to be refined
    * isotropically or else the
    * anisotropic children have to
@@ -1284,7 +1284,7 @@ namespace internal
      * not only call <code>vector::reserve()</code>, but does really append
      * the needed elements.
      *
-     * In 2D e.g. refined lines have to be stored in pairs, whereas new
+     * In 2d e.g. refined lines have to be stored in pairs, whereas new
      * lines in the interior of refined cells can be stored as single lines.
      */
     void
@@ -2732,7 +2732,7 @@ namespace internal
        * index the number of cells containing
        * this line. This information is needed to
        * decide whether a refined line may be
-       * coarsened or not in 3D. In 1D and 2D
+       * coarsened or not in 3d. In 1d and 2d
        * this argument is not needed and thus
        * ignored. The same applies for the last
        * argument and quads instead of lines.
@@ -3599,7 +3599,7 @@ namespace internal
        *
        * The faces of the cell have to
        * be refined already, whereas
-       * the inner lines in 2D will be
+       * the inner lines in 2d will be
        * created in this
        * function. Therefore iterator
        * pointers into the vectors of
@@ -10649,9 +10649,9 @@ namespace internal
       /**
        * Some dimension dependent stuff for mesh smoothing.
        *
-       * At present, this function does nothing in 1d and 2D, but
+       * At present, this function does nothing in 1d and 2d, but
        * makes sure no two cells with a level difference greater than
-       * one share one line in 3D. This is a requirement needed for
+       * one share one line in 3d. This is a requirement needed for
        * the interpolation of hanging nodes, since otherwise two steps
        * of interpolation would be necessary. This would make the
        * processes implemented in the @p AffineConstraints class much

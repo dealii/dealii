@@ -412,7 +412,7 @@ public:
 
   /**
    * Backward compatibility interface.  Return the point which shall become
-   * the new middle vertex of the two children of a regular line. In 2D, this
+   * the new middle vertex of the two children of a regular line. In 2d, this
    * line is a line at the boundary, while in 3d, it is bounding a face at the
    * boundary (the lines therefore is also on the boundary).
    *

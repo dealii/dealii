@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * More details
  * of two and three dimensional $BDM_{k}$ elements are given below.
  *<dl>
- *   <dt> In 2D:
+ *   <dt> In 2d:
  *   <dd> $ BDM_{k} = \{\mathbf{q} | \mathbf{q} = p_{k} (x,y) +
  *      r \; \text{curl} (x^{k+1}y) + s \;
  *      \text{curl} (xy^{k+1}), p_{k} \in (P_{k})^{2} \}$.
@@ -70,7 +70,7 @@ DEAL_II_NAMESPACE_OPEN
  * $(k+1)(k+2)+2$, with $k+1$ unknowns per
  * edge and $k(k-1)$ interior unknowns.
  *
- *   <dt> In 3D:
+ *   <dt> In 3d:
  *   <dd> $ BDM_{k} =
  *        \{\mathbf{q} | \mathbf{q} = p_{k} (x,y,z)
  *        + \sum_{i=0}^{k} (
@@ -82,7 +82,7 @@ DEAL_II_NAMESPACE_OPEN
  *        \begin{pmatrix}0\\zx^{i+1}y^{k-i}\\0\end{pmatrix})
  *        , p_{k} \in (P_{k})^{3} \}$.
  *
- *   Note: the 3D description of $BDM_{k}$ is not unique.  See <i>Mixed and
+ *   Note: the 3d description of $BDM_{k}$ is not unique.  See <i>Mixed and
  *   Hybrid Finite Element Methods</i> page 122 for an alternative definition.
  *
  *   The dimension of the $BDM_{k}$ space is
@@ -157,8 +157,8 @@ private:
   const PolynomialSpace<dim> polynomial_space;
 
   /**
-   * Storage for monomials. In 2D, this is just the polynomial of order
-   * <i>k</i>. In 3D, we need all polynomials from degree zero to <i>k</i>.
+   * Storage for monomials. In 2d, this is just the polynomial of order
+   * <i>k</i>. In 3d, we need all polynomials from degree zero to <i>k</i>.
    */
   std::vector<Polynomials::Polynomial<double>> monomials;
 

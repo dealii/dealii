@@ -113,7 +113,7 @@ public:
    * Compute the quadrature points on the cell if the given quadrature formula
    * is used on face <tt>face_no</tt>, subface number <tt>subface_no</tt>
    * corresponding to RefineCase::Type <tt>ref_case</tt>. The last argument is
-   * only used in 3D.
+   * only used in 3d.
    *
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
@@ -131,13 +131,13 @@ public:
    * Compute the cell quadrature formula corresponding to using
    * <tt>quadrature</tt> on subface <tt>subface_no</tt> of face
    * <tt>face_no</tt> with RefinementCase<dim-1> <tt>ref_case</tt>. The last
-   * argument is only used in 3D.
+   * argument is only used in 3d.
    *
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
    * @note This function is deprecated since it makes an implicit assumption
-   * that the cell is a line (1D), a quad (2D), or a hex (3D). Use the other
+   * that the cell is a line (1D), a quad (2d), or a hex (3d). Use the other
    * version of this function that takes the reference cell type instead.
    */
   static Quadrature<dim>
@@ -161,7 +161,7 @@ public:
    * to a single face and use it as a quadrature on this face, as is done in
    * FEFaceValues.
    *
-   * @note In 3D, this function produces eight sets of quadrature points for
+   * @note In 3d, this function produces eight sets of quadrature points for
    * each face, in order to cope possibly different orientations of the mesh.
    */
   static Quadrature<dim>

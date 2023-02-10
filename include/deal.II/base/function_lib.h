@@ -383,7 +383,7 @@ namespace Functions
   /**
    * A function that solves the Laplace equation (with specific
    * boundary values but zero right hand side) and that has a
-   * singularity at the center of the L-shaped domain in 2D (i.e.,
+   * singularity at the center of the L-shaped domain in 2d (i.e.,
    * at the location of the re-entrant corner of this non-convex
    * domain).
    *
@@ -449,7 +449,7 @@ namespace Functions
 
 
   /**
-   * Gradient of the harmonic singularity on the L-shaped domain in 2D.
+   * Gradient of the harmonic singularity on the L-shaped domain in 2d.
    *
    * The gradient of LSingularityFunction, which is a vector valued function
    * with vanishing curl and divergence.
@@ -500,7 +500,7 @@ namespace Functions
 
 
   /**
-   * Singularity on the slit domain in 2D and 3D.
+   * Singularity on the slit domain in 2d and 3d.
    *
    * @ingroup functions
    */
@@ -546,7 +546,7 @@ namespace Functions
 
 
   /**
-   * Singularity on the slit domain with one Neumann boundary in 2D.
+   * Singularity on the slit domain with one Neumann boundary in 2d.
    *
    * @ingroup functions
    */

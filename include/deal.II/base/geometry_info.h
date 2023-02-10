@@ -2121,7 +2121,7 @@ struct GeometryInfo
   /**
    * This field stores for each vertex to which faces it belongs. In any given
    * dimension, the number of faces is equal to the dimension. The first index
-   * in this 2D-array runs over all vertices, the second index over @p dim
+   * in this 2d-array runs over all vertices, the second index over @p dim
    * faces to which the vertex belongs.
    *
    * The order of the faces for each vertex is such that the first listed face
@@ -2203,7 +2203,7 @@ struct GeometryInfo
    * This field stores which child cells are adjacent to a certain face of the
    * mother cell.
    *
-   * For example, in 2D the layout of a cell is as follows:
+   * For example, in 2d the layout of a cell is as follows:
    * @verbatim
    * .      3
    * .   2-->--3
@@ -2323,7 +2323,7 @@ struct GeometryInfo
    * <tt>false</tt> and <tt>false</tt>, respectively. this combination
    * describes a face in standard orientation.
    *
-   * This function is only implemented in 3D.
+   * This function is only implemented in 3d.
    */
   static unsigned int
   standard_to_real_face_vertex(const unsigned int vertex,
@@ -2338,7 +2338,7 @@ struct GeometryInfo
    * <tt>false</tt> and <tt>false</tt>, respectively. this combination
    * describes a face in standard orientation.
    *
-   * This function is only implemented in 3D.
+   * This function is only implemented in 3d.
    */
   static unsigned int
   real_to_standard_face_vertex(const unsigned int vertex,
@@ -2353,7 +2353,7 @@ struct GeometryInfo
    * <tt>false</tt> and <tt>false</tt>, respectively. this combination
    * describes a face in standard orientation.
    *
-   * This function is only implemented in 3D.
+   * This function is only implemented in 3d.
    */
   static unsigned int
   standard_to_real_face_line(const unsigned int line,
@@ -2407,7 +2407,7 @@ struct GeometryInfo
    * <tt>false</tt>, respectively. this combination describes a face in
    * standard orientation.
    *
-   * This function is only implemented in 3D.
+   * This function is only implemented in 3d.
    */
   static unsigned int
   real_to_standard_face_line(const unsigned int line,

@@ -100,8 +100,8 @@ public:
    * reference column vs. the value column is based upon, it needs to be
    * passed as last argument to this method. The <i>default dimension for the
    * reference column</i> is 2, which is appropriate for the number of cells
-   * in 2D. If you work in 3D, set the number to 3. If the reference column is
-   * $1/h$, remember to set the dimension to 1 also when working in 3D to get
+   * in 2d. If you work in 3d, set the number to 3. If the reference column is
+   * $1/h$, remember to set the dimension to 1 also when working in 3d to get
    * correct rates.
    *
    * The new rate column and the data column will be merged to a supercolumn.
@@ -121,7 +121,7 @@ public:
    *
    * This is useful, for example, if we use as reference key the number of
    * degrees of freedom or better, the number of cells.  Assuming that the
-   * error is proportional to $ C (1/\sqrt{k})^r $ in 2D, then this method
+   * error is proportional to $ C (1/\sqrt{k})^r $ in 2d, then this method
    * will produce the rate $r$ as a result. For general dimension, as
    * described by the last parameter of this function, the formula needs to be
    * $ C (1/\sqrt[dim]{k})^r $.

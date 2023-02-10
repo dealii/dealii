@@ -1429,7 +1429,7 @@ protected:
  * determinant of the Jacobian and the quadrature weight). In the
  * @p integrate() call, an integral contribution tested by each basis function
  * underlying the FEEvaluation object (e.g. the four linear shape functions of
- * FE_Q@<2@>(1) in 2D) is computed, which gives the vector entries to be
+ * FE_Q@<2@>(1) in 2d) is computed, which gives the vector entries to be
  * summed into the @p dst vector. Note that the above code needs to explicitly
  * loop over the components in the vectorized array for evaluating the
  * function, which is necessary for interfacing with a generic Function object
@@ -1657,7 +1657,7 @@ protected:
  * specify the polynomial degree as a template parameter. This guarantees
  * maximum
  * efficiency: The evaluation with sum factorization performs a number of nested
- * short 1D loops of length equal to the polynomial degree plus one. If the
+ * short 1d loops of length equal to the polynomial degree plus one. If the
  * loop bounds are known at compile time, the compiler can unroll loops as
  * deemed most efficient by its heuristics. At least the innermost loop is
  * almost always completely unrolled, avoiding the loop overhead.
@@ -1881,7 +1881,7 @@ protected:
  * if the degree is not known at compile time, but performance will usually be
  * worse by a factor of 2-3.
  *
- * @tparam n_q_points_1d Number of points in the quadrature formula in 1D,
+ * @tparam n_q_points_1d Number of points in the quadrature formula in 1d,
  * defaults to fe_degree+1
  *
  * @tparam n_components Number of vector components when solving a system of
@@ -2380,7 +2380,7 @@ private:
  *                  rather than a compile time constant that slows down the
  *                  execution.
  *
- * @tparam n_q_points_1d Number of points in the quadrature formula in 1D,
+ * @tparam n_q_points_1d Number of points in the quadrature formula in 1d,
  *                  usually chosen as fe_degree+1
  *
  * @tparam n_components Number of vector components when solving a system of

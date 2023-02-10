@@ -601,7 +601,7 @@ namespace MatrixFreeOperators
    * mass matrix on an element for the special case of an evaluation object
    * with as many quadrature points as there are cell degrees of freedom. It
    * uses algorithms from FEEvaluation and produces the exact mass matrix for
-   * DGQ elements. This algorithm uses tensor products of inverse 1D shape
+   * DGQ elements. This algorithm uses tensor products of inverse 1d shape
    * matrices over quadrature points, so the inverse operation is exactly as
    * expensive as applying the forward operator on each cell. Of course, for
    * continuous finite elements this operation does not produce the inverse of

@@ -801,15 +801,15 @@ namespace internal
      *  - dim-dimensional neighbors of dim-dimensional entities (connected via
      *    faces)
      *  - d-dimensional entity to it's (d-1)-dimension bounding entities
-     *  - quad (2 - 3D), line (1 - 2D/3D) to vertices (0) to be able to process
+     *  - quad (2 - 3D), line (1 - 2d/3d) to vertices (0) to be able to process
      *    the user provided SubCellData during
      *    Triangulation::create_triangulation().
      * We call a table, which computes the corresponding entries of a full
      * connectivity table a reduced table.
      *
-     * The entries of the reduced table are as follows for 1D-3D:
+     * The entries of the reduced table are as follows for 1d-3d:
      *
-     * 1D :    | 0 1    2D:    | 0 1 2    3D:    | 0 1 2 3
+     * 1D :    | 0 1    2d:    | 0 1 2    3d:    | 0 1 2 3
      *      ---+-----       ---+-------       ---+--------
      *       0 |             0 |               0 |
      *       1 | x n         1 | x             1 | x

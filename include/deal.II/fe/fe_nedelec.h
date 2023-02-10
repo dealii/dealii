@@ -108,7 +108,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo Even if this element is implemented for two and three space
  * dimensions, the definition of the node values relies on consistently
- * oriented faces in 3D. Therefore, care should be taken on complicated
+ * oriented faces in 3d. Therefore, care should be taken on complicated
  * meshes.
  *
  *
@@ -156,7 +156,7 @@ DEAL_II_NAMESPACE_OPEN
  * function associated with each edge (i.e., the tangential component of each
  * shape function is non-zero on only one edge).
  *
- * In 2D, these shape functions look as follows: <table> <tr> <td
+ * In 2d, these shape functions look as follows: <table> <tr> <td
  * align="center">
  * @image html fe_nedelec_shape_function_0_00.png
  * </td>
@@ -185,7 +185,7 @@ DEAL_II_NAMESPACE_OPEN
  * For higher order N&eacute;d&eacute;lec cells, we have shape functions
  * associated with the edges, faces, and the volume.
  *
- * In 2D, for example, with FE_Nedelec(1), we have 2 shape functions associated
+ * In 2d, for example, with FE_Nedelec(1), we have 2 shape functions associated
  * with each edge, and 4 shape functions associated with the cell, which
  * correspond to the shape functions with no non-zero tangential components on
  * the boundary of the cell.
@@ -261,7 +261,7 @@ DEAL_II_NAMESPACE_OPEN
  * For higher order N&eacute;d&eacute;lec cells, we have shape functions
  * associated with the edges, faces, and the volume.
  *
- * In 2D, with FE_Nedelec(2), we have 3 shape functions associated with each
+ * In 2d, with FE_Nedelec(2), we have 3 shape functions associated with each
  * edge, and 12 shape functions associated with the cell.
  *
  * These shape functions look
@@ -407,7 +407,7 @@ public:
    * the total polynomial degree may be higher). If `order = 0`, the element is
    * linear and has degrees of freedom only on the edges. If `order >=1` the
    * element has degrees of freedom on the edges, faces and volume. For example
-   * the 3D version of FE_Nedelec has 12 degrees of freedom for `order = 0`
+   * the 3d version of FE_Nedelec has 12 degrees of freedom for `order = 0`
    * and 54 for `degree = 1`. It is important to have enough quadrature points
    * in order to perform the quadrature with sufficient accuracy.
    * For example

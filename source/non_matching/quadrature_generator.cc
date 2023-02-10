@@ -1398,7 +1398,7 @@ namespace NonMatching
         std::vector<typename VectorType::value_type> local_dof_values;
 
         /**
-         * Description of the 1D polynomial basis for tensor product elements
+         * Description of the 1d polynomial basis for tensor product elements
          * used for the fast path of this class using tensor product
          * evaluators.
          */

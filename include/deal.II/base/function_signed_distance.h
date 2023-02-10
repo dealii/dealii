@@ -202,7 +202,7 @@ namespace Functions
       compute_analyical_normal_vector_on_ellipse(const Point<dim> &point) const;
 
       /**
-       * Compute the signed distance to a 2D ellipsoid i.e. ellipse.
+       * Compute the signed distance to a 2d ellipsoid i.e. ellipse.
        */
       double
       compute_signed_distance_ellipse(const Point<dim> &point) const;

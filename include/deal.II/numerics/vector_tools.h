@@ -244,10 +244,10 @@ DEAL_II_NAMESPACE_OPEN
  * want to choose a quadrature formula with more quadrature points or one with
  * another distribution of the quadrature points in this case. You should also
  * take into account the superconvergence properties of finite elements in
- * some points: for example in 1D, the standard finite element method is a
+ * some points: for example in 1d, the standard finite element method is a
  * collocation method and should return the exact value at nodal points.
  * Therefore, the trapezoidal rule should always return a vanishing L-infinity
- * error. Conversely, in 2D the maximum L-infinity error should be located at
+ * error. Conversely, in 2d the maximum L-infinity error should be located at
  * the vertices or at the center of the cell, which would make it plausible to
  * use the Simpson quadrature rule. On the other hand, there may be
  * superconvergence at Gauss integration points. These examples are not

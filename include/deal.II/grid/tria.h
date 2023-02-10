@@ -347,7 +347,7 @@ namespace internal
  * and handle the usual one-dimensional triangulation used in the finite
  * element method (so, segments on a straight line). On the other hand,
  * objects such as @p Triangulation<1,2> or @p Triangulation<2,3> (that are
- * associated with curves in 2D or surfaces in 3D) are the ones one wants to
+ * associated with curves in 2d or surfaces in 3d) are the ones one wants to
  * use in the boundary element method.
  *
  * The name of the class is mostly hierarchical and is not meant to imply that
@@ -409,7 +409,7 @@ namespace internal
  * By using the cell iterators, you can write code independent of the spatial
  * dimension. The same applies for substructure iterators, where a
  * substructure is defined as a face of a cell. The face of a cell is a vertex
- * in 1D and a line in 2D; however, vertices are handled in a different way
+ * in 1d and a line in 2d; however, vertices are handled in a different way
  * and therefore lines have no faces.
  *
  * The Triangulation class offers functions like begin_active() which gives
@@ -528,7 +528,7 @@ namespace internal
  *
  * Creating the hierarchical information needed for this library from cells
  * storing only vertex information can be quite a complex task.  For example
- * in 2D, we have to create lines between vertices (but only once, though
+ * in 2d, we have to create lines between vertices (but only once, though
  * there are two cells which link these two vertices) and we have to create
  * neighborhood information. Grids being read in should therefore not be too
  * large, reading refined grids would be inefficient (although there is
@@ -543,7 +543,7 @@ namespace internal
  * guarantee this, in the input vector keeping the cell list, the vertex
  * indices for each cell have to be in a defined order, see the documentation
  * of GeometryInfo<dim>. In one dimension, the first vertex index must refer
- * to that vertex with the lower coordinate value. In 2D and 3D, the
+ * to that vertex with the lower coordinate value. In 2d and 3d, the
  * corresponding conditions are not easy to verify and no full attempt to do
  * so is made. If you violate this condition, you may end up with matrix
  * entries having the wrong sign (clockwise vertex numbering, which results in
@@ -707,7 +707,7 @@ namespace internal
  * Boundary indicators may be in the range from zero to
  * numbers::internal_face_boundary_id-1. The value
  * numbers::internal_face_boundary_id is reserved to denote interior lines (in
- * 2D) and interior lines and quads (in 3D), which do not have a boundary
+ * 2d) and interior lines and quads (in 3d), which do not have a boundary
  * indicator. This way, a program can easily determine, whether such an object
  * is at the boundary or not. Material indicators may be in the range from
  * zero to numbers::invalid_material_id-1.
@@ -715,7 +715,7 @@ namespace internal
  * Lines in two dimensions and quads in three dimensions inherit their
  * boundary indicator to their children upon refinement. You should therefore
  * make sure that if you have different boundary parts, the different parts
- * are separated by a vertex (in 2D) or a line (in 3D) such that each boundary
+ * are separated by a vertex (in 2d) or a line (in 3d) such that each boundary
  * line or quad has a unique boundary indicator.
  *
  * By default (unless otherwise specified during creation of a triangulation),
@@ -880,7 +880,7 @@ namespace internal
  * must make sure that a new boundary vertex does not lie too much inside the
  * cell which is to be refined. The reason is that the center vertex is placed
  * at the point which is a weighted average of the vertices of the original
- * cell, new face midpoints, and (in 3D) new line midpoints. Therefore if your
+ * cell, new face midpoints, and (in 3d) new line midpoints. Therefore if your
  * new boundary vertex is too near the center of the old quadrilateral or
  * hexahedron, the distance to the midpoint vertex will become too small, thus
  * generating distorted cells. This issue is discussed extensively in
@@ -1210,7 +1210,7 @@ public:
      * unrefined cells are flagged for refinement. Cells which are not yet
      * refined but flagged for that are accounted for the number of refined
      * neighbors. Cells on the boundary are not accounted for at all. An
-     * unrefined island is, by this definition also a cell which (in 2D) is
+     * unrefined island is, by this definition also a cell which (in 2d) is
      * surrounded by three refined cells and one unrefined one, or one
      * surrounded by two refined cells, one unrefined one and is at the
      * boundary on one side. It is thus not a true island, as the name of the
@@ -1288,7 +1288,7 @@ public:
      * for refinement. This definition is unlike that for
      * #eliminate_unrefined_islands, which would mean that an island is
      * defined as a cell which is refined but more of its neighbors are not
-     * refined than are refined. For example, in 2D, a cell's refinement would
+     * refined than are refined. For example, in 2d, a cell's refinement would
      * be reverted if at most one of its neighbors is also refined (or refined
      * but flagged for coarsening).
      *
@@ -3152,8 +3152,8 @@ public:
    * In the following, most functions are provided in two versions, with and
    * without an argument describing the level. The versions with this argument
    * are only applicable for objects describing the cells of the present
-   * triangulation. For example: in 2D <tt>n_lines(level)</tt> cannot be
-   * called, only <tt>n_lines()</tt>, as lines are faces in 2D and therefore
+   * triangulation. For example: in 2d <tt>n_lines(level)</tt> cannot be
+   * called, only <tt>n_lines()</tt>, as lines are faces in 2d and therefore
    * have no level.
    */
 
@@ -3278,16 +3278,16 @@ public:
   n_global_coarse_cells() const;
 
   /**
-   * Return the total number of used faces, active or not.  In 2D, the result
-   * equals n_lines(), in 3D it equals n_quads(), while in 1D it equals
+   * Return the total number of used faces, active or not.  In 2d, the result
+   * equals n_lines(), in 3d it equals n_quads(), while in 1d it equals
    * the number of used vertices.
    */
   unsigned int
   n_faces() const;
 
   /**
-   * Return the total number of active faces.  In 2D, the result equals
-   * n_active_lines(), in 3D it equals n_active_quads(), while in 1D it equals
+   * Return the total number of active faces.  In 2d, the result equals
+   * n_active_lines(), in 3d it equals n_active_quads(), while in 1d it equals
    * the number of used vertices.
    */
   unsigned int
@@ -3501,7 +3501,7 @@ public:
 
   /**
    * Return the total number of faces, used or not. In 2d, the result equals
-   * n_raw_lines(), in 3d it equals n_raw_quads(), while in 1D it equals
+   * n_raw_lines(), in 3d it equals n_raw_quads(), while in 1d it equals
    * the number of vertices.
    *
    * @note This function really exports internal information about the
@@ -4183,7 +4183,7 @@ private:
 
   /**
    * Pointer to the faces of the triangulation. In 1d this contains nothing,
-   * in 2D it contains data concerning lines and in 3D quads and lines.  All
+   * in 2d it contains data concerning lines and in 3d quads and lines.  All
    * of these have no level and are therefore treated separately.
    */
   std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces>

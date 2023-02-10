@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Polynomials
 {
   /**
-   * Base class for all 1D polynomials. A polynomial is represented in this
+   * Base class for all 1d polynomials. A polynomial is represented in this
    * class by its coefficients, which are set through the constructor or by
    * derived classes.
    *

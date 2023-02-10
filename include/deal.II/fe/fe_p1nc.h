@@ -34,8 +34,8 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Implementation of the scalar version of the P1 nonconforming finite
- * element, a piecewise linear element on quadrilaterals in 2D.
- * This implementation is only for 2D cells in a 2D space (i.e., codimension 0).
+ * element, a piecewise linear element on quadrilaterals in 2d.
+ * This implementation is only for 2d cells in a 2d space (i.e., codimension 0).
  *
  * Unlike the usual continuous, $H^1$ conforming finite elements,
  * the P1 nonconforming element does not enforce continuity across edges.
@@ -67,7 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  * freedom (DoFs) on a quadrilateral is by using midpoint values of a function.
  *
  * However, these 4 functionals are not linearly independent
- * because a linear function on 2D is uniquely determined by only 3 independent
+ * because a linear function on 2d is uniquely determined by only 3 independent
  * values. A simple observation reads that any linear function on a
  * quadrilateral should satisfy the 'dice rule': the sum of two function values
  * at the midpoints of the edge pair on opposite sides of a cell is equal to the
@@ -88,7 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  * the last value at the last midpoint.
  * It means that the number of independent local functionals on a cell is 3,
  * and this is also the dimension of the linear polynomial space on a cell in
- * 2D.
+ * 2d.
  *
  * <h3>Shape functions</h3>
  * Before introducing the degrees of freedom, we present 4 local shape functions
@@ -261,7 +261,7 @@ class FE_P1NC : public FiniteElement<2, 2>
 public:
   /**
    * Constructor for the P1 nonconforming element.
-   * It is only for 2D and codimension = 0.
+   * It is only for 2d and codimension = 0.
    */
   FE_P1NC();
 

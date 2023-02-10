@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  * the positive axis direction and not necessarily normal to the element for
  * consistent orientation across edges.
  *<dl>
- *   <dt> 2D bubble functions (in order)
+ *   <dt> 2d bubble functions (in order)
  *   <dd> $x=0$ edge: $\mathbf{p}_1 = \mathbf{n}_1 (1-x)(y)(1-y)$
  *
  *        $x=1$ edge: $\mathbf{p}_2 = \mathbf{n}_2 (x)(y)(1-y)$
@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  *        $y=1$ edge: $\mathbf{p}_4 = \mathbf{n}_4 (x)(1-x)(y)$
  *
- *   <dt> 3D bubble functions (in order)
+ *   <dt> 3d bubble functions (in order)
  *   <dd> $x=0$ edge: $\mathbf{p}_1 = \mathbf{n}_1 (1-x)(y)(1-y)(z)(1-z)$
  *
  *        $x=1$ edge: $\mathbf{p}_2 = \mathbf{n}_2 (x)(y)(1-y)(z)(1-z)$

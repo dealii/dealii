@@ -46,7 +46,7 @@ namespace internal
      * the subcell, or the position of an element along each direction. The
      * second field determines if there is a constrained face with that
      * direction as normal. The last field determines if there is a
-     * constrained edge in that direction (only valid in 3D).
+     * constrained edge in that direction (only valid in 3d).
      */
     enum class ConstraintKinds : std::uint16_t
     {
@@ -319,7 +319,7 @@ namespace internal
 
     private:
       /**
-       * Set up line-to-cell mapping for edge constraints in 3D.
+       * Set up line-to-cell mapping for edge constraints in 3d.
        */
       void
       setup_line_to_cell(const Triangulation<dim> &triangulation);

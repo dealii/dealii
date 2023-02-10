@@ -129,7 +129,7 @@ namespace internal
        * <tt>level=index=-1</tt> is set.
        *
        * <em>Conventions:</em> The @p ith neighbor of a cell is the one which
-       * shares the @p ith face (@p Line in 2D, @p Quad in 3D) of this cell.
+       * shares the @p ith face (@p Line in 2d, @p Quad in 3d) of this cell.
        *
        * The neighbor of a cell has at most the same level as this cell, i.e.
        * it may or may not be refined.

@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * The basis of the space is chosen to match the node functionals of the Adini
  * element.
  *
- * @todo This polynomial space is implemented in 2D only and does not compute
+ * @todo This polynomial space is implemented in 2d only and does not compute
  * derivatives of order 3 or higher.
  *
  * @ingroup Polynomials

@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Polynomials
 {
   /**
-   * Definition of piecewise 1D polynomials for the unit interval. This space
+   * Definition of piecewise 1d polynomials for the unit interval. This space
    * allows the description of interpolating polynomials on parts of the unit
    * interval, similarly to the definition of finite element basis functions
    * on subdivided elements. The primary purpose of this class is to

@@ -995,7 +995,7 @@ namespace internal
 
       /**
        * A helper function to provide faster access to cell->line_index() in
-       * 3D
+       * 3d
        */
       template <int structdim, int dim, int spacedim>
       static std::array<unsigned int, 12>
@@ -1082,7 +1082,7 @@ namespace internal
 
       /**
        * A helper function to provide faster access to
-       * cell->line_orientation(), 1D specialization
+       * cell->line_orientation(), 1d specialization
        */
       template <int dim, int spacedim>
       static std::array<unsigned int, 1>
@@ -1096,7 +1096,7 @@ namespace internal
 
       /**
        * A helper function to provide faster access to
-       * cell->line_orientation(), 2D specialization
+       * cell->line_orientation(), 2d specialization
        */
       template <int dim, int spacedim>
       static std::array<bool, 4>
@@ -1114,7 +1114,7 @@ namespace internal
 
       /**
        * A helper function to provide faster access to
-       * cell->line_orientation(), 3D specialization
+       * cell->line_orientation(), 3d specialization
        */
       template <int dim, int spacedim>
       static std::array<bool, 12>

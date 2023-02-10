@@ -60,7 +60,7 @@ namespace internal
        * CellIterator::level() and CellIterator::index(), in order to allow
        * for different kinds of iterators, e.g. standard DoFHandler,
        * multigrid, etc.)  on a fixed Triangulation. In addition, a mapping
-       * and several 1D quadrature formulas are given.
+       * and several 1d quadrature formulas are given.
        */
       void
       initialize(

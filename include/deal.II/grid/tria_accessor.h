@@ -1565,7 +1565,7 @@ public:
    * from the vertex points, this function also ignores the attached manifold
    * descriptions. The result is only exact in case the transformation from
    * the unit to the real cell is indeed affine, such as in one dimension or
-   * for Cartesian and affine (parallelogram) meshes in 2D/3D.
+   * for Cartesian and affine (parallelogram) meshes in 2d/3d.
    *
    * For exact transformations to the unit cell, use
    * Mapping::transform_real_to_unit_cell().
@@ -1597,12 +1597,12 @@ public:
    * setting to true the second additional parameter @p
    * interpolate_from_surrounding. This computes the location of the center by
    * a so-called transfinite interpolation from the center of all the bounding
-   * objects. For a 2D object, it puts a weight of <code>1/2</code> on each of
+   * objects. For a 2d object, it puts a weight of <code>1/2</code> on each of
    * the four surrounding lines and a weight <code>-1/4</code> on the four
    * vertices. This corresponds to a linear interpolation between the
    * descriptions of the four faces, subtracting the contribution of the
    * vertices that is added twice when coming through both lines adjacent to
-   * the vertex. In 3D, the weights for faces are <code>1/2</code>, the
+   * the vertex. In 3d, the weights for faces are <code>1/2</code>, the
    * weights for lines are <code>-1/4</code>, and the weights for vertices are
    * <code>1/8</code>. For further information, also confer to the
    * TransfiniteInterpolationManifold class that is able to not only apply
@@ -3021,8 +3021,8 @@ protected:
  *
  * The following refers to any dimension:
  *
- * This class allows access to a <tt>cell</tt>, which is a line in 1D and a
- * quad in 2D. Cells have more functionality than lines or quads by
+ * This class allows access to a <tt>cell</tt>, which is a line in 1d and a
+ * quad in 2d. Cells have more functionality than lines or quads by
  * themselves, for example they can be flagged for refinement, they have
  * neighbors, they have the possibility to check whether they are at the
  * boundary etc. This class offers access to all this data.
@@ -3335,7 +3335,7 @@ public:
    * for the case of a coarser neighbor. It returns a pair of numbers, face_no
    * and subface_no, with the following property, if the neighbor is not
    * refined: <tt>cell->neighbor(neighbor)->neighbor_child_on_subface(face_no,
-   * subface_no)==cell</tt>. In 3D, a coarser neighbor can still be refined.
+   * subface_no)==cell</tt>. In 3d, a coarser neighbor can still be refined.
    * In that case subface_no denotes the child index of the neighbors face
    * that relates to our face:
    * <tt>cell->neighbor(neighbor)->face(face_no)->child(subface_no)==cell->face(neighbor)</tt>.

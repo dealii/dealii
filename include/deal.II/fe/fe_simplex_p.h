@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Base class of FE_SimplexP, FE_SimplexDGP, and FE_SimplexP_Bubbles.
  *
- * @note Only implemented for 2D and 3D.
+ * @note Only implemented for 2d and 3d.
  *
  * @relates simplex
  */

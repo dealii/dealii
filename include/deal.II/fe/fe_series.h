@@ -62,7 +62,7 @@ namespace FESeries
    * The exponential form of the Fourier series is  based on completeness
    * and Hermitian orthogonality of the set of exponential
    * functions $ \phi_{\bf k}({\bf x}) = \exp(2 \pi i\, {\bf k} \cdot {\bf x})$.
-   * For example in 1D the L2-orthogonality condition reads
+   * For example in 1d the L2-orthogonality condition reads
    * @f[
    *   \int_0^1 \phi_k(x) \phi_l^\ast(x) dx=\delta_{kl}.
    * @f]

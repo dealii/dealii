@@ -149,7 +149,7 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    *
-   * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
+   * Right now, this is only implemented for RT0 in 1d. Otherwise, returns
    * always @p true.
    */
   virtual bool
@@ -311,7 +311,7 @@ private:
  * For this Raviart-Thomas element, the node values are not cell and face
  * moments with respect to certain polynomials, but the values at quadrature
  * points. Following the general scheme for numbering degrees of freedom, the
- * node values on faces (edges in 2D, quads in 3D) are first, face by face,
+ * node values on faces (edges in 2d, quads in 3d) are first, face by face,
  * according to the natural ordering of the faces of a cell. The interior
  * degrees of freedom are last.
  *

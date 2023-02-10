@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  * corresponding two directions, yielding the polynomial spaces
  * <i>(Q<sub>k,k+1</sub>, Q<sub>k+1,k</sub>)</i> and
  * <i>(Q<sub>k,k+1,k+1</sub>, Q<sub>k+1,k,k+1</sub>,
- * Q<sub>k+1,k+1,k</sub>)</i> in 2D and 3D, resp.
+ * Q<sub>k+1,k+1,k</sub>)</i> in 2d and 3d, resp.
  *
  * @ingroup Polynomials
  */

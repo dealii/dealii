@@ -1538,7 +1538,7 @@ private:
     mg_number_cache;
 
   /**
-   * Indices of degree of freedom of each d+1 geometric object (3D: vertex,
+   * Indices of degree of freedom of each d+1 geometric object (3d: vertex,
    * line, quad, hex) for all relevant active finite elements. Identification
    * of the appropriate position is done via object_dof_ptr (CRS scheme).
    */

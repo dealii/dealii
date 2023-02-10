@@ -201,13 +201,13 @@ public:
    * Return a Gauss-type quadrature matching the given reference cell (QGauss,
    * QGaussSimplex, QGaussPyramid, QGaussWedge).
    *
-   * @param[in] n_points_1D The number of quadrature points in each direction
+   * @param[in] n_points_1d The number of quadrature points in each direction
    * (QGauss) or an indication of what polynomial degree needs to be
    * integrated exactly for the other types.
    */
   template <int dim>
   Quadrature<dim>
-  get_gauss_type_quadrature(const unsigned n_points_1D) const;
+  get_gauss_type_quadrature(const unsigned n_points_1d) const;
 
   /**
    * Return a quadrature object that has a single quadrature point at the
@@ -351,7 +351,7 @@ public:
 
   /**
    * Return the default combined face orientation flag (i.e., the default set of
-   * orientations, defined by orientation, rotate, and flip for a face in 3D).
+   * orientations, defined by orientation, rotate, and flip for a face in 3d).
    */
   static constexpr unsigned char
   default_combined_face_orientation();
@@ -373,7 +373,7 @@ public:
    * Return which child cells are adjacent to a certain face of the
    * mother cell.
    *
-   * For example, in 2D the layout of a quadrilateral cell is as follows:
+   * For example, in 2d the layout of a quadrilateral cell is as follows:
    * @verbatim
    *      3
    *   2-->--3

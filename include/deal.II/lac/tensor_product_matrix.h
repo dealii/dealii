@@ -40,19 +40,19 @@ class FullMatrix;
 
 /**
  * This is a special matrix class defined as the tensor product (or Kronecker
- * product) of 1D matrices of the type
+ * product) of 1d matrices of the type
  * @f{align*}{
  * L &= A_1 \otimes M_0 + M_1 \otimes A_0
  * @f}
- * in 2D and
+ * in 2d and
  * @f{align*}{
  * L &= A_2 \otimes M_1 \otimes M_0 + M_2 \otimes A_1 \otimes M_0 + M_2 \otimes
  * M_1 \otimes A_0
  * @f}
- * in 3D. The typical application setting is a discretization of the Laplacian
+ * in 3d. The typical application setting is a discretization of the Laplacian
  * $L$ on a Cartesian (axis-aligned) geometry, where it can be exactly
- * represented by the Kronecker or tensor product of a 1D mass matrix $M$ and
- * a 1D Laplace matrix $A$ in each tensor direction (due to symmetry $M$ and $A$
+ * represented by the Kronecker or tensor product of a 1d mass matrix $M$ and
+ * a 1d Laplace matrix $A$ in each tensor direction (due to symmetry $M$ and $A$
  * are the same in each dimension). The dimension of the resulting class is the
  * product of the one-dimensional matrices.
  *
@@ -95,7 +95,7 @@ class FullMatrix;
  * @note This class can work with scalar types (float, double) and
  * VectorizedArray types.
  *
- * @tparam dim Dimension of the problem. Currently, 1D, 2D, and 3D codes are
+ * @tparam dim Dimension of the problem. Currently, 1D, 2d, and 3d codes are
  * implemented.
  *
  * @tparam Number Arithmetic type of the underlying array elements. Note that the
@@ -106,7 +106,7 @@ class FullMatrix;
  * to perform LAPACK calculations for each vectorization lane, i.e. for the
  * supported float and double numbers.
  *
- * @tparam n_rows_1d Compile-time number of rows of 1D matrices (only
+ * @tparam n_rows_1d Compile-time number of rows of 1d matrices (only
  * valid if the number of rows and columns coincide for each
  * dimension). By default at -1, which means that the number of rows
  * is determined at run-time by means of the matrices passed to the
@@ -123,7 +123,7 @@ public:
   using value_type = Number;
 
   /**
-   * The static number of rows of the 1D matrices. For more details,
+   * The static number of rows of the 1d matrices. For more details,
    * see the description of the template parameter <tt>n_rows_1d</tt>.
    */
   static constexpr int n_rows_1d_static = n_rows_1d;
@@ -142,8 +142,8 @@ public:
                                   const T &derivative_matrix);
 
   /**
-   * Initializes the tensor product matrix by copying the arrays of 1D mass
-   * matrices @p mass_matrix and 1D derivative matrices @p derivative_matrix into its
+   * Initializes the tensor product matrix by copying the arrays of 1d mass
+   * matrices @p mass_matrix and 1d derivative matrices @p derivative_matrix into its
    * base class counterparts, respectively, and by assembling the regarding
    * generalized eigenvalues and eigenvectors in eigenvalues
    * and eigenvectors, respectively.
@@ -155,7 +155,7 @@ public:
    * @warning This class accepts the following types:
    * "std::array<Table<2, Number>, dim>", "std::array<FullMatrix<Number>, dim>",
    * and "Table<2, Number>". In the latter case, we consider the same 1d
-   * mass matrix @p mass_matrix and the same 1D derivative matrix
+   * mass matrix @p mass_matrix and the same 1d derivative matrix
    * @p derivative_matrix for each tensor direction.
    */
   template <typename T>
@@ -164,7 +164,7 @@ public:
 
   /**
    * Return the number of rows of the tensor product matrix
-   * resulting from the Kronecker product of 1D matrices, which is described
+   * resulting from the Kronecker product of 1d matrices, which is described
    * in the main documentation of TensorProductMatrixSymmetricSum.
    */
   unsigned int
@@ -172,7 +172,7 @@ public:
 
   /**
    * Return the number of columns of the tensor product matrix
-   * resulting from the Kronecker product of 1D matrices, which is described
+   * resulting from the Kronecker product of 1d matrices, which is described
    * in the main documentation of TensorProductMatrixSymmetricSum.
    */
   unsigned int
@@ -343,14 +343,14 @@ namespace internal
  * A class similar to TensorProductMatrixSymmetricSum.
  *
  * The class TensorProductMatrixSymmetricSum stores a
- * 1D mass matrix, 1D stiffness matrix, eigenvalues and eigenvectors
+ * 1d mass matrix, 1d stiffness matrix, eigenvalues and eigenvectors
  * for each direction. If one uses one TensorProductMatrixSymmetricSum
  * instance for, e.g., each cell, these quantities are stored
  * for each cell. There is no possibility to reuse quantities between
  * TensorProductMatrixSymmetricSum instances even if the values of the
  * internal data structures might be the same. This class targets the case
  * of many TensorProductMatrixSymmetricSum instances, where some of them might
- * possibly share the underlying 1D matrices and hence re-use the same data.
+ * possibly share the underlying 1d matrices and hence re-use the same data.
  *
  * This class is flexible and allows to interpret the parameter
  * @p index arbitrarily. In the case of an element-centric patch
@@ -429,7 +429,7 @@ public:
   memory_consumption() const;
 
   /**
-   * Return the number of 1D matrices of each type stored internally.
+   * Return the number of 1d matrices of each type stored internally.
    * In the case that no compression could be performed, its value
    * is the parameter passed to the function reserve() times the
    * number of dimension. If compression could be performed, the
@@ -446,13 +446,13 @@ private:
   const bool compress_matrices;
 
   /**
-   * Container used to collect 1D matrices if no compression is
+   * Container used to collect 1d matrices if no compression is
    * requested. The memory is freed during finalize().
    */
   std::vector<MatrixPairType> mass_and_derivative_matrices;
 
   /**
-   * Container used during setup to determine the unique 1D
+   * Container used during setup to determine the unique 1d
    * matrices. The memory is freed during finalize().
    */
   std::map<
@@ -471,12 +471,12 @@ private:
   std::vector<unsigned int> indices;
 
   /**
-   * Vector of 1D mass matrices.
+   * Vector of 1d mass matrices.
    */
   AlignedVector<Number> mass_matrices;
 
   /**
-   * Vector of 1D derivative matrices.
+   * Vector of 1d derivative matrices.
    */
   AlignedVector<Number> derivative_matrices;
 

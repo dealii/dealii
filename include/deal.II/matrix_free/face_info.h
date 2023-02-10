@@ -97,7 +97,7 @@ namespace internal
       unsigned char subface_index;
 
       /**
-       * In 3D, one of the two cells adjacent to a face might use a different
+       * In 3d, one of the two cells adjacent to a face might use a different
        * orientation (also called as face orientation, face flip and face
        * rotation) than the standard orientation. This variable stores the
        * values of face orientation, face flip and face

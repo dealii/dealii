@@ -3091,7 +3091,7 @@ namespace internal
     }
 
     /*
-     * Helper function which applies the 1D kernels for on one
+     * Helper function which applies the 1d kernels for on one
      * component in a face. normal_dir indicates the direction of the continuous
      * component of the RT space. std::integral_constant<bool, false> is the
      * evaluation path, and std::integral_constant<bool, true> below is the

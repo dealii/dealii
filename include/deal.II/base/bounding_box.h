@@ -81,15 +81,15 @@ enum class NeighborType
  * direction $k$.
  *
  * Geometrically, a bounding box is thus:
- * - 1D: a segment (represented by its vertices in the proper order)
- * - 2D: a rectangle (represented by the vertices V at bottom left, top right)
+ * - 1d: a segment (represented by its vertices in the proper order)
+ * - 2d: a rectangle (represented by the vertices V at bottom left, top right)
  * @code
  * .--------V
  * |        |
  * V--------.
  * @endcode
  *
- * - 3D: a cuboid (in which case the two vertices V follow the convention and
+ * - 3d: a cuboid (in which case the two vertices V follow the convention and
  * are not owned by the same face)
  * @code
  *   .------V
@@ -115,10 +115,10 @@ enum class NeighborType
  *
  * Taking the cross section of a BoundingBox<spacedim> orthogonal to a given
  * direction gives a box in one dimension lower: BoundingBox<spacedim - 1>.
- * In 3D, the 2 coordinates of the cross section of BoundingBox<3> can be
+ * In 3d, the 2 coordinates of the cross section of BoundingBox<3> can be
  * ordered in 2 different ways. That is, if we take the cross section orthogonal
- * to the y direction we could either order a 3D-coordinate into a
- * 2D-coordinate as $(x,z)$ or as $(z,x)$. This class uses the second
+ * to the y direction we could either order a 3d-coordinate into a
+ * 2d-coordinate as $(x,z)$ or as $(z,x)$. This class uses the second
  * convention, corresponding to the coordinates being ordered cyclicly
  * $x \rightarrow y \rightarrow z \rightarrow x \rightarrow ... $
  * To be precise, if we take a cross section:
@@ -287,7 +287,7 @@ public:
    * Returns the cross section of the box orthogonal to @p direction.
    * This is a box in one dimension lower.
    *
-   * @note Calling this method in 1D will result in an exception since
+   * @note Calling this method in 1d will result in an exception since
    * <code>BoundingBox&lt;0&gt;</code> is not implemented.
    */
   BoundingBox<spacedim - 1, Number>
@@ -375,16 +375,16 @@ namespace internal
    *
    * The convention is the following: Starting from the locked coordinate we
    * store the lower dimensional coordinates consecutively and wrap around
-   * when going over the dimension. This relationship is, in 2D,
+   * when going over the dimension. This relationship is, in 2d,
    *
-   * | locked in 2D | 1D coordinate | 2D coordinate |
+   * | locked in 2D | 1d coordinate | 2d coordinate |
    * |:------------:|:-------------:|:-------------:|
    * |     x0       |      (a)      |   (x0,  a)    |
    * |     x1       |      (a)      |   (a , x1)    |
    *
-   * and, in 3D,
+   * and, in 3d,
    *
-   * | locked in 3D | 2D coordinates | 3D coordinates |
+   * | locked in 3D | 2d coordinates | 3d coordinates |
    * |:-------------|:--------------:|:--------------:|
    * |     x0       |    (a, b)      | (x0,  a,  b)   |
    * |     x1       |    (a, b)      | ( b, x1,  a)   |

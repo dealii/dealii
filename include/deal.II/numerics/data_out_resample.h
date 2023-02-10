@@ -34,11 +34,11 @@ DEAL_II_NAMESPACE_OPEN
  * A DataOut-like class which interpolates values defined on one Triangulation
  * onto a second potentially unrelated Triangulation. By using this class,
  * one can output the result obtained on an unstructured mesh onto a
- * structured one or one can create a slice in 3D.
+ * structured one or one can create a slice in 3d.
  *
  * The following code snippet shows the steps how to use the class when the
  * solution is given for a three dimensional triangulation and the result
- * should be outputted on a (2D) slice:
+ * should be outputted on a (2d) slice:
  * @code
  * // setup and first usage
  * DataOutResample<3, 2, 3> data_out(patch_tria,patch_mapping);

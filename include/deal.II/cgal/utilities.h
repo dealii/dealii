@@ -149,7 +149,7 @@ namespace CGALWrappers
    * (https://doc.cgal.org/latest/Polygon_mesh_processing/index.html#title14):
    *
    * > Given a closed triangulated surface mesh, each connected component splits
-   * > the 3D space into two subspaces. The vertex sequence of each face of a
+   * > the 3d space into two subspaces. The vertex sequence of each face of a
    * > component is seen either clockwise or counterclockwise from these two
    * > subspaces. The subspace that sees the sequence clockwise (resp.
    * > counterclockwise) is on the negative (resp. positive) side of the

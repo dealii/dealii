@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  * Implementation of a scalar Lagrange finite element @p Qp that yields the
  * finite element space of continuous, piecewise polynomials of degree @p p in
  * each coordinate direction. This class is realized using tensor product
- * polynomials based on 1D Lagrange polynomials with equidistant (degree up to
+ * polynomials based on 1d Lagrange polynomials with equidistant (degree up to
  * 2), Gauss-Lobatto (starting from degree 3), or given support points.
  *
  * The standard constructor of this class takes the degree @p p of this finite
@@ -79,7 +79,7 @@ DEAL_II_NAMESPACE_OPEN
  * equidistant points at degree 10 has condition number 2.6e6, whereas the
  * condition number for Gauss-Lobatto points is around 400.
  *
- * The Gauss-Lobatto points in 1D include the end points 0 and +1 of the unit
+ * The Gauss-Lobatto points in 1d include the end points 0 and +1 of the unit
  * interval. The interior points are shifted towards the end points, which
  * gives a denser point distribution close to the element boundary.
  *
@@ -100,12 +100,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h4>Q1 elements</h4>
  * <ul>
- * <li> 1D case:
+ * <li> 1d case:
  *   @verbatim
  *      0-------1
  *   @endverbatim
  *
- * <li> 2D case:
+ * <li> 2d case:
  *   @verbatim
  *      2-------3
  *      |       |
@@ -114,7 +114,7 @@ DEAL_II_NAMESPACE_OPEN
  *      0-------1
  *   @endverbatim
  *
- * <li> 3D case:
+ * <li> 3d case:
  *   @verbatim
  *         6-------7        6-------7
  *        /|       |       /       /|
@@ -166,12 +166,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h4>Q2 elements</h4>
  * <ul>
- * <li> 1D case:
+ * <li> 1d case:
  *   @verbatim
  *      0---2---1
  *   @endverbatim
  *
- * <li> 2D case:
+ * <li> 2d case:
  *   @verbatim
  *      2---7---3
  *      |       |
@@ -180,7 +180,7 @@ DEAL_II_NAMESPACE_OPEN
  *      0---6---1
  *   @endverbatim
  *
- * <li> 3D case:
+ * <li> 3d case:
  *   @verbatim
  *         6--15---7        6--15---7
  *        /|       |       /       /|
@@ -294,12 +294,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h4>Q3 elements</h4>
  * <ul>
- * <li> 1D case:
+ * <li> 1d case:
  *   @verbatim
  *      0--2--3--1
  *   @endverbatim
  *
- * <li> 2D case:
+ * <li> 2d case:
  *   @verbatim
  *      2--10-11-3
  *      |        |
@@ -396,12 +396,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h4>Q4 elements</h4>
  * <ul>
- * <li> 1D case:
+ * <li> 1d case:
  *   @verbatim
  *      0--2--3--4--1
  *   @endverbatim
  *
- * <li> 2D case:
+ * <li> 2d case:
  *   @verbatim
  *      2--13-14-15-3
  *      |           |

@@ -157,7 +157,7 @@ namespace CGALWrappers
 
   /**
    * Specialization of the above struct when the object to be constructed is a
-   * 2D triangulation embedded in the 3D space, i.e. a Triangulation<2,3>.
+   * 2d triangulation embedded in the 3d space, i.e. a Triangulation<2,3>.
    * Only three parameters are accepted:
    * - `angular_bound` is a lower bound in degrees for the angles of mesh
    * facets.

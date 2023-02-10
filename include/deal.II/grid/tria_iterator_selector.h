@@ -48,7 +48,7 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declarations for the 1D case only. See the
+     * These are the declarations for the 1d case only. See the
      * @ref Iterators
      * module for more information.
      *
@@ -102,7 +102,7 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declarations for the 2D case only. See the
+     * These are the declarations for the 2d case only. See the
      * @ref Iterators
      * module for more information.
      *
@@ -110,7 +110,7 @@ namespace internal
      * lines member variable of a <tt>Triangulation<2></tt> object. An @p
      * active_line_iterator only operates on the active lines. @p
      * raw_line_iterator objects operate on all lines, used or not. Using @p
-     * active_line_iterators may not be particularly in 2D useful since it
+     * active_line_iterators may not be particularly in 2d useful since it
      * only operates on unrefined lines. However, also refined lines may bound
      * unrefined cells if the neighboring cell is refined once more than the
      * present one.
@@ -160,7 +160,7 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declarations for the 3D case only. See the
+     * These are the declarations for the 3d case only. See the
      * @ref Iterators
      * module for more information.
      *

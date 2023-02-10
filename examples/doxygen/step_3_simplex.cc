@@ -29,11 +29,11 @@
  * <h3>Motivation</h3>
  *
  * Many freely available mesh-generation tools produce meshes that consist of
- * simplices (triangles in 2D; tetrahedra in 3D). The reason for this is that
+ * simplices (triangles in 2d; tetrahedra in 3d). The reason for this is that
  * generating such kind of meshes for complex geometries is simpler than the
  * generation of hex-only meshes. This tutorial shows how to work on such kind
  * of meshes with the experimental simplex features in deal.II. For this
- * purpose, we solve the Poisson problem from step-3 in 2D with a mesh only
+ * purpose, we solve the Poisson problem from step-3 in 2d with a mesh only
  * consisting of triangles.
  *
  *
@@ -347,18 +347,18 @@ int main()
  * <h3>Possibilities for extensions</h3>
  *
  * In this tutorial, we presented how to use the deal.II simplex infrastructure
- * to solve a simple Poisson problem on a simplex mesh in 2D. In this scope, we
+ * to solve a simple Poisson problem on a simplex mesh in 2d. In this scope, we
  * could only present a small section of the capabilities. In the following, we
  * point out further capabilities briefly.
  *
  *
- * <h4>3D meshes and codim-1 meshes in 3D</h4>
+ * <h4>3d meshes and codim-1 meshes in 3d</h4>
  *
- * An extension to 3D is quite straightforward. Both FE_SimplexP and
+ * An extension to 3d is quite straightforward. Both FE_SimplexP and
  * QGaussSimplex are implemented in a dimensional-independent way so that simply
  * replacing everywhere dim=2 with dim=3 should work out of the box.
  *
- * Furthermore, embedding of a 2D mesh consisting of triangles in 3D space is
+ * Furthermore, embedding of a 2d mesh consisting of triangles in 3d space is
  * possible.
  *
  *
@@ -367,7 +367,7 @@ int main()
  * In step-3, we considered meshes only consisting of quadrilaterals. In this
  * tutorial, we took a look at the case that the mesh only consists of
  * triangles. In the general case (also known as mixed mesh), the mesh consists
- * of both cell types. In 3D, meshes might even consist of more cell types, like
+ * of both cell types. In 3d, meshes might even consist of more cell types, like
  * wedges/prisms and pyramids. We consider such meshes in the tutorial
  * step-3mixed.
  *

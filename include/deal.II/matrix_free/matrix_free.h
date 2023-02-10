@@ -326,7 +326,7 @@ public:
      * The third option @p color is to use a traditional algorithm of coloring
      * on the global level. This scheme is a special case of the second option
      * where only one partition is present. Note that for problems with
-     * hanging nodes, there are quite many colors (50 or more in 3D), which
+     * hanging nodes, there are quite many colors (50 or more in 3d), which
      * might degrade parallel performance (bad cache behavior, many
      * synchronization points).
      *
