@@ -17,40 +17,40 @@ Cycle 0:
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.598s |            |
+| Total wallclock time elapsed since start    |     0.172s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| calculate transformation        |         1 |    0.0533s |       8.9% |
-| compute indicators              |         1 |    0.0177s |         3% |
-| initialize grid                 |         1 |    0.0397s |       6.6% |
-| output results                  |         1 |    0.0844s |        14% |
-| setup system                    |         1 |    0.0351s |       5.9% |
-| solve system                    |         1 |     0.362s |        61% |
+| calculate transformation        |         1 |    0.0194s |        11% |
+| compute indicators              |         1 |   0.00676s |       3.9% |
+| initialize grid                 |         1 |     0.011s |       6.4% |
+| output results                  |         1 |    0.0343s |        20% |
+| setup system                    |         1 |   0.00839s |       4.9% |
+| solve system                    |         1 |    0.0896s |        52% |
 +---------------------------------+-----------+------------+------------+
 
 
 Cycle 1:
    Number of active cells:       3351
      by partition:               875 761 843 872
-   Number of degrees of freedom: 18223
-     by partition:               4535 4735 4543 4410
+   Number of degrees of freedom: 18228
+     by partition:               4535 4735 4543 4415
    Number of constraints:        1202
      by partition:               303 290 326 283
-   Frequencies of poly. degrees: 2:2523 3:828
+   Frequencies of poly. degrees: 2:2522 3:829
    Solved in 7 iterations.
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.442s |            |
+| Total wallclock time elapsed since start    |     0.165s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| adapt resolution                |         1 |    0.0189s |       4.3% |
-| compute indicators              |         1 |    0.0135s |         3% |
-| output results                  |         1 |     0.064s |        14% |
-| setup system                    |         1 |    0.0232s |       5.2% |
-| solve system                    |         1 |     0.322s |        73% |
+| adapt resolution                |         1 |   0.00473s |       2.9% |
+| compute indicators              |         1 |   0.00764s |       4.6% |
+| output results                  |         1 |    0.0243s |        15% |
+| setup system                    |         1 |   0.00662s |         4% |
+| solve system                    |         1 |     0.121s |        74% |
 +---------------------------------+-----------+------------+------------+
 
 
@@ -60,24 +60,24 @@ Cycle 1:
 Cycle 7:
    Number of active cells:       5610
      by partition:               1324 1483 1482 1321
-   Number of degrees of freedom: 82062
-     by partition:               21116 19951 20113 20882
-   Number of constraints:        14383
-     by partition:               3825 3225 3557 3776
-   Frequencies of poly. degrees: 2:1130 3:1283 4:2727 5:465 6:5
+   Number of degrees of freedom: 82047
+     by partition:               21098 19960 20111 20878
+   Number of constraints:        14357
+     by partition:               3807 3229 3554 3767
+   Frequencies of poly. degrees: 2:1126 3:1289 4:2725 5:465 6:5
    Solved in 7 iterations.
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.932s |            |
+| Total wallclock time elapsed since start    |      1.83s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| adapt resolution                |         1 |    0.0182s |       1.9% |
-| compute indicators              |         1 |    0.0173s |       1.9% |
-| output results                  |         1 |    0.0572s |       6.1% |
-| setup system                    |         1 |    0.0252s |       2.7% |
-| solve system                    |         1 |     0.813s |        87% |
+| adapt resolution                |         1 |   0.00834s |      0.46% |
+| compute indicators              |         1 |    0.0178s |      0.97% |
+| output results                  |         1 |    0.0434s |       2.4% |
+| setup system                    |         1 |    0.0165s |       0.9% |
+| solve system                    |         1 |      1.74s |        95% |
 +---------------------------------+-----------+------------+------------+
 @endcode
 

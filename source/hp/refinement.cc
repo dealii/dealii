@@ -585,6 +585,11 @@ namespace hp
           // determine degree of its future finite element
           if (cell->coarsen_flag_set())
             {
+              Assert(cell->level() > 0,
+                     ExcMessage("A coarse cell is flagged for coarsening. "
+                                "Please read the note in the documentation "
+                                "of predict_error()."));
+
               // cell will be coarsened, thus determine future finite element
               // on parent cell
               const auto &parent = cell->parent();
@@ -705,6 +710,15 @@ namespace hp
             // or p-adaptivity.
             if (cell->coarsen_flag_set())
               {
+                if (cell->level() == 0)
+                  {
+                    // This cell is a coarse cell and has neither parent nor
+                    // siblings, thus it cannot be h-coarsened.
+                    // Clear the flag and move on to the next cell.
+                    cell->clear_coarsen_flag();
+                    continue;
+                  }
+
                 const auto &       parent     = cell->parent();
                 const unsigned int n_children = parent->n_children();
 
