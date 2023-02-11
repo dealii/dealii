@@ -352,15 +352,17 @@ public:
     unsigned int tasks_block_size;
 
     /**
-     * This flag determines the mapping data on cells that is cached. This
-     * class can cache data needed for gradient computations (inverse
-     * Jacobians), Jacobian determinants (JxW), quadrature points as well as
-     * data for Hessians (derivative of Jacobians). By default, only data for
-     * gradients and Jacobian determinants times quadrature weights, JxW, are
-     * cached. If quadrature points or second derivatives are needed, they
-     * must be specified by this field (even though second derivatives might
-     * still be evaluated on Cartesian cells without this option set here,
-     * since there the Jacobian describes the mapping completely).
+     * This flag determines what data needs to be computed and cached on cells.
+     *
+     * If your computations require operations like quadrature point locations
+     * or Hessians, these need to specified here (update_quadrature_points
+     * or update_hessians, respectively). Note that values, gradients, and
+     * Jacobian determinants (JxW values) are always computed regardless of the
+     * flags specified here.
+     *
+     * Note that some additional flags might be set automatically (for example
+     * second derivatives might be evaluated on Cartesian cells since there
+     * the Jacobian describes the mapping completely).
      */
     UpdateFlags mapping_update_flags;
 
@@ -500,7 +502,7 @@ public:
      * being a category) but can also be useful in other contexts where one
      * would like to control which cells together can form a batch of cells.
      * Such an example is "local time stepping", where cells of different
-     * caterogries progress with different time-step sizes and, as a
+     * categories progress with different time-step sizes and, as a
      * consequence, can only processed together with cells with the same
      * category.
      *
