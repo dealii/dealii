@@ -2275,9 +2275,9 @@ namespace GridGenerator
       }
 
     /*
-     * Verify that the edge points to the right in 1D, vectors are oriented in
-     * a counter clockwise direction in 2D, or form a right handed system in
-     * 3D.
+     * Verify that the edge points to the right in 1d, vectors are oriented in
+     * a counter clockwise direction in 2d, or form a right handed system in
+     * 3d.
      */
     bool twisted_data = false;
     switch (dim)
@@ -6623,8 +6623,8 @@ namespace GridGenerator
      *
      * @warning even though this function is implemented for structdim 1 and
      * structdim 2, it will produce <em>wrong</em> results when called for
-     * boundary lines in 3D in most cases since a boundary line can be shared
-     * by an arbitrary number of cells in 3D.
+     * boundary lines in 3d in most cases since a boundary line can be shared
+     * by an arbitrary number of cells in 3d.
      */
     template <int structdim>
     void
@@ -7852,12 +7852,12 @@ namespace GridGenerator
       in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
 
     /* static tables with the definitions of cells, faces and edges by its
-     * vertices for 2D and 3D. For the inheritance of the manifold_id,
+     * vertices for 2d and 3d. For the inheritance of the manifold_id,
      * definitions of inner-faces and boundary-faces are required. In case of
-     * 3D, also inner-edges and boundary-edges need to be defined.
+     * 3d, also inner-edges and boundary-edges need to be defined.
      */
 
-    /* Cell definition 2D:
+    /* Cell definition 2d:
      * A quadrilateral element is converted to 8 simplices elements. Each
      * triangle is defined by 3 vertices.
      */
@@ -7870,7 +7870,7 @@ namespace GridGenerator
                                                                {{8, 5, 7}},
                                                                {{3, 7, 5}}}};
 
-    /* Cell definition 3D:
+    /* Cell definition 3d:
      * A hexahedron element is converted to 24 tetrahedron elements. Each
      * tetrahedron is defined by 4 vertices.
      */
@@ -7884,7 +7884,7 @@ namespace GridGenerator
        {{13, 9, 11, 7}},  {{13, 11, 8, 6}},  {{10, 12, 9, 1}},
        {{9, 12, 11, 3}},  {{11, 12, 8, 2}},  {{8, 12, 10, 0}}}};
 
-    /* Boundary-faces 2D:
+    /* Boundary-faces 2d:
      * After converting, each of the 4 quadrilateral faces is defined by faces
      * of 2 different triangles, i.e., lines. Note that lines are defined by 2
      * vertices.
@@ -7895,7 +7895,7 @@ namespace GridGenerator
                                            {{{{0, 6}}, {{6, 1}}}},
                                            {{{{2, 7}}, {{7, 3}}}}}};
 
-    /* Boundary-faces 3D:
+    /* Boundary-faces 3d:
      * After converting, each of the 6 hexahedron faces corresponds to faces of
      * 4 different tetrahedron faces, i.e., triangles. Note that a triangle is
      * defined by 3 vertices.
@@ -7909,7 +7909,7 @@ namespace GridGenerator
          {{{{0, 1, 12}}, {{1, 12, 3}}, {{12, 3, 2}}, {{0, 12, 2}}}},
          {{{{4, 5, 13}}, {{5, 13, 7}}, {{13, 7, 6}}, {{4, 13, 6}}}}}};
 
-    /* Inner-faces 2D:
+    /* Inner-faces 2d:
      * The converted triangulation based on simplices has 8 faces that do not
      * form the boundary, i.e. inner-faces, each defined by 2 vertices.
      */
@@ -7923,7 +7923,7 @@ namespace GridGenerator
        {{7, 8}},
        {{7, 5}}}};
 
-    /* Inner-faces 3D:
+    /* Inner-faces 3d:
      * The converted triangulation based on simplices has 72 faces that do not
      * form the boundary, i.e. inner-faces, each defined by 3 vertices.
      */
@@ -7947,7 +7947,7 @@ namespace GridGenerator
        {{12, 13, 9}},  {{12, 13, 11}}, {{9, 11, 13}}, {{9, 11, 12}},
        {{12, 13, 11}}, {{12, 13, 8}},  {{8, 11, 13}}, {{8, 11, 12}}}};
 
-    /* Inner-edges 3D:
+    /* Inner-edges 3d:
      * The converted triangulation based on simplices has 60 edges that do not
      * coincide with the boundary, i.e. inner-edges, each defined by 2 vertices.
      */
@@ -7963,7 +7963,7 @@ namespace GridGenerator
        {{12, 13}}, {{9, 11}},  {{9, 13}},  {{11, 13}}, {{9, 12}},  {{11, 12}},
        {{12, 13}}, {{11, 8}},  {{11, 13}}, {{8, 13}},  {{11, 12}}, {{8, 12}}}};
 
-    /* Boundary-edges 3D:
+    /* Boundary-edges 3d:
      * For each of the 6 boundary-faces of the hexahedron, there are 8 edges (of
      * different tetrahedrons) that coincide with the boundary, i.e.
      * boundary-edges. Each boundary-edge is defined by 2 vertices. 4 of these

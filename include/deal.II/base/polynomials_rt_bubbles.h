@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  * This space is of the form <i>V<sub>k</sub> = RT<sub>k-1</sub> +
  * B<sub>k</sub></i>, where <i>B<sub>k</sub></i> is defined as follows:
  * <dl>
- * <dt> In 2D:</dt>
+ * <dt> In 2d:</dt>
  * <dd>
  * @f{align*}{
  *  B_k^1(E) = \text{span}\left\{x^{a_1-1} y^{a_2}\begin{pmatrix} (a_2+1) x \\
@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  * @f}
  * </dd>
  *
- * <dt> In 3D: </dt>
+ * <dt> In 3d: </dt>
  * <dd>
  *  @f{align*}{
  *   B_k^1(E) = \text{span}\left\{x^{a_1-1} y^{a_2} z^{a_3}\begin{pmatrix}
@@ -82,7 +82,7 @@ DEAL_II_NAMESPACE_OPEN
  * </td></tr>
  *
  * <tr> <td align="center"> Left - $2d,\,k=3$,
- * right - $3D,\,k=2$.</td></tr> </table>
+ * right - $3d,\,k=2$.</td></tr> </table>
  *
  * @ingroup Polynomials
  */

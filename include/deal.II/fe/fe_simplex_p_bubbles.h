@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  * added corresponding to interpolation at the centroid (and all other basis
  * functions are updated to preserve the partition of unity property). This
  * results in shape functions with positive means (i.e., a valid nodal
- * quadrature formula). Similarly, in 3D, the polynomial space of
+ * quadrature formula). Similarly, in 3d, the polynomial space of
  * FE_SimplexP<3>(2) is enriched with five additional degrees of freedom (where
  * four have support points at face centroids and one has a support point at the
  * centroid) to enable construction of valid nodal quadrature rule.
@@ -59,12 +59,12 @@ DEAL_II_NAMESPACE_OPEN
  * nonzero only on element interiors), the polynomial degrees of the component
  * basis functions are higher than the actual approximation degree of the
  * element. For example, with a constructor argument <code>degree = 2</code>
- * in 3D, the polynomials are in fact cubic (degree 3) but the order of the
+ * in 3d, the polynomials are in fact cubic (degree 3) but the order of the
  * approximation is the same as if we were using quadratic (degree 2) finite
  * elements.
  *
- * The 2D quadratic element was first described in @cite fried1975finite. The
- * 3D quadratic element implemented here was first described in
+ * The 2d quadratic element was first described in @cite fried1975finite. The
+ * 3d quadratic element implemented here was first described in
  * @cite Geevers_2018. Higher degree elements amendable to lumping exist but
  * are not yet implemented in this class.
  */

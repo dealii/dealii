@@ -278,7 +278,7 @@ namespace internal
 
     /**
      * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1D stripes, along the given @p direction of the tensor
+     * multiplication of 1d stripes, along the given @p direction of the tensor
      * data in the input array. This function allows the @p in and @p out
      * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
      * perform the contraction in place where @p in and @p out point to the
@@ -291,7 +291,7 @@ namespace internal
      *                            array, otherwise it sums over the columns
      * @tparam add If true, the result is added to the output vector, else
      *             the computed values overwrite the content in the output
-     * @tparam one_line If true, the kernel is only applied along a single 1D
+     * @tparam one_line If true, the kernel is only applied along a single 1d
      *                  stripe within a dim-dimensional tensor, not the full
      *                  n_rows^dim points as in the @p false case.
      *
@@ -1786,7 +1786,7 @@ namespace internal
    * This class implements a different approach to the symmetric case for
    * values, gradients, and Hessians also treated with the above functions: It
    * is possible to reduce the cost per dimension from N^2 to N^2/2, where N
-   * is the number of 1D dofs (there are only N^2/2 different entries in the
+   * is the number of 1d dofs (there are only N^2/2 different entries in the
    * shape matrix, so this is plausible). The approach is based on the idea of
    * applying the operator on the even and odd part of the input vectors
    * separately, given that the shape functions evaluated on quadrature points
@@ -1929,7 +1929,7 @@ namespace internal
 
     /**
      * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1D stripes, along the given @p direction of the tensor
+     * multiplication of 1d stripes, along the given @p direction of the tensor
      * data in the input array. This function allows the @p in and @p out
      * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
      * perform the contraction in place where @p in and @p out point to the
@@ -1946,7 +1946,7 @@ namespace internal
      *              shape values (type=0), shape gradients (type=1) or
      *              second derivatives (type=2, similar to type 0 but
      *              without two additional zero entries)
-     * @tparam one_line If true, the kernel is only applied along a single 1D
+     * @tparam one_line If true, the kernel is only applied along a single 1d
      *                  stripe within a dim-dimensional tensor, not the full
      *                  n_rows^dim points as in the @p false case.
      *
@@ -2128,7 +2128,7 @@ namespace internal
    * the Legendre basis, with symmetric shape functions in the even slots
    * (rows of the values array) and point-symmetric in the odd slots. Like the
    * even-odd decomposition, the number of operations are N^2/2 rather than
-   * N^2 FMAs (fused multiply-add), where N is the number of 1D dofs. The
+   * N^2 FMAs (fused multiply-add), where N is the number of 1d dofs. The
    * difference is in the way the input and output quantities are symmetrized.
    *
    * @tparam dim Space dimension in which this class is applied
@@ -2253,7 +2253,7 @@ namespace internal
 
     /**
      * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1D stripes, along the given @p direction of the tensor
+     * multiplication of 1d stripes, along the given @p direction of the tensor
      * data in the input array. This function allows the @p in and @p out
      * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
      * perform the contraction in place where @p in and @p out point to the
@@ -2269,7 +2269,7 @@ namespace internal
      * @tparam type Determines whether the evaluation is symmetric in even
      *              rows (type=0) or odd rows (type=1) of @p shape_data and
      *              skew-symmetric in odd rows (type=0) or even rows (type=1)
-     * @tparam one_line If true, the kernel is only applied along a single 1D
+     * @tparam one_line If true, the kernel is only applied along a single 1d
      *                  stripe within a dim-dimensional tensor, not the full
      *                  n_rows^dim points as in the @p false case.
      *
@@ -2497,7 +2497,7 @@ namespace internal
 
 
   /**
-   * Internal evaluator for shape function in 2D and 3D using the
+   * Internal evaluator for shape function in 2d and 3d using the
    * tensor product form of the anisotropic basis functions of the
    * raviart-thomas element, with degree k+1 in normal direction and
    * k in tangential direction.
@@ -2598,7 +2598,7 @@ namespace internal
 
     /**
      * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1D stripes, along the given @p direction of the tensor
+     * multiplication of 1d stripes, along the given @p direction of the tensor
      * data in the input array. This function allows the @p in and @p out
      * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
      * perform the contraction in place where @p in and @p out point to the
@@ -2615,7 +2615,7 @@ namespace internal
      *                    RT space in terms of the normal onto the face, e.g
      *                    0 if the  is in x-direction, 1 if in y-direction
      *                    etc.
-     * @tparam one_line If true, the kernel is only applied along a single 1D
+     * @tparam one_line If true, the kernel is only applied along a single 1d
      *                  stripe within a dim-dimensional tensor, not the full
      *                  n_rows^dim points as in the @p false case.
      *
@@ -2987,7 +2987,7 @@ namespace internal
    * $\varphi_i$ given a vector of coefficients $u_i$ in the form
    * $u_h(\mathbf{x}) = \sum_{i=1}^{k^d} \varphi_i(\mathbf{x}) u_i$. The shape
    * functions $\varphi_i(\mathbf{x}) =
-   * \prod_{d=1}^{\text{dim}}\varphi_{i_d}^\text{1D}(x_d)$ represent a tensor
+   * \prod_{d=1}^{\text{dim}}\varphi_{i_d}^\text{1d}(x_d)$ represent a tensor
    * product. The function returns a pair with the value of the interpolation
    * as the first component and the gradient in reference coordinates as the
    * second component. Note that for compound types (e.g. the `values` field
@@ -2997,7 +2997,7 @@ namespace internal
    * function.
    *
    * @param poly The underlying one-dimensional polynomial basis
-   * $\{\varphi^{1D}_{i_1}\}$ given as a vector of polynomials.
+   * $\{\varphi^{1d}_{i_1}\}$ given as a vector of polynomials.
    *
    * @param values The expansion coefficients $u_i$ of type `Number` in
    * the polynomial interpolation. The coefficients can be simply `double`
@@ -3007,8 +3007,8 @@ namespace internal
    * @param p The position in reference coordinates where the interpolation
    * should be evaluated.
    *
-   * @param d_linear Flag to specify whether a d-linear (linear in 1D,
-   * bi-linear in 2D, tri-linear in 3D) interpolation should be made, which
+   * @param d_linear Flag to specify whether a d-linear (linear in 1d,
+   * bi-linear in 2d, tri-linear in 3d) interpolation should be made, which
    * allows to unroll loops and considerably speed up evaluation.
    *
    * @param renumber Optional parameter to specify a renumbering in the

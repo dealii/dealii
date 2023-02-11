@@ -204,12 +204,12 @@ private:
 
 
 /**
- * Specialization of FE_FaceQ for 1D. In that case, the finite element only
+ * Specialization of FE_FaceQ for 1d. In that case, the finite element only
  * consists of one degree of freedom in each of the two faces (= vertices) of
  * a cell, irrespective of the degree. However, this element still accepts a
  * degree in its constructor and also returns that degree. This way,
  * dimension-independent programming with trace elements is also possible in
- * 1D (even though there is no computational benefit at all from it in 1D).
+ * 1d (even though there is no computational benefit at all from it in 1d).
  *
  * @ingroup fe
  */
@@ -565,7 +565,7 @@ private:
 
 
 /**
- * FE_FaceP in 1D, i.e., with degrees of freedom on the element vertices.
+ * FE_FaceP in 1d, i.e., with degrees of freedom on the element vertices.
  * See the documentation of the general template for more information.
  */
 template <int spacedim>

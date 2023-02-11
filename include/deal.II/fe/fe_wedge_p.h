@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Base class of FE_WedgeP and FE_WedgeDGP.
  *
- * @note Only implemented for 3D.
+ * @note Only implemented for 3d.
  *
  * @relates simplex
  */

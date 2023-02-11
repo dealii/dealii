@@ -41,14 +41,14 @@
  *
  * Mixed meshes try to combine the best of both worlds by partitioning the
  * geometry in parts that can be easily meshed by hypercube cells
- * (quadrilaterals in 2D, hexahedrons in 3D) and in parts that can not be meshed
- * easily, requiring simplices (triangles in 2D, tetrahedrons in 3D). Since one
+ * (quadrilaterals in 2d, hexahedrons in 3d) and in parts that can not be meshed
+ * easily, requiring simplices (triangles in 2d, tetrahedrons in 3d). Since one
  * assumes that the region requiring simplices is rather small compared to the
  * rest of the domain where more efficient and accurate methods can be applied,
  * one can expect that the overall efficiency is hardly impacted by such an
  * approach.
  *
- * One should note that in 3D, one also needs a transition region between
+ * One should note that in 3d, one also needs a transition region between
  * hypercube and simplex regions. Here, one can use wedges/prisms and/or
  * pyramids.
  *
@@ -56,13 +56,13 @@
  * <h3>Working with mixed meshes</h3>
  *
  * <i>
- * In the following, we concentrate, for the sake of simplicity, on 2D meshes:
+ * In the following, we concentrate, for the sake of simplicity, on 2d meshes:
  * they can only contain triangles and quadrilaterals. However, as detailed in
- * the outlook, an extension of the presented approach to the 3D case is
+ * the outlook, an extension of the presented approach to the 3d case is
  * straightforward.
  * </i>
  *
- * The complexity of working with mixed meshes in 2D results from the fact
+ * The complexity of working with mixed meshes in 2d results from the fact
  * that it contains of two
  * types of geometrical objects: quadrilaterals and triangles. How to deal with
  * quadrilaterals, we have discussed in step-3: we selected an appropriate
@@ -74,7 +74,7 @@
  * For mixed meshes, we need multiple finite elements, quadrature rules, and
  * mapping objects (one set for triangles and one set for quadrilaterals) in the
  * same program. To ease the work with the multitude of objects (in particular
- * in 3D, we need at least four of each), you can collect the objects and group
+ * in 3d, we need at least four of each), you can collect the objects and group
  * them together in hp::FECollection, hp::QCollection, and
  * hp::MappingCollection.
  *
@@ -427,7 +427,7 @@ int main()
  * <h3>Possibilities for extensions</h3>
  *
  * In this tutorial, we presented how to use the deal.II simplex infrastructure
- * to solve a simple Poisson problem on a mixed mesh in 2D. In this scope, we
+ * to solve a simple Poisson problem on a mixed mesh in 2d. In this scope, we
  * could only present a small section of the capabilities. In the following, we
  * point out further capabilities briefly.
  *
@@ -441,9 +441,9 @@ int main()
  * cases.
  *
  *
- * <h4>3D meshes</h4>
+ * <h4>3d meshes</h4>
  *
- * In 3D, meshes might also consist of wedges/prisms and pyramids. Therefore,
+ * In 3d, meshes might also consist of wedges/prisms and pyramids. Therefore,
  * the above introduced collections might consist of four components.
  *
  * For wedge/prism and pyramid cell types, following finite-element and

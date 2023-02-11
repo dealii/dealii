@@ -94,7 +94,7 @@ namespace parallel
      * been constructed, the triangulation `tria` can be created by calling
      * `tria.create_triangulation(construction_data);`.
      *
-     * @note This triangulation supports: 1D/2D/3D, hanging nodes,
+     * @note This triangulation supports: 1D/2d/3d, hanging nodes,
      *       geometric multigrid, and periodicity.
      *
      * @note You can create a triangulation with hanging nodes and multigrid

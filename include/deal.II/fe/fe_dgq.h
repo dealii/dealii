@@ -104,7 +104,7 @@ class Quadrature;
  * equidistant points at degree 10 has condition number 2.6e6, whereas the
  * condition number for Gauss-Lobatto points is around 400.
  *
- * The Gauss-Lobatto points in 1D include the end points 0 and +1 of the unit
+ * The Gauss-Lobatto points in 1d include the end points 0 and +1 of the unit
  * interval. The interior points are shifted towards the end points, which
  * gives a denser point distribution close to the element boundary.
  */

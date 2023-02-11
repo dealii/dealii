@@ -363,7 +363,7 @@ namespace TriangulationDescription
     /**
      * Manifold id of all lines of the cell.
      *
-     * @note Only used for 2D and 3D.
+     * @note Only used for 2d and 3d.
      */
     std::array<types::manifold_id, GeometryInfo<dim>::lines_per_cell>
       manifold_line_ids;
@@ -371,7 +371,7 @@ namespace TriangulationDescription
     /**
      * Manifold id of all face quads of the cell.
      *
-     * @note Only used for 3D.
+     * @note Only used for 3d.
      */
     std::array<types::manifold_id,
                dim == 1 ? 1 : GeometryInfo<3>::quads_per_cell>

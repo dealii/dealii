@@ -183,18 +183,18 @@ ReferenceCell::get_default_linear_mapping() const
 
 template <int dim>
 Quadrature<dim>
-ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const
+ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1d) const
 {
   AssertDimension(dim, get_dimension());
 
   if (is_hyper_cube())
-    return QGauss<dim>(n_points_1D);
+    return QGauss<dim>(n_points_1d);
   else if (is_simplex())
-    return QGaussSimplex<dim>(n_points_1D);
+    return QGaussSimplex<dim>(n_points_1d);
   else if (*this == ReferenceCells::Pyramid)
-    return QGaussPyramid<dim>(n_points_1D);
+    return QGaussPyramid<dim>(n_points_1d);
   else if (*this == ReferenceCells::Wedge)
-    return QGaussWedge<dim>(n_points_1D);
+    return QGaussWedge<dim>(n_points_1d);
   else
     Assert(false, ExcNotImplemented());
 

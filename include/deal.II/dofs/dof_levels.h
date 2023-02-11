@@ -44,7 +44,7 @@ namespace internal
      * variables of the dealii::DoFHandler class.
      *
      * The indices of degrees of freedom located on lower dimensional objects,
-     * i.e. on lines for 2D and on quads and lines for 3D are treated
+     * i.e. on lines for 2d and on quads and lines for 3d are treated
      * similarly than that on cells. However, these geometrical objects, which
      * are called faces as a generalization, are not organised in a
      * hierarchical structure of levels. Therefore, the degrees of freedom

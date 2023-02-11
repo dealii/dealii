@@ -478,12 +478,12 @@ public:
      * vectors that are as wide as possible to minimize the number of
      * arithmetic operations. However, we do not want to choose it wider than
      * necessary, e.g., we avoid something like 8-wide AVX-512 when we only
-     * compute 3 components of a 3D computation. This is because the
+     * compute 3 components of a 3d computation. This is because the
      * additional lanes would not do useful work, but a few operations on very
      * wide vectors can already lead to a lower clock frequency of processors
      * over long time spans (thousands of clock cycles). Hence, we choose
-     * 2-wide SIMD for 1D and 2D and 4-wide SIMD for 3D. Note that we do not
-     * immediately fall back to no SIMD for 1D because all architectures that
+     * 2-wide SIMD for 1D and 2d and 4-wide SIMD for 3d. Note that we do not
+     * immediately fall back to no SIMD for 1d because all architectures that
      * support SIMD also support 128-bit vectors (and none is reported to
      * reduce clock frequency for 128-bit SIMD).
      */
@@ -693,8 +693,8 @@ protected:
    * same manifold is attached to all sub-entities of a cell. This way, we can
    * avoid some of the overhead in transforming data for mappings.
    *
-   * The table has as many rows as there are vertices to the cell (2 in 1D, 4
-   * in 2D, 8 in 3D), and as many rows as there are additional support points
+   * The table has as many rows as there are vertices to the cell (2 in 1d, 4
+   * in 2d, 8 in 3d), and as many rows as there are additional support points
    * in the mapping, i.e., <code>(degree+1)^dim - 2^dim</code>.
    */
   const Table<2, double> support_point_weights_cell;

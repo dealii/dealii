@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Degrees of freedom</h3>
  *
- * @todo The 3D version exhibits some numerical instabilities, in particular
+ * @todo The 3d version exhibits some numerical instabilities, in particular
  * for higher order
  *
  * @todo Restriction matrices are missing.

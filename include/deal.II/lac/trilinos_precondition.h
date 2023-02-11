@@ -896,7 +896,7 @@ namespace TrilinosWrappers
        * that many fill-ins will be added, so that the IC preconditioner comes
        * closer to a direct sparse Cholesky decomposition. Note, however, that
        * this will drastically increase the memory requirement, especially
-       * when the preconditioner is used in 3D.
+       * when the preconditioner is used in 3d.
        */
       unsigned int ic_fill;
 
@@ -974,7 +974,7 @@ namespace TrilinosWrappers
      * literature.  When @p fill is large, the preconditioner comes closer to
      * a (direct) sparse LU decomposition. Note, however, that this will
      * drastically increase the memory requirement, especially when the
-     * preconditioner is used in 3D.
+     * preconditioner is used in 3d.
      *
      * <li> @p ilu_atol and @p ilu_rtol: These two parameters allow
      * perturbation of the diagonal of the matrix, which sometimes can help to
@@ -1127,7 +1127,7 @@ namespace TrilinosWrappers
        * that many fill-ins will be added, so that the ILU preconditioner
        * comes closer to a (direct) sparse LU decomposition. Note, however,
        * that this will drastically increase the memory requirement,
-       * especially when the preconditioner is used in 3D.
+       * especially when the preconditioner is used in 3d.
        */
       unsigned int ilut_fill;
 

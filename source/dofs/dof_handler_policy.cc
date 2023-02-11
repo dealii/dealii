@@ -2466,8 +2466,8 @@ namespace internal
 
         /**
          * The part of the renumber_mg_dofs() functionality that operates on
-         * faces. There only needs to happen something if we are in 2D or 3D, so
-         * we need to separate out the 1D case.
+         * faces. There only needs to happen something if we are in 2d or 3d, so
+         * we need to separate out the 1d case.
          *
          * See renumber_mg_dofs() for the meaning of the arguments.
          */

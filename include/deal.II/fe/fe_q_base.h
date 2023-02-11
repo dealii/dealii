@@ -286,7 +286,7 @@ protected:
   get_dpo_vector(const unsigned int degree);
 
   /**
-   * Perform the initialization of the element based on 1D support points,
+   * Perform the initialization of the element based on 1d support points,
    * i.e., sets renumbering, initializes unit support points, initializes
    * constraints as well as restriction and prolongation matrices.
    */

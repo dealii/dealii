@@ -490,7 +490,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
     {
       /*
        * This assumes that the dofs are ordered by first vertices, lines, quads
-       * and volume dofs. Note that in 2D this always gives false.
+       * and volume dofs. Note that in 2d this always gives false.
        */
       const bool is_quad_dof =
         (dim == 2 ? false :
@@ -1119,7 +1119,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
     {
       /*
        * This assumes that the dofs are ordered by first vertices, lines, quads
-       * and volume dofs. Note that in 2D this always gives false.
+       * and volume dofs. Note that in 2d this always gives false.
        */
       const bool is_quad_dof =
         (dim == 2 ? false :
@@ -1804,7 +1804,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
     {
       /*
        * This assumes that the dofs are ordered by first vertices, lines, quads
-       * and volume dofs. Note that in 2D this always gives false.
+       * and volume dofs. Note that in 2d this always gives false.
        */
       const bool is_quad_dof =
         (dim == 2 ? false :

@@ -85,7 +85,7 @@ class XDMFEntry;
  *
  * Inside each patch, the data is organized in the usual lexicographical
  * order, <i>x</i> running fastest, then <i>y</i> and <i>z</i>. Nodes are
- * stored in this order and cells as well. Each cell in 3D is stored such that
+ * stored in this order and cells as well. Each cell in 3d is stored such that
  * the front face is in the <i>xz</i>-plane. In order to enhance
  * intelligibility of this concept, the following two sections are kept from a
  * previous version of this documentation.
@@ -1514,7 +1514,7 @@ namespace DataOutBase
 
   private:
     /**
-     * Empty class to provide comparison function for Map3DPoint.
+     * Empty class to provide comparison function for Map3dPoint.
      */
     struct Point3Comp
     {

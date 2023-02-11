@@ -207,7 +207,7 @@ namespace LocalIntegrators
      * \int_Z \nabla \times u \cdot v \,dx.
      * @f]
      *
-     * This is the standard curl operator in 3D and the scalar curl in 2D. The
+     * This is the standard curl operator in 3d and the scalar curl in 2d. The
      * vector curl operator can be obtained by exchanging test and trial
      * functions.
      */

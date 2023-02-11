@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Base class of FE_PyramidP and FE_PyramidDGP.
  *
- * @note Only implemented for 3D.
+ * @note Only implemented for 3d.
  *
  * @relates simplex
  */

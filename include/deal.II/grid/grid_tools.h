@@ -281,7 +281,7 @@ namespace GridTools
    * transformation by a bi-/trilinear or higher order mapping might be
    * singular. The result is exact in case the transformation from the unit to
    * the real cell is indeed affine, such as in one dimension or for Cartesian
-   * and affine (parallelogram) meshes in 2D/3D.
+   * and affine (parallelogram) meshes in 2d/3d.
    *
    * This approximation is underlying the function
    * TriaAccessor::real_to_unit_cell_affine_approximation() function.
@@ -432,7 +432,7 @@ namespace GridTools
    * This function is called by some <tt>GridIn::read_*</tt> functions. Only
    * the vertices with indices in @p considered_vertices are tested for
    * equality. This speeds up the algorithm, which is, for worst-case hyper
-   * cube geometries $O(N^{3/2})$ in 2D and $O(N^{5/3})$ in 3D: quite slow.
+   * cube geometries $O(N^{3/2})$ in 2d and $O(N^{5/3})$ in 3d: quite slow.
    * However, if you wish to consider all vertices, simply pass an empty
    * vector. In that case, the function fills @p considered_vertices with all
    * vertices.
@@ -2807,7 +2807,7 @@ namespace GridTools
    * orientation[2] -> face_rotation
    * @endcode
    *
-   * In 2D <tt>face_orientation</tt> is always <tt>true</tt>,
+   * In 2d <tt>face_orientation</tt> is always <tt>true</tt>,
    * <tt>face_rotation</tt> is always <tt>false</tt>, and face_flip has the
    * meaning of <tt>line_flip</tt>. More precisely in 3d:
    *
@@ -3422,7 +3422,7 @@ namespace GridTools
 
 
   /**
-   * An implementation of the marching-square (2D) and marching-cube algorithm
+   * An implementation of the marching-square (2d) and marching-cube algorithm
    * for creating data structures (vectors of Point and CellData) to
    * create a linear/bilinear surface mesh on the iso line/contour of a
    * scalar field.
@@ -3432,7 +3432,7 @@ namespace GridTools
    * algorithm is not run on a cell but on subcells with vertex values having
    * been interpolated from the cell values.
    *
-   * @note The resulting mesh will contain lines in 2D and triangles in 3D.
+   * @note The resulting mesh will contain lines in 2d and triangles in 3d.
    *
    * @note The resulting mesh will not be of high quality, since it might
    *   contain cells with very small diameters if the mesh is cut close to a
@@ -3531,7 +3531,7 @@ namespace GridTools
                  const bool write_back_cell_data = true) const;
 
     /**
-     * Dummy function for 1D processing a sub-cell.
+     * Dummy function for 1d processing a sub-cell.
      */
     void
     process_sub_cell(const std::vector<value_type> &,
@@ -3546,7 +3546,7 @@ namespace GridTools
     }
 
     /**
-     * Process a sub-cell (2D).
+     * Process a sub-cell (2d).
      *
      * @note Subcells with saddle points are ignored. Please increase the number
      *   of subdivisions in this case.
@@ -3561,7 +3561,7 @@ namespace GridTools
                      const bool write_back_cell_data) const;
 
     /**
-     * Process a sub-cell (3D).
+     * Process a sub-cell (3d).
      */
     void
     process_sub_cell(const std::vector<value_type> &  ls_values,
@@ -3897,7 +3897,7 @@ namespace GridTools
 
       /**
        * Standard second-order approximation to the first derivative with a
-       * two-point centered scheme. This is used below in a 1D Newton method.
+       * two-point centered scheme. This is used below in a 1d Newton method.
        */
       template <typename F>
       inline auto
@@ -3912,7 +3912,7 @@ namespace GridTools
 
       /**
        * Standard second-order approximation to the second derivative with a
-       * three-point centered scheme. This is used below in a 1D Newton method.
+       * three-point centered scheme. This is used below in a 1d Newton method.
        */
       template <typename F>
       inline auto

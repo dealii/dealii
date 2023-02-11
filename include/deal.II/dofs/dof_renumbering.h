@@ -1240,7 +1240,7 @@ namespace DoFRenumbering
    * The primary use of this ordering is that it enables one to interpret a
    * vector of FE coefficients as a vector of tensors. For example, suppose `X`
    * is a vector containing coordinates (i.e., the sort of vector one would use
-   * with MappingFEField) and `U` is a vector containing velocities in 2D. Then
+   * with MappingFEField) and `U` is a vector containing velocities in 2d. Then
    * the `k`th support point is mapped to `{X[2*k], X[2*k + 1]}` and the
    * velocity there is `{U[2*k], U[2*k + 1]}`. Hence, with this reordering, one
    * can read solution data at each support point without additional indexing.

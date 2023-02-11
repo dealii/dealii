@@ -82,7 +82,7 @@ namespace SmoothnessEstimator
        * highest absolute value, i.e. $l^\infty$-norm. The <code>bool</code>
        * parameter defines which indices should be used in processing. In the
        * current case we are interested in coefficients which correspond to $0
-       * <= i+j < N$ and $0 <= i+j+k < N$ in 2D and 3D, respectively.
+       * <= i+j < N$ and $0 <= i+j+k < N$ in 2d and 3d, respectively.
        */
       template <int dim>
       std::pair<bool, unsigned int>
@@ -347,7 +347,7 @@ namespace SmoothnessEstimator
        * value, i.e. $l^\infty$-norm. The <code>bool</code> parameter defines
        * which indices should be used in processing. In the current case we are
        * interested in coefficients which correspond to $0 < i^2+j^2 < N^2$ and
-       * $0 < i^2+j^2+k^2 < N^2$ in 2D and 3D, respectively.
+       * $0 < i^2+j^2+k^2 < N^2$ in 2d and 3d, respectively.
        */
       template <int dim>
       std::pair<bool, unsigned int>

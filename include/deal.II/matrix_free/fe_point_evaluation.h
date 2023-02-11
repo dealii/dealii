@@ -622,7 +622,7 @@ private:
   SmartPointer<const FiniteElement<dim>> fe;
 
   /**
-   * Description of the 1D polynomial basis for tensor product elements used
+   * Description of the 1d polynomial basis for tensor product elements used
    * for the fast path of this class using tensor product evaluators.
    */
   std::vector<Polynomials::Polynomial<double>> poly;

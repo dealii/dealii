@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  * ScaLAPACK assumes that matrices are distributed according to the
  * block-cyclic decomposition scheme. An $M$ by $N$ matrix is first decomposed
  * into $\lceil M / MB \rceil$ by $\lceil N / NB \rceil$ blocks which are then
- * uniformly distributed across the 2D process grid with $p q \le Np$ processes,
+ * uniformly distributed across the 2d process grid with $p q \le Np$ processes,
  * where $p,q$ are grid dimensions and $Np$ is the total number of processes.
  * The parameters MB and NB are referred to as row and column block size and
  * determine the granularity of the block-cyclic distribution.

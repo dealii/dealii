@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * For this enhanced Raviart-Thomas element, the node values are not cell
  * and face moments with respect to certain polynomials, but the values in
  * Gauss-Lobatto quadrature points. The nodal values on edges (faces in
- * <i>3D</i>) are evaluated first, according to the natural ordering of the
+ * <i>3d</i>) are evaluated first, according to the natural ordering of the
  * edges (faces) of a cell. The interior degrees of freedom are evaluated last.
  *
  * For an RT-Bubbles element of degree <i>k</i>, we choose
@@ -71,16 +71,16 @@ DEAL_II_NAMESPACE_OPEN
  * mixed finite element methods on quadrilaterals and hexahedra"</a></i> for
  * more details.
  *
- * The elements of degree $k=3$ in <i>2D</i> and $k=2$ in <i>3D</i> are shown in
+ * The elements of degree $k=3$ in <i>2d</i> and $k=2$ in <i>3d</i> are shown in
  * the figures below (filled arrows indicate DoFs for which continuity across
- * the edges (faces in <i>3D</i>) is required).
+ * the edges (faces in <i>3d</i>) is required).
  *
  * <table> <tr> <td align="center">
  * @image html rtbubbles.png
  * </td></tr>
  *
  * <tr> <td align="center"> Left - $2d,\,k=3$,
- * right - $3D,\,k=2$.</td></tr> </table>
+ * right - $3d,\,k=2$.</td></tr> </table>
  *
  * @todo Implement restriction matrices
  */

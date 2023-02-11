@@ -131,7 +131,7 @@ namespace internal
       get_data_storage();
 
       /**
-       * Return a reference to 1D quadrature underlying this object.
+       * Return a reference to 1d quadrature underlying this object.
        */
       const Quadrature<1> &
       get_quadrature() const;
@@ -155,7 +155,7 @@ namespace internal
       std::unique_ptr<dealii::FEValues<dim>> fe_values;
 
       /**
-       * Get 1D quadrature formula to be used for reinitializing shape info.
+       * Get 1d quadrature formula to be used for reinitializing shape info.
        */
       const Quadrature<1> quadrature_1d;
 

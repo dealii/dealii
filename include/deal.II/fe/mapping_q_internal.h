@@ -51,7 +51,7 @@ namespace internal
   /**
    * Internal namespace to implement methods specific to MappingQ1, in
    * particular an explicit formula for the transformation from the real to
-   * the unit cell in 2D.
+   * the unit cell in 2d.
    */
   namespace MappingQ1
   {

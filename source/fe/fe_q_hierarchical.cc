@@ -2046,7 +2046,7 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
           for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
             h2l[next_index++] = n + 2 + i;
           // inside quad
-          Assert(fe.n_dofs_per_quad(0 /*only one quad in 2D*/) ==
+          Assert(fe.n_dofs_per_quad(0 /*only one quad in 2d*/) ==
                    fe.n_dofs_per_line() * fe.n_dofs_per_line(),
                  ExcInternalError());
           for (unsigned int i = 0; i < fe.n_dofs_per_line(); ++i)
@@ -2216,7 +2216,7 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
   // have no support no-where on
   // the boundary
   if (((dim == 2) && (shape_index >=
-                      this->get_first_quad_index(0 /*only one quad in 2D*/))) ||
+                      this->get_first_quad_index(0 /*only one quad in 2d*/))) ||
       ((dim == 3) && (shape_index >= this->get_first_hex_index())))
     return false;
 

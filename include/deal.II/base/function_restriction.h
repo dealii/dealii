@@ -42,7 +42,7 @@ namespace Functions
    *
    * The `dim`-dimensional coordinates on the restriction are ordered starting
    * from the restricted (`dim + 1`)-coordinate. In particular, this means that
-   * if the $y$-coordinate is locked to $Y$ in 3D, the coordinates are ordered
+   * if the $y$-coordinate is locked to $Y$ in 3d, the coordinates are ordered
    * as $(z, x)$ on the restriction:
    * $g = g(z, x) = f(x, Y, z)$.
    * This is the same convention as in BoundingBox::cross_section.

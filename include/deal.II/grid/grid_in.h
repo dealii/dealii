@@ -174,7 +174,7 @@ struct CellData;
  * A Wikipedia page dedicated to Universal File Format is available here:
  * https://en.wikipedia.org/wiki/Universal_File_Format
  *
- * Note that Salome, let's say in 2D, can only make a quad mesh on an object
+ * Note that Salome, let's say in 2d, can only make a quad mesh on an object
  * that has exactly 4 edges (or 4 pieces of the boundary). That means, that if
  * you have a more complicated object and would like to mesh it with quads,
  * you will need to decompose the object into >= 2 separate objects. Then 1)
@@ -192,7 +192,7 @@ struct CellData;
  *
  * <li> <tt>VTK</tt> format: VTK Unstructured Grid Legacy file reader
  * generator. The reader can handle only Unstructured Grid format of data at
- * present for 2D & 3D geometries. The documentation for the general legacy
+ * present for 2d & 3d geometries. The documentation for the general legacy
  * vtk file, including Unstructured Grid format can be found here:
  * http://www.cacr.caltech.edu/~slombey/asci/vtk/vtk_formats.simple.html
  *
@@ -634,7 +634,7 @@ public:
    *
    * This function can only be used to read two-dimensional meshes (possibly
    * embedded in three dimensions). This is the standard for graphical software
-   * such as blender, or 3D studio max, and that is what the original Assimp
+   * such as blender, or 3d studio max, and that is what the original Assimp
    * library was built for. We "bend" it to deal.II to support complex
    * co-dimension one meshes and complex two-dimensional meshes.
    *

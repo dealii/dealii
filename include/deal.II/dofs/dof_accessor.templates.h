@@ -254,7 +254,7 @@ namespace internal
        * extract some indices without having to allocate memory. We do this by
        * setting a boost small_vector with 27 elements on the stack, and only
        * allocate when we exceed 27. The number 27 is heuristic and allows up
-       * to quadratic shape functions on scalar problems in 3D, or linear
+       * to quadratic shape functions on scalar problems in 3d, or linear
        * shape functions on systems (elasticity).
        */
       using dof_index_vector_type =

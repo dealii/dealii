@@ -54,8 +54,8 @@ DEAL_II_NAMESPACE_OPEN
  * <i>x<sup>0</sup>, x<sup>1</sup>, x<sup>2</sup>,..., x<sup>n</sup></i>, we
  * get
  *
- * <dl> <dt> 1D <dd> <i> x<sup>0</sup>, x<sup>1</sup>,...,x<sup>n</sup></i>
- * <dt> 2D: <dd> <i> x<sup>0</sup>y<sup>0</sup>,
+ * <dl> <dt> 1d <dd> <i> x<sup>0</sup>, x<sup>1</sup>,...,x<sup>n</sup></i>
+ * <dt> 2d: <dd> <i> x<sup>0</sup>y<sup>0</sup>,
  * x<sup>1</sup>y<sup>0</sup>,..., x<sup>n</sup>y<sup>0</sup>,
  * <br>
  * x<sup>0</sup>y<sup>1</sup>, x<sup>1</sup>y<sup>1</sup>,...,
@@ -67,7 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  * <br>
  * x<sup>0</sup>y<sup>n-1</sup>, x<sup>1</sup>y<sup>n-1</sup>,
  * <br>
- * x<sup>0</sup>y<sup>n</sup> </i> <dt> 3D: <dd> <i>
+ * x<sup>0</sup>y<sup>n</sup> </i> <dt> 3d: <dd> <i>
  * x<sup>0</sup>y<sup>0</sup>z<sup>0</sup>,...,
  * x<sup>n</sup>y<sup>0</sup>z<sup>0</sup>,
  * <br>

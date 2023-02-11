@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo Even if this element is implemented for two and three space
  * dimensions, the definition of the node values relies on consistently
- * oriented faces in 3D. Therefore, care should be taken on complicated
+ * oriented faces in 3d. Therefore, care should be taken on complicated
  * meshes.
  *
  * <h3>Interpolation</h3>
@@ -118,7 +118,7 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    *
-   * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
+   * Right now, this is only implemented for RT0 in 1d. Otherwise, returns
    * always @p true.
    */
   virtual bool

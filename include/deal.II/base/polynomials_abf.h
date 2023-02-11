@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * polynomial order of each component must be two orders higher in the
  * corresponding direction, yielding the polynomial spaces
  * <i>(Q<sub>k+2,k</sub>, Q<sub>k,k+2</sub>)</i> and <i>(Q<sub>k+2,k,k</sub>,
- * Q<sub>k,k+2,k</sub>, Q<sub>k,k,k+2</sub>)</i> in 2D and 3D, resp.
+ * Q<sub>k,k+2,k</sub>, Q<sub>k,k,k+2</sub>)</i> in 2d and 3d, resp.
  *
  * @ingroup Polynomials
  */

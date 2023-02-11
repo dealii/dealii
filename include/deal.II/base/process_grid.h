@@ -84,7 +84,7 @@ namespace Utilities
        * The maximum number of MPI cores one can utilize is
        * $\min\{\frac{M}{MB}\frac{N}{NB}, Np\}$, where $M,N$ are the matrix
        * dimension and $MB,NB$ are the block sizes and $Np$ is the number of
-       * processes in the @p mpi_communicator. This function then creates a 2D processor grid
+       * processes in the @p mpi_communicator. This function then creates a 2d processor grid
        * assuming the ratio between number of process row $p$ and columns $q$ to
        * be equal the ratio between matrix dimensions $M$ and $N$.
        *
@@ -206,7 +206,7 @@ namespace Utilities
       int this_process_column;
 
       /**
-       * A flag which is true for processes within the 2D process grid.
+       * A flag which is true for processes within the 2d process grid.
        */
       bool mpi_process_is_active;
     };

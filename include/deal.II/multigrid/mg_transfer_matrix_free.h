@@ -209,7 +209,7 @@ private:
 
   /**
    * A variable storing whether the element is continuous and there is a joint
-   * degree of freedom in the center of the 1D line.
+   * degree of freedom in the center of the 1d line.
    */
   bool element_is_continuous;
 

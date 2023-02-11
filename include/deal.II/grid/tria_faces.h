@@ -33,8 +33,8 @@ namespace internal
      * triangulation. These classes are similar to the TriaLevel classes. As
      * cells are organized in a hierarchical structure of levels, each
      * triangulation consists of several such TriaLevels. However the faces of
-     * a triangulation, lower dimensional objects like lines in 2D or lines
-     * and quads in 3D, do not have to be based on such a hierarchical
+     * a triangulation, lower dimensional objects like lines in 2d or lines
+     * and quads in 3d, do not have to be based on such a hierarchical
      * structure. In fact we have to organise them in only one object if we
      * want to enable anisotropic refinement. Therefore the TriaFaces classes
      * store the information belonging to the faces of a triangulation

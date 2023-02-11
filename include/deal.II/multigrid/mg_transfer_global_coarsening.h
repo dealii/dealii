@@ -384,7 +384,7 @@ private:
     AlignedVector<VectorizedArray<Number>> prolongation_matrix;
 
     /**
-     * 1D prolongation matrix for tensor-product elements.
+     * 1d prolongation matrix for tensor-product elements.
      */
     AlignedVector<VectorizedArray<Number>> prolongation_matrix_1d;
 
@@ -394,7 +394,7 @@ private:
     AlignedVector<VectorizedArray<Number>> restriction_matrix;
 
     /**
-     * 1D restriction matrix for tensor-product elements.
+     * 1d restriction matrix for tensor-product elements.
      */
     AlignedVector<VectorizedArray<Number>> restriction_matrix_1d;
 

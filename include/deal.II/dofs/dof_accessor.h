@@ -1512,7 +1512,7 @@ public:
    * Return an iterator to the @p ith face of this cell.
    *
    * This function returns a DoFAccessor with <code>structdim == 0</code> in
-   * 1D, a DoFAccessor::line in 2D, and a DoFAccessor::quad in 3d.
+   * 1d, a DoFAccessor::line in 2d, and a DoFAccessor::quad in 3d.
    */
   face_iterator
   face(const unsigned int i) const;

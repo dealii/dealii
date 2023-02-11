@@ -504,7 +504,7 @@ namespace internal
             dof_handler.mg_levels.back()->dof_object.dofs =
               std::vector<types::global_dof_index>(
                 tria.n_raw_quads(i) *
-                  fe.n_dofs_per_quad(0 /*note: in 2D there is only one quad*/),
+                  fe.n_dofs_per_quad(0 /*note: in 2d there is only one quad*/),
                 numbers::invalid_dof_index);
           }
 

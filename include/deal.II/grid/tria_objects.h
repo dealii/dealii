@@ -187,9 +187,9 @@ namespace internal
       /**
        * Return an iterator to the next free slot for a single object. This
        * function is only used by Triangulation::execute_refinement()
-       * in 3D.
+       * in 3d.
        *
-       * @warning Interestingly, this function is not used for 1D or 2D
+       * @warning Interestingly, this function is not used for 1d or 2d
        * triangulations, where it seems the authors of the refinement function
        * insist on reimplementing its contents.
        *
@@ -202,9 +202,9 @@ namespace internal
       /**
        * Return an iterator to the next free slot for a pair of objects. This
        * function is only used by Triangulation::execute_refinement()
-       * in 3D.
+       * in 3d.
        *
-       * @warning Interestingly, this function is not used for 1D or 2D
+       * @warning Interestingly, this function is not used for 1d or 2d
        * triangulations, where it seems the authors of the refinement function
        * insist on reimplementing its contents.
        *

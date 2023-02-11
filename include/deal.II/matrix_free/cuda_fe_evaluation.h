@@ -68,7 +68,7 @@ namespace CUDAWrappers
    * @tparam fe_degree Degree of the tensor prodict finite element with fe_degree+1
    * degrees of freedom per coordinate direction
    *
-   * @tparam n_q_points_1d Number of points in the quadrature formular in 1D,
+   * @tparam n_q_points_1d Number of points in the quadrature formular in 1d,
    * defaults to fe_degree+1
    *
    * @tparam n_components Number of vector components when solving a system of

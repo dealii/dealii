@@ -225,12 +225,12 @@ protected:
   single_mapping_kind() const;
 
   /**
-   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * For faces with non-standard face_orientation in 3d, the dofs on faces
    * (quads) have to be permuted in order to be combined with the correct
    * shape functions and additionally can change the sign. Given a local
    * dof @p index on a quad, return the
    * sign of the permuted shape function, if the face has non-standard
-   * face_orientation, face_flip or face_rotation. In 2D and 1D there is no need
+   * face_orientation, face_flip or face_rotation. In 2d and 1d there is no need
    * for permutation and consequently it does nothing in this case.
    *
    * The permutation itself is returned by
@@ -245,7 +245,7 @@ protected:
                                             const bool face_rotation) const;
 
   /**
-   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * For faces with non-standard face_orientation in 3d, the dofs on faces
    * (quads) need not only to be permuted in order to be combined with the
    * correct shape functions. Additionally they may change their sign.
    *

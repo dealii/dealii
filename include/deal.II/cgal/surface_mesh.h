@@ -73,11 +73,11 @@ namespace CGALWrappers
    * Convert a deal.II triangulation to a CGAL::Surface_mesh. The output depends
    * on the intrinsic dimension of the input deal.II triangulation.
    *
-   * In 2D, i.e. with a
+   * In 2d, i.e. with a
    * Triangulation<2> or a Triangulation<2,3>, the output is the
    * CGAL::Surface_mesh describing the whole triangulation.
    *
-   * In 3D, the boundary the of the deal.II Triangulation is converted to
+   * In 3d, the boundary the of the deal.II Triangulation is converted to
    * a CGAL::Surface_mesh by looping over all the boundary faces.
    *
    * @param[in] triangulation The input deal.II triangulation.

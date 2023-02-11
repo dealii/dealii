@@ -314,7 +314,7 @@ class FESystem;
  *
  * <h4>Interpolation matrices in two dimensions</h4>
  *
- * In addition to the fields discussed above for 1D, a constraint matrix
+ * In addition to the fields discussed above for 1d, a constraint matrix
  * is needed to describe hanging node constraints if the finite element has
  * degrees of freedom located on edges or vertices. These constraints are
  * represented by an $m\times n$-matrix #interface_constraints, where <i>m</i>
@@ -1458,11 +1458,11 @@ public:
                                  const unsigned int face_no = 0) const;
 
   /**
-   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * For faces with non-standard face_orientation in 3d, the dofs on faces
    * (quads) have to be permuted in order to be combined with the correct
    * shape functions. Given a local dof @p index on a quad, return the local
    * index, if the face has non-standard face_orientation, face_flip or
-   * face_rotation. In 2D and 1D there is no need for permutation and
+   * face_rotation. In 2d and 1d there is no need for permutation and
    * consequently an exception is thrown.
    */
   unsigned int
@@ -1534,10 +1534,10 @@ public:
                      const bool         face_rotation    = false) const;
 
   /**
-   * For lines with non-standard line_orientation in 3D, the dofs on lines
+   * For lines with non-standard line_orientation in 3d, the dofs on lines
    * have to be permuted in order to be combined with the correct shape
    * functions. Given a local dof @p index on a line, return the local index,
-   * if the line has non-standard line_orientation. In 2D and 1D there is no
+   * if the line has non-standard line_orientation. In 2d and 1d there is no
    * need for permutation, so the given index is simply returned.
    */
   unsigned int
@@ -2459,12 +2459,12 @@ protected:
   std::vector<std::vector<Point<dim - 1>>> generalized_face_support_points;
 
   /**
-   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * For faces with non-standard face_orientation in 3d, the dofs on faces
    * (quads) have to be permuted in order to be combined with the correct
    * shape functions. Given a local dof @p index on a quad, return the shift
    * in the local index, if the face has non-standard face_orientation, i.e.
-   * <code>old_index + shift = new_index</code>. In 2D and 1D there is no need
-   * for permutation so the vector is empty. In 3D it has the size of <code>
+   * <code>old_index + shift = new_index</code>. In 2d and 1d there is no need
+   * for permutation so the vector is empty. In 3d it has the size of <code>
    * #dofs_per_quad * 8 </code>, where 8 is the number of orientations, a face
    * can be in (all combinations of the three bool flags face_orientation,
    * face_flip and face_rotation).
@@ -2476,12 +2476,12 @@ protected:
   std::vector<Table<2, int>> adjust_quad_dof_index_for_face_orientation_table;
 
   /**
-   * For lines with non-standard line_orientation in 3D, the dofs on lines
+   * For lines with non-standard line_orientation in 3d, the dofs on lines
    * have to be permuted in order to be combined with the correct shape
    * functions. Given a local dof @p index on a line, return the shift in the
    * local index, if the line has non-standard line_orientation, i.e.
-   * <code>old_index + shift = new_index</code>. In 2D and 1D there is no need
-   * for permutation so the vector is empty. In 3D it has the size of
+   * <code>old_index + shift = new_index</code>. In 2d and 1d there is no need
+   * for permutation so the vector is empty. In 3d it has the size of
    * #dofs_per_line.
    *
    * The constructor of this class fills this table with zeros, i.e.,
