@@ -114,27 +114,14 @@ macro(deal_ii_setup_target _target)
     LINK_FLAGS " ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
     )
 
-  if(CMAKE_VERSION VERSION_LESS 3.9 OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set_property(TARGET ${_target} APPEND_STRING PROPERTY
-      COMPILE_FLAGS " ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-      )
-    set_property(TARGET ${_target} APPEND PROPERTY
-      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
-      )
+  set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
+  separate_arguments(_flags)
 
-  else()
+  target_compile_options(${_target} PUBLIC ${_flags})
 
-    set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-    separate_arguments(_flags)
-    target_compile_options(${_target} PUBLIC
-      $<$<COMPILE_LANGUAGE:CXX>:${_flags}>
-      )
-
-    target_compile_definitions(${_target}
-      PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
-      )
-
-  endif()
+  target_compile_definitions(${_target}
+    PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+    )
 
   #
   # Set up the link interface:

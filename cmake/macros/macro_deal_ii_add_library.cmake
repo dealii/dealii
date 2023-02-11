@@ -40,26 +40,13 @@ macro(deal_ii_add_library _library)
       LINKER_LANGUAGE "CXX"
       )
 
-    if(CMAKE_VERSION VERSION_LESS 3.9 OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
+    separate_arguments(_flags)
+    target_compile_options(${_library}_${_build_lowercase} PUBLIC ${_flags})
 
-      set_target_properties(${_library}_${_build_lowercase} PROPERTIES
-        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-        COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
-        )
-
-    else()
-
-      set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-      separate_arguments(_flags)
-      target_compile_options(${_library}_${_build_lowercase} PUBLIC
-        $<$<COMPILE_LANGUAGE:CXX>:${_flags}>
-        )
-
-      target_compile_definitions(${_library}_${_build_lowercase}
-        PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
-        )
-
-    endif()
+    target_compile_definitions(${_library}_${_build_lowercase}
+      PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+      )
 
     set_property(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
       "$<TARGET_OBJECTS:${_library}_${_build_lowercase}>"
