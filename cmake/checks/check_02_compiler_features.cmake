@@ -276,7 +276,7 @@ endif()
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
-          __attribute__((always_inline)) int fn () { return 0; }
+          __attribute__((always_inline)) inline int fn () { return 0; }
           int main () { return fn(); }
   "
   DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE

@@ -48,6 +48,7 @@ enable_if_supported(DEAL_II_CXX_FLAGS "-w2")
 # Disable remarks like "Inlining inhibited by limit max-size"
 #
 enable_if_supported(DEAL_II_CXX_FLAGS "-diag-disable=remark")
+enable_if_supported(DEAL_II_CXX_FLAGS "-diag-disable=16219")
 
 #
 # Disable some warnings that lead to a lot of false positives:
