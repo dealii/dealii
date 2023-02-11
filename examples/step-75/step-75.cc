@@ -1351,15 +1351,6 @@ namespace Step75
                                               prm.p_refine_fraction,
                                               prm.p_coarsen_fraction);
 
-    // At this stage, we have both the future FE indices and the classic refine
-    // and coarsen flags set, from which the latter will be interpreted by
-    // Triangulation::execute_coarsening_and_refinement() for h-adaptation.
-    // We would like to only impose one type of adaptation on cells, which is
-    // what the next function will sort out for us. In short, on cells which
-    // have both types of indicators assigned, we will favor the p-adaptation
-    // one and remove the h-adaptation one.
-    hp::Refinement::choose_p_over_h(dof_handler);
-
     // After setting all indicators, we will remove those that exceed the
     // specified limits of the provided level ranges in the Parameters struct.
     // This limitation naturally arises for p-adaptation as the number of
@@ -1383,6 +1374,18 @@ namespace Step75
     for (const auto &cell :
          triangulation.active_cell_iterators_on_level(prm.min_h_level))
       cell->clear_coarsen_flag();
+
+    // At this stage, we have both the future FE indices and the classic refine
+    // and coarsen flags set. The latter will be interpreted by
+    // Triangulation::execute_coarsening_and_refinement() for h-adaptation, and
+    // our previous modification ensures that the resulting Triangulation stays
+    // within the specified level range.
+    //
+    // Now, we would like to only impose one type of adaptation on cells, which
+    // is what the next function will sort out for us. In short, on cells which
+    // have both types of indicators assigned, we will favor the p-adaptation
+    // one and remove the h-adaptation one.
+    hp::Refinement::choose_p_over_h(dof_handler);
 
     // In the end, we are left to execute coarsening and refinement. Here, not
     // only the grid will be updated, but also all previous future FE indices
