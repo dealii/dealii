@@ -222,8 +222,8 @@ in the discussion below.
   "broken" spaces.
 
 @note deal.II happens to have an implementation of this broken Raviart-Thomas
-  space: The FE_DGRT class. As a consequence, in this tutorial we will simply
-  always use the FE_DGRT class, even though in all of those places where
+  space: The FE_DGRaviartThomas class. As a consequence, in this tutorial we will simply
+  always use the FE_DGRaviartThomas class, even though in all of those places where
   we have to compute cell-local matrices and vectors, it makes no difference.
 
 
