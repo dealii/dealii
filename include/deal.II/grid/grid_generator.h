@@ -1792,7 +1792,7 @@ namespace GridGenerator
    *
    * @image html grid_generator_implicit_function_3d.png
    *
-   * @ingroup simplex
+   * @relates simplex
    *
    * @param[out] tria The output triangulation
    * @param[in] implicit_function The implicit function
