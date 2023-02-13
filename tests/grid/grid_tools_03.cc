@@ -20,7 +20,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
 #include "../tests.h"
@@ -42,17 +41,19 @@ test1()
           deallog << dim << "d, "
                   << "hypercube volume, " << i * 2
                   << " refinements: " << GridTools::volume(tria) << std::endl;
-        };
-    };
+        }
+
+      Triangulation<dim> simplex_tria;
+      GridGenerator::convert_hypercube_to_simplex_mesh(tria, simplex_tria);
+      deallog << dim << "d, simplex hypercube volume: "
+              << GridTools::volume(simplex_tria) << std::endl;
+    }
 
   // test 2: hyperball
   if (dim >= 2)
     {
       Triangulation<dim> tria;
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
-
-      static const SphericalManifold<dim> boundary;
-      tria.set_manifold(0, boundary);
 
       for (unsigned int i = 0; i < 4; ++i)
         {
@@ -61,6 +62,13 @@ test1()
                   << "hyperball volume, " << i
                   << " refinements: " << GridTools::volume(tria) << std::endl;
         }
+
+      Triangulation<dim> simplex_tria;
+      GridGenerator::convert_hypercube_to_simplex_mesh(tria, simplex_tria);
+      simplex_tria.set_all_manifold_ids(numbers::flat_manifold_id);
+      deallog << dim << "d, simplex hyperball volume: "
+              << GridTools::volume(simplex_tria) << std::endl;
+
       deallog << "exact value="
               << (dim == 2 ? numbers::PI : 4. / 3. * numbers::PI) << std::endl;
     }

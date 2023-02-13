@@ -146,7 +146,34 @@ namespace GridTools
    * Compute the volume (i.e. the dim-dimensional measure) of the
    * triangulation. We compute the measure using the integral $\sum_K \int_K 1
    * \; dx$ where $K$ are the cells of the given triangulation. The integral
-   * is approximated via quadrature for which we need the mapping argument.
+   * is approximated via quadrature. This version of the function uses a
+   * linear mapping to compute the JxW values on each cell.
+   *
+   * If the triangulation is a dim-dimensional one embedded in a higher
+   * dimensional space of dimension spacedim, then the value returned is the
+   * dim-dimensional measure. For example, for a two-dimensional triangulation
+   * in three-dimensional space, the value returned is the area of the surface
+   * so described. (This obviously makes sense since the spacedim-dimensional
+   * measure of a dim-dimensional triangulation would always be zero if dim @<
+   * spacedim).
+   *
+   * This function also works for objects of type
+   * parallel::distributed::Triangulation, in which case the function is a
+   * collective operation.
+   *
+   * @param tria The triangulation.
+   * @return The dim-dimensional measure of the domain described by the
+   * triangulation, as discussed above.
+   */
+  template <int dim, int spacedim>
+  double
+  volume(const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Compute the volume (i.e. the dim-dimensional measure) of the
+   * triangulation. We compute the measure using the integral $\sum_K \int_K 1
+   * \; dx$ where $K$ are the cells of the given triangulation. The integral
+   * is approximated via quadrature for which we use the mapping argument.
    *
    * If the triangulation is a dim-dimensional one embedded in a higher
    * dimensional space of dimension spacedim, then the value returned is the
@@ -161,24 +188,18 @@ namespace GridTools
    * collective operation.
    *
    * @param tria The triangulation.
-   * @param mapping An optional argument used to denote the mapping that
-   * should be used when describing whether cells are bounded by straight or
-   * curved faces. The default is to use a $Q_1$ mapping, which corresponds to
-   * straight lines bounding the cells.
+   * @param mapping The Mapping which computes the Jacobians used to
+   * approximate the volume via quadrature. Explicitly using a higher-order
+   * Mapping (i.e., instead of using the other version of this function) will
+   * result in a more accurate approximation of the volume on Triangulations
+   * with curvature described by Manifold objects.
    * @return The dim-dimensional measure of the domain described by the
    * triangulation, as discussed above.
    */
   template <int dim, int spacedim>
   double
   volume(const Triangulation<dim, spacedim> &tria,
-         const Mapping<dim, spacedim> &      mapping =
-           (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-              .template get_default_linear_mapping<dim, spacedim>()
-#else
-              .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
-#endif
-              ));
+         const Mapping<dim, spacedim> &      mapping);
 
   /**
    * Return an approximation of the diameter of the smallest active cell of a

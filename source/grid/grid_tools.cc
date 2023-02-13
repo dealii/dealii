@@ -32,6 +32,7 @@
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/filtered_iterator.h>
@@ -137,6 +138,20 @@ namespace GridTools
 
   template <int dim, int spacedim>
   double
+  volume(const Triangulation<dim, spacedim> &triangulation)
+  {
+    Assert(triangulation.get_reference_cells().size() == 1,
+           ExcNotImplemented());
+    const ReferenceCell reference_cell = triangulation.get_reference_cells()[0];
+    return volume(
+      triangulation,
+      reference_cell.template get_default_linear_mapping<dim, spacedim>());
+  }
+
+
+
+  template <int dim, int spacedim>
+  double
   volume(const Triangulation<dim, spacedim> &triangulation,
          const Mapping<dim, spacedim> &      mapping)
   {
@@ -145,30 +160,31 @@ namespace GridTools
     if (const auto *p = dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
       mapping_degree = p->get_degree();
     else if (const auto *p =
-               dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
+               dynamic_cast<const MappingFE<dim, spacedim> *>(&mapping))
       mapping_degree = p->get_degree();
 
     // then initialize an appropriate quadrature formula
-    const QGauss<dim>  quadrature_formula(mapping_degree + 1);
+    Assert(triangulation.get_reference_cells().size() == 1,
+           ExcNotImplemented());
+    const ReferenceCell reference_cell = triangulation.get_reference_cells()[0];
+    const Quadrature<dim> quadrature_formula =
+      reference_cell.template get_gauss_type_quadrature<dim>(mapping_degree +
+                                                             1);
     const unsigned int n_q_points = quadrature_formula.size();
 
     // we really want the JxW values from the FEValues object, but it
     // wants a finite element. create a cheap element as a dummy
     // element
-    FE_Nothing<dim, spacedim> dummy_fe;
+    FE_Nothing<dim, spacedim> dummy_fe(reference_cell);
     FEValues<dim, spacedim>   fe_values(mapping,
                                       dummy_fe,
                                       quadrature_formula,
                                       update_JxW_values);
 
-    typename Triangulation<dim, spacedim>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
-
     double local_volume = 0;
 
     // compute the integral quantities by quadrature
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
