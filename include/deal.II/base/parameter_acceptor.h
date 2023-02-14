@@ -23,7 +23,9 @@
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/smartpointer.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2/signal.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <typeinfo>
 

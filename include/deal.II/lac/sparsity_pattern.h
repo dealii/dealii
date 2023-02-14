@@ -26,6 +26,7 @@
 
 #include <deal.II/lac/sparsity_pattern_base.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 // boost::serialization::make_array used to be in array.hpp, but was
 // moved to a different file in BOOST 1.64
 #include <boost/version.hpp>
@@ -35,6 +36,7 @@
 #  include <boost/serialization/array.hpp>
 #endif
 #include <boost/serialization/split_member.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <iostream>

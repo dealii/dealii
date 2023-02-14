@@ -23,7 +23,9 @@
 
 #include <deal.II/differentiation/ad/ad_number_types.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/type_traits.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <complex>
 #include <type_traits>

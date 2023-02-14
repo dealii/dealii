@@ -31,11 +31,13 @@
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/signals2.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <bitset>
 #include <functional>

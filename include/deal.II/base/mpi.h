@@ -25,7 +25,9 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <complex>
 #include <limits>

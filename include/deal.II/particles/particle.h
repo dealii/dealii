@@ -24,7 +24,9 @@
 
 #include <deal.II/particles/property_pool.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/array.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <cstdint>
 
