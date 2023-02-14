@@ -360,7 +360,7 @@ namespace Step61
   // DoFHandler class.
   //
   // We could create a DoFHandler object for the "broken" Raviart-Thomas space
-  // (using the FE_DGRT class), but we really don't want to here: At
+  // (using the FE_DGRaviartThomas class), but we really don't want to here: At
   // least in the current function, we have no need for any globally defined
   // degrees of freedom associated with this broken space, but really only
   // need to reference the shape functions of such a space on the current

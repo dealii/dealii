@@ -137,7 +137,7 @@ private:
  * space that is discontinuous between cells and on each cell has shape
  * functions that equal those of the Nedelec element.
  *
- * The related class FE_DGRT is used in step-61.
+ * The related class FE_DGRaviartThomas is used in step-61.
  * @ingroup fe
  */
 template <int dim, int spacedim = dim>
@@ -198,7 +198,7 @@ public:
  * space that is discontinuous between cells and on each cell has shape
  * functions that equal those of the BDM element.
  *
- * The related class FE_DGRT is used in step-61.
+ * The related class FE_DGRaviartThomas is used in step-61.
  *
  * @ingroup fe
  */
