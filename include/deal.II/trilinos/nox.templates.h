@@ -966,7 +966,7 @@ namespace TrilinosWrappers
                 (update_preconditioner_predicate != nullptr))
               update_preconditioner = update_preconditioner_predicate();
 
-            if (update_preconditioner) // update preconditioner
+            if (update_preconditioner)
               flag = setup_preconditioner(x);
           }
 
