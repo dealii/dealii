@@ -34,12 +34,96 @@ namespace parallel
         const DoFHandler<dim, spacedim> &dof)
         : dof_handler(dof)
       {
+        // When coarsening, we want to mimic the behavior of SolutionTransfer
+        // and interpolate from child cells to parent. Define this strategy here
+        // since it is not readily available
+        const auto coarsening_strategy =
+          [this](
+            const typename dealii::Triangulation<dim, spacedim>::cell_iterator
+              &                                parent,
+            const std::vector<Vector<Number>> &children_values) {
+            // get the equivalent DoFCellAccessor
+            typename DoFHandler<dim, spacedim>::cell_iterator dof_cell_iterator(
+              &dof_handler.get_triangulation(),
+              parent->level(),
+              parent->index(),
+              &dof_handler);
+
+            int fe_index = 0;
+            if (dof_handler.has_hp_capabilities())
+              fe_index = dealii::internal::hp::DoFHandlerImplementation::
+                dominated_future_fe_on_children<dim, spacedim>(
+                  dof_cell_iterator);
+
+            const auto &fe = dof_handler.get_fe(fe_index);
+            Assert(fe.n_dofs_per_cell() > 0,
+                   ExcMessage(
+                     "Cannot coarsen onto a FiniteElement with no DoFs."));
+            AssertDimension(dof_cell_iterator->n_children(),
+                            children_values.size());
+
+            const auto child_iterators = dof_cell_iterator->child_iterators();
+            const unsigned int n_children_with_fe_nothing =
+              std::count_if(child_iterators.begin(),
+                            child_iterators.end(),
+                            [](const auto &child_cell) {
+                              return child_cell->get_fe().n_dofs_per_cell() ==
+                                     0;
+                            });
+
+            Assert(
+              n_children_with_fe_nothing == 0 ||
+                n_children_with_fe_nothing == dof_cell_iterator->n_children(),
+              ExcMessage(
+                "Coarsening is only supported for parent cells where either all"
+                " or none of the child cells are FE_Nothing."));
+
+            // in case all children are FE_Nothing there is nothing to
+            // interpolate and we just return the first entry from the children
+            // values (containing invalid entries)
+            if (n_children_with_fe_nothing == dof_cell_iterator->n_children())
+              {
+                return children_values[0];
+              }
+
+            const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
+            Vector<Number>     tmp(dofs_per_cell);
+            Vector<Number>     interpolated_values(dofs_per_cell);
+
+            // Otherwise, perform the actual interpolation here. Due to the
+            // assert above, we know that all child cells have data to
+            // interpolate.
+            for (unsigned int child = 0;
+                 child < dof_cell_iterator->n_children();
+                 ++child)
+              {
+                // interpolate the previously stored values on a child to the
+                // mother cell
+                fe.get_restriction_matrix(child,
+                                          dof_cell_iterator->refinement_case())
+                  .vmult(tmp, children_values[child]);
+
+                // and add up or set them in the output vector
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                  if (fe.restriction_is_additive(i))
+                    interpolated_values(i) += tmp(i);
+                  else if (tmp(i) != Number())
+                    interpolated_values(i) = tmp(i);
+              }
+
+            return interpolated_values;
+          };
+
         cell_data_transfer = std::make_unique<
           CellDataTransfer<dim, spacedim, std::vector<Vector<Number>>>>(
           dynamic_cast<
             dealii::parallel::distributed::Triangulation<dim, spacedim> &>(
             const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())));
+              dof_handler.get_triangulation())),
+          false,
+          &dealii::AdaptationStrategies::Refinement::
+            preserve<dim, spacedim, Vector<Number>>,
+          coarsening_strategy);
       }
 
 
