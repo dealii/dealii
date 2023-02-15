@@ -24,17 +24,16 @@
 # This file sets up
 #
 #   DEAL_II_WORDS_BIGENDIAN
-#   DEAL_II_HAVE_SSE2                    *)
-#   DEAL_II_HAVE_AVX                     *)
-#   DEAL_II_HAVE_AVX512                  *)
-#   DEAL_II_HAVE_ALTIVEC                 *)
-#   DEAL_II_HAVE_OPENMP_SIMD             *)
+#   DEAL_II_HAVE_SSE2                    (*)
+#   DEAL_II_HAVE_AVX                     (*)
+#   DEAL_II_HAVE_AVX512                  (*)
+#   DEAL_II_HAVE_ALTIVEC                 (*)
+#   DEAL_II_HAVE_OPENMP_SIMD             (*)
 #   DEAL_II_VECTORIZATION_WIDTH_IN_BITS
 #   DEAL_II_OPENMP_SIMD_PRAGMA
 #
-# *)
-# It is is possible to manually set the above values to their corresponding
-# values, when platform introspection is disabled with
+# (*) It is possible to manually set the above values to their
+# corresponding values, when platform introspection is disabled with
 # DEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF,
 #
 
