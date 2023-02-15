@@ -1,8 +1,7 @@
 
 #include <deal.II/base/config.h>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #include <Kokkos_Core.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 struct FillFunctor
 {
