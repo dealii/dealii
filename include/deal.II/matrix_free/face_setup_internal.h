@@ -379,8 +379,8 @@ namespace internal
               // those faces, a value -1 means that the process with the lower
               // rank gets it, whereas a value 0 means that the decision can
               // be made in an arbitrary way.
-              unsigned int      n_faces_lower_proc = 0, n_faces_higher_proc = 0;
-              std::vector<char> assignment(other_range.size(), 0);
+              unsigned int n_faces_lower_proc = 0, n_faces_higher_proc = 0;
+              std::vector<signed char> assignment(other_range.size(), 0);
               if (inner_face.second.shared_faces.size() > 0)
                 {
                   // identify faces that go to the processor with the higher
