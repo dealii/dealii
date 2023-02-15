@@ -28,13 +28,20 @@ function(print_target_properties _target)
   set(_messages)
   list(APPEND _messages "Target: ${_target}")
 
-  foreach(_property
+  set(_properties
+    INTERFACE_LINK_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES
+    INTERFACE_SYSTEM_INCLUDE_DIRECTORIES INTERFACE_COMPILE_DEFINITIONS
+    INTERFACE_COMPILE_OPTIONS INTERFACE_LINK_OPTIONS
+    )
+  if(NOT CMAKE_VERSION VERSION_LESS 3.19)
+    set(_properties
       TYPE VERSION SOVERSION LINK_LIBRARIES INCLUDE_DIRECTORIES
       COMPILE_DEFINITIONS COMPILE_FEATURES COMPILE_OPTIONS LINK_OPTIONS
-      INTERFACE_LINK_LIBRARIES INTERFACE_INCLUDE_DIRECTORIES
-      INTERFACE_SYSTEM_INCLUDE_DIRECTORIES INTERFACE_COMPILE_DEFINITIONS
-      INTERFACE_COMPILE_OPTIONS INTERFACE_LINK_OPTIONS
+      ${_properties}
       )
+  endif()
+
+  foreach(_property ${_properties})
     get_target_property(_value ${_target} ${_property})
     if(NOT "${_value}" MATCHES "-NOTFOUND" AND NOT "${_value}" STREQUAL "")
       string(REPLACE ";" " " _value "${_value}")
