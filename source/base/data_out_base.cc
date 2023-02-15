@@ -45,14 +45,12 @@
 #  include <hdf5.h>
 #endif
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #ifdef DEAL_II_WITH_ZLIB
 #  include <boost/iostreams/filter/zlib.hpp>
 #endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 

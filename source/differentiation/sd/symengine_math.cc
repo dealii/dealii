@@ -18,15 +18,12 @@
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-// Number operations
+#  include <deal.II/differentiation/sd/symengine_math.h>
+
 #  include <symengine/add.h>
 #  include <symengine/functions.h>
 #  include <symengine/mul.h>
 #  include <symengine/pow.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
-#  include <deal.II/differentiation/sd/symengine_math.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -22,9 +22,7 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <vector>

@@ -27,13 +27,11 @@
 
 #include <deal.II/fe/component_mask.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/basic_archive.hpp>
 #include <boost/core/demangle.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/serialization/split_member.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <array>

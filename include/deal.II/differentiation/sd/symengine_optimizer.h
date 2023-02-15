@@ -20,7 +20,6 @@
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 // Low level
 #  include <symengine/basic.h>
 #  include <symengine/dict.h>
@@ -33,7 +32,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef HAVE_SYMENGINE_LLVM
 #    include <symengine/llvm_double.h>
 #  endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/logstream.h>

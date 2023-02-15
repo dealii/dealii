@@ -20,18 +20,7 @@
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 // Low level
-#  include <symengine/basic.h>
-#  include <symengine/dict.h>
-#  include <symengine/symengine_exception.h>
-#  include <symengine/symengine_rcp.h>
-
-// Visitor
-#  include <symengine/visitor.h>
-
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/numbers.h>
 
@@ -39,6 +28,12 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <deal.II/differentiation/sd/symengine_utilities.h>
 
 #  include <boost/serialization/split_member.hpp>
+
+#  include <symengine/basic.h>
+#  include <symengine/dict.h>
+#  include <symengine/symengine_exception.h>
+#  include <symengine/symengine_rcp.h>
+#  include <symengine/visitor.h>
 
 
 DEAL_II_NAMESPACE_OPEN

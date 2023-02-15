@@ -22,10 +22,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/tensor.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/point.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
 
