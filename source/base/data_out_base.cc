@@ -2405,6 +2405,10 @@ namespace DataOutBase
   }
 
 
+  Hdf5Flags::Hdf5Flags(const CompressionLevel compression_level)
+    : compression_level(compression_level)
+  {}
+
 
   TecplotFlags::TecplotFlags(const char *zone_name, const double solution_time)
     : zone_name(zone_name)
@@ -8584,6 +8588,7 @@ namespace
   void
   do_write_hdf5(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
                 const DataOutBase::DataOutFilter &data_filter,
+                const DataOutBase::Hdf5Flags &    flags,
                 const bool                        write_mesh_file,
                 const std::string &               mesh_filename,
                 const std::string &               solution_filename,
@@ -8591,7 +8596,7 @@ namespace
   {
     hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
     hid_t node_dataspace, node_dataset, node_file_dataspace,
-      node_memory_dataspace;
+      node_memory_dataspace, node_dataset_id;
     hid_t cell_dataspace, cell_dataset, cell_file_dataspace,
       cell_memory_dataspace;
     hid_t pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace,
@@ -8617,6 +8622,10 @@ namespace
     status = H5Pset_fapl_mpio(file_plist_id, comm, MPI_INFO_NULL);
     AssertThrow(status >= 0, ExcIO());
 #    endif
+#  endif
+    // if zlib support is disabled flags are unused
+#  ifndef DEAL_II_WITH_ZLIB
+    (void)flags;
 #  endif
 
     // Compute the global total number of nodes/cells and determine the offset
@@ -8685,13 +8694,20 @@ namespace
                                  node_dataspace,
                                  H5P_DEFAULT);
 #  else
-        node_dataset    = H5Dcreate(h5_mesh_file_id,
+        node_dataset_id = H5Pcreate(H5P_DATASET_CREATE);
+#    ifdef DEAL_II_WITH_ZLIB
+        H5Pset_deflate(node_dataset_id,
+                       get_zlib_compression_level(flags.compression_level));
+        H5Pset_chunk(node_dataset_id, 2, node_ds_dim);
+#    endif
+        node_dataset = H5Dcreate(h5_mesh_file_id,
                                  "nodes",
                                  H5T_NATIVE_DOUBLE,
                                  node_dataspace,
                                  H5P_DEFAULT,
-                                 H5P_DEFAULT,
+                                 node_dataset_id,
                                  H5P_DEFAULT);
+        H5Pclose(node_dataset_id);
 #  endif
         AssertThrow(node_dataset >= 0, ExcIO());
 #  if H5Gcreate_vers == 1
@@ -8701,13 +8717,20 @@ namespace
                                  cell_dataspace,
                                  H5P_DEFAULT);
 #  else
-        cell_dataset    = H5Dcreate(h5_mesh_file_id,
+        node_dataset_id = H5Pcreate(H5P_DATASET_CREATE);
+#    ifdef DEAL_II_WITH_ZLIB
+        H5Pset_deflate(node_dataset_id,
+                       get_zlib_compression_level(flags.compression_level));
+        H5Pset_chunk(node_dataset_id, 2, cell_ds_dim);
+#    endif
+        cell_dataset = H5Dcreate(h5_mesh_file_id,
                                  "cells",
                                  H5T_NATIVE_UINT,
                                  cell_dataspace,
                                  H5P_DEFAULT,
-                                 H5P_DEFAULT,
+                                 node_dataset_id,
                                  H5P_DEFAULT);
+        H5Pclose(node_dataset_id);
 #  endif
         AssertThrow(cell_dataset >= 0, ExcIO());
 
@@ -8836,13 +8859,20 @@ namespace
                                     pt_data_dataspace,
                                     H5P_DEFAULT);
 #  else
+        node_dataset_id = H5Pcreate(H5P_DATASET_CREATE);
+#    ifdef DEAL_II_WITH_ZLIB
+        H5Pset_deflate(node_dataset_id,
+                       get_zlib_compression_level(flags.compression_level));
+        H5Pset_chunk(node_dataset_id, 2, node_ds_dim);
+#    endif
         pt_data_dataset = H5Dcreate(h5_solution_file_id,
                                     vector_name.c_str(),
                                     H5T_NATIVE_DOUBLE,
                                     pt_data_dataspace,
                                     H5P_DEFAULT,
-                                    H5P_DEFAULT,
+                                    node_dataset_id,
                                     H5P_DEFAULT);
+        H5Pclose(node_dataset_id);
 #  endif
         AssertThrow(pt_data_dataset >= 0, ExcIO());
 
@@ -9033,7 +9063,8 @@ DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const std::string &               filename,
   const MPI_Comm &                  comm) const
 {
-  DataOutBase::write_hdf5_parallel(get_patches(), data_filter, filename, comm);
+  DataOutBase::write_hdf5_parallel(
+    get_patches(), data_filter, hdf5_flags, filename, comm);
 }
 
 
@@ -9049,6 +9080,7 @@ DataOutInterface<dim, spacedim>::write_hdf5_parallel(
 {
   DataOutBase::write_hdf5_parallel(get_patches(),
                                    data_filter,
+                                   hdf5_flags,
                                    write_mesh_file,
                                    mesh_filename,
                                    solution_filename,
@@ -9062,10 +9094,12 @@ void
 DataOutBase::write_hdf5_parallel(
   const std::vector<Patch<dim, spacedim>> &patches,
   const DataOutBase::DataOutFilter &       data_filter,
+  const DataOutBase::Hdf5Flags &           flags,
   const std::string &                      filename,
   const MPI_Comm &                         comm)
 {
-  write_hdf5_parallel(patches, data_filter, true, filename, filename, comm);
+  write_hdf5_parallel(
+    patches, data_filter, flags, true, filename, filename, comm);
 }
 
 
@@ -9075,6 +9109,7 @@ void
 DataOutBase::write_hdf5_parallel(
   const std::vector<Patch<dim, spacedim>> &patches,
   const DataOutBase::DataOutFilter &       data_filter,
+  const DataOutBase::Hdf5Flags &           flags,
   const bool                               write_mesh_file,
   const std::string &                      mesh_filename,
   const std::string &                      solution_filename,
@@ -9091,6 +9126,7 @@ DataOutBase::write_hdf5_parallel(
   // the now unused function arguments
   (void)patches;
   (void)data_filter;
+  (void)flags;
   (void)write_mesh_file;
   (void)mesh_filename;
   (void)solution_filename;
@@ -9136,6 +9172,7 @@ DataOutBase::write_hdf5_parallel(
     {
       do_write_hdf5<dim, spacedim>(patches,
                                    data_filter,
+                                   flags,
                                    write_mesh_file,
                                    mesh_filename,
                                    solution_filename,
@@ -9242,6 +9279,8 @@ DataOutInterface<dim, spacedim>::set_flags(const FlagType &flags)
     eps_flags = *reinterpret_cast<const DataOutBase::EpsFlags *>(&flags);
   else if (typeid(flags) == typeid(gmv_flags))
     gmv_flags = *reinterpret_cast<const DataOutBase::GmvFlags *>(&flags);
+  else if (typeid(flags) == typeid(hdf5_flags))
+    hdf5_flags = *reinterpret_cast<const DataOutBase::Hdf5Flags *>(&flags);
   else if (typeid(flags) == typeid(tecplot_flags))
     tecplot_flags =
       *reinterpret_cast<const DataOutBase::TecplotFlags *>(&flags);
@@ -9311,6 +9350,10 @@ DataOutInterface<dim, spacedim>::declare_parameters(ParameterHandler &prm)
   DataOutBase::GmvFlags::declare_parameters(prm);
   prm.leave_subsection();
 
+  prm.enter_subsection("HDF5 output parameters");
+  DataOutBase::Hdf5Flags::declare_parameters(prm);
+  prm.leave_subsection();
+
   prm.enter_subsection("Tecplot output parameters");
   DataOutBase::TecplotFlags::declare_parameters(prm);
   prm.leave_subsection();
@@ -9359,6 +9402,10 @@ DataOutInterface<dim, spacedim>::parse_parameters(ParameterHandler &prm)
   gmv_flags.parse_parameters(prm);
   prm.leave_subsection();
 
+  prm.enter_subsection("HDF5 output parameters");
+  hdf5_flags.parse_parameters(prm);
+  prm.leave_subsection();
+
   prm.enter_subsection("Tecplot output parameters");
   tecplot_flags.parse_parameters(prm);
   prm.leave_subsection();
@@ -9385,6 +9432,7 @@ DataOutInterface<dim, spacedim>::memory_consumption() const
           MemoryConsumption::memory_consumption(povray_flags) +
           MemoryConsumption::memory_consumption(eps_flags) +
           MemoryConsumption::memory_consumption(gmv_flags) +
+          MemoryConsumption::memory_consumption(hdf5_flags) +
           MemoryConsumption::memory_consumption(tecplot_flags) +
           MemoryConsumption::memory_consumption(vtk_flags) +
           MemoryConsumption::memory_consumption(svg_flags) +

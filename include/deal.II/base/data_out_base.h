@@ -1079,6 +1079,23 @@ namespace DataOutBase
   {};
 
   /**
+   * Flags controlling the details of output in HDF5 format.
+   *
+   * @ingroup output
+   */
+  struct Hdf5Flags : public OutputFlagsBase<Hdf5Flags>
+  {
+    /**
+     * Flag determining the compression level at which zlib, if available, is
+     * run. The default is <tt>best_speed</tt>.
+     */
+    DataOutBase::CompressionLevel compression_level;
+
+    explicit Hdf5Flags(
+      const CompressionLevel compression_level = CompressionLevel::best_speed);
+  };
+
+  /**
    * Flags controlling the details of output in Tecplot format.
    *
    * @ingroup output
@@ -2396,6 +2413,7 @@ namespace DataOutBase
   void
   write_hdf5_parallel(const std::vector<Patch<dim, spacedim>> &patches,
                       const DataOutFilter &                    data_filter,
+                      const DataOutBase::Hdf5Flags &           flags,
                       const std::string &                      filename,
                       const MPI_Comm &                         comm);
 
@@ -2410,6 +2428,7 @@ namespace DataOutBase
   void
   write_hdf5_parallel(const std::vector<Patch<dim, spacedim>> &patches,
                       const DataOutFilter &                    data_filter,
+                      const DataOutBase::Hdf5Flags &           flags,
                       const bool                               write_mesh_file,
                       const std::string &                      mesh_filename,
                       const std::string &solution_filename,
@@ -3157,6 +3176,12 @@ private:
    * changed by using the <tt>set_flags</tt> function.
    */
   DataOutBase::GmvFlags gmv_flags;
+
+  /**
+   * Flags to be used upon output of hdf5 data in one space dimension. Can be
+   * changed by using the <tt>set_flags</tt> function.
+   */
+  DataOutBase::Hdf5Flags hdf5_flags;
 
   /**
    * Flags to be used upon output of Tecplot data in one space dimension. Can
