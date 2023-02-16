@@ -52,16 +52,10 @@ namespace parallel
          * Constructor.
          *
          * @param[in] dof_handler The DoFHandler on which all the operations
-         * will happen. At the time when this constructor is call, the
-         * DoFHandler still points to the Triangulation before the refinement in
-         * question happens.
+         * will happen. This constructor must be called before the underlying
+         * Triangulation is coarsened/refined.
          */
         FieldTransfer(const DoFHandler<dim, spacedim> &dof_handler);
-
-        /**
-         * Destructor.
-         */
-        ~FieldTransfer() = default;
 
         /**
          * Prepare the current object for coarsening and refinement.
@@ -76,10 +70,10 @@ namespace parallel
 
         /**
          * Interpolate the data previously stored in this object before the mesh
-         * was refined or coarsenend onto the current set of cells. @p new_value
+         * was refined or coarsened onto the current set of cells. @p new_value
          * is the value associated to the new degrees of freedom that where
          * created during the element activation. @p affine_constraints is the
-         * AffinieConstraints after refinement.
+         * AffineConstraints after refinement.
          */
         void
         interpolate(const Number &                   new_value,
