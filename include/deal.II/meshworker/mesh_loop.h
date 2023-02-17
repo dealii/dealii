@@ -570,7 +570,10 @@ namespace MeshWorker
 
                     // Now neighbor is on the same refinement level.
                     // Double check.
-                    Assert(!cell->neighbor_is_coarser(face_no),
+                    Assert((!periodic_neighbor &&
+                            !cell->neighbor_is_coarser(face_no)) ||
+                             (periodic_neighbor &&
+                              !cell->periodic_neighbor_is_coarser(face_no)),
                            ExcInternalError());
 
                     // If we own both cells only do faces from one side (unless
