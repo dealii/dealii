@@ -979,12 +979,13 @@ FlatManifold<dim, spacedim>::normal_vector(
       xi += delta_xi;
       ++iteration;
 
-      Assert(iteration < 10,
-             ExcMessage("The Newton iteration to find the reference point "
-                        "did not converge in 10 iterations. Do you have a "
-                        "deformed cell? (See the glossary for a definition "
-                        "of what a deformed cell is. You may want to output "
-                        "the vertices of your cell."));
+      AssertThrow(iteration < 10,
+                  ExcMessage(
+                    "The Newton iteration to find the reference point "
+                    "did not converge in 10 iterations. Do you have a "
+                    "deformed cell? (See the glossary for a definition "
+                    "of what a deformed cell is. You may want to output "
+                    "the vertices of your cell."));
 
       // It turns out that the check in reference coordinates with an absolute
       // tolerance can cause a convergence failure of the Newton method as
