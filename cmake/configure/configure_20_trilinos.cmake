@@ -233,6 +233,7 @@ macro(feature_trilinos_find_external var)
       list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
       list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
 
       # For the case of Trilinos being compiled with openmp support the
       # following Tpetra test needs -fopenmp to succeed. Make sure that we
@@ -249,11 +250,10 @@ macro(feature_trilinos_find_external var)
         "
         #include <cstdint>
         #include <Tpetra_Vector.hpp>
-        int
-        main()
+        int main()
         {
           using LO       = int;
-          using GO       = ${_global_index_type};
+          using GO       = std::make_signed_t<${_global_index_type}>;
           using map_type = Tpetra::Map<LO, GO>;
           Teuchos::RCP<const map_type>   dummy_map = Teuchos::rcp(new map_type());
           Tpetra::Vector<double, LO, GO> dummy_vector(dummy_map);
@@ -283,6 +283,7 @@ macro(feature_trilinos_find_external var)
       list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
       list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
 
       CHECK_CXX_SOURCE_COMPILES(
         "
