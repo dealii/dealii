@@ -351,14 +351,16 @@ namespace Step40
   //   cell->is_artificial()</code> is true. The simplest way, however, is to
   //   simply ask the cell whether it is owned by the local processor.
   // - Copying local contributions into the global matrix must include
-  //   distributing constraints and boundary values. In other words, we cannot
-  //   (as we did in step-6) first copy every local contribution into the global
-  //   matrix and only in a later step take care of hanging node constraints and
-  //   boundary values. The reason is, as discussed in step-17, that the
-  //   parallel vector classes do not provide access to arbitrary elements of
-  //   the matrix once they have been assembled into it -- in parts because they
-  //   may simply no longer reside on the current processor but have instead
-  //   been shipped to a different machine.
+  //   distributing constraints and boundary values not just from the local
+  //   matrix and vector into the global ones, but in the process
+  //   also -- possibly -- from one MPI process to other processes if the
+  //   entries we want to write to are not stored on the current process.
+  //   Interestingly, this requires essentially no additional work: The
+  //   AffineConstraints class we already used in step-6 is perfectly
+  //   capable to also do this in parallel, and the only difference in this
+  //   regard is that at the very end of the function, we have to call a
+  //   `compress()` function on the global matrix and right hand side vector
+  //   objects (see the description of what this does just before these calls).
   // - The way we compute the right hand side (given the
   //   formula stated in the introduction) may not be the most elegant but will
   //   do for a program whose focus lies somewhere entirely different.
@@ -421,11 +423,21 @@ namespace Step40
                                                  system_rhs);
         }
 
-    // Notice that the assembling above is just a local operation. So, to
-    // form the "global" linear system, a synchronization between all
-    // processors is needed. This could be done by invoking the function
-    // compress(). See @ref GlossCompress "Compressing distributed objects"
-    // for more information on what is compress() designed to do.
+    // In the operations above, specifically the call to
+    // `distribute_local_to_global()` in the last line, every MPI
+    // process was only working on its local data. If the operation
+    // required adding something to a matrix or vector entry that is
+    // not actually stored on the current process, then the matrix or
+    // vector object keeps track of this for a later data exchange,
+    // but for efficiency reasons, this part of the operation is only
+    // queued up, rather than executed right away. But now that we got
+    // here, it is time to send these queued-up additions to those
+    // processes that actually own these matrix or vector entries. In
+    // other words, we want to "finalize" the global data
+    // structures. This is done by invoking the function `compress()`
+    // on both the matrix and vector objects. See
+    // @ref GlossCompress "Compressing distributed objects"
+    // for more information on what `compress()` actually does.
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
   }
