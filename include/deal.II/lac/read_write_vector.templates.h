@@ -577,8 +577,7 @@ namespace LinearAlgebra
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
-    const Tpetra::
-      Vector<Number, int, std::make_signed_t<types::global_dof_index>> &vector,
+    const Tpetra::Vector<Number, int, types::signed_global_dof_index> &vector,
     const IndexSet &        source_elements,
     VectorOperation::values operation,
     const MPI_Comm &        mpi_comm,
@@ -621,11 +620,11 @@ namespace LinearAlgebra
                       "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
       }
 
-    Tpetra::Export<int, std::make_signed_t<types::global_dof_index>>
-      tpetra_export(tpetra_comm_pattern->get_tpetra_export());
+    Tpetra::Export<int, types::signed_global_dof_index> tpetra_export(
+      tpetra_comm_pattern->get_tpetra_export());
 
-    Tpetra::Vector<Number, int, std::make_signed_t<types::global_dof_index>>
-      target_vector(tpetra_export.getSourceMap());
+    Tpetra::Vector<Number, int, types::signed_global_dof_index> target_vector(
+      tpetra_export.getSourceMap());
     target_vector.doImport(vector, tpetra_export, Tpetra::REPLACE);
 
     const auto *new_values = target_vector.getData().get();

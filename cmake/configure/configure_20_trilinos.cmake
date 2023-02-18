@@ -241,9 +241,9 @@ macro(feature_trilinos_find_external var)
       add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
 
       if(DEAL_II_WITH_64BIT_INDICES)
-        set(_global_index_type "std::uint64_t")
+        set(_global_index_type "std::int64_t")
       else()
-        set(_global_index_type "unsigned int")
+        set(_global_index_type "int")
       endif()
 
       CHECK_CXX_SOURCE_COMPILES(
@@ -253,7 +253,7 @@ macro(feature_trilinos_find_external var)
         int main()
         {
           using LO       = int;
-          using GO       = std::make_signed_t<${_global_index_type}>;
+          using GO       = ${_global_index_type};
           using map_type = Tpetra::Map<LO, GO>;
           Teuchos::RCP<const map_type>   dummy_map = Teuchos::rcp(new map_type());
           Tpetra::Vector<double, LO, GO> dummy_vector(dummy_map);

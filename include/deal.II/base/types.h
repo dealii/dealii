@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <cstdint>
+#include <type_traits> // make_signed_t
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -80,6 +81,13 @@ namespace types
 #else
   using global_dof_index  = unsigned int;
 #endif
+
+  /**
+   * Signed version of global_dof_index.
+   * This is useful for interacting with Trilinos' Tpetra that only works well
+   * with a signed global ordinal type.
+   */
+  using signed_global_dof_index = std::make_signed_t<global_dof_index>;
 
   /**
    * An identifier that denotes the MPI type associated with
