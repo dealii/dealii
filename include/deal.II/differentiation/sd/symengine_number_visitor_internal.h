@@ -20,7 +20,6 @@
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
-// Low level
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/numbers.h>
 
