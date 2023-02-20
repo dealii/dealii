@@ -2576,8 +2576,6 @@ namespace TrilinosWrappers
           {
             use_transpose = UseTranspose;
             std::swap(domain_map, range_map);
-            std::swap(vmult, Tvmult);
-            std::swap(inv_vmult, inv_Tvmult);
           }
         return 0;
       }

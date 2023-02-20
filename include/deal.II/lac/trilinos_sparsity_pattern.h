@@ -31,6 +31,8 @@
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
 
+#  include <Tpetra_FECrsGraph.hpp>
+
 #  include <cmath>
 #  include <memory>
 #  include <vector>
@@ -790,7 +792,7 @@ namespace TrilinosWrappers
      * Return a const reference to the underlying Trilinos Epetra_CrsGraph
      * data that stores the sparsity pattern.
      */
-    const Epetra_FECrsGraph &
+    const Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index> &
     trilinos_sparsity_pattern() const;
 
     /**
@@ -980,7 +982,7 @@ namespace TrilinosWrappers
      * based problems which allows for adding non-local elements to the
      * pattern.
      */
-    std::unique_ptr<Epetra_FECrsGraph> graph;
+    std::unique_ptr<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> graph;
 
     /**
      * A sparsity pattern object for the non-local part of the sparsity
@@ -988,7 +990,7 @@ namespace TrilinosWrappers
      * when the particular constructor or reinit method with writable_rows
      * argument is set
      */
-    std::unique_ptr<Epetra_CrsGraph> nonlocal_graph;
+    std::unique_ptr<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> nonlocal_graph;
 
     friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;
@@ -1199,13 +1201,8 @@ namespace TrilinosWrappers
   SparsityPattern::in_local_range(const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#    ifndef DEAL_II_WITH_64BIT_INDICES
-    begin = graph->RowMap().MinMyGID();
-    end   = graph->RowMap().MaxMyGID() + 1;
-#    else
-    begin = graph->RowMap().MinMyGID64();
-    end   = graph->RowMap().MaxMyGID64() + 1;
-#    endif
+    begin = graph->getRowMap()->getMinGlobalIndex();
+    end   = graph->getRowMap()->getMaxGlobalIndex() + 1;
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -1216,7 +1213,7 @@ namespace TrilinosWrappers
   inline bool
   SparsityPattern::is_compressed() const
   {
-    return graph->Filled();
+    return graph->isFillComplete();
   }
 
 
@@ -1266,36 +1263,31 @@ namespace TrilinosWrappers
     TrilinosWrappers::types::int_type trilinos_row_index = row;
     const int                         n_cols = static_cast<int>(end - begin);
 
-    int ierr;
     if (row_is_stored_locally(row))
-      ierr =
-        graph->InsertGlobalIndices(trilinos_row_index, n_cols, col_index_ptr);
+        graph->insertGlobalIndices(trilinos_row_index, n_cols, col_index_ptr);
     else if (nonlocal_graph.get() != nullptr)
       {
         // this is the case when we have explicitly set the off-processor rows
         // and want to create a separate matrix object for them (to retain
         // thread-safety)
-        Assert(nonlocal_graph->RowMap().LID(
-                 static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
+        Assert(nonlocal_graph->getRowMap()->getLocalElement(row) != Teuchos::OrdinalTraits<dealii::types::signed_global_dof_index>::invalid(),
                ExcMessage("Attempted to write into off-processor matrix row "
                           "that has not be specified as being writable upon "
                           "initialization"));
-        ierr = nonlocal_graph->InsertGlobalIndices(trilinos_row_index,
+        nonlocal_graph->insertGlobalIndices(trilinos_row_index,
                                                    n_cols,
                                                    col_index_ptr);
       }
     else
-      ierr = graph->InsertGlobalIndices(1,
-                                        &trilinos_row_index,
+      graph->insertGlobalIndices(
+                                        trilinos_row_index,
                                         n_cols,
                                         col_index_ptr);
-
-    AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
   }
 
 
 
-  inline const Epetra_FECrsGraph &
+  inline const Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index> &
   SparsityPattern::trilinos_sparsity_pattern() const
   {
     return *graph;
@@ -1306,7 +1298,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparsityPattern::locally_owned_domain_indices() const
   {
-    return IndexSet(graph->DomainMap());
+    return IndexSet(*graph->getDomainMap());
   }
 
 
@@ -1314,7 +1306,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparsityPattern::locally_owned_range_indices() const
   {
-    return IndexSet(graph->RangeMap());
+    return IndexSet(*graph->getRangeMap());
   }
 
 #  endif // DOXYGEN

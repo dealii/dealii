@@ -37,6 +37,26 @@ find_package(HDF5)
 set(_include_dirs "${HDF5_INCLUDE_DIRS}")
 set(_libraries "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
 
+#
+# We'd like to have the full library names but the HDF5 package only
+# exports a list with short names. So check again for every lib and store
+# the full path:
+#
+set(_libraries "")
+foreach(_library hdf5 ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+  list(APPEND _libraries HDF5_LIBRARY_${_library})
+  deal_ii_find_library(HDF5_LIBRARY_${_library}
+    NAMES ${_library}
+    HINTS ${HDF5_INSTALL_LIBRARY_DIR}
+    NO_DEFAULT_PATH
+    NO_CMAKE_ENVIRONMENT_PATH
+    NO_CMAKE_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH
+    NO_CMAKE_SYSTEM_PATH
+    NO_CMAKE_FIND_ROOT_PATH
+    )
+endforeach()
+
 process_feature(HDF5
   LIBRARIES
     REQUIRED _libraries

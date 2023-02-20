@@ -136,7 +136,7 @@ public:
   /**
    * Constructor from a Trilinos Epetra_BlockMap.
    */
-  explicit IndexSet(const Epetra_BlockMap &map);
+  explicit IndexSet(const Tpetra::Map<int, types::signed_global_dof_index> &map);
 #endif
 
   /**
@@ -491,7 +491,7 @@ public:
    * application of this method is to select a subset of the elements of a
    * vector, e.g. for extracting only certain solution components.
    */
-  Epetra_Map
+  Tpetra::Map<int, dealii::types::signed_global_dof_index>
   make_trilinos_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
                     const bool      overlapping  = false) const;
 

@@ -34,14 +34,15 @@
 #    include <deal.II/lac/vector_memory.h>
 #    include <deal.II/lac/vector_operation.h>
 
-#    include <Epetra_Comm.h>
-#    include <Epetra_CrsGraph.h>
-#    include <Epetra_Export.h>
-#    include <Epetra_FECrsMatrix.h>
-#    include <Epetra_Map.h>
-#    include <Epetra_MpiComm.h>
-#    include <Epetra_MultiVector.h>
-#    include <Epetra_Operator.h>
+#    include <Tpetra_Core.hpp>
+#include <Tpetra_CrsMatrix.hpp>
+//#    include <Tpetra_CrsGraph.h>
+//#    include <Tpetra_Export.h>
+#    include <Tpetra_FECrsMatrix.hpp>
+//#    include <Tpetra_Map.h>
+//#    include <Tpetra_MpiComm.h>
+//#    include <Tpetra_MultiVector.h>
+//#    include <Tpetra_Operator.h>
 
 #    include <cmath>
 #    include <iterator>
@@ -485,7 +486,7 @@ namespace TrilinosWrappers
 {
   /**
    * This class implements a wrapper to use the Trilinos distributed sparse
-   * matrix class Epetra_FECrsMatrix. This is precisely the kind of matrix we
+   * matrix class Tpetra_FECrsMatrix. This is precisely the kind of matrix we
    * deal with all the time - we most likely get it from some assembly
    * process, where also entries not locally owned might need to be written
    * and hence need to be forwarded to the owner process.  This class is
@@ -652,12 +653,12 @@ namespace TrilinosWrappers
 
     /**
      * This function initializes the Trilinos matrix with a deal.II sparsity
-     * pattern, i.e. it makes the Trilinos Epetra matrix know the position of
+     * pattern, i.e. it makes the Trilinos Tpetra matrix know the position of
      * nonzero entries according to the sparsity pattern. This function is
      * meant for use in serial programs, where there is no need to specify how
      * the matrix is going to be distributed among different processors. This
      * function works in %parallel, too, but it is recommended to manually
-     * specify the %parallel partitioning of the matrix using an Epetra_Map.
+     * specify the %parallel partitioning of the matrix using an Tpetra_Map.
      * When run in %parallel, it is currently necessary that each processor
      * holds the sparsity_pattern structure because each processor sets its
      * rows.
@@ -723,12 +724,12 @@ namespace TrilinosWrappers
            const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
 
     /**
-     * This reinit function takes as input a Trilinos Epetra_CrsMatrix and
+     * This reinit function takes as input a Trilinos Tpetra_CrsMatrix and
      * copies its sparsity pattern. If so requested, even the content (values)
      * will be copied.
      */
     void
-    reinit(const Epetra_CrsMatrix &input_matrix, const bool copy_values = true);
+    reinit(const Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index> &input_matrix, const bool copy_values = true);
     /** @} */
 
     /**
@@ -783,7 +784,7 @@ namespace TrilinosWrappers
 
     /**
      * This constructor is similar to the one above, but it now takes two
-     * different Epetra maps for rows and columns. This interface is meant to
+     * different Tpetra maps for rows and columns. This interface is meant to
      * be used for generating rectangular matrices, where one map specifies
      * the %parallel distribution of degrees of freedom associated with matrix
      * rows and the second one specifies the %parallel distribution the dofs
@@ -801,7 +802,7 @@ namespace TrilinosWrappers
                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
-     * This function is initializes the Trilinos Epetra matrix according to
+     * This function is initializes the Trilinos Tpetra matrix according to
      * the specified sparsity_pattern, and also reassigns the matrix rows to
      * different processes according to a user-supplied index set and
      * %parallel communicator. In programs following the style of the tutorial
@@ -1048,9 +1049,9 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * behavior imposed by the underlying Tpetra_FECrsMatrix data structure:
      * If the same matrix entry is inserted more than once, the matrix entries
-     * will be added upon calling compress() (since Epetra does not track
+     * will be added upon calling compress() (since Tpetra does not track
      * values to the same entry before the final compress() is called), even
      * if VectorOperation::insert is specified as argument to compress(). In
      * the case you cannot make sure that matrix entries are only set once,
@@ -1083,9 +1084,9 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * behavior imposed by the underlying Tpetra_FECrsMatrix data structure:
      * If the same matrix entry is inserted more than once, the matrix entries
-     * will be added upon calling compress() (since Epetra does not track
+     * will be added upon calling compress() (since Tpetra does not track
      * values to the same entry before the final compress() is called), even
      * if VectorOperation::insert is specified as argument to compress(). In
      * the case you cannot make sure that matrix entries are only set once,
@@ -1126,9 +1127,9 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * behavior imposed by the underlying Tpetra_FECrsMatrix data structure:
      * If the same matrix entry is inserted more than once, the matrix entries
-     * will be added upon calling compress() (since Epetra does not track
+     * will be added upon calling compress() (since Tpetra does not track
      * values to the same entry before the final compress() is called), even
      * if VectorOperation::insert is specified as argument to compress(). In
      * the case you cannot make sure that matrix entries are only set once,
@@ -1159,9 +1160,9 @@ namespace TrilinosWrappers
      *
      * For the case that the matrix is constructed without a sparsity pattern
      * and new matrix entries are added on demand, please note the following
-     * behavior imposed by the underlying Epetra_FECrsMatrix data structure:
+     * behavior imposed by the underlying Tpetra_FECrsMatrix data structure:
      * If the same matrix entry is inserted more than once, the matrix entries
-     * will be added upon calling compress() (since Epetra does not track
+     * will be added upon calling compress() (since Tpetra does not track
      * values to the same entry before the final compress() is called), even
      * if VectorOperation::insert is specified as argument to compress(). In
      * the case you cannot make sure that matrix entries are only set once,
@@ -1416,7 +1417,7 @@ namespace TrilinosWrappers
      * namely @p VectorType can be
      * <ul>
      * <li> TrilinosWrappers::MPI::Vector,
-     * <li> LinearAlgebra::EpetraWrappers::Vector,
+     * <li> LinearAlgebra::TpetraWrappers::Vector,
      * <li> LinearAlgebra::TpetraWrappers::Vector,
      * <li> Vector<double>,
      * <li> LinearAlgebra::distributed::Vector<double>.
@@ -1658,17 +1659,17 @@ namespace TrilinosWrappers
     /** @{ */
 
     /**
-     * Return a const reference to the underlying Trilinos Epetra_CrsMatrix
+     * Return a const reference to the underlying Trilinos Tpetra_CrsMatrix
      * data.
      */
-    const Epetra_CrsMatrix &
+    const Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index> &
     trilinos_matrix() const;
 
     /**
-     * Return a const reference to the underlying Trilinos Epetra_CrsGraph
+     * Return a const reference to the underlying Trilinos Tpetra_CrsGraph
      * data that stores the sparsity pattern of the matrix.
      */
-    const Epetra_CrsGraph &
+    const Tpetra::RowGraph<int, dealii::types::signed_global_dof_index> &
     trilinos_sparsity_pattern() const;
 
     /** @} */
@@ -1929,29 +1930,29 @@ namespace TrilinosWrappers
 
   private:
     /**
-     * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
+     * Pointer to the user-supplied Tpetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    std::unique_ptr<Epetra_Map> column_space_map;
+    std::unique_ptr<Tpetra::Map<int, dealii::types::signed_global_dof_index>> column_space_map;
 
     /**
      * A sparse matrix object in Trilinos to be used for finite element based
      * problems which allows for assembling into non-local elements.  The
      * actual type, a sparse matrix, is set in the constructor.
      */
-    std::unique_ptr<Epetra_FECrsMatrix> matrix;
+    std::unique_ptr<Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>> matrix;
 
     /**
      * A sparse matrix object in Trilinos to be used for collecting the non-
      * local elements if the matrix was constructed from a Trilinos sparsity
      * pattern with the respective option.
      */
-    std::unique_ptr<Epetra_CrsMatrix> nonlocal_matrix;
+    std::unique_ptr<Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index>> nonlocal_matrix;
 
     /**
      * An export object used to communicate the nonlocal matrix.
      */
-    std::unique_ptr<Epetra_Export> nonlocal_matrix_exporter;
+    std::unique_ptr<Tpetra::Export<int, dealii::types::signed_global_dof_index>> nonlocal_matrix_exporter;
 
     /**
      * Trilinos doesn't allow to mix additions to matrix entries and
@@ -1964,7 +1965,7 @@ namespace TrilinosWrappers
      * case, so we simply use their model, which stores whether the last
      * operation was an addition or an insertion.
      */
-    Epetra_CombineMode last_action;
+    Tpetra::CombineMode last_action;
 
     /**
      * A boolean variable to hold information on whether the vector is
@@ -1985,25 +1986,25 @@ namespace TrilinosWrappers
   namespace internal
   {
     inline void
-    check_vector_map_equality(const Epetra_CrsMatrix &  mtrx,
-                              const Epetra_MultiVector &src,
-                              const Epetra_MultiVector &dst,
+    check_vector_map_equality(const Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index> &  mtrx,
+                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &src,
+                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &dst,
                               const bool                transpose)
     {
       if (transpose == false)
         {
-          Assert(src.Map().SameAs(mtrx.DomainMap()) == true,
+          Assert(src.getMap()->isSameAs(*mtrx.getDomainMap()) == true,
                  ExcMessage(
                    "Column map of matrix does not fit with vector map!"));
-          Assert(dst.Map().SameAs(mtrx.RangeMap()) == true,
+          Assert(dst.getMap()->isSameAs(*mtrx.getRangeMap()) == true,
                  ExcMessage("Row map of matrix does not fit with vector map!"));
         }
       else
         {
-          Assert(src.Map().SameAs(mtrx.RangeMap()) == true,
+          Assert(src.getMap()->isSameAs(*mtrx.getRangeMap()) == true,
                  ExcMessage(
                    "Column map of matrix does not fit with vector map!"));
-          Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
+          Assert(dst.getMap()->isSameAs(*mtrx.getDomainMap()) == true,
                  ExcMessage("Row map of matrix does not fit with vector map!"));
         }
       (void)mtrx; // removes -Wunused-variable in optimized mode
@@ -2012,26 +2013,26 @@ namespace TrilinosWrappers
     }
 
     inline void
-    check_vector_map_equality(const Epetra_Operator &   op,
-                              const Epetra_MultiVector &src,
-                              const Epetra_MultiVector &dst,
+    check_vector_map_equality(const Tpetra::Operator<double, int, dealii::types::signed_global_dof_index> &   op,
+                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &src,
+                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &dst,
                               const bool                transpose)
     {
       if (transpose == false)
         {
-          Assert(src.Map().SameAs(op.OperatorDomainMap()) == true,
+          Assert(src.getMap()->isSameAs(*op.getDomainMap()) == true,
                  ExcMessage(
                    "Column map of operator does not fit with vector map!"));
-          Assert(dst.Map().SameAs(op.OperatorRangeMap()) == true,
+          Assert(dst.getMap()->isSameAs(*op.getRangeMap()) == true,
                  ExcMessage(
                    "Row map of operator does not fit with vector map!"));
         }
       else
         {
-          Assert(src.Map().SameAs(op.OperatorRangeMap()) == true,
+          Assert(src.getMap()->isSameAs(*op.getRangeMap()) == true,
                  ExcMessage(
                    "Column map of operator does not fit with vector map!"));
-          Assert(dst.Map().SameAs(op.OperatorDomainMap()) == true,
+          Assert(dst.getMap()->isSameAs(*op.getDomainMap()) == true,
                  ExcMessage(
                    "Row map of operator does not fit with vector map!"));
         }
@@ -2047,7 +2048,7 @@ namespace TrilinosWrappers
        * matrix and preconditioner types. It provides the interface to
        * performing basic operations (<tt>vmult</tt> and <tt>Tvmult</tt>)  on
        * Trilinos vector types. It fulfills the requirements necessary for
-       * wrapping a Trilinos solver, which calls Epetra_Operator functions, as a
+       * wrapping a Trilinos solver, which calls Tpetra_Operator functions, as a
        * LinearOperator.
        *
        * @note The TrilinosWrappers::SparseMatrix or
@@ -2061,13 +2062,13 @@ namespace TrilinosWrappers
        *
        * @ingroup TrilinosWrappers
        */
-      class TrilinosPayload : public Epetra_Operator
+      class TrilinosPayload : public Tpetra::Operator<double, int, dealii::types::signed_global_dof_index>
       {
       public:
         /**
          * Definition for the internally supported vector type.
          */
-        using VectorType = Epetra_MultiVector;
+        using VectorType = Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index>;
 
         /**
          * Definition for the vector type for the domain space of the operator.
@@ -2195,7 +2196,7 @@ namespace TrilinosWrappers
          * functions, namely <tt>inv_vmult</tt> and <tt>inv_Tvmult</tt>, both of
          * which
          * are disabled because the @p Solver or @p Preconditioner are not
-         * compatible with Epetra_MultiVector.
+         * compatible with Tpetra::MultiVector.
          * The <tt>vmult</tt> and <tt>Tvmult</tt> operations retain the standard
          * definitions inherited from @p op.
          *
@@ -2292,7 +2293,7 @@ namespace TrilinosWrappers
         /** @} */
 
         /**
-         * @name Core Epetra_Operator functionality
+         * @name Core Tpetra_Operator functionality
          */
         /** @{ */
 
@@ -2302,8 +2303,8 @@ namespace TrilinosWrappers
          * This overloads the same function from the Trilinos class
          * Epetra_Operator.
          */
-        virtual bool
-        UseTranspose() const override;
+        bool
+        UseTranspose() const;
 
         /**
          * Sets an internal flag so that all operations performed by the matrix,
@@ -2320,78 +2321,39 @@ namespace TrilinosWrappers
          * the underlying Trilinos object remain synchronized throughout all
          * operations that may occur on different threads simultaneously.
          */
-        virtual int
-        SetUseTranspose(bool UseTranspose) override;
+        int
+        SetUseTranspose(bool UseTranspose);
 
         /**
          * Apply the vmult operation on a vector @p X (of internally defined
          * type VectorType) and store the result in the vector @p Y.
          *
          * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
+         * Tpetra_Operator.
          *
          * @note The intended operation depends on the status of the internal
          * transpose flag. If this flag is set to true, the result will be
          * the equivalent of performing a Tvmult operation.
          */
-        virtual int
-        Apply(const VectorType &X, VectorType &Y) const override;
+        virtual void
+        apply(const VectorType &X, VectorType &Y, Teuchos::ETransp mode = Teuchos::NO_TRANS, double alpha = 1., double beta = 0.) const override;
 
-        /**
-         * Apply the vmult inverse operation on a vector @p X (of internally
-         * defined type VectorType) and store the result in the vector @p Y.
-         *
-         * In practise, this function is only called from a Trilinos solver if
-         * the wrapped object is to act as a preconditioner.
-         *
-         * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
-         *
-         * @note This function will only be operable if the payload has been
-         * initialized with an InverseOperator, or is a wrapper to a
-         * preconditioner. If not, then using this function will lead to an
-         * error being thrown.
-         * @note The intended operation depends on the status of the internal
-         * transpose flag. If this flag is set to true, the result will be
-         * the equivalent of performing a Tvmult operation.
-         */
-        virtual int
-        ApplyInverse(const VectorType &Y, VectorType &X) const override;
         /** @} */
 
         /**
-         * @name Additional Epetra_Operator functionality
+         * @name Additional Tpetra_Operator functionality
          */
         /** @{ */
-
-        /**
-         * Return a label to describe this class.
-         *
-         * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
-         */
-        virtual const char *
-        Label() const override;
-
-        /**
-         * Return a reference to the underlying MPI communicator for
-         * this object.
-         *
-         * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
-         */
-        virtual const Epetra_Comm &
-        Comm() const override;
 
         /**
          * Return the partitioning of the domain space of this matrix, i.e., the
          * partitioning of the vectors this matrix has to be multiplied with.
          *
          * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
+         * Tpetra_Operator.
          */
-        virtual const Epetra_Map &
-        OperatorDomainMap() const override;
+        virtual Teuchos::RCP<const Tpetra::Map<int, dealii::types::signed_global_dof_index>>
+        getDomainMap() const override;
 
         /**
          * Return the partitioning of the range space of this matrix, i.e., the
@@ -2399,10 +2361,10 @@ namespace TrilinosWrappers
          * products.
          *
          * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
+         * Tpetra_Operator.
          */
-        virtual const Epetra_Map &
-        OperatorRangeMap() const override;
+        virtual Teuchos::RCP<const Tpetra::Map<int, dealii::types::signed_global_dof_index>>
+        getRangeMap() const override;
         /** @} */
 
       private:
@@ -2410,13 +2372,13 @@ namespace TrilinosWrappers
          * A generic constructor.
          *
          * This constructor allows the payload to be configured from any
-         * objects that can be cast to an Epetra operation. The
+         * objects that can be cast to an Tpetra operation. The
          * @p supports_inverse_operations flag indicates that the
          * @p op can be used to compute inverse operations; preconditioners
          * have such a facility.
          */
-        template <typename EpetraOpType>
-        TrilinosPayload(EpetraOpType &  op,
+        template <typename TpetraOpType>
+        TrilinosPayload(TpetraOpType &  op,
                         const bool      supports_inverse_operations,
                         const bool      use_transpose,
                         const MPI_Comm &mpi_communicator,
@@ -2433,40 +2395,19 @@ namespace TrilinosWrappers
          * Internal communication pattern in case the matrix needs to be copied
          * from deal.II format.
          */
-        Epetra_MpiComm communicator;
+        Teuchos::MpiComm<dealii::types::signed_global_dof_index> communicator;
 
         /**
-         * Epetra_Map that sets the partitioning of the domain space of
+         * Tpetra_Map that sets the partitioning of the domain space of
          * this operator.
          */
-        Epetra_Map domain_map;
+        Tpetra::Map<int, dealii::types::signed_global_dof_index> domain_map;
 
         /**
-         * Epetra_Map that sets the partitioning of the range space of
+         * Tpetra_Map that sets the partitioning of the range space of
          * this operator.
          */
-        Epetra_Map range_map;
-
-        /**
-         * Return a flag that describes whether this operator can return the
-         * computation of the infinity norm. Since in general this is not the
-         * case, this always returns a negetive result.
-         *
-         * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
-         */
-        virtual bool
-        HasNormInf() const override;
-
-        /**
-         * Return the infinity norm of this operator.
-         * Throws an error since, in general, we cannot compute this value.
-         *
-         * This overloads the same function from the Trilinos class
-         * Epetra_Operator.
-         */
-        virtual double
-        NormInf() const override;
+        Tpetra::Map<int, dealii::types::signed_global_dof_index> range_map;
       };
 
       /**
@@ -2843,13 +2784,8 @@ namespace TrilinosWrappers
   SparseMatrix::in_local_range(const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#      ifndef DEAL_II_WITH_64BIT_INDICES
-    begin = matrix->RowMap().MinMyGID();
-    end   = matrix->RowMap().MaxMyGID() + 1;
-#      else
-    begin = matrix->RowMap().MinMyGID64();
-    end   = matrix->RowMap().MaxMyGID64() + 1;
-#      endif
+    begin = matrix->getRowMap()->getMinGlobalIndex();
+    end   = matrix->getRowMap()->getMaxGlobalIndex() + 1;
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -2940,16 +2876,10 @@ namespace TrilinosWrappers
         // we pass on to the other function.
 
         // TODO: fix this (do not run compress here, but fail)
-        if (last_action == Insert)
-          {
-            const int ierr = matrix->GlobalAssemble(*column_space_map,
-                                                    matrix->RowMap(),
-                                                    false);
+        if (last_action == Tpetra::INSERT)
+            matrix->globalAssemble();
 
-            AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-          }
-
-        last_action = Add;
+        last_action = Tpetra::ADD;
 
         return;
       }
@@ -2964,11 +2894,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::size_type
   SparseMatrix::m() const
   {
-#      ifndef DEAL_II_WITH_64BIT_INDICES
-    return matrix->NumGlobalRows();
-#      else
-    return matrix->NumGlobalRows64();
-#      endif
+    return matrix->getRowMap()->getGlobalNumElements();
   }
 
 
@@ -2980,7 +2906,7 @@ namespace TrilinosWrappers
     // sparsity pattern), it does not know about the number of columns so we
     // must always take this from the additional column space map
     Assert(column_space_map.get() != nullptr, ExcInternalError());
-    return n_global_elements(*column_space_map);
+    return column_space_map->getGlobalNumElements();
   }
 
 
@@ -2988,7 +2914,7 @@ namespace TrilinosWrappers
   inline unsigned int
   SparseMatrix::local_size() const
   {
-    return matrix->NumMyRows();
+    return matrix->getRowMap()->getLocalNumElements();
   }
 
 
@@ -2997,13 +2923,8 @@ namespace TrilinosWrappers
   SparseMatrix::local_range() const
   {
     size_type begin, end;
-#      ifndef DEAL_II_WITH_64BIT_INDICES
-    begin = matrix->RowMap().MinMyGID();
-    end   = matrix->RowMap().MaxMyGID() + 1;
-#      else
-    begin = matrix->RowMap().MinMyGID64();
-    end   = matrix->RowMap().MaxMyGID64() + 1;
-#      endif
+    begin = matrix->getRowMap()->getMinGlobalIndex();
+    end   = matrix->getRowMap()->getMaxGlobalIndex() + 1;
 
     return std::make_pair(begin, end);
   }
@@ -3047,8 +2968,8 @@ namespace TrilinosWrappers
                        const bool                            copy_values,
                        const ::dealii::SparsityPattern *     use_this_sparsity)
   {
-    Epetra_Map map =
-      parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+      parallel_partitioning.make_tpetra_map(communicator, false);
     reinit(parallel_partitioning,
            parallel_partitioning,
            sparse_matrix,
@@ -3059,18 +2980,18 @@ namespace TrilinosWrappers
 
 
 
-  inline const Epetra_CrsMatrix &
+  inline const Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index> &
   SparseMatrix::trilinos_matrix() const
   {
-    return static_cast<const Epetra_CrsMatrix &>(*matrix);
+    return static_cast<const Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index> &>(*matrix);
   }
 
 
 
-  inline const Epetra_CrsGraph &
+  inline const Tpetra::RowGraph<int, dealii::types::signed_global_dof_index> &
   SparseMatrix::trilinos_sparsity_pattern() const
   {
-    return matrix->Graph();
+    return *matrix->getGraph();
   }
 
 
@@ -3078,7 +2999,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparseMatrix::locally_owned_domain_indices() const
   {
-    return IndexSet(matrix->DomainMap());
+    return IndexSet(*matrix->getDomainMap());
   }
 
 
@@ -3086,7 +3007,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparseMatrix::locally_owned_range_indices() const
   {
-    return IndexSet(matrix->RangeMap());
+    return IndexSet(*matrix->getRangeMap());
   }
 
 
@@ -3110,9 +3031,9 @@ namespace TrilinosWrappers
   {
     namespace LinearOperatorImplementation
     {
-      template <typename EpetraOpType>
+      template <typename TpetraOpType>
       TrilinosPayload::TrilinosPayload(
-        EpetraOpType &  op,
+        TpetraOpType &  op,
         const bool      supports_inverse_operations,
         const bool      use_transpose,
         const MPI_Comm &mpi_communicator,
@@ -3121,36 +3042,33 @@ namespace TrilinosWrappers
         : use_transpose(use_transpose)
         , communicator(mpi_communicator)
         , domain_map(
-            locally_owned_domain_indices.make_trilinos_map(communicator.Comm()))
+            locally_owned_domain_indices.make_tpetra_map(*communicator.getRawMpiComm()))
         , range_map(
-            locally_owned_range_indices.make_trilinos_map(communicator.Comm()))
+            locally_owned_range_indices.make_tpetra_map(*communicator.getRawMpiComm()))
       {
-        vmult = [&op](Range &tril_dst, const Domain &tril_src) {
+        vmult = [&op, &use_transpose](Range &tril_dst, const Domain &tril_src) {
           // Duplicated from TrilinosWrappers::PreconditionBase::vmult
           // as well as from TrilinosWrappers::SparseMatrix::Tvmult
           Assert(&tril_src != &tril_dst,
                  TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
           internal::check_vector_map_equality(op,
                                               tril_src,
-                                              tril_dst,
-                                              op.UseTranspose());
+                                              tril_dst);
 
-          const int ierr = op.Apply(tril_src, tril_dst);
+          const int ierr = op.Apply(tril_src, tril_dst, use_transpose?Teuchos::ETransp::NO_TRANS:Teuchos::ETransp::TRANS);
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
         };
 
-        Tvmult = [&op](Domain &tril_dst, const Range &tril_src) {
+        Tvmult = [&op, &use_transpose](Domain &tril_dst, const Range &tril_src) {
           // Duplicated from TrilinosWrappers::PreconditionBase::vmult
           // as well as from TrilinosWrappers::SparseMatrix::Tvmult
           Assert(&tril_src != &tril_dst,
                  TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
           internal::check_vector_map_equality(op,
                                               tril_src,
-                                              tril_dst,
-                                              !op.UseTranspose());
+                                              tril_dst);
 
-          op.SetUseTranspose(!op.UseTranspose());
-          const int ierr = op.Apply(tril_src, tril_dst);
+          const int ierr = op.Apply(tril_src, tril_dst, use_transpose?Teuchos::ETransp::TRANS:Teuchos::ETransp::NO_TRANS);
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           op.SetUseTranspose(!op.UseTranspose());
         };
