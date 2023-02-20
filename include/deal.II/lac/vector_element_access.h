@@ -157,7 +157,7 @@ namespace internal
     LinearAlgebra::TpetraWrappers::Vector<NumberType> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<NumberType, int, types::global_dof_index> vector =
+    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
       V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
@@ -170,7 +170,7 @@ namespace internal
     vector.template modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) += value;
     vector.template sync<
-      typename Tpetra::Vector<NumberType, int, types::global_dof_index>::
+      typename Tpetra::Vector<NumberType, int, types::signed_global_dof_index>::
         device_type::memory_space>();
   }
 
@@ -184,7 +184,7 @@ namespace internal
     LinearAlgebra::TpetraWrappers::Vector<NumberType> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<NumberType, int, types::global_dof_index> vector =
+    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
       V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
@@ -197,7 +197,7 @@ namespace internal
     vector.template modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) = value;
     vector.template sync<
-      typename Tpetra::Vector<NumberType, int, types::global_dof_index>::
+      typename Tpetra::Vector<NumberType, int, types::signed_global_dof_index>::
         device_type::memory_space>();
   }
 
@@ -210,7 +210,7 @@ namespace internal
     const types::global_dof_index                            i)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<NumberType, int, types::global_dof_index> vector =
+    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
       V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(

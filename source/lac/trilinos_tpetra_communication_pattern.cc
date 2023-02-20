@@ -52,20 +52,20 @@ namespace LinearAlgebra
       comm = std::make_shared<const MPI_Comm>(communicator);
 
       auto vector_space_vector_map =
-        Teuchos::rcp(new Tpetra::Map<int, types::global_dof_index>(
+        Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
           vector_space_vector_index_set.make_tpetra_map(*comm, false)));
       auto read_write_vector_map =
-        Teuchos::rcp(new Tpetra::Map<int, types::global_dof_index>(
+        Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
           read_write_vector_index_set.make_tpetra_map(*comm, true)));
 
       // Target map is read_write_vector_map
       // Source map is vector_space_vector_map. This map must have uniquely
       // owned GID.
       tpetra_import =
-        std::make_unique<Tpetra::Import<int, types::global_dof_index>>(
+        std::make_unique<Tpetra::Import<int, types::signed_global_dof_index>>(
           read_write_vector_map, vector_space_vector_map);
       tpetra_export =
-        std::make_unique<Tpetra::Export<int, types::global_dof_index>>(
+        std::make_unique<Tpetra::Export<int, types::signed_global_dof_index>>(
           read_write_vector_map, vector_space_vector_map);
     }
 
@@ -79,7 +79,7 @@ namespace LinearAlgebra
 
 
 
-    const Tpetra::Import<int, types::global_dof_index> &
+    const Tpetra::Import<int, types::signed_global_dof_index> &
     CommunicationPattern::get_tpetra_import() const
     {
       return *tpetra_import;
@@ -87,7 +87,7 @@ namespace LinearAlgebra
 
 
 
-    const Tpetra::Export<int, types::global_dof_index> &
+    const Tpetra::Export<int, types::signed_global_dof_index> &
     CommunicationPattern::get_tpetra_export() const
     {
       return *tpetra_export;

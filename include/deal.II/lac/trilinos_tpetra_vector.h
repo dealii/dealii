@@ -337,14 +337,14 @@ namespace LinearAlgebra
        * Return a const reference to the underlying Trilinos
        * Tpetra::Vector class.
        */
-      const Tpetra::Vector<Number, int, types::global_dof_index> &
+      const Tpetra::Vector<Number, int, types::signed_global_dof_index> &
       trilinos_vector() const;
 
       /**
        * Return a (modifiable) reference to the underlying Trilinos
        * Tpetra::Vector class.
        */
-      Tpetra::Vector<Number, int, types::global_dof_index> &
+      Tpetra::Vector<Number, int, types::signed_global_dof_index> &
       trilinos_vector();
 
       /**
@@ -398,7 +398,8 @@ namespace LinearAlgebra
       /**
        * Pointer to the actual Tpetra vector object.
        */
-      std::unique_ptr<Tpetra::Vector<Number, int, types::global_dof_index>>
+      std::unique_ptr<
+        Tpetra::Vector<Number, int, types::signed_global_dof_index>>
         vector;
 
       /**

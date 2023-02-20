@@ -716,7 +716,7 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
-Tpetra::Map<int, types::global_dof_index>
+Tpetra::Map<int, types::signed_global_dof_index>
 IndexSet::make_tpetra_map(const MPI_Comm &communicator,
                           const bool      overlapping) const
 {
@@ -752,7 +752,7 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
   const bool linear =
     overlapping ? false : is_ascending_and_one_to_one(communicator);
   if (linear)
-    return Tpetra::Map<int, types::global_dof_index>(
+    return Tpetra::Map<int, types::signed_global_dof_index>(
       size(),
       n_elements(),
       0,
@@ -764,11 +764,12 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
     );
   else
     {
-      const std::vector<size_type>         indices = get_index_vector();
-      std::vector<types::global_dof_index> int_indices(indices.size());
+      const std::vector<size_type>                indices = get_index_vector();
+      std::vector<types::signed_global_dof_index> int_indices(indices.size());
       std::copy(indices.begin(), indices.end(), int_indices.begin());
-      const Teuchos::ArrayView<types::global_dof_index> arr_view(int_indices);
-      return Tpetra::Map<int, types::global_dof_index>(
+      const Teuchos::ArrayView<types::signed_global_dof_index> arr_view(
+        int_indices);
+      return Tpetra::Map<int, types::signed_global_dof_index>(
         size(),
         arr_view,
         0,

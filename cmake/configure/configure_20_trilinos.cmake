@@ -233,6 +233,7 @@ macro(feature_trilinos_find_external var)
       list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
       list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
 
       # For the case of Trilinos being compiled with openmp support the
       # following Tpetra test needs -fopenmp to succeed. Make sure that we
@@ -240,17 +241,16 @@ macro(feature_trilinos_find_external var)
       add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
 
       if(DEAL_II_WITH_64BIT_INDICES)
-        set(_global_index_type "std::uint64_t")
+        set(_global_index_type "std::int64_t")
       else()
-        set(_global_index_type "unsigned int")
+        set(_global_index_type "int")
       endif()
 
       CHECK_CXX_SOURCE_COMPILES(
         "
         #include <cstdint>
         #include <Tpetra_Vector.hpp>
-        int
-        main()
+        int main()
         {
           using LO       = int;
           using GO       = ${_global_index_type};
@@ -283,6 +283,7 @@ macro(feature_trilinos_find_external var)
       list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
       list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
 
       CHECK_CXX_SOURCE_COMPILES(
         "
