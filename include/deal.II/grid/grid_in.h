@@ -411,7 +411,8 @@ public:
    * The companion GridOut::write_vtk function can be used to write VTK files
    * compatible with this method.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_vtk(std::istream &in);
@@ -516,7 +517,8 @@ public:
    * Read grid data from an msh file. The %Gmsh formats are documented at
    * http://www.gmsh.info/.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_msh(std::istream &in);
@@ -575,7 +577,9 @@ public:
    * as a boundary or material id.  Physical surface numbers created in Gmsh,
    * which can be seen in the .geo file, become material IDs.
    *
-   * @relates simplex
+   *
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_msh(const std::string &filename);
@@ -614,7 +618,8 @@ public:
    * @image html "comsol-mesh-boundary-lines.png"
    * @image html "comsol-mesh-boundary-triangles.png"
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_comsol_mphtxt(std::istream &in);

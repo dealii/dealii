@@ -831,7 +831,8 @@ public:
  * depends on the numbering of the cell vertices. If you need rules that are
  * independent of the vertex numbering then use QWitherdenVincentSimplex.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim>
 class QGaussSimplex : public QSimplex<dim>
@@ -872,7 +873,8 @@ public:
  * @note Some rules (2d 2 odd and 3d 2 even) do not yet exist and instead a
  * higher-order rule is used in their place.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim>
 class QWitherdenVincentSimplex : public QSimplex<dim>

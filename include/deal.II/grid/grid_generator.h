@@ -2268,7 +2268,8 @@ namespace GridGenerator
    *     out_tria.set_manifold(i, in_tria.get_manifold(i));
    * @endcode
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   template <int dim, int spacedim>
   void
@@ -2487,7 +2488,8 @@ namespace GridGenerator
    *
    * @note Currently, this function only works for `dim==spacedim`.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   template <int dim, int spacedim>
   void
@@ -2510,7 +2512,8 @@ namespace GridGenerator
    * quadrilateral/hexahedral cells and subdivides these into 2/5
    * triangular/tetrahedral cells.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   template <int dim, int spacedim>
   void
