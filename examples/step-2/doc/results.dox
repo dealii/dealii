@@ -47,9 +47,11 @@ strategies than Cuthill-McKee from the DoFRenumbering namespace and see how
 they affect the sparsity pattern.
 
 You can also visualize the output using <a
-href="http://www.gnuplot.info/">GNUPLOT</a> (one of the simpler visualization
-programs; maybe not the easiest to use since it is command line driven, but
-also universally available on all Linux and other Unix-like systems) by changing from <code>print_svg()</code> to <code>print_gnuplot()</code> in <code>distribute_dofs()</code> and <code>renumber_dofs()</code>:
+href="http://www.gnuplot.info/">GNUPLOT</a> (which we have already
+used above) by
+changing from <code>print_svg()</code> to <code>print_gnuplot()</code>
+in <code>distribute_dofs()</code> and <code>renumber_dofs()</code> (and
+using the file ending `.gnuplot` instead of `.svg`):
 @code
 examples/\step-2> gnuplot
 
@@ -71,7 +73,7 @@ examples/\step-2> gnuplot
 
 Terminal type set to 'x11'
 gnuplot> set style data points
-gnuplot> plot "sparsity_pattern.1"
+gnuplot> plot "sparsity-pattern-1.gnuplot"
 @endcode
 
 Another practice based on
