@@ -100,6 +100,38 @@ namespace VectorTools
   void
   subtract_mean_value(VectorType &v, const std::vector<bool> &p_select = {});
 
+  /**
+   * Add the constant @p constant_adjustment to the specified
+   * component of the finite element function given by the coefficient
+   * vector @p solution defined by the given DoFHandler.
+   *
+   * This operation is a common operation to compute a solution with
+   * mean pressure zero for a Stokes flow problem. Here, one can
+   * use VectorTools::compute_mean_value() to compute the value to
+   * subtract.
+   *
+   * For a nodal finite element like FE_Q, this function will simply add
+   * the value @p constant_adjustment to each coefficient of the corresponding
+   * component. If you have the component in a separate block @p b, you
+   * could directly use
+   * <code>solution.block(b) += constant_adjustment</code>
+   * instead of calling this function (and this would be more efficient).
+   * For other finite element spaces like FE_DGP, the logic is more
+   * complicated and handled correctly by this function.
+   *
+   * @note Not all kinds of finite elements are supported and the selected
+   * component must not be part of a non-primitive element for this
+   * implementation to work.
+   *
+   * @note In contrast to subtract_mean_value(), this function can
+   * adjust a single component of a distributed vector.
+   */
+  template <class VectorType, int dim, int spacedim = dim>
+  void
+  add_constant(VectorType &                          solution,
+               const DoFHandler<dim, spacedim> &     dof_handler,
+               const unsigned int                    component,
+               const typename VectorType::value_type constant_adjustment);
 
   /**
    * Compute the mean value of one component of the solution.
