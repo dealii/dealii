@@ -9084,8 +9084,6 @@ DataOutBase::write_hdf5_parallel(
       "DataOutBase was asked to write HDF5 output for a space dimension of 1. "
       "HDF5 only supports datasets that live in 2 or 3 dimensions."));
 
-  int ierr = 0;
-  (void)ierr;
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
   // the now unused function arguments
@@ -9142,7 +9140,7 @@ DataOutBase::write_hdf5_parallel(
                                    split_comm);
     }
 
-  ierr = MPI_Comm_free(&split_comm);
+  const int ierr = MPI_Comm_free(&split_comm);
   AssertThrowMPI(ierr);
 
 #endif

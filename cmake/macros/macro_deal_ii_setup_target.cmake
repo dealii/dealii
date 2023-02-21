@@ -115,7 +115,11 @@ macro(deal_ii_setup_target _target)
     )
 
   set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-  separate_arguments(_flags)
+
+  # Make sure some CUDA warning flags don't get deduplicated
+  string(REGEX REPLACE "(-Xcudafe --diag_suppress=[^ ]+)" "\"SHELL:\\1\"" _flags ${_flags})
+
+  separate_arguments(_flags UNIX_COMMAND ${_flags})
 
   target_compile_options(${_target} PUBLIC ${_flags})
 
