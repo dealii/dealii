@@ -29,9 +29,7 @@
 
 #ifdef DEAL_II_WITH_ADOLC
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <adolc/internal/usrparms.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #endif // DEAL_II_WITH_ADOLC
 

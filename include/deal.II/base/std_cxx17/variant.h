@@ -20,9 +20,7 @@
 #ifdef DEAL_II_HAVE_CXX17
 #  include <variant>
 #else
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <boost/variant.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 DEAL_II_NAMESPACE_OPEN

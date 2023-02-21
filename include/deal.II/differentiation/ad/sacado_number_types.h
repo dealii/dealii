@@ -67,22 +67,19 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_TRILINOS_WITH_SACADO
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Sacado.hpp>
 // It appears that some versions of Trilinos do not directly or indirectly
 // include all the headers for all forward and reverse Sacado AD types.
 // So we directly include these both here as a precaution.
 // Standard forward AD classes (templated)
-#  include <Sacado_Fad_DFad.hpp>
-// Reverse AD classes (templated)
-#  include <Sacado_trad.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/numbers.h>
 
 #  include <deal.II/differentiation/ad/ad_number_traits.h>
 #  include <deal.II/differentiation/ad/ad_number_types.h>
+
+#  include <Sacado_Fad_DFad.hpp>
+#  include <Sacado_trad.hpp>
 
 #  include <complex>
 

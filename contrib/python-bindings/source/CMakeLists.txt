@@ -16,10 +16,10 @@
 include_directories(
   ${CMAKE_BINARY_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/
-  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/contrib/python-bindings/include/
   SYSTEM
   ${DEAL_II_INCLUDE_DIRS}
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   )
 
 #

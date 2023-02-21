@@ -15,9 +15,7 @@
 
 #include <deal.II/lac/sparsity_pattern_base.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <utility>

@@ -59,11 +59,8 @@
 
 #include <deal.II/physics/transformations.h>
 
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <array>
 #include <cmath>

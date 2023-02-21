@@ -22,9 +22,7 @@
 
 #include <deal.II/boost_adaptors/point.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry/geometries/segment.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

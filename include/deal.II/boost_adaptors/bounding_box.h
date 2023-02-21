@@ -20,9 +20,7 @@
 
 #include <deal.II/base/bounding_box.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <deal.II/boost_adaptors/point.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 namespace boost

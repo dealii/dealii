@@ -48,6 +48,11 @@ macro(deal_ii_add_library _library)
       PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
       )
 
+    target_include_directories(${_library}_${_build_lowercase}
+      PUBLIC ${DEAL_II_INCLUDE_DIRS})
+    target_include_directories(${_library}_${_build_lowercase}
+      SYSTEM PUBLIC ${DEAL_II_BUNDLED_INCLUDE_DIRS})
+
     set_property(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
       "$<TARGET_OBJECTS:${_library}_${_build_lowercase}>"
       )

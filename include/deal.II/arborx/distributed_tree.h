@@ -22,9 +22,7 @@
 #  include <deal.II/arborx/access_traits.h>
 
 #  include <ArborX_DistributedTree.hpp>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Kokkos_Core.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

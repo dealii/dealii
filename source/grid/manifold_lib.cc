@@ -28,9 +28,7 @@
 
 #include <deal.II/physics/vector_relations.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
 #include <limits>

@@ -20,17 +20,6 @@
 
 #include <deal.II/base/exceptions.h>
 
-#include <cstddef>
-#include <functional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <typeinfo>
-#include <utility>
-#include <vector>
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/core/demangle.hpp>
@@ -41,11 +30,18 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <cstddef>
+#include <functional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+#include <vector>
+
 #ifdef DEAL_II_WITH_ZLIB
 #  include <boost/iostreams/filter/gzip.hpp>
 #endif
-
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

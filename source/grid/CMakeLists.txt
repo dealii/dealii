@@ -20,7 +20,7 @@ include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 # -Wmisleading-indentation will be disabled due to a humongous line of over
 # 100k characters produced by one of the CGAL headers. Unfortunately,
 # guarding the include by DEAL_II_DISABLE_EXTRA_DIAGNOSTICS is not enough
-# due to a longstanding bug in gcc. Thus, simply wet
+# due to a longstanding bug in gcc. Thus, simply set
 # -Wno-misleading-indentation on the command line for the
 # grid_generator_cgal.cc compilation unit.
 #
