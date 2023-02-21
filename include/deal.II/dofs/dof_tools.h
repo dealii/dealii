@@ -2380,7 +2380,8 @@ namespace DoFTools
    * given map @p support_points.  For each support point location, a string
    * label containing a list of all DoFs from the map is generated.  The map
    * can be generated with a call to map_dofs_to_support_points() and is useful
-   * to visualize location and global numbering of unknowns.
+   * to visualize location and global numbering of unknowns. This function is
+   * used in step-2.
    *
    * An example for the format of each line in the output is:
    * @code

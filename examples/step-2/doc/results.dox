@@ -1,14 +1,43 @@
 <h1>Results</h1>
 
-The program has, after having been run, produced two sparsity
-patterns. We can visualize them by opening the <code>.svg</code> files in a web browser.
+The program has, after having been run, produced two files of
+DoF locations and sparsity patterns each (once for the original numbering
+and once after renumbering), along with one mesh file.
 
-The results then look like this (every point denotes an entry which
-might be nonzero; of course the fact whether the entry actually is
+Let us start with the DoF locations. There is no particularly convenient
+program to visualize this kind of information, but we can resort to
+<a href="http://www.gnuplot.info/">GNUPLOT</a> (one of the simpler visualization
+programs; maybe not the easiest to use since it is command line driven, but
+also universally available on all Linux and other Unix-like systems). The
+command that produces the following pictures reads as follows:
+```
+plot [-0.1:2.1][-1.1:1.1] "mesh.gnuplot" with lines, "dof_locations_1.gnuplot" using 1:2:3 with labels point offset .3,.2 font "4,6"
+```
+This may be cryptic, but what exactly this does is also not particularly important and you shouldn't
+spend too much time understanding what it does. Rather, the important part is
+to look at what we get as output:
+<table style="width:60%" align="center">
+  <tr>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-2.dof-locations-1.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-2.dof-locations-2.png" alt=""></td>
+  </tr>
+</table>
+What these figures show is (i) a numeric label attached to each vertex -- the
+DoF index, and (ii) that the original enumeration on the left differs from
+the renumbered one on the right. Which of the two is "better" is of course
+a different question (with the answer depending on what we want to do
+with these degrees of freedom); the important point is that for the
+same mesh, one can come up with many different enumerations of the degrees
+of freedom.
+
+As for the sparsity patterns, we can visualize these by opening the
+<code>.svg</code> files in a web browser. The pictures below
+represent the matrix, and every red square denotes an entry which
+might be nonzero. (Whether the entry actually is
 zero or not depends on the equation under consideration, but the
 indicated positions in the matrix tell us which shape functions can
 and which can't couple when discretizing a local, i.e. differential,
-equation):
+equation.)
 <table style="width:60%" align="center">
   <tr>
     <td><img src="https://www.dealii.org/images/steps/developer/step-2.sparsity-1.svg" alt=""></td>
@@ -34,6 +63,9 @@ familiarize yourself with deal.II. For example, in the
 (that's what the argument "1" to the FE_Q object is). Explore how the
 sparsity pattern changes if you use higher order elements, for example
 cubic or quintic ones (by using 3 and 5 as the respective arguments).
+You might also want to see where DoFs are now located -- but for that
+you likely want to work with a mesh with fewer cells because DoFs
+are now also located on edges and in the interior of cells.
 
 You could also explore how the sparsity pattern changes by refining
 the mesh. You will see that not only the size of the matrix
@@ -75,33 +107,3 @@ Terminal type set to 'x11'
 gnuplot> set style data points
 gnuplot> plot "sparsity-pattern-1.gnuplot"
 @endcode
-
-Another practice based on
-<a href="http://www.gnuplot.info/">GNUPLOT</a> is trying to
-print out the mesh with locations and numbering of the support
-points. For that, you need to include header files for GridOut and MappingQ1.
-The code for this is:
-@code
-  std::ofstream out("gnuplot.gpl");
-  out << "plot '-' using 1:2 with lines, "
-      << "'-' with labels point pt 2 offset 1,1"
-      << std::endl;
-  GridOut().write_gnuplot (triangulation, out);
-  out << "e" << std::endl;
-  const int dim = 2;
-  std::map<types::global_dof_index, Point<dim> > support_points;
-  DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
-                                        dof_handler,
-                                        support_points);
-  DoFTools::write_gnuplot_dof_support_point_info(out,
-                                                 support_points);
-  out << "e" << std::endl;
-@endcode
-After we run the code, we get a file called gnuplot.gpl. To view this
-file, we can run the following code in the command line:
-@code
-gnuplot -p gnuplot.gpl
-@endcode.
-With that, you will get a picture similar to
-@image html support_point_dofs1.png
-depending on the mesh you are looking at. For more information, see DoFTools::write_gnuplot_dof_support_point_info.
