@@ -974,7 +974,9 @@ MappingQ<dim, spacedim>::fill_fe_values(
   // value is computed with just cell vertices and does not take into account
   // cell curvature.
   const CellSimilarity::Similarity computed_cell_similarity =
-    (polynomial_degree == 1 ? cell_similarity : CellSimilarity::none);
+    (polynomial_degree == 1 && this->preserves_vertex_locations() ?
+       cell_similarity :
+       CellSimilarity::none);
 
   if (dim > 1 && data.tensor_product_quadrature)
     {
