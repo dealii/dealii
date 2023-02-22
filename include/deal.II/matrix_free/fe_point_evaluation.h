@@ -514,7 +514,7 @@ public:
 
   /**
    * Return the value at quadrature point number @p point_index after a call to
-   * FEPointEvaluation::evaluate() with EvaluationFlags::value set, or
+   * FEPointEvaluation::evaluate() with EvaluationFlags::values set, or
    * the value that has been stored there with a call to
    * FEPointEvaluation::submit_value(). If the object is vector-valued, a
    * vector-valued return argument is given.
@@ -536,7 +536,7 @@ public:
   /**
    * Return the gradient in real coordinates at the point with index
    * `point_index` after a call to FEPointEvaluation::evaluate() with
-   * EvaluationFlags::gradient set, or the gradient that has been stored there
+   * EvaluationFlags::gradients set, or the gradient that has been stored there
    * with a call to FEPointEvaluation::submit_gradient(). The gradient in real
    * coordinates is obtained by taking the unit gradient (also accessible via
    * get_unit_gradient()) and applying the inverse Jacobian of the mapping. If
@@ -548,7 +548,7 @@ public:
   /**
    * Return the gradient in unit coordinates at the point with index
    * `point_index` after a call to FEPointEvaluation::evaluate() with
-   * EvaluationFlags::gradient set, or the gradient that has been stored there
+   * EvaluationFlags::gradients set, or the gradient that has been stored there
    * with a call to FEPointEvaluation::submit_gradient(). If the object is
    * vector-valued, a vector-valued return argument is given. Note that when
    * vectorization is enabled, values from several points are grouped
