@@ -435,7 +435,7 @@ namespace Step82
     // At the end of the function, we output this sparsity pattern as
     // a scalable vector graphic. You can visualize it by loading this
     // file in most web browsers:
-    std::ofstream out("sparsity_pattern.svg");
+    std::ofstream out("sparsity-pattern.svg");
     sparsity_pattern.print_svg(out);
   }
 
