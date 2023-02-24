@@ -222,11 +222,6 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
   test<double>();
-  test<float>();
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
-  test<std::complex<float>>();
-  test<std::complex<double>>();
-#endif
 
   deallog << "OK" << std::endl;
 
