@@ -1332,10 +1332,15 @@
  * where the sum extends over those cells on which $\varphi_i$ is nonzero.
  * The so-computed mass matrix is therefore diagonal.
  *
- * Whether or not this particular choice of quadrature formula is sufficient
- * to retain the convergence rate of the discretization is a separate
- * question. For the usual $Q_k$ finite elements, the appropriate
- * quadrature formulas are of QGaussLobatto type.
+ * Whether or not this particular choice of quadrature formula is
+ * sufficient to retain the convergence rate of the discretization is
+ * a separate question. For the usual $Q_k$ finite elements
+ * (implemented by FE_Q and FE_DGQ), the appropriate quadrature
+ * formulas are of QGaussLobatto type. Mass lumping can also be done
+ * with FE_SimplexP_Bubbles, for example, if appropriate quadrature rules
+ * are chosen.
+ *
+ * For an example of where lumped mass matrices play a role, see step-69.
  * </dd>
  *
  *

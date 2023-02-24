@@ -766,7 +766,8 @@ namespace MatrixFreeOperators
     compute_diagonal() override;
 
     /**
-     * Compute the lumped @ref GlossMassMatrix "mass matrix". This is equal to the mass matrix times a
+     * Compute the @ref GlossLumpedMassMatrix "lumped mass matrix".
+     * This is equal to the mass matrix times a
      * vector of all ones and is equivalent to approximating the mass matrix
      * with a nodal quadrature rule.
      *
