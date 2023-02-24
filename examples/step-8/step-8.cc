@@ -308,7 +308,7 @@ namespace Step8
         mu.value_list(fe_values.get_quadrature_points(), mu_values);
         right_hand_side(fe_values.get_quadrature_points(), rhs_values);
 
-        // Then assemble the entries of the local stiffness matrix and right
+        // Then assemble the entries of the local @ref GlossStiffnessMatrix "stiffness matrix" and right
         // hand side vector. This follows almost one-to-one the pattern
         // described in the introduction of this example.  One of the few
         // comments in place is that we can compute the number

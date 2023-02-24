@@ -959,7 +959,7 @@ namespace Step31
     }
 
     // The creation of the temperature matrix (or, rather, matrices, since we
-    // provide a temperature mass matrix and a temperature stiffness matrix,
+    // provide a temperature mass matrix and a temperature @ref GlossStiffnessMatrix "stiffness matrix",
     // that will be added together for time discretization) follows the
     // generation of the Stokes matrix &ndash; except that it is much easier
     // here since we do not need to take care of any blocks or coupling

@@ -83,7 +83,7 @@ continuous eigenvalue problem: @f[ \sum_j [(\nabla\phi_i,
 \varepsilon_h \sum_j (\phi_i, \phi_j) \tilde{\psi}_j\quad.  @f] In
 matrix and vector notation, this equation then reads: @f[ A
 \tilde{\Psi} = \varepsilon_h M \tilde{\Psi} \quad, @f] where $A$ is
-the stiffness matrix arising from the differential operator $L$, and
+the @ref GlossStiffnessMatrix "stiffness matrix" arising from the differential operator $L$, and
 $M$ is the @ref GlossMassMatrix "mass matrix". The solution to the eigenvalue problem is an
 eigenspectrum $\varepsilon_{h,\ell}$, with associated eigenfunctions
 $\Psi_\ell=\sum_j \phi_j\tilde{\psi}_j$.

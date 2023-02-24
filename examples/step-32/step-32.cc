@@ -2457,7 +2457,7 @@ namespace Step32
   // having inhomogeneous boundary conditions, by just making a right hand
   // side at this point (compare the comments for the <code>project()</code>
   // function above): We create some matrix columns with exactly the values
-  // that would be entered for the temperature stiffness matrix, in case we
+  // that would be entered for the temperature @ref GlossStiffnessMatrix "stiffness matrix", in case we
   // have inhomogeneously constrained dofs. That will account for the correct
   // balance of the right hand side vector with the matrix system of
   // temperature.

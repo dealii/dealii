@@ -215,7 +215,7 @@ F_{i} &\dealcoloneq& (f, v_i)_\Omega   \qquad i=1,\dots,n \\
 G_{\alpha} &\dealcoloneq& (g, q_\alpha)_\Gamma \qquad \alpha = 1,\dots, m.
 @f}
 
-While the matrix $K$ is the standard stiffness matrix for the Poisson problem on
+While the matrix $K$ is the standard @ref GlossStiffnessMatrix "stiffness matrix" for the Poisson problem on
 $\Omega$, and the vector $G$ is a standard right-hand-side vector for a finite
 element problem with forcing term $g$ on $\Gamma$, (see, for example, step-3),
 the matrix $C$ or its transpose $C^T$ are non-standard since they couple

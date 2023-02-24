@@ -507,7 +507,7 @@ namespace Polynomials
    *
    * The degrees of freedom are the values at the vertices and the derivatives
    * at the midpoint. Currently, we do not scale the polynomials in any way,
-   * although better conditioning of the element stiffness matrix could
+   * although better conditioning of the element @ref GlossStiffnessMatrix "stiffness matrix" could
    * possibly be achieved with scaling.
    *
    * Calling the constructor with a given index <tt>p</tt> will generate the

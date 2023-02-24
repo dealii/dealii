@@ -343,7 +343,7 @@ namespace internal
  * A class similar to TensorProductMatrixSymmetricSum.
  *
  * The class TensorProductMatrixSymmetricSum stores a
- * 1d @ref GlossMassMatrix "mass matrix", 1d stiffness matrix, eigenvalues and eigenvectors
+ * 1d @ref GlossMassMatrix "mass matrix", 1d @ref GlossStiffnessMatrix "stiffness matrix", eigenvalues and eigenvectors
  * for each direction. If one uses one TensorProductMatrixSymmetricSum
  * instance for, e.g., each cell, these quantities are stored
  * for each cell. There is no possibility to reuse quantities between

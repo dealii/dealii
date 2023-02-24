@@ -830,7 +830,7 @@ scheme and the current and previous time step. This being the sum of a
 symmetric positive definite and a symmetric positive semidefinite matrix, the
 result is also symmetric positive definite. Furthermore, $\frac\beta\alpha$ is
 a number proportional to the time step, and so becomes small whenever the mesh
-is fine, damping the effect of the then ill-conditioned stiffness matrix.
+is fine, damping the effect of the then ill-conditioned @ref GlossStiffnessMatrix "stiffness matrix".
 
 As a consequence, inverting this matrix with the Conjugate Gradient algorithm,
 using a simple preconditioner, is trivial and very cheap compared to inverting
