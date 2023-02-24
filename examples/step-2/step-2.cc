@@ -181,7 +181,7 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
   // With this, we can now write the results to a file:
-  std::ofstream out("sparsity_pattern1.svg");
+  std::ofstream out("sparsity-pattern-1.svg");
   sparsity_pattern.print_svg(out);
   // The result is stored in an <code>.svg</code> file, where each nonzero entry
   // in the matrix corresponds with a red square in the image. The output will
@@ -237,7 +237,7 @@ void renumber_dofs(DoFHandler<2> &dof_handler)
   SparsityPattern sparsity_pattern;
   sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
-  std::ofstream out("sparsity_pattern2.svg");
+  std::ofstream out("sparsity-pattern-2.svg");
   sparsity_pattern.print_svg(out);
 }
 
