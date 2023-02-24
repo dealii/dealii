@@ -1322,6 +1322,57 @@
  * @see @ref manifold "The module on Manifolds"
  *
  *
+ * <dt class="glossary">@anchor GlossMassMatrix <b>Mass matrix</b></dt>
+ * <dd>The "mass matrix" is a matrix of the form
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * possibly with a coefficient inside the integral, and
+ * where $\varphi_i(\mathbf x)$ are the shape functions of a finite element.
+ * The origin of the term refers to the fact that in structural mechanics
+ * (where the finite element method originated), one often starts from the
+ * elastodynamics (wave) equation
+ *   @f{align*}{
+ *     \rho \frac{\partial^2 u}{\partial t^2}
+ *     -\nabla \cdot C \nabla u = f.
+ *   @f}
+ * If one multiplies this equation by a test function $\varphi_i$,
+ * integrates over $\Omega$, and then discretizes by the substitution
+ * $u(\mathbf x,t) \to u_h(\mathbf x)=\sum_j U_j(t) \varphi_j(\mathbf x)$,
+ * then the first term above results in
+ *   @f{align*}{
+ *     \sum_j \left[\int_\Omega \rho \varphi_i \varphi_j \right]
+ *     \frac{\partial^2 U_j(t)}{\partial t^2}
+ *   @f}
+ * which can be written as
+ *   @f{align*}{
+ *     M
+ *     \frac{\partial^2 U(t)}{\partial t^2}
+ *   @f}
+ * where
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \rho(\mathbf x)\varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx.
+ *   @f}
+ * Since the matrix entries are a (weighted) integral over a mass density, they
+ * have the units of "mass", giving the "mass matrix" its name.
+ *
+ * In mathematics, where we often consider non-dimensionalized equations, we
+ * end up with the case $\rho=1$, and as a consequence the matrix without
+ * the coefficient,
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * also carries the name "mass matrix".
+ *
+ * The mass matrix is almost always written with the symbol $M$. See, for example,
+ * step-23, step-26, and a number of the other time dependent equations solved by
+ * tutorial programs.
+ *
+ * See also the @ref GlossStiffnessMatrix "stiffness matrix"
+ * for a related case.
+ * </dt>
+ *
+ *
  * <dt class="glossary">@anchor GlossMaterialId <b>Material id</b></dt>
  * <dd>Each cell of a triangulation has associated with it a property called
  * "material id". It is commonly used in problems with heterogeneous
@@ -1745,6 +1796,73 @@
  * <dd>The restriction of the finite element basis functions to a single
  * grid cell.
  * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossStiffnessMatrix <b>Stiffness matrix</b></dt>
+ * <dd>The "stiffness matrix" is a matrix of the form
+ *   @f{align*}{
+ *     A_{ij} = \int_\Omega \nabla\varphi_i(\mathbf x)
+ *       \cdot \nabla\varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * possibly with a coefficient inside the integral, and
+ * where $\varphi_i(\mathbf x)$ are the shape functions of a finite element.
+ * The term is also used for variations of the case above, for example
+ * replacing the gradient by the symmetric gradient in the case where
+ * the solution variable is vector-valued (e.g., in elasticity, or the
+ * Stokes equations). The key feature is that in the integral, first
+ * derivatives are applied to both the test and trial functions,
+ * $\varphi_i,\varphi_j$.
+ *
+ * The origin of the term refers to the fact that in structural mechanics
+ * (where the finite element method originated), one often starts from the
+ * elastostatics equation
+ *   @f{align*}{
+ *     -\nabla \cdot C \nabla u = f.
+ *   @f}
+ * In this equation, $C$ is the stress-strain tensor that, informally
+ * speaking, relates how much force one has to apply to obtain a
+ * unit displacement. In other words, it encodes the "stiffness" of
+ * the material: A large $C$, i.e., a large stiffness, means a large
+ * required force for a desired displacement and the other way around.
+ *
+ * If one multiplies this equation by a test function $\varphi_i$,
+ * integrates over $\Omega$, and then discretizes by the substitution
+ * $u(\mathbf x,t) \to u_h(\mathbf x)=\sum_j U_j(t) \varphi_j(\mathbf x)$,
+ * then after integration by parts one ends up with
+ *   @f{align*}{
+ *     \sum_j \left[\int_\Omega \nabla \varphi_i \cdot C \varphi_j \right]
+ *     U_j
+ *   @f}
+ * which can be written as
+ *   @f{align*}{
+ *     AU
+ *   @f}
+ * where
+ *   @f{align*}{
+ *     A_{ij} = \int_\Omega \nabla\varphi_i(\mathbf x) \cdot C \nabla \varphi_j(\mathbf x)\; dx.
+ *   @f}
+ * Since the matrix entries are (weighted) integrals of the stiffness
+ * coefficient, the resulting matrix is called the "stiffness matrix".
+ *
+ * In mathematics, where we often consider non-dimensionalized equations,
+ * we end up with the case $C=1$, and as a consequence the matrix without
+ * the coefficient,
+ *   @f{align*}{
+ *     A_{ij} = \int_\Omega \nabla\varphi_i(\mathbf x) \cdot \nabla\varphi_j(\mathbf x)\; dx
+ *   @f}
+ * which corresponds to the Laplace or Poisson equation,
+ *   @f{align*}{
+ *     -\Delta u = f,
+ *   @f}
+ * also carries the name "stiffness matrix".
+ *
+ * The stiffness matrix is almost always denotes by the symbol $A$. See, for example,
+ * step-4, step-6, as well as a number of the time dependent equations considered in
+ * programs such as step-23 or step-26.
+ *
+ * See also the @ref GlossStiffnessMatrix "stiffness matrix"
+ * for a related case.
+ * </dt>
  *
  *
  * <dt class="glossary">@anchor GlossSubdomainId <b>Subdomain id</b></dt>
