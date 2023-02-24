@@ -77,6 +77,40 @@ namespace LinearAlgebra
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 #  endif
+
+
+
+#  ifdef HAVE_TPETRA_INST_FLOAT
+  template void
+  ReadWriteVector<float>::import(
+    const LinearAlgebra::TpetraWrappers::Vector<float> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#  endif
+#  ifdef HAVE_TPETRA_INST_DOUBLE
+  template void
+  ReadWriteVector<double>::import(
+    const LinearAlgebra::TpetraWrappers::Vector<double> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#  endif
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
+#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+  template void
+  ReadWriteVector<std::complex<float>>::import(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#    endif
+#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+  template void
+  ReadWriteVector<std::complex<double>>::import(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#    endif
+#  endif
+
 #endif
 } // namespace LinearAlgebra
 

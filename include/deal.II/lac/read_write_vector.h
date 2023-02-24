@@ -375,7 +375,9 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      */
-    void
+    template <typename Dummy = Number>
+    std::enable_if_t<std::is_same<Dummy, Number>::value &&
+                     dealii::is_tpetra_type<Number>::value>
     import(const TpetraWrappers::Vector<Number> &tpetra_vec,
            VectorOperation::values               operation,
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -656,7 +658,9 @@ namespace LinearAlgebra
      * vector @p tpetra_vector. This is an helper function and it should not be
      * used directly.
      */
-    void
+    template <typename Dummy = Number>
+    std::enable_if_t<std::is_same<Dummy, Number>::value &&
+                     dealii::is_tpetra_type<Number>::value>
     import(const Tpetra::Vector<Number, int, types::signed_global_dof_index>
              &                     tpetra_vector,
            const IndexSet &        locally_owned_elements,

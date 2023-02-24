@@ -264,15 +264,19 @@ macro(feature_trilinos_find_external var)
         TRILINOS_TPETRA_IS_FUNCTIONAL
         )
 
-      reset_cmake_required()
-
-      if(NOT TRILINOS_TPETRA_IS_FUNCTIONAL)
+      if(TRILINOS_TPETRA_IS_FUNCTIONAL)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT          "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_FLOAT)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE         "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_DOUBLE)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT  "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_COMPLEX_FLOAT)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_COMPLEX_DOUBLE)
+      else()
         message(
           STATUS
           "Tpetra was found but is not usable! Disabling Tpetra support."
           )
         set(TRILINOS_WITH_TPETRA OFF)
       endif()
+      reset_cmake_required()
     endif()
 
     if(TRILINOS_WITH_MUELU)
@@ -421,12 +425,21 @@ macro(feature_trilinos_configure_external)
   set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
   set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
+
   if(${DEAL_II_TRILINOS_WITH_TPETRA})
-    set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
-    set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    if (DEAL_II_HAVE_TPETRA_INST_DOUBLE)
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
+    endif()
+    if (DEAL_II_HAVE_TPETRA_INST_FLOAT)
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    endif()
     if(${DEAL_II_WITH_COMPLEX_NUMBERS})
-      set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
-      set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
+    if(DEAL_II_HAVE_TPETRA_INST_COMPLEX_DOUBLE)
+        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
+      endif()
+      if(DEAL_II_HAVE_TPETRA_INST_COMPLEX_FLOAT)
+        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
+      endif()
     endif()
   endif()
 
