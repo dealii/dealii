@@ -178,7 +178,7 @@ namespace Step69
   //
   // The class <code>OfflineData</code> contains pretty much all components
   // of the discretization that do not evolve in time, in particular, the
-  // DoFHandler, SparsityPattern, boundary maps, the lumped mass matrix,
+  // DoFHandler, SparsityPattern, boundary maps, the lumped @ref GlossMassMatrix "mass matrix",
   // $\mathbf{c}_{ij}$ and $\mathbf{n}_{ij}$ matrices. Here, the term
   // <i>offline</i> refers to the fact that all the class
   // members of <code>OfflineData</code> have well-defined values

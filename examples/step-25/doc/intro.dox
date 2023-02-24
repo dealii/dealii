@@ -166,7 +166,7 @@ Above, the matrix $F_h'(\cdot)$ and the vector $F_h(\cdot)$ denote the discrete 
 \f}
 Again, note that the first matrix equation above is, in fact, the
 definition of an iterative procedure, so it is solved multiple times
-until a stopping criterion is met. Moreover, $M$ is the mass matrix,
+until a stopping criterion is met. Moreover, $M$ is the @ref GlossMassMatrix "mass matrix",
 i.e. $M_{ij} = \left( \varphi_i,\varphi_j \right)_{\Omega}$, $A$ is
 the Laplace matrix, i.e. $A_{ij} = \left( \nabla \varphi_i, \nabla
 \varphi_j \right)_{\Omega}$, $S$ is the nonlinear term in the

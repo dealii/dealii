@@ -304,7 +304,7 @@ and consequently
 @f}
 (In this last step, we have assumed that the indices $i,j,k$ only range
 over those degrees of freedom active on cell $K$,
-thereby ensuring that the mass matrix on the space $RT_s(K)$ is invertible.)
+thereby ensuring that the @ref GlossMassMatrix "mass matrix" on the space $RT_s(K)$ is invertible.)
 Equivalently, using the symmetry of the matrix $M$, we have that
 @f{equation*}{
   C^K = \left(G^K\right)^{T} \left(M^K\right)^{-1}.

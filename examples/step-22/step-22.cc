@@ -815,7 +815,7 @@ namespace Step22
       SolverCG<Vector<double>> cg(solver_control);
 
       // Now to the preconditioner to the Schur complement. As explained in
-      // the introduction, the preconditioning is done by a mass matrix in the
+      // the introduction, the preconditioning is done by a @ref GlossMassMatrix "mass matrix" in the
       // pressure variable.
       //
       // Actually, the solver needs to have the preconditioner in the form

@@ -134,7 +134,7 @@ namespace DoFTools
  * With this vector, one can get, for any given degree of freedom, a unique
  * number among those DoFs that sit on the boundary; or, if your DoF was
  * interior to the domain, the result would be numbers::invalid_dof_index.
- * We need this mapping, for example, to build the mass matrix on the boundary
+ * We need this mapping, for example, to build the @ref GlossMassMatrix "mass matrix" on the boundary
  * (for this, see make_boundary_sparsity_pattern() function, the corresponding
  * section below, as well as the MatrixCreator namespace documentation).
  *

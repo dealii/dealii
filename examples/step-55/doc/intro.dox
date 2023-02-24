@@ -136,7 +136,7 @@ great from the computational standpoint (simpler and cheaper
 than GMRES for example), and applicable (matrix and preconditioner are
 symmetric).
 
-For the approximations we will use a CG solve with the mass matrix in the
+For the approximations we will use a CG solve with the @ref GlossMassMatrix "mass matrix" in the
 pressure space for approximating the action of $S^{-1}$. Note that the mass
 matrix is spectrally equivalent to $S$. We can expect the number of CG
 iterations to be independent of $h$, even with a simple preconditioner like

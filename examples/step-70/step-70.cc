@@ -1527,7 +1527,7 @@ namespace Step70
   // This function solves the linear system with FGMRES with a block diagonal
   // preconditioner and an algebraic multigrid (AMG) method for the diagonal
   // blocks. The preconditioner applies a V cycle to the $(0,0)$ (i.e., the
-  // velocity-velocity) block and a CG with the mass matrix for the $(1,1)$
+  // velocity-velocity) block and a CG with the @ref GlossMassMatrix "mass matrix" for the $(1,1)$
   // block (which is our approximation to the Schur complement: the pressure
   // mass matrix assembled above).
   template <int dim, int spacedim>

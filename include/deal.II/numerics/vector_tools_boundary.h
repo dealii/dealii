@@ -399,7 +399,7 @@ namespace VectorTools
    * The projection happens on only those parts of the boundary whose
    * indicators are represented in this map.
    * @param[in] q The face quadrature used in the integration necessary to
-   * compute the mass matrix and right hand side of the projection.
+   * compute the @ref GlossMassMatrix "mass matrix" and right hand side of the projection.
    * @param[out] boundary_values The result of this function. It is a map
    * containing all indices of degrees of freedom at the boundary (as covered
    * by the boundary parts in @p boundary_functions) and the computed dof

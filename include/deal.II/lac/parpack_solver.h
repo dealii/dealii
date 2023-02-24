@@ -145,7 +145,7 @@ extern "C"
  *
  * In this class we make use of the method applied to the generalized
  * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$ is a
- * system matrix, $B$ is a mass matrix, and $\lambda, x$ are a set of
+ * system matrix, $B$ is a @ref GlossMassMatrix "mass matrix", and $\lambda, x$ are a set of
  * eigenvalues and eigenvectors respectively.
  *
  * The ArpackSolver can be used in application codes in the following way:

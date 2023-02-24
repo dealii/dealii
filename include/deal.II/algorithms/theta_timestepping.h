@@ -76,7 +76,7 @@ namespace Algorithms
    *   M u_{n+1} + \theta k F(u_{n+1})  = M u_n - (1-\theta)k F(u_n).
    * @f]
    *
-   * Here, <i>M</i> is the mass matrix. We see, that the right hand side
+   * Here, <i>M</i> is the @ref GlossMassMatrix "mass matrix". We see, that the right hand side
    * amounts to an explicit Euler step with modified step size in weak form
    * (up to inversion of M). The left hand side corresponds to an implicit
    * Euler step with modified step size (right hand side given). Thus, the
@@ -410,7 +410,7 @@ namespace Algorithms
      * step size from explicit_data().
      *
      * Its return value is $ Mu+cF(u) $, where $u$ is the current state
-     * vector, $M$ the mass matrix, $F$ the operator in space and $c$ is the
+     * vector, $M$ the @ref GlossMassMatrix "mass matrix", $F$ the operator in space and $c$ is the
      * adjusted time step size $(1-\theta) \Delta t$.
      */
     SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_explicit;
@@ -422,7 +422,7 @@ namespace Algorithms
      *
      * Its return value is the solution <i>u</i> of <i>Mu-cF(u)=f</i>, where
      * <i>f</i> is the dual space vector found in the "Previous time" entry of
-     * the input data, <i>M</i> the mass matrix, <i>F</i> the operator in
+     * the input data, <i>M</i> the @ref GlossMassMatrix "mass matrix", <i>F</i> the operator in
      * space and <i>c</i> is the adjusted time step size $ \theta \Delta t$
      */
     SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_implicit;

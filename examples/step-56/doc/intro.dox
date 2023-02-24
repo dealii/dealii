@@ -94,7 +94,7 @@ Since $P$ is aimed to be a preconditioner only, we shall use
 the approximations on the right in the equation above.
 
 As discussed in step-22, $-M_p^{-1}=:\widetilde{S^{-1}} \approx
-S^{-1}$, where $M_p$ is the pressure mass matrix and is solved approximately by using CG
+S^{-1}$, where $M_p$ is the pressure @ref GlossMassMatrix "mass matrix" and is solved approximately by using CG
 with ILU as a preconditioner, and $\widetilde{A^{-1}}$ is obtained by one of
 multiple methods: solving a linear system with CG and ILU as
 preconditioner, just using one application of an ILU, solving a linear

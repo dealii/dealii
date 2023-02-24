@@ -252,7 +252,7 @@ P^{-1} =
 
 with $\tilde{A} = A + \gamma B^TW^{-1}B$ and $\tilde{S}$ is the
 corresponding Schur complement $\tilde{S} = B^T \tilde{A}^{-1} B$. We
-let $W = M_p$ where $M_p$ is the pressure mass matrix, then
+let $W = M_p$ where $M_p$ is the pressure @ref GlossMassMatrix "mass matrix", then
 $\tilde{S}^{-1}$ can be approximated by
 @f{eqnarray*}
 \tilde{S}^{-1} \approx -(\nu+\gamma)M_p^{-1}.

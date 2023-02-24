@@ -122,7 +122,7 @@ DEAL_II_NAMESPACE_OPEN
  * <li> 0: The vector Laplacian for the velocity (here with a vector valued
  * element)
  * <li> 1: The divergence matrix
- * <li> 2: The pressure mass matrix used in the preconditioner
+ * <li> 2: The pressure @ref GlossMassMatrix "mass matrix" used in the preconditioner
  * </ul>
  *
  * With these matrices, the function called by MeshWorker::loop() could be

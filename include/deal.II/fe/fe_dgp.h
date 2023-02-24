@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * necessarily on the real cell). As a consequence, the first basis function
  * of this element is always the function that is constant and equal to one,
  * regardless of the polynomial degree of the element. In addition, as a
- * result of the orthogonality of the basis functions, the mass matrix is
+ * result of the orthogonality of the basis functions, the @ref GlossMassMatrix "mass matrix" is
  * diagonal if the grid cells are parallelograms. Note that this is in
  * contrast to the FE_DGPMonomial class that actually uses the monomial basis
  * listed above as basis functions, without transformation from reference to

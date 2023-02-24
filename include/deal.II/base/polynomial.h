@@ -661,7 +661,7 @@ namespace Polynomials
    * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=2x(x-1)$, and
    * $p_2(x)=x^2$, in accordance with the construction principle for degree 3.
    *
-   * These two relaxations improve the condition number of the mass matrix
+   * These two relaxations improve the condition number of the @ref GlossMassMatrix "mass matrix"
    * (i.e., interpolation) significantly, as can be seen from the following
    * table:
    *

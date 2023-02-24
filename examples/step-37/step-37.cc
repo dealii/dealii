@@ -191,7 +191,7 @@ namespace Step37
   // parameter as is done in the MatrixFreeOperators::LaplaceOperator class.
   //
   // As a sidenote, if we implemented several different operations on the same
-  // grid and degrees of freedom (like a mass matrix and a Laplace matrix), we
+  // grid and degrees of freedom (like a @ref GlossMassMatrix "mass matrix" and a Laplace matrix), we
   // would define two classes like the current one for each of the operators
   // (derived from the MatrixFreeOperators::Base class), and let both of them
   // refer to the same MatrixFree data cache from the general problem

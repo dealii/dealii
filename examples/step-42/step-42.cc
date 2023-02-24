@@ -1101,7 +1101,7 @@ namespace Step42
 
   // @sect4{PlasticityContactProblem::assemble_mass_matrix_diagonal}
 
-  // The next helper function computes the (diagonal) mass matrix that
+  // The next helper function computes the (diagonal) @ref GlossMassMatrix "mass matrix" that
   // is used to determine the active set of the active set method we use in
   // the contact algorithm. This matrix is of mass matrix type, but unlike
   // the standard mass matrix, we can make it diagonal (even in the case of

@@ -212,7 +212,7 @@ where $\{\psi_n\}_{n=1}^{N_c}$ and $\{\psi_n\}_{n=N_c+1}^{N_c+N_n}$ are the basi
 @f[
 M\boldsymbol{B}=\boldsymbol{G},
 @f]
-where the components of the (local) mass matrix and the right-hand side are given respectively by
+where the components of the (local) @ref GlossMassMatrix "mass matrix" and the right-hand side are given respectively by
 @f[
 M_{mn}\dealcoloneq\int_{\Omega}\psi_n:\psi_m \quad \mbox{and} \quad G_m\dealcoloneq\int_e\average{{\rm div}\, \psi_m}\cdot \mathbf{n}_e\jump{\varphi}, \qquad 1\leq m,n \leq N_c+N_n.
 @f]

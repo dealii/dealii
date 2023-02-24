@@ -86,7 +86,7 @@ namespace Step36
     DoFHandler<dim>    dof_handler;
 
     // With these exceptions: For our eigenvalue problem, we need both a
-    // stiffness matrix for the left hand side as well as a mass matrix for
+    // stiffness matrix for the left hand side as well as a @ref GlossMassMatrix "mass matrix" for
     // the right hand side. We also need not just one solution function, but a
     // whole set of these for the eigenfunctions we want to compute, along
     // with the corresponding eigenvalues:

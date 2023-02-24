@@ -91,7 +91,7 @@ namespace Step82
 
     // As indicated by its name, the function
     // <code>assemble_local_matrix()</code> is used for the assembly of the
-    // (local) mass matrix used to compute the two lifting terms (see the matrix
+    // (local) @ref GlossMassMatrix "mass matrix" used to compute the two lifting terms (see the matrix
     // $\boldsymbol{M}_c$ introduced in the introduction when describing the
     // computation of $b_e$). The function
     // <code>compute_discrete_hessians()</code> computes the required discrete

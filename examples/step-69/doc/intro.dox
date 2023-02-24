@@ -267,7 +267,7 @@ the (explicit time stepping) scheme as:
 @f}
 where
   - $m_i \dealcoloneq \int_{\Omega} \phi_i \, \mathrm{d}\mathbf{x}$
-    is the lumped mass matrix
+    is the lumped @ref GlossMassMatrix "mass matrix"
   - $\tau$ is the time step size
   - $\mathbf{c}_{ij} \dealcoloneq \int_{\Omega} \nabla\phi_j\phi_i \,
     \mathrm{d}\mathbf{x}$ (note that $\mathbf{c}_{ij}\in \mathbb{R}^d$)

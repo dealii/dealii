@@ -234,7 +234,7 @@ namespace SUNDIALS
    *  - implicit_function()
    *  - explicit_function()
    *
-   * If the mass matrix is different from the identity, the user should supply
+   * If the @ref GlossMassMatrix "mass matrix" is different from the identity, the user should supply
    *  - mass_times_vector() and, optionally,
    *  - mass_times_setup()
    *
@@ -611,7 +611,7 @@ namespace SUNDIALS
 
     /**
      * A function object that users may supply and that is intended to compute
-     * the product of the mass matrix with a given vector `v`. This function
+     * the product of the @ref GlossMassMatrix "mass matrix" with a given vector `v`. This function
      * will be called by ARKode (possibly several times) after
      * mass_times_setup() has been called at least once. ARKode tries to do its
      * best to call mass_times_setup() the minimum amount of times.
@@ -631,7 +631,7 @@ namespace SUNDIALS
 
     /**
      * A function object that users may supply and that is intended to set up
-     * the mass matrix. This function is called by ARKode any time a mass
+     * the @ref GlossMassMatrix "mass matrix". This function is called by ARKode any time a mass
      * matrix update is required. The user should compute the mass matrix (or
      * update all the variables that allow the application of the mass matrix).
      * This function is guaranteed to be called by ARKode at least once, before
@@ -738,7 +738,7 @@ namespace SUNDIALS
     /**
      * A LinearSolveFunction object that users may supply and that is intended
      * to solve the linearized system $Ax=b$, where $A = M-\gamma J$ is the
-     * Jacobian of the nonlinear residual. The application of the mass matrix
+     * Jacobian of the nonlinear residual. The application of the @ref GlossMassMatrix "mass matrix"
      * $M$ and Jacobian $J$ are known through the functions mass_times_vector()
      * and jacobian_times_vector() and $\gamma$ is a factor provided by
      * SUNDIALS. The matrix-vector product $Ax$ is encoded in the supplied
@@ -871,7 +871,7 @@ namespace SUNDIALS
      *
      * This function should compute the solution to the preconditioner equation
      * $Pz=r$ and store it in @p z. In this equation $P$ should approximate the
-     * mass matrix $M$.
+     * @ref GlossMassMatrix "mass matrix" $M$.
      *
      * @param[in] t  The current time
      * @param[in] r  The right-hand side of the preconditioner equation
@@ -900,7 +900,7 @@ namespace SUNDIALS
      * specified in mass_preconditioner_solve().
      *
      * This function should prepare the solution of the preconditioner equation
-     * $Pz=r$. In this equation $P$ should approximate the mass matrix $M$.
+     * $Pz=r$. In this equation $P$ should approximate the @ref GlossMassMatrix "mass matrix" $M$.
      *
      * If the mass_preconditioner_setup() function is not provided, then
      * mass_preconditioner_solve() should do all the work by itself.
@@ -1021,7 +1021,7 @@ namespace SUNDIALS
     setup_system_solver(const VectorType &solution);
 
     /**
-     * Set up the solver and preconditioner for a non-identity mass matrix in
+     * Set up the solver and preconditioner for a non-identity @ref GlossMassMatrix "mass matrix" in
      * the ARKODE memory object based on the user-specified functions.
      * @param solution The solution vector which is used as a template to create
      *   new vectors.

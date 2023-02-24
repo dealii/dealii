@@ -266,7 +266,7 @@ namespace Step11
     // That's quite simple, right?
     //
     // Two remarks are in order, though: First, these functions are used in a
-    // lot of contexts. Maybe you want to create a Laplace or mass matrix for
+    // lot of contexts. Maybe you want to create a Laplace or @ref GlossMassMatrix "mass matrix" for
     // a vector values finite element; or you want to use the default Q1
     // mapping; or you want to assembled the matrix with a coefficient in the
     // Laplace operator. For this reason, there are quite a large number of

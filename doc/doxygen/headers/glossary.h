@@ -77,7 +77,7 @@
   \end{array}\right),
  * @f}
  * where $U,P$ are the values of velocity and pressure degrees of freedom,
- * respectively, $M$ is the mass matrix on the velocity space, $B$ corresponds to
+ * respectively, $M$ is the @ref GlossMassMatrix "mass matrix" on the velocity space, $B$ corresponds to
  * the negative divergence operator, and $B^T$ is its transpose and corresponds
  * to the negative gradient.
  *
