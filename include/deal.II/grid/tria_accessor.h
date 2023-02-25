@@ -567,14 +567,36 @@ private:
  * @ingroup Accessors
  */
 template <int structdim, int dim, int spacedim = dim>
-class InvalidAccessor : public TriaAccessorBase<structdim, dim, spacedim>
+class InvalidAccessor
 {
 public:
   /**
-   * Propagate alias from base class to this class.
+   * Dimension of the space the object represented by this accessor lives in.
+   * For example, if this accessor represents a quad that is part of a two-
+   * dimensional surface in four-dimensional space, then this value is four.
    */
-  using AccessorData =
-    typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData;
+  static constexpr unsigned int space_dimension = spacedim;
+
+  /**
+   * Dimensionality of the object that the thing represented by this accessor
+   * is part of. For example, if this accessor represents a line that is part
+   * of a hexahedron, then this value will be three.
+   */
+  static constexpr unsigned int dimension = dim;
+
+  /**
+   * Dimensionality of the current object represented by this accessor. For
+   * example, if it is line (irrespective of whether it is part of a quad or
+   * hex, and what dimension we are in), then this value equals 1.
+   */
+  static const unsigned int structure_dimension = structdim;
+
+  /**
+   * Declare the data type that this accessor class expects to get passed from
+   * the iterator classes. Since the pure triangulation iterators need no
+   * additional data, this data type is @p void.
+   */
+  using AccessorData = void;
 
   /**
    * Constructor.  This class is used for iterators that do not make
@@ -625,6 +647,28 @@ public:
   operator++() const;
   void
   operator--() const;
+
+  /**
+   * Return the state of the iterator.  For the different states an accessor
+   * can be in, refer to the TriaRawIterator documentation.
+   */
+  static IteratorState::IteratorStates
+  state();
+
+
+  /**
+   * Level of this object. Vertices have no level, so this function always
+   * returns zero.
+   */
+  static int
+  level();
+
+  /**
+   * Index of this object. Returns the global index of the vertex this object
+   * points to.
+   */
+  static int
+  index();
 
   /**
    * Dummy function representing whether the accessor points to a used or an

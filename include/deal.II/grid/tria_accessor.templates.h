@@ -393,9 +393,7 @@ InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
 
 template <int structdim, int dim, int spacedim>
 InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
-  const InvalidAccessor &i)
-  : TriaAccessorBase<structdim, dim, spacedim>(
-      static_cast<const TriaAccessorBase<structdim, dim, spacedim> &>(i))
+  const InvalidAccessor &)
 {
   Assert(false,
          ExcMessage("You are attempting an invalid conversion between "
@@ -565,7 +563,7 @@ inline typename dealii::internal::TriangulationImplementation::
 {
   // nothing to do here. we could throw an exception but we can't get here
   // without first creating an object which would have already thrown
-  return dealii::internal::TriangulationImplementation::
+  return typename dealii::internal::TriangulationImplementation::
     Iterators<dim, spacedim>::quad_iterator();
 }
 

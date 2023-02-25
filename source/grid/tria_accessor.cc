@@ -3512,6 +3512,32 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
 
 
+template <int structdim, int dim, int spacedim>
+IteratorState::IteratorStates
+InvalidAccessor<structdim, dim, spacedim>::state()
+{
+  return IteratorState::invalid;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+int
+InvalidAccessor<structdim, dim, spacedim>::level()
+{
+  return -1;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+int
+InvalidAccessor<structdim, dim, spacedim>::index()
+{
+  return -1;
+}
+
+
 // explicit instantiations
 #include "tria_accessor.inst"
 
