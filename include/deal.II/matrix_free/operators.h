@@ -1858,8 +1858,6 @@ namespace MatrixFreeOperators
                VectorType,
                VectorizedArrayType>::compute_diagonal()
   {
-    using Number =
-      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
            ExcNotInitialized());
     Assert(this->selected_rows == this->selected_columns,
@@ -1912,8 +1910,13 @@ namespace MatrixFreeOperators
     for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
          ++i)
       {
+#ifdef DEBUG
+        // only define the type alias in debug mode to avoid a warning
+        using Number =
+          typename Base<dim, VectorType, VectorizedArrayType>::value_type;
         Assert(diagonal_vector.local_element(i) > Number(0),
                ExcInternalError());
+#endif
         inverse_diagonal_vector.local_element(i) =
           1. / inverse_diagonal_vector.local_element(i);
       }
