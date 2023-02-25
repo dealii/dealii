@@ -93,7 +93,7 @@ public:
    * Sort the indices in ascending order. While this operation is not very
    * useful for Table objects, it is used for the SymmetricTensor class.
    */
-  DEAL_II_CONSTEXPR void
+  DEAL_II_CONSTEXPR_FUNCTION void
   sort();
 
   /**
@@ -165,7 +165,7 @@ TableIndices<N>::operator!=(const TableIndices<N> &other) const
 
 
 template <int N>
-DEAL_II_CONSTEXPR inline void
+DEAL_II_CONSTEXPR_FUNCTION inline void
 TableIndices<N>::sort()
 {
   std::sort(std::begin(indices), std::end(indices));

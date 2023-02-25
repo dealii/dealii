@@ -319,8 +319,8 @@ public:
    * Return a pointer to the underlying array serving as element storage.
    * In case the container is empty a nullptr is returned.
    */
-  value_type *
-  data() const noexcept;
+  DEAL_II_HOST_DEVICE value_type *
+                      data() const noexcept;
 
   /**
    * Return an iterator pointing to the beginning of the array view.
@@ -539,8 +539,9 @@ ArrayView<ElementType, MemorySpaceType>::operator!=(
 
 
 template <typename ElementType, typename MemorySpaceType>
-inline typename ArrayView<ElementType, MemorySpaceType>::value_type *
-ArrayView<ElementType, MemorySpaceType>::data() const noexcept
+inline DEAL_II_HOST_DEVICE
+  typename ArrayView<ElementType, MemorySpaceType>::value_type *
+  ArrayView<ElementType, MemorySpaceType>::data() const noexcept
 {
   if (n_elements == 0)
     return nullptr;
