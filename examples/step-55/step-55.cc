@@ -440,7 +440,7 @@ namespace Step55
     }
 
     // The preconditioner matrix has a different coupling (we only fill in
-    // the 1,1 block with the mass matrix), otherwise this code is identical
+    // the 1,1 block with the @ref GlossMassMatrix "mass matrix"), otherwise this code is identical
     // to the construction of the system_matrix above.
     {
       preconditioner_matrix.clear();

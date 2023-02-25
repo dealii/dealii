@@ -812,7 +812,7 @@ namespace Step59
     // we check that it is diagonal and then extract the determinant of the
     // original Jacobian, i.e., the inverse of the determinant of the inverse
     // Jacobian, and set the weight as $\text{det}(J) / h_d^2$ according to
-    // the 1d Laplacian times $d-1$ copies of the mass matrix.
+    // the 1d Laplacian times $d-1$ copies of the @ref GlossMassMatrix "mass matrix".
     cell_matrices.clear();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*data);
     unsigned int old_mapping_data_index = numbers::invalid_unsigned_int;

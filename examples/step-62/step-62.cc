@@ -911,7 +911,7 @@ namespace step62
                           const Tensor<2, dim> grad_phi_j =
                             fe_values[displacement].gradient(j, q);
 
-                          // calculate the values of the mass matrix.
+                          // calculate the values of the @ref GlossMassMatrix "mass matrix".
                           quadrature_data.mass_coefficient[i][j] =
                             rho_values[q] * xi * phi_i * phi_j;
 

@@ -688,7 +688,7 @@ public:
    * Return the norm of the vector <i>v</i> with respect to the norm induced
    * by this matrix, i.e. <i>v<sup>T</sup>Mv)</i>. This is useful, e.g. in the
    * finite element context, where the <i>L<sup>T</sup></i>-norm of a function
-   * equals the matrix norm with respect to the mass matrix of the vector
+   * equals the matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector
    * representing the nodal values of the finite element function. Note that
    * even though the function's name might suggest something different, for
    * historic reasons not the norm but its square is returned, as defined

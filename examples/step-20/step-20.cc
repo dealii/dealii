@@ -634,7 +634,7 @@ namespace Step20
     // After we have the pressure, we can compute the velocity. The equation
     // reads $MU=-BP+F$, and we solve it by first computing the right hand
     // side, and then multiplying it with the object that represents the
-    // inverse of the mass matrix:
+    // inverse of the @ref GlossMassMatrix "mass matrix":
     U = op_M_inv * (F - op_B * P);
   }
 

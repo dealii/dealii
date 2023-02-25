@@ -456,7 +456,7 @@ namespace FETools
    * After these quadrature approximations, we end up with a nodal
    * representation <tt>V<sub>h</sub></tt> of <tt>v<sub>h</sub></tt> that
    * satisfies the following system of linear equations: <tt>M V<sub>h</sub> =
-   * Q U</tt>, where <tt>M<sub>ij</sub>=(phi_i,phi_j)</tt> is the mass matrix
+   * Q U</tt>, where <tt>M<sub>ij</sub>=(phi_i,phi_j)</tt> is the @ref GlossMassMatrix "mass matrix"
    * approximated by <tt>lhs_quadrature</tt>, and <tt>Q</tt> is the matrix
    * <tt>Q<sub>iq</sub>=phi<sub>i</sub>(x<sub>q</sub>) w<sub>q</sub></tt>
    * where <tt>w<sub>q</sub></tt> are quadrature weights; <tt>U</tt> is the
@@ -766,7 +766,7 @@ namespace FETools
    *
    * The global projection can be computed by local matrices if the finite
    * element spaces are discontinuous. With continuous elements, this is
-   * impossible, since a global mass matrix must be inverted.
+   * impossible, since a global @ref GlossMassMatrix "mass matrix" must be inverted.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void

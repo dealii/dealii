@@ -3345,7 +3345,7 @@ public:
    * defined by the finite element passed to `fe_values`, and `j` taking
    * on a specified subset of `i`'s range, starting at `i` itself and ending at
    * the number of cell degrees of freedom. In this way, we can construct the
-   * upper half and the diagonal of a stiffness matrix contribution (assuming it
+   * upper half and the diagonal of a @ref GlossStiffnessMatrix "stiffness matrix" contribution (assuming it
    * is symmetric, and that only one half of it needs to be computed), for
    * example.
    *
@@ -3379,7 +3379,7 @@ public:
    * defined by the finite element passed to `fe_values`, and `j` taking
    * on a specified subset of `i`'s range, starting at zero and ending at
    * `i` itself. In this way, we can construct the lower half and the
-   * diagonal of a stiffness matrix contribution (assuming it is symmetric, and
+   * diagonal of a @ref GlossStiffnessMatrix "stiffness matrix" contribution (assuming it is symmetric, and
    * that only one half of it needs to be computed), for example.
    *
    * @note If the @p end_dof_index is equal to zero, then the returned index

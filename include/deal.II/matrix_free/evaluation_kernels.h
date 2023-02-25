@@ -5580,7 +5580,7 @@ namespace internal
 
 
   /**
-   * This struct implements the action of the inverse mass matrix operation
+   * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation
    * using an FEEvaluationData argument.
    */
   template <int dim, typename Number>
@@ -5697,7 +5697,7 @@ namespace internal
 
 
   /**
-   * This struct implements the action of the inverse mass matrix operation
+   * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation
    * using an FEEvaluationData argument.
    */
   template <int dim, typename Number>
@@ -5784,7 +5784,7 @@ namespace internal
 
 
   /**
-   * This struct implements the action of the inverse mass matrix operation
+   * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation
    * using an FEEvaluationData argument.
    */
   template <int dim, typename Number>

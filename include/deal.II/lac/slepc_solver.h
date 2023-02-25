@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The SLEPc solvers are intended to be used for solving the generalized
  * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$ is a
- * system matrix, $B$ is a mass matrix, and $\lambda, x$ are a set of
+ * system matrix, $B$ is a @ref GlossMassMatrix "mass matrix", and $\lambda, x$ are a set of
  * eigenvalues and eigenvectors respectively. The emphasis is on methods and
  * techniques appropriate for problems in which the associated matrices are
  * sparse. Most of the methods offered by the SLEPc library are projection

@@ -75,7 +75,7 @@ $k_n$:
   \theta F^n
   \right],
 @f}
-where $M$ is the mass matrix and $A$ is the stiffness matrix that results from
+where $M$ is the @ref GlossMassMatrix "mass matrix" and $A$ is the @ref GlossStiffnessMatrix "stiffness matrix" that results from
 discretizing the Laplacian. Bringing all known quantities to the right hand
 side yields the linear system we have to solve in every step:
 @f{align*}

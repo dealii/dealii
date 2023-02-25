@@ -596,7 +596,7 @@ namespace Step56
   // @sect4{StokesProblem::assemble_system}
 
   // In this function, the system matrix is assembled. We assemble the pressure
-  // mass matrix in the (1,1) block (if needed) and move it out of this location
+  // @ref GlossMassMatrix "mass matrix" in the (1,1) block (if needed) and move it out of this location
   // at the end of this function.
   template <int dim>
   void StokesProblem<dim>::assemble_system()

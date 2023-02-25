@@ -401,7 +401,7 @@ public:
    * Return the square of the norm of the vector <tt>v</tt> induced by this
    * matrix, i.e. <i>(v,Mv)</i>. This is useful, e.g. in the finite element
    * context, where the <i>L<sup>2</sup></i> norm of a function equals the
-   * matrix norm with respect to the mass matrix of the vector representing
+   * matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector representing
    * the nodal values of the finite element function.
    *
    * Obviously, the matrix needs to be quadratic for this operation, and for

@@ -801,7 +801,7 @@
   \begin{array}{cc} M & B \\ B^T & 0 \end{array}
   \right),
 @f}
- * where $M$ represents the mass matrix that results from discretizing the
+ * where $M$ represents the @ref GlossMassMatrix "mass matrix" that results from discretizing the
  * identity operator $\mathbf 1$ and $B$ the equivalent of the gradient
  * operator.
  *

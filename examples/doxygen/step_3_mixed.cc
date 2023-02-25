@@ -278,7 +278,7 @@ void Step3::setup_system()
 //    cell - a reference to the right FEValues object (constructed
 //    with the correct mapping object, finite element, and quadrature rule),
 //    which can be used as usual to compute the cell integrals.
-//  - The cell-local stiffness matrix and the right-hand-side vector have
+//  - The cell-local @ref GlossStiffnessMatrix "stiffness matrix" and the right-hand-side vector have
 //    different sizes depending on the cell type (6 DoFs vs. 9 DoFs) so that
 //    they might need to be resized for each cell.
 //

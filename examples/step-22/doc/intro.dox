@@ -448,7 +448,7 @@ elaborate preconditioning scheme for the Schur complement.
 
 <li>
 Second, every time we multiplied with $B^TM^{-1}B$ we had to solve with the
-mass matrix $M$. This wasn't particularly difficult, however, since the mass
+@ref GlossMassMatrix "mass matrix" $M$. This wasn't particularly difficult, however, since the mass
 matrix is always well conditioned and so simple to invert using CG and a
 little bit of preconditioning.
 </ol>
@@ -484,7 +484,7 @@ this Schur complement in a straightforward way with the CG method:
 using no preconditioner, the condition number of the Schur complement matrix
 depends on the size ratios of the largest to the smallest cells, and one still
 needs on the order of 50-100 CG iterations. However, there is a simple cure:
-precondition with the mass matrix on the pressure space and we get down to a
+precondition with the @ref GlossMassMatrix "mass matrix" on the pressure space and we get down to a
 number between 5-15 CG iterations, pretty much independently of the structure
 of the mesh (take a look at the <a href="#Results">results section</a> of this
 program to see that indeed the number of CG iterations does not change as we

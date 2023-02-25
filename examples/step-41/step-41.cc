@@ -68,7 +68,7 @@ namespace Step41
   // (unconstrained) form of the linear system
   // (<code>complete_system_matrix</code> and
   // <code>complete_system_rhs</code>) as well as the active set itself and
-  // the diagonal of the mass matrix $B$ used in scaling Lagrange multipliers
+  // the diagonal of the @ref GlossMassMatrix "mass matrix" $B$ used in scaling Lagrange multipliers
   // in the active set formulation. The rest is as in step-4:
   template <int dim>
   class ObstacleProblem

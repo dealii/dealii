@@ -377,7 +377,7 @@ namespace BlackScholesSolver
 
   // The next function sets up the DoFHandler object, computes
   // the constraints, and sets the linear algebra objects to their correct
-  // sizes. We also compute the mass matrix here by calling a function from the
+  // sizes. We also compute the @ref GlossMassMatrix "mass matrix" here by calling a function from the
   // library. We will compute the other 3 matrices next, because these need to
   // be computed 'by hand'.
   //

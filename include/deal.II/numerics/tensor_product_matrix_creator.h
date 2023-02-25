@@ -54,7 +54,7 @@ namespace TensorProductMatrixCreator
   };
 
   /**
-   * Create 1d mass matrix and 1d derivative matrix for a scalar
+   * Create 1d @ref GlossMassMatrix "mass matrix" and 1d derivative matrix for a scalar
    * constant-coefficient
    * Laplacian for a @p dim dimensional Cartesian cell. Its boundary types
    * can be specified with @p boundary_ids. The cell extent (including the cell extent

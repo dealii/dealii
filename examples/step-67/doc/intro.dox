@@ -324,7 +324,7 @@ cells:
 where $\boldsymbol{\varphi}_i$ runs through all basis functions with from 1 to
 $n_\text{dofs}$.
 
-We now denote by $\mathcal M$ the mass matrix with entries $\mathcal M_{ij} =
+We now denote by $\mathcal M$ the @ref GlossMassMatrix "mass matrix" with entries $\mathcal M_{ij} =
 \sum_{K} \left(\boldsymbol{\varphi}_i,
 \boldsymbol{\varphi}_j\right)_K$, and by
 @f[

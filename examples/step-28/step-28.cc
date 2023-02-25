@@ -842,7 +842,7 @@ namespace Step28
   {
     // The first case is that both cells are no further refined. In that case,
     // we can assemble the relevant terms (see the introduction). This
-    // involves assembling the mass matrix on the finer of the two cells (in
+    // involves assembling the @ref GlossMassMatrix "mass matrix" on the finer of the two cells (in
     // fact there are two mass matrices with different coefficients, one for
     // the fission distribution cross section $\chi_g\nu\Sigma_{f,g'}$ and one
     // for the scattering cross section $\Sigma_{s,g'\to g}$). This is

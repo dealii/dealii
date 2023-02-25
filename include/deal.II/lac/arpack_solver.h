@@ -129,7 +129,7 @@ dseupd_(int *         rvec,
  *
  * In this class we make use of the method applied to the generalized
  * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$ is a
- * system matrix, $B$ is a mass matrix, and $\lambda, x$ are a set of
+ * system matrix, $B$ is a @ref GlossMassMatrix "mass matrix", and $\lambda, x$ are a set of
  * eigenvalues and eigenvectors respectively.
  *
  * The ArpackSolver can be used in application codes with serial objects in
@@ -301,7 +301,7 @@ public:
    * this parameter is entirely unused.
    *
    * @param B The inner product of the underlying space, typically the mass
-   * matrix. For constrained problems, it can be a partial mass matrix, like
+   * matrix. For constrained problems, it can be a partial @ref GlossMassMatrix "mass matrix", like
    * for instance the velocity mass matrix of a Stokes problem. Only its
    * function <code>vmult()</code> is used.
    *

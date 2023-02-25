@@ -1231,7 +1231,7 @@ public:
    * situation could be where one wants to assemble of a right hand side
    * vector on a problem with inhomogeneous constraints, but the global matrix
    * has been assembled previously. A typical example of this is a time
-   * stepping algorithm where the stiffness matrix is assembled once, and the
+   * stepping algorithm where the @ref GlossStiffnessMatrix "stiffness matrix" is assembled once, and the
    * right hand side updated every time step. Note that, however, the entries
    * in the columns of the local matrix have to be exactly the same as those
    * that have been written into the global matrix. Otherwise, this function

@@ -2032,7 +2032,7 @@ namespace Step44
           }
       }
 
-    // Now we build the local cell stiffness matrix and RHS vector. Since the
+    // Now we build the local cell @ref GlossStiffnessMatrix "stiffness matrix" and RHS vector. Since the
     // global and local system matrices are symmetric, we can exploit this
     // property by building only the lower half of the local matrix and copying
     // the values to the upper half.  So we only assemble half of the

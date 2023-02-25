@@ -507,7 +507,7 @@ namespace Polynomials
    *
    * The degrees of freedom are the values at the vertices and the derivatives
    * at the midpoint. Currently, we do not scale the polynomials in any way,
-   * although better conditioning of the element stiffness matrix could
+   * although better conditioning of the element @ref GlossStiffnessMatrix "stiffness matrix" could
    * possibly be achieved with scaling.
    *
    * Calling the constructor with a given index <tt>p</tt> will generate the
@@ -661,7 +661,7 @@ namespace Polynomials
    * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=2x(x-1)$, and
    * $p_2(x)=x^2$, in accordance with the construction principle for degree 3.
    *
-   * These two relaxations improve the condition number of the mass matrix
+   * These two relaxations improve the condition number of the @ref GlossMassMatrix "mass matrix"
    * (i.e., interpolation) significantly, as can be seen from the following
    * table:
    *

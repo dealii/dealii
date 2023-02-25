@@ -469,7 +469,7 @@ these three cases, as follows:
     = (B_c M_{K_c})^{ij} \phi_{g'}^j,
   @f}
   where $M_{K_c}^{lj}=\int_{K_c} f(x) \varphi_{g'}^l(x) \varphi_{g'}^j(x)$ is
-  the weighted mass matrix on child $c$ of cell $K$.
+  the weighted @ref GlossMassMatrix "mass matrix" on child $c$ of cell $K$.
 
   The next question is what happens if a child $K_c$ of $K$ is not
   active. Then, we have to apply the process recursively, i.e. we have to

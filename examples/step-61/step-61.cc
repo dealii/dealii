@@ -461,7 +461,7 @@ namespace Step61
         coefficient.value_list(fe_values.get_quadrature_points(),
                                coefficient_values);
 
-        // The first cell matrix we will compute is the mass matrix
+        // The first cell matrix we will compute is the @ref GlossMassMatrix "mass matrix"
         // for the Raviart-Thomas space.  Hence, we need to loop over
         // all the quadrature points for the velocity FEValues object.
         cell_matrix_M = 0;

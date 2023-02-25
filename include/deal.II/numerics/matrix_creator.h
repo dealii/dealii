@@ -135,7 +135,7 @@ namespace hp
  * the coefficient @p a, as well as the degree of the given @p Mapping (if
  * any).
  *
- * Note, that for vector-valued elements the mass matrix and the laplace
+ * Note, that for vector-valued elements the @ref GlossMassMatrix "mass matrix" and the laplace
  * matrix is implemented in such a way that each component couples only with
  * itself, i.e. there is no coupling of shape functions belonging to different
  * components. If the degrees of freedom have been sorted according to their
@@ -195,7 +195,7 @@ namespace hp
 namespace MatrixCreator
 {
   /**
-   * Assemble the mass matrix. If no coefficient is given (i.e., if the
+   * Assemble the @ref GlossMassMatrix "mass matrix". If no coefficient is given (i.e., if the
    * pointer to a function object is zero as it is by default), the
    * coefficient is taken as being constant and equal to one.
    * In case you want to specify @p constraints and use the default argument
@@ -241,7 +241,7 @@ namespace MatrixCreator
       constraints = AffineConstraints<typename SparseMatrixType::value_type>());
 
   /**
-   * Assemble the mass matrix and a right hand side vector. If no coefficient
+   * Assemble the @ref GlossMassMatrix "mass matrix" and a right hand side vector. If no coefficient
    * is given (i.e., if the pointer to a function object is zero as it is by
    * default), the coefficient is taken as being constant and equal to one.
    * In case you want to specify @p constraints and use the default argument
@@ -354,7 +354,7 @@ namespace MatrixCreator
 
 
   /**
-   * Assemble the mass matrix and a right hand side vector along the boundary.
+   * Assemble the @ref GlossMassMatrix "mass matrix" and a right hand side vector along the boundary.
    *
    * The matrix is assumed to already be initialized with a suiting sparsity
    * pattern (the DoFHandler provides an appropriate function).

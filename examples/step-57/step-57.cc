@@ -179,7 +179,7 @@ namespace Step57
   // we solve this system via a direct solver for simplicity. The computation
   // involved in the second factor is a simple matrix-vector
   // multiplication. The Schur complement $\tilde{S}$ can be well approximated
-  // by the pressure mass matrix and its inverse can be obtained through an
+  // by the pressure @ref GlossMassMatrix "mass matrix" and its inverse can be obtained through an
   // inexact solver. Because the pressure mass matrix is symmetric and
   // positive definite, we can use CG to solve the corresponding linear
   // system.

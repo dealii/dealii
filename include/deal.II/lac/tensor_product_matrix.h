@@ -51,7 +51,7 @@ class FullMatrix;
  * @f}
  * in 3d. The typical application setting is a discretization of the Laplacian
  * $L$ on a Cartesian (axis-aligned) geometry, where it can be exactly
- * represented by the Kronecker or tensor product of a 1d mass matrix $M$ and
+ * represented by the Kronecker or tensor product of a 1d @ref GlossMassMatrix "mass matrix" $M$ and
  * a 1d Laplace matrix $A$ in each tensor direction (due to symmetry $M$ and $A$
  * are the same in each dimension). The dimension of the resulting class is the
  * product of the one-dimensional matrices.
@@ -155,7 +155,7 @@ public:
    * @warning This class accepts the following types:
    * "std::array<Table<2, Number>, dim>", "std::array<FullMatrix<Number>, dim>",
    * and "Table<2, Number>". In the latter case, we consider the same 1d
-   * mass matrix @p mass_matrix and the same 1d derivative matrix
+   * @ref GlossMassMatrix "mass matrix" @p mass_matrix and the same 1d derivative matrix
    * @p derivative_matrix for each tensor direction.
    */
   template <typename T>
@@ -239,7 +239,7 @@ public:
 
 protected:
   /**
-   * An array containing a mass matrix for each tensor direction.
+   * An array containing a @ref GlossMassMatrix "mass matrix" for each tensor direction.
    */
   std::array<Table<2, Number>, dim> mass_matrix;
 
@@ -343,7 +343,7 @@ namespace internal
  * A class similar to TensorProductMatrixSymmetricSum.
  *
  * The class TensorProductMatrixSymmetricSum stores a
- * 1d mass matrix, 1d stiffness matrix, eigenvalues and eigenvectors
+ * 1d @ref GlossMassMatrix "mass matrix", 1d @ref GlossStiffnessMatrix "stiffness matrix", eigenvalues and eigenvectors
  * for each direction. If one uses one TensorProductMatrixSymmetricSum
  * instance for, e.g., each cell, these quantities are stored
  * for each cell. There is no possibility to reuse quantities between

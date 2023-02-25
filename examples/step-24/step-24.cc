@@ -95,7 +95,7 @@ namespace Step24
     unsigned int timestep_number;
     const double theta;
 
-    //  Here's what's new: first, we need that boundary mass matrix $B$ that
+    //  Here's what's new: first, we need that boundary @ref GlossMassMatrix "mass matrix" $B$ that
     //  came out of the absorbing boundary condition. Likewise, since this
     //  time we consider a realistic medium, we must have a measure of the
     //  wave speed $c_0$ that will enter all the formulas with the Laplace

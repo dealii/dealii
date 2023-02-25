@@ -1847,7 +1847,7 @@ protected:
  *
  * This observation also translates to the case when different differential
  * operators are implemented in a program, for example the action of a mass
- * matrix for one phase of the algorithm and the action of a stiffness matrix
+ * matrix for one phase of the algorithm and the action of a @ref GlossStiffnessMatrix "stiffness matrix"
  * in another one. Only a single MatrixFree object is necessary, maintaining
  * full efficiency by using different local functions with the respective
  * implementation in separate FEEvaluation objects. In other words, a user

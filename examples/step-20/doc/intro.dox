@@ -476,7 +476,7 @@ then we can subdivide the linear system $Ax=b$ into the following blocks:
   \end{array}\right),
 @f}
 where $U,P$ are the values of velocity and pressure degrees of freedom,
-respectively, $M$ is the mass matrix on the velocity space, $B^T$ corresponds to
+respectively, $M$ is the @ref GlossMassMatrix "mass matrix" on the velocity space, $B^T$ corresponds to
 the negative divergence operator, and $B$ is its transpose and corresponds
 to the gradient.
 

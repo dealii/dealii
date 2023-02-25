@@ -65,7 +65,7 @@ namespace internal
  * different blocks in a block system. For example, a preconditioner for the
  * Oseen system can be built as a block system, where the pressure block is of
  * the form <b>M</b><sup>-1</sup><b>FA</b><sup>-1</sup> with <b>M</b> the
- * pressure mass matrix, <b>A</b> the pressure Laplacian and <b>F</b> the
+ * pressure @ref GlossMassMatrix "mass matrix", <b>A</b> the pressure Laplacian and <b>F</b> the
  * advection diffusion operator applied to the pressure space. Since only a
  * single matrix is needed for the other blocks, using BlockSparseMatrix or
  * similar would be a waste of memory.

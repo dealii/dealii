@@ -279,7 +279,7 @@ fully discrete problem at time step $n$:
 where $\mathbf{u}_t^{*}$ is the velocity linearly extrapolated from
 $\mathbf{u}^{(n_p)}_t$ and $\mathbf{u}^{(n_{pp})}_t$ to the current time $t^{(n)}$ if $\theta<\theta^*$ while $\mathbf{u}_t^{*}$ is $\mathbf{u}^{(n_p)}_t$ if $\theta>\theta^*$.
 Consequently, the equation is linear in $S_h^{(n)}$ and all that is required
-is to solve with a mass matrix on the saturation space.
+is to solve with a @ref GlossMassMatrix "mass matrix" on the saturation space.
 
 Since the Dirichlet boundary conditions for saturation are only imposed on the
 inflow boundaries, the third term on the left hand side of the equation above

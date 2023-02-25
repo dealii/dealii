@@ -185,7 +185,7 @@ get the equations
  &[BU-G]_i \geq 0, \quad \Lambda_i \leq 0,\quad \Lambda_i[BU-G]_i = 0
 \qquad \forall i.&
 @f}
-where $B$ is the mass matrix on the chosen finite element space and the
+where $B$ is the @ref GlossMassMatrix "mass matrix" on the chosen finite element space and the
 indices $i$ above are for all degrees of freedom in the set $\cal S$ of degrees of
 freedom located in the interior of the domain
 (we have Dirichlet conditions on the perimeter). However, we

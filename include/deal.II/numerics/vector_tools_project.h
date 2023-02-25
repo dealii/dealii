@@ -66,7 +66,7 @@ namespace VectorTools
    *   (\varphi_i, f_h)_\Omega = (\varphi_i,f)_\Omega
    * @f}
    * for all test functions $\varphi_i$. This requires solving a linear system
-   * involving the mass matrix since the equation above is equivalent to
+   * involving the @ref GlossMassMatrix "mass matrix" since the equation above is equivalent to
    * the linear system
    * @f{align*}{
    *   \sum_j (\varphi_i, \varphi_j)_\Omega F_j = (\varphi_i,f)_\Omega
@@ -102,7 +102,7 @@ namespace VectorTools
    * therefore make sure that the given quadrature formula is sufficiently
    * accurate for creating the right-hand side.
    *
-   * Otherwise, only serial Triangulations are supported and the mass matrix
+   * Otherwise, only serial Triangulations are supported and the @ref GlossMassMatrix "mass matrix"
    * is assembled using MatrixTools::create_mass_matrix. The given
    * quadrature rule is then used for both the matrix and the right-hand side.
    * You should therefore make sure that the given quadrature formula is also

@@ -280,7 +280,7 @@ We note that here and in the following, the indices $k,l$ run over spatial
 directions, i.e. $0\le k,l < d$, and that indices $i,j$ run over degrees
 of freedom.
 
-The local stiffness matrix on cell $K$ therefore has the following entries:
+The local @ref GlossStiffnessMatrix "stiffness matrix" on cell $K$ therefore has the following entries:
 @f[
   A^K_{ij}
   =

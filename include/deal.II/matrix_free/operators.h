@@ -598,7 +598,7 @@ namespace MatrixFreeOperators
 
   /**
    * This class implements the operation of the action of the inverse of a
-   * mass matrix on an element for the special case of an evaluation object
+   * @ref GlossMassMatrix "mass matrix" on an element for the special case of an evaluation object
    * with as many quadrature points as there are cell degrees of freedom. It
    * uses algorithms from FEEvaluation and produces the exact mass matrix for
    * DGQ elements. This algorithm uses tensor products of inverse 1d shape
@@ -637,7 +637,7 @@ namespace MatrixFreeOperators
                              VectorizedArrayType> &fe_eval);
 
     /**
-     * Applies the inverse mass matrix operation on an input array. It is
+     * Applies the inverse @ref GlossMassMatrix "mass matrix" operation on an input array. It is
      * assumed that the passed input and output arrays are of correct size,
      * namely FEEvaluation::dofs_per_cell long. The inverse of the
      * local coefficient (also containing the inverse JxW values) must be
@@ -651,7 +651,7 @@ namespace MatrixFreeOperators
           VectorizedArrayType *                     out_array) const;
 
     /**
-     * Applies the inverse mass matrix operation on an input array, using the
+     * Applies the inverse @ref GlossMassMatrix "mass matrix" operation on an input array, using the
      * inverse of the JxW values provided by the `fe_eval` argument passed to
      * the constructor of this class. Note that the user code must call
      * FEEvaluation::reinit() on the underlying evaluator to make the
@@ -726,7 +726,7 @@ namespace MatrixFreeOperators
 
 
   /**
-   * This class implements the operation of the action of a mass matrix.
+   * This class implements the operation of the action of a @ref GlossMassMatrix "mass matrix".
    *
    * @note This class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
@@ -766,7 +766,7 @@ namespace MatrixFreeOperators
     compute_diagonal() override;
 
     /**
-     * Compute the lumped mass matrix. This is equal to the mass matrix times a
+     * Compute the lumped @ref GlossMassMatrix "mass matrix". This is equal to the mass matrix times a
      * vector of all ones and is equivalent to approximating the mass matrix
      * with a nodal quadrature rule.
      *
@@ -797,7 +797,7 @@ namespace MatrixFreeOperators
 
   private:
     /**
-     * Applies the mass matrix operation on an input vector. It is
+     * Applies the @ref GlossMassMatrix "mass matrix" operation on an input vector. It is
      * assumed that the passed input and output vector are correctly initialized
      * using initialize_dof_vector().
      */
