@@ -71,7 +71,7 @@ namespace parallel
 {
   namespace distributed
   {
-    template <int, int>
+    template <int dim, int spacedim>
     class Triangulation;
   }
 } // namespace parallel

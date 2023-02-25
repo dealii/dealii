@@ -39,6 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation;
 template <typename Accessor>
 class TriaRawIterator;
@@ -1870,6 +1871,7 @@ private:
 
 private:
   template <int, int>
+  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   friend class Triangulation;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
@@ -4170,6 +4172,7 @@ private:
   set_direction_flag(const bool new_direction_flag) const;
 
   template <int, int>
+  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   friend class Triangulation;
 
   template <int, int>
