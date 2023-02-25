@@ -1,0 +1,94 @@
+
+DEAL:1D::ReferenceCell: Line
+DEAL:1D::Face=0, vertex=0, location=0.00000
+DEAL:1D::Face=1, vertex=0, location=1.00000
+DEAL:2D::ReferenceCell: Quad
+DEAL:2D::Face=0, vertex=0, location=0.00000 0.00000
+DEAL:2D::Face=0, vertex=1, location=0.00000 1.00000
+DEAL:2D::Face=1, vertex=0, location=1.00000 0.00000
+DEAL:2D::Face=1, vertex=1, location=1.00000 1.00000
+DEAL:2D::Face=2, vertex=0, location=0.00000 0.00000
+DEAL:2D::Face=2, vertex=1, location=1.00000 0.00000
+DEAL:2D::Face=3, vertex=0, location=0.00000 1.00000
+DEAL:2D::Face=3, vertex=1, location=1.00000 1.00000
+DEAL:2D::ReferenceCell: Tri
+DEAL:2D::Face=0, vertex=0, location=0.00000 0.00000
+DEAL:2D::Face=0, vertex=1, location=1.00000 0.00000
+DEAL:2D::Face=1, vertex=0, location=1.00000 0.00000
+DEAL:2D::Face=1, vertex=1, location=0.00000 1.00000
+DEAL:2D::Face=2, vertex=0, location=0.00000 1.00000
+DEAL:2D::Face=2, vertex=1, location=0.00000 0.00000
+DEAL:3D::ReferenceCell: Tet
+DEAL:3D::Face=0, vertex=0, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=0, vertex=1, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=0, vertex=2, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=1, vertex=0, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=1, vertex=1, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=1, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=2, vertex=0, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=2, vertex=1, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=2, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=3, vertex=0, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=3, vertex=1, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=3, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::Face=0, vertex=0, location=-1.00000 -1.00000 0.00000
+DEAL:3D::Face=0, vertex=1, location=1.00000 -1.00000 0.00000
+DEAL:3D::Face=0, vertex=2, location=-1.00000 1.00000 0.00000
+DEAL:3D::Face=0, vertex=3, location=1.00000 1.00000 0.00000
+DEAL:3D::Face=1, vertex=0, location=-1.00000 -1.00000 0.00000
+DEAL:3D::Face=1, vertex=1, location=-1.00000 1.00000 0.00000
+DEAL:3D::Face=1, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=2, vertex=0, location=1.00000 1.00000 0.00000
+DEAL:3D::Face=2, vertex=1, location=1.00000 -1.00000 0.00000
+DEAL:3D::Face=2, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=3, vertex=0, location=1.00000 -1.00000 0.00000
+DEAL:3D::Face=3, vertex=1, location=-1.00000 -1.00000 0.00000
+DEAL:3D::Face=3, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=4, vertex=0, location=-1.00000 1.00000 0.00000
+DEAL:3D::Face=4, vertex=1, location=1.00000 1.00000 0.00000
+DEAL:3D::Face=4, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::Face=0, vertex=0, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=0, vertex=1, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=0, vertex=2, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=1, vertex=0, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=1, vertex=1, location=1.00000 0.00000 1.00000
+DEAL:3D::Face=1, vertex=2, location=0.00000 1.00000 1.00000
+DEAL:3D::Face=2, vertex=0, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=2, vertex=1, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=2, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=2, vertex=3, location=1.00000 0.00000 1.00000
+DEAL:3D::Face=3, vertex=0, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=3, vertex=1, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=3, vertex=2, location=1.00000 0.00000 1.00000
+DEAL:3D::Face=3, vertex=3, location=0.00000 1.00000 1.00000
+DEAL:3D::Face=4, vertex=0, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=4, vertex=1, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=4, vertex=2, location=0.00000 1.00000 1.00000
+DEAL:3D::Face=4, vertex=3, location=0.00000 0.00000 1.00000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::Face=0, vertex=0, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=0, vertex=1, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=0, vertex=2, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=0, vertex=3, location=0.00000 1.00000 1.00000
+DEAL:3D::Face=1, vertex=0, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=1, vertex=1, location=1.00000 1.00000 0.00000
+DEAL:3D::Face=1, vertex=2, location=1.00000 0.00000 1.00000
+DEAL:3D::Face=1, vertex=3, location=1.00000 1.00000 1.00000
+DEAL:3D::Face=2, vertex=0, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=2, vertex=1, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=2, vertex=2, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=2, vertex=3, location=1.00000 0.00000 1.00000
+DEAL:3D::Face=3, vertex=0, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=3, vertex=1, location=0.00000 1.00000 1.00000
+DEAL:3D::Face=3, vertex=2, location=1.00000 1.00000 0.00000
+DEAL:3D::Face=3, vertex=3, location=1.00000 1.00000 1.00000
+DEAL:3D::Face=4, vertex=0, location=0.00000 0.00000 0.00000
+DEAL:3D::Face=4, vertex=1, location=1.00000 0.00000 0.00000
+DEAL:3D::Face=4, vertex=2, location=0.00000 1.00000 0.00000
+DEAL:3D::Face=4, vertex=3, location=1.00000 1.00000 0.00000
+DEAL:3D::Face=5, vertex=0, location=0.00000 0.00000 1.00000
+DEAL:3D::Face=5, vertex=1, location=1.00000 0.00000 1.00000
+DEAL:3D::Face=5, vertex=2, location=0.00000 1.00000 1.00000
+DEAL:3D::Face=5, vertex=3, location=1.00000 1.00000 1.00000
