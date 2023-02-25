@@ -105,6 +105,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup geomprimitives
  */
 template <int dim, typename Number = double>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point : public Tensor<1, dim, Number>
 {
 public:

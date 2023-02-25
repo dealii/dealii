@@ -27,8 +27,11 @@ template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
 class Mapping;
+
 template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point;
+
 template <typename Number>
 class Vector;
 namespace hp
