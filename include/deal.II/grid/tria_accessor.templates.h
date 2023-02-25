@@ -375,11 +375,10 @@ TriaAccessorBase<structdim, dim, spacedim>::objects() const
 /*---------------------- Functions: InvalidAccessor -------------------------*/
 
 template <int structdim, int dim, int spacedim>
-InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
-  const Triangulation<dim, spacedim> *,
-  const int,
-  const int,
-  const AccessorData *)
+InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(const void *,
+                                                           const int,
+                                                           const int,
+                                                           const AccessorData *)
 {
   Assert(false,
          ExcMessage("You are attempting an invalid conversion between "
@@ -544,27 +543,23 @@ InvalidAccessor<structdim, dim, spacedim>::vertex(const unsigned int) const
 
 
 template <int structdim, int dim, int spacedim>
-inline typename dealii::internal::TriangulationImplementation::
-  Iterators<dim, spacedim>::line_iterator
-  InvalidAccessor<structdim, dim, spacedim>::line(const unsigned int) const
+inline void *
+InvalidAccessor<structdim, dim, spacedim>::line(const unsigned int) const
 {
   // nothing to do here. we could throw an exception but we can't get here
   // without first creating an object which would have already thrown
-  return typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::line_iterator();
+  return nullptr;
 }
 
 
 
 template <int structdim, int dim, int spacedim>
-inline typename dealii::internal::TriangulationImplementation::
-  Iterators<dim, spacedim>::quad_iterator
-  InvalidAccessor<structdim, dim, spacedim>::quad(const unsigned int) const
+inline void *
+InvalidAccessor<structdim, dim, spacedim>::quad(const unsigned int) const
 {
   // nothing to do here. we could throw an exception but we can't get here
   // without first creating an object which would have already thrown
-  return typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::quad_iterator();
+  return nullptr;
 }
 
 
