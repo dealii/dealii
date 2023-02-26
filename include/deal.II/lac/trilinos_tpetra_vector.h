@@ -40,6 +40,41 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Type trait indicating if a certain number type has been explicitly
+ * instantiated in Tpetra. deal.II only supports those number types in Tpetra
+ * wrapper classes.
+ */
+template <typename Number>
+struct is_tpetra_type : std::false_type
+{};
+
+#  ifdef HAVE_TPETRA_INST_FLOAT
+template <>
+struct is_tpetra_type<float> : std::true_type
+{};
+#  endif
+
+#  ifdef HAVE_TPETRA_INST_DOUBLE
+template <>
+struct is_tpetra_type<double> : std::true_type
+{};
+#  endif
+
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
+#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+template <>
+struct is_tpetra_type<std::complex<float>> : std::true_type
+{};
+#    endif
+
+#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+template <>
+struct is_tpetra_type<std::complex<double>> : std::true_type
+{};
+#    endif
+#  endif
+
 namespace LinearAlgebra
 {
   // Forward declaration

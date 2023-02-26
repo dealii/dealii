@@ -575,7 +575,9 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
-  void
+  template <typename Dummy>
+  std::enable_if_t<std::is_same<Dummy, Number>::value &&
+                   dealii::is_tpetra_type<Number>::value>
   ReadWriteVector<Number>::import(
     const Tpetra::Vector<Number, int, types::signed_global_dof_index> &vector,
     const IndexSet &        source_elements,
@@ -858,7 +860,9 @@ namespace LinearAlgebra
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
-  void
+  template <typename Dummy>
+  std::enable_if_t<std::is_same<Dummy, Number>::value &&
+                   dealii::is_tpetra_type<Number>::value>
   ReadWriteVector<Number>::import(
     const LinearAlgebra::TpetraWrappers::Vector<Number> &trilinos_vec,
     VectorOperation::values                              operation,

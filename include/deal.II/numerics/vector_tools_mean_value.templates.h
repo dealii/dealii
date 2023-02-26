@@ -269,6 +269,21 @@ namespace VectorTools
     // TODO: no vector access using operator()
     AssertThrow(false, ExcNotImplemented());
   }
+
+
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template <int dim, int spacedim, typename ValueType>
+  void
+  add_constant(LinearAlgebra::TpetraWrappers::Vector<ValueType> &,
+               const DoFHandler<dim, spacedim> &,
+               const unsigned int,
+               const ValueType)
+  {
+    // TODO: no vector access using operator()
+    AssertThrow(false, ExcNotImplemented());
+  }
+#  endif
 #endif
 
 
