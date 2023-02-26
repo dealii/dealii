@@ -952,7 +952,7 @@ namespace internal
       std::enable_if_t<has_apply<PreconditionerType>, U>
       finalize_after_convergence(const unsigned int iteration_index)
       {
-        if (iteration_index % 2 == 1 || iteration_index == 2)
+        if (iteration_index % 2 == 1)
           this->x.add(this->alpha, this->p);
         else
           {
@@ -968,9 +968,9 @@ namespace internal
             // previous_beta has not been applied at this stage, allowing us
             // to recover the previous search direction
             const Number alpha_plus_previous_alpha_over_beta =
-              this->alpha + this->previous_alpha / this->previous_beta;
+              this->alpha + this->previous_alpha / this->beta;
             const Number previous_alpha_over_beta =
-              this->previous_alpha / this->previous_beta;
+              this->previous_alpha / this->beta;
 
             DEAL_II_OPENMP_SIMD_PRAGMA
             for (unsigned int j = 0; j < end_range; ++j)
