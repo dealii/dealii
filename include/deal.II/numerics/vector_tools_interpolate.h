@@ -27,6 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number>
 class AffineConstraints;
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 template <typename number>
 class FullMatrix;

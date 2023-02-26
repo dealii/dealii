@@ -311,6 +311,7 @@ namespace parallel
  * @ingroup dofs
  */
 template <int dim, int spacedim = dim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler : public Subscriptor
 {
   using ActiveSelector =
