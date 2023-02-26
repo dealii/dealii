@@ -2135,7 +2135,7 @@ DoFHandler<dim, spacedim>::distribute_dofs(
       "in the constructor before you can distribute DoFs."));
   Assert(this->tria->n_levels() > 0,
          ExcMessage("The Triangulation you are using is empty!"));
-  Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
+  Assert(ff.size() > 0, ExcMessage("The given hp::FECollection is empty!"));
 
   //
   // register the new finite element collection
