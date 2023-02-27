@@ -827,7 +827,7 @@ namespace internal
                 v[j] = Number();
               }
           }
-        else if (iteration_index % 2 == 0)
+        else if (iteration_index % 2 == 0 && beta != Number())
           {
             for (unsigned int j = start_range; j < end_regular; j += n_lanes)
               {
@@ -849,6 +849,37 @@ namespace internal
               {
                 r[j] -= alpha * v[j];
                 p[j] = beta * p[j] + this->preconditioner.apply(j, r[j]);
+                v[j] = Number();
+              }
+          }
+        else if (iteration_index % 2 == 0 && beta == Number())
+          {
+            // Case where beta is zero: we cannot reconstruct p_{j-1} in the
+            // next iteration, and must hence compute x here. This can happen
+            // before termination
+            for (unsigned int j = start_range; j < end_regular; j += n_lanes)
+              {
+                VectorizedArray<Number> rj, xj, vj, pj, prec_rj;
+                rj.load(r + j);
+                vj.load(v + j);
+                xj.load(x + j);
+                pj.load(p + j);
+                xj += alpha * pj;
+                xj.store(x + j);
+                rj -= alpha * vj;
+                rj.store(r + j);
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int l = 0; l < n_lanes; ++l)
+                  prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
+                prec_rj.store(p + j);
+                rj = VectorizedArray<Number>();
+                rj.store(v + j);
+              }
+            for (unsigned int j = end_regular; j < end_range; ++j)
+              {
+                r[j] -= alpha * v[j];
+                x[j] += alpha * p[j];
+                p[j] = this->preconditioner.apply(j, r[j]);
                 v[j] = Number();
               }
           }
@@ -952,7 +983,7 @@ namespace internal
       std::enable_if_t<has_apply<PreconditionerType>, U>
       finalize_after_convergence(const unsigned int iteration_index)
       {
-        if (iteration_index % 2 == 1)
+        if (iteration_index % 2 == 1 || this->beta == Number())
           this->x.add(this->alpha, this->p);
         else
           {
@@ -1019,7 +1050,7 @@ namespace internal
                 v += length;
               }
           }
-        else if (iteration_index % 2 == 0)
+        else if (iteration_index % 2 == 0 && beta != Number())
           {
             for (unsigned int j = start_range; j < end_range; j += grain_size)
               {
@@ -1035,6 +1066,33 @@ namespace internal
                 for (unsigned int i = 0; i < length; ++i)
                   {
                     p[i] = this->beta * p[i] + prec_r[i];
+                    v[i] = Number();
+                  }
+                p += length;
+                r += length;
+                v += length;
+              }
+          }
+        else if (iteration_index % 2 == 0 && beta == Number())
+          {
+            // Case where beta is zero: We cannot reconstruct p_{j-1} in the
+            // next iteration, and must hence compute x here. This can happen
+            // before termination
+            for (unsigned int j = start_range; j < end_range; j += grain_size)
+              {
+                const unsigned int length = std::min(grain_size, end_range - j);
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  r[i] -= this->alpha * v[i];
+                this->preconditioner.apply_to_subrange(j,
+                                                       j + length,
+                                                       r,
+                                                       prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    x[i] += this->alpha * p[i];
+                    p[i] = prec_r[i];
                     v[i] = Number();
                   }
                 p += length;
@@ -1161,7 +1219,7 @@ namespace internal
       std::enable_if_t<!has_apply<PreconditionerType>, U>
       finalize_after_convergence(const unsigned int iteration_index)
       {
-        if (iteration_index % 2 == 1 || iteration_index == 2)
+        if (iteration_index % 2 == 1 || this->beta == Number())
           this->x.add(this->alpha, this->p);
         else
           {
@@ -1171,9 +1229,9 @@ namespace internal
             Number *     r = this->r.begin();
             Number *     p = this->p.begin();
             const Number alpha_plus_previous_alpha_over_beta =
-              this->alpha + this->previous_alpha / this->previous_beta;
+              this->alpha + this->previous_alpha / this->beta;
             const Number previous_alpha_over_beta =
-              this->previous_alpha / this->previous_beta;
+              this->previous_alpha / this->beta;
 
             constexpr unsigned int         grain_size = 128;
             std::array<Number, grain_size> prec_r;
