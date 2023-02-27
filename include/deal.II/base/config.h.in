@@ -173,20 +173,6 @@
 #endif
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
-// clang++ assumes that all constexpr functions are __host__ __device__ when
-// compiling CUDA code, i.e, when Kokkos was configured with CUDA support.
-// This is problematic when calling non-constexpr functions in constexpr
-// functions. Also, we intend constexpr functions to only be device-callable if
-// not marked with DEAL_II_HOST_DEVICE. Hence, just annotate constexpr
-// functions additionally with "__host__".
-#if defined(DEAL_II_CONSTEXPR)
-#  if defined(__clang__) && defined(__CUDA__)
-#    define DEAL_II_CONSTEXPR_FUNCTION DEAL_II_CONSTEXPR __host__
-#  else
-#    define DEAL_II_CONSTEXPR_FUNCTION DEAL_II_CONSTEXPR
-#  endif
-#endif
-
 
 // defined for backwards compatibility with older deal.II versions
 #define DEAL_II_WITH_CXX11
