@@ -1276,6 +1276,74 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossLumpedMassMatrix <b>Lumped mass matrix</b></dt>
+ * <dd>The @ref GlossMassMatrix "mass matrix" is a matrix of the form
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * It frequently appears in the solution of time dependent problems where, if
+ * one uses an explicit time stepping method, it then leads to the need
+ * to solve problems of the form
+ *   @f{align*}{
+ *     MU^n = MU^{n-1} + k_n BU^{n-1},
+ *   @f}
+ * in time step $n$, where $U^n$ is the solution to be computed, $U^{n-1}$ is the
+ * known solution from the first time step, and $B$ is a matrix related to the
+ * differential operator in the PDE. $k_n$ is the size of the time step. A similar
+ * linear system of equations also arises out of the discretization of second-order
+ * differential equations.
+ *
+ * The presence of the matrix $M$ on the left side is a nuisance because, even
+ * though we have used an explicit time stepping method, we still have to solve a
+ * linear system in each time step. It would be much preferable if the matrix were
+ * diagonal. "Lumping" the mass matrix is a strategy to replace $M$ by a matrix
+ * $M_\text{diagonal}$ that actually is diagonal, yet does not destroy the accuracy
+ * of the resulting solution.
+ *
+ * Historically, mass lumping was performed by adding the elements of a row
+ * together and setting the diagonal entries of $M_\text{diagonal}$ to that
+ * sum. This works for $Q_1$ and $P_1$ elements, for example, and can be
+ * understood mechanically by replacing the continuous medium we are
+ * discretizating by one where the continuous mass distribution is replaced by
+ * one where (finite amounts of) mass are located only at the nodes. That is,
+ * we are "lumping together" the mass of an element at its vertices, thus
+ * giving rise to the name "lumped mass matrix". A more mathematical perspective
+ * is to compute the integral above for $M_{ij}$ via special quadrature rules;
+ * in particular, we replace the computation of
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx
+ *            = \sum_K \int_K \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * by quadrature
+ *   @f{align*}{
+ *     (M_{\text{diagonal}})_{ij} = \sum_K \sum_q \varphi_i(\mathbf x_q^K) \varphi_j(\mathbf x_q^K)
+ *     |K| w_q,
+ *   @f}
+ * where we choose the quadrature points as the *nodes* at which the
+ * shape functions are defined. If we order the quadrature points in the
+ * same way as the shape functions, then
+ *   @f{align*}{
+ *     \varphi_i(\mathbf x_q^K) = \delta_{iq},
+ *   @f}
+ * and consequently
+ *   @f{align*}{
+ *     (M_{\text{diagonal}})_{ij} = \delta_{ij} \sum_{K, \text{supp}\varphi_i \cap K \neq \emptyset} |K| w_i,
+ *   @f}
+ * where the sum extends over those cells on which $\varphi_i$ is nonzero.
+ * The so-computed mass matrix is therefore diagonal.
+ *
+ * Whether or not this particular choice of quadrature formula is
+ * sufficient to retain the convergence rate of the discretization is
+ * a separate question. For the usual $Q_k$ finite elements
+ * (implemented by FE_Q and FE_DGQ), the appropriate quadrature
+ * formulas are of QGaussLobatto type. Mass lumping can also be done
+ * with FE_SimplexP_Bubbles, for example, if appropriate quadrature rules
+ * are chosen.
+ *
+ * For an example of where lumped mass matrices play a role, see step-69.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossManifoldIndicator <b>%Manifold indicator</b></dt>
  *
  * <dd> Every object that makes up a Triangulation (cells, faces,
@@ -1368,6 +1436,8 @@
  * step-23, step-26, and a number of the other time dependent equations solved by
  * tutorial programs.
  *
+ * The mass matrix is occasionally approximated by a diagonal matrix,
+ * see the glossary entry for @ref GlossLumpedMassMatrix "lumped mass matrix".
  * See also the @ref GlossStiffnessMatrix "stiffness matrix"
  * for a related case.
  * </dt>
