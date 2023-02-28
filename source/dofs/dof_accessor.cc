@@ -42,7 +42,7 @@ const unsigned int
 
 template <int structdim, int dim, int spacedim>
 DoFInvalidAccessor<structdim, dim, spacedim>::DoFInvalidAccessor(
-  const Triangulation<dim, spacedim> *,
+  const void *,
   const int,
   const int,
   const AccessorData *)

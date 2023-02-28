@@ -605,10 +605,10 @@ public:
    * semantic sense, and we generate an exception when such an object is
    * actually generated.
    */
-  InvalidAccessor(const Triangulation<dim, spacedim> *parent     = nullptr,
-                  const int                           level      = -1,
-                  const int                           index      = -1,
-                  const AccessorData *                local_data = nullptr);
+  InvalidAccessor(const void *        parent     = nullptr,
+                  const int           level      = -1,
+                  const int           index      = -1,
+                  const AccessorData *local_data = nullptr);
 
   /**
    * Copy constructor.  This class is used for iterators that do not make
@@ -718,17 +718,15 @@ public:
    * Dummy function to extract lines. Returns a default-constructed line
    * iterator.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::line_iterator
-    line(const unsigned int i) const;
+  void *
+  line(const unsigned int i) const;
 
   /**
    * Dummy function to extract quads. Returns a default-constructed quad
    * iterator.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::quad_iterator
-    quad(const unsigned int i) const;
+  void *
+  quad(const unsigned int i) const;
 };
 
 
