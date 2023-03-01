@@ -28,6 +28,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * Standardized data struct to pipe additional data to SolverRelaxation. There
+ * is no data in here for relaxation methods.
+ */
+struct SolverRelaxationAdditionalData
+{};
+
+/**
  * Implementation of an iterative solver based on relaxation methods. The
  * stopping criterion is the norm of the residual.
  *
@@ -58,11 +65,9 @@ class SolverRelaxation : public SolverBase<VectorType>
 {
 public:
   /**
-   * Standardized data struct to pipe additional data to the solver. There is
-   * no data in here for relaxation methods.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {};
+  using AdditionalData = SolverRelaxationAdditionalData;
 
   /**
    * Constructor.

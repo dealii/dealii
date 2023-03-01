@@ -124,6 +124,87 @@ namespace internal
   } // namespace SolverGMRESImplementation
 } // namespace internal
 
+
+/**
+ * Standardized data struct to pipe additional data to the solver.
+ */
+struct SolverGMRESAdditionalData
+{
+  enum class OrthogonalizationStrategy
+  {
+    /**
+     * Use modified Gram-Schmidt algorithm.
+     */
+    modified_gram_schmidt,
+    /**
+     * Use classical Gram-Schmidt algorithm. Since this approach works on
+     * multi-vectors and performs a global reduction only once, it is
+     * more efficient than the modified Gram-Schmidt algorithm.
+     * However, it might be numerically unstable.
+     */
+    classical_gram_schmidt
+  };
+
+  /**
+   * Constructor. By default, set the number of temporary vectors to 30,
+   * i.e. do a restart every 28 iterations. Also set preconditioning from
+   * left, the residual of the stopping criterion to the default residual,
+   * and re-orthogonalization only if necessary. Also, the batched mode with
+   * reduced functionality to track information is disabled by default.
+   */
+  explicit SolverGMRESAdditionalData(
+    const unsigned int              max_n_tmp_vectors          = 30,
+    const bool                      right_preconditioning      = false,
+    const bool                      use_default_residual       = true,
+    const bool                      force_re_orthogonalization = false,
+    const bool                      batched_mode               = false,
+    const OrthogonalizationStrategy orthogonalization_strategy =
+      OrthogonalizationStrategy::modified_gram_schmidt);
+
+  /**
+   * Maximum number of temporary vectors. This parameter controls the size
+   * of the Arnoldi basis, which for historical reasons is
+   * #max_n_tmp_vectors-2. SolverGMRES assumes that there are at least three
+   * temporary vectors, so this value must be greater than or equal to three.
+   */
+  unsigned int max_n_tmp_vectors;
+
+  /**
+   * Flag for right preconditioning.
+   *
+   * @note Change between left and right preconditioning will also change
+   * the way residuals are evaluated. See the corresponding section in the
+   * SolverGMRES.
+   */
+  bool right_preconditioning;
+
+  /**
+   * Flag for the default residual that is used to measure convergence.
+   */
+  bool use_default_residual;
+
+  /**
+   * Flag to force re-orthogonalization of orthonormal basis in every step.
+   * If set to false, the solver automatically checks for loss of
+   * orthogonality every 5 iterations and enables re-orthogonalization only
+   * if necessary.
+   */
+  bool force_re_orthogonalization;
+
+  /**
+   * Flag to control whether a reduced mode of the solver should be
+   * run. This is necessary when running (several) SolverGMRES instances
+   * involving very small and cheap linear systems where the feedback from
+   * all signals, eigenvalue computations, and log stream are disabled.
+   */
+  bool batched_mode;
+
+  /**
+   * Strategy to orthogonalize vectors.
+   */
+  OrthogonalizationStrategy orthogonalization_strategy;
+};
+
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized Minimal
  * Residual Method. The stopping criterion is the norm of the residual.
@@ -193,84 +274,9 @@ class SolverGMRES : public SolverBase<VectorType>
 {
 public:
   /**
-   * Standardized data struct to pipe additional data to the solver.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    enum class OrthogonalizationStrategy
-    {
-      /**
-       * Use modified Gram-Schmidt algorithm.
-       */
-      modified_gram_schmidt,
-      /**
-       * Use classical Gram-Schmidt algorithm. Since this approach works on
-       * multi-vectors and performs a global reduction only once, it is
-       * more efficient than the modified Gram-Schmidt algorithm.
-       * However, it might be numerically unstable.
-       */
-      classical_gram_schmidt
-    };
-
-    /**
-     * Constructor. By default, set the number of temporary vectors to 30,
-     * i.e. do a restart every 28 iterations. Also set preconditioning from
-     * left, the residual of the stopping criterion to the default residual,
-     * and re-orthogonalization only if necessary. Also, the batched mode with
-     * reduced functionality to track information is disabled by default.
-     */
-    explicit AdditionalData(
-      const unsigned int              max_n_tmp_vectors          = 30,
-      const bool                      right_preconditioning      = false,
-      const bool                      use_default_residual       = true,
-      const bool                      force_re_orthogonalization = false,
-      const bool                      batched_mode               = false,
-      const OrthogonalizationStrategy orthogonalization_strategy =
-        OrthogonalizationStrategy::modified_gram_schmidt);
-
-    /**
-     * Maximum number of temporary vectors. This parameter controls the size
-     * of the Arnoldi basis, which for historical reasons is
-     * #max_n_tmp_vectors-2. SolverGMRES assumes that there are at least three
-     * temporary vectors, so this value must be greater than or equal to three.
-     */
-    unsigned int max_n_tmp_vectors;
-
-    /**
-     * Flag for right preconditioning.
-     *
-     * @note Change between left and right preconditioning will also change
-     * the way residuals are evaluated. See the corresponding section in the
-     * SolverGMRES.
-     */
-    bool right_preconditioning;
-
-    /**
-     * Flag for the default residual that is used to measure convergence.
-     */
-    bool use_default_residual;
-
-    /**
-     * Flag to force re-orthogonalization of orthonormal basis in every step.
-     * If set to false, the solver automatically checks for loss of
-     * orthogonality every 5 iterations and enables re-orthogonalization only
-     * if necessary.
-     */
-    bool force_re_orthogonalization;
-
-    /**
-     * Flag to control whether a reduced mode of the solver should be
-     * run. This is necessary when running (several) SolverGMRES instances
-     * involving very small and cheap linear systems where the feedback from
-     * all signals, eigenvalue computations, and log stream are disabled.
-     */
-    bool batched_mode;
-
-    /**
-     * Strategy to orthogonalize vectors.
-     */
-    OrthogonalizationStrategy orthogonalization_strategy;
-  };
+  using AdditionalData = SolverGMRESAdditionalData;
 
   /**
    * Constructor.
@@ -485,6 +491,24 @@ protected:
   Vector<double> h;
 };
 
+/**
+ * Standardized data struct to pipe additional data to SolverFGMRES.
+ */
+struct SolverFGMRESAdditionalData
+{
+  /**
+   * Constructor. By default, set the maximum basis size to 30.
+   */
+  explicit SolverFGMRESAdditionalData(const unsigned int max_basis_size = 30)
+    : max_basis_size(max_basis_size)
+  {}
+
+  /**
+   * Maximum basis size.
+   */
+  unsigned int max_basis_size;
+};
+
 
 
 /**
@@ -512,22 +536,9 @@ class SolverFGMRES : public SolverBase<VectorType>
 {
 public:
   /**
-   * Standardized data struct to pipe additional data to the solver.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Constructor. By default, set the maximum basis size to 30.
-     */
-    explicit AdditionalData(const unsigned int max_basis_size = 30)
-      : max_basis_size(max_basis_size)
-    {}
-
-    /**
-     * Maximum basis size.
-     */
-    unsigned int max_basis_size;
-  };
+  using AdditionalData = SolverFGMRESAdditionalData;
 
   /**
    * Constructor.
@@ -656,8 +667,7 @@ namespace internal
 
 
 
-template <class VectorType>
-inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
+inline SolverGMRESAdditionalData::SolverGMRESAdditionalData(
   const unsigned int              max_n_tmp_vectors,
   const bool                      right_preconditioning,
   const bool                      use_default_residual,

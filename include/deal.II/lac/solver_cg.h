@@ -45,6 +45,23 @@ namespace LinearAlgebra
 } // namespace LinearAlgebra
 #endif
 
+/**
+ * Standardized data struct to pipe additional data to a SolverCG.
+ * Here, it does not store anything but just exists for consistency
+ * with the other solver classes.
+ */
+struct SolverCGAdditionalData
+{};
+
+/**
+ * Standardized data struct to pipe additional data to a SolverFlexibleCG.
+ * Here, it does not store anything but just exists for consistency
+ * with the other solver classes.
+ */
+struct SolverFlexibleCGAdditionalData
+{};
+
+
 
 /** @addtogroup Solvers */
 /** @{ */
@@ -183,12 +200,9 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * Standardized data struct to pipe additional data to the solver.
-   * Here, it does not store anything but just exists for consistency
-   * with the other solver classes.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {};
+  using AdditionalData = SolverCGAdditionalData;
 
   /**
    * Constructor.
@@ -360,12 +374,9 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * Standardized data struct to pipe additional data to the solver.
-   * Here, it does not store anything but just exists for consistency
-   * with the other solver classes.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {};
+  using AdditionalData = SolverCGAdditionalData;
 
   /**
    * Constructor.

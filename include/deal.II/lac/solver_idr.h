@@ -94,6 +94,22 @@ namespace internal
 } // namespace internal
 
 /**
+ * Structure for storing additional data needed by SolverIDR.
+ */
+struct SolverIDRAdditionalData
+{
+  /**
+   * Constructor. By default, an IDR(2) method is used.
+   */
+  explicit SolverIDRAdditionalData(const unsigned int s = 2)
+    : s(s)
+  {}
+
+  const unsigned int s;
+};
+
+
+/**
  * This class implements the IDR(s) method used for solving nonsymmetric,
  * indefinite linear systems, developed in <a
  * href="https://epubs.siam.org/doi/abs/10.1137/070685804">
@@ -120,19 +136,9 @@ class SolverIDR : public SolverBase<VectorType>
 {
 public:
   /**
-   * Structure for storing additional data needed by the solver.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Constructor. By default, an IDR(2) method is used.
-     */
-    explicit AdditionalData(const unsigned int s = 2)
-      : s(s)
-    {}
-
-    const unsigned int s;
-  };
+  using AdditionalData = SolverIDRAdditionalData;
 
   /**
    * Constructor.
