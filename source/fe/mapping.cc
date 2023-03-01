@@ -51,6 +51,34 @@ Mapping<dim, spacedim>::get_vertices(
 
 
 template <int dim, int spacedim>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_face>
+Mapping<dim, spacedim>::get_vertices(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no) const
+{
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_face>
+    face_vertices;
+
+  const auto &cell_vertices    = get_vertices(cell);
+  const auto &reference_cell   = cell->reference_cell();
+  const auto  face_orientation = cell->combined_face_orientation(face_no);
+
+  for (const unsigned int v :
+       reference_cell.face_reference_cell(face_no).vertex_indices())
+    {
+      face_vertices.push_back(
+        cell_vertices[reference_cell.face_to_cell_vertices(
+          face_no, v, face_orientation)]);
+    }
+
+  return face_vertices;
+}
+
+
+
+template <int dim, int spacedim>
 Point<spacedim>
 Mapping<dim, spacedim>::get_center(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
