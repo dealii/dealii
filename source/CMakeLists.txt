@@ -76,7 +76,15 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   # Combine all ${build} OBJECT targets to a ${build} library:
   #
 
-  add_library(${DEAL_II_NAMESPACE}_${build_lowercase} dummy.cc)
+  set(_object_files "")
+  if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
+    foreach(_target ${_object_targets})
+      list(APPEND _object_files "$<TARGET_OBJECTS:${_target}>")
+    endforeach()
+  endif()
+
+  add_library(${DEAL_II_NAMESPACE}_${build_lowercase} dummy.cc ${_object_files})
   add_dependencies(library ${DEAL_II_NAMESPACE}_${build_lowercase})
 
   #
@@ -85,13 +93,15 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   #
   populate_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase} ${build})
 
-  #
-  # Add all object targets as private link targets
-  #
-  get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
-  target_link_libraries(${DEAL_II_NAMESPACE}_${build_lowercase}
-    PRIVATE ${_object_targets}
-    )
+  if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    #
+    # Add all object targets as private link targets
+    #
+    get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
+    target_link_libraries(${DEAL_II_NAMESPACE}_${build_lowercase}
+      PRIVATE ${_object_targets}
+      )
+    endif()
 
   set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
     PROPERTIES
