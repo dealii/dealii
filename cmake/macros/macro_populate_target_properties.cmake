@@ -53,7 +53,7 @@ function(populate_target_properties _target _build)
 
   target_link_libraries(${_target} ${_visibility}
     ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${_build}}
-   ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
+    ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
     )
 
   #
@@ -68,6 +68,8 @@ function(populate_target_properties _target _build)
   target_include_directories(${_target} PRIVATE
     ${CMAKE_BINARY_DIR}/include
     ${CMAKE_SOURCE_DIR}/include
+    )
+  target_include_directories(${_target} SYSTEM PRIVATE
     ${DEAL_II_BUNDLED_INCLUDE_DIRS}
     )
 
@@ -85,7 +87,7 @@ function(populate_target_properties _target _build)
     if(NOT "${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
       list(APPEND _includes "$<INSTALL_INTERFACE:\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled>")
     endif()
-    target_include_directories(${_target} INTERFACE ${_includes})
+    target_include_directories(${_target} SYSTEM INTERFACE ${_includes})
   endif()
 
   target_compile_definitions(${_target} ${_visibility}
