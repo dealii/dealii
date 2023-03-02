@@ -38,6 +38,13 @@ function(insource_setup_target _target _build)
     $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
     )
 
+  separate_arguments(_link_options UNIX_COMMAND
+    "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+    )
+  target_link_options(${_target} PRIVATE
+    $<$<COMPILE_LANGUAGE:CXX>:${_link_options}>
+    )
+
   target_include_directories(${_target}
     PRIVATE
       "${CMAKE_BINARY_DIR}/include"

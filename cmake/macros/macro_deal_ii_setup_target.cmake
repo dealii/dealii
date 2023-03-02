@@ -97,5 +97,12 @@ macro(deal_ii_setup_target _target)
     $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
     )
 
+  separate_arguments(_link_options UNIX_COMMAND
+    "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+    )
+  target_link_options(${_target} PRIVATE
+    $<$<COMPILE_LANGUAGE:CXX>:${_link_options}>
+    )
+
   target_link_libraries(${_target} ${DEAL_II_TARGET_${_build}})
 endmacro()
