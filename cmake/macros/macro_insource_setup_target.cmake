@@ -31,6 +31,13 @@ function(insource_setup_target _target _build)
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
 
+  separate_arguments(_compile_options UNIX_COMMAND
+    "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+    )
+  target_compile_options(${_target} PRIVATE
+    $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
+    )
+
   target_include_directories(${_target}
     PRIVATE
       "${CMAKE_BINARY_DIR}/include"
