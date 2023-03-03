@@ -680,6 +680,29 @@ struct EnableIfScalar<std::complex<T>>
 };
 
 
+/**
+ * A namespace that is used to declare concepts used in C++20-style
+ * `requires` clauses.
+ */
+namespace concepts
+{
+#ifdef DEAL_II_HAVE_CXX20
+  /**
+   * A concept that tests that a combination of `dim` and `spacedim`
+   * template arguments is valid. Specifically, we must have that
+   * - `dim>=1`
+   * - `spacedim<=3`
+   * - `dim<=spacedim`.
+   * These are the kinds of requirements that are imposed, for
+   * example, on class Triangulation.
+   */
+  template <int dim, int spacedim>
+  concept is_valid_dim_spacedim = (dim >= 1 && spacedim <= 3 &&
+                                   dim <= spacedim);
+#endif
+} // namespace concepts
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

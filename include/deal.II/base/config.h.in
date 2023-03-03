@@ -150,6 +150,18 @@
 #cmakedefine DEAL_II_HAVE_CXX17
 #cmakedefine DEAL_II_HAVE_CXX20
 
+/**
+ * If we have C++20 available, we can have concepts and requires
+ * clauses. We want to avoid using too many `#ifdef` statements, so
+ * define a convenience macro that allows us to write a 'requires'
+ * clause that is simply removed when not using C++20.
+ */
+#ifdef DEAL_II_HAVE_CXX20
+#  define DEAL_II_CXX20_REQUIRES(condition) requires(condition)
+#else
+#  define DEAL_II_CXX20_REQUIRES(condition)
+#endif
+
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
@@ -174,9 +186,10 @@
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
-// defined for backwards compatibility with older deal.II versions
+// The following two are defined for backwards compatibility with older deal.II versions:
 #define DEAL_II_WITH_CXX11
 #define DEAL_II_WITH_CXX14
+
 #ifdef DEAL_II_HAVE_CXX17
 #  define DEAL_II_WITH_CXX17
 #endif

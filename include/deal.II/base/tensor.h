@@ -38,8 +38,11 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 template <typename ElementType, typename MemorySpace>
 class ArrayView;
+
 template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point;
+
 template <int rank_, int dim, typename Number = double>
 class Tensor;
 template <typename Number>

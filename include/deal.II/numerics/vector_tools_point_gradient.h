@@ -25,13 +25,17 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
 class Mapping;
+
 template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point;
+
 template <int rank_, int dim, typename Number>
 class Tensor;
 template <typename Number>

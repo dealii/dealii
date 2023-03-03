@@ -20,6 +20,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/block_indices.h>
 
@@ -30,6 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 #endif
 

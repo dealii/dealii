@@ -48,6 +48,7 @@ DEAL_II_NAMESPACE_OPEN
 // forward declare Point
 #ifndef DOXYGEN
 template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point;
 #endif
 

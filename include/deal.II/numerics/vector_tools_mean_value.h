@@ -26,6 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 // forward declarations
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 template <int dim, int spacedim>
 class Mapping;

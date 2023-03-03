@@ -66,6 +66,8 @@ macro(_test_cxx20_support)
   # of the C++20 standard (which will have "202002L" when finalized). gcc-10
   # exports this version number when configured with C++20 support.
   # clang-10 exports the final "202002L" version instead, as does gcc-11.
+  #
+  # Beyond this, check for some features we actually need.
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <cmath>
@@ -78,6 +80,20 @@ macro(_test_cxx20_support)
     #if !(defined __cpp_lib_ranges) || (__cpp_lib_ranges < 201911)
     #  error \"insufficient support for C++20\"
     #endif
+
+
+    // Test concepts and requires clauses
+    template <int dim, int spacedim>
+    concept is_valid_dim_spacedim = (dim >= 1 && spacedim <= 3 &&
+                                     dim <= spacedim);
+
+    template <int dim, int spacedim>
+    requires is_valid_dim_spacedim<dim,spacedim>
+    class Triangulation 
+    {};
+
+    Triangulation<1,3> t;
+
 
     int main()
     {

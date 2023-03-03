@@ -24,6 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 template <int dim, typename Number>
 class Function;
@@ -32,6 +33,7 @@ class Mapping;
 template <int dim>
 class Quadrature;
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation;
 namespace hp
 {
