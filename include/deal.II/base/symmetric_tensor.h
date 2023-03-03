@@ -421,7 +421,7 @@ namespace internal
     {
       using tensor_type = const ::dealii::SymmetricTensor<rank, dim, Number>;
 
-      using reference = Number;
+      using reference = const Number &;
     };
 
     /**
