@@ -3311,7 +3311,7 @@ deviator(const SymmetricTensor<2, dim, Number> &t)
   SymmetricTensor<2, dim, Number> tmp = t;
 
   // subtract scaled trace from the diagonal
-  const Number tr = trace(t) / dim;
+  const Number tr = trace(t) * internal::NumberType<Number>::value(1.0 / dim);
   for (unsigned int i = 0; i < dim; ++i)
     tmp.data[i] -= tr;
 
