@@ -62,6 +62,9 @@
 // The last step is as in previous programs. In particular, just like in
 // step-7, we pack everything that's specific to this program into a namespace
 // of its own.
+
+extern void foo_bar_baz();
+
 namespace Step8
 {
   using namespace dealii;
@@ -607,6 +610,7 @@ namespace Step8
 // step-6 (apart from the changed class names, of course).
 int main()
 {
+  foo_bar_baz();
   try
     {
       Step8::ElasticProblem<2> elastic_problem_2d;
