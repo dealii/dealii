@@ -82,14 +82,12 @@ template <int dim, int spacedim>
 Point<spacedim>
 Mapping<dim, spacedim>::get_center(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const bool map_center_of_reference_cell) const
+  const bool map_barycenter_of_reference_cell) const
 {
-  if (map_center_of_reference_cell)
+  if (map_barycenter_of_reference_cell)
     {
-      Point<dim> reference_center;
-      for (unsigned int d = 0; d < dim; ++d)
-        reference_center[d] = .5;
-      return transform_unit_to_real_cell(cell, reference_center);
+      return transform_unit_to_real_cell(
+        cell, cell->reference_cell().template barycenter<dim>());
     }
   else
     {
@@ -97,7 +95,7 @@ Mapping<dim, spacedim>::get_center(
       Point<spacedim> center;
       for (const auto &v : vertices)
         center += v;
-      return center / GeometryInfo<dim>::vertices_per_cell;
+      return center / cell->n_vertices();
     }
 }
 
