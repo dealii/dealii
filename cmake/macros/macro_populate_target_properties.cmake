@@ -40,7 +40,7 @@ function(populate_target_properties _target _build)
   if(NOT "${_target}" MATCHES "^(object|bundled|${DEAL_II_NAMESPACE})_")
     message(FATAL_ERROR
       "Internal error: The specified target name must begin with object_, "
-      "bundled_, or ${DEAL_II_NAMESPACE}. Encountered: ${_target}"
+      "bundled_, or ${DEAL_II_NAMESPACE}_. Encountered: ${_target}"
       )
   endif()
 
@@ -50,11 +50,6 @@ function(populate_target_properties _target _build)
   endif()
 
   set_target_properties(${_target} PROPERTIES LINKER_LANGUAGE "CXX")
-
-  target_link_libraries(${_target} ${_visibility}
-    ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${_build}}
-    ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
-    )
 
   #
   # Include the current source directory of any target as private include
@@ -95,7 +90,8 @@ function(populate_target_properties _target _build)
     )
 
   #
-  # Add copmile and link options with private scope
+  # Add compile and link options with private scope, and add the link
+  # interface:
   #
 
   separate_arguments(_compile_options UNIX_COMMAND
@@ -105,9 +101,16 @@ function(populate_target_properties _target _build)
     $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
     )
 
-  separate_arguments(_link_options UNIX_COMMAND
-    "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-    )
-  target_link_options(${_target} PRIVATE ${_link_options})
+  get_property(_type TARGET ${_target} PROPERTY TYPE)
+  if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
+    separate_arguments(_link_options UNIX_COMMAND
+      "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+      )
+    target_link_options(${_target} PRIVATE ${_link_options})
+  endif()
 
+  target_link_libraries(${_target} ${_visibility}
+    ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${_build}}
+    ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
+    )
 endfunction()
