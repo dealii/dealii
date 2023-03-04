@@ -49,21 +49,19 @@ namespace TrilinosWrappers
       if (!sparsity_pattern->is_compressed())
         sparsity_pattern->compress();
 
-      colnum_cache = std::make_shared<std::vector<size_type>>(
+      colnum_cache = std::make_shared<std::vector<dealii::types::signed_global_dof_index>>(
         sparsity_pattern->row_length(this->a_row));
 
       if (colnum_cache->size() > 0)
         {
           // get a representation of the present row
-          int       ncols;
-          const int ierr = sparsity_pattern->graph->ExtractGlobalRowCopy(
+          std::size_t       ncols;
+          Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>::nonconst_global_inds_host_view_type column_indices_view(colnum_cache->data(), colnum_cache->size());
+          sparsity_pattern->graph->getGlobalRowCopy(
             this->a_row,
-            colnum_cache->size(),
-            ncols,
-            reinterpret_cast<TrilinosWrappers::types::int_type *>(
-              const_cast<size_type *>(colnum_cache->data())));
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-          AssertThrow(static_cast<std::vector<size_type>::size_type>(ncols) ==
+            column_indices_view,
+            ncols);
+          AssertThrow(ncols ==
                         colnum_cache->size(),
                       ExcInternalError());
         }
@@ -85,14 +83,14 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern()
   {
     column_space_map =
-      std::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
+      Teuchos::rcp(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(TrilinosWrappers::types::int_type(0),
                                    TrilinosWrappers::types::int_type(0),
-                                   Utilities::Trilinos::comm_self());
-    graph = std::make_unique<Epetra_FECrsGraph>(View,
-                                                *column_space_map,
-                                                *column_space_map,
-                                                0);
-    graph->FillComplete();
+                                   Utilities::Trilinos::tpetra_comm_self()));
+    graph = Teuchos::rcp(new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
+                                                column_space_map,
+                                                column_space_map,
+                                                0));
+    graph->fillComplete();
   }
 
 
@@ -125,15 +123,14 @@ namespace TrilinosWrappers
 
 
 
-  // Copy function only works if the
-  // sparsity pattern is empty.
+  // Copy function only works if the sparsity pattern is empty.
   SparsityPattern::SparsityPattern(const SparsityPattern &input_sparsity)
     : SparsityPatternBase(input_sparsity)
-    , column_space_map(new Epetra_Map(TrilinosWrappers::types::int_type(0),
-                                      TrilinosWrappers::types::int_type(0),
-                                      Utilities::Trilinos::comm_self()))
+    , column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(0,
+                                      0,
+                                      Utilities::Trilinos::tpetra_comm_self()))
     , graph(
-        new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0))
+        new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(column_space_map, column_space_map, 0))
   {
     (void)input_sparsity;
     Assert(input_sparsity.n_rows() == 0,
@@ -241,12 +238,12 @@ namespace TrilinosWrappers
     using size_type = SparsityPattern::size_type;
 
     void
-    reinit_sp(const Epetra_Map &                  row_map,
-              const Epetra_Map &                  col_map,
+    reinit_sp(const Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &                  row_map,
+              const Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &                  col_map,
               const size_type                     n_entries_per_row,
-              std::unique_ptr<Epetra_Map> &       column_space_map,
-              std::unique_ptr<Epetra_FECrsGraph> &graph,
-              std::unique_ptr<Epetra_CrsGraph> &  nonlocal_graph)
+              Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &       column_space_map,
+              Teuchos::RCP<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> &graph,
+              Teuchos::RCP<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> &  nonlocal_graph)
     {
       Assert(row_map.IsOneToOne(),
              ExcMessage("Row map must be 1-to-1, i.e., no overlap between "
@@ -257,19 +254,7 @@ namespace TrilinosWrappers
 
       nonlocal_graph.reset();
       graph.reset();
-      column_space_map = std::make_unique<Epetra_Map>(col_map);
-
-      AssertThrow((TrilinosWrappers::max_my_gid(row_map) -
-                   TrilinosWrappers::min_my_gid(row_map)) *
-                      std::uint64_t(n_entries_per_row) <
-                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
-                  ExcMessage("The TrilinosWrappers use Epetra internally which "
-                             "uses 'signed int' to represent local indices. "
-                             "Therefore, only 2,147,483,647 nonzero matrix "
-                             "entries can be stored on a single process, "
-                             "but you are requesting more than that. "
-                             "If possible, use more MPI processes."));
-
+      column_space_map = col_map;
 
       // for more than one processor, need to specify only row map first and
       // let the matrix entries decide about the column map (which says which
@@ -279,29 +264,29 @@ namespace TrilinosWrappers
       // columns as well. If we use a recent Trilinos version, we can also
       // require building a non-local graph which gives us thread-safe
       // initialization.
-      if (row_map.Comm().NumProc() > 1)
-        graph = std::make_unique<Epetra_FECrsGraph>(
-          Copy, row_map, n_entries_per_row, false
+      if (row_map->getComm()->getSize() > 1)
+        graph = Teuchos::rcp(new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
+          row_map, n_entries_per_row, false
           // TODO: Check which new Trilinos version supports this...
           // Remember to change tests/trilinos/assemble_matrix_parallel_07, too.
           //#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
           //                 , true
           //#endif
-        );
+        ));
       else
-        graph = std::make_unique<Epetra_FECrsGraph>(
-          Copy, row_map, col_map, n_entries_per_row, false);
+        graph = Teuchos::rcp(new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
+          row_map, col_map, n_entries_per_row, false));
     }
 
 
 
     void
-    reinit_sp(const Epetra_Map &                  row_map,
-              const Epetra_Map &                  col_map,
+    reinit_sp(const Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &                  row_map,
+              const Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &                  col_map,
               const std::vector<size_type> &      n_entries_per_row,
-              std::unique_ptr<Epetra_Map> &       column_space_map,
-              std::unique_ptr<Epetra_FECrsGraph> &graph,
-              std::unique_ptr<Epetra_CrsGraph> &  nonlocal_graph)
+              Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &       column_space_map,
+              Teuchos::RCP<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> &graph,
+              Teuchos::RCP<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> &  nonlocal_graph)
     {
       Assert(row_map.IsOneToOne(),
              ExcMessage("Row map must be 1-to-1, i.e., no overlap between "
@@ -316,16 +301,16 @@ namespace TrilinosWrappers
       AssertDimension(n_entries_per_row.size(),
                       TrilinosWrappers::n_global_elements(row_map));
 
-      column_space_map = std::make_unique<Epetra_Map>(col_map);
+      column_space_map = col_map;
 
       // Translate the vector of row lengths into one that only stores
       // those entries that related to the locally stored rows of the matrix:
-      std::vector<int> local_entries_per_row(
-        TrilinosWrappers::max_my_gid(row_map) -
-        TrilinosWrappers::min_my_gid(row_map));
+      std::vector<dealii::types::signed_global_dof_index> local_entries_per_row(
+        row_map.getMaxGlobalIndex() -
+        row_map.getMinGlobalIndex());
       for (unsigned int i = 0; i < local_entries_per_row.size(); ++i)
         local_entries_per_row[i] =
-          n_entries_per_row[TrilinosWrappers::min_my_gid(row_map) + i];
+          n_entries_per_row[row_map.getMinGlobalIndex() + i];
 
       AssertThrow(std::accumulate(local_entries_per_row.begin(),
                                   local_entries_per_row.end(),
@@ -338,8 +323,8 @@ namespace TrilinosWrappers
                              "but you are requesting more than that. "
                              "If possible, use more MPI processes."));
 
-      if (row_map.Comm().NumProc() > 1)
-        graph = std::make_unique<Epetra_FECrsGraph>(
+      if (row_map.getComm()->getSize() > 1)
+        graph = std::make_unique<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
           Copy, row_map, local_entries_per_row.data(), false
           // TODO: Check which new Trilinos version supports this...
           // Remember to change tests/trilinos/assemble_matrix_parallel_07, too.
@@ -348,7 +333,7 @@ namespace TrilinosWrappers
           //#endif
         );
       else
-        graph = std::make_unique<Epetra_FECrsGraph>(
+        graph = std::make_unique<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
           Copy, row_map, col_map, local_entries_per_row.data(), false);
     }
 
@@ -356,13 +341,13 @@ namespace TrilinosWrappers
 
     template <typename SparsityPatternType>
     void
-    reinit_sp(const Epetra_Map &                  row_map,
-              const Epetra_Map &                  col_map,
+    reinit_sp(const Tpetra::Map<int, dealii::types::signed_global_dof_index> &                  row_map,
+              const Tpetra::Map<int, dealii::types::signed_global_dof_index> &                  col_map,
               const SparsityPatternType &         sp,
               const bool                          exchange_data,
-              std::unique_ptr<Epetra_Map> &       column_space_map,
-              std::unique_ptr<Epetra_FECrsGraph> &graph,
-              std::unique_ptr<Epetra_CrsGraph> &  nonlocal_graph)
+              std::unique_ptr<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &       column_space_map,
+              std::unique_ptr<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> &graph,
+              std::unique_ptr<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> &  nonlocal_graph)
     {
       nonlocal_graph.reset();
       graph.reset();
@@ -372,14 +357,14 @@ namespace TrilinosWrappers
       AssertDimension(sp.n_cols(),
                       TrilinosWrappers::n_global_elements(col_map));
 
-      column_space_map = std::make_unique<Epetra_Map>(col_map);
+      column_space_map = std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(col_map);
 
       Assert(row_map.LinearMap() == true,
              ExcMessage(
                "This function only works if the row map is contiguous."));
 
-      const size_type first_row = TrilinosWrappers::min_my_gid(row_map),
-                      last_row  = TrilinosWrappers::max_my_gid(row_map) + 1;
+      const size_type first_row = row_map.getMinGlobalIndex(),
+                      last_row = row_map.getMaxGlobalIndex() + 1;
       std::vector<int> n_entries_per_row(last_row - first_row);
 
       // Trilinos wants the row length as an int this is hopefully never going
@@ -399,13 +384,13 @@ namespace TrilinosWrappers
                              "but you are requesting more than that. "
                              "If possible, use more MPI processes."));
 
-      if (row_map.Comm().NumProc() > 1)
-        graph = std::make_unique<Epetra_FECrsGraph>(Copy,
+      if (row_map.getComm()->getSize() > 1)
+        graph = std::make_unique<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(Copy,
                                                     row_map,
                                                     n_entries_per_row.data(),
                                                     false);
       else
-        graph = std::make_unique<Epetra_FECrsGraph>(
+        graph = std::make_unique<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
           Copy, row_map, col_map, n_entries_per_row.data(), false);
 
       AssertDimension(sp.n_rows(), n_global_rows(*graph));
@@ -434,7 +419,7 @@ namespace TrilinosWrappers
                     ++p;
                 }
             }
-            graph->Epetra_CrsGraph::InsertGlobalIndices(row,
+            graph->Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>::insertGlobalIndices(row,
                                                         row_length,
                                                         row_indices.data());
           }
@@ -459,20 +444,18 @@ namespace TrilinosWrappers
                 }
             }
             const TrilinosWrappers::types::int_type trilinos_row = row;
-            graph->InsertGlobalIndices(1,
-                                       &trilinos_row,
+            graph->insertGlobalIndices(
+                                       trilinos_row,
                                        row_length,
                                        row_indices.data());
           }
 
       // TODO A dynamic_cast fails here, this is suspicious.
-      const auto &range_map =
-        static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
-      int ierr = graph->GlobalAssemble(*column_space_map, range_map, true);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      //const auto &range_map =
+      //  static_cast<const Tpetra::Map<int, dealii::types::signed_global_dof_index> &>(*graph->getRangeMap()); // NOLINT
+      graph->globalAssemble();
 
-      ierr = graph->OptimizeStorage();
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      //graph->OptimizeStorage();
     }
   } // namespace
 
@@ -485,8 +468,8 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(parallel_partitioning.size(),
                                 parallel_partitioning.size());
-    Epetra_Map map =
-      parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+      parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(
       map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
   }
@@ -500,8 +483,8 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(parallel_partitioning.size(),
                                 parallel_partitioning.size());
-    Epetra_Map map =
-      parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+      parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(
       map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
   }
@@ -516,10 +499,10 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Epetra_Map row_map =
-      row_parallel_partitioning.make_trilinos_map(communicator, false);
-    Epetra_Map col_map =
-      col_parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+      row_parallel_partitioning.make_tpetra_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+      col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
               n_entries_per_row,
@@ -538,10 +521,10 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Epetra_Map row_map =
-      row_parallel_partitioning.make_trilinos_map(communicator, false);
-    Epetra_Map col_map =
-      col_parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+      row_parallel_partitioning.make_tpetra_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+      col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
               n_entries_per_row,
@@ -561,10 +544,10 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Epetra_Map row_map =
-      row_parallel_partitioning.make_trilinos_map(communicator, false);
-    Epetra_Map col_map =
-      col_parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+      row_parallel_partitioning.make_tpetra_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+      col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
               n_entries_per_row,
@@ -587,10 +570,10 @@ namespace TrilinosWrappers
     nonlocal_partitioner.subtract_set(row_parallel_partitioning);
     if (Utilities::MPI::n_mpi_processes(communicator) > 1)
       {
-        Epetra_Map nonlocal_map =
-          nonlocal_partitioner.make_trilinos_map(communicator, true);
+        Tpetra::Map<int, dealii::types::signed_global_dof_index> nonlocal_map =
+          nonlocal_partitioner.make_tpetra_map(communicator, true);
         nonlocal_graph =
-          std::make_unique<Epetra_CrsGraph>(Copy, nonlocal_map, 0);
+          std::make_unique<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>>(Copy, nonlocal_map, 0);
       }
     else
       Assert(nonlocal_partitioner.n_elements() == 0, ExcInternalError());
@@ -609,10 +592,10 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Epetra_Map row_map =
-      row_parallel_partitioning.make_trilinos_map(communicator, false);
-    Epetra_Map col_map =
-      col_parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+      row_parallel_partitioning.make_tpetra_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+      col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
               nontrilinos_sparsity_pattern,
@@ -638,8 +621,8 @@ namespace TrilinosWrappers
                     parallel_partitioning.size());
     SparsityPatternBase::resize(parallel_partitioning.size(),
                                 parallel_partitioning.size());
-    Epetra_Map map =
-      parallel_partitioning.make_trilinos_map(communicator, false);
+    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+      parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(map,
               map,
               nontrilinos_sparsity_pattern,
@@ -664,11 +647,11 @@ namespace TrilinosWrappers
   SparsityPattern::copy_from(const SparsityPattern &sp)
   {
     SparsityPatternBase::resize(sp.n_rows(), sp.n_cols());
-    column_space_map = std::make_unique<Epetra_Map>(*sp.column_space_map);
-    graph            = std::make_unique<Epetra_FECrsGraph>(*sp.graph);
+    column_space_map = std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(*sp.column_space_map);
+    graph            = std::make_unique<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(*sp.graph);
 
     if (sp.nonlocal_graph.get() != nullptr)
-      nonlocal_graph = std::make_unique<Epetra_CrsGraph>(*sp.nonlocal_graph);
+      nonlocal_graph = std::make_unique<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>>(*sp.nonlocal_graph);
     else
       nonlocal_graph.reset();
   }
@@ -680,12 +663,12 @@ namespace TrilinosWrappers
   SparsityPattern::copy_from(const SparsityPatternType &sp)
   {
     SparsityPatternBase::resize(sp.n_rows(), sp.n_cols());
-    const Epetra_Map rows(TrilinosWrappers::types::int_type(sp.n_rows()),
+    const Tpetra::Map<int, dealii::types::signed_global_dof_index> rows(TrilinosWrappers::types::int_type(sp.n_rows()),
                           0,
-                          Utilities::Trilinos::comm_self());
-    const Epetra_Map columns(TrilinosWrappers::types::int_type(sp.n_cols()),
+                          Utilities::Trilinos::tpetra_comm_self());
+    const Tpetra::Map<int, dealii::types::signed_global_dof_index> columns(TrilinosWrappers::types::int_type(sp.n_cols()),
                              0,
-                             Utilities::Trilinos::comm_self());
+                             Utilities::Trilinos::tpetra_comm_self());
 
     reinit_sp(
       rows, columns, sp, false, column_space_map, graph, nonlocal_graph);
@@ -701,10 +684,10 @@ namespace TrilinosWrappers
     // the pointer and generate an
     // empty sparsity pattern.
     column_space_map =
-      std::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
+      std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(TrilinosWrappers::types::int_type(0),
                                    TrilinosWrappers::types::int_type(0),
-                                   Utilities::Trilinos::comm_self());
-    graph = std::make_unique<Epetra_FECrsGraph>(View,
+                                   Utilities::Trilinos::tpetra_comm_self());
+    graph = std::make_unique<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(View,
                                                 *column_space_map,
                                                 *column_space_map,
                                                 0);
@@ -742,7 +725,7 @@ namespace TrilinosWrappers
             // messages to many ranks like putting index 0 on many processors)
             else if (column_space_map->NumMyElements() > 0)
               column = TrilinosWrappers::global_index(*column_space_map, 0);
-            ierr = nonlocal_graph->InsertGlobalIndices(row, 1, &column);
+            ierr = nonlocal_graph->insertGlobalIndices(row, 1, &column);
             AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           }
         Assert(nonlocal_graph->RowMap().NumMyElements() == 0 ||
@@ -755,7 +738,7 @@ namespace TrilinosWrappers
         AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
         ierr = nonlocal_graph->OptimizeStorage();
         AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
-        Epetra_Export exporter(nonlocal_graph->RowMap(), graph->RowMap());
+        Tpetra::Export<int, dealii::types::signed_global_dof_index> exporter(nonlocal_graph->RowMap(), graph->RowMap());
         ierr = graph->Export(*nonlocal_graph, exporter, Add);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
         ierr = graph->FillComplete(*column_space_map, graph->RangeMap());
@@ -765,8 +748,8 @@ namespace TrilinosWrappers
       {
         // TODO A dynamic_cast fails here, this is suspicious.
         const auto &range_map =
-          static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
-        ierr = graph->GlobalAssemble(*column_space_map, range_map, true);
+          static_cast<const Tpetra::Map<int, dealii::types::signed_global_dof_index> &>(graph->RangeMap()); // NOLINT
+        ierr = graph->globalAssemble(*column_space_map, range_map, true);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
@@ -779,7 +762,7 @@ namespace TrilinosWrappers
         AssertThrow(
           false,
           ExcMessage(
-            "The Epetra_CrsGraph::OptimizeStorage() function "
+            "The Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>::OptimizeStorage() function "
             "has thrown an error with code " +
             std::to_string(error_code) +
             ". You will have to look up the exact meaning of this error "
@@ -990,23 +973,23 @@ namespace TrilinosWrappers
 
 
 
-  const Epetra_Map &
+  const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
   SparsityPattern::domain_partitioner() const
   {
     // TODO A dynamic_cast fails here, this is suspicious.
     const auto &domain_map =
-      static_cast<const Epetra_Map &>(graph->DomainMap()); // NOLINT
+      static_cast<const Tpetra::Map<int, dealii::types::signed_global_dof_index> &>(graph->DomainMap()); // NOLINT
     return domain_map;
   }
 
 
 
-  const Epetra_Map &
+  const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
   SparsityPattern::range_partitioner() const
   {
     // TODO A dynamic_cast fails here, this is suspicious.
     const auto &range_map =
-      static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
+      static_cast<const Tpetra::Map<int, dealii::types::signed_global_dof_index> &>(graph->RangeMap()); // NOLINT
     return range_map;
   }
 
@@ -1015,8 +998,8 @@ namespace TrilinosWrappers
   MPI_Comm
   SparsityPattern::get_mpi_communicator() const
   {
-    const Epetra_MpiComm *mpi_comm =
-      dynamic_cast<const Epetra_MpiComm *>(&graph->RangeMap().Comm());
+    const auto *mpi_comm =
+      &graph->RangeMap().Comm();
     Assert(mpi_comm != nullptr, ExcInternalError());
     return mpi_comm->Comm();
   }
@@ -1065,7 +1048,7 @@ namespace TrilinosWrappers
   SparsityPattern::print_gnuplot(std::ostream &out) const
   {
     Assert(graph->Filled() == true, ExcInternalError());
-    for (dealii::types::global_dof_index row = 0; row < local_size(); ++row)
+    for (dealii::types::signed_global_dof_index row = 0; row < local_size(); ++row)
       {
         int *indices;
         int  num_entries;
@@ -1073,8 +1056,8 @@ namespace TrilinosWrappers
 
         Assert(num_entries >= 0, ExcInternalError());
         // avoid sign comparison warning
-        const dealii::types::global_dof_index num_entries_ = num_entries;
-        for (dealii::types::global_dof_index j = 0; j < num_entries_; ++j)
+        const dealii::types::signed_global_dof_index num_entries_ = num_entries;
+        for (dealii::types::signed_global_dof_index j = 0; j < num_entries_; ++j)
           // while matrix entries are usually
           // written (i,j), with i vertical and
           // j horizontal, gnuplot output is

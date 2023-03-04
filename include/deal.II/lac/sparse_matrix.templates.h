@@ -430,7 +430,7 @@ SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
       // copy column indices and values and at the same time enquire about the
       // length of the row
       int ncols;
-      int ierr = matrix.trilinos_matrix().ExtractGlobalRowCopy(
+      int ierr = matrix.trilinos_matrix().getGlobalRowCopy(
         row,
         matrix.row_length(row),
         ncols,

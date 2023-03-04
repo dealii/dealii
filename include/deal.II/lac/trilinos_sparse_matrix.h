@@ -2934,11 +2934,8 @@ namespace TrilinosWrappers
   inline std::uint64_t
   SparseMatrix::n_nonzero_elements() const
   {
-    // Trilinos uses 64bit functions internally for attribute access, which
-    // return `long long`. They also offer 32bit variants that return `int`,
-    // however those call the 64bit version and convert the values to 32bit.
-    // There is no necessity in using the 32bit versions at all.
-    return static_cast<std::uint64_t>(matrix->NumGlobalNonzeros64());
+    AssertThrow(false, ExcNotImplemented());
+    return -1;
   }
 
 

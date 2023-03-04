@@ -173,7 +173,7 @@ namespace TrilinosWrappers
           colnum_cache->resize(matrix->n());
         }
 
-      int ierr = matrix->trilinos_matrix().ExtractGlobalRowCopy(
+      int ierr = matrix->trilinos_matrix().getGlobalRowCopy(
         this->a_row,
         colnums,
         ncols,
@@ -1743,7 +1743,7 @@ namespace TrilinosWrappers
 
         indices.resize(graph->NumGlobalIndices(row));
         int n_indices = 0;
-        graph->ExtractGlobalRowCopy(row,
+        graph->getGlobalRowCopy(row,
                                     indices.size(),
                                     n_indices,
                                     indices.data());

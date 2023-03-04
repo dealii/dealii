@@ -78,7 +78,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      using size_type = dealii::types::global_dof_index;
+      using size_type = dealii::types::signed_global_dof_index;
 
       /**
        * Constructor.
@@ -150,7 +150,7 @@ namespace TrilinosWrappers
        * performance, we keep a shared pointer to these entries so that more
        * than one accessor can access this data if necessary.
        */
-      std::shared_ptr<const std::vector<size_type>> colnum_cache;
+      std::shared_ptr<std::vector<dealii::types::signed_global_dof_index>> colnum_cache;
 
       /**
        * Discard the old row caches (they may still be used by other
@@ -175,7 +175,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      using size_type = dealii::types::global_dof_index;
+      using size_type = dealii::types::signed_global_dof_index;
 
       /**
        * Constructor. Create an iterator into the matrix @p matrix for the
@@ -279,7 +279,7 @@ namespace TrilinosWrappers
     /**
      * Declare type for container size.
      */
-    using size_type = dealii::types::global_dof_index;
+    using size_type = dealii::types::signed_global_dof_index;
 
     /**
      * Declare an alias for the iterator class.
@@ -776,8 +776,8 @@ namespace TrilinosWrappers
                 const bool      indices_are_sorted = false);
 
     virtual void
-    add_row_entries(const size_type &                 row,
-                    const ArrayView<const size_type> &columns,
+    add_row_entries(const dealii::types::global_dof_index &                 row,
+                    const ArrayView<const dealii::types::global_dof_index> &columns,
                     const bool indices_are_sorted = false) override;
 
     using SparsityPatternBase::add_entries;
@@ -801,7 +801,7 @@ namespace TrilinosWrappers
      * pattern, i.e., the partitioning of the vectors matrices based on this
      * sparsity pattern are multiplied with.
      */
-    const Epetra_Map &
+    const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
     domain_partitioner() const;
 
     /**
@@ -810,7 +810,7 @@ namespace TrilinosWrappers
      * i.e., the partitioning of the vectors that are result from matrix-
      * vector products.
      */
-    const Epetra_Map &
+    const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
     range_partitioner() const;
 
     /**
@@ -975,14 +975,14 @@ namespace TrilinosWrappers
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    std::unique_ptr<Epetra_Map> column_space_map;
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> column_space_map;
 
     /**
      * A sparsity pattern object in Trilinos to be used for finite element
      * based problems which allows for adding non-local elements to the
      * pattern.
      */
-    std::unique_ptr<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> graph;
+    Teuchos::RCP<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> graph;
 
     /**
      * A sparsity pattern object for the non-local part of the sparsity
@@ -990,7 +990,7 @@ namespace TrilinosWrappers
      * when the particular constructor or reinit method with writable_rows
      * argument is set
      */
-    std::unique_ptr<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> nonlocal_graph;
+    Teuchos::RCP<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> nonlocal_graph;
 
     friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;
@@ -1070,12 +1070,12 @@ namespace TrilinosWrappers
 
       // If at end of line: do one step, then cycle until we find a row with a
       // nonzero number of entries that is stored locally.
-      if (accessor.a_index >= accessor.colnum_cache->size())
+      if (accessor.a_index >= static_cast<dealii::types::signed_global_dof_index>(accessor.colnum_cache->size()))
         {
           accessor.a_index = 0;
           ++accessor.a_row;
 
-          while (accessor.a_row < accessor.sparsity_pattern->n_rows())
+          while (accessor.a_row < static_cast<dealii::types::signed_global_dof_index>(accessor.sparsity_pattern->n_rows()))
             {
               const auto row_length =
                 accessor.sparsity_pattern->row_length(accessor.a_row);
@@ -1186,7 +1186,7 @@ namespace TrilinosWrappers
     // place the iterator on the first entry
     // past this line, or at the end of the
     // matrix
-    for (size_type i = r + 1; i < n_rows(); ++i)
+    for (size_type i = r + 1; i < static_cast<dealii::types::signed_global_dof_index>(n_rows()); ++i)
       if (row_length(i) > 0)
         return const_iterator(this, i, 0);
 

@@ -28,9 +28,6 @@
 
 // for AztecOO solvers
 #  include <Amesos.h>
-#  include <AztecOO.h>
-#  include <Epetra_LinearProblem.h>
-#  include <Epetra_Operator.h>
 
 // for Belos solvers
 #  ifdef DEAL_II_TRILINOS_WITH_BELOS

@@ -22,7 +22,7 @@
 #  include <deal.II/lac/vector.h>
 
 #  include <Epetra_MultiVector.h>
-#  include <Ifpack.h>
+#  include <Ifpack2_Relaxation.hpp>
 #  include <Ifpack_Chebyshev.h>
 #  include <Teuchos_ParameterList.hpp>
 #  include <Teuchos_RCP.hpp>
@@ -104,8 +104,8 @@ namespace TrilinosWrappers
     // release memory before reallocation
     preconditioner.reset();
     preconditioner.reset(
-      Ifpack().Create("point relaxation",
-                      const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+      Ifpack2().Create("point relaxation",
+                      /*const_cast<Epetra_CrsMatrix *>(*/&matrix.trilinos_matrix()/*)*/,
                       0));
 
     Ifpack_Preconditioner *ifpack =

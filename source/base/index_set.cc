@@ -35,12 +35,35 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+IndexSet::IndexSet(const Tpetra::Map<int, types::signed_global_dof_index> &map)
+  : is_compressed(true)
+  , index_space_size(1 + map.getMaxAllGlobalIndex())
+  , largest_range(numbers::invalid_unsigned_int)
+{
+  Assert(map.getMinAllGlobalIndex() == 0,
+         ExcMessage(
+           "The Tpetra::Map does not contain the global index 0, "
+           "which means some entries are not present on any processor."));
+
+  // For a contiguous map, we do not need to go through the whole data...
+  if (map.isContiguous())
+    add_range(size_type(map.getMinGlobalIndex()), size_type(map.getMaxGlobalIndex() + 1));
+  else
+    {
+      const size_type n_indices = map.getLocalNumElements();
+      const types::signed_global_dof_index *     indices =
+        map.getMyGlobalIndices().data();
+      add_indices(indices, indices + n_indices);
+    }
+  compress();
+}
+
 // the 64-bit path uses a few different names, so put that into a separate
 // implementation
 
 #  ifdef DEAL_II_WITH_64BIT_INDICES
 
-IndexSet::IndexSet(const Tpetra::Map<int, types::signed_global_dof_index> &map)
+IndexSet::IndexSet(const Epetra_BlockMap &map)
   : is_compressed(true)
   , index_space_size(1 + map.MaxAllGID64())
   , largest_range(numbers::invalid_unsigned_int)
@@ -67,7 +90,7 @@ IndexSet::IndexSet(const Tpetra::Map<int, types::signed_global_dof_index> &map)
 
 // this is the standard 32-bit implementation
 
-IndexSet::IndexSet(const Tpetra::Map<int, types::signed_global_dof_index> &map)
+IndexSet::IndexSet(const Epetra_Map& map)
   : is_compressed(true)
   , index_space_size(1 + map.MaxAllGID())
   , largest_range(numbers::invalid_unsigned_int)
