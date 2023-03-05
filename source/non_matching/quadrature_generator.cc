@@ -467,9 +467,9 @@ namespace NonMatching
         const double               weight,
         const unsigned int         height_function_direction,
         const std::vector<std::reference_wrapper<const Function<1>>>
-          &                             level_sets,
-        const AdditionalQGeneratorData &additional_data,
-        QPartitioning<dim> &            q_partitioning)
+          &                                      level_sets,
+        const QuadratureGeneratorAdditionalData &additional_data,
+        QPartitioning<dim> &                     q_partitioning)
       {
         // Make this int to avoid a warning signed/unsigned comparison.
         const int n_roots = roots.size();
@@ -511,7 +511,7 @@ namespace NonMatching
 
 
 
-      RootFinder::AdditionalData::AdditionalData(
+      RootFinderAdditionalData::RootFinderAdditionalData(
         const double       tolerance,
         const unsigned int max_recursion_depth,
         const unsigned int max_iterations)
@@ -707,8 +707,8 @@ namespace NonMatching
 
       template <int dim, int spacedim>
       UpThroughDimensionCreator<dim, spacedim>::UpThroughDimensionCreator(
-        const hp::QCollection<1> &      q_collection1D,
-        const AdditionalQGeneratorData &additional_data)
+        const hp::QCollection<1> &               q_collection1D,
+        const QuadratureGeneratorAdditionalData &additional_data)
         : q_collection1D(&q_collection1D)
         , additional_data(additional_data)
         , root_finder(
@@ -843,8 +843,8 @@ namespace NonMatching
 
       template <int dim, int spacedim>
       QGeneratorBase<dim, spacedim>::QGeneratorBase(
-        const hp::QCollection<1> &      q_collection1D,
-        const AdditionalQGeneratorData &additional_data)
+        const hp::QCollection<1> &               q_collection1D,
+        const QuadratureGeneratorAdditionalData &additional_data)
         : additional_data(additional_data)
         , q_collection1D(&q_collection1D)
       {
@@ -855,8 +855,8 @@ namespace NonMatching
 
       template <int dim, int spacedim>
       QGenerator<dim, spacedim>::QGenerator(
-        const hp::QCollection<1> &      q_collection1D,
-        const AdditionalQGeneratorData &additional_data)
+        const hp::QCollection<1> &               q_collection1D,
+        const QuadratureGeneratorAdditionalData &additional_data)
         : QGeneratorBase<dim, spacedim>(q_collection1D, additional_data)
         , low_dim_algorithm(q_collection1D, additional_data)
         , up_through_dimension_creator(q_collection1D, additional_data)
@@ -1184,8 +1184,8 @@ namespace NonMatching
 
       template <int spacedim>
       QGenerator<1, spacedim>::QGenerator(
-        const hp::QCollection<1> &      q_collection1D,
-        const AdditionalQGeneratorData &additional_data)
+        const hp::QCollection<1> &               q_collection1D,
+        const QuadratureGeneratorAdditionalData &additional_data)
         : QGeneratorBase<1, spacedim>(q_collection1D, additional_data)
         , root_finder(
             RootFinder::AdditionalData(additional_data.root_finder_tolerance,
@@ -1601,7 +1601,7 @@ namespace NonMatching
 
 
 
-  AdditionalQGeneratorData::AdditionalQGeneratorData(
+  QuadratureGeneratorAdditionalData::QuadratureGeneratorAdditionalData(
     const unsigned int max_box_splits,
     const double       lower_bound_implicit_function,
     const double       min_distance_between_roots,

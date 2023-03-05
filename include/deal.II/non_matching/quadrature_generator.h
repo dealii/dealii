@@ -57,18 +57,19 @@ namespace NonMatching
   /**
    * Struct storing settings for the QuadratureGenerator class.
    */
-  struct AdditionalQGeneratorData
+  struct QuadratureGeneratorAdditionalData
   {
     /**
      * Constructor.
      */
-    AdditionalQGeneratorData(const unsigned int max_box_splits          = 4,
-                             const double lower_bound_implicit_function = 1e-11,
-                             const double min_distance_between_roots    = 1e-12,
-                             const double limit_to_be_definite          = 1e-11,
-                             const double root_finder_tolerance         = 1e-12,
-                             const unsigned int max_root_finder_splits  = 2,
-                             bool               split_in_half           = true);
+    QuadratureGeneratorAdditionalData(
+      const unsigned int max_box_splits                = 4,
+      const double       lower_bound_implicit_function = 1e-11,
+      const double       min_distance_between_roots    = 1e-12,
+      const double       limit_to_be_definite          = 1e-11,
+      const double       root_finder_tolerance         = 1e-12,
+      const unsigned int max_root_finder_splits        = 2,
+      bool               split_in_half                 = true);
 
     /**
      * The number of times we are allowed to split the incoming box
@@ -129,6 +130,11 @@ namespace NonMatching
     bool split_in_half;
   };
 
+  /**
+   * Deprecated alias. Use QuadratureGeneratorAdditionalData.
+   */
+  using AdditionalQGeneratorData DEAL_II_DEPRECATED =
+    QuadratureGeneratorAdditionalData;
 
 
   /**
@@ -188,7 +194,7 @@ namespace NonMatching
   class QuadratureGenerator
   {
   public:
-    using AdditionalData = AdditionalQGeneratorData;
+    using AdditionalData = QuadratureGeneratorAdditionalData;
 
     /**
      * Constructor. Each Quadrature<1> in @p quadratures1d can be chosen as base
@@ -292,7 +298,7 @@ namespace NonMatching
   class FaceQuadratureGenerator
   {
   public:
-    using AdditionalData = AdditionalQGeneratorData;
+    using AdditionalData = QuadratureGeneratorAdditionalData;
 
     /**
      * Constructor. Each Quadrature<1> in @p quadratures1d can be chosen as base
@@ -393,7 +399,7 @@ namespace NonMatching
   class FaceQuadratureGenerator<1>
   {
   public:
-    using AdditionalData = AdditionalQGeneratorData;
+    using AdditionalData = QuadratureGeneratorAdditionalData;
 
     /**
      * Constructor. The incoming hp::QCollection is not used. But this class
@@ -491,7 +497,7 @@ namespace NonMatching
   class DiscreteQuadratureGenerator : public QuadratureGenerator<dim>
   {
   public:
-    using AdditionalData = AdditionalQGeneratorData;
+    using AdditionalData = QuadratureGeneratorAdditionalData;
 
     /**
      * Constructor, the discrete level set function is described by the
@@ -547,7 +553,7 @@ namespace NonMatching
   class DiscreteFaceQuadratureGenerator : public FaceQuadratureGenerator<dim>
   {
   public:
-    using AdditionalData = AdditionalQGeneratorData;
+    using AdditionalData = QuadratureGeneratorAdditionalData;
 
     /**
      * Constructor, the discrete level set function is described by the
@@ -589,6 +595,38 @@ namespace NonMatching
     namespace QuadratureGeneratorImplementation
     {
       /**
+       * Struct storing settings for the RootFinder class.
+       */
+      struct RootFinderAdditionalData
+      {
+        /**
+         * Constructor.
+         */
+        RootFinderAdditionalData(const double       tolerance           = 1e-12,
+                                 const unsigned int max_recursion_depth = 2,
+                                 const unsigned int max_iterations      = 500);
+
+        /**
+         * The tolerance in the stopping criteria for the underlying root
+         * finding algorithm boost::math::tools::toms748_solve.
+         */
+        double tolerance;
+
+        /**
+         * The number of times we are allowed to split the interval where we
+         * seek roots.
+         */
+        unsigned int max_recursion_depth;
+
+        /**
+         * The maximum number of iterations in
+         * boost::math::tools::toms748_solve.
+         */
+        unsigned int max_iterations;
+      };
+
+
+      /**
        * A class that attempts to find multiple distinct roots of a function,
        * $f(x)$, over an interval, $[l, r]$. This is done as follows. If there
        * is a sign change in function value between the interval end points,
@@ -609,36 +647,9 @@ namespace NonMatching
       {
       public:
         /**
-         * Struct storing settings for the RootFinder class.
+         * Alias for the additional data.
          */
-        struct AdditionalData
-        {
-          /**
-           * Constructor.
-           */
-          AdditionalData(const double       tolerance           = 1e-12,
-                         const unsigned int max_recursion_depth = 2,
-                         const unsigned int max_iterations      = 500);
-
-          /**
-           * The tolerance in the stopping criteria for the underlying root
-           * finding algorithm boost::math::tools::toms748_solve.
-           */
-          double tolerance;
-
-          /**
-           * The number of times we are allowed to split the interval where we
-           * seek roots.
-           */
-          unsigned int max_recursion_depth;
-
-          /**
-           * The maximum number of iterations in
-           * boost::math::tools::toms748_solve.
-           */
-          unsigned int max_iterations;
-        };
-
+        using AdditionalData = RootFinderAdditionalData;
 
         /**
          * Constructor.
@@ -832,8 +843,8 @@ namespace NonMatching
          * Constructor. Takes the same parameters as QuadratureGenerator.
          */
         UpThroughDimensionCreator(
-          const hp::QCollection<1> &      q_collection1D,
-          const AdditionalQGeneratorData &additional_data);
+          const hp::QCollection<1> &               q_collection1D,
+          const QuadratureGeneratorAdditionalData &additional_data);
 
         /**
          * Create $dim$-dimensional immersed quadratures from the incoming
@@ -883,7 +894,7 @@ namespace NonMatching
         /**
          * Stores options/settings for the algorithm.
          */
-        const AdditionalQGeneratorData additional_data;
+        const QuadratureGeneratorAdditionalData additional_data;
 
         /**
          * Which quadrature rule in the above collection that is used to
@@ -958,8 +969,9 @@ namespace NonMatching
       class QGeneratorBase
       {
       public:
-        QGeneratorBase(const hp::QCollection<1> &      q_collection1D,
-                       const AdditionalQGeneratorData &additional_data);
+        QGeneratorBase(
+          const hp::QCollection<1> &               q_collection1D,
+          const QuadratureGeneratorAdditionalData &additional_data);
 
         /**
          * Clear the quadratures created by the previous call to generate().
@@ -977,7 +989,7 @@ namespace NonMatching
         /**
          * Stores options/settings for the algorithm.
          */
-        const AdditionalQGeneratorData additional_data;
+        const QuadratureGeneratorAdditionalData additional_data;
 
         /**
          * Which 1d-quadrature in the collection we should use to generate
@@ -1088,8 +1100,8 @@ namespace NonMatching
         /**
          * Constructor. Takes the same parameters QuadratureGenerator.
          */
-        QGenerator(const hp::QCollection<1> &      q_collection1D,
-                   const AdditionalQGeneratorData &additional_data);
+        QGenerator(const hp::QCollection<1> &               q_collection1D,
+                   const QuadratureGeneratorAdditionalData &additional_data);
 
         /**
          * Create immersed quadrature rules over the incoming @p box and add
@@ -1144,7 +1156,7 @@ namespace NonMatching
         /**
          * Split the incoming box and call generate() recursively with each box.
          * The box is split in 2 or 4 parts depending on the value of
-         * AdditionalQGeneratorData::split_in_half.
+         * QuadratureGeneratorAdditionalData::split_in_half.
          */
         void
         split_box_and_recurse(
@@ -1211,8 +1223,8 @@ namespace NonMatching
         /**
          * Constructor. Takes the same parameters QuadratureGenerator.
          */
-        QGenerator(const hp::QCollection<1> &      quadratures1D,
-                   const AdditionalQGeneratorData &additional_data);
+        QGenerator(const hp::QCollection<1> &               quadratures1D,
+                   const QuadratureGeneratorAdditionalData &additional_data);
 
         /**
          * Creates quadrature points over the interval defined by the incoming
