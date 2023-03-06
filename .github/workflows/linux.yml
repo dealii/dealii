@@ -57,7 +57,7 @@ jobs:
     - name: build
       run: |
         cd build
-        make -j 2
+        make VERBOSE=1 -j2
     - name: quicktest
       run: |
         cd build
@@ -112,7 +112,7 @@ jobs:
     - name: build
       run: |
         cd build
-        make -j 2
+        make VERBOSE=1 -j2
     - name: test
       run: |
         # Remove warning: "A high-performance Open MPI point-to-point
@@ -121,8 +121,8 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make -j 2 setup_tests_simplex
-        ctest --output-on-failure -j 2
+        make -j2 setup_tests_simplex
+        ctest --output-on-failure -j2
     - name: failed test log
       if: ${{ failure() }}
       uses: actions/upload-artifact@v3
@@ -207,11 +207,11 @@ jobs:
     - name: build deal.II
       run: |
         cd build
-        make -j 2
+        make VERBOSE=1 -j2
     - name: build CUDA tests
       run: |
         cd build
-        make -j 2 setup_tests_cuda
+        make -j2 setup_tests_cuda
         cd tests/cuda
         make -j2 compile_test_executables
 
@@ -287,7 +287,7 @@ jobs:
       run: |
         source /opt/intel/oneapi/setvars.sh
         cd build
-        make -j 2
+        make VERBOSE=1 -j2
     - name: quicktest
       run: |
         source /opt/intel/oneapi/setvars.sh
