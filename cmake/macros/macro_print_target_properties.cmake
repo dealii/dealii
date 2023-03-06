@@ -44,7 +44,7 @@ function(print_target_properties _target)
   foreach(_property ${_properties})
     get_target_property(_value ${_target} ${_property})
     if(NOT "${_value}" MATCHES "-NOTFOUND" AND NOT "${_value}" STREQUAL "")
-      string(REPLACE ";" " " _value "${_value}")
+      string(REPLACE ";" "," _value "${_value}") # workaround: we cannot use ";"
       list(APPEND _messages "    ${_property}: ${_value}")
     endif()
   endforeach()

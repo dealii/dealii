@@ -42,12 +42,13 @@ configure_file( # for binary dir:
 ########################################################################
 
 set(_macros
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_shell_escape_option_groups.cmake
   )
 file(COPY ${_macros}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
