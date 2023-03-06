@@ -49,11 +49,8 @@ jobs:
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON \
               ..
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-serial-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
         cd build
@@ -104,11 +101,8 @@ jobs:
               -D DEAL_II_WITH_HDF5="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               ..
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-simplex-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
         cd build
@@ -199,11 +193,8 @@ jobs:
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               ..
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-cuda-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build deal.II
       run: |
         cd build
@@ -278,11 +269,8 @@ jobs:
               -D LAPACK_DIR=${MKLROOT} \
               -D TBB_DIR=${TBBROOT} \
               ..
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-intel-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
         source /opt/intel/oneapi/setvars.sh
