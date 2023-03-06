@@ -26,9 +26,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 class AffineConstraints;
+
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <typename number>
 class FullMatrix;
 template <int dim, typename Number>
@@ -65,8 +67,8 @@ namespace VectorTools
    * See the general documentation of this namespace for further information.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate(
     const Mapping<dim, spacedim> &                             mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
@@ -77,8 +79,8 @@ namespace VectorTools
    * Same as above but in an hp-context.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate(
     const hp::MappingCollection<dim, spacedim> &               mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
@@ -91,8 +93,8 @@ namespace VectorTools
    * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate(
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
@@ -117,12 +119,13 @@ namespace VectorTools
    * instantiated by hand.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  interpolate(const DoFHandler<dim, spacedim> &dof_1,
-              const DoFHandler<dim, spacedim> &dof_2,
-              const FullMatrix<double> &       transfer,
-              const InVector &                 data_1,
-              OutVector &                      data_2);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void interpolate(const DoFHandler<dim, spacedim> &dof_1,
+                   const DoFHandler<dim, spacedim> &dof_2,
+                   const FullMatrix<double> &       transfer,
+                   const InVector &                 data_1,
+                   OutVector &                      data_2);
 
   /**
    * This function is a kind of generalization or modification of the very
@@ -171,8 +174,8 @@ namespace VectorTools
    * dofs of the previous one.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_based_on_material_id(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_based_on_material_id(
     const Mapping<dim, spacedim> &   mapping,
     const DoFHandler<dim, spacedim> &dof_handler,
     const std::map<types::material_id,
@@ -206,11 +209,11 @@ namespace VectorTools
    * flag).
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
-                                const VectorType &               u1,
-                                const DoFHandler<dim, spacedim> &dof2,
-                                VectorType &                     u2);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
+                                     const VectorType &               u1,
+                                     const DoFHandler<dim, spacedim> &dof2,
+                                     VectorType &                     u2);
 
   /**
    * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
@@ -226,8 +229,8 @@ namespace VectorTools
    * does not necessarily respect continuity requirements at hanging nodes.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_to_different_mesh(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_different_mesh(
     const DoFHandler<dim, spacedim> &                         dof1,
     const VectorType &                                        u1,
     const DoFHandler<dim, spacedim> &                         dof2,
@@ -242,8 +245,8 @@ namespace VectorTools
    * pointing from a source DoFHandler to a destination DoFHandler.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_to_different_mesh(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_different_mesh(
     const InterGridMap<DoFHandler<dim, spacedim>> &           intergridmap,
     const VectorType &                                        u1,
     const AffineConstraints<typename VectorType::value_type> &constraints,
@@ -281,10 +284,10 @@ namespace VectorTools
    * components are primitive.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  get_position_vector(const DoFHandler<dim, spacedim> &dh,
-                      VectorType &                     vector,
-                      const ComponentMask &            mask = ComponentMask());
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void get_position_vector(const DoFHandler<dim, spacedim> &dh,
+                           VectorType &                     vector,
+                           const ComponentMask &mask = ComponentMask());
 
   /**
    * Like the above function but also taking @p mapping as argument.
@@ -295,11 +298,11 @@ namespace VectorTools
    * preserve vertex locations (like Eulerian mappings).
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  get_position_vector(const Mapping<dim, spacedim> &   mapping,
-                      const DoFHandler<dim, spacedim> &dh,
-                      VectorType &                     vector,
-                      const ComponentMask &            mask = ComponentMask());
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void get_position_vector(const Mapping<dim, spacedim> &   mapping,
+                           const DoFHandler<dim, spacedim> &dh,
+                           VectorType &                     vector,
+                           const ComponentMask &mask = ComponentMask());
 
   /** @} */
 } // namespace VectorTools

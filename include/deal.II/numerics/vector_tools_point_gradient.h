@@ -27,6 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
@@ -86,8 +87,8 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const DoFHandler<dim, spacedim> &dof,
     const VectorType &               fe_function,
     const Point<spacedim, double> &  point,
@@ -110,8 +111,8 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const DoFHandler<dim, spacedim> &dof,
     const VectorType &               fe_function,
     const Point<spacedim, double> &  point,
@@ -150,10 +151,11 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const DoFHandler<dim, spacedim> &dof,
-                 const VectorType &               fe_function,
-                 const Point<spacedim, double> &  point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const DoFHandler<dim, spacedim> &dof,
+    const VectorType &               fe_function,
+    const Point<spacedim, double> &  point);
 
   /**
    * Same as above for hp.
@@ -172,10 +174,11 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const DoFHandler<dim, spacedim> &dof,
-                 const VectorType &               fe_function,
-                 const Point<spacedim, double> &  point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const DoFHandler<dim, spacedim> &dof,
+    const VectorType &               fe_function,
+    const Point<spacedim, double> &  point);
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -210,8 +213,8 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const Mapping<dim, spacedim> &   mapping,
     const DoFHandler<dim, spacedim> &dof,
     const VectorType &               fe_function,
@@ -235,8 +238,8 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof,
     const VectorType &                          fe_function,
@@ -276,11 +279,12 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const Mapping<dim, spacedim> &   mapping,
-                 const DoFHandler<dim, spacedim> &dof,
-                 const VectorType &               fe_function,
-                 const Point<spacedim, double> &  point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const VectorType &               fe_function,
+    const Point<spacedim, double> &  point);
 
   /**
    * Same as above for hp.
@@ -299,11 +303,12 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const hp::MappingCollection<dim, spacedim> &mapping,
-                 const DoFHandler<dim, spacedim> &           dof,
-                 const VectorType &                          fe_function,
-                 const Point<spacedim, double> &             point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof,
+    const VectorType &                          fe_function,
+    const Point<spacedim, double> &             point);
 
   /** @} */
 } // namespace VectorTools

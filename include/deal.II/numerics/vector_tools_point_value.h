@@ -24,6 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
@@ -236,8 +237,8 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_difference(
     const DoFHandler<dim, spacedim> &                          dof,
     const VectorType &                                         fe_function,
     const Function<spacedim, typename VectorType::value_type> &exact_solution,
@@ -257,8 +258,8 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_difference(
     const Mapping<dim, spacedim> &                             mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const VectorType &                                         fe_function,
@@ -303,11 +304,11 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_value(const DoFHandler<dim, spacedim> &        dof,
-              const VectorType &                       fe_function,
-              const Point<spacedim, double> &          point,
-              Vector<typename VectorType::value_type> &value);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_value(const DoFHandler<dim, spacedim> &        dof,
+                   const VectorType &                       fe_function,
+                   const Point<spacedim, double> &          point,
+                   Vector<typename VectorType::value_type> &value);
 
   /**
    * Same as above for hp.
@@ -327,11 +328,11 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_value(const DoFHandler<dim, spacedim> &        dof,
-              const VectorType &                       fe_function,
-              const Point<spacedim, double> &          point,
-              Vector<typename VectorType::value_type> &value);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_value(const DoFHandler<dim, spacedim> &        dof,
+                   const VectorType &                       fe_function,
+                   const Point<spacedim, double> &          point,
+                   Vector<typename VectorType::value_type> &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -373,10 +374,11 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  point_value(const DoFHandler<dim, spacedim> &dof,
-              const VectorType &               fe_function,
-              const Point<spacedim, double> &  point);
+    point_value(const DoFHandler<dim, spacedim> &dof,
+                const VectorType &               fe_function,
+                const Point<spacedim, double> &  point);
 
   /**
    * Same as above for hp.
@@ -396,10 +398,11 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  point_value(const DoFHandler<dim, spacedim> &dof,
-              const VectorType &               fe_function,
-              const Point<spacedim, double> &  point);
+    point_value(const DoFHandler<dim, spacedim> &dof,
+                const VectorType &               fe_function,
+                const Point<spacedim, double> &  point);
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -436,12 +439,12 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_value(const Mapping<dim, spacedim> &           mapping,
-              const DoFHandler<dim, spacedim> &        dof,
-              const VectorType &                       fe_function,
-              const Point<spacedim, double> &          point,
-              Vector<typename VectorType::value_type> &value);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_value(const Mapping<dim, spacedim> &           mapping,
+                   const DoFHandler<dim, spacedim> &        dof,
+                   const VectorType &                       fe_function,
+                   const Point<spacedim, double> &          point,
+                   Vector<typename VectorType::value_type> &value);
 
   /**
    * Same as above for hp.
@@ -461,12 +464,12 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_value(const hp::MappingCollection<dim, spacedim> &mapping,
-              const DoFHandler<dim, spacedim> &           dof,
-              const VectorType &                          fe_function,
-              const Point<spacedim, double> &             point,
-              Vector<typename VectorType::value_type> &   value);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_value(const hp::MappingCollection<dim, spacedim> &mapping,
+                   const DoFHandler<dim, spacedim> &           dof,
+                   const VectorType &                          fe_function,
+                   const Point<spacedim, double> &             point,
+                   Vector<typename VectorType::value_type> &   value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -502,11 +505,12 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  point_value(const Mapping<dim, spacedim> &   mapping,
-              const DoFHandler<dim, spacedim> &dof,
-              const VectorType &               fe_function,
-              const Point<spacedim, double> &  point);
+    point_value(const Mapping<dim, spacedim> &   mapping,
+                const DoFHandler<dim, spacedim> &dof,
+                const VectorType &               fe_function,
+                const Point<spacedim, double> &  point);
 
   /**
    * Same as above for hp.
@@ -526,11 +530,12 @@ namespace VectorTools
    *   when trying to evaluate point values of discontinuous functions.
    */
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  point_value(const hp::MappingCollection<dim, spacedim> &mapping,
-              const DoFHandler<dim, spacedim> &           dof,
-              const VectorType &                          fe_function,
-              const Point<spacedim, double> &             point);
+    point_value(const hp::MappingCollection<dim, spacedim> &mapping,
+                const DoFHandler<dim, spacedim> &           dof,
+                const VectorType &                          fe_function,
+                const Point<spacedim, double> &             point);
   /** @} */
 } // namespace VectorTools
 

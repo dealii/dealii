@@ -26,15 +26,18 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
 class Mapping;
 template <int dim>
 class Quadrature;
+
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation;
+
 namespace hp
 {
   template <int dim, int spacedim>
@@ -139,8 +142,9 @@ namespace VectorTools
    * Vector<float>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const Mapping<dim, spacedim> &                           mapping,
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
@@ -156,8 +160,9 @@ namespace VectorTools
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
@@ -171,8 +176,9 @@ namespace VectorTools
    * Same as above for hp.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const hp::MappingCollection<dim, spacedim> &             mapping,
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
@@ -188,8 +194,9 @@ namespace VectorTools
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
@@ -225,11 +232,11 @@ namespace VectorTools
    * @note Instantiated for type Vector<double> and Vector<float>.
    */
   template <int dim, int spacedim, class InVector>
-  double
-  compute_global_error(const Triangulation<dim, spacedim> &tria,
-                       const InVector &                    cellwise_error,
-                       const NormType &                    norm,
-                       const double                        exponent = 2.);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector>)
+  double compute_global_error(const Triangulation<dim, spacedim> &tria,
+                              const InVector &cellwise_error,
+                              const NormType &norm,
+                              const double    exponent = 2.);
 
   /** @} */
 } // namespace VectorTools

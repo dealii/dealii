@@ -26,9 +26,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 class AffineConstraints;
+
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
@@ -139,67 +141,69 @@ namespace VectorTools
    * boundary before projecting the interior of the function.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const Mapping<dim, spacedim> &                            mapping,
-          const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const Quadrature<dim> &                                   quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec,
-          const bool                 enforce_zero_boundary     = false,
-          const Quadrature<dim - 1> &q_boundary                = (dim > 1 ?
-                                                                    QGauss<dim - 1>(2) :
-                                                                    Quadrature<dim - 1>(0)),
-          const bool                 project_to_boundary_first = false);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const Mapping<dim, spacedim> &                             mapping,
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const Quadrature<dim> &                                    quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const bool                 enforce_zero_boundary = false,
+    const Quadrature<dim - 1> &q_boundary = (dim > 1 ? QGauss<dim - 1>(2) :
+                                                       Quadrature<dim - 1>(0)),
+    const bool                 project_to_boundary_first = false);
 
   /**
    * Call the project() function above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const Quadrature<dim> &                                   quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec,
-          const bool                 enforce_zero_boundary     = false,
-          const Quadrature<dim - 1> &q_boundary                = (dim > 1 ?
-                                                                    QGauss<dim - 1>(2) :
-                                                                    Quadrature<dim - 1>(0)),
-          const bool                 project_to_boundary_first = false);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const Quadrature<dim> &                                    quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const bool                 enforce_zero_boundary = false,
+    const Quadrature<dim - 1> &q_boundary = (dim > 1 ? QGauss<dim - 1>(2) :
+                                                       Quadrature<dim - 1>(0)),
+    const bool                 project_to_boundary_first = false);
 
   /**
    * Same as above, but with hp-capabilities.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const hp::MappingCollection<dim, spacedim> &              mapping,
-          const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const hp::QCollection<dim> &                              quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec,
-          const bool                      enforce_zero_boundary = false,
-          const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
-            dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
-          const bool project_to_boundary_first = false);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const hp::MappingCollection<dim, spacedim> &               mapping,
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const hp::QCollection<dim> &                               quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const bool                      enforce_zero_boundary = false,
+    const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
+      dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
+    const bool project_to_boundary_first = false);
 
   /**
    * Call the project() function above, with a collection of $Q_1$ mapping
    * objects, i.e., with hp::StaticMappingQ1::mapping_collection.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const hp::QCollection<dim> &                              quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec,
-          const bool                      enforce_zero_boundary = false,
-          const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
-            dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
-          const bool project_to_boundary_first = false);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const hp::QCollection<dim> &                               quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const bool                      enforce_zero_boundary = false,
+    const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
+      dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
+    const bool project_to_boundary_first = false);
 
   /**
    * The same as above for projection of scalar-valued quadrature data.
@@ -226,15 +230,16 @@ namespace VectorTools
    * quadrature point data.
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const Mapping<dim, spacedim> &                            mapping,
-          const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const Quadrature<dim> &                                   quadrature,
-          const std::function<typename VectorType::value_type(
-            const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
-            const unsigned int)> &                                  func,
-          VectorType &                                              vec_result);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const Mapping<dim, spacedim> &                            mapping,
+    const DoFHandler<dim, spacedim> &                         dof,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    const Quadrature<dim> &                                   quadrature,
+    const std::function<typename VectorType::value_type(
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
+      const unsigned int)> &                                  func,
+    VectorType &                                              vec_result);
 
   /**
    * The same as above for projection of scalar-valued MatrixFree quadrature
@@ -265,8 +270,8 @@ namespace VectorTools
    * FEEvaluation object.
    */
   template <int dim, typename VectorType>
-  void
-  project(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
     std::shared_ptr<
       const MatrixFree<dim,
                        typename VectorType::value_type,
@@ -284,8 +289,8 @@ namespace VectorTools
    * matrix_free.get_dof_handler().get_fe().degree+1</code>.
    */
   template <int dim, typename VectorType>
-  void
-  project(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
     std::shared_ptr<
       const MatrixFree<dim,
                        typename VectorType::value_type,

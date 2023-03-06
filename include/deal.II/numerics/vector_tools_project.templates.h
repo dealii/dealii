@@ -408,8 +408,8 @@ namespace VectorTools
      * by copying from a LinearAlgebra::distributed::Vector.
      */
     template <int dim, typename VectorType, int spacedim>
-    void
-    project_matrix_free_copy_vector(
+    DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+    void project_matrix_free_copy_vector(
       const Mapping<dim, spacedim> &                             mapping,
       const DoFHandler<dim, spacedim> &                          dof,
       const AffineConstraints<typename VectorType::value_type> & constraints,
@@ -478,8 +478,8 @@ namespace VectorTools
               class M_or_MC,
               template <int>
               class Q_or_QC>
-    void
-    do_project(
+    DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+    void do_project(
       const M_or_MC<dim, spacedim> &                             mapping,
       const DoFHandler<dim, spacedim> &                          dof,
       const AffineConstraints<typename VectorType::value_type> & constraints,
@@ -579,8 +579,8 @@ namespace VectorTools
 
 
     template <int dim, typename VectorType, int spacedim>
-    void
-    project_parallel(
+    DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+    void project_parallel(
       const Mapping<dim, spacedim> &                            mapping,
       const DoFHandler<dim, spacedim> &                         dof,
       const AffineConstraints<typename VectorType::value_type> &constraints,
@@ -682,8 +682,8 @@ namespace VectorTools
 
 
     template <int dim, typename VectorType, int spacedim>
-    void
-    project_parallel(
+    DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+    void project_parallel(
       std::shared_ptr<const MatrixFree<dim, typename VectorType::value_type>>
                                                                 matrix_free,
       const AffineConstraints<typename VectorType::value_type> &constraints,
@@ -767,20 +767,21 @@ namespace VectorTools
      * based on the number of components.
      */
     template <typename VectorType, int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
     std::enable_if_t<
       !numbers::NumberTraits<typename VectorType::value_type>::is_complex &&
         (dim == spacedim),
-      void>
-    project(
-      const Mapping<dim, spacedim> &                             mapping,
-      const DoFHandler<dim, spacedim> &                          dof,
-      const AffineConstraints<typename VectorType::value_type> & constraints,
-      const Quadrature<dim> &                                    quadrature,
-      const Function<spacedim, typename VectorType::value_type> &function,
-      VectorType &                                               vec_result,
-      const bool                 enforce_zero_boundary,
-      const Quadrature<dim - 1> &q_boundary,
-      const bool                 project_to_boundary_first)
+      void> project(const Mapping<dim, spacedim> &   mapping,
+                    const DoFHandler<dim, spacedim> &dof,
+                    const AffineConstraints<typename VectorType::value_type>
+                      &                    constraints,
+                    const Quadrature<dim> &quadrature,
+                    const Function<spacedim, typename VectorType::value_type>
+                      &                        function,
+                    VectorType &               vec_result,
+                    const bool                 enforce_zero_boundary,
+                    const Quadrature<dim - 1> &q_boundary,
+                    const bool                 project_to_boundary_first)
     {
       // If we can, use the matrix-free implementation
       bool use_matrix_free =
@@ -830,20 +831,21 @@ namespace VectorTools
      * for which we are sure that we cannot use the MatrixFree implementation.
      */
     template <typename VectorType, int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
     std::enable_if_t<
       numbers::NumberTraits<typename VectorType::value_type>::is_complex ||
         (dim < spacedim),
-      void>
-    project(
-      const Mapping<dim, spacedim> &                             mapping,
-      const DoFHandler<dim, spacedim> &                          dof,
-      const AffineConstraints<typename VectorType::value_type> & constraints,
-      const Quadrature<dim> &                                    quadrature,
-      const Function<spacedim, typename VectorType::value_type> &function,
-      VectorType &                                               vec_result,
-      const bool                 enforce_zero_boundary,
-      const Quadrature<dim - 1> &q_boundary,
-      const bool                 project_to_boundary_first)
+      void> project(const Mapping<dim, spacedim> &   mapping,
+                    const DoFHandler<dim, spacedim> &dof,
+                    const AffineConstraints<typename VectorType::value_type>
+                      &                    constraints,
+                    const Quadrature<dim> &quadrature,
+                    const Function<spacedim, typename VectorType::value_type>
+                      &                        function,
+                    VectorType &               vec_result,
+                    const bool                 enforce_zero_boundary,
+                    const Quadrature<dim - 1> &q_boundary,
+                    const bool                 project_to_boundary_first)
     {
       Assert((dynamic_cast<const parallel::TriangulationBase<dim> *>(
                 &(dof.get_triangulation())) == nullptr),
@@ -864,15 +866,16 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const Mapping<dim, spacedim> &                            mapping,
-          const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const Quadrature<dim> &                                   quadrature,
-          const std::function<typename VectorType::value_type(
-            const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
-            const unsigned int)> &                                  func,
-          VectorType &                                              vec_result)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const Mapping<dim, spacedim> &                            mapping,
+    const DoFHandler<dim, spacedim> &                         dof,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    const Quadrature<dim> &                                   quadrature,
+    const std::function<typename VectorType::value_type(
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
+      const unsigned int)> &                                  func,
+    VectorType &                                              vec_result)
   {
     internal::project_parallel<dim, VectorType, spacedim>(
       mapping, dof, constraints, quadrature, func, vec_result);
@@ -881,18 +884,19 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType>
-  void
-  project(std::shared_ptr<const MatrixFree<
-            dim,
-            typename VectorType::value_type,
-            VectorizedArray<typename VectorType::value_type>>>      matrix_free,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const unsigned int,
-          const std::function<VectorizedArray<typename VectorType::value_type>(
-            const unsigned int,
-            const unsigned int)> &func,
-          VectorType &            vec_result,
-          const unsigned int      fe_component)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    std::shared_ptr<const MatrixFree<
+      dim,
+      typename VectorType::value_type,
+      VectorizedArray<typename VectorType::value_type>>>      matrix_free,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    const unsigned int,
+    const std::function<VectorizedArray<typename VectorType::value_type>(
+      const unsigned int,
+      const unsigned int)> &func,
+    VectorType &            vec_result,
+    const unsigned int      fe_component)
   {
     internal::project_parallel<dim, VectorType, dim>(
       matrix_free, constraints, func, vec_result, fe_component);
@@ -901,17 +905,18 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType>
-  void
-  project(std::shared_ptr<const MatrixFree<
-            dim,
-            typename VectorType::value_type,
-            VectorizedArray<typename VectorType::value_type>>>      matrix_free,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const std::function<VectorizedArray<typename VectorType::value_type>(
-            const unsigned int,
-            const unsigned int)> &                                  func,
-          VectorType &                                              vec_result,
-          const unsigned int fe_component)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    std::shared_ptr<const MatrixFree<
+      dim,
+      typename VectorType::value_type,
+      VectorizedArray<typename VectorType::value_type>>>      matrix_free,
+    const AffineConstraints<typename VectorType::value_type> &constraints,
+    const std::function<VectorizedArray<typename VectorType::value_type>(
+      const unsigned int,
+      const unsigned int)> &                                  func,
+    VectorType &                                              vec_result,
+    const unsigned int                                        fe_component)
   {
     project(matrix_free,
             constraints,
@@ -924,16 +929,17 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const Mapping<dim, spacedim> &                            mapping,
-          const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const Quadrature<dim> &                                   quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec_result,
-          const bool                 enforce_zero_boundary,
-          const Quadrature<dim - 1> &q_boundary,
-          const bool                 project_to_boundary_first)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const Mapping<dim, spacedim> &                             mapping,
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const Quadrature<dim> &                                    quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec_result,
+    const bool                 enforce_zero_boundary,
+    const Quadrature<dim - 1> &q_boundary,
+    const bool                 project_to_boundary_first)
   {
     internal::project(mapping,
                       dof,
@@ -949,15 +955,16 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const Quadrature<dim> &                                   quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec,
-          const bool                 enforce_zero_boundary,
-          const Quadrature<dim - 1> &q_boundary,
-          const bool                 project_to_boundary_first)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const Quadrature<dim> &                                    quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const bool                 enforce_zero_boundary,
+    const Quadrature<dim - 1> &q_boundary,
+    const bool                 project_to_boundary_first)
   {
     project(get_default_linear_mapping(dof.get_triangulation()),
             dof,
@@ -973,16 +980,17 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const hp::MappingCollection<dim, spacedim> &              mapping,
-          const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const hp::QCollection<dim> &                              quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec_result,
-          const bool                      enforce_zero_boundary,
-          const hp::QCollection<dim - 1> &q_boundary,
-          const bool                      project_to_boundary_first)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const hp::MappingCollection<dim, spacedim> &               mapping,
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const hp::QCollection<dim> &                               quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec_result,
+    const bool                      enforce_zero_boundary,
+    const hp::QCollection<dim - 1> &q_boundary,
+    const bool                      project_to_boundary_first)
   {
     Assert((dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &(dof.get_triangulation())) == nullptr),
@@ -1002,15 +1010,16 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
-  void
-  project(const DoFHandler<dim, spacedim> &                         dof,
-          const AffineConstraints<typename VectorType::value_type> &constraints,
-          const hp::QCollection<dim> &                              quadrature,
-          const Function<spacedim, typename VectorType::value_type> &function,
-          VectorType &                                               vec,
-          const bool                      enforce_zero_boundary,
-          const hp::QCollection<dim - 1> &q_boundary,
-          const bool                      project_to_boundary_first)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void project(
+    const DoFHandler<dim, spacedim> &                          dof,
+    const AffineConstraints<typename VectorType::value_type> & constraints,
+    const hp::QCollection<dim> &                               quadrature,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &                                               vec,
+    const bool                      enforce_zero_boundary,
+    const hp::QCollection<dim - 1> &q_boundary,
+    const bool                      project_to_boundary_first)
   {
     project(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
             dof,
