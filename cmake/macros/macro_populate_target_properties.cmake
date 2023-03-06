@@ -106,7 +106,9 @@ function(populate_target_properties _target _build)
     separate_arguments(_link_options UNIX_COMMAND
       "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
       )
-    target_link_options(${_target} PRIVATE ${_link_options})
+    target_link_options(${_target} PRIVATE
+      $<$<COMPILE_LANGUAGE:CXX>:${_link_options}>
+      )
   endif()
 
   target_link_libraries(${_target} ${_visibility}
