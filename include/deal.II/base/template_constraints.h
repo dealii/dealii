@@ -22,7 +22,9 @@
 #include <deal.II/base/complex_overloads.h>
 
 #include <complex>
+#include <type_traits>
 #include <utility>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -680,6 +682,72 @@ struct EnableIfScalar<std::complex<T>>
 };
 
 
+// Forward declarations of vector types
+template <typename Number>
+class Vector;
+
+template <typename Number>
+class BlockVector;
+
+namespace LinearAlgebra
+{
+  template <typename Number>
+  class Vector;
+
+  template <typename Number>
+  class BlockVector;
+
+  namespace distributed
+  {
+    template <typename Number, typename MemorySpace>
+    class Vector;
+
+    template <typename Number>
+    class BlockVector;
+  } // namespace distributed
+} // namespace LinearAlgebra
+
+#ifdef DEAL_II_WITH_PETSC
+namespace PETScWrappers
+{
+  class Vector;
+  class BlockVector;
+
+  namespace MPI
+  {
+    class Vector;
+    class BlockVector;
+  } // namespace MPI
+} // namespace PETScWrappers
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+namespace TrilinosWrappers
+{
+  namespace MPI
+  {
+    class Vector;
+    class BlockVector;
+  } // namespace MPI
+} // namespace TrilinosWrappers
+
+namespace LinearAlgebra
+{
+  namespace EpetraWrappers
+  {
+    class Vector;
+  }
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  namespace TpetraWrappers
+  {
+    class Vector;
+  }
+#  endif
+} // namespace LinearAlgebra
+#endif
+
+
 /**
  * A namespace that is used to declare concepts used in C++20-style
  * `requires` clauses.
@@ -699,6 +767,110 @@ namespace concepts
   template <int dim, int spacedim>
   concept is_valid_dim_spacedim = (dim >= 1 && spacedim <= 3 &&
                                    dim <= spacedim);
+
+  namespace internal
+  {
+    /**
+     * A template variable that returns whether the template argument is
+     * a valid deal.II vector type. Its general definition is `false`, with
+     * specializations dealing with actual vector types for which the
+     * predicate is `true`.
+     */
+    template <typename T>
+    constexpr bool is_dealii_vector_type = false;
+
+    template <typename Number>
+    constexpr bool is_dealii_vector_type<dealii::Vector<Number>> = true;
+
+    template <typename Number>
+    constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> = true;
+
+    template <typename Number>
+    constexpr bool
+      is_dealii_vector_type<dealii::LinearAlgebra::Vector<Number>> = true;
+
+    template <typename Number>
+    constexpr bool
+      is_dealii_vector_type<dealii::LinearAlgebra::BlockVector<Number>> = true;
+
+    template <typename Number, typename MemorySpace>
+    constexpr bool is_dealii_vector_type<
+      dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>> = true;
+
+    template <typename Number>
+    constexpr bool is_dealii_vector_type<
+      dealii::LinearAlgebra::distributed::BlockVector<Number>> = true;
+
+#  ifdef DEAL_II_WITH_PETSC
+    template <>
+    constexpr bool is_dealii_vector_type<dealii::PETScWrappers::Vector> = true;
+
+    template <>
+    constexpr bool is_dealii_vector_type<dealii::PETScWrappers::BlockVector> =
+      true;
+
+    template <>
+    constexpr bool is_dealii_vector_type<dealii::PETScWrappers::MPI::Vector> =
+      true;
+
+    template <>
+    constexpr bool
+      is_dealii_vector_type<dealii::PETScWrappers::MPI::BlockVector> = true;
+#  endif
+
+#  ifdef DEAL_II_WITH_TRILINOS
+    template <>
+    constexpr bool
+      is_dealii_vector_type<dealii::TrilinosWrappers::MPI::Vector> = true;
+
+    template <>
+    constexpr bool
+      is_dealii_vector_type<dealii::TrilinosWrappers::MPI::BlockVector> = true;
+
+    template <>
+    constexpr bool
+      is_dealii_vector_type<dealii::LinearAlgebra::EpetraWrappers::Vector> =
+        true;
+
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    template <>
+    constexpr bool
+      is_dealii_vector_type<dealii::LinearAlgebra::TpetraWrappers::Vector> =
+        true;
+#    endif
+#  endif
+  } // namespace internal
+
+
+  /**
+   * A concept that tests whether a given template argument is a deal.II
+   * vector type. This concept is used in many places, such as for the
+   * functions in namespace VectorTools, where functions take a vector
+   * as argument, but the type of the vector is a template argument. The
+   * concept ensures that these functions cannot be called with an `int`
+   * argument, for example, for which the declaration without the concept
+   * would be perfectly valid but for which one would later get a linker
+   * error because the function is only instantiated for deal.II vector
+   * types.
+   */
+  template <typename VectorType>
+  concept is_dealii_vector_type =
+    internal::is_dealii_vector_type<std::remove_cv_t<VectorType>>;
+
+  /**
+   * A concept that tests whether a given template argument is a deal.II
+   * vector type into which one can write. It is defined by asking
+   * whether the is_dealii_vector_type concept is satisfied, and
+   * that the template argument is not a `const`-qualified type. For
+   * example, `is_writable_dealii_vector_type<dealii::Vector>` is true,
+   * whereas `is_writable_dealii_vector_type<const dealii::Vector>` is
+   * not.
+   */
+  template <typename VectorType>
+  concept is_writable_dealii_vector_type = is_dealii_vector_type<VectorType> &&
+                                           (std::is_const_v<VectorType> ==
+                                            false);
+
 #endif
 } // namespace concepts
 
