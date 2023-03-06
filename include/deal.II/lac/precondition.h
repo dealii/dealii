@@ -54,6 +54,197 @@ namespace LinearAlgebra
 } // namespace LinearAlgebra
 #endif
 
+/**
+ * Standard struct to pass additional data to PreconditionIdentity. This does
+ * nothing.
+ */
+struct PreconditionIdentityAdditionalData
+{};
+
+/**
+ * Standard struct to pass additional data to PreconditionRichardson.
+ */
+class PreconditionRichardsonAdditionalData
+{
+public:
+  /**
+   * Constructor. Block size must be given since there is no reasonable
+   * default parameter.
+   */
+  PreconditionRichardsonAdditionalData(const double relaxation = 1.);
+
+  /**
+   * Relaxation parameter.
+   */
+  double relaxation;
+};
+
+/**
+ * Standard struct to pass additional data to PreconditionRelaxation.
+ */
+template <typename PreconditionerType>
+class PreconditionRelaxationAdditionalData
+{
+public:
+  /**
+   * Constructor.
+   */
+  PreconditionRelaxationAdditionalData(const double       relaxation   = 1.,
+                                       const unsigned int n_iterations = 1);
+
+  /**
+   * Relaxation parameter.
+   */
+  double relaxation;
+
+  /**
+   * Number of smoothing steps to be performed.
+   */
+  unsigned int n_iterations;
+
+  /**
+   * Preconditioner.
+   */
+  std::shared_ptr<PreconditionerType> preconditioner;
+};
+
+
+/**
+ * Standardized data struct to pipe additional parameters to
+ * PreconditionChebyshev.
+ */
+template <typename PreconditionerType>
+struct PreconditionChebyshevAdditionalData
+{
+  /**
+   * An enum to define the available types of eigenvalue estimation
+   * algorithms.
+   */
+  enum class EigenvalueAlgorithm
+  {
+    /**
+     * This option runs the conjugate gradient solver and computes an
+     * eigenvalue estimation from the underlying Lanczos space. This only
+     * works for symmetric positive definite matrices.
+     */
+    lanczos,
+    /**
+     * This option runs a power iteration to estimate the largest
+     * eigenvalue. This algorithm also works for non-symmetric matrices,
+     * but typically gives less accurate estimates than the option 'lanczos'
+     * because it does not take the relation between vectors in the iterations
+     * into account (roughly speaking the off-diagonal entries in the
+     * tri-diagonal matrix of the Lanczos iteration).
+     */
+    power_iteration
+  };
+
+  /**
+   * An enum to define the available types of polynomial types.
+   */
+  enum class PolynomialType
+  {
+    /**
+     * First-kind Chebyshev polynomials.
+     */
+    first_kind,
+    /**
+     * Fourth-kind Chebyshev polynomials according to @cite lottes2022optimal
+     * and @cite phillips2022optimal.
+     */
+    fourth_kind
+  };
+
+  /**
+   * Constructor.
+   */
+  PreconditionChebyshevAdditionalData(
+    const unsigned int        degree              = 1,
+    const double              smoothing_range     = 0.,
+    const unsigned int        eig_cg_n_iterations = 8,
+    const double              eig_cg_residual     = 1e-2,
+    const double              max_eigenvalue      = 1,
+    const EigenvalueAlgorithm eigenvalue_algorithm =
+      EigenvalueAlgorithm::lanczos,
+    const PolynomialType polynomial_type = PolynomialType::first_kind);
+
+  /**
+   * Copy assignment operator.
+   */
+  PreconditionChebyshevAdditionalData &
+  operator=(const PreconditionChebyshevAdditionalData &other_data);
+
+  /**
+   * This determines the degree of the Chebyshev polynomial. The degree of
+   * the polynomial gives the number of matrix-vector products to be
+   * performed for one application of the step() operation. During vmult(),
+   * the method performs `(degree-1)` matrix-vector products. Degree one
+   * corresponds to a damped Jacobi method.
+   *
+   * If the degree is set to numbers::invalid_unsigned_int, the algorithm
+   * will automatically determine the number of necessary iterations based
+   * on the usual Chebyshev error formula as mentioned in the discussion of
+   * the main class.
+   */
+  unsigned int degree;
+
+  /**
+   * This sets the range between the largest eigenvalue in the matrix and
+   * the smallest eigenvalue to be treated. If the parameter is set to a
+   * number less than 1, an estimate for the largest and for the smallest
+   * eigenvalue will be calculated internally. For a smoothing range larger
+   * than one, the Chebyshev polynomial will act in the interval
+   * $[\lambda_\mathrm{max}/ \tt{smoothing\_range}, \lambda_\mathrm{max}]$,
+   * where $\lambda_\mathrm{max}$ is an estimate of the maximum eigenvalue
+   * of the matrix. A choice of <tt>smoothing_range</tt> between 5 and 20 is
+   * useful in case the preconditioner is used as a smoother in multigrid.
+   */
+  double smoothing_range;
+
+  /**
+   * Maximum number of CG iterations performed for finding the maximum
+   * eigenvalue. If set to zero, no computations are performed. Instead, the
+   * user must supply a largest eigenvalue via the variable
+   * PreconditionChebyshev::AdditionalData::max_eigenvalue.
+   */
+  unsigned int eig_cg_n_iterations;
+
+  /**
+   * Tolerance for CG iterations performed for finding the maximum
+   * eigenvalue.
+   */
+  double eig_cg_residual;
+
+  /**
+   * Maximum eigenvalue to work with. Only in effect if @p
+   * eig_cg_n_iterations is set to zero, otherwise this parameter is
+   * ignored.
+   */
+  double max_eigenvalue;
+
+  /**
+   * Constraints to be used for the operator given. This variable is used to
+   * zero out the correct entries when creating an initial guess.
+   */
+  AffineConstraints<double> constraints;
+
+  /**
+   * Stores the preconditioner object that the Chebyshev is wrapped around.
+   */
+  std::shared_ptr<PreconditionerType> preconditioner;
+
+  /**
+   * Specifies the underlying eigenvalue estimation algorithm.
+   */
+  EigenvalueAlgorithm eigenvalue_algorithm;
+
+  /**
+   * Specifies the polynomial type to be used.
+   */
+  PolynomialType polynomial_type;
+};
+
+
 
 /**
  * @addtogroup Preconditioners
@@ -89,16 +280,9 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * This function is only present to provide the interface of a
-   * preconditioner to be handed to a smoother.  This does nothing.
+   * An alias for the preconditioner-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Constructor.
-     */
-    AdditionalData() = default;
-  };
+  using AdditionalData = PreconditionIdentityAdditionalData;
 
   /**
    * Constructor, sets the domain and range sizes to their defaults.
@@ -204,22 +388,9 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * Parameters for Richardson preconditioner.
+   * An alias for the preconditioner-specific additional data.
    */
-  class AdditionalData
-  {
-  public:
-    /**
-     * Constructor. Block size must be given since there is no reasonable
-     * default parameter.
-     */
-    AdditionalData(const double relaxation = 1.);
-
-    /**
-     * Relaxation parameter.
-     */
-    double relaxation;
-  };
+  using AdditionalData = PreconditionRichardsonAdditionalData;
 
   /**
    * Constructor, sets the relaxation parameter, domain and range sizes to
@@ -397,7 +568,7 @@ private:
 
 
 /**
- * Base class for other preconditioners. Here, only some common features
+ * Base class for other preconditioners. Here, only some common features for
  * Jacobi, SOR and SSOR preconditioners are implemented. For preconditioning,
  * refer to derived classes.
  */
@@ -412,33 +583,10 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * Class for parameters.
+   * An alias for the preconditioner-specific additional data.
    */
-  class AdditionalData
-  {
-  public:
-    /**
-     * Constructor.
-     */
-    AdditionalData(const double       relaxation   = 1.,
-                   const unsigned int n_iterations = 1);
-
-    /**
-     * Relaxation parameter.
-     */
-    double relaxation;
-
-    /**
-     * Number of smoothing steps to be performed.
-     */
-    unsigned int n_iterations;
-
-
-    /*
-     * Preconditioner.
-     */
-    std::shared_ptr<PreconditionerType> preconditioner;
-  };
+  using AdditionalData =
+    PreconditionRelaxationAdditionalData<PreconditionerType>;
 
   /**
    * Initialize matrix and relaxation parameter. The matrix is just stored in
@@ -514,7 +662,7 @@ protected:
    */
   unsigned int n_iterations;
 
-  /*
+  /**
    * Preconditioner.
    */
   std::shared_ptr<PreconditionerType> preconditioner;
@@ -1938,139 +2086,10 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * Standardized data struct to pipe additional parameters to the
-   * preconditioner.
+   * An alias for the preconditioner-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * An enum to define the available types of eigenvalue estimation
-     * algorithms.
-     */
-    enum class EigenvalueAlgorithm
-    {
-      /**
-       * This option runs the conjugate gradient solver and computes an
-       * eigenvalue estimation from the underlying Lanczos space. This only
-       * works for symmetric positive definite matrices.
-       */
-      lanczos,
-      /**
-       * This option runs a power iteration to estimate the largest
-       * eigenvalue. This algorithm also works for non-symmetric matrices,
-       * but typically gives less accurate estimates than the option 'lanczos'
-       * because it does not take the relation between vectors in the iterations
-       * into account (roughly speaking the off-diagonal entries in the
-       * tri-diagonal matrix of the Lanczos iteration).
-       */
-      power_iteration
-    };
-
-    /**
-     * An enum to define the available types of polynomial types.
-     */
-    enum class PolynomialType
-    {
-      /**
-       * First-kind Chebyshev polynomials.
-       */
-      first_kind,
-      /**
-       * Fourth-kind Chebyshev polynomials according to @cite lottes2022optimal
-       * and @cite phillips2022optimal.
-       */
-      fourth_kind
-    };
-
-    /**
-     * Constructor.
-     */
-    AdditionalData(
-      const unsigned int        degree              = 1,
-      const double              smoothing_range     = 0.,
-      const unsigned int        eig_cg_n_iterations = 8,
-      const double              eig_cg_residual     = 1e-2,
-      const double              max_eigenvalue      = 1,
-      const EigenvalueAlgorithm eigenvalue_algorithm =
-        EigenvalueAlgorithm::lanczos,
-      const PolynomialType polynomial_type = PolynomialType::first_kind);
-
-    /**
-     * Copy assignment operator.
-     */
-    AdditionalData &
-    operator=(const AdditionalData &other_data);
-
-    /**
-     * This determines the degree of the Chebyshev polynomial. The degree of
-     * the polynomial gives the number of matrix-vector products to be
-     * performed for one application of the step() operation. During vmult(),
-     * the method performs `(degree-1)` matrix-vector products. Degree one
-     * corresponds to a damped Jacobi method.
-     *
-     * If the degree is set to numbers::invalid_unsigned_int, the algorithm
-     * will automatically determine the number of necessary iterations based
-     * on the usual Chebyshev error formula as mentioned in the discussion of
-     * the main class.
-     */
-    unsigned int degree;
-
-    /**
-     * This sets the range between the largest eigenvalue in the matrix and
-     * the smallest eigenvalue to be treated. If the parameter is set to a
-     * number less than 1, an estimate for the largest and for the smallest
-     * eigenvalue will be calculated internally. For a smoothing range larger
-     * than one, the Chebyshev polynomial will act in the interval
-     * $[\lambda_\mathrm{max}/ \tt{smoothing\_range}, \lambda_\mathrm{max}]$,
-     * where $\lambda_\mathrm{max}$ is an estimate of the maximum eigenvalue
-     * of the matrix. A choice of <tt>smoothing_range</tt> between 5 and 20 is
-     * useful in case the preconditioner is used as a smoother in multigrid.
-     */
-    double smoothing_range;
-
-    /**
-     * Maximum number of CG iterations performed for finding the maximum
-     * eigenvalue. If set to zero, no computations are performed. Instead, the
-     * user must supply a largest eigenvalue via the variable
-     * PreconditionChebyshev::AdditionalData::max_eigenvalue.
-     */
-    unsigned int eig_cg_n_iterations;
-
-    /**
-     * Tolerance for CG iterations performed for finding the maximum
-     * eigenvalue.
-     */
-    double eig_cg_residual;
-
-    /**
-     * Maximum eigenvalue to work with. Only in effect if @p
-     * eig_cg_n_iterations is set to zero, otherwise this parameter is
-     * ignored.
-     */
-    double max_eigenvalue;
-
-    /**
-     * Constraints to be used for the operator given. This variable is used to
-     * zero out the correct entries when creating an initial guess.
-     */
-    AffineConstraints<double> constraints;
-
-    /**
-     * Stores the preconditioner object that the Chebyshev is wrapped around.
-     */
-    std::shared_ptr<PreconditionerType> preconditioner;
-
-    /**
-     * Specifies the underlying eigenvalue estimation algorithm.
-     */
-    EigenvalueAlgorithm eigenvalue_algorithm;
-
-    /**
-     * Specifies the polynomial type to be used.
-     */
-    PolynomialType polynomial_type;
-  };
-
+  using AdditionalData =
+    PreconditionChebyshevAdditionalData<PreconditionerType>;
 
   /**
    * Constructor.
@@ -2319,8 +2338,8 @@ PreconditionIdentity::n() const
 
 //---------------------------------------------------------------------------
 
-inline PreconditionRichardson::AdditionalData::AdditionalData(
-  const double relaxation)
+inline PreconditionRichardsonAdditionalData::
+  PreconditionRichardsonAdditionalData(const double relaxation)
   : relaxation(relaxation)
 {}
 
@@ -2657,9 +2676,10 @@ PreconditionUseMatrix<MatrixType, VectorType>::vmult(
 
 //---------------------------------------------------------------------------
 
-template <typename MatrixType, typename PreconditionerType>
-inline PreconditionRelaxation<MatrixType, PreconditionerType>::AdditionalData::
-  AdditionalData(const double relaxation, const unsigned int n_iterations)
+template <typename PreconditionerType>
+inline PreconditionRelaxationAdditionalData<PreconditionerType>::
+  PreconditionRelaxationAdditionalData(const double       relaxation,
+                                       const unsigned int n_iterations)
   : relaxation(relaxation)
   , n_iterations(n_iterations)
 {}
@@ -3478,15 +3498,16 @@ namespace internal
 
 
 
-template <typename MatrixType, class VectorType, typename PreconditionerType>
-inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  AdditionalData::AdditionalData(const unsigned int        degree,
-                                 const double              smoothing_range,
-                                 const unsigned int        eig_cg_n_iterations,
-                                 const double              eig_cg_residual,
-                                 const double              max_eigenvalue,
-                                 const EigenvalueAlgorithm eigenvalue_algorithm,
-                                 const PolynomialType      polynomial_type)
+template <typename PreconditionerType>
+inline PreconditionChebyshevAdditionalData<PreconditionerType>::
+  PreconditionChebyshevAdditionalData(
+    const unsigned int        degree,
+    const double              smoothing_range,
+    const unsigned int        eig_cg_n_iterations,
+    const double              eig_cg_residual,
+    const double              max_eigenvalue,
+    const EigenvalueAlgorithm eigenvalue_algorithm,
+    const PolynomialType      polynomial_type)
   : degree(degree)
   , smoothing_range(smoothing_range)
   , eig_cg_n_iterations(eig_cg_n_iterations)
@@ -3498,12 +3519,10 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
 
 
-template <typename MatrixType, class VectorType, typename PreconditionerType>
-inline typename PreconditionChebyshev<MatrixType,
-                                      VectorType,
-                                      PreconditionerType>::AdditionalData &
-PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  AdditionalData::operator=(const AdditionalData &other_data)
+template <typename PreconditionerType>
+inline PreconditionChebyshevAdditionalData<PreconditionerType> &
+PreconditionChebyshevAdditionalData<PreconditionerType>::operator=(
+  const PreconditionChebyshevAdditionalData &other_data)
 {
   degree               = other_data.degree;
   smoothing_range      = other_data.smoothing_range;
