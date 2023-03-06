@@ -30,6 +30,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
+template <class T>
+class AlignedVector;
+
 template <int N, typename T>
 class Table;
 
@@ -1052,6 +1055,74 @@ inline ArrayView<const ElementType>
 make_array_view(const std::vector<ElementType> &vector,
                 const std::size_t               starting_index,
                 const std::size_t               size_of_view)
+{
+  Assert(starting_index + size_of_view <= vector.size(),
+         ExcMessage("The starting index and size of the view you want to "
+                    "create would lead to a view that extends beyond the end "
+                    "of the given vector."));
+  return ArrayView<const ElementType>(&vector[starting_index], size_of_view);
+}
+
+
+
+/**
+ * Create a writable view to an entire AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ */
+template <typename ElementType>
+inline ArrayView<ElementType>
+make_array_view(AlignedVector<ElementType> &vector)
+{
+  return ArrayView<ElementType>(vector.data(), vector.size());
+}
+
+
+
+/**
+ * Create a read-only view to an entire AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ */
+template <typename ElementType>
+inline ArrayView<const ElementType>
+make_array_view(const AlignedVector<ElementType> &vector)
+{
+  return ArrayView<const ElementType>(vector.data(), vector.size());
+}
+
+
+
+/**
+ * Create a writable view to a part of an AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ */
+template <typename ElementType>
+inline ArrayView<ElementType>
+make_array_view(AlignedVector<ElementType> &vector,
+                const std::size_t           starting_index,
+                const std::size_t           size_of_view)
+{
+  Assert(starting_index + size_of_view <= vector.size(),
+         ExcMessage("The starting index and size of the view you want to "
+                    "create would lead to a view that extends beyond the end "
+                    "of the given vector."));
+  return ArrayView<ElementType>(&vector[starting_index], size_of_view);
+}
+
+
+
+/**
+ * Create a read-only view to a part of an AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ */
+template <typename ElementType>
+inline ArrayView<const ElementType>
+make_array_view(const AlignedVector<ElementType> &vector,
+                const std::size_t                 starting_index,
+                const std::size_t                 size_of_view)
 {
   Assert(starting_index + size_of_view <= vector.size(),
          ExcMessage("The starting index and size of the view you want to "

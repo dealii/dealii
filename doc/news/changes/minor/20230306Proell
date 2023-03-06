@@ -1,0 +1,3 @@
+New: Provide overloads for `make_array_view` for `AlignedVector`.
+<br>
+(Sebastian Proell, 2023/03/06)
