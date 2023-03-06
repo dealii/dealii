@@ -259,7 +259,7 @@ jobs:
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D CMAKE_CXX_COMPILER=icpc \
-              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_CXX_FLAGS='-Werror -O0' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI=ON \
               -D DEAL_II_WITH_LAPACK=ON \
