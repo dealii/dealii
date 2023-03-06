@@ -297,7 +297,7 @@ namespace Step37
     virtual ~PotentialBCFunction() = default;
 
     virtual double
-    value(const Point<dim> &p, const unsigned int) const
+    value(const Point<dim> &p, const unsigned int) const override
     {
       const double r = p.distance(x0);
       Assert(r > 0, ExcDivideByZero());
