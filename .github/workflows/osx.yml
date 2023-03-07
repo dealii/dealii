@@ -29,8 +29,8 @@ jobs:
       run: cat detailed.log
     - name: build
       run: |
-        make -j 2
-        make -j 2 test # quicktests
+        make VERBOSE=1 -j2
+        make -j2 test # quicktests
     - name: archive error 1
       uses: actions/upload-artifact@v3
       if: always()
@@ -72,8 +72,8 @@ jobs:
       run: cat detailed.log
     - name: build
       run: |
-        make -j 2
-        make -j 2 test #quicktests
+        make VERBOSE=1 -j2
+        make -j2 test #quicktests
     - name: archive error 1
       uses: actions/upload-artifact@v3
       if: always()
