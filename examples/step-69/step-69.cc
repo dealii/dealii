@@ -289,12 +289,12 @@ namespace Step69
   class ProblemDescription
   {
   public:
-    static constexpr unsigned int problem_dimension = 2 + dim;
+    static constexpr unsigned int n_solution_variables = 2 + dim;
 
-    using state_type = Tensor<1, problem_dimension>;
-    using flux_type  = Tensor<1, problem_dimension, Tensor<1, dim>>;
+    using state_type = Tensor<1, n_solution_variables>;
+    using flux_type  = Tensor<1, n_solution_variables, Tensor<1, dim>>;
 
-    const static std::array<std::string, problem_dimension> component_names;
+    const static std::array<std::string, n_solution_variables> component_names;
 
     static constexpr double gamma = 7. / 5.;
 
@@ -381,14 +381,14 @@ namespace Step69
   class TimeStepping : public ParameterAcceptor
   {
   public:
-    static constexpr unsigned int problem_dimension =
-      ProblemDescription<dim>::problem_dimension;
+    static constexpr unsigned int n_solution_variables =
+      ProblemDescription<dim>::n_solution_variables;
 
     using state_type = typename ProblemDescription<dim>::state_type;
     using flux_type  = typename ProblemDescription<dim>::flux_type;
 
-    using vector_type =
-      std::array<LinearAlgebra::distributed::Vector<double>, problem_dimension>;
+    using vector_type = std::array<LinearAlgebra::distributed::Vector<double>,
+                                   n_solution_variables>;
 
     TimeStepping(const MPI_Comm            mpi_communicator,
                  TimerOutput &             computing_timer,
@@ -433,13 +433,13 @@ namespace Step69
   class SchlierenPostprocessor : public ParameterAcceptor
   {
   public:
-    static constexpr unsigned int problem_dimension =
-      ProblemDescription<dim>::problem_dimension;
+    static constexpr unsigned int n_solution_variables =
+      ProblemDescription<dim>::n_solution_variables;
 
     using state_type = typename ProblemDescription<dim>::state_type;
 
-    using vector_type =
-      std::array<LinearAlgebra::distributed::Vector<double>, problem_dimension>;
+    using vector_type = std::array<LinearAlgebra::distributed::Vector<double>,
+                                   n_solution_variables>;
 
     SchlierenPostprocessor(
       const MPI_Comm          mpi_communicator,
@@ -944,7 +944,7 @@ namespace Step69
     // <code>gather()</code> (second interface): this second function
     // signature having two input arguments will be used to gather the
     // state at a node <code>i</code> and return it as a
-    // <code>Tensor<1,problem_dimension></code> for our convenience.
+    // <code>Tensor<1,n_solution_variables></code> for our convenience.
 
     template <std::size_t k>
     DEAL_II_ALWAYS_INLINE inline Tensor<1, k>
@@ -960,10 +960,10 @@ namespace Step69
     // <code>scatter()</code>: this function has three input arguments, the
     // first one is meant to be a "global object" (say a locally owned or
     // locally relevant vector), the second argument which could be a
-    // <code>Tensor<1,problem_dimension></code>, and the last argument
+    // <code>Tensor<1,n_solution_variables></code>, and the last argument
     // which represents a index of the global object. This function will be
     // primarily used to write the updated nodal values, stored as
-    // <code>Tensor<1,problem_dimension></code>, into the global objects.
+    // <code>Tensor<1,n_solution_variables></code>, into the global objects.
 
     template <std::size_t k, int k2>
     DEAL_II_ALWAYS_INLINE inline void
@@ -2021,7 +2021,7 @@ namespace Step69
                   const auto c_ij = gather_get_entry(cij_matrix, jt);
                   const auto d_ij = get_entry(dij_matrix, jt);
 
-                  for (unsigned int k = 0; k < problem_dimension; ++k)
+                  for (unsigned int k = 0; k < n_solution_variables; ++k)
                     {
                       U_i_new[k] +=
                         tau_max / m_i *
@@ -2630,8 +2630,8 @@ namespace Step69
     for (auto &it : U)
       it.reinit(offline_data.partitioner);
 
-    constexpr auto problem_dimension =
-      ProblemDescription<dim>::problem_dimension;
+    constexpr auto n_solution_variables =
+      ProblemDescription<dim>::n_solution_variables;
 
     // The function signature of
     // <code>InitialValues<dim>::initial_state</code> is not quite right
@@ -2640,7 +2640,7 @@ namespace Step69
     // returns just the value of the <code>i</code>th component. This
     // lambda in turn is converted to a Function<dim> object with the help of
     // the ScalarFunctionFromFunctionObject wrapper.
-    for (unsigned int i = 0; i < problem_dimension; ++i)
+    for (unsigned int i = 0; i < n_solution_variables; ++i)
       VectorTools::interpolate(offline_data.dof_handler,
                                ScalarFunctionFromFunctionObject<dim, double>(
                                  [&](const Point<dim> &x) {
@@ -2729,8 +2729,8 @@ namespace Step69
         background_thread_state.wait();
       }
 
-    constexpr auto problem_dimension =
-      ProblemDescription<dim>::problem_dimension;
+    constexpr auto n_solution_variables =
+      ProblemDescription<dim>::n_solution_variables;
 
     // At this point we make a copy of the state vector, run the schlieren
     // postprocessor, and run DataOut<dim>::build_patches() The actual
@@ -2742,7 +2742,7 @@ namespace Step69
     // worker thread to ensure that once we exit this function and the
     // worker thread finishes the DataOut<dim> object gets destroyed again.
 
-    for (unsigned int i = 0; i < problem_dimension; ++i)
+    for (unsigned int i = 0; i < n_solution_variables; ++i)
       {
         output_vector[i] = U[i];
         output_vector[i].update_ghost_values();
@@ -2756,7 +2756,7 @@ namespace Step69
 
     const auto &component_names = ProblemDescription<dim>::component_names;
 
-    for (unsigned int i = 0; i < problem_dimension; ++i)
+    for (unsigned int i = 0; i < n_solution_variables; ++i)
       data_out->add_data_vector(output_vector[i], component_names[i]);
 
     data_out->add_data_vector(schlieren_postprocessor.schlieren,
