@@ -451,15 +451,23 @@ public:
   {}
 
   /**
-   * This function assigns a scalar to this class.
+   * This function assigns a scalar to the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const Number scalar)
+  operator=(const Number scalar) &
   {
     data = scalar;
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const Number scalar) && = delete;
 
   /**
    * Access operator (only valid with component 0 in the base class without
@@ -992,11 +1000,20 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const double x)
+  operator=(const double x) &
   {
     data = _mm512_set1_pd(x);
     return *this;
   }
+
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const double scalar) && = delete;
 
   /**
    * Access operator.
@@ -1571,11 +1588,19 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const float x)
+  operator=(const float x) &
   {
     data = _mm512_set1_ps(x);
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const float scalar) && = delete;
 
   /**
    * Access operator.
@@ -2232,11 +2257,19 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const double x)
+  operator=(const double x) &
   {
     data = _mm256_set1_pd(x);
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const double scalar) && = delete;
 
   /**
    * Access operator.
@@ -2770,11 +2803,19 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const float x)
+  operator=(const float x) &
   {
     data = _mm256_set1_ps(x);
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const float scalar) && = delete;
 
   /**
    * Access operator.
@@ -3328,11 +3369,19 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const double x)
+  operator=(const double x) &
   {
     data = _mm_set1_pd(x);
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const double scalar) && = delete;
 
   /**
    * Access operator.
@@ -3794,11 +3843,19 @@ public:
 
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const float x)
+  operator=(const float x) &
   {
     data = _mm_set1_ps(x);
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const float scalar) && = delete;
 
   /**
    * Access operator.
@@ -4274,11 +4331,11 @@ public:
   {}
 
   /**
-   * This function assigns a scalar to this class.
+   * This function assigns a scalar to the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const double x)
+  operator=(const double x) &
   {
     data = vec_splats(x);
 
@@ -4288,6 +4345,14 @@ public:
     (void)x;
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const double scalar) && = delete;
 
   /**
    * Access operator. The component must be either 0 or 1.
@@ -4521,11 +4586,11 @@ public:
   {}
 
   /**
-   * This function assigns a scalar to this class.
+   * This function assigns a scalar to the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
-  operator=(const float x)
+  operator=(const float x) &
   {
     data = vec_splats(x);
 
@@ -4535,6 +4600,14 @@ public:
     (void)x;
     return *this;
   }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const float scalar) && = delete;
 
   /**
    * Access operator. The component must be between 0 and 3.
