@@ -36,6 +36,17 @@
 #define DEAL_II_CUDA_HOST_DEV DEAL_II_HOST_DEVICE
 #define DEAL_II_HOST_DEVICE_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
 
+// clang++ assumes that all constexpr functions are __host__ __device__ when
+// compiling CUDA code, i.e, when Kokkos was configured with CUDA support.
+// This is problematic when calling non-constexpr functions in constexpr
+// functions. Hence, we need a way to annotate functions explicitly as
+// host-only.
+#if defined(__clang__) && defined(__CUDA__)
+#  define DEAL_II_HOST __host__
+#else
+#  define DEAL_II_HOST
+#endif
+
 // Forward-declare the automatic differentiation types so we can add prototypes
 // for our own wrappers.
 #ifdef DEAL_II_WITH_ADOLC
