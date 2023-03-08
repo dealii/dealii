@@ -202,7 +202,15 @@ namespace Step22
            ExcIndexRange(component, 0, this->n_components));
 
     if (component == 0)
-      return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
+      {
+        if (p[0] < 0)
+          return -1;
+        else if (p[0] > 0)
+          return 1;
+        else
+          return 0;
+      }
+
     return 0;
   }
 
