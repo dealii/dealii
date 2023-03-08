@@ -468,13 +468,15 @@ namespace GridGenerator
    * to the cylinder: see the mathematical definition given in
    * GridGenerator::concentric_hyper_shells.
    *
-   * @param colorize Assign different boundary ids if set to true. For more
+   * @param colorize If `true`, then assign different boundary ids to
+   * different parts of the boundary. For more
    * information on boundary indicators see
    * @ref GlossBoundaryIndicator "this glossary entry".
    * The left boundary (at $x = 0$) is assigned an id of $0$, the right
-   * boundary (at $x = 2.2$) is assigned an id of $1$, the cylinder boundary
-   * is assigned an id of $2$, and the channel walls are assigned an id of
-   * $3$.
+   * boundary (at $x = 2.2$) is assigned an id of $1$; the boundary of
+   * the obstacle in the middle (i.e., the circle in 2d or the cylinder
+   * walls in 3d) is assigned an id of $2$, and the channel walls are
+   * assigned an id of $3$.
    *
    * See the original paper for more information:
    * @code{.bib}
