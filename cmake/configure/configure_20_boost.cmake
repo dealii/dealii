@@ -91,13 +91,16 @@ macro(feature_boost_find_external var)
 
         set(_binary_test_dir ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBugWorkdir)
 
+        set(_flags "${DEAL_II_CXX_FLAGS}")
+        strip_flag(_flags "-Werror")
+
         file(REMOVE_RECURSE ${_binary_test_dir})
         file(MAKE_DIRECTORY ${_binary_test_dir})
         execute_process(
           COMMAND ${CMAKE_COMMAND}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-            "-DCMAKE_CXX_FLAGS=${DEAL_II_CXX_FLAGS}"
+            "-DCMAKE_CXX_FLAGS=${_flags}"
             "-DCMAKE_EXE_LINKER_FLAGS=${DEAL_II_LINKER_FLAGS}"
             "-DCMAKE_SHARED_LINKER_FLAGS=${DEAL_II_LINKER_FLAGS}"
             "-DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}"
