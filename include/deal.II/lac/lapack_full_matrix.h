@@ -836,6 +836,27 @@ public:
   eigenvalue(const size_type i) const;
 
   /**
+   * After a call to compute_eigenvalues(), this function returns all (right)
+   * eigenvectors as returned by LAPACK. This means that eigenvectors are
+   * contained in column-major ordering in a matrix associated to the given
+   * flat vector. Note that for real-valued matrices, there might appear
+   * complex eigenvalues with complex-conjugate values and eigenvectors. For
+   * those cases, LAPACK places a column of n() entries with the real part and
+   * the next column (corresponding to the complex conjugate eigenvalue) for
+   * the imaginary part of the eigenvector.
+   */
+  std::vector<number>
+  get_right_eigenvectors() const;
+
+  /**
+   * Return the matrix of left eigenvectors after a call to
+   * compute_eigenvalues(), following the same convention as
+   * get_right_eigenvectors().
+   */
+  std::vector<number>
+  get_left_eigenvectors() const;
+
+  /**
    * Retrieve singular values after compute_svd() or compute_inverse_svd() was
    * called.
    */
@@ -1152,6 +1173,32 @@ LAPACKFullMatrix<number>::eigenvalue(const size_type i) const
     return std::complex<number>(wi[i]);
   else
     return std::complex<number>(wr[i], wi[i]);
+}
+
+
+template <typename number>
+inline std::vector<number>
+LAPACKFullMatrix<number>::get_right_eigenvectors() const
+{
+  Assert(state & LAPACKSupport::eigenvalues, ExcInvalidState());
+  Assert(vr.size() == this->n_rows() * this->n_cols(),
+         ExcMessage("Right eigenvectors are not available! Did you "
+                    "set the associated flag in compute_eigenvalues()"));
+
+  return vr;
+}
+
+
+template <typename number>
+inline std::vector<number>
+LAPACKFullMatrix<number>::get_left_eigenvectors() const
+{
+  Assert(state & LAPACKSupport::eigenvalues, ExcInvalidState());
+  Assert(vl.size() == this->n_rows() * this->n_cols(),
+         ExcMessage("Left eigenvectors are not available! Did you "
+                    "set the associated flag in compute_eigenvalues()"));
+
+  return vl;
 }
 
 
