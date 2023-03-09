@@ -776,7 +776,17 @@ namespace Utilities
 #endif
 
       // Initialize Kokkos
-      Kokkos::initialize(argc, argv);
+      {
+        std::vector<char *> argv_new;
+        for (int i = 0; i < argc; ++i)
+          argv_new.push_back(argv[i]);
+        std::stringstream threads_flag;
+        threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
+        argv_new.push_back(const_cast<char *>(threads_flag.str().c_str()));
+        argv_new.push_back(nullptr);
+        int argc_new = argc + 1;
+        Kokkos::initialize(argc_new, argv_new.data());
+      }
 
       // we are allowed to call MPI_Init ourselves and PETScInitialize will
       // detect this. This allows us to use MPI_Init_thread instead.
