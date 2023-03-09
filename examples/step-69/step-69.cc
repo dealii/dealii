@@ -1222,9 +1222,10 @@ namespace Step69
     // - The iterator <code>indices.begin()</code> points to a row index.
     // - The iterator <code>indices.end()</code> points to a numerically higher
     //   row index.
-    // - The function <code>on_subranges(i1,i2)</code> (where <code>i1</code>
-    //   and <code>i2</code> define a sub-range within the range spanned by
-    //   the end and begin iterators defined in the two previous bullets)
+    // - The function <code>on_subranges(index_begin, index_end)</code>
+    //   (where <code>index_begin</code> and <code>index_end</code>
+    //   define a sub-range within the range spanned by
+    //   the begin and end iterators defined in the two previous bullets)
     //   applies an operation to every iterator in such subrange. We may as
     //   well call <code>on_subranges</code> the "worker".
     // - Grainsize: minimum number of iterators (in this case representing
@@ -1271,10 +1272,10 @@ namespace Step69
         0, n_locally_relevant);
 
       const auto on_subranges = //
-        [&](const auto i1, const auto i2) {
+        [&](const auto index_begin, const auto index_end) {
           for (const auto row_index :
-               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
-                                                                        *i2))
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                 *index_begin, *index_end))
             {
               // First column-loop: we compute and store the entries of the
               // matrix norm_matrix and write normalized entries into the
@@ -1810,17 +1811,17 @@ namespace Step69
     // <code>nij_matrix</code> above are used here again.
     //
     // We define again a "worker" function <code>on_subranges</code> that
-    // computes the viscosity $d_{ij}$ for a subrange [i1, i2) of column
-    // indices:
+    // computes the viscosity $d_{ij}$ for a subrange `[*index_begin,
+    // *index_end)` of column indices:
     {
       TimerOutput::Scope scope(computing_timer,
                                "time_stepping - 1 compute d_ij");
 
       const auto on_subranges = //
-        [&](const auto i1, const auto i2) {
+        [&](const auto index_begin, const auto index_end) {
           for (const auto i :
-               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
-                                                                        *i2))
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                 *index_begin, *index_end))
             {
               const auto U_i = gather(U, i);
 
@@ -1913,12 +1914,12 @@ namespace Step69
       // locally.
 
       const auto on_subranges = //
-        [&](const auto i1, const auto i2) {
+        [&](const auto index_begin, const auto index_end) {
           double tau_max_on_subrange = std::numeric_limits<double>::infinity();
 
           for (const auto i :
-               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
-                                                                        *i2))
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                 *index_begin, *index_end))
             {
               double d_sum = 0.;
 
@@ -1999,8 +2000,9 @@ namespace Step69
                                "time_stepping - 3 perform update");
 
       const auto on_subranges = //
-        [&](const auto i1, const auto i2) {
-          for (const auto i : boost::make_iterator_range(i1, i2))
+        [&](const auto index_begin, const auto index_end) {
+          for (const auto i :
+               boost::make_iterator_range(index_begin, index_end))
             {
               Assert(i < n_locally_owned, ExcInternalError());
 
@@ -2249,11 +2251,12 @@ namespace Step69
     // global maxima and minima of the gradients.
     {
       const auto on_subranges = //
-        [&](const auto i1, const auto i2) {
+        [&](const auto index_begin, const auto index_end) {
           double r_i_max_on_subrange = 0.;
           double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
 
-          for (const auto i : boost::make_iterator_range(i1, i2))
+          for (const auto i :
+               boost::make_iterator_range(index_begin, index_end))
             {
               Assert(i < n_locally_owned, ExcInternalError());
 
@@ -2333,8 +2336,9 @@ namespace Step69
 
     {
       const auto on_subranges = //
-        [&](const auto i1, const auto i2) {
-          for (const auto i : boost::make_iterator_range(i1, i2))
+        [&](const auto index_begin, const auto index_end) {
+          for (const auto i :
+               boost::make_iterator_range(index_begin, index_end))
             {
               Assert(i < n_locally_owned, ExcInternalError());
 
