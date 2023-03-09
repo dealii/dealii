@@ -1,0 +1,82 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+// Tests eigenvectors of LAPACKFullMatrix
+
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/vector.h>
+
+#include <iostream>
+
+#include "../tests.h"
+
+/*
+ * Eigenvalues and -vectors of this system are
+ * lambda = 3     v = (0.707,  0.707)
+ * lambda = 5     v = (0.707, -0.707)
+ */
+const double mat1[2][2] = {{4., -1.}, {-1., 4.}};
+
+/*
+ * Eigenvalues and -vectors of this system are
+ * lambda = 1+1i     v = (0.707, -0.707i)
+ * lambda = 1-1i     v = (0.707,  0.707i)
+ */
+const double mat2[2][2] = {{1., -1.}, {1., 1.}};
+
+
+void
+check_matrix(const double *matrix_pointer)
+{
+  FullMatrix<double>       A(2, 2, matrix_pointer);
+  LAPACKFullMatrix<double> LA(2, 2);
+  LA = A;
+
+  deallog << "Checking matrix " << std::endl;
+  LA.print_formatted(deallog.get_file_stream());
+
+  LA.compute_eigenvalues(true, true);
+  deallog << "Eigenvalues: ";
+  for (unsigned int i = 0; i < A.m(); ++i)
+    {
+      std::complex<double> lambda = LA.eigenvalue(i);
+      deallog << lambda << " ";
+    }
+  deallog << std::endl;
+  deallog << "Right eigenvectors ";
+  for (const auto d : LA.get_right_eigenvectors())
+    deallog << d << " ";
+  deallog << std::endl;
+  deallog << "Left eigenvectors ";
+  for (const auto d : LA.get_left_eigenvectors())
+    deallog << d << " ";
+  deallog << std::endl;
+}
+
+
+
+int
+main()
+{
+  initlog();
+
+  // Test symmetric system
+  check_matrix(&mat1[0][0]);
+
+  // Test non-symmetric system with complex eigenvalues/eigenvectors
+  check_matrix(&mat2[0][0]);
+}
