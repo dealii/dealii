@@ -1,4 +1,4 @@
 
-DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>::type)>:: type>((scalar.component), 0, (fe_values_views_cache.scalars.size()))
-DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>::type)>:: type>((scalar.component), 0, (fe_values_views_cache.scalars.size()))
-DEAL::dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( typename std::common_type<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>::type)>:: type>((scalar.component), 0, (fe_values_views_cache.scalars.size()))
+DEAL::dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( std::common_type_t<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>)>>((scalar.component), 0, (fe_values_views_cache.scalars.size()))
+DEAL::dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( std::common_type_t<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>)>>((scalar.component), 0, (fe_values_views_cache.scalars.size()))
+DEAL::dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( std::common_type_t<decltype(scalar.component), decltype(fe_values_views_cache.scalars.size())>)>>((scalar.component), 0, (fe_values_views_cache.scalars.size()))

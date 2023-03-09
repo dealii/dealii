@@ -1712,7 +1712,7 @@ namespace deal_II_exceptions
     inline constexpr bool
     compare_for_equality(const T &t, const U &u)
     {
-      using common_type = typename std::common_type<T, U>::type;
+      using common_type = std::common_type_t<T, U>;
       return static_cast<common_type>(t) == static_cast<common_type>(u);
     }
 
@@ -1726,7 +1726,7 @@ namespace deal_II_exceptions
     inline constexpr bool
     compare_less_than(const T &t, const U &u)
     {
-      using common_type = typename std::common_type<T, U>::type;
+      using common_type = std::common_type_t<T, U>;
       return (static_cast<common_type>(t) < static_cast<common_type>(u));
     }
   } // namespace internals
@@ -1789,7 +1789,7 @@ namespace internal
   // Workaround to allow for commas in template parameter lists
   // in preprocessor macros as found in
   // https://stackoverflow.com/questions/13842468/comma-in-c-c-macro
-  template <typename T>
+  template <typename F>
   struct argument_type;
 
   template <typename T, typename U>
@@ -1797,6 +1797,9 @@ namespace internal
   {
     using type = U;
   };
+
+  template <typename F>
+  using argument_type_t = typename argument_type<F>::type;
 } // namespace internal
 
 /**
@@ -1818,12 +1821,13 @@ namespace internal
  *
  * @ingroup Exceptions
  */
-#define AssertIndexRange(index, range)                                         \
-  Assert(                                                                      \
-    ::dealii::deal_II_exceptions::internals::compare_less_than(index, range),  \
-    dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( \
-      typename std::common_type<decltype(index), decltype(range)>::type)>::    \
-                                type>((index), 0, (range)))
+#define AssertIndexRange(index, range)                                       \
+  Assert(::dealii::deal_II_exceptions::internals::compare_less_than(index,   \
+                                                                    range),  \
+         dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( \
+           std::common_type_t<decltype(index), decltype(range)>)>>((index),  \
+                                                                   0,        \
+                                                                   (range)))
 
 /**
  * An assertion that checks whether a number is finite or not. We explicitly
