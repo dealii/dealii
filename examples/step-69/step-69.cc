@@ -367,11 +367,11 @@ namespace Step69
   // classes at hand we can now implement the explicit time-stepping scheme
   // that was introduced in the discussion above. The main method of the
   // <code>%TimeStepping</code> class is <code>make_one_step(vector_type &U,
-  // double t)</code> that takes a reference to a state vector
+  // const double t)</code> that takes a reference to a state vector
   // <code>U</code> and a time point <code>t</code> (as input arguments)
   // computes the updated solution, stores it in the vector
   // <code>temp</code>, swaps its contents with the vector <code>U</code>,
-  // and returns the chosen step-size $\tau$.
+  // and finally returns the chosen step-size $\tau$.
   //
   // The other important method is <code>prepare()</code> which primarily
   // sets the proper partition and sparsity pattern for the temporary
@@ -398,7 +398,7 @@ namespace Step69
 
     void prepare();
 
-    double make_one_step(vector_type &U, double t);
+    double make_one_step(vector_type &U, const double t);
 
   private:
     const MPI_Comm mpi_communicator;
@@ -1755,7 +1755,7 @@ namespace Step69
   // <code>offline_data->sparsity_pattern</code>).
 
   template <int dim>
-  double TimeStepping<dim>::make_one_step(vector_type &U, double t)
+  double TimeStepping<dim>::make_one_step(vector_type &U, const double t)
   {
     const auto &n_locally_owned    = offline_data->n_locally_owned;
     const auto &n_locally_relevant = offline_data->n_locally_relevant;
