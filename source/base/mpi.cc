@@ -781,7 +781,11 @@ namespace Utilities
         for (int i = 0; i < argc; ++i)
           argv_new.push_back(argv[i]);
         std::stringstream threads_flag;
+#if KOKKOS_VERSION >= 30700
+        threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
+#else
         threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
+#endif
         argv_new.push_back(const_cast<char *>(threads_flag.str().c_str()));
         argv_new.push_back(nullptr);
         int argc_new = argc + 1;

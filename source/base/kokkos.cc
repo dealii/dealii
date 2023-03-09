@@ -35,9 +35,13 @@ namespace internal
         // only execute once
         static bool dummy = [] {
           dealii_initialized_kokkos = true;
+#if KOKKOS_VERSION >= 30700
           const auto settings =
             Kokkos::InitializationSettings().set_num_threads(
               MultithreadInfo::n_threads());
+#else
+          const Kokkos::InitArguments settings(MultithreadInfo::n_threads());
+#endif
           Kokkos::initialize(settings);
           std::atexit(Kokkos::finalize);
           return true;
