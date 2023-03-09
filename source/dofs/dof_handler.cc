@@ -2158,6 +2158,25 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
          ExcMessage("The Triangulation you are using is empty!"));
   Assert(ff.size() > 0, ExcMessage("The given hp::FECollection is empty!"));
 
+#ifdef DEBUG
+  // make sure that the provided FE collection is large enough to
+  // cover all FE indices presently in use on the mesh
+  if ((hp_cell_active_fe_indices.size() > 0) &&
+      (hp_cell_future_fe_indices.size() > 0))
+    {
+      Assert(hp_capability_enabled, ExcInternalError());
+
+      for (const auto &cell :
+           this->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+        {
+          Assert(cell->active_fe_index() < ff.size(),
+                 ExcInvalidFEIndex(cell->active_fe_index(), ff.size()));
+          Assert(cell->future_fe_index() < ff.size(),
+                 ExcInvalidFEIndex(cell->future_fe_index(), ff.size()));
+        }
+    }
+#endif
+
   //
   // register the new finite element collection
   //
@@ -2205,22 +2224,6 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
       // on both its own cells and all ghost cells
       internal::hp::DoFHandlerImplementation::Implementation::
         communicate_active_fe_indices(*this);
-
-#ifdef DEBUG
-      // make sure that the FE collection is large enough to
-      // cover all FE indices presently in use on the mesh
-      for (const auto &cell : this->active_cell_iterators())
-        {
-          if (!cell->is_artificial())
-            Assert(cell->active_fe_index() < this->fe_collection.size(),
-                   ExcInvalidFEIndex(cell->active_fe_index(),
-                                     this->fe_collection.size()));
-          if (cell->is_locally_owned())
-            Assert(cell->future_fe_index() < this->fe_collection.size(),
-                   ExcInvalidFEIndex(cell->future_fe_index(),
-                                     this->fe_collection.size()));
-        }
-#endif
     }
 
   {
