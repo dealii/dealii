@@ -754,7 +754,7 @@ namespace LinearAlgebra
  */
 namespace concepts
 {
-#ifdef DEAL_II_HAVE_CXX20
+#if defined(DEAL_II_HAVE_CXX20) || defined(DOXYGEN)
   /**
    * A concept that tests that a combination of `dim` and `spacedim`
    * template arguments is valid. Specifically, we must have that
