@@ -2567,15 +2567,17 @@ namespace Step69
 
     print_head(pcout, "enter main loop");
 
-    for (unsigned int cycle = 1; t < t_final; ++cycle)
+    unsigned int timestep_number = 1;
+    while (t < t_final)
       {
         // We first print an informative status message
 
         std::ostringstream head;
         std::ostringstream secondary;
 
-        head << "Cycle  " << Utilities::int_to_string(cycle, 6) << "  (" //
-             << std::fixed << std::setprecision(1) << t / t_final * 100  //
+        head << "Cycle  " << Utilities::int_to_string(timestep_number, 6)
+             << "  ("                                                   //
+             << std::fixed << std::setprecision(1) << t / t_final * 100 //
              << "%)";
         secondary << "at time t = " << std::setprecision(8) << std::fixed << t;
 
@@ -2601,6 +2603,8 @@ namespace Step69
             output(U, base_name, t, output_cycle);
             ++output_cycle;
           }
+
+        ++timestep_number;
       }
 
     // We wait for any remaining background output thread to finish before
