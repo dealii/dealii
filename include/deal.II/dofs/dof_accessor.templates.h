@@ -2140,8 +2140,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return 0; // ::DoFHandler only supports a single active FE with index
-                    // zero
+          return DoFHandler<dim, spacedim>::default_fe_index;
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2168,7 +2167,6 @@ namespace internal
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           {
-            // ::DoFHandler only supports a single active FE with index zero
             AssertDimension(i, (DoFHandler<dim, spacedim>::default_fe_index));
             return;
           }
@@ -2199,10 +2197,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return DoFHandler<dim, spacedim>::
-            default_fe_index; // ::DoFHandler only supports
-                              // a single active FE with
-                              // index zero
+          return DoFHandler<dim, spacedim>::default_fe_index;
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2234,7 +2229,6 @@ namespace internal
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           {
-            // ::DoFHandler only supports a single active FE with index zero
             AssertDimension(i, (DoFHandler<dim, spacedim>::default_fe_index));
             return;
           }
@@ -2265,8 +2259,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return false; // ::DoFHandler only supports a single active FE with
-                        // index zero
+          return false;
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2293,8 +2286,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return; // ::DoFHandler only supports a single active FE with index
-                  // zero
+          return;
 
         Assert(
           accessor.dof_handler != nullptr,
