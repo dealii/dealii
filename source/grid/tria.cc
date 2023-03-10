@@ -11898,6 +11898,9 @@ void Triangulation<dim, spacedim>::create_triangulation(
               cell->face(pair.first)->set_boundary_id(pair.second);
         }
     }
+
+  // inform all listeners that the triangulation has been created
+  signals.create();
 }
 
 
