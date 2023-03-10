@@ -72,13 +72,13 @@ function(populate_target_properties _target _build)
     set(_includes
       $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
       $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-      "$<INSTALL_INTERFACE:\${DEAL_II_INCLUDE_RELDIR}>"
+      "$<INSTALL_INTERFACE:${DEAL_II_INCLUDE_RELDIR}>"
       )
     foreach(_include ${DEAL_II_BUNDLED_INCLUDE_DIRS})
       list(APPEND _includes $<BUILD_INTERFACE:${_include}>)
     endforeach()
     if(NOT "${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
-      list(APPEND _includes "$<INSTALL_INTERFACE:\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled>")
+      list(APPEND _includes "$<INSTALL_INTERFACE:${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled>")
     endif()
     target_include_directories(${_target} SYSTEM INTERFACE ${_includes})
   endif()
