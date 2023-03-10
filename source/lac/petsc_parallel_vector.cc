@@ -293,7 +293,7 @@ namespace PETScWrappers
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
 
-#  if DEBUG
+#  ifdef DEBUG
       {
         // test ghost allocation in debug mode
         PetscInt begin, end;

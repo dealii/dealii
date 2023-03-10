@@ -587,7 +587,7 @@ QIterated<1>::QIterated(const Quadrature<1> &        base_quadrature,
     else if (std::abs(i[0] - 1.0) < 1e-12)
       i[0] = 1.0;
 
-#if DEBUG
+#ifdef DEBUG
   double sum_of_weights = 0;
   for (unsigned int i = 0; i < this->size(); ++i)
     sum_of_weights += this->weight(i);

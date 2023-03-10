@@ -1791,7 +1791,7 @@ namespace internal
                              fe.n_dofs_per_vertex() > 0;
                     });
 
-#if DEBUG
+#ifdef DEBUG
       const bool fine_element_is_discontinuous =
         std::all_of(dof_handler_fine.get_fe_collection().begin(),
                     dof_handler_fine.get_fe_collection().end(),
