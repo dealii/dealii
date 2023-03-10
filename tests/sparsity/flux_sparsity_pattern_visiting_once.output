@@ -1,0 +1,4 @@
+
+DEAL::dealii::Sparsity
+This sentence should appear once when the corresponding face is visited only once
+1
