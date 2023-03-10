@@ -105,7 +105,7 @@ macro(deal_ii_setup_target _target)
       )
     shell_escape_option_groups(_link_options)
     target_link_options(${_target} PRIVATE
-      $<$<COMPILE_LANGUAGE:CXX>:${_link_options}>
+      $<$<LINK_LANGUAGE:CXX>:${_link_options}>
       )
   endif()
 

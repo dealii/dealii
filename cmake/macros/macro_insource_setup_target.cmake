@@ -35,9 +35,7 @@ function(insource_setup_target _target _build)
     "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
     )
   shell_escape_option_groups(_compile_options)
-  target_compile_options(${_target} PRIVATE
-    $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
-    )
+  target_compile_options(${_target} PRIVATE ${_compile_options})
 
   get_property(_type TARGET ${_target} PROPERTY TYPE)
   if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
@@ -45,9 +43,7 @@ function(insource_setup_target _target _build)
       "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
       )
     shell_escape_option_groups(_link_options)
-    target_link_options(${_target} PRIVATE
-      $<$<COMPILE_LANGUAGE:CXX>:${_link_options}>
-      )
+    target_link_options(${_target} PRIVATE ${_link_options})
   endif()
 
   target_include_directories(${_target}
