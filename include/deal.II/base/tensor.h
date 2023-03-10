@@ -1043,8 +1043,10 @@ template <int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<0, dim, Number>::operator Number &()
 {
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+#  endif
   return value;
 }
 
@@ -1053,8 +1055,10 @@ template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<0, dim, Number>::operator const Number &() const
 {
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+#  endif
   return value;
 }
 
@@ -1231,8 +1235,10 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   typename Tensor<0, dim, Number>::real_type
   Tensor<0, dim, Number>::norm_square() const
 {
+#  ifndef __CUDA_ARCH__
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+#  endif
   return numbers::NumberTraits<Number>::abs_square(value);
 }
 
@@ -1332,7 +1338,9 @@ Tensor<rank_, dim, Number>::Tensor(
 {
   // make nvcc happy
   const int my_n_independent_components = n_independent_components;
+#  ifndef __CUDA_ARCH__
   AssertDimension(initializer.size(), my_n_independent_components);
+#  endif
 
   for (unsigned int i = 0; i < my_n_independent_components; ++i)
     (*this)[unrolled_to_component_indices(i)] = initializer[i];
@@ -1399,7 +1407,9 @@ namespace internal
               const unsigned int i,
               std::integral_constant<int, dim>)
     {
+#  ifndef __CUDA_ARCH__
       AssertIndexRange(i, dim);
+#  endif
       return values[i];
     }
 
@@ -1409,10 +1419,12 @@ namespace internal
               const unsigned int,
               std::integral_constant<int, 0>)
     {
+#  ifndef __CUDA_ARCH__
       Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
+#  endif
       return *dummy;
     }
   } // namespace TensorSubscriptor
