@@ -52,10 +52,8 @@ function(populate_target_properties _target _build)
   set_target_properties(${_target} PROPERTIES LINKER_LANGUAGE "CXX")
 
   #
-  # Include the current source directory of any target as private include
-  # and add the contents of ${DEAL_II_INCLUDE_DIRS} as a public interface.
+  # Add the contents of ${DEAL_II_INCLUDE_DIRS} as a public interface.
   #
-  target_include_directories(${_target} BEFORE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
   target_include_directories(${_target} SYSTEM ${_visibility} ${DEAL_II_INCLUDE_DIRS})
 
   # Build-directory specific includes:
