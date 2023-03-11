@@ -25,7 +25,7 @@
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/type_traits.h>
 
-#if DEBUG
+#ifdef DEBUG
 #  include <boost/algorithm/string/join.hpp>
 #endif
 
@@ -210,7 +210,7 @@ namespace internal
     (void)matrix_free;
     (void)dof_info;
 
-#if DEBUG
+#ifdef DEBUG
     if (vec.partitioners_are_compatible(*dof_info.vector_partitioner) == false)
       {
         unsigned int dof_index = numbers::invalid_unsigned_int;

@@ -480,7 +480,7 @@ namespace hp
           for (const Edge &e : sub_graph)
             identities_graph.erase(e);
 
-#if DEBUG
+#ifdef DEBUG
           // There are three checks we ought to perform:
           // - That the sub-graph is undirected, i.e. that every edge appears
           //   in both directions
