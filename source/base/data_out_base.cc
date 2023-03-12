@@ -5481,7 +5481,9 @@ namespace DataOutBase
       {
         AssertThrow(std::get<3>(nonscalar_data_range) !=
                       DataComponentInterpretation::component_is_part_of_tensor,
-                    ExcNotImplemented());
+                    ExcMessage(
+                      "The VTK writer does not currently support outputting "
+                      "tensor data. Use the VTU writer instead."));
 
         AssertThrow(std::get<1>(nonscalar_data_range) >=
                       std::get<0>(nonscalar_data_range),
