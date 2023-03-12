@@ -776,7 +776,28 @@ namespace Utilities
 #endif
 
       // Initialize Kokkos
-      Kokkos::initialize(argc, argv);
+      {
+        // argv has argc+1 elements and the last one is a nullptr. For appending
+        // one element we thus create a new argv by copying the first argc
+        // elements, append the new option, and then a nullptr.
+        std::vector<char *> argv_new(argc + 2);
+        for (int i = 0; i < argc; ++i)
+          argv_new[i] = argv[i];
+        std::stringstream threads_flag;
+#if KOKKOS_VERSION >= 30700
+        threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
+#else
+        threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
+#endif
+        std::string threads_flag_string = threads_flag.str();
+        argv_new[argc]     = const_cast<char *>(threads_flag_string.c_str());
+        argv_new[argc + 1] = nullptr;
+        // The first argument in Kokkos::initialzie is of type int&. Hence, we
+        // need to define a new variable to pass to it (insted of using argc+1
+        // inline).
+        int argc_new = argc + 1;
+        Kokkos::initialize(argc_new, argv_new.data());
+      }
 
       // we are allowed to call MPI_Init ourselves and PETScInitialize will
       // detect this. This allows us to use MPI_Init_thread instead.

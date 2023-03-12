@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/kokkos.h>
+#include <deal.II/base/multithread_info.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
@@ -34,7 +35,14 @@ namespace internal
         // only execute once
         static bool dummy = [] {
           dealii_initialized_kokkos = true;
-          Kokkos::initialize();
+#if KOKKOS_VERSION >= 30700
+          const auto settings =
+            Kokkos::InitializationSettings().set_num_threads(
+              MultithreadInfo::n_threads());
+#else
+          const Kokkos::InitArguments settings(MultithreadInfo::n_threads());
+#endif
+          Kokkos::initialize(settings);
           std::atexit(Kokkos::finalize);
           return true;
         }();
