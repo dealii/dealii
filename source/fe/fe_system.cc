@@ -135,7 +135,6 @@ namespace internal
   copy_primitive_base_element_values(
     const FESystem<dim, spacedim> &fe,
     const unsigned int             base_no,
-    const unsigned int             n_q_points,
     const UpdateFlags              base_flags,
     const Table<2, unsigned int> & base_to_system_table,
     const FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
@@ -147,31 +146,39 @@ namespace internal
     const unsigned int n_components = fe.element_multiplicity(base_no);
     const unsigned int n_dofs_per_cell =
       fe.base_element(base_no).n_dofs_per_cell();
-    for (unsigned int component = 0; component < n_components; ++component)
-      for (unsigned int b = 0; b < n_dofs_per_cell; ++b)
-        {
-          const unsigned int out_index = base_to_system_table[component][b];
 
-          if (base_flags & update_values)
-            for (unsigned int q = 0; q < n_q_points; ++q)
-              output_data.shape_values[out_index][q] =
-                base_data.shape_values[b][q];
+    auto copy_row = [](const auto row_in, auto row_out) {
+      std::copy(row_in.begin(), row_in.end(), row_out.begin());
+    };
 
-          if (base_flags & update_gradients)
-            for (unsigned int q = 0; q < n_q_points; ++q)
-              output_data.shape_gradients[out_index][q] =
-                base_data.shape_gradients[b][q];
+    if (base_flags & update_values)
+      for (unsigned int component = 0; component < n_components; ++component)
+        for (unsigned int b = 0; b < n_dofs_per_cell; ++b)
+          copy_row(
+            base_data.shape_values[b],
+            output_data.shape_values[base_to_system_table[component][b]]);
 
-          if (base_flags & update_hessians)
-            for (unsigned int q = 0; q < n_q_points; ++q)
-              output_data.shape_hessians[out_index][q] =
-                base_data.shape_hessians[b][q];
+    if (base_flags & update_gradients)
+      for (unsigned int component = 0; component < n_components; ++component)
+        for (unsigned int b = 0; b < n_dofs_per_cell; ++b)
+          copy_row(
+            base_data.shape_gradients[b],
+            output_data.shape_gradients[base_to_system_table[component][b]]);
 
-          if (base_flags & update_3rd_derivatives)
-            for (unsigned int q = 0; q < n_q_points; ++q)
-              output_data.shape_3rd_derivatives[out_index][q] =
-                base_data.shape_3rd_derivatives[b][q];
-        }
+    if (base_flags & update_hessians)
+      for (unsigned int component = 0; component < n_components; ++component)
+        for (unsigned int b = 0; b < n_dofs_per_cell; ++b)
+          copy_row(
+            base_data.shape_hessians[b],
+            output_data.shape_hessians[base_to_system_table[component][b]]);
+
+    if (base_flags & update_3rd_derivatives)
+      for (unsigned int component = 0; component < n_components; ++component)
+        for (unsigned int b = 0; b < n_dofs_per_cell; ++b)
+          copy_row(
+            base_data.shape_3rd_derivatives[b],
+            output_data
+              .shape_3rd_derivatives[base_to_system_table[component][b]]);
   }
 
   /**
@@ -1508,7 +1515,6 @@ FESystem<dim, spacedim>::compute_fill(
             internal::copy_primitive_base_element_values(
               *this,
               base_no,
-              n_q_points,
               base_flags,
               primitive_offset_tables[base_no],
               base_data,
