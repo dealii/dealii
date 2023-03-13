@@ -1327,6 +1327,8 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   getline(in, line);
   AssertThrow(line == "Quadrilaterals", ExcInvalidDBMESHInput(line));
 
+  static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+    {0, 1, 5, 4, 2, 3, 7, 6}};
   std::vector<CellData<dim>> cells;
   SubCellData                subcelldata;
   unsigned int               n_cells;
@@ -1338,7 +1340,9 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       cells.emplace_back();
       for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         {
-          in >> cells.back().vertices[GeometryInfo<dim>::ucd_to_deal[i]];
+          in >>
+            cells.back().vertices[dim == 3 ? local_vertex_numbering[i] :
+                                             GeometryInfo<dim>::ucd_to_deal[i]];
 
           AssertThrow((cells.back().vertices[i] >= 1) &&
                         (static_cast<unsigned int>(cells.back().vertices[i]) <=
@@ -2306,6 +2310,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   std::map<unsigned int, types::boundary_id> boundary_ids_1d;
 
   {
+    static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+      {0, 1, 5, 4, 2, 3, 7, 6}};
     unsigned int global_cell = 0;
     for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
       {
@@ -2477,7 +2483,9 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                         GeometryInfo<dim>::vertices_per_cell)
                       {
                         in >> cells.back()
-                                .vertices[GeometryInfo<dim>::ucd_to_deal[i]];
+                                .vertices[dim == 3 ?
+                                            local_vertex_numbering[i] :
+                                            GeometryInfo<dim>::ucd_to_deal[i]];
                       }
                     else
                       {
@@ -3389,6 +3397,8 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   unsigned int v_offset = 0;
   unsigned int c_offset = 0;
 
+  static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+    {0, 1, 5, 4, 2, 3, 7, 6}};
   // The index of the mesh will be used as a material index.
   for (unsigned int m = start_mesh; m < end_mesh; ++m)
     {
@@ -3433,7 +3443,8 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
               for (const unsigned int f : GeometryInfo<dim>::vertex_indices())
                 {
                   cells[valid_cell]
-                    .vertices[GeometryInfo<dim>::ucd_to_deal[f]] =
+                    .vertices[dim == 3 ? local_vertex_numbering[f] :
+                                         GeometryInfo<dim>::ucd_to_deal[f]] =
                     mFaces[i].mIndices[f] + v_offset;
                 }
               cells[valid_cell].material_id = m;

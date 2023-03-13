@@ -1069,6 +1069,9 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
             (msh_flags.write_lines ? n_boundary_lines(tria) : 0))
       << '\n';
 
+  static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+    {0, 1, 5, 4, 2, 3, 7, 6}};
+
   // write cells. Enumerate cells
   // consecutively, starting with 1
   for (const auto &cell : tria.active_cell_iterators())
@@ -1083,7 +1086,9 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
       for (const unsigned int vertex : cell->vertex_indices())
         {
           if (cell->reference_cell() == ReferenceCells::get_hypercube<dim>())
-            out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex]) +
+            out << cell->vertex_index(
+                     dim == 3 ? local_vertex_numbering[vertex] :
+                                GeometryInfo<dim>::ucd_to_deal[vertex]) +
                      1
                 << ' ';
           else if (cell->reference_cell() == ReferenceCells::get_simplex<dim>())
@@ -4237,6 +4242,8 @@ namespace internal
             ReferenceCells::get_hypercube<dim>(), quadrature);
         }
 
+      static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+        {0, 1, 5, 4, 2, 3, 7, 6}};
       for (const auto &cell : tria.active_cell_iterators())
         {
           if (gnuplot_flags.write_cell_numbers)
@@ -4253,8 +4260,11 @@ namespace internal
               // points (+ the initial point again) in a row and lifting the
               // drawing pencil at the end
               for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-                out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i]) << ' '
-                    << cell->level() << ' ' << cell->material_id() << '\n';
+                out << cell->vertex(dim == 3 ?
+                                      local_vertex_numbering[i] :
+                                      GeometryInfo<dim>::ucd_to_deal[i])
+                    << ' ' << cell->level() << ' ' << cell->material_id()
+                    << '\n';
               out << cell->vertex(0) << ' ' << cell->level() << ' '
                   << cell->material_id() << '\n'
                   << '\n' // double new line for gnuplot 3d plots

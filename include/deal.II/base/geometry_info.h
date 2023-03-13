@@ -157,7 +157,7 @@ namespace internal
       static constexpr std::array<unsigned int, 8>
       ucd_to_deal()
       {
-        return {{0, 1, 5, 4, 2, 3, 7, 6}};
+        return {{0, 4, 5, 1, 2, 6, 7, 3}};
       }
 
       static constexpr std::array<unsigned int, 6>
