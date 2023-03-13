@@ -2598,10 +2598,11 @@ namespace GridTools
 
 
   template <int dim, template <int, int> class MeshType, int spacedim>
-  unsigned int
-  find_closest_vertex(const MeshType<dim, spacedim> &mesh,
-                      const Point<spacedim> &        p,
-                      const std::vector<bool> &      marked_vertices)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
+  unsigned int find_closest_vertex(const MeshType<dim, spacedim> &mesh,
+                                   const Point<spacedim> &        p,
+                                   const std::vector<bool> &marked_vertices)
   {
     // first get the underlying triangulation from the mesh and determine
     // vertices and used vertices
@@ -2664,11 +2665,12 @@ namespace GridTools
 
 
   template <int dim, template <int, int> class MeshType, int spacedim>
-  unsigned int
-  find_closest_vertex(const Mapping<dim, spacedim> & mapping,
-                      const MeshType<dim, spacedim> &mesh,
-                      const Point<spacedim> &        p,
-                      const std::vector<bool> &      marked_vertices)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
+  unsigned int find_closest_vertex(const Mapping<dim, spacedim> & mapping,
+                                   const MeshType<dim, spacedim> &mesh,
+                                   const Point<spacedim> &        p,
+                                   const std::vector<bool> &marked_vertices)
   {
     // Take a shortcut in the simple case.
     if (mapping.preserves_vertex_locations() == true)
@@ -2720,6 +2722,8 @@ namespace GridTools
 
 
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
 #else
@@ -2727,8 +2731,8 @@ namespace GridTools
     typename dealii::internal::
       ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
 #endif
-  find_cells_adjacent_to_vertex(const MeshType<dim, spacedim> &mesh,
-                                const unsigned int             vertex)
+    find_cells_adjacent_to_vertex(const MeshType<dim, spacedim> &mesh,
+                                  const unsigned int             vertex)
   {
     // make sure that the given vertex is
     // an active vertex of the underlying
@@ -2911,6 +2915,8 @@ namespace GridTools
   } // namespace internal
 
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim>>
 #else
@@ -2918,22 +2924,24 @@ namespace GridTools
               ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
             Point<dim>>
 #endif
-  find_active_cell_around_point(
-    const Mapping<dim, spacedim> & mapping,
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const std::vector<
-      std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
-      &                                                  vertex_to_cells,
-    const std::vector<std::vector<Tensor<1, spacedim>>> &vertex_to_cell_centers,
-    const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint,
-    const std::vector<bool> &                              marked_vertices,
-    const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree,
-    const double                                           tolerance,
-    const RTree<
-      std::pair<BoundingBox<spacedim>,
-                typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      *relevant_cell_bounding_boxes_rtree)
+    find_active_cell_around_point(
+      const Mapping<dim, spacedim> & mapping,
+      const MeshType<dim, spacedim> &mesh,
+      const Point<spacedim> &        p,
+      const std::vector<
+        std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
+        &vertex_to_cells,
+      const std::vector<std::vector<Tensor<1, spacedim>>>
+        &vertex_to_cell_centers,
+      const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint,
+      const std::vector<bool> &marked_vertices,
+      const RTree<std::pair<Point<spacedim>, unsigned int>>
+        &          used_vertices_rtree,
+      const double tolerance,
+      const RTree<
+        std::pair<BoundingBox<spacedim>,
+                  typename Triangulation<dim, spacedim>::active_cell_iterator>>
+        *relevant_cell_bounding_boxes_rtree)
   {
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
@@ -3206,11 +3214,16 @@ namespace GridTools
     namespace BoundingBoxPredicate
     {
       template <class MeshType>
-      std::tuple<BoundingBox<MeshType::space_dimension>, bool>
-      compute_cell_predicate_bounding_box(
-        const typename MeshType::cell_iterator &parent_cell,
-        const std::function<
-          bool(const typename MeshType::active_cell_iterator &)> &predicate)
+      DEAL_II_CXX20_REQUIRES(
+        concepts::is_triangulation_or_dof_handler<MeshType>)
+      std::tuple<
+        BoundingBox<MeshType::space_dimension>,
+        bool> compute_cell_predicate_bounding_box(const typename MeshType::
+                                                    cell_iterator &parent_cell,
+                                                  const std::function<bool(
+                                                    const typename MeshType::
+                                                      active_cell_iterator &)>
+                                                    &predicate)
       {
         bool has_predicate =
           false; // Start assuming there's no cells with predicate inside
@@ -3259,14 +3272,15 @@ namespace GridTools
 
 
   template <class MeshType>
-  std::vector<BoundingBox<MeshType::space_dimension>>
-  compute_mesh_predicate_bounding_box(
-    const MeshType &mesh,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &                predicate,
-    const unsigned int refinement_level,
-    const bool         allow_merge,
-    const unsigned int max_boxes)
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::
+    vector<BoundingBox<MeshType::space_dimension>> compute_mesh_predicate_bounding_box(
+      const MeshType &mesh,
+      const std::function<bool(const typename MeshType::active_cell_iterator &)>
+        &                predicate,
+      const unsigned int refinement_level,
+      const bool         allow_merge,
+      const unsigned int max_boxes)
   {
     // Algorithm brief description: begin with creating bounding boxes of all
     // cells at refinement_level (and coarser levels if there are active cells)

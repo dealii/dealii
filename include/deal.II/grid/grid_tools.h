@@ -94,6 +94,7 @@ namespace GridTools
 namespace internal
 {
   template <int dim, int spacedim, class MeshType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   class ActiveCellIterator
   {
   public:
@@ -1333,10 +1334,12 @@ namespace GridTools
    * @return The index of the closest vertex found.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
-  unsigned int
-  find_closest_vertex(const MeshType<dim, spacedim> &mesh,
-                      const Point<spacedim> &        p,
-                      const std::vector<bool> &      marked_vertices = {});
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
+  unsigned int find_closest_vertex(
+    const MeshType<dim, spacedim> &mesh,
+    const Point<spacedim> &        p,
+    const std::vector<bool> &      marked_vertices = {});
 
   /**
    * Find and return the index of the used vertex (or marked vertex) in a
@@ -1362,11 +1365,13 @@ namespace GridTools
    * @return The index of the closest vertex found.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
-  unsigned int
-  find_closest_vertex(const Mapping<dim, spacedim> & mapping,
-                      const MeshType<dim, spacedim> &mesh,
-                      const Point<spacedim> &        p,
-                      const std::vector<bool> &      marked_vertices = {});
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
+  unsigned int find_closest_vertex(
+    const Mapping<dim, spacedim> & mapping,
+    const MeshType<dim, spacedim> &mesh,
+    const Point<spacedim> &        p,
+    const std::vector<bool> &      marked_vertices = {});
 
 
   /**
@@ -1389,6 +1394,8 @@ namespace GridTools
    * for this case.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
 #else
@@ -1396,8 +1403,8 @@ namespace GridTools
     typename dealii::internal::
       ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
 #endif
-  find_cells_adjacent_to_vertex(const MeshType<dim, spacedim> &container,
-                                const unsigned int             vertex_index);
+    find_cells_adjacent_to_vertex(const MeshType<dim, spacedim> &container,
+                                  const unsigned int             vertex_index);
 
   /**
    * Find an active non-artificial cell that surrounds a given point @p p. The return type
@@ -1462,6 +1469,8 @@ namespace GridTools
    * processor will return a locally owned cell and the other one a ghost cell.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim>>
 #else
@@ -1469,11 +1478,11 @@ namespace GridTools
               ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
             Point<dim>>
 #endif
-  find_active_cell_around_point(const Mapping<dim, spacedim> & mapping,
-                                const MeshType<dim, spacedim> &mesh,
-                                const Point<spacedim> &        p,
-                                const std::vector<bool> &marked_vertices = {},
-                                const double             tolerance = 1.e-10);
+    find_active_cell_around_point(const Mapping<dim, spacedim> & mapping,
+                                  const MeshType<dim, spacedim> &mesh,
+                                  const Point<spacedim> &        p,
+                                  const std::vector<bool> &marked_vertices = {},
+                                  const double             tolerance = 1.e-10);
 
   /**
    * A version of the above function that assumes straight boundaries and
@@ -1483,16 +1492,18 @@ namespace GridTools
    * @return An iterator into the mesh that points to the surrounding cell.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   typename MeshType<dim, spacedim>::active_cell_iterator
 #else
   typename dealii::internal::
     ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
 #endif
-  find_active_cell_around_point(const MeshType<dim, spacedim> &mesh,
-                                const Point<spacedim> &        p,
-                                const std::vector<bool> &marked_vertices = {},
-                                const double             tolerance = 1.e-10);
+    find_active_cell_around_point(const MeshType<dim, spacedim> &mesh,
+                                  const Point<spacedim> &        p,
+                                  const std::vector<bool> &marked_vertices = {},
+                                  const double             tolerance = 1.e-10);
 
   /**
    * Another version where we use that mapping on a given
@@ -1585,6 +1596,8 @@ namespace GridTools
    * call the function above with argument `cache` in this case.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim>>
 #else
@@ -1592,24 +1605,25 @@ namespace GridTools
               ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
             Point<dim>>
 #endif
-  find_active_cell_around_point(
-    const Mapping<dim, spacedim> & mapping,
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const std::vector<
-      std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
-      &                                                  vertex_to_cell_map,
-    const std::vector<std::vector<Tensor<1, spacedim>>> &vertex_to_cell_centers,
-    const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint =
-      typename MeshType<dim, spacedim>::active_cell_iterator(),
-    const std::vector<bool> &                              marked_vertices = {},
-    const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree =
-      RTree<std::pair<Point<spacedim>, unsigned int>>{},
-    const double tolerance = 1.e-10,
-    const RTree<
-      std::pair<BoundingBox<spacedim>,
-                typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      *relevant_cell_bounding_boxes_rtree = nullptr);
+    find_active_cell_around_point(
+      const Mapping<dim, spacedim> & mapping,
+      const MeshType<dim, spacedim> &mesh,
+      const Point<spacedim> &        p,
+      const std::vector<
+        std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
+        &vertex_to_cell_map,
+      const std::vector<std::vector<Tensor<1, spacedim>>>
+        &vertex_to_cell_centers,
+      const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint =
+        typename MeshType<dim, spacedim>::active_cell_iterator(),
+      const std::vector<bool> &marked_vertices = {},
+      const RTree<std::pair<Point<spacedim>, unsigned int>> &
+        used_vertices_rtree = RTree<std::pair<Point<spacedim>, unsigned int>>{},
+      const double tolerance = 1.e-10,
+      const RTree<
+        std::pair<BoundingBox<spacedim>,
+                  typename Triangulation<dim, spacedim>::active_cell_iterator>>
+        *relevant_cell_bounding_boxes_rtree = nullptr);
 
   /**
    * As compared to the functions above, this function identifies all active
@@ -1633,6 +1647,8 @@ namespace GridTools
    * @endcode
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::vector<std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
                         Point<dim>>>
@@ -1642,13 +1658,13 @@ namespace GridTools
       ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
     Point<dim>>>
 #endif
-  find_all_active_cells_around_point(
-    const Mapping<dim, spacedim> & mapping,
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const double                   tolerance,
-    const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
-                    Point<dim>> &  first_cell);
+    find_all_active_cells_around_point(
+      const Mapping<dim, spacedim> & mapping,
+      const MeshType<dim, spacedim> &mesh,
+      const Point<spacedim> &        p,
+      const double                   tolerance,
+      const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
+                      Point<dim>> &  first_cell);
 
   /**
    * A variant of the previous function that internally calls one of the
@@ -1657,6 +1673,8 @@ namespace GridTools
    * function find_all_active_cells_around_point() above.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::vector<std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
                         Point<dim>>>
@@ -1666,12 +1684,12 @@ namespace GridTools
       ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
     Point<dim>>>
 #endif
-  find_all_active_cells_around_point(
-    const Mapping<dim, spacedim> & mapping,
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const double                   tolerance       = 1e-10,
-    const std::vector<bool> &      marked_vertices = {});
+    find_all_active_cells_around_point(
+      const Mapping<dim, spacedim> & mapping,
+      const MeshType<dim, spacedim> &mesh,
+      const Point<spacedim> &        p,
+      const double                   tolerance       = 1e-10,
+      const std::vector<bool> &      marked_vertices = {});
 
   /**
    * Return a list of all descendants of the given cell that are active. For
@@ -1695,8 +1713,9 @@ namespace GridTools
    * @endcode
    */
   template <class MeshType>
-  std::vector<typename MeshType::active_cell_iterator>
-  get_active_child_cells(const typename MeshType::cell_iterator &cell);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::vector<typename MeshType::active_cell_iterator> get_active_child_cells(
+    const typename MeshType::cell_iterator &cell);
 
   /**
    * Extract the active cells around a given cell @p cell and return them in
@@ -1723,8 +1742,8 @@ namespace GridTools
    * @endcode
    */
   template <class MeshType>
-  void
-  get_active_neighbors(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  void get_active_neighbors(
     const typename MeshType::active_cell_iterator &       cell,
     std::vector<typename MeshType::active_cell_iterator> &active_neighbors);
 
@@ -1778,11 +1797,12 @@ namespace GridTools
    * the predicated subdomain.
    */
   template <class MeshType>
-  std::vector<typename MeshType::active_cell_iterator>
-  compute_active_cell_halo_layer(
-    const MeshType &mesh,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &predicate);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::
+    vector<typename MeshType::active_cell_iterator> compute_active_cell_halo_layer(
+      const MeshType &mesh,
+      const std::function<bool(const typename MeshType::active_cell_iterator &)>
+        &predicate);
 
 
   /**
@@ -1793,12 +1813,13 @@ namespace GridTools
    * all of those cells for which the @p predicate returns @p true.
    */
   template <class MeshType>
-  std::vector<typename MeshType::cell_iterator>
-  compute_cell_halo_layer_on_level(
-    const MeshType &mesh,
-    const std::function<bool(const typename MeshType::cell_iterator &)>
-      &                predicate,
-    const unsigned int level);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::
+    vector<typename MeshType::cell_iterator> compute_cell_halo_layer_on_level(
+      const MeshType &mesh,
+      const std::function<bool(const typename MeshType::cell_iterator &)>
+        &                predicate,
+      const unsigned int level);
 
 
   /**
@@ -1814,8 +1835,10 @@ namespace GridTools
    * @return A list of ghost cells
    */
   template <class MeshType>
-  std::vector<typename MeshType::active_cell_iterator>
-  compute_ghost_cell_halo_layer(const MeshType &mesh);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::vector<
+    typename MeshType::
+      active_cell_iterator> compute_ghost_cell_halo_layer(const MeshType &mesh);
 
   /**
    * Extract and return the set of active cells within a geometric distance of
@@ -1866,12 +1889,13 @@ namespace GridTools
    * See compute_active_cell_halo_layer().
    */
   template <class MeshType>
-  std::vector<typename MeshType::active_cell_iterator>
-  compute_active_cell_layer_within_distance(
-    const MeshType &mesh,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &          predicate,
-    const double layer_thickness);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::
+    vector<typename MeshType::active_cell_iterator> compute_active_cell_layer_within_distance(
+      const MeshType &mesh,
+      const std::function<bool(const typename MeshType::active_cell_iterator &)>
+        &          predicate,
+      const double layer_thickness);
 
   /**
    * Extract and return a set of ghost cells which are within a
@@ -1896,9 +1920,11 @@ namespace GridTools
    * compute_active_cell_layer_within_distance().
    */
   template <class MeshType>
-  std::vector<typename MeshType::active_cell_iterator>
-  compute_ghost_cell_layer_within_distance(const MeshType &mesh,
-                                           const double    layer_thickness);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::
+    vector<typename MeshType::active_cell_iterator> compute_ghost_cell_layer_within_distance(
+      const MeshType &mesh,
+      const double    layer_thickness);
 
   /**
    * Compute and return a bounding box, defined through a pair of points
@@ -1916,11 +1942,15 @@ namespace GridTools
    * to a BoundingBox object.
    */
   template <class MeshType>
-  std::pair<Point<MeshType::space_dimension>, Point<MeshType::space_dimension>>
-  compute_bounding_box(
-    const MeshType &mesh,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &predicate);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::pair<
+    Point<MeshType::space_dimension>,
+    Point<MeshType::
+            space_dimension>> compute_bounding_box(const MeshType &mesh,
+                                                   const std::function<bool(
+                                                     const typename MeshType::
+                                                       active_cell_iterator &)>
+                                                     &predicate);
 
   /**
    * Compute a collection of bounding boxes so that all active cells for which
@@ -1993,14 +2023,15 @@ namespace GridTools
    * linear.
    */
   template <class MeshType>
-  std::vector<BoundingBox<MeshType::space_dimension>>
-  compute_mesh_predicate_bounding_box(
-    const MeshType &mesh,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &                predicate,
-    const unsigned int refinement_level = 0,
-    const bool         allow_merge      = false,
-    const unsigned int max_boxes        = numbers::invalid_unsigned_int);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::
+    vector<BoundingBox<MeshType::space_dimension>> compute_mesh_predicate_bounding_box(
+      const MeshType &mesh,
+      const std::function<bool(const typename MeshType::active_cell_iterator &)>
+        &                predicate,
+      const unsigned int refinement_level = 0,
+      const bool         allow_merge      = false,
+      const unsigned int max_boxes        = numbers::invalid_unsigned_int);
 
   /**
    * Given an array of points, use the global bounding box description obtained
@@ -2497,9 +2528,13 @@ namespace GridTools
    * stored locally, so the resulting list may not cover the entire domain.
    */
   template <typename MeshType>
-  std::list<std::pair<typename MeshType::cell_iterator,
-                      typename MeshType::cell_iterator>>
-  get_finest_common_cells(const MeshType &mesh_1, const MeshType &mesh_2);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::list<std::pair<
+    typename MeshType::cell_iterator,
+    typename MeshType::cell_iterator>> get_finest_common_cells(const MeshType
+                                                                 &mesh_1,
+                                                               const MeshType
+                                                                 &mesh_2);
 
   /**
    * Return true if the two triangulations are based on the same coarse mesh.
@@ -2525,8 +2560,8 @@ namespace GridTools
    * @ref ConceptMeshType "MeshType concept".
    */
   template <typename MeshType>
-  bool
-  have_same_coarse_mesh(const MeshType &mesh_1, const MeshType &mesh_2);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  bool have_same_coarse_mesh(const MeshType &mesh_1, const MeshType &mesh_2);
 
   /** @} */
   /**
@@ -2606,8 +2641,9 @@ namespace GridTools
    * freedom on these.
    */
   template <class MeshType>
-  std::vector<typename MeshType::active_cell_iterator>
-  get_patch_around_cell(const typename MeshType::active_cell_iterator &cell);
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::vector<typename MeshType::active_cell_iterator> get_patch_around_cell(
+    const typename MeshType::active_cell_iterator &cell);
 
 
   /**
@@ -2952,8 +2988,8 @@ namespace GridTools
    * or local grid refinement.
    */
   template <typename MeshType>
-  void
-  collect_periodic_faces(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  void collect_periodic_faces(
     const MeshType &         mesh,
     const types::boundary_id b_id1,
     const types::boundary_id b_id2,
@@ -2988,8 +3024,8 @@ namespace GridTools
    * @ref GlossFaceOrientation "standard orientation".
    */
   template <typename MeshType>
-  void
-  collect_periodic_faces(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  void collect_periodic_faces(
     const MeshType &         mesh,
     const types::boundary_id b_id,
     const unsigned int       direction,
@@ -3217,8 +3253,8 @@ namespace GridTools
    * data with similar calls as the ones above.)
    */
   template <typename DataType, typename MeshType>
-  void
-  exchange_cell_data_to_ghosts(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  void exchange_cell_data_to_ghosts(
     const MeshType &                                     mesh,
     const std::function<std_cxx17::optional<DataType>(
       const typename MeshType::active_cell_iterator &)> &pack,
@@ -3239,8 +3275,8 @@ namespace GridTools
    * communicated.
    */
   template <typename DataType, typename MeshType>
-  void
-  exchange_cell_data_to_level_ghosts(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  void exchange_cell_data_to_level_ghosts(
     const MeshType &                                    mesh,
     const std::function<std_cxx17::optional<DataType>(
       const typename MeshType::level_cell_iterator &)> &pack,
@@ -3795,8 +3831,9 @@ namespace GridTools
 
 
   template <class MeshType>
-  std::vector<typename MeshType::active_cell_iterator>
-  get_active_child_cells(const typename MeshType::cell_iterator &cell)
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::vector<typename MeshType::active_cell_iterator> get_active_child_cells(
+    const typename MeshType::cell_iterator &cell)
   {
     std::vector<typename MeshType::active_cell_iterator> child_cells;
 
@@ -3821,8 +3858,8 @@ namespace GridTools
 
 
   template <class MeshType>
-  void
-  get_active_neighbors(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  void get_active_neighbors(
     const typename MeshType::active_cell_iterator &       cell,
     std::vector<typename MeshType::active_cell_iterator> &active_neighbors)
   {
@@ -4429,8 +4466,8 @@ namespace GridTools
     template <typename DataType,
               typename MeshType,
               typename MeshCellIteratorType>
-    inline void
-    exchange_cell_data(
+    DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+    inline void exchange_cell_data(
       const MeshType &mesh,
       const std::function<
         std_cxx17::optional<DataType>(const MeshCellIteratorType &)> &pack,
@@ -4719,8 +4756,8 @@ namespace GridTools
   } // namespace internal
 
   template <typename DataType, typename MeshType>
-  inline void
-  exchange_cell_data_to_ghosts(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  inline void exchange_cell_data_to_ghosts(
     const MeshType &                                     mesh,
     const std::function<std_cxx17::optional<DataType>(
       const typename MeshType::active_cell_iterator &)> &pack,
@@ -4755,8 +4792,8 @@ namespace GridTools
 
 
   template <typename DataType, typename MeshType>
-  inline void
-  exchange_cell_data_to_level_ghosts(
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  inline void exchange_cell_data_to_level_ghosts(
     const MeshType &                                    mesh,
     const std::function<std_cxx17::optional<DataType>(
       const typename MeshType::level_cell_iterator &)> &pack,

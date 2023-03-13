@@ -53,6 +53,7 @@ namespace hp
   class FECollection;
 } // namespace hp
 template <class MeshType>
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 class InterGridMap;
 template <int dim, int spacedim>
 class Mapping;
