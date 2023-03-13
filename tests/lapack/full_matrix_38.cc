@@ -38,12 +38,20 @@ const double mat1[2][2] = {{4., -1.}, {-1., 4.}};
  */
 const double mat2[2][2] = {{1., -1.}, {1., 1.}};
 
+/*
+ * Eigenvalues and -vectors of this system are
+ * lambda = 1     v = (1, 0, 0)
+ * lambda = 1     v = (0, 1, 0)
+ * lambda = 1     v = (-1, 0, 0)
+ */
+const double mat3[3][3] = {{1., 0, 2.}, {0., 1., 0.}, {0., 0., 1.}};
+
 
 void
-check_matrix(const double *matrix_pointer)
+check_matrix(const double *matrix_pointer, const unsigned int size)
 {
-  FullMatrix<double>       A(2, 2, matrix_pointer);
-  LAPACKFullMatrix<double> LA(2, 2);
+  FullMatrix<double>       A(size, size, matrix_pointer);
+  LAPACKFullMatrix<double> LA(size, size);
   LA = A;
 
   deallog << "Checking matrix " << std::endl;
@@ -58,9 +66,9 @@ check_matrix(const double *matrix_pointer)
     }
   deallog << std::endl;
   deallog << "Right eigenvectors" << std::endl;
-  LA.get_right_eigenvectors().print_formatted(deallog.get_file_stream());
+  LA.get_right_eigenvectors().print(deallog.get_file_stream());
   deallog << "Left eigenvectors" << std::endl;
-  LA.get_left_eigenvectors().print_formatted(deallog.get_file_stream());
+  LA.get_left_eigenvectors().print(deallog.get_file_stream());
   deallog << std::endl;
 }
 
@@ -72,8 +80,11 @@ main()
   initlog();
 
   // Test symmetric system
-  check_matrix(&mat1[0][0]);
+  check_matrix(&mat1[0][0], 2);
 
   // Test non-symmetric system with complex eigenvalues/eigenvectors
-  check_matrix(&mat2[0][0]);
+  check_matrix(&mat2[0][0], 2);
+
+  // Test case of one eigenvalue with two associated eigenvectors
+  check_matrix(&mat3[0][0], 3);
 }
