@@ -57,13 +57,10 @@ check_matrix(const double *matrix_pointer)
       deallog << lambda << " ";
     }
   deallog << std::endl;
-  deallog << "Right eigenvectors ";
-  for (const auto d : LA.get_right_eigenvectors())
-    deallog << d << " ";
-  deallog << std::endl;
-  deallog << "Left eigenvectors ";
-  for (const auto d : LA.get_left_eigenvectors())
-    deallog << d << " ";
+  deallog << "Right eigenvectors" << std::endl;
+  LA.get_right_eigenvectors().print_formatted(deallog.get_file_stream());
+  deallog << "Left eigenvectors" << std::endl;
+  LA.get_left_eigenvectors().print_formatted(deallog.get_file_stream());
   deallog << std::endl;
 }
 
