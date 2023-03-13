@@ -1712,7 +1712,7 @@ namespace deal_II_exceptions
      * different types (e.g., unsigned and signed variables).
      */
     template <typename T, typename U>
-    inline constexpr bool
+    inline DEAL_II_HOST_DEVICE constexpr bool
     compare_for_equality(const T &t, const U &u)
     {
       using common_type = std::common_type_t<T, U>;
@@ -1726,7 +1726,7 @@ namespace deal_II_exceptions
      * different types (e.g., unsigned and signed variables).
      */
     template <typename T, typename U>
-    inline constexpr bool
+    inline DEAL_II_HOST_DEVICE constexpr bool
     compare_less_than(const T &t, const U &u)
     {
       using common_type = std::common_type_t<T, U>;
