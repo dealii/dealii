@@ -5705,24 +5705,42 @@ namespace internal
   {
     template <int fe_degree, int = 0>
     static bool
-    run(const unsigned int           n_desired_components,
-        const AlignedVector<Number> &inverse_shape,
-        const AlignedVector<Number> &inverse_coefficients,
-        const Number *               in_array,
-        Number *                     out_array,
-        std::enable_if_t<fe_degree != -1> * = nullptr)
+    run(const unsigned int                          n_desired_components,
+        const FEEvaluationData<dim, Number, false> &fe_eval,
+        const AlignedVector<Number> &               inverse_coefficients,
+        const bool                                  dyadic_coefficients,
+        const Number *                              in_array,
+        Number *                                    out_array)
     {
-      constexpr unsigned int dofs_per_component =
-        Utilities::pow(fe_degree + 1, dim);
+      const unsigned int given_degree =
+        (fe_degree > -1) ? fe_degree :
+                           fe_eval.get_shape_info().data.front().fe_degree;
+
+      const unsigned int dofs_per_component =
+        Utilities::pow(given_degree + 1, dim);
+
       Assert(inverse_coefficients.size() > 0 &&
                inverse_coefficients.size() % dofs_per_component == 0,
              ExcMessage(
                "Expected diagonal to be a multiple of scalar dof per cells"));
-      if (inverse_coefficients.size() != dofs_per_component)
-        AssertDimension(n_desired_components * dofs_per_component,
-                        inverse_coefficients.size());
+
+      if (!dyadic_coefficients)
+        {
+          if (inverse_coefficients.size() != dofs_per_component)
+            AssertDimension(n_desired_components * dofs_per_component,
+                            inverse_coefficients.size())
+        }
+      else
+        {
+          AssertDimension(n_desired_components * n_desired_components *
+                            dofs_per_component,
+                          inverse_coefficients.size());
+        }
 
       Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
+      Assert(fe_eval.get_shape_info().element_type <=
+               MatrixFreeFunctions::tensor_symmetric_no_collocation,
+             ExcNotImplemented());
 
       EvaluatorTensorProduct<evaluate_evenodd,
                              dim,
@@ -5731,53 +5749,106 @@ namespace internal
                              Number>
         evaluator(AlignedVector<Number>(),
                   AlignedVector<Number>(),
-                  inverse_shape);
+                  fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+                  given_degree + 1,
+                  given_degree + 1);
+
+      const Number *in  = in_array;
+      Number *      out = out_array;
+
+      const Number *inv_coefficient = inverse_coefficients.data();
 
       const unsigned int shift_coefficient =
         inverse_coefficients.size() > dofs_per_component ? dofs_per_component :
                                                            0;
-      const Number *inv_coefficient = inverse_coefficients.data();
-      for (unsigned int d = 0; d < n_desired_components; ++d)
+
+      const auto n_comp_outer = dyadic_coefficients ? 1 : n_desired_components;
+      const auto n_comp_inner = dyadic_coefficients ? n_desired_components : 1;
+
+      for (unsigned int d = 0; d < n_comp_outer; ++d)
         {
-          const Number *in  = in_array + d * dofs_per_component;
-          Number *      out = out_array + d * dofs_per_component;
-          // Need to select 'apply' method with hessian slot because values
-          // assume symmetries that do not exist in the inverse shapes
-          evaluator.template hessians<0, true, false>(in, out);
-          if (dim > 1)
-            evaluator.template hessians<1, true, false>(out, out);
-          if (dim > 2)
-            evaluator.template hessians<2, true, false>(out, out);
+          for (unsigned int di = 0; di < n_comp_inner; ++di)
+            {
+              const Number *in_  = in + di * dofs_per_component;
+              Number *      out_ = out + di * dofs_per_component;
+              evaluator.template hessians<0, true, false>(in_, out_);
+              if (dim > 1)
+                evaluator.template hessians<1, true, false>(out_, out_);
+              if (dim > 2)
+                evaluator.template hessians<2, true, false>(out_, out_);
+            }
+          if (dyadic_coefficients)
+            {
+              const auto n_coeff_components =
+                n_desired_components * n_desired_components;
+              if (n_desired_components == dim)
+                {
+                  for (unsigned int q = 0; q < dofs_per_component; ++q)
+                    vmult<dim>(&inv_coefficient[q * n_coeff_components],
+                               &in[q],
+                               &out[q],
+                               dofs_per_component);
+                }
+              else
+                {
+                  for (unsigned int q = 0; q < dofs_per_component; ++q)
+                    vmult<-1>(&inv_coefficient[q * n_coeff_components],
+                              &in[q],
+                              &out[q],
+                              dofs_per_component,
+                              n_desired_components);
+                }
+            }
+          else
+            for (unsigned int q = 0; q < dofs_per_component; ++q)
+              out[q] *= inv_coefficient[q];
 
-          for (unsigned int q = 0; q < dofs_per_component; ++q)
-            out[q] *= inv_coefficient[q];
+          for (unsigned int di = 0; di < n_comp_inner; ++di)
+            {
+              Number *out_ = out + di * dofs_per_component;
+              if (dim > 2)
+                evaluator.template hessians<2, false, false>(out_, out_);
+              if (dim > 1)
+                evaluator.template hessians<1, false, false>(out_, out_);
+              evaluator.template hessians<0, false, false>(out_, out_);
+            }
 
-          if (dim > 2)
-            evaluator.template hessians<2, false, false>(out, out);
-          if (dim > 1)
-            evaluator.template hessians<1, false, false>(out, out);
-          evaluator.template hessians<0, false, false>(out, out);
-
+          in += dofs_per_component;
+          out += dofs_per_component;
           inv_coefficient += shift_coefficient;
         }
+
       return false;
     }
 
-    /**
-     * Version for degree = -1
-     */
-    template <int fe_degree, int = 0>
-    static bool
-    run(const unsigned int,
-        const AlignedVector<Number> &,
-        const AlignedVector<Number> &,
-        const Number *,
-        Number *,
-        std::enable_if_t<fe_degree == -1> * = nullptr)
+    template <int n_components>
+    static void
+    vmult(const Number *     inverse_coefficients,
+          const Number *     src,
+          Number *           dst,
+          const unsigned int dofs_per_component,
+          const unsigned int n_given_components = 0)
     {
-      static_assert(fe_degree == -1, "Only usable for degree -1");
-      Assert(false, ExcNotImplemented());
-      return false;
+      const unsigned int n_desired_components =
+        (n_components > -1) ? n_components : n_given_components;
+
+      std::array<Number, dim + 2> tmp;
+      Assert(n_desired_components <= dim + 2,
+             ExcMessage(
+               "Number of components larger than dim+2 not supported."));
+
+      for (unsigned int d = 0; d < n_desired_components; ++d)
+        tmp[d] = src[d * dofs_per_component];
+
+      for (unsigned int d1 = 0; d1 < n_desired_components; ++d1)
+        {
+          const Number *inv_coeff_row =
+            &inverse_coefficients[d1 * n_desired_components];
+          Number sum = inv_coeff_row[0] * tmp[0];
+          for (unsigned int d2 = 1; d2 < n_desired_components; ++d2)
+            sum += inv_coeff_row[d2] * tmp[d2];
+          dst[d1 * dofs_per_component] = sum;
+        }
     }
   };
 

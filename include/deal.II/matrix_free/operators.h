@@ -648,7 +648,8 @@ namespace MatrixFreeOperators
     apply(const AlignedVector<VectorizedArrayType> &inverse_coefficient,
           const unsigned int                        n_actual_components,
           const VectorizedArrayType *               in_array,
-          VectorizedArrayType *                     out_array) const;
+          VectorizedArrayType *                     out_array,
+          const bool dyadic_coefficients = false) const;
 
     /**
      * Applies the inverse @ref GlossMassMatrix "mass matrix" operation on an input array, using the
@@ -663,6 +664,24 @@ namespace MatrixFreeOperators
      */
     void
     apply(const VectorizedArrayType *in_array,
+          VectorizedArrayType *      out_array) const;
+
+    /**
+     * This operation applies the inverse @ref GlossMassMatrix "mass matrix"
+     * operation on an input array with local dyadic-valued coefficients.
+     * The second-rank tensor at each quadrature point defines a linear operator
+     * on a vector holding the dof components. It is assumed that the passed
+     * input and output arrays are of correct size, namely
+     * FEEvaluation::dofs_per_cell long.
+     * `inverse_dyadic_coefficients` must be dofs_per_component long, and every
+     * element must be a second-rank tensor of dimension `n_components`. All
+     * entries should also contain the inverse JxW values. The `in_array` and
+     * `out_array` arguments may point to the same memory position.
+     */
+    void
+    apply(const AlignedVector<Tensor<2, n_components, VectorizedArrayType>>
+            &                        inverse_dyadic_coefficients,
+          const VectorizedArrayType *in_array,
           VectorizedArrayType *      out_array) const;
 
     /**
@@ -1033,8 +1052,12 @@ namespace MatrixFreeOperators
     fill_inverse_JxW_values(
       AlignedVector<VectorizedArrayType> &inverse_jxw) const
   {
-    constexpr unsigned int dofs_per_component_on_cell =
-      Utilities::pow(fe_degree + 1, dim);
+    const unsigned int dofs_per_component_on_cell =
+      (fe_degree > -1) ?
+        Utilities::pow(fe_degree + 1, dim) :
+        Utilities::pow(fe_eval.get_shape_info().data.front().fe_degree + 1,
+                       dim - 1);
+
     Assert(inverse_jxw.size() > 0 &&
              inverse_jxw.size() % dofs_per_component_on_cell == 0,
            ExcMessage(
@@ -1089,27 +1112,62 @@ namespace MatrixFreeOperators
     apply(const AlignedVector<VectorizedArrayType> &inverse_coefficients,
           const unsigned int                        n_actual_components,
           const VectorizedArrayType *               in_array,
-          VectorizedArrayType *                     out_array) const
+          VectorizedArrayType *                     out_array,
+          const bool                                dyadic_coefficients) const
   {
-    const unsigned int given_degree =
-      fe_eval.get_shape_info().data[0].fe_degree;
     if (fe_degree > -1)
-      internal::CellwiseInverseMassMatrixImplFlexible<dim,
-                                                      VectorizedArrayType>::
-        template run<fe_degree>(
-          n_actual_components,
-          fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-          inverse_coefficients,
-          in_array,
-          out_array);
+      internal::CellwiseInverseMassMatrixImplFlexible<
+        dim,
+        VectorizedArrayType>::template run<fe_degree>(n_actual_components,
+                                                      fe_eval,
+                                                      inverse_coefficients,
+                                                      dyadic_coefficients,
+                                                      in_array,
+                                                      out_array);
     else
       internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
         n_actual_components,
-        given_degree,
-        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+        fe_eval,
         inverse_coefficients,
+        dyadic_coefficients,
         in_array,
         out_array);
+  }
+
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
+  inline void
+  CellwiseInverseMassMatrix<dim,
+                            fe_degree,
+                            n_components,
+                            Number,
+                            VectorizedArrayType>::
+    apply(const AlignedVector<Tensor<2, n_components, VectorizedArrayType>>
+            &                        inverse_dyadic_coefficients,
+          const VectorizedArrayType *in_array,
+          VectorizedArrayType *      out_array) const
+  {
+    const unsigned int dofs_per_component = inverse_dyadic_coefficients.size();
+    constexpr unsigned int n_tensor_components = n_components * n_components;
+
+    AlignedVector<VectorizedArrayType> inverse_coefficients(
+      dofs_per_component * n_tensor_components);
+
+    // Flatten the inverse dyadic coefficients into `inverse_coefficients`
+    {
+      auto begin = inverse_coefficients.begin();
+      for (unsigned int q = 0; q < dofs_per_component; ++q)
+        {
+          const auto end = std::next(begin, n_tensor_components);
+          inverse_dyadic_coefficients[q].unroll(begin, end);
+          begin = end;
+        }
+    }
+
+    apply(inverse_coefficients, n_components, in_array, out_array, true);
   }
 
 

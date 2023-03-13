@@ -105,12 +105,12 @@ namespace internal
           Number *                                    out_array);
 
     static void
-    apply(const unsigned int           n_components,
-          const unsigned int           fe_degree,
-          const AlignedVector<Number> &inverse_shape,
-          const AlignedVector<Number> &inverse_coefficients,
-          const Number *               in_array,
-          Number *                     out_array);
+    apply(const unsigned int                          n_components,
+          const FEEvaluationData<dim, Number, false> &fe_eval,
+          const AlignedVector<Number> &               inverse_coefficients,
+          const bool                                  dyadic_coefficients,
+          const Number *                              in_array,
+          Number *                                    out_array);
 
     static void
     transform_from_q_points_to_basis(
