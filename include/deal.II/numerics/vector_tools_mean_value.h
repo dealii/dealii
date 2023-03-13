@@ -98,8 +98,9 @@ namespace VectorTools
    * provided the boolean mask is empty, i.e. selecting the whole vector.
    */
   template <typename VectorType>
-  void
-  subtract_mean_value(VectorType &v, const std::vector<bool> &p_select = {});
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void subtract_mean_value(VectorType &             v,
+                           const std::vector<bool> &p_select = {});
 
   /**
    * Add the constant @p constant_adjustment to the specified
@@ -128,11 +129,11 @@ namespace VectorTools
    * adjust a single component of a distributed vector.
    */
   template <class VectorType, int dim, int spacedim = dim>
-  void
-  add_constant(VectorType &                          solution,
-               const DoFHandler<dim, spacedim> &     dof_handler,
-               const unsigned int                    component,
-               const typename VectorType::value_type constant_adjustment);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void add_constant(VectorType &                          solution,
+                    const DoFHandler<dim, spacedim> &     dof_handler,
+                    const unsigned int                    component,
+                    const typename VectorType::value_type constant_adjustment);
 
   /**
    * Compute the mean value of one component of the solution.
@@ -158,8 +159,8 @@ namespace VectorTools
    * mean value and subtract it right inside the evaluation routine.
    */
   template <int dim, typename VectorType, int spacedim>
-  typename VectorType::value_type
-  compute_mean_value(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  typename VectorType::value_type compute_mean_value(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
     const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q_collection,
@@ -172,23 +173,25 @@ namespace VectorTools
    * and a single Mapping object.
    */
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  compute_mean_value(const Mapping<dim, spacedim> &   mapping,
-                     const DoFHandler<dim, spacedim> &dof,
-                     const Quadrature<dim> &          quadrature,
-                     const VectorType &               v,
-                     const unsigned int               component);
+    compute_mean_value(const Mapping<dim, spacedim> &   mapping,
+                       const DoFHandler<dim, spacedim> &dof,
+                       const Quadrature<dim> &          quadrature,
+                       const VectorType &               v,
+                       const unsigned int               component);
 
   /**
    * Call the other compute_mean_value() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  compute_mean_value(const DoFHandler<dim, spacedim> &dof,
-                     const Quadrature<dim> &          quadrature,
-                     const VectorType &               v,
-                     const unsigned int               component);
+    compute_mean_value(const DoFHandler<dim, spacedim> &dof,
+                       const Quadrature<dim> &          quadrature,
+                       const VectorType &               v,
+                       const unsigned int               component);
   /** @} */
 } // namespace VectorTools
 

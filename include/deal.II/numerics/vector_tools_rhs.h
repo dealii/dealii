@@ -24,9 +24,11 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 class AffineConstraints;
+
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
@@ -56,8 +58,8 @@ namespace VectorTools
    * See the general documentation of this namespace for further information.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const Mapping<dim, spacedim> &                             mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const Quadrature<dim> &                                    q,
@@ -71,8 +73,8 @@ namespace VectorTools
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof,
     const Quadrature<dim> &                                    q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
@@ -84,8 +86,8 @@ namespace VectorTools
    * Like the previous set of functions, but for hp-objects.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const hp::MappingCollection<dim, spacedim> &               mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim> &                               q,
@@ -98,8 +100,8 @@ namespace VectorTools
    * Like the previous set of functions, but for hp-objects.
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim> &                               q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
@@ -117,8 +119,8 @@ namespace VectorTools
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const Mapping<dim, spacedim> &                             mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const Quadrature<dim - 1> &                                q,
@@ -135,8 +137,8 @@ namespace VectorTools
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof,
     const Quadrature<dim - 1> &                                q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
@@ -151,8 +153,8 @@ namespace VectorTools
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const hp::MappingCollection<dim, spacedim> &               mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim - 1> &                           q,
@@ -170,8 +172,8 @@ namespace VectorTools
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof,
     const hp::QCollection<dim - 1> &                           q,
     const Function<spacedim, typename VectorType::value_type> &rhs,
