@@ -852,9 +852,6 @@ namespace DoFTools
                         }
                       else
                         {
-                          if (!face_has_flux_coupling(cell, face_n))
-                            continue;
-
                           typename DoFHandler<dim,
                                               spacedim>::level_cell_iterator
                             neighbor =
@@ -887,6 +884,10 @@ namespace DoFTools
                                 !cell->periodic_neighbor_is_coarser(face_n))) &&
                               neighbor->is_locally_owned())
                             continue; // (the neighbor is finer)
+
+                          if (!face_has_flux_coupling(cell, face_n))
+                            continue;
+
 
                           const unsigned int neighbor_face_n =
                             periodic_neighbor ?
@@ -1197,9 +1198,6 @@ namespace DoFTools
                             level_cell_iterator neighbor =
                               cell->neighbor_or_periodic_neighbor(face);
 
-                          if (!face_has_flux_coupling(cell, face))
-                            continue;
-
                           // Like the non-hp-case: If the cells are on the same
                           // level (and both are active, locally-owned cells)
                           // then only add to the sparsity pattern if the
@@ -1228,6 +1226,10 @@ namespace DoFTools
                                 !cell->periodic_neighbor_is_coarser(face))) &&
                               neighbor->is_locally_owned())
                             continue; // (the neighbor is finer)
+
+
+                          if (!face_has_flux_coupling(cell, face))
+                            continue;
 
                           // In 1d, go straight to the cell behind this
                           // particular cell's most terminal cell. This makes us
