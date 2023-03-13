@@ -23,8 +23,6 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 

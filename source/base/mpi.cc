@@ -24,8 +24,10 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <boost/serialization/utility.hpp>
