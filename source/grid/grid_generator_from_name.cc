@@ -230,6 +230,21 @@ namespace GridGenerator
                          double,
                          unsigned int,
                          bool>(concentric_hyper_shells, arguments, tria);
+
+      else if (name == "subdivided_hyper_cube_with_simplices")
+        parse_and_create<dim, dim, unsigned int, double, double, bool>(
+          subdivided_hyper_cube_with_simplices, arguments, tria);
+
+      else if (name == "subdivided_hyper_rectangle_with_simplices")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<unsigned int> &,
+                         const Point<dim> &,
+                         const Point<dim> &,
+                         bool>(subdivided_hyper_rectangle_with_simplices,
+                               arguments,
+                               tria);
+
       else
         return false;
 
