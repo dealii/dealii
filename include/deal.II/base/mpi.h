@@ -1131,7 +1131,8 @@ namespace Utilities
       MPI_InitFinalize(
         int &              argc,
         char **&           argv,
-        const unsigned int max_num_threads = numbers::invalid_unsigned_int);
+        const unsigned int max_num_threads = numbers::invalid_unsigned_int,
+        const bool         allow_external_initialization_ = false);
 
       /**
        * Destructor. Calls <tt>MPI_Finalize()</tt> in case this class owns the
@@ -1206,8 +1207,18 @@ namespace Utilities
        */
       static std::set<MPI_Request *> requests;
 
+      bool allow_external_initialization = false;
+
 #ifdef DEAL_II_WITH_PETSC
       bool finalize_petscslepc;
+#endif
+
+#ifdef DEAL_II_WITH_MPI
+      bool finalize_mpi = true;
+#endif
+
+#ifdef DEAL_II_WITH_P4EST
+      bool finalize_sc = true;
 #endif
     };
 
