@@ -71,7 +71,7 @@ void test(MPI_Comm comm) {
 
 int main(int argc, char *argv[]) {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  // mpi_initlog();
+  mpi_initlog();
   MPI_Comm comm = MPI_COMM_WORLD;
   test<1>(comm);
   test<2>(comm);
