@@ -5,12 +5,14 @@
     color: #80ff00;
 }
 
-table.tutorial {
+@media (prefers-color-scheme: light) {
+  table.tutorial {
     color: black;
     border: 1px solid #aaa;
     background-color: #f9f9f9;
     padding: 5px;
     font-size: 95%;
+  }
 }
 div.tutorial {
     color: black;
