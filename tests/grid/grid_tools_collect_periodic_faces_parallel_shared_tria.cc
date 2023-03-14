@@ -23,7 +23,9 @@
 #include <deal.II/grid/tria.h>
 
 #include <vector>
-using namespace dealii;
+
+#include "../tests.h"
+
 template <int dim>
 void test(MPI_Comm comm) {
   deallog << "dim = " << dim << std::endl;
