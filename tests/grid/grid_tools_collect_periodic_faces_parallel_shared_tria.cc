@@ -44,9 +44,7 @@ void test(MPI_Comm comm) {
     // Collect periodic faces in the x-direction
     GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
     // Check the size of the matched_pairs vector
-    if (matched_pairs.size() != 1) {
-      // throw error
-    }
+    deallog << matched_pairs.size()  << std::endl;
   } else if constexpr (dim == 2) {
     Point<dim> p1{0., 0.};
     Point<dim> p2{1., 1.};
@@ -54,8 +52,7 @@ void test(MPI_Comm comm) {
     GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
 
     GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-    if (matched_pairs.size() != 16) {
-    }
+    deallog << matched_pairs.size() << std::endl;
   } else if constexpr (dim == 3) {
     Point<dim> p1{0., 0., 0.};
     Point<dim> p2{1., 1., 1.};
@@ -64,8 +61,7 @@ void test(MPI_Comm comm) {
     GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
 
     GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-    if (matched_pairs.size() != 256) {
-    }
+    deallog << matched_pairs.size() << std::endl;
   }
 }
 
