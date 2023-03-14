@@ -14,11 +14,11 @@
  * ---------------------------------------------------------------------
  */
 
-// @sect3{This test considers two elements which share a common, regular face.
+// This test considers two elements which share a common, regular face.
 // The logic of make_flux_sparsity_pattern() loops over all faces and filters
 // some of them according to a predicate face_has_flux_coupling(). We check
 // that the only internal face in the current setup is visited exactly once and
-// that the predicate face_has_flux_coupling() is evaluated once for this face.}
+// that the predicate face_has_flux_coupling() is evaluated once for this face.
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -63,18 +63,21 @@ create_and_output_flux_sparsity_with_filter(
   std::function<bool(const typename DoFHandler<dim>::active_cell_iterator,
                      const unsigned int)> filter)
 {
-  DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-  DoFTools::make_flux_sparsity_pattern(
-    dof_handler,
-    dsp,
-    AffineConstraints<double>(),
-    true,
-    Table<2, DoFTools::Coupling>(1, 1, new auto(DoFTools::always)),
-    Table<2, DoFTools::Coupling>(1, 1, new auto(DoFTools::always)),
-    numbers::invalid_subdomain_id,
-    [&](const auto &cell, const unsigned int face_index) {
-      return filter(cell, face_index);
-    });
+  DynamicSparsityPattern       dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+  Table<2, DoFTools::Coupling> coupling(1, 1);
+  coupling.fill(DoFTools::always);
+
+  DoFTools::make_flux_sparsity_pattern(dof_handler,
+                                       dsp,
+                                       AffineConstraints<double>(),
+                                       true,
+                                       coupling,
+                                       coupling,
+                                       numbers::invalid_subdomain_id,
+                                       [&](const auto &       cell,
+                                           const unsigned int face_index) {
+                                         return filter(cell, face_index);
+                                       });
   dsp.print(deallog.get_file_stream());
 }
 
@@ -82,12 +85,11 @@ template <int dim>
 void
 check()
 {
-  // create a square with two elements
   const Triangulation<dim> tria = make_two_elements<dim>();
-  // Generate Q1 dofs for the mesh grid
+
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(FE_Q<dim>(1));
-  // create and output the sparsity pattern by using a filter
+
   create_and_output_flux_sparsity_with_filter<dim>(dof_handler,
                                                    is_face_on_OY<dim>);
 }
