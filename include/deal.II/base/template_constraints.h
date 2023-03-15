@@ -778,28 +778,29 @@ namespace concepts
      * predicate is `true`.
      */
     template <typename T>
-    constexpr bool is_dealii_vector_type = false;
+    inline constexpr bool is_dealii_vector_type = false;
 
     template <typename Number>
-    constexpr bool is_dealii_vector_type<dealii::Vector<Number>> = true;
+    inline constexpr bool is_dealii_vector_type<dealii::Vector<Number>> = true;
 
     template <typename Number>
-    constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> = true;
+    inline constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> =
+      true;
 
     template <typename Number>
-    constexpr bool
+    inline constexpr bool
       is_dealii_vector_type<dealii::LinearAlgebra::Vector<Number>> = true;
 
     template <typename Number>
-    constexpr bool
+    inline constexpr bool
       is_dealii_vector_type<dealii::LinearAlgebra::BlockVector<Number>> = true;
 
     template <typename Number, typename MemorySpace>
-    constexpr bool is_dealii_vector_type<
+    inline constexpr bool is_dealii_vector_type<
       dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>> = true;
 
     template <typename Number>
-    constexpr bool is_dealii_vector_type<
+    inline constexpr bool is_dealii_vector_type<
       dealii::LinearAlgebra::distributed::BlockVector<Number>> = true;
 
 #  ifdef DEAL_II_WITH_PETSC
@@ -836,7 +837,7 @@ namespace concepts
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <typename Number>
-    constexpr bool is_dealii_vector_type<
+    inline constexpr bool is_dealii_vector_type<
       dealii::LinearAlgebra::TpetraWrappers::Vector<Number>> = true;
 #    endif
 #  endif
