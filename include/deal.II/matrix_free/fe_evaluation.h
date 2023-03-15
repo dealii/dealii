@@ -295,7 +295,7 @@ public:
    * corresponds to the value of the integrated function with the test
    * function of the given index.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -308,7 +308,7 @@ public:
    * get_dof_value. Therefore, the original data that was read from a vector
    * is overwritten as soon as a value is submitted.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -323,7 +323,7 @@ public:
    * vector-valued, a vector-valued return argument is given. Note that when
    * vectorization is enabled, values from several cells are grouped together.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -338,7 +338,7 @@ public:
    * which is tested by all basis function on the current cell and integrated
    * over.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -351,7 +351,7 @@ public:
    * EvaluationFlags::gradients, or the value that has been stored there with
    * a call to FEEvaluationBase::submit_gradient().
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -368,7 +368,7 @@ public:
    * This call is equivalent to calling get_gradient() * get_normal_vector()
    * but will use a more efficient internal representation of data.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -383,7 +383,7 @@ public:
    * this specifies what is tested by all basis function gradients on the
    * current cell and integrated over.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -420,7 +420,7 @@ public:
    * this specifies what is tested by the Hessians of all basis functions on the
    * current cell and integrated over.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -434,7 +434,7 @@ public:
    * or even the trace of the Hessian, the Laplacian, is needed, use the other
    * functions below.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -446,7 +446,7 @@ public:
    * quadrature point number @p q_point after a call to
    * FEEvaluation::evaluate(EvaluationFlags::hessians).
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -460,7 +460,7 @@ public:
    * when computing the full Hessian, some operations can be saved when only
    * the Laplacian is requested.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -476,7 +476,7 @@ public:
    * Return the divergence of a vector-valued finite element at quadrature
    * point number @p q_point after a call to @p evaluate(...,true,...).
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    */
   VectorizedArrayType
   get_divergence(const unsigned int q_point) const;
@@ -487,7 +487,7 @@ public:
    * evaluate(...,true,...). It corresponds to <tt>0.5
    * (grad+grad<sup>T</sup>)</tt>.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    */
   SymmetricTensor<2, dim, VectorizedArrayType>
   get_symmetric_gradient(const unsigned int q_point) const;
@@ -496,7 +496,7 @@ public:
    * Return the curl of the vector field, $\nabla \times v$ after a call to @p
    * evaluate(...,true,...).
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    */
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
   get_curl(const unsigned int q_point) const;
@@ -509,7 +509,7 @@ public:
    * tested by all basis function gradients on the current cell and integrated
    * over.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
@@ -528,7 +528,7 @@ public:
    * symmetric gradient which is tested by all basis function symmetric
    * gradients on the current cell and integrated over.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
@@ -545,7 +545,7 @@ public:
    * Write the components of a curl containing the values on quadrature point
    * @p q_point. Access to the same data field as through @p get_gradient.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
@@ -1949,7 +1949,9 @@ public:
 
   /**
    * The static number of quadrature points determined from the given template
-   * argument `n_q_points_1d`. Note that the actual number of quadrature
+   * argument `n_q_points_1d`.
+   *
+   * @note The actual number of quadrature
    * points, `n_q_points`, can be different if `fe_degree=-1` is given and
    * run-time loop lengths are used rather than compile time ones.
    */
@@ -1958,7 +1960,9 @@ public:
 
   /**
    * The static number of degrees of freedom of a scalar component determined
-   * from the given template argument `fe_degree`. Note that the actual number
+   * from the given template argument `fe_degree`.
+   *
+   * @note The actual number
    * of degrees of freedom `dofs_per_component` can be different if
    * `fe_degree=-1` is given or if the underlying is of more complicated type
    * than the usual FE_Q or FE_DGQ ones, such as FE_DGP.
@@ -1968,7 +1972,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given or if the underlying is of more complicated type than the usual
    * FE_Q or FE_DGQ ones, such as FE_DGP.
@@ -1978,7 +1984,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given or if the underlying is of more complicated type than the usual
    * FE_Q or FE_DGQ ones, such as FE_DGP.
@@ -2452,7 +2460,9 @@ public:
 
   /**
    * The static number of quadrature points determined from the given template
-   * argument `n_q_points_1d` taken to the power of dim-1. Note that the actual
+   * argument `n_q_points_1d` taken to the power of dim-1.
+   *
+   * @note The actual
    * number of quadrature points, `n_q_points`, can be different if
    * `fe_degree=-1` is given and run-time loop lengths are used rather than
    * compile time ones.
@@ -2462,7 +2472,9 @@ public:
 
   /**
    * The static number of quadrature points on a cell with the same quadrature
-   * formula. Note that this value is only present for simpler comparison with
+   * formula.
+   *
+   * @note This value is only present for simpler comparison with
    * the cell quadrature, as the actual number of points is given to a face by
    * the `static_n_q_points` variable.
    */
@@ -2471,7 +2483,9 @@ public:
 
   /**
    * The static number of degrees of freedom of a scalar component determined
-   * from the given template argument `fe_degree`. Note that the actual number
+   * from the given template argument `fe_degree`.
+   *
+   * @note The actual number
    * of degrees of freedom `dofs_per_component` can be different if
    * `fe_degree=-1` is given.
    */
@@ -2480,7 +2494,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given.
    */
@@ -2489,7 +2505,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given.
    */

@@ -95,7 +95,7 @@ DEAL_II_NAMESPACE_OPEN
  * parallelization in shared memory and vectorization.
  *
  * Vectorization is implemented by merging several topological cells into one
- * so-called macro cell. This enables the application of all cell-related
+ * so-called `cell batch`. This enables the application of all cell-related
  * operations for several cells with one CPU instruction and is one of the
  * main features of this framework.
  *
@@ -130,25 +130,27 @@ public:
 
   /**
    * Collects the options for initialization of the MatrixFree class. The
-   * first parameter specifies the MPI communicator to be used, the second the
+   * parameter @p tasks_parallel_scheme specifies the
    * parallelization options in shared memory (task-based parallelism, where
    * one can choose between no parallelism and three schemes that avoid that
    * cells with access to the same vector entries are accessed
-   * simultaneously), the third with the block size for task parallel
-   * scheduling, the fourth the update flags that should be stored by this
-   * class.
+   * simultaneously), and the parameter @p tasks_block_size the block size for
+   * task parallel scheduling. The parameters @p mapping_update_flags,
+   * @p mapping_update_flags_boundary_faces, @p mapping_update_flags_inner_faces,
+   * and @p mapping_update_flags_faces_by_cells specify the update flags that
+   * should be stored by this class.
    *
-   * The fifth parameter specifies the level in the triangulation from which
+   * The parameter @p mg_level specifies the level in the triangulation from which
    * the indices are to be used. If the level is set to
-   * numbers::invalid_unsigned_int, the active cells are traversed, and
+   * `numbers::invalid_unsigned_int`, the active cells are traversed, and
    * otherwise the cells in the given level. This option has no effect in case
    * a DoFHandler is given.
    *
-   * The parameter @p initialize_plain_indices indicates whether the DoFInfo
+   * The parameter @p store_plain_indices indicates whether the DoFInfo
    * class should also allow for access to vectors without resolving
    * constraints.
    *
-   * The two parameters `initialize_indices` and `initialize_mapping` allow
+   * The two parameters @p initialize_indices and @p initialize_mapping allow
    * the user to disable some of the initialization processes. For example, if
    * only the scheduling that avoids touching the same vector/matrix indices
    * simultaneously is to be found, the mapping needs not be
@@ -156,23 +158,27 @@ public:
    * the next but the topology has not (like when using a deforming mesh with
    * MappingQEulerian), it suffices to initialize the mapping only.
    *
-   * The two parameters `cell_vectorization_categories` and
-   * `cell_vectorization_categories_strict` control the formation of batches
+   * The two parameters @p cell_vectorization_categories and
+   * @p cell_vectorization_categories_strict control the formation of batches
    * for vectorization over several cells. It is used implicitly when working
    * with hp-adaptivity but can also be useful in other contexts, such as in
    * local time stepping where one would like to control which elements
-   * together form a batch of cells. The array `cell_vectorization_categories`
+   * together form a batch of cells. The array @p cell_vectorization_categories
    * is accessed by the number given by cell->active_cell_index() when working
-   * on the active cells with `mg_level` set to `numbers::invalid_unsigned_int`
+   * on the active cells with @p mg_level set to `numbers::invalid_unsigned_int`
    * and by cell->index() for the level cells. By default, the different
-   * categories in `cell_vectorization_category` can be mixed and the algorithm
+   * categories in @p cell_vectorization_category can be mixed and the algorithm
    * is allowed to merge lower category numbers with the next higher categories
    * if it is necessary inside the algorithm, in order to avoid partially
    * filled SIMD lanes as much as possible. This gives a better utilization of
    * the vectorization but might need special treatment, in particular for
-   * face integrals. If set to @p true, the algorithm will instead keep
+   * face integrals. If set to `true', the algorithm will instead keep
    * different categories separate and not mix them in a single vectorized
    * array.
+   *
+   * Finally, @p allow_ghosted_vectors_in_loops allows to enable and disable
+   * checks and @p communicator_sm gives the MPI communicator to be used
+   * if MPI-3.0 shared-memory features should be used.
    */
   struct AdditionalData
   {
@@ -341,12 +347,12 @@ public:
     TasksParallelScheme tasks_parallel_scheme;
 
     /**
-     * Set the number of so-called macro cells that should form one
+     * Set the number of so-called cell batches that should form one
      * partition. If zero size is given, the class tries to find a good size
      * for the blocks based on MultithreadInfo::n_threads() and the number of
      * cells present. Otherwise, the given number is used. If the given number
      * is larger than one third of the number of total cells, this means no
-     * parallelism. Note that in the case vectorization is used, a macro cell
+     * parallelism. Note that in the case vectorization is used, a cell batch
      * consists of more than one physical cell.
      */
     unsigned int tasks_block_size;
@@ -2152,7 +2158,7 @@ public:
 
 
   /**
-   * Return the table that translates a triple of the macro cell number,
+   * Return the table that translates a triple of the cell-batch number,
    * the index of a face within a cell and the index within the cell batch of
    * vectorization into the index within the faces array.
    */

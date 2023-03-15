@@ -165,8 +165,9 @@ namespace internal
       std::vector<FaceToCellTopology<vectorization_width>> faces;
 
       /**
-       * This table translates a triple of the macro cell number, the index of a
-       * face within a cell and the index within the cell batch of vectorization
+       * This table translates a triple of the cell-batch number number, the
+       * index of a face within a cell and the index within the cell batch of
+       * vectorization
        * into the index within the @p faces array.
        */
       ::dealii::Table<3, unsigned int> cell_and_face_to_plain_faces;
