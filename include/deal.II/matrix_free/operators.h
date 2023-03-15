@@ -660,8 +660,8 @@ namespace MatrixFreeOperators
      * FEEvaluationBase::JxW() method return the information of the correct
      * cell. It is assumed that the pointers of the input and output arrays
      * are valid over the length FEEvaluation::dofs_per_cell, which is the
-     * number of entries processed by this function. The `in_array` and
-     * `out_array` arguments may point to the same memory position.
+     * number of entries processed by this function. The @p in_array and
+     * @p out_array arguments may point to the same memory position.
      */
     void
     apply(const VectorizedArrayType *in_array,
@@ -673,11 +673,11 @@ namespace MatrixFreeOperators
      * The second-rank tensor at each quadrature point defines a linear operator
      * on a vector holding the dof components. It is assumed that the passed
      * input and output arrays are of correct size, namely
-     * FEEvaluation::dofs_per_cell long. The `in_array` and `out_array`
+     * FEEvaluation::dofs_per_cell long. The @p in_array and @p out_array
      * arguments may point to the same memory position.
-     * `inverse_dyadic_coefficients` must be dofs_per_component long, and every
-     * element must be a second-rank tensor of dimension `n_components`. All
-     * entries should also contain the inverse JxW values.
+     * @p inverse_dyadic_coefficients must be `dofs_per_component` long, and
+     * every element must be a second-rank tensor of dimension @p n_components.
+     * All entries should be multiplied with the inverse `JxW` values.
      */
     void
     apply(const AlignedVector<Tensor<2, n_components, VectorizedArrayType>>
