@@ -126,7 +126,8 @@ public:
   using ScalarNumber =
     typename internal::VectorizedArrayTrait<Number>::value_type;
 
-  static constexpr unsigned int n_lanes = sizeof(Number) / sizeof(ScalarNumber);
+  static constexpr unsigned int n_lanes =
+    internal::VectorizedArrayTrait<Number>::width;
 
   /**
    * Constructor, taking a single ShapeInfo object to inject the capability
