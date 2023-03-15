@@ -741,6 +741,7 @@ namespace LinearAlgebra
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   namespace TpetraWrappers
   {
+    template <typename Number>
     class Vector;
   }
 #  endif
@@ -777,66 +778,67 @@ namespace concepts
      * predicate is `true`.
      */
     template <typename T>
-    constexpr bool is_dealii_vector_type = false;
+    inline constexpr bool is_dealii_vector_type = false;
 
     template <typename Number>
-    constexpr bool is_dealii_vector_type<dealii::Vector<Number>> = true;
+    inline constexpr bool is_dealii_vector_type<dealii::Vector<Number>> = true;
 
     template <typename Number>
-    constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> = true;
+    inline constexpr bool is_dealii_vector_type<dealii::BlockVector<Number>> =
+      true;
 
     template <typename Number>
-    constexpr bool
+    inline constexpr bool
       is_dealii_vector_type<dealii::LinearAlgebra::Vector<Number>> = true;
 
     template <typename Number>
-    constexpr bool
+    inline constexpr bool
       is_dealii_vector_type<dealii::LinearAlgebra::BlockVector<Number>> = true;
 
     template <typename Number, typename MemorySpace>
-    constexpr bool is_dealii_vector_type<
+    inline constexpr bool is_dealii_vector_type<
       dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace>> = true;
 
     template <typename Number>
-    constexpr bool is_dealii_vector_type<
+    inline constexpr bool is_dealii_vector_type<
       dealii::LinearAlgebra::distributed::BlockVector<Number>> = true;
 
 #  ifdef DEAL_II_WITH_PETSC
     template <>
-    constexpr bool is_dealii_vector_type<dealii::PETScWrappers::Vector> = true;
-
-    template <>
-    constexpr bool is_dealii_vector_type<dealii::PETScWrappers::BlockVector> =
+    inline constexpr bool is_dealii_vector_type<dealii::PETScWrappers::Vector> =
       true;
 
     template <>
-    constexpr bool is_dealii_vector_type<dealii::PETScWrappers::MPI::Vector> =
-      true;
+    inline constexpr bool
+      is_dealii_vector_type<dealii::PETScWrappers::BlockVector> = true;
 
     template <>
-    constexpr bool
+    inline constexpr bool
+      is_dealii_vector_type<dealii::PETScWrappers::MPI::Vector> = true;
+
+    template <>
+    inline constexpr bool
       is_dealii_vector_type<dealii::PETScWrappers::MPI::BlockVector> = true;
 #  endif
 
 #  ifdef DEAL_II_WITH_TRILINOS
     template <>
-    constexpr bool
+    inline constexpr bool
       is_dealii_vector_type<dealii::TrilinosWrappers::MPI::Vector> = true;
 
     template <>
-    constexpr bool
+    inline constexpr bool
       is_dealii_vector_type<dealii::TrilinosWrappers::MPI::BlockVector> = true;
 
     template <>
-    constexpr bool
+    inline constexpr bool
       is_dealii_vector_type<dealii::LinearAlgebra::EpetraWrappers::Vector> =
         true;
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <>
-    constexpr bool
-      is_dealii_vector_type<dealii::LinearAlgebra::TpetraWrappers::Vector> =
-        true;
+    template <typename Number>
+    inline constexpr bool is_dealii_vector_type<
+      dealii::LinearAlgebra::TpetraWrappers::Vector<Number>> = true;
 #    endif
 #  endif
   } // namespace internal
