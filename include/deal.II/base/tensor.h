@@ -291,7 +291,16 @@ public:
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
-                                operator=(const OtherNumber &d);
+                                operator=(const OtherNumber &d) &;
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  template <typename OtherNumber>
+  constexpr DEAL_II_HOST_DEVICE Tensor &
+                                operator=(const OtherNumber &d) && = delete;
 
   /**
    * Test for equality of two tensors.
@@ -685,7 +694,15 @@ public:
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
   constexpr Tensor &
-  operator=(const Number &d);
+  operator=(const Number &d) &;
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  constexpr DEAL_II_HOST_DEVICE Tensor &
+                                operator=(const Number &d) && = delete;
 
 #ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
   /**
@@ -1095,7 +1112,7 @@ Tensor<0, dim, Number>::operator=(Tensor<0, dim, Number> &&other) noexcept
 template <int dim, typename Number>
 template <typename OtherNumber>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE Tensor<0, dim, Number> &
-Tensor<0, dim, Number>::operator=(const OtherNumber &d)
+Tensor<0, dim, Number>::operator=(const OtherNumber &d) &
 {
   value = internal::NumberType<Number>::value(d);
   return *this;
@@ -1542,7 +1559,7 @@ Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, OtherNumber> &t)
 
 template <int rank_, int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
-Tensor<rank_, dim, Number>::operator=(const Number &d)
+Tensor<rank_, dim, Number>::operator=(const Number &d) &
 {
   Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
   (void)d;
