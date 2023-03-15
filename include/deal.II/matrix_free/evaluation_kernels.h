@@ -5707,7 +5707,7 @@ namespace internal
     static bool
     run(const unsigned int                          n_desired_components,
         const FEEvaluationData<dim, Number, false> &fe_eval,
-        const AlignedVector<Number> &               inverse_coefficients,
+        const ArrayView<const Number> &             inverse_coefficients,
         const bool                                  dyadic_coefficients,
         const Number *                              in_array,
         Number *                                    out_array)
@@ -5728,7 +5728,7 @@ namespace internal
         {
           if (inverse_coefficients.size() != dofs_per_component)
             AssertDimension(n_desired_components * dofs_per_component,
-                            inverse_coefficients.size())
+                            inverse_coefficients.size());
         }
       else
         {
@@ -5821,8 +5821,9 @@ namespace internal
       return false;
     }
 
+  private:
     template <int n_components>
-    static void
+    static inline void
     vmult(const Number *     inverse_coefficients,
           const Number *     src,
           Number *           dst,

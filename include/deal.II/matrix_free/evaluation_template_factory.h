@@ -107,7 +107,7 @@ namespace internal
     static void
     apply(const unsigned int                          n_components,
           const FEEvaluationData<dim, Number, false> &fe_eval,
-          const AlignedVector<Number> &               inverse_coefficients,
+          const ArrayView<const Number> &             inverse_coefficients,
           const bool                                  dyadic_coefficients,
           const Number *                              in_array,
           Number *                                    out_array);
