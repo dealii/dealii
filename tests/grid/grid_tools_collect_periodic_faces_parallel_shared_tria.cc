@@ -42,15 +42,15 @@ test(MPI_Comm comm)
   unsigned int              num_refinements = 1 << 4;
   Point<dim>                p1;
   Point<dim>                p2;
-  std::vector<unsigned int> repitions(dim);
+  std::vector<unsigned int> repititions(dim);
 
   for (unsigned int i = 0; i < dim; ++i)
     {
-      p1[i]        = 0.;
-      p2[i]        = 1.;
-      repitions[i] = num_refinements;
+      p1[i]          = 0.;
+      p2[i]          = 1.;
+      repititions[i] = num_refinements;
     }
-  GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
+  GridGenerator::subdivided_hyper_rectangle(tria, repititions, p1, p2, true);
   // Collect periodic faces in the x-direction
   GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
   // Check the size of the matched_pairs vector
