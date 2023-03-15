@@ -1070,6 +1070,8 @@ make_array_view(const std::vector<ElementType> &vector,
  * Create a writable view to an entire AlignedVector object. See the
  * documentation of the corresponding overload for std::vector for more
  * information.
+ *
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline ArrayView<ElementType>
@@ -1084,6 +1086,8 @@ make_array_view(AlignedVector<ElementType> &vector)
  * Create a read-only view to an entire AlignedVector object. See the
  * documentation of the corresponding overload for std::vector for more
  * information.
+ *
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline ArrayView<const ElementType>
@@ -1098,6 +1102,8 @@ make_array_view(const AlignedVector<ElementType> &vector)
  * Create a writable view to a part of an AlignedVector object. See the
  * documentation of the corresponding overload for std::vector for more
  * information.
+ *
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline ArrayView<ElementType>
@@ -1118,6 +1124,8 @@ make_array_view(AlignedVector<ElementType> &vector,
  * Create a read-only view to a part of an AlignedVector object. See the
  * documentation of the corresponding overload for std::vector for more
  * information.
+ *
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline ArrayView<const ElementType>
