@@ -5580,7 +5580,7 @@ namespace internal
 
 
   /**
-   * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation
+   * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation,
    * using an FEEvaluationData argument.
    */
   template <int dim, typename Number>
@@ -5698,7 +5698,9 @@ namespace internal
 
   /**
    * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation
-   * using an FEEvaluationData argument.
+   * with user-provided coefficients at quadrature points (in contrast to
+   * CellwiseInverseMassMatrixImplBasic, which implicitly uses `1/(|J|xW)' as
+   * coefficient).
    */
   template <int dim, typename Number>
   struct CellwiseInverseMassMatrixImplFlexible
@@ -5784,8 +5786,10 @@ namespace internal
 
 
   /**
-   * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation
-   * using an FEEvaluationData argument.
+   * This struct implements the action of a projection of the values given
+   * at the quadrature points to the support points,
+   * using an FEEvaluationData argument. For the derivation, see comments in
+   * step-67.
    */
   template <int dim, typename Number>
   struct CellwiseInverseMassMatrixImplTransformFromQPoints
