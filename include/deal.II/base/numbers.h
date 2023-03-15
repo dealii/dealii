@@ -724,7 +724,7 @@ namespace internal
 
     // Type T is explicitly convertible (but not constructible) from F.
     template <typename F>
-    static constexpr DEAL_II_ALWAYS_INLINE T
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE T
     value(const F &f,
           std::enable_if_t<!std::is_same<typename std::decay<T>::type,
                                          typename std::decay<F>::type>::value &&
