@@ -1116,22 +1116,20 @@ namespace MatrixFreeOperators
           VectorizedArrayType *                     out_array) const
   {
     if (fe_degree > -1)
-      internal::CellwiseInverseMassMatrixImplFlexible<dim,
-                                                      VectorizedArrayType>::
-        template run<fe_degree>(
-          n_actual_components,
-          fe_eval,
-          ArrayView<const VectorizedArrayType>(inverse_coefficients.data(),
-                                               inverse_coefficients.size()),
-          false,
-          in_array,
-          out_array);
+      internal::CellwiseInverseMassMatrixImplFlexible<
+        dim,
+        VectorizedArrayType>::template run<fe_degree>(n_actual_components,
+                                                      fe_eval,
+                                                      make_array_view(
+                                                        inverse_coefficients),
+                                                      false,
+                                                      in_array,
+                                                      out_array);
     else
       internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
         n_actual_components,
         fe_eval,
-        ArrayView<const VectorizedArrayType>(inverse_coefficients.data(),
-                                             inverse_coefficients.size()),
+        make_array_view(inverse_coefficients),
         false,
         in_array,
         out_array);
