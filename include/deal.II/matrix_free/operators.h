@@ -1057,7 +1057,7 @@ namespace MatrixFreeOperators
       (fe_degree > -1) ?
         Utilities::pow(fe_degree + 1, dim) :
         Utilities::pow(fe_eval.get_shape_info().data.front().fe_degree + 1,
-                       dim - 1);
+                       dim);
 
     Assert(inverse_jxw.size() > 0 &&
              inverse_jxw.size() % dofs_per_component_on_cell == 0,
