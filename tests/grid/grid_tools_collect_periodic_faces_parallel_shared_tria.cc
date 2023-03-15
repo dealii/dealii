@@ -39,42 +39,22 @@ test(MPI_Comm comm)
     typename parallel::shared::Triangulation<dim>::cell_iterator>>
     matched_pairs;
 
-  unsigned int num_refinements = 1 << 4;
+  unsigned int              num_refinements = 1 << 4;
+  Point<dim>                p1;
+  Point<dim>                p2;
+  std::vector<unsigned int> repitions(dim);
 
-  if constexpr (dim == 1)
+  for (unsigned int i = 0; i < dim; ++i)
     {
-      Point<dim>                p1{0.};
-      Point<dim>                p2{1.};
-      std::vector<unsigned int> repitions{num_refinements};
-      GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
-
-      // Collect periodic faces in the x-direction
-      GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-      // Check the size of the matched_pairs vector
-      deallog << matched_pairs.size() << std::endl;
+      p1[i]        = 0.;
+      p2[i]        = 1.;
+      repitions[i] = num_refinements;
     }
-  else if constexpr (dim == 2)
-    {
-      Point<dim>                p1{0., 0.};
-      Point<dim>                p2{1., 1.};
-      std::vector<unsigned int> repitions{num_refinements, num_refinements};
-      GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
-
-      GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-      deallog << matched_pairs.size() << std::endl;
-    }
-  else if constexpr (dim == 3)
-    {
-      Point<dim>                p1{0., 0., 0.};
-      Point<dim>                p2{1., 1., 1.};
-      std::vector<unsigned int> repitions{num_refinements,
-                                          num_refinements,
-                                          num_refinements};
-      GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
-
-      GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-      deallog << matched_pairs.size() << std::endl;
-    }
+  GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
+  // Collect periodic faces in the x-direction
+  GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
+  // Check the size of the matched_pairs vector
+  deallog << matched_pairs.size() << std::endl;
 }
 
 int
