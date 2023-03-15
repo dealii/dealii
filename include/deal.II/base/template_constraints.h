@@ -907,34 +907,34 @@ namespace parallel
 
 namespace concepts
 {
+#if defined(DEAL_II_HAVE_CXX20) || defined(DOXYGEN)
   namespace internal
   {
     template <typename T>
-    constexpr bool is_triangulation_or_dof_handler = false;
+    inline constexpr bool is_triangulation_or_dof_handler = false;
 
     template <int dim, int spacedim>
-    constexpr bool
+    inline constexpr bool
       is_triangulation_or_dof_handler<Triangulation<dim, spacedim>> = true;
 
     template <int dim, int spacedim>
-    constexpr bool is_triangulation_or_dof_handler<
+    inline constexpr bool is_triangulation_or_dof_handler<
       parallel::distributed::Triangulation<dim, spacedim>> = true;
 
     template <int dim, int spacedim>
-    constexpr bool is_triangulation_or_dof_handler<
+    inline constexpr bool is_triangulation_or_dof_handler<
       parallel::shared::Triangulation<dim, spacedim>> = true;
 
     template <int dim, int spacedim>
-    constexpr bool is_triangulation_or_dof_handler<
+    inline constexpr bool is_triangulation_or_dof_handler<
       parallel::fullydistributed::Triangulation<dim, spacedim>> = true;
 
     template <int dim, int spacedim>
-    constexpr bool is_triangulation_or_dof_handler<DoFHandler<dim, spacedim>> =
-      true;
+    inline constexpr bool
+      is_triangulation_or_dof_handler<DoFHandler<dim, spacedim>> = true;
   } // namespace internal
 
 
-#if defined(DEAL_II_HAVE_CXX20) || defined(DOXYGEN)
   /**
    * A concept that is used to check whether the `MeshType` template
    * type used in many functions in namespace GridTools and
