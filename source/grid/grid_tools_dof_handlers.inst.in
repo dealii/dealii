@@ -370,41 +370,41 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-   namespace GridTools
-   \{
-     template void
-     collect_periodic_faces<
-       parallel::shared::Triangulation<deal_II_dimension,
-                                       deal_II_space_dimension>>(
-       const parallel::shared::Triangulation<deal_II_dimension,
-                                             deal_II_space_dimension> &,
-       const types::boundary_id,
-       const types::boundary_id,
-       const unsigned int,
-       std::vector<PeriodicFacePair<parallel::shared::Triangulation<
-         deal_II_dimension,
-         deal_II_space_dimension>::cell_iterator>> &,
-       const Tensor<1,
-                    parallel::shared::Triangulation<
-                      deal_II_dimension,
-                      deal_II_space_dimension>::space_dimension> &,
-       const FullMatrix<double> &);
-     template void
-     collect_periodic_faces<
-       parallel::shared::Triangulation<deal_II_dimension,
-                                       deal_II_space_dimension>>(
-       const parallel::shared::Triangulation<deal_II_dimension,
-                                             deal_II_space_dimension> &,
-       const types::boundary_id,
-       const unsigned int,
-       std::vector<PeriodicFacePair<parallel::shared::Triangulation<
-         deal_II_dimension,
-         deal_II_space_dimension>::cell_iterator>> &,
-       const Tensor<1,
-                    parallel::shared::Triangulation<
-                      deal_II_dimension,
-                      deal_II_space_dimension>::space_dimension> &,
-       const FullMatrix<double> &);
-   \}
+    namespace GridTools
+    \{
+      template void
+      collect_periodic_faces<
+        parallel::shared::Triangulation<deal_II_dimension,
+                                        deal_II_space_dimension>>(
+        const parallel::shared::Triangulation<deal_II_dimension,
+                                              deal_II_space_dimension> &,
+        const types::boundary_id,
+        const types::boundary_id,
+        const unsigned int,
+        std::vector<PeriodicFacePair<parallel::shared::Triangulation<
+          deal_II_dimension,
+          deal_II_space_dimension>::cell_iterator>> &,
+        const Tensor<1,
+                     parallel::shared::Triangulation<
+                       deal_II_dimension,
+                       deal_II_space_dimension>::space_dimension> &,
+        const FullMatrix<double> &);
+      template void
+      collect_periodic_faces<
+        parallel::shared::Triangulation<deal_II_dimension,
+                                        deal_II_space_dimension>>(
+        const parallel::shared::Triangulation<deal_II_dimension,
+                                              deal_II_space_dimension> &,
+        const types::boundary_id,
+        const unsigned int,
+        std::vector<PeriodicFacePair<parallel::shared::Triangulation<
+          deal_II_dimension,
+          deal_II_space_dimension>::cell_iterator>> &,
+        const Tensor<1,
+                     parallel::shared::Triangulation<
+                       deal_II_dimension,
+                       deal_II_space_dimension>::space_dimension> &,
+        const FullMatrix<double> &);
+    \}
 #endif
   }

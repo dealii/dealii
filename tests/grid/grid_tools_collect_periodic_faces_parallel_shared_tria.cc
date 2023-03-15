@@ -16,8 +16,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
+
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
@@ -27,47 +29,57 @@
 #include "../tests.h"
 
 template <int dim>
-void test(MPI_Comm comm) {
+void
+test(MPI_Comm comm)
+{
   deallog << "dim = " << dim << std::endl;
   parallel::shared::Triangulation<dim> tria(comm);
 
   std::vector<typename GridTools::PeriodicFacePair<
-      typename parallel::shared::Triangulation<dim>::cell_iterator>>
-      matched_pairs;
+    typename parallel::shared::Triangulation<dim>::cell_iterator>>
+    matched_pairs;
 
   unsigned int num_refinements = 1 << 4;
 
-  if constexpr (dim == 1) {
-    Point<dim> p1{0.};
-    Point<dim> p2{1.};
-    std::vector<unsigned int> repitions{num_refinements};
-    GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
+  if constexpr (dim == 1)
+    {
+      Point<dim>                p1{0.};
+      Point<dim>                p2{1.};
+      std::vector<unsigned int> repitions{num_refinements};
+      GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
 
-    // Collect periodic faces in the x-direction
-    GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-    // Check the size of the matched_pairs vector
-    deallog << matched_pairs.size()  << std::endl;
-  } else if constexpr (dim == 2) {
-    Point<dim> p1{0., 0.};
-    Point<dim> p2{1., 1.};
-    std::vector<unsigned int> repitions{num_refinements, num_refinements};
-    GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
+      // Collect periodic faces in the x-direction
+      GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
+      // Check the size of the matched_pairs vector
+      deallog << matched_pairs.size() << std::endl;
+    }
+  else if constexpr (dim == 2)
+    {
+      Point<dim>                p1{0., 0.};
+      Point<dim>                p2{1., 1.};
+      std::vector<unsigned int> repitions{num_refinements, num_refinements};
+      GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
 
-    GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-    deallog << matched_pairs.size() << std::endl;
-  } else if constexpr (dim == 3) {
-    Point<dim> p1{0., 0., 0.};
-    Point<dim> p2{1., 1., 1.};
-    std::vector<unsigned int> repitions{num_refinements, num_refinements,
-                                        num_refinements};
-    GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
+      GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
+      deallog << matched_pairs.size() << std::endl;
+    }
+  else if constexpr (dim == 3)
+    {
+      Point<dim>                p1{0., 0., 0.};
+      Point<dim>                p2{1., 1., 1.};
+      std::vector<unsigned int> repitions{num_refinements,
+                                          num_refinements,
+                                          num_refinements};
+      GridGenerator::subdivided_hyper_rectangle(tria, repitions, p1, p2, true);
 
-    GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
-    deallog << matched_pairs.size() << std::endl;
-  }
+      GridTools::collect_periodic_faces(tria, 0, 1, 0, matched_pairs);
+      deallog << matched_pairs.size() << std::endl;
+    }
 }
 
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[])
+{
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();
   MPI_Comm comm = MPI_COMM_WORLD;
