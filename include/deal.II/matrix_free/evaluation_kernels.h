@@ -835,6 +835,8 @@ namespace internal
                       const Number *                         values_dofs_actual,
                       FEEvaluationData<dim, Number, false> & fe_eval)
   {
+    Assert(!(evaluation_flag & EvaluationFlags::hessians), ExcNotImplemented());
+
     const std::size_t n_dofs =
       fe_eval.get_shape_info().dofs_per_component_on_cell;
     const std::size_t n_q_points = fe_eval.get_shape_info().n_q_points;
@@ -885,9 +887,6 @@ namespace internal
             values_dofs_actual_ptr += n_dofs;
           }
       }
-
-    if (evaluation_flag & EvaluationFlags::hessians)
-      Assert(false, ExcNotImplemented());
   }
 
 
@@ -905,9 +904,8 @@ namespace internal
                        FEEvaluationData<dim, Number, false> &fe_eval,
                        const bool add_into_values_array)
   {
-    // TODO: implement hessians
-    AssertThrow(!(integration_flag & EvaluationFlags::hessians),
-                ExcNotImplemented());
+    Assert(!(integration_flag & EvaluationFlags::hessians),
+           ExcNotImplemented());
 
     const std::size_t n_dofs =
       fe_eval.get_shape_info().dofs_per_component_on_cell;
