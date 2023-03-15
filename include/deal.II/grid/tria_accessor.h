@@ -1871,9 +1871,7 @@ private:
   clear_children() const;
 
 private:
-  template <int, int>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  friend class Triangulation;
+  friend class Triangulation<dim, spacedim>;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
   friend struct dealii::internal::TriangulationImplementation::
@@ -4172,9 +4170,7 @@ private:
   void
   set_direction_flag(const bool new_direction_flag) const;
 
-  template <int, int>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  friend class Triangulation;
+  friend class Triangulation<dim, spacedim>;
 
   template <int, int>
   friend class parallel::TriangulationBase;
