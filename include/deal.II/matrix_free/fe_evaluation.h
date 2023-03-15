@@ -474,7 +474,7 @@ public:
 
   /**
    * Return the divergence of a vector-valued finite element at quadrature
-   * point number @p q_point after a call to @p evaluate(...,true,...).
+   * point number @p q_point after a call to @p evaluate(EvaluationFlags::gradients).
    *
    * @note Only available for n_components_==dim.
    */
@@ -484,7 +484,7 @@ public:
   /**
    * Return the symmetric gradient of a vector-valued finite element at
    * quadrature point number @p q_point after a call to @p
-   * evaluate(...,true,...). It corresponds to <tt>0.5
+   * evaluate(EvaluationFlags::gradients). It corresponds to <tt>0.5
    * (grad+grad<sup>T</sup>)</tt>.
    *
    * @note Only available for n_components_==dim.
@@ -494,7 +494,7 @@ public:
 
   /**
    * Return the curl of the vector field, $\nabla \times v$ after a call to @p
-   * evaluate(...,true,...).
+   * evaluate(EvaluationFlags::gradients).
    *
    * @note Only available for n_components_==dim.
    */
@@ -505,7 +505,7 @@ public:
    * Write a contribution that is tested by the divergence to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies what is
    * tested by all basis function gradients on the current cell and integrated
    * over.
    *
@@ -524,7 +524,7 @@ public:
    * Write a contribution that is tested by the symmetric gradient to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_symmetric_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies the
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies the
    * symmetric gradient which is tested by all basis function symmetric
    * gradients on the current cell and integrated over.
    *
@@ -1020,7 +1020,7 @@ public:
 
   /**
    * Return the divergence of a vector-valued finite element at quadrature
-   * point number @p q_point after a call to @p evaluate(...,true,...).
+   * point number @p q_point after a call to @p evaluate(EvaluationFlags::gradients).
    */
   VectorizedArrayType
   get_divergence(const unsigned int q_point) const;
@@ -1028,7 +1028,7 @@ public:
   /**
    * Return the symmetric gradient of a vector-valued finite element at
    * quadrature point number @p q_point after a call to @p
-   * evaluate(...,true,...). It corresponds to <tt>0.5
+   * evaluate(EvaluationFlags::gradients). It corresponds to <tt>0.5
    * (grad+grad<sup>T</sup>)</tt>.
    */
   SymmetricTensor<2, dim, VectorizedArrayType>
@@ -1036,7 +1036,7 @@ public:
 
   /**
    * Return the curl of the vector field, $\nabla \times v$ after a call to @p
-   * evaluate(...,true,...).
+   * evaluate(EvaluationFlags::gradients).
    */
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
   get_curl(const unsigned int q_point) const;
@@ -1083,7 +1083,7 @@ public:
    * Write a contribution that is tested by the divergence to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies what is
    * tested by all basis function gradients on the current cell and integrated
    * over.
    */
@@ -1095,7 +1095,7 @@ public:
    * Write a contribution that is tested by the symmetric gradient to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_symmetric_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies the
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies the
    * symmetric gradient which is tested by all basis function symmetric
    * gradients on the current cell and integrated over.
    */
