@@ -289,7 +289,7 @@ namespace internal
 
       /**
        * Given @p cell_indices_contiguous_sm containing the local index of
-       * cells of macro faces (inner/outer) and macro faces compute
+       * cells of face batches (inner/outer) and cell batches compute
        * dof_indices_contiguous_sm.
        */
       void

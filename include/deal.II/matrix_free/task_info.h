@@ -223,7 +223,7 @@ namespace internal
        * This helper function determines a block size if the user decided not
        * to force a block size through MatrixFree::AdditionalData. This is
        * computed based on the number of hardware threads on the system and
-       * the number of macro cells that we should work on.
+       * the number of cell batches that we should work on.
        */
       void
       guess_block_size(const unsigned int dofs_per_cell);
