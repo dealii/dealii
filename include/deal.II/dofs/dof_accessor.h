@@ -738,9 +738,7 @@ protected:
 private:
   // Make the DoFHandler class a friend so that it can call the set_xxx()
   // functions.
-  template <int, int>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  friend class DoFHandler;
+  friend class DoFHandler<dim, spacedim>;
 
   friend struct dealii::internal::DoFHandlerImplementation::Policy::
     Implementation;
@@ -1209,9 +1207,7 @@ protected:
 
   // Make the DoFHandler class a friend so that it can call the set_xxx()
   // functions.
-  template <int dim1, int spacedim1>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim1, spacedim1>))
-  friend class DoFHandler;
+  friend class DoFHandler<1, spacedim>;
 
   friend struct dealii::internal::DoFHandlerImplementation::Policy::
     Implementation;
