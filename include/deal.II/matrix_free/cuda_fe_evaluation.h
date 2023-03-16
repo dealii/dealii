@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/memory_space.h"
+
 #ifdef DEAL_II_WITH_CUDA
 
 #  include <deal.II/base/tensor.h>
@@ -30,6 +32,8 @@
 #  include <deal.II/matrix_free/cuda_matrix_free.h>
 #  include <deal.II/matrix_free/cuda_matrix_free.templates.h>
 #  include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
+
+#  include <Kokkos_Core.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -247,7 +251,15 @@ namespace CUDAWrappers
     const bool use_coloring;
 
     Number *inv_jac;
-    Number *JxW;
+    // We would like to use
+    // Kokkos::Subview<Kokkos::View<Number **,
+    // MemorySpace::Default::kokkos_space>, int, decltype(Kokkos::ALL)>
+    // but we get error: incomplete type is not allowed. I cannot reproduce
+    // outside of deal.II. Need to investigate more.
+    Kokkos::Subview<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>,
+                    int,
+                    Kokkos::pair<int, int>>
+      JxW;
 
     // Internal buffer
     Number *values;
@@ -271,11 +283,14 @@ namespace CUDAWrappers
     , mf_object_id(data->id)
     , constraint_mask(data->constraint_mask[cell_id])
     , use_coloring(data->use_coloring)
+    , JxW(Kokkos::subview(
+        data->JxW,
+        cell_id,
+        Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim))))
     , values(shdata->values)
   {
     local_to_global = data->local_to_global + padding_length * cell_id;
     inv_jac         = data->inv_jacobian + padding_length * cell_id;
-    JxW             = data->JxW + padding_length * cell_id;
 
     for (unsigned int i = 0; i < dim; ++i)
       gradients[i] = shdata->gradients[i];

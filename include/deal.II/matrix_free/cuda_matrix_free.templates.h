@@ -19,7 +19,11 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/memory_space.h"
+
 #include <deal.II/matrix_free/cuda_matrix_free.h>
+
+#include <string>
 
 #ifdef DEAL_II_WITH_CUDA
 
@@ -231,8 +235,8 @@ namespace CUDAWrappers
       // Host data
       std::vector<types::global_dof_index> local_to_global_host;
       std::vector<Point<dim, Number>>      q_points_host;
-      std::vector<Number>                  JxW_host;
-      std::vector<Number>                  inv_jacobian_host;
+      Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
+      std::vector<Number> inv_jacobian_host;
       std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
         constraint_mask_host;
       // Local buffer
@@ -334,20 +338,13 @@ namespace CUDAWrappers
       // TODO this should be a templated parameter.
       const unsigned int n_dofs_1d = fe_degree + 1;
 
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_in_elem)
-        {
-          if (dim == 1)
-            data->block_dim[color] = dim3(n_dofs_1d * cells_per_block);
-          else if (dim == 2)
-            data->block_dim[color] =
-              dim3(n_dofs_1d * cells_per_block, n_dofs_1d);
-          else
-            data->block_dim[color] =
-              dim3(n_dofs_1d * cells_per_block, n_dofs_1d, n_dofs_1d);
-        }
+      if (dim == 1)
+        data->block_dim[color] = dim3(n_dofs_1d * cells_per_block);
+      else if (dim == 2)
+        data->block_dim[color] = dim3(n_dofs_1d * cells_per_block, n_dofs_1d);
       else
-        data->block_dim[color] = dim3(cells_per_block);
+        data->block_dim[color] =
+          dim3(n_dofs_1d * cells_per_block, n_dofs_1d, n_dofs_1d);
 
       local_to_global_host.resize(n_cells * padding_length);
 
@@ -355,7 +352,11 @@ namespace CUDAWrappers
         q_points_host.resize(n_cells * padding_length);
 
       if (update_flags & update_JxW_values)
-        JxW_host.resize(n_cells * padding_length);
+        JxW = Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
+          Kokkos::view_alloc("JxW_" + std::to_string(color),
+                             Kokkos::WithoutInitializing),
+          n_cells,
+          dofs_per_cell);
 
       if (update_flags & update_gradients)
         inv_jacobian_host.resize(n_cells * padding_length * dim * dim);
@@ -411,10 +412,13 @@ namespace CUDAWrappers
 
       if (update_flags & update_JxW_values)
         {
+          // FIXME too many deep_copy
+          auto JxW_host = Kokkos::create_mirror_view_and_copy(
+            MemorySpace::Host::kokkos_space{}, JxW);
           std::vector<double> JxW_values_double = fe_values.get_JxW_values();
-          const unsigned int  offset            = cell_id * padding_length;
           for (unsigned int i = 0; i < q_points_per_cell; ++i)
-            JxW_host[i + offset] = static_cast<Number>(JxW_values_double[i]);
+            JxW_host(cell_id, i) = static_cast<Number>(JxW_values_double[i]);
+          Kokkos::deep_copy(JxW, JxW_host);
         }
 
       if (update_flags & update_gradients)
@@ -438,10 +442,6 @@ namespace CUDAWrappers
       const unsigned int n_cells = data->n_cells[color];
 
       // Local-to-global mapping
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_over_elem)
-        transpose_in_place(local_to_global_host, n_cells, padding_length);
-
       alloc_and_copy(
         &data->local_to_global[color],
         ArrayView<const types::global_dof_index>(local_to_global_host.data(),
@@ -451,10 +451,6 @@ namespace CUDAWrappers
       // Quadrature points
       if (update_flags & update_quadrature_points)
         {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            transpose_in_place(q_points_host, n_cells, padding_length);
-
           alloc_and_copy(&data->q_points[color],
                          ArrayView<const Point<dim, Number>>(
                            q_points_host.data(), q_points_host.size()),
@@ -464,14 +460,7 @@ namespace CUDAWrappers
       // Jacobian determinants/quadrature weights
       if (update_flags & update_JxW_values)
         {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            transpose_in_place(JxW_host, n_cells, padding_length);
-
-          alloc_and_copy(&data->JxW[color],
-                         ArrayView<const Number>(JxW_host.data(),
-                                                 JxW_host.size()),
-                         n_cells * padding_length);
+          data->JxW[color] = JxW;
         }
 
       // Inverse jacobians
@@ -484,15 +473,6 @@ namespace CUDAWrappers
           transpose_in_place(inv_jacobian_host,
                              padding_length * n_cells,
                              dim * dim);
-
-          // Transpose second time means we get the following index order:
-          // q*n_cells*dim*dim + i*n_cells + cell_id which is good for an
-          // element-level parallelization
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            transpose_in_place(inv_jacobian_host,
-                               n_cells * dim * dim,
-                               padding_length);
 
           alloc_and_copy(&data->inv_jacobian[color],
                          ArrayView<const Number>(inv_jacobian_host.data(),
@@ -740,10 +720,6 @@ namespace CUDAWrappers
       Utilities::CUDA::free(inv_jacobian_color_ptr);
     inv_jacobian.clear();
 
-    for (auto &JxW_color_ptr : JxW)
-      Utilities::CUDA::free(JxW_color_ptr);
-    JxW.clear();
-
     for (auto &constraint_mask_color_ptr : constraint_mask)
       Utilities::CUDA::free(constraint_mask_color_ptr);
     constraint_mask.clear();
@@ -892,6 +868,7 @@ namespace CUDAWrappers
                         n_constrained_dofs * sizeof(unsigned int);
 
     // For each color, add local_to_global, inv_jacobian, JxW, and q_points.
+    // FIXME
     for (unsigned int i = 0; i < n_colors; ++i)
       {
         bytes += n_cells[i] * padding_length * sizeof(unsigned int) +
@@ -927,12 +904,7 @@ namespace CUDAWrappers
     if (update_flags & update_gradients)
       update_flags |= update_JxW_values;
 
-    if (additional_data.parallelization_scheme != parallel_over_elem &&
-        additional_data.parallelization_scheme != parallel_in_elem)
-      AssertThrow(false, ExcMessage("Invalid parallelization scheme."));
-
-    this->parallelization_scheme = additional_data.parallelization_scheme;
-    this->use_coloring           = additional_data.use_coloring;
+    this->use_coloring = additional_data.use_coloring;
     this->overlap_communication_computation =
       additional_data.overlap_communication_computation;
 

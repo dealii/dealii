@@ -19,9 +19,12 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/memory_space.h"
+
 #ifdef DEAL_II_WITH_CUDA
 
 #  include <deal.II/base/cuda_size.h>
+#  include <deal.II/base/memory_space.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/partitioner.h>
 #  include <deal.II/base/quadrature.h>
@@ -118,15 +121,12 @@ namespace CUDAWrappers
       /**
        * Constructor.
        */
-      AdditionalData(
-        const ParallelizationScheme parallelization_scheme = parallel_in_elem,
-        const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values |
-                                                 update_quadrature_points,
-        const bool use_coloring                      = false,
-        const bool overlap_communication_computation = false)
-        : parallelization_scheme(parallelization_scheme)
-        , mapping_update_flags(mapping_update_flags)
+      AdditionalData(const UpdateFlags mapping_update_flags =
+                       update_gradients | update_JxW_values |
+                       update_quadrature_points,
+                     const bool use_coloring                      = false,
+                     const bool overlap_communication_computation = false)
+        : mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
         , overlap_communication_computation(overlap_communication_computation)
       {
@@ -142,11 +142,6 @@ namespace CUDAWrappers
             ExcMessage(
               "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
       }
-      /**
-       * Parallelization scheme used, parallelization over degrees of freedom or
-       * over cells.
-       */
-      ParallelizationScheme parallelization_scheme;
       /**
        * This flag is used to determine which quantities should be cached. This
        * class can cache data needed for gradient computations (inverse
@@ -195,9 +190,9 @@ namespace CUDAWrappers
       Number *inv_jacobian;
 
       /**
-       * Pointer to the Jacobian times the weights.
+       * Kokkos::View of the Jacobian times the weights.
        */
-      Number *JxW;
+      Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
 
       /**
        * ID of the associated MatrixFree object.
@@ -459,12 +454,6 @@ namespace CUDAWrappers
     int my_id;
 
     /**
-     * Parallelization scheme used, parallelization over degrees of freedom or
-     * over cells.
-     */
-    ParallelizationScheme parallelization_scheme;
-
-    /**
      * If true, use graph coloring. Otherwise, use atomic operations. Graph
      * coloring ensures bitwise reproducibility but is slower on Pascal and
      * newer architectures.
@@ -531,10 +520,11 @@ namespace CUDAWrappers
     std::vector<Number *> inv_jacobian;
 
     /**
-     * Vector of pointer to the Jacobian times the weights associated to the
-     * cells of each color.
+     * Vector of Kokkos::View to the Jacobian times the weights associated to
+     * the cells of each color.
      */
-    std::vector<Number *> JxW;
+    std::vector<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>>
+      JxW;
 
     /**
      * Pointer to the constrained degrees of freedom.
@@ -830,7 +820,7 @@ namespace CUDAWrappers
     if (update_flags & update_JxW_values)
       {
         data_host.JxW.resize(n_elements);
-        Utilities::CUDA::copy_to_host(data.JxW, data_host.JxW);
+        Utilities::CUDA::copy_to_host(data.JxW.data(), data_host.JxW);
       }
 
     data_host.constraint_mask.resize(data_host.n_cells);
