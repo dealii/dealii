@@ -28,6 +28,8 @@
 
 #include "../tests.h"
 
+#include "Kokkos_Core.hpp"
+
 
 template <int dim, int fe_degree>
 class DummyOperator
@@ -172,11 +174,12 @@ int
 main()
 {
   initlog();
-  init_cuda();
+  Kokkos::initialize();
 
   test<2, 3>();
   test<3, 3>();
 
   deallog << "OK" << std::endl;
+  Kokkos::finalize();
   return 0;
 }

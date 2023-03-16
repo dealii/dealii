@@ -24,6 +24,8 @@
 
 #include "../tests.h"
 
+#include "Kokkos_Core.hpp"
+
 template <int dim,
           int fe_degree,
           int n_q_points_1d = fe_degree + 1,
@@ -147,7 +149,12 @@ main()
 {
   initlog();
 
+  Kokkos::initialize();
   init_cuda();
 
   test<2, 1>();
+
+  Kokkos::finalize();
+
+  return 0;
 }

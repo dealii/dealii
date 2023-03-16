@@ -43,6 +43,7 @@
 
 #include "../tests.h"
 
+#include "Kokkos_Core.hpp"
 #include "matrix_vector_mf.h"
 
 template <int fe_degree, int n_q_points_1d>
@@ -147,70 +148,74 @@ main()
 
   deallog << std::setprecision(3);
 
+  Kokkos::initialize();
   init_cuda();
 
-  Triangulation<2> tria;
-  GridGenerator::hyper_cube(tria);
-  tria.refine_global(5 - 2);
-  AffineConstraints<double> constraints;
-  constraints.close();
-  bool constant_coefficient = true;
+  {
+    Triangulation<2> tria;
+    GridGenerator::hyper_cube(tria);
+    tria.refine_global(5 - 2);
+    AffineConstraints<double> constraints;
+    constraints.close();
+    bool constant_coefficient = true;
 
-  // Create the first MatrixFree object
-  constexpr unsigned int fe_degree_1     = 1;
-  constexpr unsigned int n_q_points_1d_1 = fe_degree_1 + 1;
-  FE_Q<2>                fe_1(fe_degree_1);
-  DoFHandler<2>          dof_1(tria);
-  dof_1.distribute_dofs(fe_1);
-  MappingQ<2>                                         mapping_1(fe_degree_1);
-  CUDAWrappers::MatrixFree<2, double>                 mf_data_1;
-  CUDAWrappers::MatrixFree<2, double>::AdditionalData additional_data_1;
-  additional_data_1.mapping_update_flags = update_values | update_gradients |
-                                           update_JxW_values |
-                                           update_quadrature_points;
-  const QGauss<1> quad_1(n_q_points_1d_1);
-  mf_data_1.reinit(mapping_1, dof_1, constraints, quad_1, additional_data_1);
-  const unsigned int n_dofs_1 = dof_1.n_dofs();
-  MatrixFreeTest<2,
-                 fe_degree_1,
-                 double,
-                 LinearAlgebra::CUDAWrappers::Vector<double>,
-                 n_q_points_1d_1>
-    mf_1(mf_data_1,
-         n_dofs_1 * std::pow(n_q_points_1d_1, 2),
-         constant_coefficient);
+    // Create the first MatrixFree object
+    constexpr unsigned int fe_degree_1     = 1;
+    constexpr unsigned int n_q_points_1d_1 = fe_degree_1 + 1;
+    FE_Q<2>                fe_1(fe_degree_1);
+    DoFHandler<2>          dof_1(tria);
+    dof_1.distribute_dofs(fe_1);
+    MappingQ<2>                                         mapping_1(fe_degree_1);
+    CUDAWrappers::MatrixFree<2, double>                 mf_data_1;
+    CUDAWrappers::MatrixFree<2, double>::AdditionalData additional_data_1;
+    additional_data_1.mapping_update_flags = update_values | update_gradients |
+                                             update_JxW_values |
+                                             update_quadrature_points;
+    const QGauss<1> quad_1(n_q_points_1d_1);
+    mf_data_1.reinit(mapping_1, dof_1, constraints, quad_1, additional_data_1);
+    const unsigned int n_dofs_1 = dof_1.n_dofs();
+    MatrixFreeTest<2,
+                   fe_degree_1,
+                   double,
+                   LinearAlgebra::CUDAWrappers::Vector<double>,
+                   n_q_points_1d_1>
+      mf_1(mf_data_1,
+           n_dofs_1 * std::pow(n_q_points_1d_1, 2),
+           constant_coefficient);
 
-  // Create the second MatrixFree object
-  constexpr unsigned int fe_degree_2     = 2;
-  constexpr unsigned int n_q_points_1d_2 = fe_degree_2 + 1;
-  FE_Q<2>                fe_2(fe_degree_2);
-  DoFHandler<2>          dof_2(tria);
-  dof_2.distribute_dofs(fe_2);
-  MappingQ<2>                                         mapping_2(fe_degree_2);
-  CUDAWrappers::MatrixFree<2, double>                 mf_data_2;
-  CUDAWrappers::MatrixFree<2, double>::AdditionalData additional_data_2;
-  additional_data_2.mapping_update_flags = update_values | update_gradients |
-                                           update_JxW_values |
-                                           update_quadrature_points;
-  const QGauss<1> quad_2(n_q_points_1d_2);
-  mf_data_2.reinit(mapping_2, dof_2, constraints, quad_2, additional_data_2);
-  const unsigned int n_dofs_2 = dof_2.n_dofs();
-  MatrixFreeTest<2,
-                 fe_degree_2,
-                 double,
-                 LinearAlgebra::CUDAWrappers::Vector<double>,
-                 n_q_points_1d_2>
-    mf_2(mf_data_2,
-         n_dofs_2 * std::pow(n_q_points_1d_2, 2),
-         constant_coefficient);
+    // Create the second MatrixFree object
+    constexpr unsigned int fe_degree_2     = 2;
+    constexpr unsigned int n_q_points_1d_2 = fe_degree_2 + 1;
+    FE_Q<2>                fe_2(fe_degree_2);
+    DoFHandler<2>          dof_2(tria);
+    dof_2.distribute_dofs(fe_2);
+    MappingQ<2>                                         mapping_2(fe_degree_2);
+    CUDAWrappers::MatrixFree<2, double>                 mf_data_2;
+    CUDAWrappers::MatrixFree<2, double>::AdditionalData additional_data_2;
+    additional_data_2.mapping_update_flags = update_values | update_gradients |
+                                             update_JxW_values |
+                                             update_quadrature_points;
+    const QGauss<1> quad_2(n_q_points_1d_2);
+    mf_data_2.reinit(mapping_2, dof_2, constraints, quad_2, additional_data_2);
+    const unsigned int n_dofs_2 = dof_2.n_dofs();
+    MatrixFreeTest<2,
+                   fe_degree_2,
+                   double,
+                   LinearAlgebra::CUDAWrappers::Vector<double>,
+                   n_q_points_1d_2>
+      mf_2(mf_data_2,
+           n_dofs_2 * std::pow(n_q_points_1d_2, 2),
+           constant_coefficient);
 
-  // Perform MV with the first object
-  do_test<fe_degree_1, n_q_points_1d_1>(
-    dof_1, mf_1, n_dofs_1, mapping_1, constraints);
+    // Perform MV with the first object
+    do_test<fe_degree_1, n_q_points_1d_1>(
+      dof_1, mf_1, n_dofs_1, mapping_1, constraints);
 
-  // Perform MV with the second object
-  do_test<fe_degree_2, n_q_points_1d_2>(
-    dof_2, mf_2, n_dofs_2, mapping_2, constraints);
+    // Perform MV with the second object
+    do_test<fe_degree_2, n_q_points_1d_2>(
+      dof_2, mf_2, n_dofs_2, mapping_2, constraints);
+  }
+  Kokkos::finalize();
 
   return 0;
 }

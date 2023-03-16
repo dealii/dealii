@@ -38,9 +38,9 @@
 
 template <typename Number>
 void
-check(
-  const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vector,
-  const Utilities::MPI::Partitioner &reference_partitioner)
+check(const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+        &                                vector,
+      const Utilities::MPI::Partitioner &reference_partitioner)
 {
   Assert(vector.get_partitioner()->locally_owned_range() ==
            reference_partitioner.locally_owned_range(),
@@ -116,7 +116,11 @@ main(int argc, char **argv)
   init_cuda(true);
   MPILogInitAll mpi_inilog;
 
-  test<2, 1, LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>();
+  test<2,
+       1,
+       LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>();
   if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1)
     test<2, 1, LinearAlgebra::CUDAWrappers::Vector<double>>();
+
+  return 0;
 }
