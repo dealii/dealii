@@ -236,7 +236,8 @@ namespace CUDAWrappers
       std::vector<types::global_dof_index> local_to_global_host;
       std::vector<Point<dim, Number>>      q_points_host;
       Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
-      std::vector<Number> inv_jacobian_host;
+      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>
+        inv_jacobian;
       std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
         constraint_mask_host;
       // Local buffer
@@ -359,7 +360,12 @@ namespace CUDAWrappers
           dofs_per_cell);
 
       if (update_flags & update_gradients)
-        inv_jacobian_host.resize(n_cells * padding_length * dim * dim);
+        inv_jacobian =
+          Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
+                               Kokkos::WithoutInitializing),
+            n_cells,
+            dofs_per_cell);
 
       constraint_mask_host.resize(n_cells);
     }
@@ -423,13 +429,16 @@ namespace CUDAWrappers
 
       if (update_flags & update_gradients)
         {
+          // FIXME too many deep_copy
+          auto inv_jacobian_host = Kokkos::create_mirror_view_and_copy(
+            MemorySpace::Host::kokkos_space{}, inv_jacobian);
           const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
             fe_values.get_inverse_jacobians();
-          std::copy(&inv_jacobians[0][0][0],
-                    &inv_jacobians[0][0][0] +
-                      q_points_per_cell * sizeof(DerivativeForm<1, dim, dim>) /
-                        sizeof(double),
-                    &inv_jacobian_host[cell_id * padding_length * dim * dim]);
+          for (unsigned int i = 0; i < q_points_per_cell; ++i)
+            for (unsigned int j = 0; j < dim; ++j)
+              for (unsigned int k = 0; k < dim; ++k)
+                inv_jacobian_host(cell_id, i, j, k) = inv_jacobians[i][j][k];
+          Kokkos::deep_copy(inv_jacobian, inv_jacobian_host);
         }
     }
 
@@ -466,18 +475,7 @@ namespace CUDAWrappers
       // Inverse jacobians
       if (update_flags & update_gradients)
         {
-          // Reorder so that all J_11 elements are together, all J_12 elements
-          // are together, etc., i.e., reorder indices from
-          // cell_id*q_points_per_cell*dim*dim + q*dim*dim +i to
-          // i*q_points_per_cell*n_cells + cell_id*q_points_per_cell+q
-          transpose_in_place(inv_jacobian_host,
-                             padding_length * n_cells,
-                             dim * dim);
-
-          alloc_and_copy(&data->inv_jacobian[color],
-                         ArrayView<const Number>(inv_jacobian_host.data(),
-                                                 inv_jacobian_host.size()),
-                         n_cells * dim * dim * padding_length);
+          data->inv_jacobian[color] = inv_jacobian;
         }
 
       alloc_and_copy(
@@ -715,10 +713,6 @@ namespace CUDAWrappers
     for (auto &local_to_global_color_ptr : local_to_global)
       Utilities::CUDA::free(local_to_global_color_ptr);
     local_to_global.clear();
-
-    for (auto &inv_jacobian_color_ptr : inv_jacobian)
-      Utilities::CUDA::free(inv_jacobian_color_ptr);
-    inv_jacobian.clear();
 
     for (auto &constraint_mask_color_ptr : constraint_mask)
       Utilities::CUDA::free(constraint_mask_color_ptr);

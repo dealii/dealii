@@ -185,9 +185,10 @@ namespace CUDAWrappers
       types::global_dof_index *local_to_global;
 
       /**
-       * Pointer to the inverse Jacobian.
+       * Kokkos::View of the inverse Jacobian.
        */
-      Number *inv_jacobian;
+      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>
+        inv_jacobian;
 
       /**
        * Kokkos::View of the Jacobian times the weights.
@@ -514,10 +515,12 @@ namespace CUDAWrappers
     std::vector<types::global_dof_index *> local_to_global;
 
     /**
-     * Vector of pointer to the inverse Jacobian associated to the cells of each
-     * color.
+     * Vector of Kokkos::View of the inverse Jacobian associated to the cells of
+     * each color.
      */
-    std::vector<Number *> inv_jacobian;
+    std::vector<
+      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>>
+      inv_jacobian;
 
     /**
      * Vector of Kokkos::View to the Jacobian times the weights associated to
@@ -813,7 +816,7 @@ namespace CUDAWrappers
     if (update_flags & update_gradients)
       {
         data_host.inv_jacobian.resize(n_elements * dim * dim);
-        Utilities::CUDA::copy_to_host(data.inv_jacobian,
+        Utilities::CUDA::copy_to_host(data.inv_jacobian.data(),
                                       data_host.inv_jacobian);
       }
 

@@ -250,8 +250,20 @@ namespace CUDAWrappers
 
     const bool use_coloring;
 
-    Number *inv_jac;
-    // We would like to use
+    // FIXME We would like to use
+    // Kokkos::Subview<Kokkos::View<Number **[dim][dim],
+    // MemorySpace::Default::kokkos_space>, int, decltype(Kokkos::ALL),
+    // decltype(Kokkos::ALL), decltype(Kokkos::ALL)> but we get error:
+    // incomplete type is not allowed. I cannot reproduce outside of deal.II.
+    // Need to investigate more.
+    Kokkos::Subview<
+      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>,
+      int,
+      Kokkos::pair<int, int>,
+      Kokkos::pair<int, int>,
+      Kokkos::pair<int, int>>
+      inv_jac;
+    // FIXME We would like to use
     // Kokkos::Subview<Kokkos::View<Number **,
     // MemorySpace::Default::kokkos_space>, int, decltype(Kokkos::ALL)>
     // but we get error: incomplete type is not allowed. I cannot reproduce
@@ -283,6 +295,12 @@ namespace CUDAWrappers
     , mf_object_id(data->id)
     , constraint_mask(data->constraint_mask[cell_id])
     , use_coloring(data->use_coloring)
+    , inv_jac(Kokkos::subview(
+        data->inv_jacobian,
+        cell_id,
+        Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim)),
+        Kokkos::pair<int, int>(0, dim),
+        Kokkos::pair<int, int>(0, dim)))
     , JxW(Kokkos::subview(
         data->JxW,
         cell_id,
@@ -290,7 +308,6 @@ namespace CUDAWrappers
     , values(shdata->values)
   {
     local_to_global = data->local_to_global + padding_length * cell_id;
-    inv_jac         = data->inv_jacobian + padding_length * cell_id;
 
     for (unsigned int i = 0; i < dim; ++i)
       gradients[i] = shdata->gradients[i];
@@ -510,14 +527,12 @@ namespace CUDAWrappers
 
     // TODO optimize if the mesh is uniform
     const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    const Number *     inv_jacobian = &inv_jac[q_point];
     gradient_type      grad;
     for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
       {
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jacobian[padding_length * n_cells * (dim * d_2 + d_1)] *
-                 gradients[d_2][q_point];
+          tmp += inv_jac(q_point, d_2, d_1) * gradients[d_2][q_point];
         grad[d_1] = tmp;
       }
 
@@ -537,13 +552,11 @@ namespace CUDAWrappers
   {
     // TODO optimize if the mesh is uniform
     const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    const Number *     inv_jacobian = &inv_jac[q_point];
     for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
       {
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jacobian[n_cells * padding_length * (dim * d_1 + d_2)] *
-                 grad_in[d_2];
+          tmp += inv_jac(q_point, d_1, d_2) * grad_in[d_2];
         gradients[d_1][q_point] = tmp * JxW[q_point];
       }
   }
