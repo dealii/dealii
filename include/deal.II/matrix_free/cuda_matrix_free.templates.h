@@ -576,6 +576,38 @@ namespace CUDAWrappers
       if (cell < gpu_data.n_cells)
         func(cell, &gpu_data);
     }
+
+
+
+    template <typename VectorType>
+    struct VectorLocalSize
+    {
+      static unsigned int
+      get(const VectorType &vec)
+      {
+        return vec.locally_owned_size();
+      }
+    };
+
+    template <>
+    struct VectorLocalSize<LinearAlgebra::CUDAWrappers::Vector<double>>
+    {
+      static unsigned int
+      get(const LinearAlgebra::CUDAWrappers::Vector<double> &vec)
+      {
+        return vec.size();
+      }
+    };
+
+    template <>
+    struct VectorLocalSize<LinearAlgebra::CUDAWrappers::Vector<float>>
+    {
+      static unsigned int
+      get(const LinearAlgebra::CUDAWrappers::Vector<float> &vec)
+      {
+        return vec.size();
+      }
+    };
   } // namespace internal
 
 
@@ -738,10 +770,9 @@ namespace CUDAWrappers
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
     // work-around can be removed.
     types::global_dof_index *constr_dofs = constrained_dofs;
-    const unsigned int       size =
-      partitioner ? dst.locally_owned_size() : dst.size();
-    const Number *src_ptr = src.get_values();
-    Number *      dst_ptr = dst.get_values();
+    const unsigned int size = internal::VectorLocalSize<VectorType>::get(dst);
+    const Number *     src_ptr = src.get_values();
+    Number *           dst_ptr = dst.get_values();
     Kokkos::parallel_for(
       "copy_constrained_values",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
