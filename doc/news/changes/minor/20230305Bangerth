@@ -1,5 +1,5 @@
 Fixed: It was previously possible to assign scalar values to
-VectorizedArray objects that were temporaries -- say in expressions
+Tensor and VectorizedArray objects that were temporaries -- say in expressions
 such as
 ```
   VectorizedArray<...> my_function();
