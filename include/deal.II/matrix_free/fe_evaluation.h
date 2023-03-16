@@ -3422,9 +3422,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                          internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
-  const bool is_neighbor_cells = !is_face && !this->is_interior_face();
-  const bool use_vectorized_path =
-    !(masking_is_active || is_neighbor_cells || has_hn_constraints);
+  const bool use_vectorized_path = !(masking_is_active || has_hn_constraints);
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
   std::array<VectorizedArrayType *, n_components> values_dofs;

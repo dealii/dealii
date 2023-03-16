@@ -185,7 +185,7 @@ namespace dealii
 
     this->cell_type =
       this->matrix_free->get_mapping_info().cell_type[cell_batch_index];
-    this->cell                 = cell_batch_index;
+    this->cell                 = numbers::invalid_unsigned_int;
     this->face_orientations[0] = 0;
     this->subface_index        = GeometryInfo<dim>::max_children_per_cell;
     this->face_numbers[0]      = face_number;
