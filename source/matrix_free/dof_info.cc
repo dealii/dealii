@@ -56,7 +56,6 @@ namespace internal
       dofs_per_cell.clear();
       dofs_per_face.clear();
       vectorization_length       = 1;
-      dimension                  = 2;
       global_base_element_offset = 0;
       n_base_elements            = 0;
       n_components.clear();
