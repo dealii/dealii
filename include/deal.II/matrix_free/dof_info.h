@@ -466,13 +466,6 @@ namespace internal
       };
 
       /**
-       * Stores the dimension of the underlying DoFHandler. Since the indices
-       * are not templated, this is the variable that makes the dimension
-       * accessible in the (rare) cases it is needed inside this class.
-       */
-      unsigned int dimension;
-
-      /**
        * For efficiency reasons, always keep a fixed number of cells with
        * similar properties together. This variable controls the number of
        * cells batched together. As opposed to the other classes which are

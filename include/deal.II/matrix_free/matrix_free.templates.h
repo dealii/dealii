@@ -519,7 +519,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         {
           Assert(dof_handler[i]->get_fe_collection().size() == 1,
                  ExcNotImplemented());
-          dof_info[i].dimension = dim;
           dof_info[i].n_base_elements =
             dof_handler[i]->get_fe(0).n_base_elements();
           dof_info[i].n_components.resize(dof_info[i].n_base_elements);
@@ -1226,7 +1225,6 @@ namespace internal
             dof_info[no].dofs_per_cell.push_back(fe.n_dofs_per_cell());
             dof_info[no].dofs_per_face.push_back(fe.n_dofs_per_face(
               0)); // we assume that all faces have the same number of dofs
-            dof_info[no].dimension       = dim;
             dof_info[no].n_base_elements = fe.n_base_elements();
             dof_info[no].n_components.resize(dof_info[no].n_base_elements);
             dof_info[no].start_components.resize(dof_info[no].n_base_elements +
