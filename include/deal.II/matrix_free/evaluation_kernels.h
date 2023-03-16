@@ -5833,7 +5833,7 @@ namespace internal
       const unsigned int n_desired_components =
         (n_components > -1) ? n_components : n_given_components;
 
-      std::array<Number, dim + 2> tmp;
+      std::array<Number, dim + 2> tmp = {};
       Assert(n_desired_components <= dim + 2,
              ExcMessage(
                "Number of components larger than dim+2 not supported."));
