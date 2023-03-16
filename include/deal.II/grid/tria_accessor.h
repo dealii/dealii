@@ -4172,8 +4172,7 @@ private:
 
   friend class Triangulation<dim, spacedim>;
 
-  template <int, int>
-  friend class parallel::TriangulationBase;
+  friend class parallel::TriangulationBase<dim, spacedim>;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
   friend struct dealii::internal::TriangulationImplementation::

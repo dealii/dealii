@@ -1812,8 +1812,8 @@ namespace internal
 
 
 template <int dim, int spacedim>
-inline bool
-DoFHandler<dim, spacedim>::has_hp_capabilities() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline bool DoFHandler<dim, spacedim>::has_hp_capabilities() const
 {
   return hp_capability_enabled;
 }
@@ -1821,8 +1821,8 @@ DoFHandler<dim, spacedim>::has_hp_capabilities() const
 
 
 template <int dim, int spacedim>
-inline bool
-DoFHandler<dim, spacedim>::has_level_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline bool DoFHandler<dim, spacedim>::has_level_dofs() const
 {
   return mg_number_cache.size() > 0;
 }
@@ -1830,8 +1830,8 @@ DoFHandler<dim, spacedim>::has_level_dofs() const
 
 
 template <int dim, int spacedim>
-inline bool
-DoFHandler<dim, spacedim>::has_active_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline bool DoFHandler<dim, spacedim>::has_active_dofs() const
 {
   return number_cache.n_global_dofs > 0;
 }
@@ -1839,8 +1839,8 @@ DoFHandler<dim, spacedim>::has_active_dofs() const
 
 
 template <int dim, int spacedim>
-inline types::global_dof_index
-DoFHandler<dim, spacedim>::n_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline types::global_dof_index DoFHandler<dim, spacedim>::n_dofs() const
 {
   return number_cache.n_global_dofs;
 }
@@ -1848,8 +1848,9 @@ DoFHandler<dim, spacedim>::n_dofs() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 inline types::global_dof_index
-DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
+  DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
 {
   Assert(has_level_dofs(),
          ExcMessage(
@@ -1861,8 +1862,8 @@ DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-types::global_dof_index
-DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+types::global_dof_index DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
 {
   return number_cache.n_locally_owned_dofs;
 }
@@ -1870,8 +1871,8 @@ DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
 
 
 template <int dim, int spacedim>
-const IndexSet &
-DoFHandler<dim, spacedim>::locally_owned_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const IndexSet &DoFHandler<dim, spacedim>::locally_owned_dofs() const
 {
   return number_cache.locally_owned_dofs;
 }
@@ -1879,8 +1880,9 @@ DoFHandler<dim, spacedim>::locally_owned_dofs() const
 
 
 template <int dim, int spacedim>
-const IndexSet &
-DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const IndexSet &DoFHandler<dim, spacedim>::locally_owned_mg_dofs(
+  const unsigned int level) const
 {
   Assert(level < this->get_triangulation().n_global_levels(),
          ExcMessage("The given level index exceeds the number of levels "
@@ -1895,8 +1897,9 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-inline const FiniteElement<dim, spacedim> &
-DoFHandler<dim, spacedim>::get_fe(const types::fe_index number) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline const FiniteElement<dim, spacedim> &DoFHandler<dim, spacedim>::get_fe(
+  const types::fe_index number) const
 {
   Assert(fe_collection.size() > 0,
          ExcMessage("No finite element collection is associated with "
@@ -1907,8 +1910,9 @@ DoFHandler<dim, spacedim>::get_fe(const types::fe_index number) const
 
 
 template <int dim, int spacedim>
-inline const hp::FECollection<dim, spacedim> &
-DoFHandler<dim, spacedim>::get_fe_collection() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline const hp::FECollection<dim, spacedim>
+  &DoFHandler<dim, spacedim>::get_fe_collection() const
 {
   return fe_collection;
 }
@@ -1916,8 +1920,9 @@ DoFHandler<dim, spacedim>::get_fe_collection() const
 
 
 template <int dim, int spacedim>
-inline const Triangulation<dim, spacedim> &
-DoFHandler<dim, spacedim>::get_triangulation() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline const Triangulation<dim, spacedim>
+  &DoFHandler<dim, spacedim>::get_triangulation() const
 {
   Assert(tria != nullptr,
          ExcMessage("This DoFHandler object has not been associated "
@@ -1928,8 +1933,8 @@ DoFHandler<dim, spacedim>::get_triangulation() const
 
 
 template <int dim, int spacedim>
-inline MPI_Comm
-DoFHandler<dim, spacedim>::get_communicator() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline MPI_Comm DoFHandler<dim, spacedim>::get_communicator() const
 {
   Assert(tria != nullptr,
          ExcMessage("This DoFHandler object has not been associated "
@@ -1940,8 +1945,8 @@ DoFHandler<dim, spacedim>::get_communicator() const
 
 
 template <int dim, int spacedim>
-inline const BlockInfo &
-DoFHandler<dim, spacedim>::block_info() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline const BlockInfo &DoFHandler<dim, spacedim>::block_info() const
 {
   Assert(this->hp_capability_enabled == false, ExcNotImplementedWithHP());
 
@@ -1951,9 +1956,9 @@ DoFHandler<dim, spacedim>::block_info() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 template <typename number>
-types::global_dof_index
-DoFHandler<dim, spacedim>::n_boundary_dofs(
+types::global_dof_index DoFHandler<dim, spacedim>::n_boundary_dofs(
   const std::map<types::boundary_id, const Function<spacedim, number> *>
     &boundary_ids) const
 {
@@ -1994,9 +1999,9 @@ namespace internal
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 template <class Archive>
-void
-DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
+void DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
 {
   if (this->hp_capability_enabled)
     {
@@ -2044,9 +2049,9 @@ DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 template <class Archive>
-void
-DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
+void DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 {
   if (this->hp_capability_enabled)
     {
@@ -2126,11 +2131,12 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
 
 template <int dim, int spacedim>
-inline types::global_dof_index &
-DoFHandler<dim, spacedim>::MGVertexDoFs::access_index(
-  const unsigned int level,
-  const unsigned int dof_number,
-  const unsigned int dofs_per_vertex)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline types::global_dof_index
+  &DoFHandler<dim, spacedim>::MGVertexDoFs::access_index(
+    const unsigned int level,
+    const unsigned int dof_number,
+    const unsigned int dofs_per_vertex)
 {
   Assert((level >= coarsest_level) && (level <= finest_level),
          ExcInvalidLevel(level));
