@@ -85,7 +85,8 @@
  * Here, <b>D</b> denotes the symmetric gradient defined by
  * $\mathbf Du = \tfrac12 (\nabla \mathbf u + (\nabla \mathbf u)^T)$
  * and the colon indicates double contraction of two tensors of rank 2
- * (the Frobenius inner product). This bilinear form looks indeed very
+ * (the [Frobenius inner product](https://en.wikipedia.org/wiki/Frobenius_inner_product)).
+ * This bilinear form looks indeed very
  * much like the bilinear form of the Poisson problem in step-3. The
  * only differences are
  * <ol>
