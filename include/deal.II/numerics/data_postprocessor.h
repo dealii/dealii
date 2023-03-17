@@ -162,7 +162,7 @@ namespace DataPostprocessorInputs
    * {
    * public:
    *   BoundaryIds()
-   *     : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+   *     : DataPostprocessorScalar<dim>("boundary_id", update_default)
    *   {}
    *
    *
