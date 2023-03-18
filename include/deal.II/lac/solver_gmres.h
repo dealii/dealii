@@ -1738,6 +1738,8 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
   // matrix used for the orthogonalization process later
   H.reinit(basis_size + 1, basis_size);
 
+  Vector<double> h(basis_size + 1);
+
   // Vectors for projected system
   Vector<double> projected_rhs;
   Vector<double> y;
@@ -1773,10 +1775,20 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
           A.vmult(*aux, z[j]);
 
           // Gram-Schmidt
-          H(0, j) = *aux * v[0];
-          for (unsigned int i = 1; i <= j; ++i)
-            H(i, j) = aux->add_and_dot(-H(i - 1, j), v[i - 1], v[i]);
-          H(j + 1, j) = a = std::sqrt(aux->add_and_dot(-H(j, j), v[j], *aux));
+          bool         re_orthogonalize = false;
+          const double s =
+            internal::SolverGMRESImplementation::iterated_gram_schmidt<
+              VectorType>(SolverGMRES<VectorType>::AdditionalData::
+                            OrthogonalizationStrategy::modified_gram_schmidt,
+                          v,
+                          j + 1,
+                          0,
+                          *aux,
+                          h,
+                          re_orthogonalize);
+          for (unsigned int i = 0; i <= j; ++i)
+            H(i, j) = h(i);
+          H(j + 1, j) = a = s;
 
           // Compute projected solution
 
