@@ -1284,7 +1284,7 @@ namespace Step35
   // Let us also note that we here compute the vorticity as a scalar quantity in
   // a separate function, using the $L^2$ projection of the quantity
   // $\text{curl} u$ onto the finite element space used for the components of
-  // the velocity. In principle, however, we could also have computed as a
+  // the velocity. In principle, however, we could also have computed it as a
   // pointwise quantity from the velocity, and do so through the
   // DataPostprocessor mechanism discussed in step-29 and step-33.
   template <int dim>
