@@ -336,15 +336,15 @@ namespace Step29
     // should return the <i>square</i> of the absolute value --
     // thereby not satisfying the properties mathematicians require of
     // something called a "norm".)
-    for (unsigned int i = 0; i < computed_quantities.size(); ++i)
+    for (unsigned int p = 0; p < computed_quantities.size(); ++p)
       {
-        AssertDimension(computed_quantities[i].size(), 1);
-        AssertDimension(inputs.solution_values[i].size(), 2);
+        AssertDimension(computed_quantities[p].size(), 1);
+        AssertDimension(inputs.solution_values[p].size(), 2);
 
-        const std::complex<double> u(inputs.solution_values[i](0),
-                                     inputs.solution_values[i](1));
+        const std::complex<double> u(inputs.solution_values[p](0),
+                                     inputs.solution_values[p](1));
 
-        computed_quantities[i](0) = std::abs(u);
+        computed_quantities[p](0) = std::abs(u);
       }
   }
 
