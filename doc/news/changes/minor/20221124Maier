@@ -4,4 +4,3 @@ always export the <code>compile_commands.json</code> file used for various
 tooling (such as completion backends like clangd).
 <br>
 (Matthias Maier, 2022/11/24)
-
