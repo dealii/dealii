@@ -4,7 +4,5 @@ configured via the <code>setup_tests_quick_tests</code> target, and run via
 invoking ctest from the build directory. The <code>test</code> target will
 now ensure that the library is fully compiled and quick tests are
 configured prior to running all quick tests.
-
 <br>
 (Matthias Maier, 2022/11/29, 2022/12/10)
-
