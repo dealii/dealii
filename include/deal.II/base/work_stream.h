@@ -469,14 +469,14 @@ namespace WorkStream
                 typename ScratchData,
                 typename CopyData>
       void
-      run(const Iterator &                         begin,
-          const typename identity<Iterator>::type &end,
-          Worker                                   worker,
-          Copier                                   copier,
-          const ScratchData &                      sample_scratch_data,
-          const CopyData &                         sample_copy_data,
-          const unsigned int                       queue_length,
-          const unsigned int                       chunk_size)
+      run(const Iterator &                            begin,
+          const std_cxx20::type_identity_t<Iterator> &end,
+          Worker                                      worker,
+          Copier                                      copier,
+          const ScratchData &                         sample_scratch_data,
+          const CopyData &                            sample_copy_data,
+          const unsigned int                          queue_length,
+          const unsigned int                          chunk_size)
       {
         using ItemType = typename IteratorRangeToItemStream<Iterator,
                                                             ScratchData,
@@ -678,12 +678,12 @@ namespace WorkStream
                 typename ScratchData,
                 typename CopyData>
       void
-      run(const Iterator &                         begin,
-          const typename identity<Iterator>::type &end,
-          Worker                                   worker,
-          Copier                                   copier,
-          const ScratchData &                      sample_scratch_data,
-          const CopyData &                         sample_copy_data)
+      run(const Iterator &                            begin,
+          const std_cxx20::type_identity_t<Iterator> &end,
+          Worker                                      worker,
+          Copier                                      copier,
+          const ScratchData &                         sample_scratch_data,
+          const CopyData &                            sample_copy_data)
       {
         // need to copy the sample since it is marked const
         ScratchData scratch_data = sample_scratch_data;
@@ -1119,12 +1119,12 @@ namespace WorkStream
             typename ScratchData,
             typename CopyData>
   void
-  run(const Iterator &                         begin,
-      const typename identity<Iterator>::type &end,
-      Worker                                   worker,
-      Copier                                   copier,
-      const ScratchData &                      sample_scratch_data,
-      const CopyData &                         sample_copy_data,
+  run(const Iterator &                            begin,
+      const std_cxx20::type_identity_t<Iterator> &end,
+      Worker                                      worker,
+      Copier                                      copier,
+      const ScratchData &                         sample_scratch_data,
+      const CopyData &                            sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
       const unsigned int chunk_size   = 8)
   {
@@ -1356,9 +1356,9 @@ namespace WorkStream
             typename ScratchData,
             typename CopyData>
   void
-  run(const Iterator &                         begin,
-      const typename identity<Iterator>::type &end,
-      MainClass &                              main_object,
+  run(const Iterator &                            begin,
+      const std_cxx20::type_identity_t<Iterator> &end,
+      MainClass &                                 main_object,
       void (MainClass::*worker)(const Iterator &, ScratchData &, CopyData &),
       void (MainClass::*copier)(const CopyData &),
       const ScratchData &sample_scratch_data,
@@ -1390,8 +1390,8 @@ namespace WorkStream
             typename ScratchData,
             typename CopyData>
   void
-  run(const IteratorOverIterators<Iterator> &                         begin,
-      const IteratorOverIterators<typename identity<Iterator>::type> &end,
+  run(const IteratorOverIterators<Iterator> &                            begin,
+      const IteratorOverIterators<std_cxx20::type_identity_t<Iterator>> &end,
       MainClass &main_object,
       void (MainClass::*worker)(const Iterator &, ScratchData &, CopyData &),
       void (MainClass::*copier)(const CopyData &),
@@ -1433,17 +1433,18 @@ namespace WorkStream
             typename CopyData,
             typename = std::enable_if_t<has_begin_and_end<IteratorRangeType>>>
   void
-  run(IteratorRangeType iterator_range,
-      MainClass &       main_object,
-      void (MainClass::*worker)(
-        const typename identity<IteratorRangeType>::type::iterator &,
-        ScratchData &,
-        CopyData &),
-      void (MainClass::*copier)(const CopyData &),
-      const ScratchData &sample_scratch_data,
-      const CopyData &   sample_copy_data,
-      const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8)
+  run(
+    IteratorRangeType iterator_range,
+    MainClass &       main_object,
+    void (MainClass::*worker)(
+      const typename std_cxx20::type_identity_t<IteratorRangeType>::iterator &,
+      ScratchData &,
+      CopyData &),
+    void (MainClass::*copier)(const CopyData &),
+    const ScratchData &sample_scratch_data,
+    const CopyData &   sample_copy_data,
+    const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+    const unsigned int chunk_size   = 8)
   {
     // Call the function above
     run(std::begin(iterator_range),

@@ -815,7 +815,7 @@ namespace Threads
    */
   template <typename RT, typename... Args>
   DEAL_II_DEPRECATED inline Thread<RT>
-  new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
+  new_thread(RT (*fun_ptr)(Args...), std_cxx20::type_identity_t<Args>... args)
   {
     // See the comment in the first new_thread() implementation
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -837,8 +837,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (C::*fun_ptr)(Args...),
-             typename identity<C>::type &c,
-             typename identity<Args>::type... args)
+             std_cxx20::type_identity_t<C> &c,
+             std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_thread(std::function<RT()>(std::bind(
@@ -855,8 +855,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (C::*fun_ptr)(Args...) const,
-             typename identity<const C>::type &c,
-             typename identity<Args>::type... args)
+             std_cxx20::type_identity_t<const C> &c,
+             std_cxx20::type_identity_t<Args>... args)
   {
     // See the comment in the first new_thread() implementation
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -1587,7 +1587,7 @@ namespace Threads
    */
   template <typename RT, typename... Args>
   inline Task<RT>
-  new_task(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
+  new_task(RT (*fun_ptr)(Args...), std_cxx20::type_identity_t<Args>... args)
   {
     auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
     return new_task(
@@ -1605,8 +1605,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   inline Task<RT>
   new_task(RT (C::*fun_ptr)(Args...),
-           typename identity<C>::type &c,
-           typename identity<Args>::type... args)
+           std_cxx20::type_identity_t<C> &c,
+           std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(
@@ -1622,8 +1622,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   inline Task<RT>
   new_task(RT (C::*fun_ptr)(Args...) const,
-           typename identity<const C>::type &c,
-           typename identity<Args>::type... args)
+           std_cxx20::type_identity_t<const C> &c,
+           std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(

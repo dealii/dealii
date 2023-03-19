@@ -2024,7 +2024,7 @@ namespace GridTools
   void
   match_periodic_face_pairs(
     std::set<std::pair<CellIterator, unsigned int>> &pairs1,
-    std::set<std::pair<typename identity<CellIterator>::type, unsigned int>>
+    std::set<std::pair<std_cxx20::type_identity_t<CellIterator>, unsigned int>>
       &                                          pairs2,
     const unsigned int                           direction,
     std::vector<PeriodicFacePair<CellIterator>> &matched_pairs,

@@ -436,10 +436,10 @@ namespace MeshWorker
             class ASSEMBLER,
             class ITERATOR>
   void
-  loop(ITERATOR                          begin,
-       typename identity<ITERATOR>::type end,
-       DOFINFO &                         dinfo,
-       INFOBOX &                         info,
+  loop(ITERATOR                             begin,
+       std_cxx20::type_identity_t<ITERATOR> end,
+       DOFINFO &                            dinfo,
+       INFOBOX &                            info,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
          &cell_worker,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
@@ -491,7 +491,7 @@ namespace MeshWorker
   template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void
   integration_loop(ITERATOR                              begin,
-                   typename identity<ITERATOR>::type     end,
+                   std_cxx20::type_identity_t<ITERATOR>  end,
                    DoFInfo<dim, spacedim> &              dof_info,
                    IntegrationInfoBox<dim, spacedim> &   box,
                    const LocalIntegrator<dim, spacedim> &integrator,
