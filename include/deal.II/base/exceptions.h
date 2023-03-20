@@ -2082,7 +2082,8 @@ namespace internal
  * @ingroup Exceptions
  */
 #  define AssertThrowExodusII(error_code) \
-    AssertThrow(error_code == 0, ExcExodusII(error_code));
+    AssertThrow(error_code == 0,          \
+                dealii::StandardExceptions::ExcExodusII(error_code));
 #endif // DEAL_II_TRILINOS_WITH_SEACAS
 
 using namespace StandardExceptions;
