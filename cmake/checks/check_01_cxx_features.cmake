@@ -70,8 +70,7 @@ macro(_test_cxx20_support)
   # Beyond this, check for some features we actually need.
   CHECK_CXX_SOURCE_COMPILES(
     "
-    #include <cmath>
-    #include <ranges>
+    #include <version>
 
     #if __cplusplus < 201709L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
     #  error \"insufficient support for C++20\"
