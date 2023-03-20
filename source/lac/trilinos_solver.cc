@@ -591,85 +591,37 @@ namespace TrilinosWrappers
 
   /* ---------------------- SolverCG ------------------------ */
 
-  SolverCG::AdditionalData::AdditionalData(const bool output_solver_details)
-    : SolverBase::AdditionalData(output_solver_details)
-  {}
-
-
-
   SolverCG::SolverCG(SolverControl &cn, const AdditionalData &data)
-    : SolverBase(cn, data)
-    , additional_data(data)
-  {
-    solver_name = cg;
-  }
+    : SolverBase(cg, cn, data)
+  {}
 
 
   /* ---------------------- SolverGMRES ------------------------ */
 
-  SolverGMRES::AdditionalData::AdditionalData(
-    const bool         output_solver_details,
-    const unsigned int restart_parameter)
-    : SolverBase::AdditionalData(output_solver_details, restart_parameter)
-  {}
-
-
-
   SolverGMRES::SolverGMRES(SolverControl &cn, const AdditionalData &data)
-    : SolverBase(cn, data)
-    , additional_data(data)
-  {
-    solver_name = gmres;
-  }
+    : SolverBase(gmres, cn, data)
+  {}
 
 
   /* ---------------------- SolverBicgstab ------------------------ */
 
-  SolverBicgstab::AdditionalData::AdditionalData(
-    const bool output_solver_details)
-    : SolverBase::AdditionalData(output_solver_details)
-  {}
-
-
-
   SolverBicgstab::SolverBicgstab(SolverControl &cn, const AdditionalData &data)
-    : SolverBase(cn, data)
-    , additional_data(data)
-  {
-    solver_name = bicgstab;
-  }
+    : SolverBase(bicgstab, cn, data)
+  {}
 
 
   /* ---------------------- SolverCGS ------------------------ */
 
-  SolverCGS::AdditionalData::AdditionalData(const bool output_solver_details)
-    : SolverBase::AdditionalData(output_solver_details)
-  {}
-
-
-
   SolverCGS::SolverCGS(SolverControl &cn, const AdditionalData &data)
-    : SolverBase(cn, data)
-    , additional_data(data)
-  {
-    solver_name = cgs;
-  }
+    : SolverBase(cgs, cn, data)
+  {}
 
 
   /* ---------------------- SolverTFQMR ------------------------ */
 
-  SolverTFQMR::AdditionalData::AdditionalData(const bool output_solver_details)
-    : SolverBase::AdditionalData(output_solver_details)
-  {}
-
-
-
   SolverTFQMR::SolverTFQMR(SolverControl &cn, const AdditionalData &data)
-    : SolverBase(cn, data)
-    , additional_data(data)
-  {
-    solver_name = tfqmr;
-  }
+    : SolverBase(tfqmr, cn, data)
+  {}
 
 
 
