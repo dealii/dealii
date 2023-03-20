@@ -81,6 +81,10 @@ macro(_test_cxx20_support)
     #  error \"insufficient support for C++20\"
     #endif
 
+    #if !(defined __cpp_type_identity) || (__cpp_lib_type_identity < 201806)
+    #  error \"insufficient support for C++20\"
+    #endif
+
 
     // Test concepts and requires clauses
     template <int dim, int spacedim>
