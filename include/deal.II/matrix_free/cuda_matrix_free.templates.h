@@ -234,7 +234,8 @@ namespace CUDAWrappers
       MatrixFree<dim, Number> *data;
       // Host data
       std::vector<types::global_dof_index> local_to_global_host;
-      std::vector<Point<dim, Number>>      q_points_host;
+      Kokkos::View<Point<dim, Number> **, MemorySpace::Default::kokkos_space>
+                                                                  q_points;
       Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
       Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>
         inv_jacobian;
@@ -350,7 +351,12 @@ namespace CUDAWrappers
       local_to_global_host.resize(n_cells * padding_length);
 
       if (update_flags & update_quadrature_points)
-        q_points_host.resize(n_cells * padding_length);
+        q_points = Kokkos::View<Point<dim, Number> **,
+                                MemorySpace::Default::kokkos_space>(
+          Kokkos::view_alloc("q_points_" + std::to_string(color),
+                             Kokkos::WithoutInitializing),
+          n_cells,
+          q_points_per_cell);
 
       if (update_flags & update_JxW_values)
         JxW = Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
@@ -409,11 +415,14 @@ namespace CUDAWrappers
       // Quadrature points
       if (update_flags & update_quadrature_points)
         {
-          const std::vector<Point<dim>> &q_points =
+          // FIXME too many deep_copy
+          auto q_points_host = Kokkos::create_mirror_view_and_copy(
+            MemorySpace::Host::kokkos_space{}, q_points);
+          const std::vector<Point<dim>> &q_points_vec =
             fe_values.get_quadrature_points();
-          std::copy(q_points.begin(),
-                    q_points.end(),
-                    &q_points_host[cell_id * padding_length]);
+          for (unsigned int i = 0; i < q_points_per_cell; ++i)
+            q_points_host(cell_id, i) = q_points_vec[i];
+          Kokkos::deep_copy(q_points, q_points_host);
         }
 
       if (update_flags & update_JxW_values)
@@ -460,10 +469,7 @@ namespace CUDAWrappers
       // Quadrature points
       if (update_flags & update_quadrature_points)
         {
-          alloc_and_copy(&data->q_points[color],
-                         ArrayView<const Point<dim, Number>>(
-                           q_points_host.data(), q_points_host.size()),
-                         n_cells * padding_length);
+          data->q_points[color] = q_points;
         }
 
       // Jacobian determinants/quadrature weights
@@ -706,10 +712,6 @@ namespace CUDAWrappers
   void
   MatrixFree<dim, Number>::free()
   {
-    for (auto &q_points_color_ptr : q_points)
-      Utilities::CUDA::free(q_points_color_ptr);
-    q_points.clear();
-
     for (auto &local_to_global_color_ptr : local_to_global)
       Utilities::CUDA::free(local_to_global_color_ptr);
     local_to_global.clear();

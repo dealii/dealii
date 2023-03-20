@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include "deal.II/base/memory_space.h"
+#include "deal.II/base/utilities.h"
 
 #ifdef DEAL_II_WITH_CUDA
 
@@ -174,9 +175,9 @@ namespace CUDAWrappers
     struct Data
     {
       /**
-       * Pointer to the quadrature points.
+       * Kokkos::View of the quadrature points.
        */
-      point_type *q_points;
+      Kokkos::View<point_type **, MemorySpace::Default::kokkos_space> q_points;
 
       /**
        * Map the position in the local vector to the position in the global
@@ -503,10 +504,11 @@ namespace CUDAWrappers
     std::vector<unsigned int> n_cells;
 
     /**
-     * Vector of pointers to the quadrature points associated to the cells of
-     * each color.
+     * Vector of Kokkos::View to the quadrature points associated to the cells
+     * of each color.
      */
-    std::vector<point_type *> q_points;
+    std::vector<Kokkos::View<point_type **, MemorySpace::Default::kokkos_space>>
+      q_points;
 
     /**
      * Map the position in the local vector to the position in the global
@@ -714,8 +716,7 @@ namespace CUDAWrappers
       const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
       const unsigned int                                          n_q_points_1d)
   {
-    return *(data->q_points + data->padding_length * cell +
-             q_point_id_in_cell<dim>(n_q_points_1d));
+    return data->q_points(cell, q_point_id_in_cell<dim>(n_q_points_1d));
   }
 
   /**
@@ -726,9 +727,11 @@ namespace CUDAWrappers
   struct DataHost
   {
     /**
-     * Vector of quadrature points.
+     * Kokkos::View of quadrature points on the host.
      */
-    std::vector<Point<dim, Number>> q_points;
+    typename Kokkos::View<Point<dim, Number> **,
+                          MemorySpace::Default::kokkos_space>::HostMirror
+      q_points;
 
     /**
      * Map the position in the local vector to the position in the global
@@ -737,14 +740,17 @@ namespace CUDAWrappers
     std::vector<types::global_dof_index> local_to_global;
 
     /**
-     * Vector of inverse Jacobians.
+     * Kokkos::View of inverse Jacobians on the host.
      */
-    std::vector<Number> inv_jacobian;
+    typename Kokkos::View<Number **[dim][dim],
+                          MemorySpace::Default::kokkos_space>::HostMirror
+      inv_jacobian;
 
     /**
-     * Vector of Jacobian times the weights.
+     * Kokkos::View of Jacobian times the weights on the host.
      */
-    std::vector<Number> JxW;
+    typename Kokkos::View<Number **,
+                          MemorySpace::Default::kokkos_space>::HostMirror JxW;
 
     /**
      * ID of the associated MatrixFree object.
@@ -805,8 +811,8 @@ namespace CUDAWrappers
       data_host.n_cells * data_host.padding_length;
     if (update_flags & update_quadrature_points)
       {
-        data_host.q_points.resize(n_elements);
-        Utilities::CUDA::copy_to_host(data.q_points, data_host.q_points);
+        data_host.q_points = Kokkos::create_mirror(data.q_points);
+        Kokkos::deep_copy(data_host.q_points, data.q_points);
       }
 
     data_host.local_to_global.resize(n_elements);
@@ -815,15 +821,14 @@ namespace CUDAWrappers
 
     if (update_flags & update_gradients)
       {
-        data_host.inv_jacobian.resize(n_elements * dim * dim);
-        Utilities::CUDA::copy_to_host(data.inv_jacobian.data(),
-                                      data_host.inv_jacobian);
+        data_host.inv_jacobian = Kokkos::create_mirror(data.inv_jacobian);
+        Kokkos::deep_copy(data_host.inv_jacobian, data.inv_jacobian);
       }
 
     if (update_flags & update_JxW_values)
       {
-        data_host.JxW.resize(n_elements);
-        Utilities::CUDA::copy_to_host(data.JxW.data(), data_host.JxW);
+        data_host.JxW = Kokkos::create_mirror(data.JxW);
+        Kokkos::deep_copy(data_host.JxW, data.JxW);
       }
 
     data_host.constraint_mask.resize(data_host.n_cells);
@@ -865,7 +870,7 @@ namespace CUDAWrappers
                             const DataHost<dim, Number> &data,
                             const unsigned int           i)
   {
-    return data.q_points[data.padding_length * cell + i];
+    return data.q_points(cell, i);
   }
 
 
