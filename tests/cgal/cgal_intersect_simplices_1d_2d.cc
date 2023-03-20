@@ -42,11 +42,8 @@ test_inside_intersection(Triangulation<2> &tria0, Triangulation<1, 2> &tria1)
   const auto   cell1         = tria1.begin_active();
   // cell1->vertex(1)+=Point<2>(1.0,1.);
 
-  const auto vec_of_arrays =
-    CGALWrappers::compute_intersection_of_cells<2, 1, 2>(cell0,
-                                                         cell1,
-                                                         MappingQ1<2>(),
-                                                         MappingQ1<1, 2>());
+  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
+    cell0, cell1, MappingQ1<2>(), MappingQ1<1, 2>());
 
   const auto   quad = qgauss.mapped_quadrature(vec_of_arrays);
   const double sum =
@@ -67,11 +64,8 @@ test_intersection(Triangulation<2> &tria0, Triangulation<1, 2> &tria1)
   const auto   cell0         = tria0.begin_active();
   const auto   cell1         = tria1.begin_active();
 
-  const auto vec_of_arrays =
-    CGALWrappers::compute_intersection_of_cells<2, 1, 2>(cell0,
-                                                         cell1,
-                                                         MappingQ1<2>(),
-                                                         MappingQ1<1, 2>());
+  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
+    cell0, cell1, MappingQ1<2>(), MappingQ1<1, 2>());
 
   const auto   quad = qgauss.mapped_quadrature(vec_of_arrays);
   const double sum =
@@ -91,11 +85,8 @@ test_failing_intersection(Triangulation<2> &tria0, Triangulation<1, 2> &tria1)
   const auto   cell0         = tria0.begin_active();
   const auto   cell1         = tria1.begin_active();
 
-  const auto vec_of_arrays =
-    CGALWrappers::compute_intersection_of_cells<2, 1, 2>(cell0,
-                                                         cell1,
-                                                         MappingQ1<2>(),
-                                                         MappingQ1<1, 2>());
+  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
+    cell0, cell1, MappingQ1<2>(), MappingQ1<1, 2>());
 
   const auto   quad = qgauss.mapped_quadrature(vec_of_arrays);
   const double sum =

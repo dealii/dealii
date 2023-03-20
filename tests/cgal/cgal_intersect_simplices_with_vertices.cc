@@ -13,9 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-// Compute intersection of simplices in 2D, and return a vector of arrays where
-// you can build Quadrature rules. Then check that the sum of weights give the
-// correct area for each region.
+// This test is the same as cgal_intersection_simplices_2d_2d() but directly
+// working with vertices While the functionality of the intersections is tested
+// with the iterator interface this test ensures there are no linker errors if
+// the vertex version is called directly.
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -26,6 +27,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/cgal/intersections.h>
+#include <deal.II/cgal/utilities.h>
 
 #include "../tests.h"
 
@@ -41,9 +43,13 @@ test_inside_intersection(Triangulation<2> &tria0, Triangulation<2> &tria1)
   const auto   cell0         = tria0.begin_active();
   const auto   cell1         = tria1.begin_active();
 
-  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
-    cell0, cell1, MappingQ1<2>(), MappingQ1<2>());
+  const auto &vertices0 =
+    CGALWrappers::get_vertices_in_cgal_order(cell0, MappingQ1<2>());
+  const auto &vertices1 =
+    CGALWrappers::get_vertices_in_cgal_order(cell1, MappingQ1<2>());
 
+  const auto &vec_of_arrays =
+    CGALWrappers::compute_intersection_of_cells<2, 2, 2>(vertices0, vertices1);
 
   const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
   const double sum =
@@ -64,8 +70,14 @@ test_intersection(Triangulation<2> &tria0, Triangulation<2> &tria1)
   const auto cell0 = tria0.begin_active();
   const auto cell1 = tria1.begin_active();
 
-  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
-    cell0, cell1, MappingQ1<2>(), MappingQ1<2>());
+  const auto &vertices0 =
+    CGALWrappers::get_vertices_in_cgal_order(cell0, MappingQ1<2>());
+  const auto &vertices1 =
+    CGALWrappers::get_vertices_in_cgal_order(cell1, MappingQ1<2>());
+
+  const auto &vec_of_arrays =
+    CGALWrappers::compute_intersection_of_cells<2, 2, 2>(vertices0, vertices1);
+
 
   const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
   const double sum =
@@ -86,8 +98,13 @@ test_failing_intersection(Triangulation<2> &tria0, Triangulation<2> &tria1)
   const auto cell0 = tria0.begin_active();
   const auto cell1 = tria1.begin_active();
 
-  const auto vec_of_arrays = CGALWrappers::compute_intersection_of_cells(
-    cell0, cell1, MappingQ1<2>(), MappingQ1<2>());
+  const auto &vertices0 =
+    CGALWrappers::get_vertices_in_cgal_order(cell0, MappingQ1<2>());
+  const auto &vertices1 =
+    CGALWrappers::get_vertices_in_cgal_order(cell1, MappingQ1<2>());
+
+  const auto &vec_of_arrays =
+    CGALWrappers::compute_intersection_of_cells<2, 2, 2>(vertices0, vertices1);
 
   const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
   const double sum =

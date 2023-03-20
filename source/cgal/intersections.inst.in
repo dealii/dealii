@@ -27,5 +27,11 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS)
       const Mapping<dim1, spacedim> &                              mapping1,
       const double                                                 tol);
 
+    template std::vector<std::array<Point<spacedim>, dim1 + 1>>
+    compute_intersection_of_cells<dim0, dim1, spacedim>(
+      const ArrayView<const Point<spacedim>> &vertices0,
+      const ArrayView<const Point<spacedim>> &vertices1,
+      const double                            tol);
+
 #endif
   }
