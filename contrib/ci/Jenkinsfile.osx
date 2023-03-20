@@ -4,7 +4,7 @@
 
 This Jenkins job runs a build on OSX
 
-See https://jenkins.tjhei.info/job/dealii-osx/ for details.
+See https://ci.tjhei.info/job/dealii-osx/ for details.
 
 */
 
@@ -64,7 +64,7 @@ pipeline
 
           steps
           {
-            githubNotify context: 'OSX', description: 'pending...',  status: 'PENDING'
+            githubNotify context: 'Jenkins: OSX', description: 'pending...',  status: 'PENDING'
             sh '''
                wget -q -O - https://api.github.com/repos/dealii/dealii/issues/${CHANGE_ID}/labels | grep 'ready to test' || \
                { echo "This commit will only be tested when it has the label 'ready to test'. Trigger a rebuild by adding a comment that contains '/rebuild'..."; exit 1; }
@@ -74,7 +74,7 @@ pipeline
           {
             failure
             {
-              githubNotify context: 'OSX', description: 'need ready to test label and /rebuild',  status: 'PENDING'
+              githubNotify context: 'Jenkins: OSX', description: 'need ready to test label and /rebuild',  status: 'PENDING'
               script
               {
                 currentBuild.result='NOT_BUILT'
@@ -99,7 +99,7 @@ pipeline
                       -D DEAL_II_CXX_FLAGS='-Werror' \
                       -D DEAL_II_EARLY_DEPRECATIONS=ON \
                       -D CMAKE_BUILD_TYPE=Debug \
-                      $WORKSPACE/ && make -j 4
+                      $WORKSPACE/ && make -j 8
                     make test # quicktests
                  '''
             }
@@ -113,7 +113,7 @@ pipeline
             }
             failure
             {
-              githubNotify context: 'OSX', description: 'build failed',  status: 'FAILURE'
+              githubNotify context: 'Jenkins: OSX', description: 'build failed',  status: 'FAILURE'
             }
           }
         }
@@ -122,7 +122,7 @@ pipeline
         {
           steps
           {
-            githubNotify context: 'OSX', description: 'OK',  status: 'SUCCESS'
+            githubNotify context: 'Jenkins: OSX', description: 'OK',  status: 'SUCCESS'
           }
         }
       }
