@@ -2149,14 +2149,19 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::distribute_dofs(
   const hp::FECollection<dim, spacedim> &ff)
 {
-  Assert(
-    this->tria != nullptr,
-    ExcMessage(
-      "You need to set the Triangulation in the DoFHandler using reinit() or "
-      "in the constructor before you can distribute DoFs."));
+  Assert(this->tria != nullptr,
+         ExcMessage(
+           "You need to set the Triangulation in the DoFHandler using reinit() "
+           "or in the constructor before you can distribute DoFs."));
   Assert(this->tria->n_levels() > 0,
          ExcMessage("The Triangulation you are using is empty!"));
+
+  // verify size of provided FE collection
   Assert(ff.size() > 0, ExcMessage("The given hp::FECollection is empty!"));
+  Assert((ff.size() <= std::numeric_limits<types::fe_index>::max()) &&
+           (ff.size() != numbers::invalid_fe_index),
+         ExcMessage("The given hp::FECollection contains more finite elements "
+                    "than the DoFHandler can cover with active FE indices."));
 
   //
   // register the new finite element collection
