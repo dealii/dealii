@@ -567,13 +567,13 @@ namespace Step33
     // this because we say so in the <code>get_needed_update_flags()</code>
     // function below). For the inner vectors, we check that at least the first
     // element of the outer vector has the correct inner size:
-    const unsigned int n_quadrature_points = inputs.solution_values.size();
+    const unsigned int n_evaluation_points = inputs.solution_values.size();
 
     if (do_schlieren_plot == true)
-      Assert(inputs.solution_gradients.size() == n_quadrature_points,
+      Assert(inputs.solution_gradients.size() == n_evaluation_points,
              ExcInternalError());
 
-    Assert(computed_quantities.size() == n_quadrature_points,
+    Assert(computed_quantities.size() == n_evaluation_points,
            ExcInternalError());
 
     Assert(inputs.solution_values[0].size() == n_components,
@@ -595,21 +595,21 @@ namespace Step33
     // variables in the input vector, using the
     // <code>first_momentum_component</code> and
     // <code>density_component</code> information:
-    for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    for (unsigned int p = 0; p < n_evaluation_points; ++p)
       {
-        const double density = inputs.solution_values[q](density_component);
+        const double density = inputs.solution_values[p](density_component);
 
         for (unsigned int d = 0; d < dim; ++d)
-          computed_quantities[q](d) =
-            inputs.solution_values[q](first_momentum_component + d) / density;
+          computed_quantities[p](d) =
+            inputs.solution_values[p](first_momentum_component + d) / density;
 
-        computed_quantities[q](dim) =
-          compute_pressure(inputs.solution_values[q]);
+        computed_quantities[p](dim) =
+          compute_pressure(inputs.solution_values[p]);
 
         if (do_schlieren_plot == true)
-          computed_quantities[q](dim + 1) =
-            inputs.solution_gradients[q][density_component] *
-            inputs.solution_gradients[q][density_component];
+          computed_quantities[p](dim + 1) =
+            inputs.solution_gradients[p][density_component] *
+            inputs.solution_gradients[p][density_component];
       }
   }
 

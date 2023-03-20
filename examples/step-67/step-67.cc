@@ -1845,24 +1845,24 @@ namespace Euler_DG
              dim + 2 + (do_schlieren_plot == true ? 1 : 0),
            ExcInternalError());
 
-    for (unsigned int q = 0; q < n_evaluation_points; ++q)
+    for (unsigned int p = 0; p < n_evaluation_points; ++p)
       {
         Tensor<1, dim + 2> solution;
         for (unsigned int d = 0; d < dim + 2; ++d)
-          solution[d] = inputs.solution_values[q](d);
+          solution[d] = inputs.solution_values[p](d);
 
         const double         density  = solution[0];
         const Tensor<1, dim> velocity = euler_velocity<dim>(solution);
         const double         pressure = euler_pressure<dim>(solution);
 
         for (unsigned int d = 0; d < dim; ++d)
-          computed_quantities[q](d) = velocity[d];
-        computed_quantities[q](dim)     = pressure;
-        computed_quantities[q](dim + 1) = std::sqrt(gamma * pressure / density);
+          computed_quantities[p](d) = velocity[d];
+        computed_quantities[p](dim)     = pressure;
+        computed_quantities[p](dim + 1) = std::sqrt(gamma * pressure / density);
 
         if (do_schlieren_plot == true)
-          computed_quantities[q](dim + 2) =
-            inputs.solution_gradients[q][0] * inputs.solution_gradients[q][0];
+          computed_quantities[p](dim + 2) =
+            inputs.solution_gradients[p][0] * inputs.solution_gradients[p][0];
       }
   }
 

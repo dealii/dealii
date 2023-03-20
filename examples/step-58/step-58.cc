@@ -480,14 +480,14 @@ namespace Step58
       AssertDimension(computed_quantities.size(),
                       inputs.solution_values.size());
 
-      for (unsigned int q = 0; q < computed_quantities.size(); ++q)
+      for (unsigned int p = 0; p < computed_quantities.size(); ++p)
         {
-          AssertDimension(computed_quantities[q].size(), 1);
-          AssertDimension(inputs.solution_values[q].size(), 2);
+          AssertDimension(computed_quantities[p].size(), 1);
+          AssertDimension(inputs.solution_values[p].size(), 2);
 
-          const std::complex<double> psi(inputs.solution_values[q](0),
-                                         inputs.solution_values[q](1));
-          computed_quantities[q](0) = std::norm(psi);
+          const std::complex<double> psi(inputs.solution_values[p](0),
+                                         inputs.solution_values[p](1));
+          computed_quantities[p](0) = std::norm(psi);
         }
     }
 
@@ -537,16 +537,16 @@ namespace Step58
                       inputs.solution_values.size());
 
       double max_phase = -numbers::PI;
-      for (unsigned int q = 0; q < computed_quantities.size(); ++q)
+      for (unsigned int p = 0; p < computed_quantities.size(); ++p)
         {
-          AssertDimension(computed_quantities[q].size(), 1);
-          AssertDimension(inputs.solution_values[q].size(), 2);
+          AssertDimension(computed_quantities[p].size(), 1);
+          AssertDimension(inputs.solution_values[p].size(), 2);
 
           max_phase =
             std::max(max_phase,
                      std::arg(
-                       std::complex<double>(inputs.solution_values[q](0),
-                                            inputs.solution_values[q](1))));
+                       std::complex<double>(inputs.solution_values[p](0),
+                                            inputs.solution_values[p](1))));
         }
 
       for (auto &output : computed_quantities)
