@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,9 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-// Check the path of SolverCG that can apply loops to sub-ranges of the
-// matrix. That feature is used for matrix-free loops with increased data
-// locality.
+// Check the path of SolverCG that can apply loops to sub-ranges of the matrix
+// in terms of the final solution vector, terminating at arbitrary numbers of
+// iterations also when the solution has not converged yet, and make sure we
+// obtain the same result as without interleaving.
 
 
 #include <deal.II/lac/diagonal_matrix.h>
@@ -58,25 +59,14 @@ struct MyDiagonalMatrix
 
 
 
-SolverControl::State
-monitor_norm(const unsigned int iteration,
-             const double       check_value,
-             const LinearAlgebra::distributed::Vector<double> &)
-{
-  deallog << "   CG estimated residual at iteration " << iteration << ": "
-          << check_value << std::endl;
-  return SolverControl::success;
-}
-
-
 int
 main()
 {
   initlog();
 
-  // Create diagonal matrix with entries between 1 and 30
+  // Create diagonal matrix with entries between 1 and 15
   DiagonalMatrix<LinearAlgebra::distributed::Vector<double>> unit_matrix;
-  unit_matrix.get_vector().reinit(30);
+  unit_matrix.get_vector().reinit(15);
   unit_matrix.get_vector() = 1.0;
 
   LinearAlgebra::distributed::Vector<double> matrix_entries(unit_matrix.m());
@@ -88,13 +78,20 @@ main()
     sol(unit_matrix.m());
   rhs = 1.;
 
-  deallog << "Solve with PreconditionIdentity: " << std::endl;
-  SolverControl                                        control(30, 1e-4);
-  SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
-  solver.connect(&monitor_norm);
-  solver.solve(matrix, sol, rhs, PreconditionIdentity());
+  for (unsigned int n_iter = 1; n_iter < 12; ++n_iter)
+    {
+      deallog << "Test solution accuracy with " << n_iter << " iterations"
+              << std::endl;
+      deallog << "Solve with PreconditionIdentity: " << std::endl;
+      IterationNumberControl control(n_iter, 1e-12);
+      SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
+      sol = 0;
+      solver.solve(matrix, sol, rhs, PreconditionIdentity());
+      sol.print(deallog.get_file_stream());
 
-  deallog << "Solve with diagonal preconditioner: " << std::endl;
-  sol = 0;
-  solver.solve(matrix, sol, rhs, unit_matrix);
+      deallog << "Solve with diagonal preconditioner: " << std::endl;
+      sol = 0;
+      solver.solve(matrix, sol, rhs, unit_matrix);
+      sol.print(deallog.get_file_stream());
+    }
 }
