@@ -222,10 +222,18 @@ namespace DataPostprocessorInputs
      * This array is only filled if a user-derived class overloads the
      * DataPostprocessor::get_needed_update_flags(), and the function
      * returns (possibly among other flags)
-     * UpdateFlags::update_quadrature_points.  Alternatively, a class
+     * UpdateFlags::update_quadrature_points. Alternatively, a class
      * derived from DataPostprocessorScalar, DataPostprocessorVector,
      * or DataPostprocessorTensor may pass this flag to the constructor of
      * these three classes.
+     *
+     * @note In the current context, the flag UpdateFlags::update_quadrature_points
+     *   is misnamed because we are not actually performing any quadrature.
+     *   Rather, we are *evaluating* the solution at specific evaluation
+     *   points, but these points are unrelated to quadrature (i.e.,
+     *   to computing integrals) and will, in general, not be located
+     *   at Gauss points or the quadrature points of any of the typical
+     *   quadrature rules.)
      */
     std::vector<Point<spacedim>> evaluation_points;
 
@@ -661,6 +669,14 @@ public:
    * DataPostprocessor is to be used in combination with DataOutFaces, you may
    * also ask for a update of normals via the @p update_normal_vectors flag.
    * The description of the flags can be found at dealii::UpdateFlags.
+   *
+   * @note In the current context, the flag UpdateFlags::update_quadrature_points
+   *   is misnamed because we are not actually performing any quadrature.
+   *   Rather, we are *evaluating* the solution at specific evaluation
+   *   points, but these points are unrelated to quadrature (i.e.,
+   *   to computing integrals) and will, in general, not be located
+   *   at Gauss points or the quadrature points of any of the typical
+   *   quadrature rules.)
    */
   virtual UpdateFlags
   get_needed_update_flags() const = 0;
@@ -715,6 +731,14 @@ public:
    * DataPostprocessor is to be used in combination with DataOutFaces, you may
    * also ask for a update of normals via the @p update_normal_vectors flag.
    * The description of the flags can be found at dealii::UpdateFlags.
+   *
+   * @note In the current context, the flag UpdateFlags::update_quadrature_points
+   *   is misnamed because we are not actually performing any quadrature.
+   *   Rather, we are *evaluating* the solution at specific evaluation
+   *   points, but these points are unrelated to quadrature (i.e.,
+   *   to computing integrals) and will, in general, not be located
+   *   at Gauss points or the quadrature points of any of the typical
+   *   quadrature rules.)
    */
   DataPostprocessorScalar(const std::string &name,
                           const UpdateFlags  update_flags);
@@ -923,6 +947,16 @@ private:
  * does not adequately resolve this interface. This, however, is not
  * important to the current discussion.
  *
+ * @note In the current context, the flag UpdateFlags::update_quadrature_points
+ *   is misnamed because we are not actually performing any quadrature.
+ *   Rather, we are *evaluating* the solution at specific evaluation
+ *   points, but these points are unrelated to quadrature (i.e.,
+ *   to computing integrals) and will, in general, not be located
+ *   at Gauss points or the quadrature points of any of the typical
+ *   quadrature rules.) In the example above, we need the location
+ *   of these evaluation points because we need to evaluate the
+ *   coefficients at these points.
+ *
  *
  * <h3> Extension to the gradients of vector-valued problems </h3>
  *
@@ -959,6 +993,14 @@ public:
    * DataPostprocessor is to be used in combination with DataOutFaces, you may
    * also ask for a update of normals via the @p update_normal_vectors flag.
    * The description of the flags can be found at dealii::UpdateFlags.
+   *
+   * @note In the current context, the flag UpdateFlags::update_quadrature_points
+   *   is misnamed because we are not actually performing any quadrature.
+   *   Rather, we are *evaluating* the solution at specific evaluation
+   *   points, but these points are unrelated to quadrature (i.e.,
+   *   to computing integrals) and will, in general, not be located
+   *   at Gauss points or the quadrature points of any of the typical
+   *   quadrature rules.)
    */
   DataPostprocessorVector(const std::string &name,
                           const UpdateFlags  update_flags);
@@ -1217,6 +1259,14 @@ public:
    * DataPostprocessor is to be used in combination with DataOutFaces, you may
    * also ask for a update of normals via the @p update_normal_vectors flag.
    * The description of the flags can be found at dealii::UpdateFlags.
+   *
+   * @note In the current context, the flag UpdateFlags::update_quadrature_points
+   *   is misnamed because we are not actually performing any quadrature.
+   *   Rather, we are *evaluating* the solution at specific evaluation
+   *   points, but these points are unrelated to quadrature (i.e.,
+   *   to computing integrals) and will, in general, not be located
+   *   at Gauss points or the quadrature points of any of the typical
+   *   quadrature rules.)
    */
   DataPostprocessorTensor(const std::string &name,
                           const UpdateFlags  update_flags);
