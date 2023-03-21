@@ -232,8 +232,9 @@ namespace CUDAWrappers
 
     private:
       MatrixFree<dim, Number> *data;
-      // Host data
-      std::vector<types::global_dof_index> local_to_global_host;
+      Kokkos::View<types::global_dof_index **,
+                   MemorySpace::Default::kokkos_space>
+        local_to_global;
       Kokkos::View<Point<dim, Number> **, MemorySpace::Default::kokkos_space>
                                                                   q_points;
       Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
@@ -348,7 +349,13 @@ namespace CUDAWrappers
         data->block_dim[color] =
           dim3(n_dofs_1d * cells_per_block, n_dofs_1d, n_dofs_1d);
 
-      local_to_global_host.resize(n_cells * padding_length);
+
+      local_to_global = Kokkos::View<types::global_dof_index **,
+                                     MemorySpace::Default::kokkos_space>(
+        Kokkos::view_alloc("local_to_global_" + std::to_string(color),
+                           Kokkos::WithoutInitializing),
+        n_cells,
+        dofs_per_cell);
 
       if (update_flags & update_quadrature_points)
         q_points = Kokkos::View<Point<dim, Number> **,
@@ -406,9 +413,13 @@ namespace CUDAWrappers
                                       lexicographic_dof_indices,
                                       cell_id_view);
 
-      memcpy(&local_to_global_host[cell_id * padding_length],
-             lexicographic_dof_indices.data(),
-             dofs_per_cell * sizeof(types::global_dof_index));
+      // FIXME too many deep_copy
+      auto local_to_global_host =
+        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
+                                            local_to_global);
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        local_to_global_host(cell_id, i) = lexicographic_dof_indices[i];
+      Kokkos::deep_copy(local_to_global, local_to_global_host);
 
       fe_values.reinit(cell);
 
@@ -460,11 +471,7 @@ namespace CUDAWrappers
       const unsigned int n_cells = data->n_cells[color];
 
       // Local-to-global mapping
-      alloc_and_copy(
-        &data->local_to_global[color],
-        ArrayView<const types::global_dof_index>(local_to_global_host.data(),
-                                                 local_to_global_host.size()),
-        n_cells * padding_length);
+      data->local_to_global[color] = local_to_global;
 
       // Quadrature points
       if (update_flags & update_quadrature_points)
@@ -712,10 +719,6 @@ namespace CUDAWrappers
   void
   MatrixFree<dim, Number>::free()
   {
-    for (auto &local_to_global_color_ptr : local_to_global)
-      Utilities::CUDA::free(local_to_global_color_ptr);
-    local_to_global.clear();
-
     for (auto &constraint_mask_color_ptr : constraint_mask)
       Utilities::CUDA::free(constraint_mask_color_ptr);
     constraint_mask.clear();

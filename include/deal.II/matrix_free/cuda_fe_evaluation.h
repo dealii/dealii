@@ -240,10 +240,19 @@ namespace CUDAWrappers
     apply_for_each_quad_point(const Functor &func);
 
   private:
-    types::global_dof_index *local_to_global;
-    unsigned int             n_cells;
-    unsigned int             padding_length;
-    const unsigned int       mf_object_id;
+    // FIXME We would like to use
+    // Kokkos::Subview<Kokkos::View<types::global_dof_index **,
+    // MemorySpace::Default::kokkos_space>, int, decltype(Kokkos::ALL)>
+    // but we get error: incomplete type is not allowed. I cannot reproduce
+    // outside of deal.II. Need to investigate more.
+    Kokkos::Subview<Kokkos::View<types::global_dof_index **,
+                                 MemorySpace::Default::kokkos_space>,
+                    int,
+                    Kokkos::pair<int, int>>
+                       local_to_global;
+    unsigned int       n_cells;
+    unsigned int       padding_length;
+    const unsigned int mf_object_id;
 
     const dealii::internal::MatrixFreeFunctions::ConstraintKinds
       constraint_mask;
@@ -290,7 +299,11 @@ namespace CUDAWrappers
     FEEvaluation(const unsigned int       cell_id,
                  const data_type *        data,
                  SharedData<dim, Number> *shdata)
-    : n_cells(data->n_cells)
+    : local_to_global(Kokkos::subview(
+        data->local_to_global,
+        cell_id,
+        Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim))))
+    , n_cells(data->n_cells)
     , padding_length(data->padding_length)
     , mf_object_id(data->id)
     , constraint_mask(data->constraint_mask[cell_id])
@@ -307,8 +320,6 @@ namespace CUDAWrappers
         Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim))))
     , values(shdata->values)
   {
-    local_to_global = data->local_to_global + padding_length * cell_id;
-
     for (unsigned int i = 0; i < dim; ++i)
       gradients[i] = shdata->gradients[i];
   }

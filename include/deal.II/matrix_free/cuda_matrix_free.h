@@ -183,7 +183,9 @@ namespace CUDAWrappers
        * Map the position in the local vector to the position in the global
        * vector.
        */
-      types::global_dof_index *local_to_global;
+      Kokkos::View<types::global_dof_index **,
+                   MemorySpace::Default::kokkos_space>
+        local_to_global;
 
       /**
        * Kokkos::View of the inverse Jacobian.
@@ -514,7 +516,9 @@ namespace CUDAWrappers
      * Map the position in the local vector to the position in the global
      * vector.
      */
-    std::vector<types::global_dof_index *> local_to_global;
+    std::vector<Kokkos::View<types::global_dof_index **,
+                             MemorySpace::Default::kokkos_space>>
+      local_to_global;
 
     /**
      * Vector of Kokkos::View of the inverse Jacobian associated to the cells of
@@ -737,7 +741,9 @@ namespace CUDAWrappers
      * Map the position in the local vector to the position in the global
      * vector.
      */
-    std::vector<types::global_dof_index> local_to_global;
+    typename Kokkos::View<types::global_dof_index **,
+                          MemorySpace::Default::kokkos_space>::HostMirror
+      local_to_global;
 
     /**
      * Kokkos::View of inverse Jacobians on the host.
@@ -815,9 +821,8 @@ namespace CUDAWrappers
         Kokkos::deep_copy(data_host.q_points, data.q_points);
       }
 
-    data_host.local_to_global.resize(n_elements);
-    Utilities::CUDA::copy_to_host(data.local_to_global,
-                                  data_host.local_to_global);
+    data_host.local_to_global = Kokkos::create_mirror(data.local_to_global);
+    Kokkos::deep_copy(data_host.local_to_global, data.local_to_global);
 
     if (update_flags & update_gradients)
       {
