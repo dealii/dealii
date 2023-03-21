@@ -319,6 +319,12 @@ public:
   size() const;
 
   /**
+   * Return a bool whether the array view is empty.
+   */
+  bool
+  empty() const;
+
+  /**
    * Return a pointer to the underlying array serving as element storage.
    * In case the container is empty a nullptr is returned.
    */
@@ -570,6 +576,15 @@ inline std::size_t
 ArrayView<ElementType, MemorySpaceType>::size() const
 {
   return n_elements;
+}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+inline bool
+ArrayView<ElementType, MemorySpaceType>::empty() const
+{
+  return n_elements == 0;
 }
 
 
