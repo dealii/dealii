@@ -34,6 +34,11 @@
 #include <utility>
 #include <vector>
 
+#ifdef DEAL_II_HAVE_CXX20
+#  include <concepts>
+#endif
+
+
 #ifdef DEAL_II_WITH_TBB
 #  include <tbb/task_group.h>
 #endif
@@ -787,8 +792,8 @@ namespace Threads
    * @ingroup CPP11
    */
   template <typename FunctionObjectType>
-  DEAL_II_DEPRECATED inline auto
-  new_thread(FunctionObjectType function_object)
+  DEAL_II_CXX20_REQUIRES((std::invocable<FunctionObjectType>))
+  DEAL_II_DEPRECATED inline auto new_thread(FunctionObjectType function_object)
     -> Thread<decltype(function_object())>
   {
     // See the comment in the first new_thread() implementation
@@ -913,8 +918,10 @@ namespace Threads
      * Set the value of a std::promise object by evaluating the action.
      */
     template <typename RT, typename Function>
-    void
-    evaluate_and_set_promise(Function &function, std::promise<RT> &promise)
+    DEAL_II_CXX20_REQUIRES(
+      (std::invocable<Function> &&
+       std::convertible_to<std::invoke_result_t<Function>, RT>))
+    void evaluate_and_set_promise(Function &function, std::promise<RT> &promise)
     {
       promise.set_value(function());
     }
@@ -928,8 +935,9 @@ namespace Threads
      * call `std::promise::set_value()` without argument.
      */
     template <typename Function>
-    void
-    evaluate_and_set_promise(Function &function, std::promise<void> &promise)
+    DEAL_II_CXX20_REQUIRES((std::invocable<Function>))
+    void evaluate_and_set_promise(Function &          function,
+                                  std::promise<void> &promise)
     {
       function();
       promise.set_value();
@@ -1560,8 +1568,8 @@ namespace Threads
    * @ingroup CPP11
    */
   template <typename FunctionObjectType>
-  inline auto
-  new_task(FunctionObjectType function_object)
+  DEAL_II_CXX20_REQUIRES((std::invocable<FunctionObjectType>))
+  inline auto new_task(FunctionObjectType function_object)
     -> Task<decltype(function_object())>
   {
     using return_type = decltype(function_object());
