@@ -6025,7 +6025,8 @@ namespace GridTools
     }
 
 
-    // checks weather bounding boxes of elements intersect with bounding boxes of other rank
+    // checks weather bounding boxes of elements intersect with bounding boxes
+    // of other rank
     template <int spacedim>
     std::tuple<std::vector<unsigned int>,
                std::vector<unsigned int>,
