@@ -135,8 +135,8 @@ namespace parallel
   template <typename InputIterator, typename OutputIterator, typename Function>
   DEAL_II_CXX20_REQUIRES(
     (std::invocable<Function, InputIterator> &&
-     std::convertible_to<std::invoke_result_t<Function, InputIterator>,
-                         decltype(*std::declval<OutputIterator>())>))
+     std::assignable_from<decltype(*std::declval<OutputIterator>()),
+                          std::invoke_result_t<Function, InputIterator>>))
   void transform(const InputIterator &begin_in,
                  const InputIterator &end_in,
                  OutputIterator       out,
@@ -197,9 +197,9 @@ namespace parallel
             typename Function>
   DEAL_II_CXX20_REQUIRES(
     (std::invocable<Function, InputIterator1, InputIterator2> &&
-     std::convertible_to<
-       std::invoke_result_t<Function, InputIterator1, InputIterator2>,
-       decltype(*std::declval<OutputIterator>())>))
+     std::assignable_from<
+       decltype(*std::declval<OutputIterator>()),
+       std::invoke_result_t<Function, InputIterator1, InputIterator2>>))
   void transform(const InputIterator1 &begin_in1,
                  const InputIterator1 &end_in1,
                  InputIterator2        in2,
@@ -263,11 +263,11 @@ namespace parallel
             typename Function>
   DEAL_II_CXX20_REQUIRES(
     (std::invocable<Function, InputIterator1, InputIterator2, InputIterator3> &&
-     std::convertible_to<std::invoke_result_t<Function,
-                                              InputIterator1,
-                                              InputIterator2,
-                                              InputIterator3>,
-                         decltype(*std::declval<OutputIterator>())>))
+     std::assignable_from<decltype(*std::declval<OutputIterator>()),
+                          std::invoke_result_t<Function,
+                                               InputIterator1,
+                                               InputIterator2,
+                                               InputIterator3>>))
   void transform(const InputIterator1 &begin_in1,
                  const InputIterator1 &end_in1,
                  InputIterator2        in2,
