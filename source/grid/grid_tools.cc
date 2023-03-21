@@ -5966,27 +5966,10 @@ namespace GridTools
     std::tuple<std::vector<unsigned int>,
                std::vector<unsigned int>,
                std::vector<unsigned int>>
-    guess_point_owner(
-      const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
-      const std::vector<Point<spacedim>> &                   points,
-      const double                                           tolerance)
+    convert_guessed_ranks_and_indices_to_crs(
+      const std::vector<std::pair<unsigned int, unsigned int>>
+        &ranks_and_indices)
     {
-      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
-      ranks_and_indices.reserve(points.size());
-
-      for (unsigned int i = 0; i < points.size(); ++i)
-        {
-          const auto &point = points[i];
-          for (unsigned rank = 0; rank < global_bboxes.size(); ++rank)
-            for (const auto &box : global_bboxes[rank])
-              if (box.point_inside(point, tolerance))
-                {
-                  ranks_and_indices.emplace_back(rank, i);
-                  break;
-                }
-        }
-
-      // convert to CRS
       std::sort(ranks_and_indices.begin(), ranks_and_indices.end());
 
       std::vector<unsigned int> ranks;
@@ -6013,6 +5996,64 @@ namespace GridTools
                              std::move(indices));
     }
 
+    // checks weather a point might be located at another rank
+    template <int spacedim>
+    std::tuple<std::vector<unsigned int>,
+               std::vector<unsigned int>,
+               std::vector<unsigned int>>
+    guess_point_owner(
+      const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+      const std::vector<Point<spacedim>> &                   points,
+      const double                                           tolerance)
+    {
+      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
+      ranks_and_indices.reserve(points.size());
+
+      for (unsigned int i = 0; i < points.size(); ++i)
+        {
+          const auto &point = points[i];
+          for (unsigned rank = 0; rank < global_bboxes.size(); ++rank)
+            for (const auto &box : global_bboxes[rank])
+              if (box.point_inside(point, tolerance))
+                {
+                  ranks_and_indices.emplace_back(rank, i);
+                  break;
+                }
+        }
+
+      return convert_guessed_ranks_and_indices_to_crs(ranks_and_indices);
+    }
+
+
+    // checks weather bounding boxes of elements intersect with bounding boxes of other rank
+    template <int spacedim>
+    std::tuple<std::vector<unsigned int>,
+               std::vector<unsigned int>,
+               std::vector<unsigned int>>
+    guess_intersection_owner(
+      const std::vector<std::vector<dealii::BoundingBox<spacedim>>>
+        &                                                 global_bboxes,
+      const dealii::RTree<dealii::BoundingBox<spacedim>> &element_bboxes,
+      const double                                        tolerance)
+    {
+      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
+      ranks_and_indices.reserve(element_bboxes.size());
+
+      // check which global bounding box intersects with element bounding boxes
+      for (unsigned int i = 0; i < element_bboxes.size(); ++i)
+        {
+          for (unsigned int rank = 0; rank < global_bboxes.size(); ++rank)
+            {
+              for (const auto &global_bbox : global_bboxes[rank])
+                {
+                  if (global_bbox.has_overlap_with(element_bboxes[i],
+                                                   tolerance))
+                    ranks_and_indices.emplace_back(rank, i);
+                }
+            }
+        }
+      return convert_guessed_ranks_and_indices_to_crs(ranks_and_indices);
+    }
 
 
     template <int dim, int spacedim>
