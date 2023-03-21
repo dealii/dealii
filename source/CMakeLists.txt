@@ -83,7 +83,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   #
 
   set(_object_files "")
-  if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  if(NOT BUILD_SHARED_LIBS)
     get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
     foreach(_target ${_object_targets})
       list(APPEND _object_files "$<TARGET_OBJECTS:${_target}>")
@@ -99,7 +99,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   #
   populate_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase} ${build})
 
-  if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+  if(BUILD_SHARED_LIBS)
     #
     # Add all object targets as private link targets
     #
