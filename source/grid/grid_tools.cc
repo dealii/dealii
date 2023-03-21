@@ -5966,8 +5966,7 @@ namespace GridTools
                std::vector<unsigned int>,
                std::vector<unsigned int>>
     convert_guessed_ranks_and_indices_to_crs(
-      const std::vector<std::pair<unsigned int, unsigned int>>
-        &ranks_and_indices)
+      std::vector<std::pair<unsigned int, unsigned int>> &ranks_and_indices)
     {
       std::sort(ranks_and_indices.begin(), ranks_and_indices.end());
 
