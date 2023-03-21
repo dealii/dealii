@@ -133,7 +133,10 @@ namespace parallel
    * module.
    */
   template <typename InputIterator, typename OutputIterator, typename Function>
-  DEAL_II_CXX20_REQUIRES((std::invocable<Function, InputIterator>))
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Function, InputIterator> &&
+     std::convertible_to<std::invoke_result_t<Function, InputIterator>,
+                         decltype(*std::declval<OutputIterator>())>))
   void transform(const InputIterator &begin_in,
                  const InputIterator &end_in,
                  OutputIterator       out,
@@ -193,7 +196,10 @@ namespace parallel
             typename OutputIterator,
             typename Function>
   DEAL_II_CXX20_REQUIRES(
-    (std::invocable<Function, InputIterator1, InputIterator2>))
+    (std::invocable<Function, InputIterator1, InputIterator2> &&
+     std::convertible_to<
+       std::invoke_result_t<Function, InputIterator1, InputIterator2>,
+       decltype(*std::declval<OutputIterator>())>))
   void transform(const InputIterator1 &begin_in1,
                  const InputIterator1 &end_in1,
                  InputIterator2        in2,
@@ -256,7 +262,12 @@ namespace parallel
             typename OutputIterator,
             typename Function>
   DEAL_II_CXX20_REQUIRES(
-    (std::invocable<Function, InputIterator1, InputIterator2, InputIterator3>))
+    (std::invocable<Function, InputIterator1, InputIterator2, InputIterator3> &&
+     std::convertible_to<std::invoke_result_t<Function,
+                                              InputIterator1,
+                                              InputIterator2,
+                                              InputIterator3>,
+                         decltype(*std::declval<OutputIterator>())>))
   void transform(const InputIterator1 &begin_in1,
                  const InputIterator1 &end_in1,
                  InputIterator2        in2,
@@ -528,7 +539,10 @@ namespace parallel
    * module.
    */
   template <typename ResultType, typename Iterator, typename Function>
-  DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Function, Iterator, Iterator> &&
+     std::convertible_to<std::invoke_result_t<Function, Iterator, Iterator>,
+                         ResultType>))
   ResultType
     accumulate_from_subranges(const Function &                         f,
                               const Iterator &                         begin,
