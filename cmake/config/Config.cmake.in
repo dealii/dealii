@@ -20,7 +20,6 @@
 ##                                                                    ##
 ########################################################################
 
-
 #
 # General information
 #
@@ -44,7 +43,6 @@ set(DEAL_II_PROJECT_CONFIG_NAME "@DEAL_II_PROJECT_CONFIG_NAME@")
 
 set(DEAL_II_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
 set(DEAL_II_BUILD_TYPES "@DEAL_II_BUILD_TYPES@")
-
 
 #
 # Information about the project location
@@ -90,7 +88,6 @@ if(NOT ${DEAL_II_PACKAGE_NAME}_FIND_QUIETLY)
   endif()
 endif()
 
-
 #
 # Include all convenience macros:
 #
@@ -104,7 +101,6 @@ foreach(file ${_macro_files})
   endif()
   include(${file})
 endforeach()
-
 
 #
 # Compiler and linker configuration
@@ -131,18 +127,6 @@ set(DEAL_II_LINKER_FLAGS_DEBUG "@DEAL_II_LINKER_FLAGS_DEBUG@")
 # _additionally_ used for release targets:
 set(DEAL_II_LINKER_FLAGS_RELEASE "@DEAL_II_LINKER_FLAGS_RELEASE@")
 
-# used for all targets:
-set(DEAL_II_DEFINITIONS "@DEAL_II_DEFINITIONS@")
-set(DEAL_II_USER_DEFINITIONS "${DEAL_II_DEFINITIONS}")
-
-# _additionally_ used for debug targets:
-set(DEAL_II_DEFINITIONS_DEBUG "@DEAL_II_DEFINITIONS_DEBUG@")
-set(DEAL_II_USER_DEFINITIONS_DEBUG "${DEAL_II_DEFINITIONS_DEBUG}")
-
-# _additionally_ used for release targets:
-set(DEAL_II_DEFINITIONS_RELEASE "@DEAL_II_DEFINITIONS_RELEASE@")
-set(DEAL_II_USER_DEFINITIONS_RELEASE "${DEAL_II_DEFINITIONS_RELEASE}")
-
 #
 # MPI runtime:
 #
@@ -153,28 +137,42 @@ set(DEAL_II_MPIEXEC_PREFLAGS "@MPIEXEC_PREFLAGS@")
 set(DEAL_II_MPIEXEC_POSTFLAGS "@MPIEXEC_POSTFLAGS@")
 
 #
-# Information about include directories and libraries
-#
-
-# Full list of include directories:
-set(DEAL_II_INCLUDE_DIRS "@CONFIG_INCLUDE_DIRS@")
-
-# Full list of libraries for the debug target:
-set(DEAL_II_LIBRARIES_DEBUG "@CONFIG_LIBRARIES_DEBUG@")
-
-# Full list of libraries for the release target:
-set(DEAL_II_LIBRARIES_RELEASE "@CONFIG_LIBRARIES_RELEASE@")
-
-# Full list of libraries with "debug" and "optimized" keywords for easy use with TARGET_LINK_LIBRARIES:
-set(DEAL_II_LIBRARIES "@CONFIG_LIBRARIES@")
-
-
-#
 # Information about library targets and feature configuration
 #
 
-# The library targets file:
 set(DEAL_II_TARGET_CONFIG "${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake")
+
+#
+# We support a rather nonstandard situation where the find_package(deal.II)
+# call happens before proper setup of a toolchain via project(). The
+# reasoning behind this was to properly initialize the compiler in user
+# projects via the deal_ii_initialize_cached_variables():
+#
+#   find_package(deal.II)
+#   deal_ii_initialize_cached_variables()
+#   project(...)
+#   ...
+#   deal_ii_setup_target(...)
+#
+# This requires that the deal_ii_setup_target() loads the target
+# configuration because this has to happen after the call to project().
+#
+# Unfortunately _not_ automatically including all target definitions is
+# non-standard behavior and rather surprising. Therefore, in order to
+# support the modern way of searching for a dependency and using it:
+#
+#   project(...)
+#   find_package(deal.II)
+#   ...
+#   target_link_libraries(... dealii::dealii_[debug|release])
+#
+# we check whether project(... [CXX]) has been called prior to
+# find_package(deal.II) and if yes simply include our target configuration:
+#
+if(DEFINED CMAKE_CXX_COMPILER_ABI)
+  include(${DEAL_II_TARGET_CONFIG})
+  set(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+endif()
 
 # The Debug target:
 set(DEAL_II_TARGET_DEBUG "@CONFIG_TARGET_DEBUG@")

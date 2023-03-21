@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_unity_include_src
   affine_constraints.cc
   block_sparse_matrix.cc
@@ -192,5 +190,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/lac/*.h
   )
 
-deal_ii_add_library(obj_lac OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_lac "${_inst}")
+define_object_library(object_lac OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_lac "${_inst}")

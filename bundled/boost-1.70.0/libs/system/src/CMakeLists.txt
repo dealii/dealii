@@ -18,5 +18,5 @@ set(src_boost_system
   error_code.cpp
   )
 
-deal_ii_add_library(obj_boost_system OBJECT ${src_boost_system})
+define_object_library(bundled_boost_system OBJECT ${src_boost_system})
 

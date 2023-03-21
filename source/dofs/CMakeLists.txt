@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_unity_include_src
   block_info.cc
   dof_faces.cc
@@ -61,5 +59,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
   )
 
-deal_ii_add_library(obj_dofs OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_dofs "${_inst}")
+define_object_library(object_dofs OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_dofs "${_inst}")

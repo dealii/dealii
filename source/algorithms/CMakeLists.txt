@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   general_data_storage.cc
   operator.cc
@@ -29,5 +27,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/algorithms/*.h
   )
 
-deal_ii_add_library(obj_algorithms OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_algorithms "${_inst}")
+define_object_library(object_algorithms OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_algorithms "${_inst}")

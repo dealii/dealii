@@ -27,5 +27,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/trilinos/*.h
   )
 
-deal_ii_add_library(obj_trilinos OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_trilinos "${_inst}")
+define_object_library(object_trilinos OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_trilinos "${_inst}")

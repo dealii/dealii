@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 #
 # All source/base files are sufficiently small that they may be added to the
 # unity build file (see the developer documentation on DEAL_II_UNITY_BUILD
@@ -155,7 +153,7 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
   )
 
-deal_ii_add_library(obj_base OBJECT ${_src} ${_header} ${_inst}
+define_object_library(object_base OBJECT ${_src} ${_header} ${_inst}
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   )
-expand_instantiations(obj_base "${_inst}")
+expand_instantiations(object_base "${_inst}")

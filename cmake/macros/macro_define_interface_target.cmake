@@ -114,17 +114,19 @@ function(define_interface_target _feature)
     separate_arguments(_compile_options UNIX_COMMAND
       "${${_feature}_CXX_FLAGS} ${${_feature}_CXX_FLAGS_${_build}}"
       )
+    shell_escape_option_groups(_compile_options)
     if(NOT "${_compile_options}" STREQUAL "")
       message(STATUS "    COMPILE_OPTIONS:     ${_compile_options}")
-      target_compile_options(${_interface_target} INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>)
+      target_compile_options(${_interface_target} INTERFACE ${_compile_options})
     endif()
 
     separate_arguments(_link_options UNIX_COMMAND
       "${${_feature}_LINKER_FLAGS} ${${_feature}_LINKER_FLAGS_${_build}}"
       )
+    shell_escape_option_groups(_link_options)
     if(NOT "${_link_options}" STREQUAL "")
       message(STATUS "    LINK_OPTIONS:        ${_link_options}")
-      target_link_options(${_interface_target} INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${_link_options}>)
+      target_link_options(${_interface_target} INTERFACE ${_link_options})
     endif()
 
     export(TARGETS ${_interface_target}

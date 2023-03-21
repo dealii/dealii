@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_unity_include_src
   fe_collection.cc
   fe_values.cc
@@ -45,5 +43,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/hp/*.h
   )
 
-deal_ii_add_library(obj_hp OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_hp "${_inst}")
+define_object_library(object_hp OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_hp "${_inst}")

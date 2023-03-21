@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 #
 # Work around an issue where gcc emits a note that the warning
 # -Wmisleading-indentation will be disabled due to a humongous line of over
@@ -30,7 +28,6 @@ if(DEAL_II_WITH_CGAL)
     APPEND_STRING PROPERTY COMPILE_FLAGS " ${_flag}"
     )
 endif()
-
 
 set(_unity_include_src
   cell_id.cc
@@ -97,5 +94,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
   )
 
-deal_ii_add_library(obj_grid OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_grid "${_inst}")
+define_object_library(object_grid OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_grid "${_inst}")

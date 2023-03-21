@@ -122,24 +122,24 @@ macro(process_feature _feature)
     elseif("${_arg}" STREQUAL "OPTIONAL")
       set(_required FALSE)
 
-    elseif(_arg MATCHES "^(optimized|debug|general)$"
-            AND "${_current_suffix}" STREQUAL "LIBRARIES")
-      list(APPEND _temp_${_current_suffix} ${_arg})
-
     else()
       if ("${_current_suffix}" STREQUAL "")
         message(FATAL_ERROR
           "Internal configuration error: the second "
           "argument to process_feature must be a keyword"
           )
+      elseif(_arg MATCHES "^(optimized|debug|general)$")
+        message(FATAL_ERROR
+          "Internal configuration error: process_feature() does not support "
+          "»debug«, »optimized«, or »general« library identifiers, use the "
+          "appropriate keyword instead."
+          )
       endif()
 
       mark_as_advanced(${_arg})
 
       if("${_current_suffix}" STREQUAL "CLEAR")
-        if(NOT _arg MATCHES "^(optimized|debug|general)$")
-          list(APPEND _clear_variables_list ${_arg})
-        endif()
+        list(APPEND _clear_variables_list ${_arg})
 
       else()
 

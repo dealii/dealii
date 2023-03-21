@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   ad_drivers.cc
   ad_helpers.cc
@@ -38,5 +36,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/ad/*.h
   )
 
-deal_ii_add_library(obj_differentiation_ad OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_differentiation_ad "${_inst}")
+define_object_library(object_differentiation_ad OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_differentiation_ad "${_inst}")

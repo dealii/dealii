@@ -27,36 +27,33 @@ function(insource_setup_target _target _build)
   string(TOLOWER ${_build} _build_lowercase)
 
   set_target_properties(${_target} PROPERTIES
-    LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
     LINKER_LANGUAGE "CXX"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
+
+  separate_arguments(_compile_options UNIX_COMMAND
+    "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+    )
+  shell_escape_option_groups(_compile_options)
+  target_compile_options(${_target} PRIVATE ${_compile_options})
+
+  get_property(_type TARGET ${_target} PROPERTY TYPE)
+  if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
+    separate_arguments(_link_options UNIX_COMMAND
+      "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+      )
+    shell_escape_option_groups(_link_options)
+    target_link_options(${_target} PRIVATE ${_link_options})
+  endif()
 
   target_include_directories(${_target}
     PRIVATE
       "${CMAKE_BINARY_DIR}/include"
       "${CMAKE_SOURCE_DIR}/include"
-    )
-  target_include_directories(${_target}
-    SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS} ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-    )
-
-  set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-
-  # Make sure some CUDA warning flags don't get deduplicated
-  string(REGEX REPLACE "(-Xcudafe --diag_suppress=[^ ]+)" "\"SHELL:\\1\"" _flags ${_flags})
-
-  separate_arguments(_flags UNIX_COMMAND ${_flags})
-
-  target_compile_options(${_target} PUBLIC ${_flags})
-
-  target_compile_definitions(${_target}
-    PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+    SYSTEM PRIVATE
+      ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+      ${DEAL_II_INCLUDE_DIRS}
     )
 
-  get_property(_type TARGET ${_target} PROPERTY TYPE)
-  if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
-    target_link_libraries(${_target} ${DEAL_II_NAMESPACE}_${_build_lowercase})
-  endif()
-
+  target_link_libraries(${_target} ${DEAL_II_NAMESPACE}_${_build_lowercase})
 endfunction()

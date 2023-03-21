@@ -89,14 +89,14 @@ set(src_tbb
   tbb/tbb_thread.cpp
   tbb/x86_rtm_rw_mutex.cpp
   )
-deal_ii_add_library(obj_tbb OBJECT ${src_tbb})
+define_object_library(bundled_tbb OBJECT ${src_tbb})
 
 #
 # Add necessary definitions:
 #
 
-deal_ii_add_definitions(obj_tbb "__TBB_BUILD=1")
-deal_ii_add_definitions(obj_tbb "USE_PTHREAD")
+deal_ii_add_definitions(bundled_tbb "__TBB_BUILD=1")
+deal_ii_add_definitions(bundled_tbb "USE_PTHREAD")
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  deal_ii_add_definitions(obj_tbb "DO_ITT_NOTIFY")
+  deal_ii_add_definitions(bundled_tbb "DO_ITT_NOTIFY")
 endif()

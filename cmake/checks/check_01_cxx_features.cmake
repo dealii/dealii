@@ -47,8 +47,9 @@
 macro(_set_up_cmake_required)
   reset_cmake_required()
   set(CMAKE_REQUIRED_FLAGS "")
-  add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED}")
+  add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_WARNING_FLAGS}")
   add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
+  add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED}")
 endmacro()
 
 

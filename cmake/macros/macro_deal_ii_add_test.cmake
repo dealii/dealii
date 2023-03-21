@@ -455,7 +455,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         set_target_properties(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
         deal_ii_setup_target(${_target} ${_build})
-        target_link_libraries(${_target}
+        target_link_libraries(${_target} PUBLIC
           ${TEST_LIBRARIES} ${TEST_LIBRARIES_${_build}}
           )
 

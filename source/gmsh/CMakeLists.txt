@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   utilities.cc
   )
@@ -27,5 +25,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/gmsh/*.h
   )
 
-deal_ii_add_library(obj_gmsh OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_gmsh "${_inst}")
+define_object_library(object_gmsh OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_gmsh "${_inst}")

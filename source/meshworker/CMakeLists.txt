@@ -13,8 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   mesh_worker.cc
   mesh_worker_info.cc
@@ -32,5 +30,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/meshworker/*.h
   )
 
-deal_ii_add_library(obj_meshworker OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_meshworker "${_inst}")
+define_object_library(object_meshworker OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_meshworker "${_inst}")
