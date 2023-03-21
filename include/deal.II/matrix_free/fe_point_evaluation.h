@@ -970,15 +970,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const EvaluationFlags::EvaluationFlags &evaluation_flag)
 {
   if (!is_reinitialized)
-    {
-      const_cast<unsigned int &>(n_q_points) =
-        mapping_info->get_unit_points(current_cell_index, current_face_number)
-          .size();
-      if (update_flags & update_values)
-        values.resize(n_q_points, numbers::signaling_nan<value_type>());
-      if (update_flags & update_gradients)
-        gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
-    }
+    reinit(numbers::invalid_unsigned_int);
 
   if (n_q_points == 0)
     return;
@@ -1121,15 +1113,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
   if (!is_reinitialized)
-    {
-      const_cast<unsigned int &>(n_q_points) =
-        mapping_info->get_unit_points(current_cell_index, current_face_number)
-          .size();
-      if (update_flags & update_values)
-        values.resize(n_q_points, numbers::signaling_nan<value_type>());
-      if (update_flags & update_gradients)
-        gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
-    }
+    reinit(numbers::invalid_unsigned_int);
 
   if (n_q_points == 0) // no evaluation points provided
     {
