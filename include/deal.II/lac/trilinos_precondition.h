@@ -69,7 +69,8 @@ namespace TrilinosWrappers
   class SolverBase;
 
   /**
-   * The base class for all preconditioners based on Trilinos sparse matrices.
+   * The abstract base class for all preconditioners based on Trilinos sparse
+   * matrices.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -85,26 +86,12 @@ namespace TrilinosWrappers
     /**
      * Standardized data struct to pipe additional flags to the
      * preconditioner.
+     *
+     * @deprecated This struct is unused and can be safely removed from user
+     *  code.
      */
-    struct AdditionalData
+    struct DEAL_II_DEPRECATED AdditionalData
     {};
-
-    /**
-     * Constructor. Does not do anything. The <tt>initialize</tt> function of
-     * the derived classes will have to create the preconditioner from a given
-     * sparse matrix.
-     */
-    PreconditionBase();
-
-    /**
-     * Copy constructor.
-     */
-    PreconditionBase(const PreconditionBase &);
-
-    /**
-     * Destructor.
-     */
-    ~PreconditionBase() override = default;
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
@@ -227,6 +214,13 @@ namespace TrilinosWrappers
 
   protected:
     /**
+     * Constructor. Does not do anything. The <tt>initialize</tt> function of
+     * the derived classes will have to create the preconditioner from a given
+     * sparse matrix.
+     */
+    PreconditionBase() = default;
+
+    /**
      * This is a pointer to the preconditioner object that is used when
      * applying the preconditioner.
      */
@@ -236,7 +230,7 @@ namespace TrilinosWrappers
      * Internal communication pattern in case the matrix needs to be copied
      * from deal.II format.
      */
-    Epetra_MpiComm communicator;
+    Epetra_MpiComm communicator{MPI_COMM_SELF};
 
     /**
      * Internal Trilinos map in case the matrix needs to be copied from
