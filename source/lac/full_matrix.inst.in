@@ -17,8 +17,6 @@
 
 for (S : REAL_AND_COMPLEX_SCALARS)
   {
-    template class FullMatrix<S>;
-
     template void FullMatrix<S>::print(LogStream &,
                                        const unsigned int,
                                        const unsigned int) const;
