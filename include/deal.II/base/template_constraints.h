@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/complex_overloads.h>
+#include <deal.II/base/std_cxx20/type_traits.h>
 
 #include <complex>
 #include <type_traits>
@@ -333,70 +334,15 @@ constexpr bool has_begin_and_end =
   internal::is_supported_operation<begin_and_end_t, T>;
 
 
-
 /**
- * A template class that simply exports its template argument as a local
- * alias. This class, while at first appearing useless, makes sense in the
- * following context: if you have a function template as follows:
- * @code
- * template <typename T>
- * void f(T, T);
- * @endcode
- * then it can't be called in an expression like <code>f(1, 3.141)</code>
- * because the type <code>T</code> of the template can not be deduced in a
- * unique way from the types of the arguments. However, if the template is
- * written as
- * @code
- * template <typename T>
- * void f(T, typename identity<T>::type);
- * @endcode
- * then the call becomes valid: the type <code>T</code> is not deducible from
- * the second argument to the function, so only the first argument
- * participates in template type resolution.
+ * A `using` declaration to make the
+ * [std::identity_type](https://en.cppreference.com/w/cpp/types/type_identity)
+ * class available under the name that deal.II has used for a long time.
  *
- * The context for this feature is as follows: consider
- * @code
- * template <typename RT, typename A>
- * void forward_call(RT (*p) (A), A a)
- * {
- *   p(a);
- * }
- *
- * void h (double);
- *
- * void g()
- * {
- *   forward_call(&h, 1);
- * }
- * @endcode
- * This code fails to compile because the compiler can't decide whether the
- * template type <code>A</code> should be <code>double</code> (from the
- * signature of the function given as first argument to
- * <code>forward_call</code>, or <code>int</code> because the expression
- * <code>1</code> has that type. Of course, what we would like the compiler to
- * do is simply cast the <code>1</code> to <code>double</code>. We can achieve
- * this by writing the code as follows:
- * @code
- * template <typename RT, typename A>
- * void forward_call(RT (*p) (A), typename identity<A>::type a)
- * {
- *   p(a);
- * }
- *
- * void h (double);
- *
- * void g()
- * {
- *   forward_call(&h, 1);
- * }
- * @endcode
+ * @deprecated Use `std_cxx20::identity_type` instead.
  */
 template <typename T>
-struct identity
-{
-  using type = T;
-};
-
+using identity = std_cxx20::type_identity<T>;
 
 
 /**
