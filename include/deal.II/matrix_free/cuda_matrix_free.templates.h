@@ -240,8 +240,9 @@ namespace CUDAWrappers
       Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
       Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>
         inv_jacobian;
-      std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-        constraint_mask_host;
+      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                   MemorySpace::Default::kokkos_space>
+        constraint_mask;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
       FEValues<dim>                        fe_values;
@@ -380,7 +381,11 @@ namespace CUDAWrappers
             n_cells,
             dofs_per_cell);
 
-      constraint_mask_host.resize(n_cells);
+      // Initialize to zero, i.e., unconstrained cell
+      constraint_mask =
+        Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                     MemorySpace::Default::kokkos_space>(
+          "constraint_mask_" + std::to_string(color), n_cells);
     }
 
 
@@ -404,6 +409,10 @@ namespace CUDAWrappers
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
 
+      // FIXME too many deep_copy
+      auto constraint_mask_host =
+        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
+                                            constraint_mask);
       const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
         cell_id_view(constraint_mask_host[cell_id]);
 
@@ -412,6 +421,7 @@ namespace CUDAWrappers
                                       {lexicographic_inv},
                                       lexicographic_dof_indices,
                                       cell_id_view);
+      Kokkos::deep_copy(constraint_mask, constraint_mask_host);
 
       // FIXME too many deep_copy
       auto local_to_global_host =
@@ -491,11 +501,7 @@ namespace CUDAWrappers
           data->inv_jacobian[color] = inv_jacobian;
         }
 
-      alloc_and_copy(
-        &data->constraint_mask[color],
-        ArrayView<const dealii::internal::MatrixFreeFunctions::ConstraintKinds>(
-          constraint_mask_host.data(), constraint_mask_host.size()),
-        n_cells);
+      data->constraint_mask[color] = constraint_mask;
     }
 
 
@@ -718,10 +724,6 @@ namespace CUDAWrappers
   void
   MatrixFree<dim, Number>::free()
   {
-    for (auto &constraint_mask_color_ptr : constraint_mask)
-      Utilities::CUDA::free(constraint_mask_color_ptr);
-    constraint_mask.clear();
-
     internal::used_objects[my_id].store(false);
     my_id = -1;
   }

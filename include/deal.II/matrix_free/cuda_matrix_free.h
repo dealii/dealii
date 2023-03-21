@@ -221,7 +221,9 @@ namespace CUDAWrappers
       /**
        * Mask deciding where constraints are set on a given cell.
        */
-      dealii::internal::MatrixFreeFunctions::ConstraintKinds *constraint_mask;
+      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                   MemorySpace::Default::kokkos_space>
+        constraint_mask;
 
       /**
        * If true, use graph coloring has been used and we can simply add into
@@ -544,7 +546,9 @@ namespace CUDAWrappers
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds *>
+    std::vector<
+      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                   MemorySpace::Default::kokkos_space>>
       constraint_mask;
 
     /**
@@ -782,8 +786,9 @@ namespace CUDAWrappers
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-      constraint_mask;
+    typename Kokkos::View<
+      dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+      MemorySpace::Default::kokkos_space>::HostMirror constraint_mask;
 
     /**
      * If true, use graph coloring has been used and we can simply add into
@@ -837,9 +842,8 @@ namespace CUDAWrappers
         Kokkos::deep_copy(data_host.JxW, data.JxW);
       }
 
-    data_host.constraint_mask.resize(data_host.n_cells);
-    Utilities::CUDA::copy_to_host(data.constraint_mask,
-                                  data_host.constraint_mask);
+    data_host.constraint_mask = Kokkos::create_mirror(data.constraint_mask);
+    Kokkos::deep_copy(data_host.constraint_mask, data.constraint_mask);
 
     return data_host;
   }
