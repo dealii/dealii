@@ -607,7 +607,6 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::MatrixFree()
     : my_id(-1)
     , n_dofs(0)
-    , constrained_dofs(nullptr)
     , padding_length(0)
     , dof_handler(nullptr)
   {}
@@ -723,8 +722,6 @@ namespace CUDAWrappers
       Utilities::CUDA::free(constraint_mask_color_ptr);
     constraint_mask.clear();
 
-    Utilities::CUDA::free(constrained_dofs);
-
     internal::used_objects[my_id].store(false);
     my_id = -1;
   }
@@ -744,7 +741,7 @@ namespace CUDAWrappers
            ExcMessage("src and dst vectors have different size."));
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
     // work-around can be removed.
-    types::global_dof_index *constr_dofs = constrained_dofs;
+    auto               constr_dofs = constrained_dofs;
     const unsigned int size = internal::VectorLocalSize<VectorType>::get(dst);
     const Number *     src_ptr = src.get_values();
     Number *           dst_ptr = dst.get_values();
@@ -775,7 +772,7 @@ namespace CUDAWrappers
     Number *dst_ptr = dst.get_values();
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
     // work-around can be removed.
-    types::global_dof_index *constr_dofs = constrained_dofs;
+    auto constr_dofs = constrained_dofs;
     // When working with distributed vectors, the constrained dofs are
     // computed for ghosted vectors but we want to set the values of the
     // constrained dofs of non-ghosted vectors.
@@ -1144,17 +1141,17 @@ namespace CUDAWrappers
               }
           }
 
-        cuda_error = cudaMalloc(&constrained_dofs,
-                                n_constrained_dofs *
-                                  sizeof(dealii::types::global_dof_index));
-        AssertCuda(cuda_error);
+        constrained_dofs = Kokkos::View<types::global_dof_index *,
+                                        MemorySpace::Default::kokkos_space>(
+          Kokkos::view_alloc("constrained_dofs", Kokkos::WithoutInitializing),
+          n_constrained_dofs);
 
-        cuda_error = cudaMemcpy(constrained_dofs,
-                                constrained_dofs_host.data(),
-                                n_constrained_dofs *
-                                  sizeof(dealii::types::global_dof_index),
-                                cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+        Kokkos::View<types::global_dof_index *,
+                     MemorySpace::Default::kokkos_space,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+          constrained_dofs_host_view(constrained_dofs_host.data(),
+                                     constrained_dofs_host.size());
+        Kokkos::deep_copy(constrained_dofs, constrained_dofs_host_view);
       }
   }
 

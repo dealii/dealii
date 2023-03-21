@@ -536,9 +536,10 @@ namespace CUDAWrappers
       JxW;
 
     /**
-     * Pointer to the constrained degrees of freedom.
+     * Kokkos::View to the constrained degrees of freedom.
      */
-    types::global_dof_index *constrained_dofs;
+    Kokkos::View<types::global_dof_index *, MemorySpace::Default::kokkos_space>
+      constrained_dofs;
 
     /**
      * Mask deciding where constraints are set on a given cell.
