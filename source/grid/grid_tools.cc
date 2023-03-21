@@ -5962,7 +5962,6 @@ namespace GridTools
 
   namespace internal
   {
-    template <int spacedim>
     std::tuple<std::vector<unsigned int>,
                std::vector<unsigned int>,
                std::vector<unsigned int>>
