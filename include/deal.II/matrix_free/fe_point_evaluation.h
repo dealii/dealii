@@ -759,14 +759,14 @@ private:
   unsigned int current_face_number;
 
   /**
-   * The reference points specified at reinit().
-   */
-  ArrayView<const Point<dim>> unit_points;
-
-  /**
    * Bool indicating if fast path is chosen.
    */
   bool fast_path;
+
+  /**
+   * Bool indicating if class is reinitialized and data vectors a resized.
+   */
+  bool is_reinitialized;
 };
 
 // ----------------------- template and inline function ----------------------
@@ -788,6 +788,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , mapping_info(mapping_info_on_the_fly.get())
   , current_cell_index(numbers::invalid_unsigned_int)
   , current_face_number(numbers::invalid_unsigned_int)
+  , is_reinitialized(false)
 {
   setup(first_selected_component);
 }
@@ -806,6 +807,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , mapping_info(&mapping_info)
   , current_cell_index(numbers::invalid_unsigned_int)
   , current_face_number(numbers::invalid_unsigned_int)
+  , is_reinitialized(false)
 {
   setup(first_selected_component);
 }
@@ -904,14 +906,14 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
       fe_values->reinit(cell);
     }
 
-  this->unit_points = unit_points;
-
   const_cast<unsigned int &>(n_q_points) = unit_points.size();
 
   if (update_flags & update_values)
     values.resize(n_q_points, numbers::signaling_nan<value_type>());
   if (update_flags & update_gradients)
     gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
+
+  is_reinitialized = true;
 }
 
 
@@ -927,6 +929,13 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   const_cast<unsigned int &>(n_q_points) =
     mapping_info->get_unit_points(current_cell_index, current_face_number)
       .size();
+
+  if (update_flags & update_values)
+    values.resize(n_q_points, numbers::signaling_nan<value_type>());
+  if (update_flags & update_gradients)
+    gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
+
+  is_reinitialized = true;
 }
 
 
@@ -943,6 +952,13 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   const_cast<unsigned int &>(n_q_points) =
     mapping_info->get_unit_points(current_cell_index, current_face_number)
       .size();
+
+  if (update_flags & update_values)
+    values.resize(n_q_points, numbers::signaling_nan<value_type>());
+  if (update_flags & update_gradients)
+    gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
+
+  is_reinitialized = true;
 }
 
 
@@ -953,20 +969,18 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const ArrayView<const Number> &         solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flag)
 {
-  const bool precomputed_mapping = mapping_info_on_the_fly.get() == nullptr;
-  if (precomputed_mapping)
+  if (!is_reinitialized)
     {
-      unit_points =
-        mapping_info->get_unit_points(current_cell_index, current_face_number);
-
+      const_cast<unsigned int &>(n_q_points) =
+        mapping_info->get_unit_points(current_cell_index, current_face_number)
+          .size();
       if (update_flags & update_values)
-        values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
+        values.resize(n_q_points, numbers::signaling_nan<value_type>());
       if (update_flags & update_gradients)
-        gradients.resize(unit_points.size(),
-                         numbers::signaling_nan<gradient_type>());
+        gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
     }
 
-  if (unit_points.size() == 0)
+  if (n_q_points == 0)
     return;
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
@@ -989,8 +1003,11 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
 
       // unit gradients are currently only implemented with the fast tensor
       // path
-      unit_gradients.resize(unit_points.size(),
+      unit_gradients.resize(n_q_points,
                             numbers::signaling_nan<gradient_type>());
+
+      const auto unit_points =
+        mapping_info->get_unit_points(current_cell_index, current_face_number);
 
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<Number>::size();
@@ -1049,7 +1066,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
 
       if (evaluation_flag & EvaluationFlags::values)
         {
-          values.resize(unit_points.size());
+          values.resize(n_q_points);
           std::fill(values.begin(), values.end(), value_type());
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
@@ -1057,12 +1074,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components, Number>::access(
                         values[q], d) += fe_values->shape_value(i, q) * value;
                 else if (nonzero_shape_function_component[i][d])
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components, Number>::access(
                         values[q], d) +=
@@ -1072,7 +1089,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
 
       if (evaluation_flag & EvaluationFlags::gradients)
         {
-          gradients.resize(unit_points.size());
+          gradients.resize(n_q_points);
           std::fill(gradients.begin(), gradients.end(), gradient_type());
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
@@ -1080,12 +1097,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components, Number>::access(
                         gradients[q], d) += fe_values->shape_grad(i, q) * value;
                 else if (nonzero_shape_function_component[i][d])
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components, Number>::access(
                         gradients[q], d) +=
@@ -1103,20 +1120,18 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const ArrayView<Number> &               solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
-  const bool precomputed_mapping = mapping_info_on_the_fly.get() == nullptr;
-  if (precomputed_mapping)
+  if (!is_reinitialized)
     {
-      unit_points =
-        mapping_info->get_unit_points(current_cell_index, current_face_number);
-
+      const_cast<unsigned int &>(n_q_points) =
+        mapping_info->get_unit_points(current_cell_index, current_face_number)
+          .size();
       if (update_flags & update_values)
-        values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
+        values.resize(n_q_points, numbers::signaling_nan<value_type>());
       if (update_flags & update_gradients)
-        gradients.resize(unit_points.size(),
-                         numbers::signaling_nan<gradient_type>());
+        gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
     }
 
-  if (unit_points.size() == 0) // no evaluation points provided
+  if (n_q_points == 0) // no evaluation points provided
     {
       std::fill(solution_values.begin(), solution_values.end(), 0.0);
       return;
@@ -1130,9 +1145,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
       // fast path with tensor product integration
 
       if (integration_flags & EvaluationFlags::values)
-        AssertIndexRange(unit_points.size(), values.size() + 1);
+        AssertIndexRange(n_q_points, values.size() + 1);
       if (integration_flags & EvaluationFlags::gradients)
-        AssertIndexRange(unit_points.size(), gradients.size() + 1);
+        AssertIndexRange(n_q_points, gradients.size() + 1);
 
       if (solution_renumbered_vectorized.size() != dofs_per_component)
         solution_renumbered_vectorized.resize(dofs_per_component);
@@ -1142,6 +1157,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           dim,
           n_components,
           VectorizedArray<Number>>::value_type());
+
+      const auto unit_points =
+        mapping_info->get_unit_points(current_cell_index, current_face_number);
 
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<Number>::size();
@@ -1219,20 +1237,20 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
 
       if (integration_flags & EvaluationFlags::values)
         {
-          AssertIndexRange(unit_points.size(), values.size() + 1);
+          AssertIndexRange(n_q_points, values.size() + 1);
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     solution_values[i] +=
                       fe_values->shape_value(i, q) *
                       internal::FEPointEvaluation::
                         EvaluatorTypeTraits<dim, n_components, Number>::access(
                           values[q], d);
                 else if (nonzero_shape_function_component[i][d])
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     solution_values[i] +=
                       fe_values->shape_value_component(i, q, d) *
                       internal::FEPointEvaluation::
@@ -1243,20 +1261,20 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
 
       if (integration_flags & EvaluationFlags::gradients)
         {
-          AssertIndexRange(unit_points.size(), gradients.size() + 1);
+          AssertIndexRange(n_q_points, gradients.size() + 1);
           for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
               for (unsigned int d = 0; d < n_components; ++d)
                 if (nonzero_shape_function_component[i][d] &&
                     (fe->is_primitive(i) || fe->is_primitive()))
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     solution_values[i] +=
                       fe_values->shape_grad(i, q) *
                       internal::FEPointEvaluation::
                         EvaluatorTypeTraits<dim, n_components, Number>::access(
                           gradients[q], d);
                 else if (nonzero_shape_function_component[i][d])
-                  for (unsigned int q = 0; q < unit_points.size(); ++q)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
                     solution_values[i] +=
                       fe_values->shape_grad_component(i, q, d) *
                       internal::FEPointEvaluation::
@@ -1315,7 +1333,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::submit_value(
   const value_type & value,
   const unsigned int point_index)
 {
-  AssertIndexRange(point_index, unit_points.size());
+  AssertIndexRange(point_index, n_q_points);
   values[point_index] = value;
 }
 
@@ -1327,7 +1345,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::submit_gradient(
   const gradient_type &gradient,
   const unsigned int   point_index)
 {
-  AssertIndexRange(point_index, unit_points.size());
+  AssertIndexRange(point_index, n_q_points);
   gradients[point_index] = gradient;
 }
 
@@ -1402,7 +1420,9 @@ inline Point<dim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::unit_point(
   const unsigned int point_index) const
 {
-  AssertIndexRange(point_index, unit_points.size());
+  AssertIndexRange(point_index, n_q_points);
+  const auto unit_points =
+    mapping_info->get_unit_points(current_cell_index, current_face_number);
   return unit_points[point_index];
 }
 
