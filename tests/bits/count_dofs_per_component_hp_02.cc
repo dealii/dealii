@@ -38,8 +38,6 @@
 // collection has more than one element
 
 
-using namespace std;
-
 template <int dim>
 void
 test()

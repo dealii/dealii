@@ -37,7 +37,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim, typename number, int spacedim>
 void

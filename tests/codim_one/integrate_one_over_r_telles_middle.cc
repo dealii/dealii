@@ -29,8 +29,6 @@
 
 #include "../base/simplex.h"
 
-using namespace std;
-
 // We test the integration of singular kernels with a singularity of kind 1/R
 // We multiply this function with a polynomial up to degree 6.
 
@@ -40,24 +38,25 @@ main()
   initlog();
   deallog << std::fixed;
 
-  deallog << endl
-          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]" << endl
+  deallog << std::endl
+          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]"
+          << std::endl
           << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being"
-          << endl
-          << "the distance from (x,y) to [0.5,0.5]." << endl
-          << endl;
+          << std::endl
+          << "the distance from (x,y) to [0.5,0.5]." << std::endl
+          << std::endl;
 
 
   Point<2> center(0.5, 0.5);
   for (unsigned int m = 1; m < 6; ++m)
     {
       deallog << " =========Quadrature Order: " << m
-              << " =============================== " << endl;
+              << " =============================== " << std::endl;
       deallog
         << " ============================================================ "
-        << endl;
+        << std::endl;
       deallog << " ===============Vertex: " << center
-              << " ============================= " << endl;
+              << " ============================= " << std::endl;
       QTelles<2>        quad(4 * m, center);
       QGaussOneOverR<2> quad_2(m, center, true);
 

@@ -29,20 +29,20 @@
 
 #include "../base/simplex.h"
 
-using namespace std;
-
 int
 main()
 {
   initlog();
   deallog << std::fixed;
 
-  deallog << endl
-          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]" << endl
+  deallog << std::endl
+          << "Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]"
+          << std::endl
           << "for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being"
-          << endl
-          << "the distance from (x,y) to four vertices of the square." << endl
-          << endl;
+          << std::endl
+          << "the distance from (x,y) to four vertices of the square."
+          << std::endl
+          << std::endl;
 
 
   std::vector<Point<2>> vertices = FE_Q<2>(1).get_unit_support_points();
@@ -50,14 +50,14 @@ main()
   for (unsigned int m = 1; m < 7; ++m)
     {
       deallog << " =========Quadrature Order: " << m
-              << " =============================== " << endl;
+              << " =============================== " << std::endl;
       deallog
         << " ============================================================ "
-        << endl;
+        << std::endl;
       unsigned int index = 0;
       {
         deallog << " ===============Vertex: " << vertices[index]
-                << " ============================= " << endl;
+                << " ============================= " << std::endl;
         QTelles<2>        quad(m, vertices[index]);
         QGaussOneOverR<2> quad2(m, vertices[index]);
 

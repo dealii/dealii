@@ -35,7 +35,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 void
 log_vector(const std::vector<std::vector<types::global_dof_index>> &count)

@@ -43,8 +43,6 @@
 
 #include <string>
 
-using namespace std;
-
 // Returns the following integral: /int_0^1 x^N * ln(|x-point|/alpha) dx
 double
 log_integral(const unsigned int N, const double point, const double alpha);
@@ -58,7 +56,7 @@ main()
   deallog << std::setprecision(10);
 
 
-  vector<Point<1>> origins;
+  std::vector<Point<1>> origins;
   origins.push_back(Point<1>());
   origins.push_back(Point<1>(1.));
   origins.push_back(Point<1>(1. / 3.));
@@ -66,7 +64,7 @@ main()
   origins.push_back(Point<1>(1. / 5.));
   origins.push_back(Point<1>(3. / 5.));
 
-  vector<double> alphas;
+  std::vector<double> alphas;
   alphas.push_back(1.);
   alphas.push_back(1. / 3.);
   alphas.push_back(3. / 2.);
@@ -84,10 +82,10 @@ main()
               exact_integral =
                 log_integral(power, origins[nos][0], alphas[nas]);
               deallog << "=================================================="
-                      << endl;
+                      << std::endl;
               deallog << "int_0^1 x^" << power << " ln(|x-" << origins[nos]
                       << "|/" << alphas[nas] << ") = " << exact_integral
-                      << endl;
+                      << std::endl;
               for (unsigned int nq = 2; nq < 13; ++nq)
                 {
                   QGaussLogR<1> quad(nq, origins[nos], alphas[nas]);
@@ -127,11 +125,11 @@ main()
                     deallog
                       << ", difference between factored and unfactored: "
                       << std::abs(approx_integral - approx_integral_factored);
-                  deallog << endl;
+                  deallog << std::endl;
                 }
             }
           deallog << "=================================================="
-                  << endl;
+                  << std::endl;
         }
     }
 }

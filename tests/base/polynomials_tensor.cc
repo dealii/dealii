@@ -26,8 +26,6 @@
 
 #include "../tests.h"
 
-using namespace std;
-
 template <int dim, class PolynomialType>
 void
 check_point(const Point<dim> &x, const PolynomialType &p)

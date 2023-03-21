@@ -40,7 +40,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim, typename number, int spacedim>
 void
@@ -86,7 +86,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
   mgdof.distribute_dofs(fe);
   mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof);
-  const vector<types::global_dof_index> ndofs =
+  const std::vector<types::global_dof_index> ndofs =
     DoFTools::count_dofs_per_fe_block(mgdof);
 
   for (unsigned int l = 0; l < tr.n_levels(); ++l)
@@ -127,7 +127,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
   deallog << "u0\t" << (int)(u[0] * u[0] + .4) << std::endl
           << "u1\t" << (int)(u[1] * u[1] + .4) << std::endl
           << "u2\t" << (int)(u[2] * u[2] + .4) << std::endl;
-  // Now restrict the same vectors.
+  // Now restrict the same std::vectors.
   u[1] = 0.;
   u[0] = 0.;
   transfer.restrict_and_add(2, u[1], u[2]);
@@ -136,7 +136,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
           << "u0\t" << (int)(u[0] * u[0] + .5) << std::endl;
 
   // Check copy to mg and back
-  // Fill a global vector by counting
+  // Fill a global std::vector by counting
   // from one up
   BlockVector<double> v;
   v.reinit(ndofs);
@@ -153,7 +153,7 @@ check_select(const FiniteElement<dim> &fe, unsigned int selected)
   deallog << std::endl;
 
   // Now do the opposite: fill a
-  // multigrid vector counting the
+  // multigrid std::vector counting the
   // dofs and see where the numbers go
   for (unsigned int i = 0; i < u[2].size(); ++i)
     u[2](i) = i + 1;

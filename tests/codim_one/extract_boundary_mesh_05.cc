@@ -29,8 +29,6 @@
 
 #include "../tests.h"
 
-using namespace std;
-
 
 void
 test()
@@ -38,8 +36,8 @@ test()
   const unsigned int dim = 2;
 
   Triangulation<dim - 1, dim> boundary_mesh;
-  map<Triangulation<dim - 1, dim>::cell_iterator,
-      Triangulation<dim, dim>::face_iterator>
+  std::map<Triangulation<dim - 1, dim>::cell_iterator,
+           Triangulation<dim, dim>::face_iterator>
                      surface_to_volume_mapping;
   Triangulation<dim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);

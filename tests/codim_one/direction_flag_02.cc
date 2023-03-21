@@ -24,8 +24,6 @@
 
 #include "../tests.h"
 
-using namespace std;
-
 
 void
 test()
