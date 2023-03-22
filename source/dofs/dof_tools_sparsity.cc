@@ -790,7 +790,7 @@ namespace DoFTools
             // accumulation of sparsity pattern because this is
             // the only time this face is visited otherwise use an
             // artificial way to visit this face once
-            bool this_face_is_regular_for_neighbor =
+            const bool this_face_is_regular_for_neighbor =
               !periodic_neighbor ?
                 !cell->neighbor_is_coarser(face_n) :
                 !cell->periodic_neighbor_is_coarser(
