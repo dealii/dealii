@@ -775,7 +775,7 @@ namespace DoFTools
         // faces
         if (dim == 1)
           {
-            if ((neighbor->level() > cell->level()) // happens only in 1D
+            if ((neighbor->level() > cell->level())
                 || ((neighbor->level() == cell->level()) &&
                     (neighbor->index() >
                      cell->index())) // artificial way to visit once
