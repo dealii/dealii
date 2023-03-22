@@ -387,10 +387,10 @@ subsection Distributed Lagrange<1,2>
   set Embedded configuration finite element degree = 1
   set Embedded space finite element degree         = 1
   set Embedding space finite element degree        = 1
-  set Homogeneous Dirichlet boundary ids           = 0,1,2,3
+  set Dirichlet boundary ids                       = 0,1,2,3
   set Initial embedded space refinement            = 8
   set Initial embedding space refinement           = 4
-  set Local refinements steps near embedded domain = 4
+  set Local refinements steps near embedded domain = 2
   set Use displacement in embedded interface       = false
   set Verbosity level                              = 10
   subsection Embedded configuration
