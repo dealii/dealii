@@ -2239,54 +2239,46 @@ template class QWitherdenVincentSimplex<1>;
 template class QWitherdenVincentSimplex<2>;
 template class QWitherdenVincentSimplex<3>;
 
+#ifndef DOXYGEN
+template Quadrature<1>
+QSimplex<1>::compute_affine_transformation(
+  const std::array<Point<1>, 1 + 1> &vertices) const;
+
+template Quadrature<2>
+QSimplex<1>::compute_affine_transformation(
+  const std::array<Point<2>, 1 + 1> &vertices) const;
+
+template Quadrature<2>
+QSimplex<2>::compute_affine_transformation(
+  const std::array<Point<2>, 2 + 1> &vertices) const;
+
+template Quadrature<3>
+QSimplex<1>::compute_affine_transformation(
+  const std::array<Point<3>, 1 + 1> &vertices) const;
+
+template Quadrature<3>
+QSimplex<2>::compute_affine_transformation(
+  const std::array<Point<3>, 2 + 1> &vertices) const;
+
+template Quadrature<3>
+QSimplex<3>::compute_affine_transformation(
+  const std::array<Point<3>, 3 + 1> &vertices) const;
+
+template Quadrature<3>
+QSimplex<1>::mapped_quadrature(
+  const std::vector<std::array<Point<3>, 1 + 1>> &simplices) const;
+
+template Quadrature<2>
+QSimplex<2>::mapped_quadrature(
+  const std::vector<std::array<Point<2>, 2 + 1>> &simplices) const;
+
+template Quadrature<3>
+QSimplex<2>::mapped_quadrature(
+  const std::vector<std::array<Point<3>, 2 + 1>> &simplices) const;
+
+template Quadrature<3>
+QSimplex<3>::mapped_quadrature(
+  const std::vector<std::array<Point<3>, 3 + 1>> &simplices) const;
+#endif
+
 DEAL_II_NAMESPACE_CLOSE
-
-namespace dealii
-{
-  template Quadrature<1>
-  QSimplex<1>::compute_affine_transformation(
-    const std::array<Point<1>, 1 + 1> &vertices) const;
-
-  template Quadrature<2>
-  QSimplex<1>::compute_affine_transformation(
-    const std::array<Point<2>, 1 + 1> &vertices) const;
-
-  template Quadrature<2>
-  QSimplex<2>::compute_affine_transformation(
-    const std::array<Point<2>, 2 + 1> &vertices) const;
-
-  template Quadrature<3>
-  QSimplex<1>::compute_affine_transformation(
-    const std::array<Point<3>, 1 + 1> &vertices) const;
-
-  template Quadrature<3>
-  QSimplex<2>::compute_affine_transformation(
-    const std::array<Point<3>, 2 + 1> &vertices) const;
-
-  template Quadrature<3>
-  QSimplex<3>::compute_affine_transformation(
-    const std::array<Point<3>, 3 + 1> &vertices) const;
-} // namespace dealii
-
-namespace dealii
-{
-  template Quadrature<2>
-  QSimplex<1>::mapped_quadrature(
-    const std::vector<std::array<Point<2>, 1 + 1>> &simplices) const;
-
-  template Quadrature<3>
-  QSimplex<1>::mapped_quadrature(
-    const std::vector<std::array<Point<3>, 1 + 1>> &simplices) const;
-
-  template Quadrature<2>
-  QSimplex<2>::mapped_quadrature(
-    const std::vector<std::array<Point<2>, 2 + 1>> &simplices) const;
-
-  template Quadrature<3>
-  QSimplex<2>::mapped_quadrature(
-    const std::vector<std::array<Point<3>, 2 + 1>> &simplices) const;
-
-  template Quadrature<3>
-  QSimplex<3>::mapped_quadrature(
-    const std::vector<std::array<Point<3>, 3 + 1>> &simplices) const;
-} // namespace dealii
