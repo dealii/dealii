@@ -81,10 +81,13 @@ macro(_test_cxx20_support)
     #  error \"insufficient support for C++20\"
     #endif
 
-    #if !(defined __cpp_type_identity) || (__cpp_lib_type_identity < 201806)
-    #  error \"insufficient support for C++20\"
+    #if !(defined __cpp_lib_type_identity)
+    #  error \"insufficient support for C++20: __cpp_lib_type_identity not defined\"
     #endif
 
+    #if !(defined __cpp_lib_type_identity) || (__cpp_lib_type_identity < 201806)
+    #  error \"insufficient support for C++20: __cpp_lib_type_identity is too old \"
+    #endif
 
     // Test concepts and requires clauses
     template <int dim, int spacedim>
