@@ -104,17 +104,6 @@ namespace CUDAWrappers
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
 
     /**
-     * Parallelization scheme used: parallel_in_elem (parallelism at the level
-     * of degrees of freedom) or parallel_over_elem (parallelism at the level of
-     * cells)
-     */
-    enum ParallelizationScheme
-    {
-      parallel_in_elem,
-      parallel_over_elem
-    };
-
-    /**
      * Standardized data struct to pipe additional data to MatrixFree.
      */
     struct AdditionalData

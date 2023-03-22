@@ -134,67 +134,6 @@ namespace CUDAWrappers
       return global_co_shape_gradients_f[i];
     }
 
-    template <typename Number>
-    using CUDAVector = ::dealii::LinearAlgebra::CUDAWrappers::Vector<Number>;
-
-    /**
-     * Transpose a N x M matrix stored in a one-dimensional array to a M x N
-     * matrix stored in a one-dimensional array.
-     */
-    template <typename Number>
-    void
-    transpose(const unsigned int N,
-              const unsigned     M,
-              const Number *     src,
-              Number *           dst)
-    {
-      // src is N X M
-      // dst is M X N
-      for (unsigned int i = 0; i < N; ++i)
-        for (unsigned int j = 0; j < M; ++j)
-          dst[j * N + i] = src[i * M + j];
-    }
-
-
-
-    /**
-     * Same as above but the source and the destination are the same vector.
-     */
-    template <typename Number>
-    void
-    transpose_in_place(std::vector<Number> &array_host,
-                       const unsigned int   n,
-                       const unsigned int   m)
-    {
-      // convert to structure-of-array
-      std::vector<Number> old(array_host.size());
-      old.swap(array_host);
-
-      transpose(n, m, old.data(), array_host.data());
-    }
-
-
-
-    /**
-     * Allocate an array on the @ref GlossDevice "device" and copy @p array_host to the @ref GlossDevice "device".
-     */
-    template <typename Number1>
-    void
-    alloc_and_copy(Number1 **array_device,
-                   const ArrayView<const Number1, MemorySpace::Host> array_host,
-                   const unsigned int                                n)
-    {
-      cudaError_t error_code = cudaMalloc(array_device, n * sizeof(Number1));
-      AssertCuda(error_code);
-      AssertDimension(array_host.size(), n);
-
-      error_code = cudaMemcpy(*array_device,
-                              array_host.data(),
-                              n * sizeof(Number1),
-                              cudaMemcpyHostToDevice);
-      AssertCuda(error_code);
-    }
-
 
 
     /**
