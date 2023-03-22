@@ -13,8 +13,8 @@
  *
  * ---------------------------------------------------------------------
  */
-// @sect3{A 2D test about the flux sparsity pattern for a locally refined
-// domain. The make_flux_sparsity_pattern() with trivial dof_masks is computed.}
+// A 2D test about the flux sparsity pattern for a locally refined
+// domain. The make_flux_sparsity_pattern() with trivial dof_masks is computed.
 
 #include <deal.II/dofs/dof_tools.h>
 
