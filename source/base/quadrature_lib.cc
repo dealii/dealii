@@ -2243,9 +2243,17 @@ DEAL_II_NAMESPACE_CLOSE
 
 namespace dealii
 {
+  template Quadrature<1>
+  QSimplex<1>::compute_affine_transformation(
+    const std::array<Point<1>, 1 + 1> &vertices) const;
+
   template Quadrature<2>
   QSimplex<1>::compute_affine_transformation(
     const std::array<Point<2>, 1 + 1> &vertices) const;
+
+  template Quadrature<2>
+  QSimplex<2>::compute_affine_transformation(
+    const std::array<Point<2>, 2 + 1> &vertices) const;
 
   template Quadrature<3>
   QSimplex<1>::compute_affine_transformation(
@@ -2254,6 +2262,10 @@ namespace dealii
   template Quadrature<3>
   QSimplex<2>::compute_affine_transformation(
     const std::array<Point<3>, 2 + 1> &vertices) const;
+
+  template Quadrature<3>
+  QSimplex<3>::compute_affine_transformation(
+    const std::array<Point<3>, 3 + 1> &vertices) const;
 } // namespace dealii
 
 namespace dealii
