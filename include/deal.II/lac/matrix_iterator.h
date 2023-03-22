@@ -87,14 +87,16 @@ public:
   /**
    * Comparison. True, if both accessors are equal.
    */
+  template <class OtherAccessor>
   bool
-  operator==(const MatrixIterator &) const;
+  operator==(const MatrixIterator<OtherAccessor> &) const;
 
   /**
    * Inverse of <tt>==</tt>.
    */
+  template <class OtherAccessor>
   bool
-  operator!=(const MatrixIterator &) const;
+  operator!=(const MatrixIterator<OtherAccessor> &) const;
 
   /**
    * Comparison operator. Result is true if either the first row number is
@@ -178,16 +180,20 @@ MatrixIterator<ACCESSOR>::operator->() const
 
 
 template <class ACCESSOR>
+template <class OtherAccessor>
 inline bool
-MatrixIterator<ACCESSOR>::operator==(const MatrixIterator &other) const
+MatrixIterator<ACCESSOR>::operator==(
+  const MatrixIterator<OtherAccessor> &other) const
 {
   return (accessor == other.accessor);
 }
 
 
 template <class ACCESSOR>
+template <class OtherAccessor>
 inline bool
-MatrixIterator<ACCESSOR>::operator!=(const MatrixIterator &other) const
+MatrixIterator<ACCESSOR>::operator!=(
+  const MatrixIterator<OtherAccessor> &other) const
 {
   return !(*this == other);
 }
