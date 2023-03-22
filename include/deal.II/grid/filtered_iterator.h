@@ -28,6 +28,11 @@
 #include <set>
 #include <tuple>
 
+#ifdef DEAL_II_HAVE_CXX20
+#  include <concepts>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -638,6 +643,7 @@ public:
    * predicate for filtering subsequent assignment and iteration.
    */
   template <typename Predicate>
+  DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
   FilteredIterator(Predicate p);
 
   /**
@@ -658,6 +664,7 @@ public:
    * advanced to the first cell that has.
    */
   template <typename Predicate>
+  DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
   FilteredIterator(Predicate p, const BaseIterator &bi);
 
   /**
@@ -888,8 +895,9 @@ private:
  * @relatesalso FilteredIterator
  */
 template <typename BaseIterator, typename Predicate>
-FilteredIterator<BaseIterator>
-make_filtered_iterator(const BaseIterator &i, const Predicate &p)
+DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
+FilteredIterator<BaseIterator> make_filtered_iterator(const BaseIterator &i,
+                                                      const Predicate &   p)
 {
   FilteredIterator<BaseIterator> fi(p);
   fi.set_to_next_positive(i);
@@ -978,8 +986,10 @@ namespace internal
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate>
-inline IteratorRange<FilteredIterator<BaseIterator>>
-filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
+DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
+inline IteratorRange<FilteredIterator<BaseIterator>> filter_iterators(
+  IteratorRange<BaseIterator> i,
+  const Predicate &           p)
 {
   FilteredIterator<BaseIterator> fi(p, *(i.begin()));
   FilteredIterator<BaseIterator> fi_end(p, *(i.end()));
@@ -1045,12 +1055,13 @@ filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate, typename... Targs>
+DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 IteratorRange<
   typename internal::FilteredIteratorImplementation::
-    NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>::type>
-filter_iterators(IteratorRange<BaseIterator> i,
-                 const Predicate &           p,
-                 const Targs... args)
+    NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>::
+      type> filter_iterators(IteratorRange<BaseIterator> i,
+                             const Predicate &           p,
+                             const Targs... args)
 {
   // Recursively create filtered iterators, one predicate at a time
   auto fi = filter_iterators(i, p);
@@ -1118,6 +1129,7 @@ filter_iterators(IteratorRange<BaseIterator> i,
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate>
+DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 inline IteratorRange<FilteredIterator<BaseIterator>>
 operator|(IteratorRange<BaseIterator> i, const Predicate &p)
 {
@@ -1131,6 +1143,7 @@ operator|(IteratorRange<BaseIterator> i, const Predicate &p)
 
 template <typename BaseIterator>
 template <typename Predicate>
+DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate p)
   : predicate(new PredicateTemplate<Predicate>(p))
 {}
@@ -1139,6 +1152,7 @@ inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate p)
 
 template <typename BaseIterator>
 template <typename Predicate>
+DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate           p,
                                                         const BaseIterator &bi)
   : BaseIterator(bi)
