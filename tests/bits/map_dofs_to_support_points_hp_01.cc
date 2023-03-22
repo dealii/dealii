@@ -34,8 +34,6 @@
 // for the hp-case
 
 
-using namespace std;
-
 template <int dim>
 void
 test()

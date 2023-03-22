@@ -39,7 +39,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim, int spacedim>
 void

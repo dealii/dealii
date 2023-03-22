@@ -45,8 +45,6 @@
 
 #include "../grid/mesh_3d.h"
 
-using namespace std;
-
 template <int dim>
 class F : public Function<dim>
 {

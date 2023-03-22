@@ -36,7 +36,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim>
 void
@@ -73,5 +73,5 @@ main()
   check<2>();
   check<3>();
 
-  deallog << "OK" << endl;
+  deallog << "OK" << std::endl;
 }

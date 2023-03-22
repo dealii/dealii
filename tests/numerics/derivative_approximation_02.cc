@@ -40,7 +40,7 @@
 #include <vector>
 
 #include "../tests.h"
-using namespace std;
+
 
 const double a = 4, b = 5;
 
@@ -213,19 +213,20 @@ derivatives()
       double ex_normthird = DerivativeApproximation::derivative_norm(ex_third);
 
       // output of all values for comparison
-      deallog << "cell " << cell << endl;
-      deallog << "approx. gradient: " << grad << " , norm: " << normgrad << endl
+      deallog << "cell " << cell << std::endl;
+      deallog << "approx. gradient: " << grad << " , norm: " << normgrad
+              << std::endl
               << "  exact gradient: " << ex_grad << " , norm: " << ex_normgrad
-              << endl;
+              << std::endl;
       deallog << "approx. second derivative (hessian): " << second
-              << " , norm: " << normsecond << endl
+              << " , norm: " << normsecond << std::endl
               << "  exact second derivative (hessian): " << ex_second
-              << " , norm: " << ex_normsecond << endl;
+              << " , norm: " << ex_normsecond << std::endl;
       deallog << "approx. third derivative: " << third
-              << " , norm: " << normthird << endl
+              << " , norm: " << normthird << std::endl
               << "  exact third derivative: " << ex_third
-              << " , norm: " << ex_normthird << endl
-              << endl;
+              << " , norm: " << ex_normthird << std::endl
+              << std::endl;
     }
 }
 
@@ -235,8 +236,10 @@ main()
 {
   initlog();
 
-  deallog << "------------ 2D ------------" << endl << endl;
+  deallog << "------------ 2D ------------" << std::endl << std::endl;
   derivatives<2>();
-  deallog << endl << "------------ 3D ------------" << endl << endl;
+  deallog << std::endl
+          << "------------ 3D ------------" << std::endl
+          << std::endl;
   derivatives<3>();
 }

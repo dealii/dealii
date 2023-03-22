@@ -37,7 +37,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <unsigned int spacedim>
 void
@@ -85,7 +85,7 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
 
   d = u_1;
   d.sadd(-1.0, u_1_back);
-  deallog << "distance=" << d.l2_norm() << endl;
+  deallog << "distance=" << d.l2_norm() << std::endl;
 }
 
 int
@@ -100,34 +100,34 @@ main(int argc, char **argv)
   deallog
     << "### 2D-Case, first cell unrefined, second cell refined once###\n\n";
   check<2>(0, 1);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 2D-Case, first cell refined once, second cell refined three times###\n\n";
   check<2>(1, 3);
-  deallog << endl;
+  deallog << std::endl;
 
   // this should still be an identity operation although interpolation is from
   // fine to coarse mesh because second mesh uses quadratic elements
   deallog
     << "### 2D-Case, first cell refined twice, second cell refined once###\n\n";
   check<2>(2, 1);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 3D-Case, first cell unrefined, second cell refined once###\n\n";
   check<3>(0, 1);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 3D-Case, first cell refined once, second cell refined three times###\n\n";
   check<3>(1, 3);
-  deallog << endl;
+  deallog << std::endl;
 
   // this should still be an identity operation although interpolation is from
   // fine to coarse mesh because second mesh uses quadratic elements
   deallog
     << "### 3D-Case, first cell refined twice, second cell refined once###\n\n";
   check<3>(2, 1);
-  deallog << endl;
+  deallog << std::endl;
 }

@@ -35,7 +35,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim>
 void
@@ -125,5 +125,5 @@ main()
     check<3>(fe);
   }
 
-  deallog << "OK" << endl;
+  deallog << "OK" << std::endl;
 }

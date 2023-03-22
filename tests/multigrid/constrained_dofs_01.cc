@@ -42,7 +42,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim>
 void

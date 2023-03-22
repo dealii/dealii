@@ -36,8 +36,6 @@
 // on different cells.
 
 
-using namespace std;
-
 template <int dim>
 void
 test()

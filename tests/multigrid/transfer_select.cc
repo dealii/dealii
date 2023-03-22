@@ -38,7 +38,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim>
 void
@@ -59,7 +59,7 @@ check_select(const FiniteElement<dim> &fe,
   mgdof.distribute_dofs(fe);
   mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof, target_component);
-  const vector<types::global_dof_index> ndofs =
+  const std::vector<types::global_dof_index> ndofs =
     DoFTools::count_dofs_per_fe_component(mgdof, true, target_component);
   Assert(ndofs.size() ==
            *std::max_element(target_component.begin(), target_component.end()) +

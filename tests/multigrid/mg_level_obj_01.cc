@@ -22,7 +22,6 @@
 
 #include "../tests.h"
 
-using namespace std;
 
 
 template <class T>
