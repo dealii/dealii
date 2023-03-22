@@ -1185,8 +1185,7 @@ namespace DoFTools
                   // Loop over interior faces
                   for (const unsigned int face : cell->face_indices())
                     {
-                      const typename dealii::DoFHandler<dim,
-                                                        spacedim>::face_iterator
+                      const typename DoFHandler<dim, spacedim>::face_iterator
                         cell_face = cell->face(face);
 
                       const bool periodic_neighbor =
@@ -1194,8 +1193,9 @@ namespace DoFTools
 
                       if ((!cell->at_boundary(face)) || periodic_neighbor)
                         {
-                          typename dealii::DoFHandler<dim, spacedim>::
-                            level_cell_iterator neighbor =
+                          typename DoFHandler<dim,
+                                              spacedim>::level_cell_iterator
+                            neighbor =
                               cell->neighbor_or_periodic_neighbor(face);
 
                           // Like the non-hp-case: If the cells are on the same
@@ -1247,8 +1247,7 @@ namespace DoFTools
                                    sub_nr != cell_face->n_children();
                                    ++sub_nr)
                                 {
-                                  const typename dealii::DoFHandler<dim,
-                                                                    spacedim>::
+                                  const typename DoFHandler<dim, spacedim>::
                                     level_cell_iterator sub_neighbor =
                                       periodic_neighbor ?
                                         cell

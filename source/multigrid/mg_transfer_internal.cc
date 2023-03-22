@@ -59,8 +59,8 @@ namespace internal
     template <int dim, int spacedim>
     void
     fill_copy_indices(
-      const dealii::DoFHandler<dim, spacedim> &dof_handler,
-      const MGConstrainedDoFs *                mg_constrained_dofs,
+      const DoFHandler<dim, spacedim> &dof_handler,
+      const MGConstrainedDoFs *        mg_constrained_dofs,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
         &copy_indices,
@@ -552,9 +552,9 @@ namespace internal
 
     template <int dim, typename Number>
     void
-    setup_element_info(ElementInfo<Number> &          elem_info,
-                       const FiniteElement<1> &       fe,
-                       const dealii::DoFHandler<dim> &dof_handler)
+    setup_element_info(ElementInfo<Number> &   elem_info,
+                       const FiniteElement<1> &fe,
+                       const DoFHandler<dim> & dof_handler)
     {
       // currently, we have only FE_Q and FE_DGQ type elements implemented
       elem_info.n_components = dof_handler.get_fe().element_multiplicity(0);
@@ -617,8 +617,8 @@ namespace internal
     template <int dim, typename Number>
     void
     setup_transfer(
-      const dealii::DoFHandler<dim> &dof_handler,
-      const MGConstrainedDoFs *      mg_constrained_dofs,
+      const DoFHandler<dim> &  dof_handler,
+      const MGConstrainedDoFs *mg_constrained_dofs,
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
         &                                     external_partitioners,
       ElementInfo<Number> &                   elem_info,
@@ -692,7 +692,7 @@ namespace internal
           std::vector<types::global_dof_index> ghosted_level_dofs_l0;
 
           // step 2.1: loop over the cells on the coarse side
-          typename dealii::DoFHandler<dim>::cell_iterator cell,
+          typename DoFHandler<dim>::cell_iterator cell,
             endc = dof_handler.end(level - 1);
           for (cell = dof_handler.begin(level - 1); cell != endc; ++cell)
             {

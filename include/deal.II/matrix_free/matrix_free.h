@@ -3123,8 +3123,8 @@ namespace internal
     template <int dim, int spacedim>
     inline std::vector<IndexSet>
     extract_locally_owned_index_sets(
-      const std::vector<const ::dealii::DoFHandler<dim, spacedim> *> &dofh,
-      const unsigned int                                              level)
+      const std::vector<const DoFHandler<dim, spacedim> *> &dofh,
+      const unsigned int                                    level)
     {
       std::vector<IndexSet> locally_owned_set;
       locally_owned_set.reserve(dofh.size());

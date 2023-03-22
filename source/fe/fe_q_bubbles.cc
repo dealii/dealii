@@ -117,7 +117,7 @@ namespace internal
             tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
             tr.execute_coarsening_and_refinement();
 
-            dealii::DoFHandler<dim, spacedim> dh(tr);
+            DoFHandler<dim, spacedim> dh(tr);
             dh.distribute_dofs(fe);
 
             dealii::FEValues<dim, spacedim> fine(get_default_linear_mapping(tr),
@@ -136,8 +136,8 @@ namespace internal
               nc, std::vector<types::global_dof_index>(fe.n_dofs_per_cell()));
 
             // now create the mass matrix and all the right_hand sides
-            unsigned int                                           child_no = 0;
-            typename dealii::DoFHandler<dim>::active_cell_iterator cell =
+            unsigned int                                   child_no = 0;
+            typename DoFHandler<dim>::active_cell_iterator cell =
               dh.begin_active();
             for (; cell != dh.end(); ++cell, ++child_no)
               {

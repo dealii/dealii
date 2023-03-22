@@ -111,7 +111,7 @@ namespace internal
 
 #ifdef _MSC_VER
   template <int dim, int spacedim>
-  class ActiveCellIterator<dim, spacedim, dealii::DoFHandler<dim, spacedim>>
+  class ActiveCellIterator<dim, spacedim, DoFHandler<dim, spacedim>>
   {
   public:
     using type =
@@ -3194,7 +3194,7 @@ namespace GridTools
    * those processors:
    * @code
    * using active_cell_iterator =
-   *   typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator;
+   *   typename DoFHandler<dim,spacedim>::active_cell_iterator;
    * auto pack = [] (const active_cell_iterator &cell) -> unsigned int
    *             {
    *               return cell->active_fe_index();
@@ -3207,7 +3207,7 @@ namespace GridTools
    *               };
    *
    * GridTools::exchange_cell_data_to_ghosts<
-   *   unsigned int, dealii::DoFHandler<dim,spacedim>> (dof_handler,
+   *   unsigned int, DoFHandler<dim,spacedim>> (dof_handler,
    *                                                    pack,
    *                                                    unpack);
    * @endcode

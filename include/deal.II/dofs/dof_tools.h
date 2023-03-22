@@ -626,8 +626,8 @@ namespace DoFTools
    * in the triangulation. By default flux couplings are added over all internal
    * faces. @p face_has_flux_coupling should be a function that takes an
    * active_cell_iterator and a face index and should return true if there is a
-   * flux coupling over the face. When using the ::dealii::DoFHandler we could,
-   * for example, use
+   * flux coupling over the face. When using DoFHandler we could, for example,
+   * use
    *
    * @code
    *  auto face_has_flux_coupling =

@@ -27,8 +27,8 @@ namespace parallel
 {
   template <int dim, int spacedim>
   CellWeights<dim, spacedim>::CellWeights(
-    const dealii::DoFHandler<dim, spacedim> &dof_handler,
-    const WeightingFunction &                weighting_function)
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const WeightingFunction &        weighting_function)
   {
     reinit(dof_handler, weighting_function);
   }
