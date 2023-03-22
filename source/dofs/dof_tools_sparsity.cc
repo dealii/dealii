@@ -775,10 +775,10 @@ namespace DoFTools
         // faces
         if (dim == 1)
           {
-            if ((neighbor->level() > cell->level())
-                || ((neighbor->level() == cell->level()) &&
-                    (neighbor->index() >
-                     cell->index())) // artificial way to visit once
+            if ((neighbor->level() > cell->level()) ||
+                ((neighbor->level() == cell->level()) &&
+                 (neighbor->index() >
+                  cell->index())) // artificial way to visit once
             )
               return true;
           }
@@ -788,8 +788,9 @@ namespace DoFTools
             // If the common face is not a regular face (is a
             // subface) of the neighbor, proceed to the
             // accumulation of sparsity pattern. Because this is
-            // the only time this face is visited. If the common face is regular for both cell and neighbor - use an
-            // artificial way to visit this face once.
+            // the only time this face is visited. If the common face is regular
+            // for both cell and neighbor - use an artificial way to visit this
+            // face once.
             const bool this_face_is_regular_for_neighbor =
               !periodic_neighbor ?
                 !cell->neighbor_is_coarser(face_n) :
