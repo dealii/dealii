@@ -786,10 +786,10 @@ namespace DoFTools
         if (dim != 1)
           {
             // If the common face is not a regular face (is a
-            // subface) of the neighbor proceed to the
-            // accumulation of sparsity pattern because this is
-            // the only time this face is visited otherwise use an
-            // artificial way to visit this face once
+            // subface) of the neighbor, proceed to the
+            // accumulation of sparsity pattern. Because this is
+            // the only time this face is visited. If the common face is regular for both cell and neighbor - use an
+            // artificial way to visit this face once.
             const bool this_face_is_regular_for_neighbor =
               !periodic_neighbor ?
                 !cell->neighbor_is_coarser(face_n) :
@@ -812,6 +812,7 @@ namespace DoFTools
 
         return false;
       }
+
       // implementation of the same function in namespace DoFTools for
       // non-hp-DoFHandlers
       template <int dim, int spacedim, typename number>
