@@ -2174,11 +2174,11 @@ public:
   reinit(const typename Triangulation<dim>::cell_iterator &cell);
 
   /**
-   * Check if face evaluation/integration is supported.
+   * Check if fast evaluation/integration is supported.
    */
   static bool
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d);
+                            const unsigned int given_n_q_points_1d);
 
   /**
    * Evaluate the function values, the gradients, and the Hessians of the
@@ -2604,11 +2604,11 @@ public:
   reinit(const unsigned int cell_batch_number, const unsigned int face_number);
 
   /**
-   * Check if face evaluation/integration is supported.
+   * Check if fast evaluation/integration is supported.
    */
   static bool
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d);
+                            const unsigned int given_n_q_points_1d);
 
   /**
    * Evaluates the function values, the gradients, and the Laplacians of the
@@ -9191,11 +9191,11 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d)
+                            const unsigned int given_n_q_points_1d)
 {
   return fe_degree == -1 ?
            internal::FEEvaluationFactory<dim, VectorizedArrayType>::
-             fast_evaluation_supported(given_degree, give_n_q_points_1d) :
+             fast_evaluation_supported(given_degree, given_n_q_points_1d) :
            true;
 }
 
@@ -9215,11 +9215,11 @@ FEFaceEvaluation<dim,
                  Number,
                  VectorizedArrayType>::
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d)
+                            const unsigned int given_n_q_points_1d)
 {
   return fe_degree == -1 ?
            internal::FEEvaluationFactory<dim, VectorizedArrayType>::
-             fast_evaluation_supported(given_degree, give_n_q_points_1d) :
+             fast_evaluation_supported(given_degree, given_n_q_points_1d) :
            true;
 }
 
