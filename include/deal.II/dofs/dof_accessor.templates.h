@@ -2109,13 +2109,6 @@ namespace internal
 {
   namespace DoFCellAccessorImplementation
   {
-    // make sure we refer to class
-    // dealii::DoFCellAccessor, not
-    // namespace
-    // dealii::internal::DoFCellAccessor
-    using DoFHandler;
-    using dealii::DoFCellAccessor;
-
     /**
      * A class with the same purpose as the similarly named class of the
      * Triangulation class. See there for more information.
