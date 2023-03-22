@@ -13,11 +13,12 @@
  *
  * ---------------------------------------------------------------------
  */
-// @sect3{A 2D test about the flux sparsity pattern for a mesh with hanging
+
+// A 2D test about the flux sparsity pattern for a mesh with hanging
 // nodes as in sparsity/face_spartisy_pattern_2d.cc. Here, some of faces are
 // excluded from flux sparsity pattern using a face filter. The
 // make_flux_sparsity_pattern() with trivial dof_masks is computed but with a
-// non-trivial face_has_flux_coupling predicate.}
+// non-trivial face_has_flux_coupling predicate.
 
 #include <deal.II/dofs/dof_tools.h>
 
