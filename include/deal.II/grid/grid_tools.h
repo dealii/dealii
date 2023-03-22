@@ -63,6 +63,11 @@
 #include <list>
 #include <set>
 
+#ifdef DEAL_II_HAVE_CXX20
+#  include <concepts>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
@@ -602,9 +607,13 @@ namespace GridTools
    * step-38. It is also used in step-49 and step-53.
    */
   template <int dim, typename Transformation, int spacedim>
-  void
-  transform(const Transformation &        transformation,
-            Triangulation<dim, spacedim> &triangulation);
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Transformation, Point<spacedim>> &&
+     std::assignable_from<
+       Point<spacedim> &,
+       std::invoke_result_t<Transformation, Point<spacedim>>>))
+  void transform(const Transformation &        transformation,
+                 Triangulation<dim, spacedim> &triangulation);
 
   /**
    * Shift each vertex of the triangulation by the given shift vector. This
@@ -3704,10 +3713,14 @@ namespace GridTools
 
 
 
-  template <int dim, typename Predicate, int spacedim>
-  void
-  transform(const Predicate &             predicate,
-            Triangulation<dim, spacedim> &triangulation)
+  template <int dim, typename Transformation, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Transformation, Point<spacedim>> &&
+     std::assignable_from<
+       Point<spacedim> &,
+       std::invoke_result_t<Transformation, Point<spacedim>>>))
+  void transform(const Transformation &        transformation,
+                 Triangulation<dim, spacedim> &triangulation)
   {
     std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
 
@@ -3725,7 +3738,7 @@ namespace GridTools
         if (treated_vertices[cell->vertex_index(v)] == false)
           {
             // transform this vertex
-            cell->vertex(v) = predicate(cell->vertex(v));
+            cell->vertex(v) = transformation(cell->vertex(v));
             // and mark it as treated
             treated_vertices[cell->vertex_index(v)] = true;
           };
