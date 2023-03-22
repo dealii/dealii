@@ -710,7 +710,7 @@ namespace internal
               typename OtherVectorType>
     std::enable_if_t<TRANSFER::supports_dof_handler_vector>
     vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
-          dealii::Multigrid<VectorType> &             multigrid,
+          Multigrid<VectorType> &                     multigrid,
           const TRANSFER &                            transfer,
           OtherVectorType &                           dst,
           const OtherVectorType &                     src,
@@ -741,7 +741,7 @@ namespace internal
               typename OtherVectorType>
     void
     vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
-          dealii::Multigrid<VectorType> &             multigrid,
+          Multigrid<VectorType> &                     multigrid,
           const TRANSFER &                            transfer,
           OtherVectorType &                           dst,
           const OtherVectorType &                     src,
@@ -769,7 +769,7 @@ namespace internal
               typename OtherVectorType>
     std::enable_if_t<TRANSFER::supports_dof_handler_vector>
     vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
-              dealii::Multigrid<VectorType> &             multigrid,
+              Multigrid<VectorType> &                     multigrid,
               const TRANSFER &                            transfer,
               OtherVectorType &                           dst,
               const OtherVectorType &                     src,
@@ -802,7 +802,7 @@ namespace internal
               typename OtherVectorType>
     void
     vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
-              dealii::Multigrid<VectorType> &             multigrid,
+              Multigrid<VectorType> &                     multigrid,
               const TRANSFER &                            transfer,
               OtherVectorType &                           dst,
               const OtherVectorType &                     src,
