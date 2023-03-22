@@ -5976,28 +5976,82 @@ namespace GridTools
 
   namespace internal
   {
-    template <int spacedim>
+    /**
+     * Determine for each rank which entry of @p entities it
+     * might own. The first entry of the returned tuple is a list of
+     * ranks and the second and third entry give CRS data
+     * structure (pointers within a list of indices).
+     */
+    template <int spacedim, typename T>
     std::tuple<std::vector<unsigned int>,
                std::vector<unsigned int>,
                std::vector<unsigned int>>
-    guess_point_owner(
+    guess_owners_of_entities(
+      const MPI_Comm &                                       comm,
       const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
-      const std::vector<Point<spacedim>> &                   points,
+      const std::vector<T> &                                 entities,
       const double                                           tolerance)
     {
-      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
-      ranks_and_indices.reserve(points.size());
+      std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes_temp;
+      auto *global_bboxes_to_be_used = &global_bboxes;
 
-      for (unsigned int i = 0; i < points.size(); ++i)
+      if (global_bboxes.size() == 1) // TODO: and not ArborX installed
         {
-          const auto &point = points[i];
-          for (unsigned rank = 0; rank < global_bboxes.size(); ++rank)
-            for (const auto &box : global_bboxes[rank])
-              if (box.point_inside(point, tolerance))
-                {
-                  ranks_and_indices.emplace_back(rank, i);
-                  break;
-                }
+          global_bboxes_temp =
+            Utilities::MPI::all_gather(comm, global_bboxes[0]);
+          global_bboxes_to_be_used = &global_bboxes_temp;
+        }
+
+      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
+      ranks_and_indices.reserve(entities.size());
+
+      if (true)
+        {
+          // helper function to determine if a bounding box is valid
+          const auto is_valid = [](const auto &bb) {
+            for (unsigned int i = 0; i < spacedim; ++i)
+              if (bb.get_boundary_points().first[i] >
+                  bb.get_boundary_points().second[i])
+                return false;
+
+            return true;
+          };
+
+          // linearize vector of vectors
+          std::vector<std::pair<BoundingBox<spacedim>, unsigned int>>
+            boxes_and_ranks;
+
+          for (unsigned rank = 0; rank < global_bboxes_to_be_used->size();
+               ++rank)
+            for (const auto &box : (*global_bboxes_to_be_used)[rank])
+              if (is_valid(box))
+                boxes_and_ranks.emplace_back(box, rank);
+
+          // pack boxes into r-tree
+          const auto tree = pack_rtree(boxes_and_ranks);
+
+          // loop over all entities
+          for (unsigned int i = 0; i < entities.size(); ++i)
+            {
+              // create a bounding box with tolerance
+              const auto bb =
+                BoundingBox<spacedim>(entities[i]).create_extended(tolerance);
+
+              // determine ranks potentially owning point/bounding box
+              std::set<unsigned int> my_ranks;
+
+              for (const auto &box_and_rank :
+                   tree | boost::geometry::index::adaptors::queried(
+                            boost::geometry::index::intersects(bb)))
+                my_ranks.insert(box_and_rank.second);
+
+              for (const auto rank : my_ranks)
+                ranks_and_indices.emplace_back(rank, i);
+            }
+        }
+      else
+        {
+          // TODO: use ArborX
         }
 
       // convert to CRS
@@ -6007,14 +6061,14 @@ namespace GridTools
       std::vector<unsigned int> ptr;
       std::vector<unsigned int> indices;
 
-      unsigned int dummy_rank = numbers::invalid_unsigned_int;
+      unsigned int current_rank = numbers::invalid_unsigned_int;
 
-      for (const auto &i : ranks_and_indices)
+      for (const std::pair<unsigned int, unsigned int> &i : ranks_and_indices)
         {
-          if (dummy_rank != i.first)
+          if (current_rank != i.first)
             {
-              dummy_rank = i.first;
-              ranks.push_back(dummy_rank);
+              current_rank = i.first;
+              ranks.push_back(current_rank);
               ptr.push_back(indices.size());
             }
 
@@ -6022,9 +6076,7 @@ namespace GridTools
         }
       ptr.push_back(indices.size());
 
-      return std::make_tuple(std::move(ranks),
-                             std::move(ptr),
-                             std::move(indices));
+      return {std::move(ranks), std::move(ptr), std::move(indices)};
     }
 
 
@@ -6128,8 +6180,10 @@ namespace GridTools
       auto &recv_ranks      = result.recv_ranks;
       auto &recv_ptrs       = result.recv_ptrs;
 
-      const auto potential_owners =
-        internal::guess_point_owner(global_bboxes, points, tolerance);
+      const auto comm = cache.get_triangulation().get_communicator();
+
+      const auto potential_owners = internal::guess_owners_of_entities(
+        comm, global_bboxes, points, tolerance);
 
       const auto &potential_owners_ranks   = std::get<0>(potential_owners);
       const auto &potential_owners_ptrs    = std::get<1>(potential_owners);
@@ -6264,7 +6318,7 @@ namespace GridTools
         create_request,
         answer_request,
         process_answer,
-        cache.get_triangulation().get_communicator());
+        comm);
 
       if (true)
         {

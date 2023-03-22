@@ -90,12 +90,8 @@ namespace Utilities
       const auto local_tree = pack_rtree(local_boxes);
 
       // compress r-tree to a minimal set of bounding boxes
-      const auto local_reduced_box =
-        extract_rtree_level(local_tree, rtree_level);
-
-      // gather bounding boxes of other processes
-      const auto global_bboxes =
-        Utilities::MPI::all_gather(tria.get_communicator(), local_reduced_box);
+      std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes(1);
+      global_bboxes[0] = extract_rtree_level(local_tree, rtree_level);
 
       const GridTools::Cache<dim, spacedim> cache(tria, mapping);
 
