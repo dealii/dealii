@@ -2247,8 +2247,8 @@ namespace internal
 
 
   /**
-   * This class chooses an appropriate evaluation strategy based on the
-   * template parameters and the shape_info variable which contains runtime
+   * This class chooses an appropriate evaluation/integration strategy based on
+   * the template parameters and the shape_info variable which contains runtime
    * parameters for the strategy underlying FEEvaluation::evaluate(), i.e.
    * this calls internal::FEEvaluationImpl::evaluate(),
    * internal::FEEvaluationImplCollocation::evaluate() or
@@ -2264,14 +2264,21 @@ namespace internal
   template <int dim, typename Number, bool do_integrate>
   struct FEEvaluationImplSelector
   {
-    template <int fe_degree, int n_q_points_1d, typename VNumber>
+    template <int fe_degree, int n_q_points_1d, typename OtherNumber>
     static bool
     run(const unsigned int                     n_components,
         const EvaluationFlags::EvaluationFlags evaluation_flag,
-        VNumber *                              values_dofs,
+        OtherNumber *                          values_dofs,
         FEEvaluationData<dim, Number, false> & fe_eval,
         const bool                             sum_into_values_array = false)
     {
+      // `OtherNumber` is either `const Number` (evaluate()) or `Number`
+      // (integrate())
+      static_assert(
+        std::is_same<Number,
+                     typename std::remove_const<OtherNumber>::type>::value,
+        "Type of Number and of OtherNumber do not match.");
+
       const auto element_type = fe_eval.get_shape_info().element_type;
       using ElementType       = MatrixFreeFunctions::ElementType;
 
@@ -2425,12 +2432,12 @@ namespace internal
                    sum_into_values_array);
     }
 
-    template <typename T, typename VNumber>
+    template <typename T, typename OtherNumber>
     static void
     evaluate_or_integrate(
       const unsigned int                     n_components,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      VNumber *                              values_dofs,
+      OtherNumber *                          values_dofs,
       FEEvaluationData<dim, Number, false> & fe_eval,
       const bool                             sum_into_values_array)
     {
@@ -2442,35 +2449,6 @@ namespace internal
                                std::integral_constant<bool, do_integrate>());
     }
   };
-
-
-
-  template <int dim, typename Number>
-  struct FEEvaluationImplEvaluateSelector
-    : public FEEvaluationImplSelector<dim, Number, false>
-  {};
-
-
-
-  /**
-   * This class chooses an appropriate evaluation strategy based on the
-   * template parameters and the shape_info variable which contains runtime
-   * parameters for the strategy underlying FEEvaluation::integrate(), i.e.
-   * this calls internal::FEEvaluationImpl::integrate(),
-   * internal::FEEvaluationImplCollocation::integrate() or
-   * internal::FEEvaluationImplTransformToCollocation::integrate() with
-   * appropriate template parameters. In case the template parameters
-   * fe_degree and n_q_points_1d contain valid information (i.e. fe_degree>-1
-   * and n_q_points_1d>0), we simply pass these values to the respective
-   * template specializations.  Otherwise, we perform a runtime matching of
-   * the runtime parameters to find the correct specialization. This matching
-   * currently supports $0\leq fe\_degree \leq 9$ and $degree+1\leq
-   * n\_q\_points\_1d\leq fe\_degree+2$.
-   */
-  template <int dim, typename Number>
-  struct FEEvaluationImplIntegrateSelector
-    : public FEEvaluationImplSelector<dim, Number, true>
-  {};
 
 
 
