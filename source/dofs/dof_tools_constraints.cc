@@ -1839,15 +1839,15 @@ namespace DoFTools
     template <typename FaceIterator, typename number>
     void
     set_periodicity_constraints(
-      const FaceIterator &                         face_1,
-      const typename identity<FaceIterator>::type &face_2,
-      const FullMatrix<double> &                   transformation,
-      AffineConstraints<number> &                  affine_constraints,
-      const ComponentMask &                        component_mask,
-      const bool                                   face_orientation,
-      const bool                                   face_flip,
-      const bool                                   face_rotation,
-      const number                                 periodicity_factor)
+      const FaceIterator &                            face_1,
+      const std_cxx20::type_identity_t<FaceIterator> &face_2,
+      const FullMatrix<double> &                      transformation,
+      AffineConstraints<number> &                     affine_constraints,
+      const ComponentMask &                           component_mask,
+      const bool                                      face_orientation,
+      const bool                                      face_flip,
+      const bool                                      face_rotation,
+      const number                                    periodicity_factor)
     {
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -2290,16 +2290,16 @@ namespace DoFTools
   template <typename FaceIterator, typename number>
   void
   make_periodicity_constraints(
-    const FaceIterator &                         face_1,
-    const typename identity<FaceIterator>::type &face_2,
-    AffineConstraints<number> &                  affine_constraints,
-    const ComponentMask &                        component_mask,
-    const bool                                   face_orientation,
-    const bool                                   face_flip,
-    const bool                                   face_rotation,
-    const FullMatrix<double> &                   matrix,
-    const std::vector<unsigned int> &            first_vector_components,
-    const number                                 periodicity_factor)
+    const FaceIterator &                            face_1,
+    const std_cxx20::type_identity_t<FaceIterator> &face_2,
+    AffineConstraints<number> &                     affine_constraints,
+    const ComponentMask &                           component_mask,
+    const bool                                      face_orientation,
+    const bool                                      face_flip,
+    const bool                                      face_rotation,
+    const FullMatrix<double> &                      matrix,
+    const std::vector<unsigned int> &               first_vector_components,
+    const number                                    periodicity_factor)
   {
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;

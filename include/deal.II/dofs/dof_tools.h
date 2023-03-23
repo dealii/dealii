@@ -1029,9 +1029,9 @@ namespace DoFTools
   template <typename FaceIterator, typename number>
   void
   make_periodicity_constraints(
-    const FaceIterator &                         face_1,
-    const typename identity<FaceIterator>::type &face_2,
-    AffineConstraints<number> &                  constraints,
+    const FaceIterator &                            face_1,
+    const std_cxx20::type_identity_t<FaceIterator> &face_2,
+    AffineConstraints<number> &                     constraints,
     const ComponentMask &            component_mask   = ComponentMask(),
     const bool                       face_orientation = true,
     const bool                       face_flip        = false,

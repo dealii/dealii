@@ -290,8 +290,8 @@ private:
  */
 template <typename BaseIterator>
 IteratorRange<BaseIterator>
-make_iterator_range(const BaseIterator &                         begin,
-                    const typename identity<BaseIterator>::type &end)
+make_iterator_range(const BaseIterator &                            begin,
+                    const std_cxx20::type_identity_t<BaseIterator> &end)
 {
   IteratorRange<BaseIterator> ir(begin, end);
   return ir;

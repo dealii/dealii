@@ -404,10 +404,10 @@ namespace parallel
    */
   template <typename Iterator, typename Function>
   DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
-  void apply_to_subranges(const Iterator &                         begin,
-                          const typename identity<Iterator>::type &end,
-                          const Function &                         f,
-                          const unsigned int                       grainsize)
+  void apply_to_subranges(const Iterator &                            begin,
+                          const std_cxx20::type_identity_t<Iterator> &end,
+                          const Function &                            f,
+                          const unsigned int                          grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -554,9 +554,9 @@ namespace parallel
      std::convertible_to<std::invoke_result_t<Function, Iterator, Iterator>,
                          ResultType>))
   ResultType
-    accumulate_from_subranges(const Function &                         f,
-                              const Iterator &                         begin,
-                              const typename identity<Iterator>::type &end,
+    accumulate_from_subranges(const Function &                            f,
+                              const Iterator &                            begin,
+                              const std_cxx20::type_identity_t<Iterator> &end,
                               const unsigned int grainsize)
   {
 #ifndef DEAL_II_WITH_TBB

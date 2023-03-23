@@ -43,7 +43,7 @@ namespace std_cxx20
    * written as
    * @code
    * template <typename T>
-   * void f(T, typename identity<T>::type);
+   * void f(T, std_cxx20::type_identity_t<T>);
    * @endcode
    * then the call becomes valid: the type <code>T</code> is not deducible
    * from the second argument to the function, so only the first argument
@@ -73,7 +73,7 @@ namespace std_cxx20
    * achieve this by writing the code as follows:
    * @code
    * template <typename RT, typename A>
-   * void forward_call(RT (*p) (A), typename identity<A>::type a)
+   * void forward_call(RT (*p) (A), std_cxx20::type_identity_t<A> a)
    * {
    *   p(a);
    * }

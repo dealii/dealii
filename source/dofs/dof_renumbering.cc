@@ -753,7 +753,7 @@ namespace DoFRenumbering
   types::global_dof_index
   compute_component_wise(std::vector<types::global_dof_index> &new_indices,
                          const CellIterator &                  start,
-                         const typename identity<CellIterator>::type &end,
+                         const std_cxx20::type_identity_t<CellIterator> &end,
                          const std::vector<unsigned int> &component_order_arg,
                          const bool                       is_level_operation)
   {
