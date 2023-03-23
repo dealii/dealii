@@ -5555,11 +5555,14 @@ namespace internal
     run(const unsigned int                          n_components,
         const FEEvaluationData<dim, Number, false> &fe_eval,
         const Number *                              in_array,
-        Number *                                    out_array,
-        std::enable_if_t<fe_degree != -1> * = nullptr)
+        Number *                                    out_array)
     {
-      constexpr unsigned int dofs_per_component =
-        Utilities::pow(fe_degree + 1, dim);
+      const unsigned int given_degree =
+        (fe_degree > -1) ? fe_degree :
+                           fe_eval.get_shape_info().data.front().fe_degree;
+
+      const unsigned int dofs_per_component =
+        Utilities::pow(given_degree + 1, dim);
 
       Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
       Assert(fe_eval.get_shape_info().element_type <=
@@ -5572,10 +5575,11 @@ namespace internal
                              fe_degree + 1,
                              Number,
                              Number2>
-        evaluator(
-          {},
-          {},
-          fe_eval.get_shape_info().data.front().inverse_shape_values_eo);
+        evaluator({},
+                  {},
+                  fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+                  given_degree + 1,
+                  given_degree + 1);
 
       for (unsigned int d = 0; d < n_components; ++d)
         {
@@ -5603,57 +5607,6 @@ namespace internal
           if (dim > 1)
             evaluator.template hessians<1, false, false>(out, out);
           evaluator.template hessians<0, false, false>(out, out);
-        }
-      return false;
-    }
-
-    template <int fe_degree, int = 0>
-    static bool
-    run(const unsigned int                          n_components,
-        const FEEvaluationData<dim, Number, false> &fe_eval,
-        const Number *                              in_array,
-        Number *                                    out_array,
-        std::enable_if_t<fe_degree == -1> * = nullptr)
-    {
-      static_assert(fe_degree == -1, "Only usable for degree -1");
-      const unsigned int dofs_per_component =
-        fe_eval.get_shape_info().dofs_per_component_on_cell;
-
-      Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
-
-      EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>
-        evaluator(fe_eval.get_shape_info().data.front().inverse_shape_values,
-                  {},
-                  {},
-                  fe_eval.get_shape_info().data.front().fe_degree + 1,
-                  fe_eval.get_shape_info().data.front().fe_degree + 1);
-
-      for (unsigned int d = 0; d < n_components; ++d)
-        {
-          const Number *in  = in_array + d * dofs_per_component;
-          Number *      out = out_array + d * dofs_per_component;
-          // Need to select 'apply' method with hessian slot because values
-          // assume symmetries that do not exist in the inverse shapes
-          evaluator.template values<0, true, false>(in, out);
-          if (dim > 1)
-            evaluator.template values<1, true, false>(out, out);
-          if (dim > 2)
-            evaluator.template values<2, true, false>(out, out);
-        }
-      for (unsigned int q = 0; q < dofs_per_component; ++q)
-        {
-          const Number inverse_JxW_q = Number(1.) / fe_eval.JxW(q);
-          for (unsigned int d = 0; d < n_components; ++d)
-            out_array[q + d * dofs_per_component] *= inverse_JxW_q;
-        }
-      for (unsigned int d = 0; d < n_components; ++d)
-        {
-          Number *out = out_array + d * dofs_per_component;
-          if (dim > 2)
-            evaluator.template values<2, false, false>(out, out);
-          if (dim > 1)
-            evaluator.template values<1, false, false>(out, out);
-          evaluator.template values<0, false, false>(out, out);
         }
       return false;
     }
