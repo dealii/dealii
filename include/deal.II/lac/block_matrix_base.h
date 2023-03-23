@@ -653,7 +653,7 @@ public:
    * for more information.
    */
   void
-  compress(::dealii::VectorOperation::values operation);
+  compress(VectorOperation::values operation);
 
   /**
    * Multiply the entire matrix by a fixed factor.
@@ -2144,8 +2144,7 @@ BlockMatrixBase<MatrixType>::diag_element(const size_type i) const
 
 template <class MatrixType>
 inline void
-BlockMatrixBase<MatrixType>::compress(
-  ::dealii::VectorOperation::values operation)
+BlockMatrixBase<MatrixType>::compress(VectorOperation::values operation)
 {
   for (unsigned int r = 0; r < n_block_rows(); ++r)
     for (unsigned int c = 0; c < n_block_cols(); ++c)

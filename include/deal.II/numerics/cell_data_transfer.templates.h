@@ -35,7 +35,7 @@ namespace internal
     void
     post_unpack_action(VectorType &out)
     {
-      out.compress(::dealii::VectorOperation::insert);
+      out.compress(VectorOperation::insert);
     }
 
     template <typename value_type>

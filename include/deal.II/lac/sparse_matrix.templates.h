@@ -2069,7 +2069,7 @@ SparseMatrix<number>::block_read(std::istream &in)
 
 
 template <typename number>
-void SparseMatrix<number>::compress(::dealii::VectorOperation::values)
+void SparseMatrix<number>::compress(VectorOperation::values)
 {}
 
 

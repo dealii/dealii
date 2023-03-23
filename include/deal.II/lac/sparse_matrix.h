@@ -783,7 +783,7 @@ public:
   /**
    * Dummy function for compatibility with distributed, parallel matrices.
    */
-  void compress(::dealii::VectorOperation::values);
+  void compress(VectorOperation::values);
 
   /** @} */
   /**

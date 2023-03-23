@@ -2315,7 +2315,7 @@ namespace internal
 
       embedded_partitioner
         ->template import_from_ghosted_array_start<Number, MemorySpace::Host>(
-          dealii::VectorOperation::add,
+          VectorOperation::add,
           0,
           dealii::ArrayView<Number>(
             const_cast<Number *>(vec.begin()) +
@@ -2338,7 +2338,7 @@ namespace internal
 
       embedded_partitioner
         ->template import_from_ghosted_array_finish<Number, MemorySpace::Host>(
-          dealii::VectorOperation::add,
+          VectorOperation::add,
           dealii::ArrayView<const Number>(buffer.begin(), buffer.size()),
           dealii::ArrayView<Number>(vec.begin(),
                                     embedded_partitioner->locally_owned_size()),

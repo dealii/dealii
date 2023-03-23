@@ -50,7 +50,7 @@ namespace internal
         post_unpack_action(std::vector<VectorType *> &all_out)
         {
           for (auto &out : all_out)
-            out->compress(::dealii::VectorOperation::insert);
+            out->compress(VectorOperation::insert);
         }
 
         template <typename value_type>

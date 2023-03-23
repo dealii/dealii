@@ -179,8 +179,7 @@ public:
    * for more information.
    */
   void
-  compress(::dealii::VectorOperation::values operation =
-             ::dealii::VectorOperation::unknown);
+  compress(VectorOperation::values operation = VectorOperation::unknown);
 
   /**
    * Returns `false` as this is a serial block vector.
@@ -444,7 +443,7 @@ BlockVector<Number>::operator=(const BlockVector<Number2> &v)
 
 template <typename Number>
 inline void
-BlockVector<Number>::compress(::dealii::VectorOperation::values operation)
+BlockVector<Number>::compress(VectorOperation::values operation)
 {
   for (size_type i = 0; i < this->n_blocks(); ++i)
     this->components[i].compress(operation);

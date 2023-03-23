@@ -3618,7 +3618,7 @@ namespace internal
     {
       (void)component_in_block_vector;
       Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
-      vec.compress(dealii::VectorOperation::add);
+      vec.compress(VectorOperation::add);
     }
 
 
@@ -3681,7 +3681,7 @@ namespace internal
           AssertDimension(requests.size(), tmp_data.size());
 
           part.import_from_ghosted_array_start(
-            dealii::VectorOperation::add,
+            VectorOperation::add,
             component_in_block_vector * 2 + channel_shift,
             ArrayView<Number>(vec.begin(), part.locally_owned_size()),
             vec.shared_vector_data(),
@@ -3725,7 +3725,7 @@ namespace internal
                     VectorType &       vec)
     {
       (void)component_in_block_vector;
-      vec.compress_finish(dealii::VectorOperation::add);
+      vec.compress_finish(VectorOperation::add);
     }
 
 
@@ -4255,7 +4255,7 @@ namespace internal
     const unsigned int                                    channel = 0)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
-      vec.compress(dealii::VectorOperation::add);
+      vec.compress(VectorOperation::add);
     else
       for (unsigned int i = 0; i < vec.n_blocks(); ++i)
         compress_start(vec.block(i), exchanger, channel + i);

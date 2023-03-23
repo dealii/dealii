@@ -1037,15 +1037,15 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::compress(::dealii::VectorOperation::values operation)
+  SparseMatrix::compress(VectorOperation::values operation)
   {
     Epetra_CombineMode mode = last_action;
     if (last_action == Zero)
       {
-        if ((operation == ::dealii::VectorOperation::add) ||
-            (operation == ::dealii::VectorOperation::unknown))
+        if ((operation == VectorOperation::add) ||
+            (operation == VectorOperation::unknown))
           mode = Add;
-        else if (operation == ::dealii::VectorOperation::insert)
+        else if (operation == VectorOperation::insert)
           mode = Insert;
         else
           Assert(
@@ -1055,11 +1055,10 @@ namespace TrilinosWrappers
       }
     else
       {
-        Assert(((last_action == Add) &&
-                (operation != ::dealii::VectorOperation::insert)) ||
-                 ((last_action == Insert) &&
-                  (operation != ::dealii::VectorOperation::add)),
-               ExcMessage("Operation and argument to compress() do not match"));
+        Assert(
+          ((last_action == Add) && (operation != VectorOperation::insert)) ||
+            ((last_action == Insert) && (operation != VectorOperation::add)),
+          ExcMessage("Operation and argument to compress() do not match"));
       }
 
     // flush buffers
@@ -1762,9 +1761,8 @@ namespace TrilinosWrappers
   SparseMatrix::operator=(const double d)
   {
     Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
-    compress(
-      ::dealii::VectorOperation::unknown); // TODO: why do we do this? Should we
-                                           // not check for is_compressed?
+    compress(VectorOperation::unknown); // TODO: why do we do this? Should we
+                                        // not check for is_compressed?
 
     const int ierr = matrix->PutScalar(d);
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));

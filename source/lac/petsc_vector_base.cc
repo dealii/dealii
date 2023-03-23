@@ -123,7 +123,7 @@ namespace PETScWrappers
   VectorBase::VectorBase()
     : vector(nullptr)
     , ghosted(false)
-    , last_action(::dealii::VectorOperation::unknown)
+    , last_action(VectorOperation::unknown)
   {}
 
 
@@ -132,7 +132,7 @@ namespace PETScWrappers
     : Subscriptor()
     , ghosted(v.ghosted)
     , ghost_indices(v.ghost_indices)
-    , last_action(::dealii::VectorOperation::unknown)
+    , last_action(VectorOperation::unknown)
   {
     PetscErrorCode ierr = VecDuplicate(v.vector, &vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -147,7 +147,7 @@ namespace PETScWrappers
     : Subscriptor()
     , vector(v)
     , ghosted(false)
-    , last_action(::dealii::VectorOperation::unknown)
+    , last_action(VectorOperation::unknown)
   {
     /* TODO GHOSTED */
     const PetscErrorCode ierr =
@@ -171,7 +171,7 @@ namespace PETScWrappers
   VectorBase::reinit(Vec v)
   {
     /* TODO GHOSTED */
-    AssertThrow(last_action == ::dealii::VectorOperation::unknown,
+    AssertThrow(last_action == VectorOperation::unknown,
                 ExcMessage("Cannot assign a new Vec"));
     PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(v));
@@ -189,7 +189,7 @@ namespace PETScWrappers
 
     ghosted = false;
     ghost_indices.clear();
-    last_action = ::dealii::VectorOperation::unknown;
+    last_action = VectorOperation::unknown;
   }
 
 
@@ -407,8 +407,8 @@ namespace PETScWrappers
                                      get_mpi_communicator());
       AssertThrowMPI(ierr);
 
-      AssertThrow(all_int_last_action != (::dealii::VectorOperation::add |
-                                          ::dealii::VectorOperation::insert),
+      AssertThrow(all_int_last_action !=
+                    (VectorOperation::add | VectorOperation::insert),
                   ExcMessage("Error: not all processors agree on the last "
                              "VectorOperation before this compress() call."));
 #    endif
@@ -416,8 +416,7 @@ namespace PETScWrappers
     }
 
     AssertThrow(
-      last_action == ::dealii::VectorOperation::unknown ||
-        last_action == operation,
+      last_action == VectorOperation::unknown || last_action == operation,
       ExcMessage(
         "Missing compress() or calling with wrong VectorOperation argument."));
 
@@ -443,7 +442,7 @@ namespace PETScWrappers
     // reset the last action field to
     // indicate that we're back to a
     // pristine state
-    last_action = ::dealii::VectorOperation::unknown;
+    last_action = VectorOperation::unknown;
   }
 
 
@@ -973,11 +972,9 @@ namespace PETScWrappers
                                    const PetscScalar *values,
                                    const bool         add_values)
   {
-    ::dealii::VectorOperation::values action =
-      (add_values ? ::dealii::VectorOperation::add :
-                    ::dealii::VectorOperation::insert);
-    Assert((last_action == action) ||
-             (last_action == ::dealii::VectorOperation::unknown),
+    VectorOperation::values action =
+      (add_values ? VectorOperation::add : VectorOperation::insert);
+    Assert((last_action == action) || (last_action == VectorOperation::unknown),
            internal::VectorReference::ExcWrongMode(action, last_action));
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     // VecSetValues complains if we

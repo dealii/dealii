@@ -326,7 +326,7 @@ namespace PETScWrappers
           ierr = MatMPIAIJSetPreallocationCSR(matrix, &i, &i, nullptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
-      compress(dealii::VectorOperation::insert);
+      compress(VectorOperation::insert);
 
       {
         close_matrix(matrix);
@@ -664,7 +664,7 @@ namespace PETScWrappers
           ierr = MatSeqAIJSetPreallocationCSR(local_matrix, &i, &i, nullptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
-      compress(dealii::VectorOperation::insert);
+      compress(VectorOperation::insert);
 
       {
         close_matrix(local_matrix);
