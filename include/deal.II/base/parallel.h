@@ -134,9 +134,11 @@ namespace parallel
    */
   template <typename InputIterator, typename OutputIterator, typename Function>
   DEAL_II_CXX20_REQUIRES(
-    (std::invocable<Function, InputIterator> &&
-     std::assignable_from<decltype(*std::declval<OutputIterator>()),
-                          std::invoke_result_t<Function, InputIterator>>))
+    (std::invocable<Function, decltype(*std::declval<InputIterator>())> &&
+     std::assignable_from<
+       decltype(*std::declval<OutputIterator>()),
+       std::invoke_result_t<Function,
+                            decltype(*std::declval<InputIterator>())>>))
   void transform(const InputIterator &begin_in,
                  const InputIterator &end_in,
                  OutputIterator       out,
@@ -196,10 +198,14 @@ namespace parallel
             typename OutputIterator,
             typename Function>
   DEAL_II_CXX20_REQUIRES(
-    (std::invocable<Function, InputIterator1, InputIterator2> &&
+    (std::invocable<Function,
+                    decltype(*std::declval<InputIterator1>()),
+                    decltype(*std::declval<InputIterator2>())> &&
      std::assignable_from<
        decltype(*std::declval<OutputIterator>()),
-       std::invoke_result_t<Function, InputIterator1, InputIterator2>>))
+       std::invoke_result_t<Function,
+                            decltype(*std::declval<InputIterator1>()),
+                            decltype(*std::declval<InputIterator2>())>>))
   void transform(const InputIterator1 &begin_in1,
                  const InputIterator1 &end_in1,
                  InputIterator2        in2,
@@ -262,12 +268,16 @@ namespace parallel
             typename OutputIterator,
             typename Function>
   DEAL_II_CXX20_REQUIRES(
-    (std::invocable<Function, InputIterator1, InputIterator2, InputIterator3> &&
-     std::assignable_from<decltype(*std::declval<OutputIterator>()),
-                          std::invoke_result_t<Function,
-                                               InputIterator1,
-                                               InputIterator2,
-                                               InputIterator3>>))
+    (std::invocable<Function,
+                    decltype(*std::declval<InputIterator1>()),
+                    decltype(*std::declval<InputIterator2>()),
+                    decltype(*std::declval<InputIterator3>())> &&
+     std::assignable_from<
+       decltype(*std::declval<OutputIterator>()),
+       std::invoke_result_t<Function,
+                            decltype(*std::declval<InputIterator1>()),
+                            decltype(*std::declval<InputIterator2>()),
+                            decltype(*std::declval<InputIterator3>())>>))
   void transform(const InputIterator1 &begin_in1,
                  const InputIterator1 &end_in1,
                  InputIterator2        in2,
