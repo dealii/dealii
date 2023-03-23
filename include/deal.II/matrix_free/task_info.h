@@ -578,13 +578,13 @@ namespace internal
 
       /**
        * Number of even partitions accumulated over the field @p
-       * partitions_even
+       * partition_evens
        */
       unsigned int evens;
 
       /**
        * Number of odd partitions accumulated over the field @p
-       * partitions_odd
+       * partition_odds
        */
       unsigned int odds;
 
