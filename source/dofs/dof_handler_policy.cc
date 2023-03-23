@@ -50,11 +50,6 @@ namespace internal
   {
     namespace Policy
     {
-      // use class dealii::DoFHandler instead
-      // of namespace internal::DoFHandler in
-      // the following
-      using dealii::DoFHandler;
-
       namespace
       {
         /**

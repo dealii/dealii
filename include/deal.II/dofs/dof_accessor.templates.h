@@ -1980,10 +1980,6 @@ template <int spacedim, bool level_dof_access>
 inline unsigned int
 DoFAccessor<0, 1, spacedim, level_dof_access>::n_active_fe_indices() const
 {
-  Assert((std::is_same<DoFHandler<1, spacedim>,
-                       dealii::DoFHandler<1, spacedim>>::value == true),
-         ExcNotImplemented());
-
   return 1;
 }
 
@@ -1994,10 +1990,6 @@ inline types::fe_index
 DoFAccessor<0, 1, spacedim, level_dof_access>::nth_active_fe_index(
   const unsigned int /*n*/) const
 {
-  Assert((std::is_same<DoFHandler<1, spacedim>,
-                       dealii::DoFHandler<1, spacedim>>::value == true),
-         ExcNotImplemented());
-
   return 0;
 }
 
@@ -2117,13 +2109,6 @@ namespace internal
 {
   namespace DoFCellAccessorImplementation
   {
-    // make sure we refer to class
-    // dealii::DoFCellAccessor, not
-    // namespace
-    // dealii::internal::DoFCellAccessor
-    using dealii::DoFCellAccessor;
-    using dealii::DoFHandler;
-
     /**
      * A class with the same purpose as the similarly named class of the
      * Triangulation class. See there for more information.

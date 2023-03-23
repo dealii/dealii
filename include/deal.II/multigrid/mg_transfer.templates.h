@@ -56,7 +56,7 @@ namespace internal
      */
     template <int dim, typename number, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
+    reinit_vector(const DoFHandler<dim, spacedim> &dof_handler,
                   const std::vector<unsigned int> &,
                   MGLevelObject<dealii::Vector<number>> &v)
     {
@@ -75,9 +75,9 @@ namespace internal
      */
     template <int dim, typename number, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
-                  std::vector<unsigned int>                target_component,
-                  MGLevelObject<BlockVector<number>> &     v)
+    reinit_vector(const DoFHandler<dim, spacedim> &   dof_handler,
+                  std::vector<unsigned int>           target_component,
+                  MGLevelObject<BlockVector<number>> &v)
     {
       const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
       if (target_component.size() == 0)
@@ -115,7 +115,7 @@ namespace internal
      */
     template <int dim, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
+    reinit_vector(const DoFHandler<dim, spacedim> &dof_handler,
                   const std::vector<unsigned int> &,
                   MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
     {
@@ -143,7 +143,7 @@ namespace internal
      */
     template <int dim, int spacedim>
     void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &dof_handler,
+    reinit_vector(const DoFHandler<dim, spacedim> &dof_handler,
                   const std::vector<unsigned int> &,
                   MGLevelObject<PETScWrappers::MPI::Vector> &v)
     {

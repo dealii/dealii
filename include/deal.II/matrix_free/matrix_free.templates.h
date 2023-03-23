@@ -1125,9 +1125,9 @@ namespace internal
   std::vector<bool>
   compute_dof_info(
     const std::vector<const dealii::AffineConstraints<number> *> &constraint,
-    const std::vector<IndexSet> &locally_owned_dofs,
-    const std::vector<SmartPointer<const dealii::DoFHandler<dim>>> &dof_handler,
-    const Table<2, MatrixFreeFunctions::ShapeInfo<double>> &        shape_infos,
+    const std::vector<IndexSet> &                           locally_owned_dofs,
+    const std::vector<SmartPointer<const DoFHandler<dim>>> &dof_handler,
+    const Table<2, MatrixFreeFunctions::ShapeInfo<double>> &shape_infos,
     const unsigned int               cell_level_index_end_local,
     const unsigned int               mg_level,
     const bool                       hold_all_faces_to_owned_cells,

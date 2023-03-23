@@ -1061,10 +1061,10 @@ namespace internal
          */
         template <int spacedim>
         static void
-        reserve_space(dealii::DoFHandler<1, spacedim> &dof_handler)
+        reserve_space(DoFHandler<1, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
-                 (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
+                 (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
@@ -1086,10 +1086,10 @@ namespace internal
 
         template <int spacedim>
         static void
-        reserve_space(dealii::DoFHandler<2, spacedim> &dof_handler)
+        reserve_space(DoFHandler<2, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
-                 (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
+                 (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
@@ -1113,10 +1113,10 @@ namespace internal
 
         template <int spacedim>
         static void
-        reserve_space(dealii::DoFHandler<3, spacedim> &dof_handler)
+        reserve_space(DoFHandler<3, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
-                 (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
+                 (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
@@ -1328,15 +1328,18 @@ namespace internal
               // to have functions that can pack and unpack the data we want to
               // transport -- namely, the single unsigned int active_fe_index
               // objects
-              auto pack = [](const typename dealii::DoFHandler<dim, spacedim>::
-                               active_cell_iterator &cell) -> types::fe_index {
+              auto pack =
+                [](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &cell) -> types::fe_index {
                 return cell->active_fe_index();
               };
 
-              auto unpack = [&dof_handler](
-                              const typename dealii::DoFHandler<dim, spacedim>::
-                                active_cell_iterator &cell,
-                              const types::fe_index   active_fe_index) -> void {
+              auto unpack =
+                [&dof_handler](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &                   cell,
+                  const types::fe_index active_fe_index) -> void {
                 // we would like to say
                 //   cell->set_active_fe_index(active_fe_index);
                 // but this is not allowed on cells that are not
@@ -1348,7 +1351,7 @@ namespace internal
 
               GridTools::exchange_cell_data_to_ghosts<
                 types::fe_index,
-                dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
+                DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
             }
           else
             {
@@ -1414,17 +1417,19 @@ namespace internal
                            DistributedTriangulationBase<dim, spacedim> *>(
                          &dof_handler.get_triangulation()))
             {
-              auto pack = [&dof_handler](
-                            const typename dealii::DoFHandler<dim, spacedim>::
-                              active_cell_iterator &cell) -> types::fe_index {
+              auto pack =
+                [&dof_handler](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &cell) -> types::fe_index {
                 return dof_handler
                   .hp_cell_future_fe_indices[cell->level()][cell->index()];
               };
 
-              auto unpack = [&dof_handler](
-                              const typename dealii::DoFHandler<dim, spacedim>::
-                                active_cell_iterator &cell,
-                              const types::fe_index   future_fe_index) -> void {
+              auto unpack =
+                [&dof_handler](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &                   cell,
+                  const types::fe_index future_fe_index) -> void {
                 dof_handler
                   .hp_cell_future_fe_indices[cell->level()][cell->index()] =
                   future_fe_index;
@@ -1432,7 +1437,7 @@ namespace internal
 
               GridTools::exchange_cell_data_to_ghosts<
                 types::fe_index,
-                dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
+                DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
             }
           else
             {

@@ -901,8 +901,7 @@ namespace DoFTools
     {
       template <int spacedim>
       IndexSet
-      extract_hanging_node_dofs(
-        const dealii::DoFHandler<1, spacedim> &dof_handler)
+      extract_hanging_node_dofs(const DoFHandler<1, spacedim> &dof_handler)
       {
         // there are no hanging nodes in 1d
         return IndexSet(dof_handler.n_dofs());
@@ -911,8 +910,7 @@ namespace DoFTools
 
       template <int spacedim>
       IndexSet
-      extract_hanging_node_dofs(
-        const dealii::DoFHandler<2, spacedim> &dof_handler)
+      extract_hanging_node_dofs(const DoFHandler<2, spacedim> &dof_handler)
       {
         const unsigned int dim = 2;
 
@@ -928,8 +926,7 @@ namespace DoFTools
               for (const unsigned int face : cell->face_indices())
                 if (cell->face(face)->has_children())
                   {
-                    const typename dealii::DoFHandler<dim,
-                                                      spacedim>::line_iterator
+                    const typename DoFHandler<dim, spacedim>::line_iterator
                       line = cell->face(face);
 
                     for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
@@ -957,8 +954,7 @@ namespace DoFTools
 
       template <int spacedim>
       IndexSet
-      extract_hanging_node_dofs(
-        const dealii::DoFHandler<3, spacedim> &dof_handler)
+      extract_hanging_node_dofs(const DoFHandler<3, spacedim> &dof_handler)
       {
         const unsigned int dim = 3;
 
@@ -971,8 +967,8 @@ namespace DoFTools
           if (!cell->is_artificial())
             for (auto f : cell->face_indices())
               {
-                const typename dealii::DoFHandler<dim, spacedim>::face_iterator
-                  face = cell->face(f);
+                const typename DoFHandler<dim, spacedim>::face_iterator face =
+                  cell->face(f);
                 if (cell->face(f)->has_children())
                   {
                     for (unsigned int child = 0; child < 4; ++child)

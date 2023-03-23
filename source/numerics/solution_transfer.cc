@@ -217,7 +217,7 @@ namespace internal
    */
   template <int dim, int spacedim>
   void
-  extract_interpolation_matrices(const dealii::DoFHandler<dim, spacedim> &dof,
+  extract_interpolation_matrices(const DoFHandler<dim, spacedim> &     dof,
                                  dealii::Table<2, FullMatrix<double>> &matrices)
   {
     if (dof.has_hp_capabilities() == false)

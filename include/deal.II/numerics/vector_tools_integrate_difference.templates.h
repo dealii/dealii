@@ -611,7 +611,7 @@ namespace VectorTools
                            concepts::is_writable_dealii_vector_type<OutVector>)
   void integrate_difference(
     const dealii::hp::MappingCollection<dim, spacedim> &     mapping,
-    const dealii::DoFHandler<dim, spacedim> &                dof,
+    const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
@@ -635,7 +635,7 @@ namespace VectorTools
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
                            concepts::is_writable_dealii_vector_type<OutVector>)
   void integrate_difference(
-    const dealii::DoFHandler<dim, spacedim> &                dof,
+    const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
