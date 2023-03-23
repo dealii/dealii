@@ -25,18 +25,18 @@
 
 template <int dim>
 Point<dim>
-trans_func(Point<dim> &p);
+trans_func(const Point<dim> &p);
 
 template <>
 Point<2>
-trans_func(Point<2> &p)
+trans_func(const Point<2> &p)
 {
   Point<2> r(p(0) + p(1) * p(1), p(1));
   return r;
 }
 template <>
 Point<3>
-trans_func(Point<3> &p)
+trans_func(const Point<3> &p)
 {
   Point<3> r(p(0) + p(1) * p(1), p(1), p(2));
   return r;
