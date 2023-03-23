@@ -34,7 +34,12 @@ namespace CUDA = LinearAlgebra::CUDAWrappers;
 
 template <int M, int N, int type, bool add, bool dof_to_quad>
 __global__ void
-evaluate_tensor_product(double *dst, double *src)
+evaluate_tensor_product(
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values,
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients,
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients,
+  double *                                                   dst,
+  double *                                                   src)
 {
   CUDAWrappers::internal::EvaluatorTensorProduct<
     CUDAWrappers::internal::evaluate_general,
@@ -42,14 +47,12 @@ evaluate_tensor_product(double *dst, double *src)
     M - 1,
     N,
     double>
-    evaluator(0);
+    evaluator(shape_values, shape_gradients, co_shape_gradients);
 
   if (type == 0)
-    evaluator.template values<0, dof_to_quad, add, false>(
-      CUDAWrappers::internal::get_global_shape_values<double>(0), src, dst);
+    evaluator.template values<0, dof_to_quad, add, false>(src, dst);
   if (type == 1)
-    evaluator.template gradients<0, dof_to_quad, add, false>(
-      CUDAWrappers::internal::get_global_shape_values<double>(0), src, dst);
+    evaluator.template gradients<0, dof_to_quad, add, false>(src, dst);
 }
 
 template <int M, int N, int type, bool add>
@@ -57,7 +60,8 @@ void
 test()
 {
   deallog << "Test " << M << " x " << N << std::endl;
-  LinearAlgebra::ReadWriteVector<double> shape_host(M * N);
+  unsigned int                           size_shape_values = M * N;
+  LinearAlgebra::ReadWriteVector<double> shape_host(size_shape_values);
   for (unsigned int i = 0; i < (M + 1) / 2; ++i)
     for (unsigned int j = 0; j < N; ++j)
       {
@@ -96,28 +100,33 @@ test()
   x_dev.import(x_host, VectorOperation::insert);
   y_dev.import(y_host, VectorOperation::insert);
 
-  unsigned int size_shape_values = M * N * sizeof(double);
 
-  cudaError_t cuda_error =
-    cudaMemcpyToSymbol(CUDAWrappers::internal::get_global_shape_values<double>(
-                         0),
-                       shape_host.begin(),
-                       size_shape_values,
-                       0,
-                       cudaMemcpyHostToDevice);
-  AssertCuda(cuda_error);
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values(
+    Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
+    size_shape_values);
+  Kokkos::View<double *,
+               MemorySpace::Host::kokkos_space,
+               Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+    shape_host_view(shape_host.begin(), size_shape_values);
+  Kokkos::deep_copy(shape_values, shape_host_view);
 
-  cuda_error = cudaMemcpyToSymbol(
-    CUDAWrappers::internal::get_global_shape_gradients<double>(0),
-    shape_host.begin(),
-    size_shape_values,
-    0,
-    cudaMemcpyHostToDevice);
-  AssertCuda(cuda_error);
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients(
+    Kokkos::view_alloc("shape_gradients", Kokkos::WithoutInitializing),
+    size_shape_values);
+  Kokkos::deep_copy(shape_gradients, shape_host_view);
+
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients(
+    Kokkos::view_alloc("co_shape_gradients", Kokkos::WithoutInitializing),
+    size_shape_values);
+  Kokkos::deep_copy(co_shape_gradients, shape_host_view);
+
 
   // Launch the kernel
-  evaluate_tensor_product<M, N, type, add, false>
-    <<<1, M>>>(y_dev.get_values(), x_dev.get_values());
+  evaluate_tensor_product<M, N, type, add, false><<<1, M>>>(shape_values,
+                                                            shape_gradients,
+                                                            co_shape_gradients,
+                                                            y_dev.get_values(),
+                                                            x_dev.get_values());
 
   // Check the results on the host
   y_host.import(y_dev, VectorOperation::insert);
@@ -145,8 +154,11 @@ test()
   x_dev.import(x_host, VectorOperation::insert);
 
   // Launch the kernel
-  evaluate_tensor_product<M, N, type, add, true>
-    <<<1, M>>>(x_dev.get_values(), y_dev.get_values());
+  evaluate_tensor_product<M, N, type, add, true><<<1, M>>>(shape_values,
+                                                           shape_gradients,
+                                                           co_shape_gradients,
+                                                           x_dev.get_values(),
+                                                           y_dev.get_values());
 
   // Check the results on the host
   x_host.import(x_dev, VectorOperation::insert);
@@ -162,6 +174,7 @@ main()
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
+  Kokkos::initialize();
   init_cuda();
 
   deallog.push("values");
@@ -203,6 +216,8 @@ main()
   deallog.pop();
 
   deallog.pop();
+
+  Kokkos::finalize();
 
   return 0;
 }

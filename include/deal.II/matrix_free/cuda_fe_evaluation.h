@@ -249,10 +249,9 @@ namespace CUDAWrappers
                                  MemorySpace::Default::kokkos_space>,
                     int,
                     Kokkos::pair<int, int>>
-                       local_to_global;
-    unsigned int       n_cells;
-    unsigned int       padding_length;
-    const unsigned int mf_object_id;
+                 local_to_global;
+    unsigned int n_cells;
+    unsigned int padding_length;
 
     const dealii::internal::MatrixFreeFunctions::ConstraintKinds
       constraint_mask;
@@ -282,6 +281,14 @@ namespace CUDAWrappers
                     Kokkos::pair<int, int>>
       JxW;
 
+    // Data shared by multiple cells
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_gradients;
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+      co_shape_gradients;
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+      constraint_weights;
+
     // Internal buffer
     Number *values;
     Number *gradients[dim];
@@ -305,7 +312,6 @@ namespace CUDAWrappers
         Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim))))
     , n_cells(data->n_cells)
     , padding_length(data->padding_length)
-    , mf_object_id(data->id)
     , constraint_mask(data->constraint_mask[cell_id])
     , use_coloring(data->use_coloring)
     , inv_jac(Kokkos::subview(
@@ -318,6 +324,10 @@ namespace CUDAWrappers
         data->JxW,
         cell_id,
         Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim))))
+    , shape_values(data->shape_values)
+    , shape_gradients(data->shape_gradients)
+    , co_shape_gradients(data->co_shape_gradients)
+    , constraint_weights(data->constraint_weights)
     , values(shdata->values)
   {
     for (unsigned int i = 0; i < dim; ++i)
@@ -344,7 +354,8 @@ namespace CUDAWrappers
     KOKKOS_IF_ON_DEVICE(values[idx] = __ldg(&src[src_idx]); __syncthreads();)
     KOKKOS_IF_ON_HOST(values[idx] = src[src_idx];)
 
-    internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_mask,
+    internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
   }
 
@@ -361,7 +372,8 @@ namespace CUDAWrappers
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
-    internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_mask,
+    internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_weights,
+                                                          constraint_mask,
                                                           values);
 
     const unsigned int idx = internal::compute_index<dim, n_q_points_1d>();
@@ -394,7 +406,9 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product(mf_object_id);
+      evaluator_tensor_product(shape_values,
+                               shape_gradients,
+                               co_shape_gradients);
     if (evaluate_val == true && evaluate_grad == true)
       {
         evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
@@ -431,7 +445,9 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product(mf_object_id);
+      evaluator_tensor_product(shape_values,
+                               shape_gradients,
+                               co_shape_gradients);
     if (integrate_val == true && integrate_grad == true)
       {
         evaluator_tensor_product.integrate_value_and_gradient(values,

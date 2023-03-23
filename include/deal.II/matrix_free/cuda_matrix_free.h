@@ -188,9 +188,34 @@ namespace CUDAWrappers
       Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
 
       /**
-       * ID of the associated MatrixFree object.
+       * Mask deciding where constraints are set on a given cell.
        */
-      unsigned int id;
+      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                   MemorySpace::Default::kokkos_space>
+        constraint_mask;
+
+      /**
+       * Values of the shape functions.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
+
+      /**
+       * Gradients of the shape functions.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        shape_gradients;
+
+      /**
+       * Gradients of the shape functions for collocation methods.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        co_shape_gradients;
+
+      /**
+       * Weights used when resolving hanginf nodes.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights;
 
       /**
        * Number of cells.
@@ -208,13 +233,6 @@ namespace CUDAWrappers
       unsigned int row_start;
 
       /**
-       * Mask deciding where constraints are set on a given cell.
-       */
-      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
-                   MemorySpace::Default::kokkos_space>
-        constraint_mask;
-
-      /**
        * If true, use graph coloring has been used and we can simply add into
        * the destingation vector. Otherwise, use atomic operations.
        */
@@ -225,11 +243,6 @@ namespace CUDAWrappers
      * Default constructor.
      */
     MatrixFree();
-
-    /**
-     * Destructor.
-     */
-    ~MatrixFree();
 
     /**
      * Return the length of the padding.
@@ -377,12 +390,6 @@ namespace CUDAWrappers
      */
     const std::shared_ptr<const Utilities::MPI::Partitioner> &
     get_vector_partitioner() const;
-
-    /**
-     * Free all the memory allocated.
-     */
-    void
-    free();
 
     /**
      * Return the DoFHandler.
@@ -539,6 +546,28 @@ namespace CUDAWrappers
       Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
                    MemorySpace::Default::kokkos_space>>
       constraint_mask;
+
+    /**
+     * Values of the shape functions.
+     */
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
+
+    /**
+     * Gradients of the shape functions.
+     */
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_gradients;
+
+    /**
+     * Gradients of the shape functions for collocation methods.
+     */
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+      co_shape_gradients;
+
+    /**
+     * Weights used when resolving hanginf nodes.
+     */
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+      constraint_weights;
 
     /**
      * Grid dimensions associated to the different colors. The grid dimensions
@@ -753,11 +782,6 @@ namespace CUDAWrappers
                           MemorySpace::Default::kokkos_space>::HostMirror JxW;
 
     /**
-     * ID of the associated MatrixFree object.
-     */
-    unsigned int id;
-
-    /**
      * Number of cells.
      */
     unsigned int n_cells;
@@ -802,7 +826,6 @@ namespace CUDAWrappers
   {
     DataHost<dim, Number> data_host;
 
-    data_host.id             = data.id;
     data_host.n_cells        = data.n_cells;
     data_host.padding_length = data.padding_length;
     data_host.row_start      = data.row_start;

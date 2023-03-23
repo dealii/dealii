@@ -53,89 +53,6 @@ namespace CUDAWrappers
 {
   namespace internal
   {
-    constexpr unsigned int data_array_size =
-      (mf_max_elem_degree + 1) * (mf_max_elem_degree + 1);
-
-    // Default initialized to false
-    extern std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
-
-    template <typename NumberType>
-    using DataArray = NumberType[data_array_size];
-
-    // These variables are stored in the device constant memory.
-    // Shape values
-    __constant__ double global_shape_values_d[mf_n_concurrent_objects]
-                                             [data_array_size];
-    __constant__ float global_shape_values_f[mf_n_concurrent_objects]
-                                            [data_array_size];
-    // Shape gradients
-    __constant__ double global_shape_gradients_d[mf_n_concurrent_objects]
-                                                [data_array_size];
-    __constant__ float global_shape_gradients_f[mf_n_concurrent_objects]
-                                               [data_array_size];
-    // for collocation methods
-    __constant__ double global_co_shape_gradients_d[mf_n_concurrent_objects]
-                                                   [data_array_size];
-    __constant__ float global_co_shape_gradients_f[mf_n_concurrent_objects]
-                                                  [data_array_size];
-
-    template <typename Number>
-    DEAL_II_HOST_DEVICE inline DataArray<Number> &
-    get_global_shape_values(unsigned int i);
-
-    template <>
-    DEAL_II_HOST_DEVICE inline DataArray<double> &
-    get_global_shape_values<double>(unsigned int i)
-    {
-      return global_shape_values_d[i];
-    }
-
-    template <>
-    DEAL_II_HOST_DEVICE inline DataArray<float> &
-    get_global_shape_values<float>(unsigned int i)
-    {
-      return global_shape_values_f[i];
-    }
-
-    template <typename Number>
-    DEAL_II_HOST_DEVICE inline DataArray<Number> &
-    get_global_shape_gradients(unsigned int i);
-
-    template <>
-    DEAL_II_HOST_DEVICE inline DataArray<double> &
-    get_global_shape_gradients<double>(unsigned int i)
-    {
-      return global_shape_gradients_d[i];
-    }
-
-    template <>
-    DEAL_II_HOST_DEVICE inline DataArray<float> &
-    get_global_shape_gradients<float>(unsigned int i)
-    {
-      return global_shape_gradients_f[i];
-    }
-
-    // for collocation methods
-    template <typename Number>
-    DEAL_II_HOST_DEVICE inline DataArray<Number> &
-    get_global_co_shape_gradients(unsigned int i);
-
-    template <>
-    DEAL_II_HOST_DEVICE inline DataArray<double> &
-    get_global_co_shape_gradients<double>(unsigned int i)
-    {
-      return global_co_shape_gradients_d[i];
-    }
-
-    template <>
-    DEAL_II_HOST_DEVICE inline DataArray<float> &
-    get_global_co_shape_gradients<float>(unsigned int i)
-    {
-      return global_co_shape_gradients_f[i];
-    }
-
-
-
     /**
      * Helper class to (re)initialize MatrixFree object.
      */
@@ -222,13 +139,6 @@ namespace CUDAWrappers
       , padding_length(data->get_padding_length())
       , hanging_nodes(dof_handler.get_triangulation())
     {
-      cudaError_t error_code = cudaMemcpyToSymbol(
-        constraint_weights,
-        shape_info.data.front().subface_interpolation_matrices[0].data(),
-        sizeof(double) *
-          shape_info.data.front().subface_interpolation_matrices[0].size());
-      AssertCuda(error_code);
-
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
     }
@@ -559,14 +469,6 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  MatrixFree<dim, Number>::~MatrixFree()
-  {
-    free();
-  }
-
-
-
-  template <int dim, typename Number>
   template <typename IteratorFiltersType>
   void
   MatrixFree<dim, Number>::reinit(const Mapping<dim> &             mapping,
@@ -646,25 +548,18 @@ namespace CUDAWrappers
       data_copy.inv_jacobian = inv_jacobian[color];
     if (JxW.size() > 0)
       data_copy.JxW = JxW[color];
-    data_copy.local_to_global = local_to_global[color];
-    data_copy.id              = my_id;
-    data_copy.n_cells         = n_cells[color];
-    data_copy.padding_length  = padding_length;
-    data_copy.row_start       = row_start[color];
-    data_copy.use_coloring    = use_coloring;
-    data_copy.constraint_mask = constraint_mask[color];
+    data_copy.local_to_global    = local_to_global[color];
+    data_copy.constraint_mask    = constraint_mask[color];
+    data_copy.shape_values       = shape_values;
+    data_copy.shape_gradients    = shape_gradients;
+    data_copy.co_shape_gradients = co_shape_gradients;
+    data_copy.constraint_weights = constraint_weights;
+    data_copy.n_cells            = n_cells[color];
+    data_copy.padding_length     = padding_length;
+    data_copy.row_start          = row_start[color];
+    data_copy.use_coloring       = use_coloring;
 
     return data_copy;
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::free()
-  {
-    internal::used_objects[my_id].store(false);
-    my_id = -1;
   }
 
 
@@ -845,9 +740,6 @@ namespace CUDAWrappers
     this->overlap_communication_computation =
       additional_data.overlap_communication_computation;
 
-    // TODO: only free if we actually need arrays of different length
-    free();
-
     n_dofs = dof_handler->n_dofs();
 
     const FiniteElement<dim> &fe = dof_handler->get_fe();
@@ -871,55 +763,50 @@ namespace CUDAWrappers
     const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
       quad, fe);
 
-    unsigned int size_shape_values = n_dofs_1d * n_q_points_1d * sizeof(Number);
+    unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
     FE_DGQArbitraryNodes<1> fe_quad_co(quad);
     const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
       shape_info_co(quad, fe_quad_co);
 
-    unsigned int size_co_shape_values =
-      n_q_points_1d * n_q_points_1d * sizeof(Number);
-
-    // Check if we already a part of the constant memory allocated to us. If
-    // not, we try to get a block of memory.
-    bool found_id = false;
-    while (!found_id)
+    shape_values = Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+      Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
+      size_shape_values);
+    auto shape_values_host = Kokkos::create_mirror_view(shape_values);
+    for (unsigned int i = 0; i < size_shape_values; ++i)
       {
-        ++my_id;
-        Assert(
-          my_id < static_cast<int>(mf_n_concurrent_objects),
-          ExcMessage(
-            "Maximum number of concurrent MatrixFree objects reached. Increase mf_n_concurrent_objects"));
-        bool f = false;
-        found_id =
-          internal::used_objects[my_id].compare_exchange_strong(f, true);
+        shape_values_host[i] = shape_info.data.front().shape_values[i];
       }
-
-    cudaError_t cuda_error =
-      cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(0),
-                         shape_info.data.front().shape_values.data(),
-                         size_shape_values,
-                         my_id * internal::data_array_size * sizeof(Number),
-                         cudaMemcpyHostToDevice);
-    AssertCuda(cuda_error);
+    Kokkos::deep_copy(shape_values, shape_values_host);
 
     if (update_flags & update_gradients)
       {
-        cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(0),
-                             shape_info.data.front().shape_gradients.data(),
-                             size_shape_values,
-                             my_id * internal::data_array_size * sizeof(Number),
-                             cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+        shape_gradients =
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("shape_gradients", Kokkos::WithoutInitializing),
+            size_shape_values);
+        auto shape_gradients_host = Kokkos::create_mirror_view(shape_gradients);
+        for (unsigned int i = 0; i < size_shape_values; ++i)
+          {
+            shape_gradients_host[i] =
+              shape_info.data.front().shape_gradients[i];
+          }
+        Kokkos::deep_copy(shape_gradients, shape_gradients_host);
 
-        cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(0),
-                             shape_info_co.data.front().shape_gradients.data(),
-                             size_co_shape_values,
-                             my_id * internal::data_array_size * sizeof(Number),
-                             cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+
+        co_shape_gradients =
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("co_shape_gradients",
+                               Kokkos::WithoutInitializing),
+            size_shape_values);
+        auto co_shape_gradients_host =
+          Kokkos::create_mirror_view(co_shape_gradients);
+        for (unsigned int i = 0; i < size_shape_values; ++i)
+          {
+            co_shape_gradients_host[i] =
+              shape_info_co.data.front().shape_gradients[i];
+          }
+        Kokkos::deep_copy(co_shape_gradients, co_shape_gradients_host);
       }
 
     // Setup the number of cells per CUDA thread block
@@ -927,6 +814,21 @@ namespace CUDAWrappers
 
     internal::ReinitHelper<dim, Number> helper(
       this, mapping, fe, quad, shape_info, *dof_handler, update_flags);
+
+    const unsigned int constraint_weights_size =
+      shape_info.data.front().subface_interpolation_matrices[0].size();
+    constraint_weights =
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+        Kokkos::view_alloc("constraint_weights", Kokkos::WithoutInitializing),
+        constraint_weights_size);
+    auto constraint_weights_host =
+      Kokkos::create_mirror_view(constraint_weights);
+    for (unsigned int i = 0; i < constraint_weights_size; ++i)
+      {
+        constraint_weights_host[i] =
+          shape_info.data.front().subface_interpolation_matrices[0][i];
+      }
+    Kokkos::deep_copy(constraint_weights, constraint_weights_host);
 
     // Create a graph coloring
     CellFilter begin(iterator_filter, dof_handler->begin_active());

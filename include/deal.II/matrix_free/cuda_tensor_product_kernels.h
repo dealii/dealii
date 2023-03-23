@@ -46,6 +46,52 @@ namespace CUDAWrappers
       evaluate_evenodd
     };
 
+    /**
+     * Helper function for values() and gradients().
+     */
+    template <int dim,
+              int n_q_points_1d,
+              typename Number,
+              int  direction,
+              bool dof_to_quad,
+              bool add,
+              bool in_place>
+    DEAL_II_HOST_DEVICE void
+    apply(Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_data,
+          const Number *                                             in,
+          Number *                                                   out)
+    {
+      KOKKOS_IF_ON_DEVICE(
+        const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
+        const unsigned int j = (dim == 3) ? threadIdx.y : 0;
+        const unsigned int q = (dim == 1) ? (threadIdx.x % n_q_points_1d) :
+                               (dim == 2) ? threadIdx.y :
+                                            threadIdx.z;
+
+        // This loop simply multiply the shape function at the quadrature point
+        // by the value finite element coefficient.
+        Number t = 0;
+        for (int k = 0; k < n_q_points_1d; ++k) {
+          const unsigned int shape_idx =
+            dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
+          const unsigned int source_idx =
+            (direction == 0) ? (k + n_q_points_1d * (i + n_q_points_1d * j)) :
+            (direction == 1) ? (i + n_q_points_1d * (k + n_q_points_1d * j)) :
+                               (i + n_q_points_1d * (j + n_q_points_1d * k));
+          t += shape_data[shape_idx] *
+               (in_place ? out[source_idx] : in[source_idx]);
+        }
+
+        if (in_place) __syncthreads();
+
+        const unsigned int destination_idx =
+          (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
+          (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
+                             (i + n_q_points_1d * (j + n_q_points_1d * q));
+
+        if (add) out[destination_idx] += t;
+        else out[destination_idx] = t;)
+    }
 
 
     /**
@@ -59,9 +105,7 @@ namespace CUDAWrappers
               int              n_q_points_1d,
               typename Number>
     struct EvaluatorTensorProduct
-    {
-      const int mf_object_id;
-    };
+    {};
 
 
 
@@ -78,13 +122,13 @@ namespace CUDAWrappers
                                   n_q_points_1d,
                                   Number>
     {
-      static constexpr unsigned int dofs_per_cell =
-        Utilities::pow(fe_degree + 1, dim);
-      static constexpr unsigned int n_q_points =
-        Utilities::pow(n_q_points_1d, dim);
-
       DEAL_II_HOST_DEVICE
-      EvaluatorTensorProduct(int mf_object_id);
+      EvaluatorTensorProduct(
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+          shape_gradients,
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+          co_shape_gradients);
 
       /**
        * Evaluate the values of a finite element function at the quadrature
@@ -92,7 +136,7 @@ namespace CUDAWrappers
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
       DEAL_II_HOST_DEVICE void
-      values(Number shape_values[], const Number *in, Number *out) const;
+      values(const Number *in, Number *out) const;
 
       /**
        * Evaluate the gradient of a finite element function at the quadrature
@@ -100,14 +144,14 @@ namespace CUDAWrappers
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
       DEAL_II_HOST_DEVICE void
-      gradients(Number shape_gradients[], const Number *in, Number *out) const;
+      gradients(const Number *in, Number *out) const;
 
       /**
-       * Helper function for values() and gradients().
+       * TODO
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
       DEAL_II_HOST_DEVICE void
-      apply(Number shape_data[], const Number *in, Number *out) const;
+      co_gradients(const Number *in, Number *out) const;
 
       /**
        * Evaluate the finite element function at the quadrature points.
@@ -150,7 +194,16 @@ namespace CUDAWrappers
       DEAL_II_HOST_DEVICE void
       integrate_value_and_gradient(Number *u, Number *grad_u[dim]);
 
-      const int mf_object_id;
+      // TODO shape values
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
+
+      // TODO shape gradients
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        shape_gradients;
+
+      // TODO shape gradients for collocation methods
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        co_shape_gradients;
     };
 
 
@@ -161,8 +214,16 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::EvaluatorTensorProduct(int object_id)
-      : mf_object_id(object_id)
+                           Number>::
+      EvaluatorTensorProduct(
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+          shape_gradients,
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+          co_shape_gradients)
+      : shape_values(shape_values)
+      , shape_gradients(shape_gradients)
+      , co_shape_gradients(co_shape_gradients)
     {}
 
 
@@ -174,11 +235,10 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::values(Number        shape_values[],
-                                           const Number *in,
-                                           Number *      out) const
+                           Number>::values(const Number *in, Number *out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(shape_values, in, out);
+      apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
+        shape_values, in, out);
     }
 
 
@@ -190,11 +250,11 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::gradients(Number        shape_gradients[],
-                                              const Number *in,
+                           Number>::gradients(const Number *in,
                                               Number *      out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(shape_gradients, in, out);
+      apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
+        shape_gradients, in, out);
     }
 
 
@@ -206,40 +266,11 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::apply(Number        shape_data[],
-                                          const Number *in,
-                                          Number *      out) const
+                           Number>::co_gradients(const Number *in,
+                                                 Number *      out) const
     {
-      KOKKOS_IF_ON_DEVICE(
-        const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
-        const unsigned int j = (dim == 3) ? threadIdx.y : 0;
-        const unsigned int q = (dim == 1) ? (threadIdx.x % n_q_points_1d) :
-                               (dim == 2) ? threadIdx.y :
-                                            threadIdx.z;
-
-        // This loop simply multiply the shape function at the quadrature point
-        // by the value finite element coefficient.
-        Number t = 0;
-        for (int k = 0; k < n_q_points_1d; ++k) {
-          const unsigned int shape_idx =
-            dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
-          const unsigned int source_idx =
-            (direction == 0) ? (k + n_q_points_1d * (i + n_q_points_1d * j)) :
-            (direction == 1) ? (i + n_q_points_1d * (k + n_q_points_1d * j)) :
-                               (i + n_q_points_1d * (j + n_q_points_1d * k));
-          t += shape_data[shape_idx] *
-               (in_place ? out[source_idx] : in[source_idx]);
-        }
-
-        if (in_place) __syncthreads();
-
-        const unsigned int destination_idx =
-          (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
-          (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
-                             (i + n_q_points_1d * (j + n_q_points_1d * q));
-
-        if (add) out[destination_idx] += t;
-        else out[destination_idx] = t;)
+      apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
+        co_shape_gradients, in, out);
     }
 
 
@@ -256,31 +287,25 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              values<0, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, true, false, true>(u, u);
 
               break;
             }
           case 2:
             {
-              values<0, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<1, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, true, false, true>(u, u);
 
               break;
             }
           case 3:
             {
-              values<0, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<1, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<2, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<2, true, false, true>(u, u);
 
               break;
             }
@@ -306,31 +331,25 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              values<0, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, false, false, true>(u, u);
 
               break;
             }
           case 2:
             {
-              values<0, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<1, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, false, false, true>(u, u);
 
               break;
             }
           case 3:
             {
-              values<0, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<1, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<2, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<2, false, false, true>(u, u);
 
               break;
             }
@@ -357,69 +376,39 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              gradients<0, true, false, false>(
-                get_global_shape_gradients<Number>(mf_object_id), u, grad_u[0]);
+              gradients<0, true, false, false>(u, grad_u[0]);
 
               break;
             }
           case 2:
             {
-              gradients<0, true, false, false>(
-                get_global_shape_gradients<Number>(mf_object_id), u, grad_u[0]);
-              values<0, true, false, false>(
-                get_global_shape_values<Number>(mf_object_id), u, grad_u[1]);
+              gradients<0, true, false, false>(u, grad_u[0]);
+              values<0, true, false, false>(u, grad_u[1]);
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, true, false, true>(get_global_shape_values<Number>(
-                                             mf_object_id),
-                                           grad_u[0],
-                                           grad_u[0]);
-              gradients<1, true, false, true>(
-                get_global_shape_gradients<Number>(mf_object_id),
-                grad_u[1],
-                grad_u[1]);
+              values<1, true, false, true>(grad_u[0], grad_u[0]);
+              gradients<1, true, false, true>(grad_u[1], grad_u[1]);
 
               break;
             }
           case 3:
             {
-              gradients<0, true, false, false>(
-                get_global_shape_gradients<Number>(mf_object_id), u, grad_u[0]);
-              values<0, true, false, false>(
-                get_global_shape_values<Number>(mf_object_id), u, grad_u[1]);
-              values<0, true, false, false>(
-                get_global_shape_values<Number>(mf_object_id), u, grad_u[2]);
+              gradients<0, true, false, false>(u, grad_u[0]);
+              values<0, true, false, false>(u, grad_u[1]);
+              values<0, true, false, false>(u, grad_u[2]);
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, true, false, true>(get_global_shape_values<Number>(
-                                             mf_object_id),
-                                           grad_u[0],
-                                           grad_u[0]);
-              gradients<1, true, false, true>(
-                get_global_shape_gradients<Number>(mf_object_id),
-                grad_u[1],
-                grad_u[1]);
-              values<1, true, false, true>(get_global_shape_values<Number>(
-                                             mf_object_id),
-                                           grad_u[2],
-                                           grad_u[2]);
+              values<1, true, false, true>(grad_u[0], grad_u[0]);
+              gradients<1, true, false, true>(grad_u[1], grad_u[1]);
+              values<1, true, false, true>(grad_u[2], grad_u[2]);
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<2, true, false, true>(get_global_shape_values<Number>(
-                                             mf_object_id),
-                                           grad_u[0],
-                                           grad_u[0]);
-              values<2, true, false, true>(get_global_shape_values<Number>(
-                                             mf_object_id),
-                                           grad_u[1],
-                                           grad_u[1]);
-              gradients<2, true, false, true>(
-                get_global_shape_gradients<Number>(mf_object_id),
-                grad_u[2],
-                grad_u[2]);
+              values<2, true, false, true>(grad_u[0], grad_u[0]);
+              values<2, true, false, true>(grad_u[1], grad_u[1]);
+              gradients<2, true, false, true>(grad_u[2], grad_u[2]);
 
               break;
             }
@@ -447,61 +436,37 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              values<0, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              gradients<0, true, false, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                u,
-                grad_u[0]);
+              co_gradients<0, true, false, false>(u, grad_u[0]);
 
               break;
             }
           case 2:
             {
-              values<0, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<1, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              gradients<0, true, false, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                u,
-                grad_u[0]);
-              gradients<1, true, false, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                u,
-                grad_u[1]);
+              co_gradients<0, true, false, false>(u, grad_u[0]);
+              co_gradients<1, true, false, false>(u, grad_u[1]);
 
               break;
             }
           case 3:
             {
-              values<0, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<1, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<2, true, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<2, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              gradients<0, true, false, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                u,
-                grad_u[0]);
-              gradients<1, true, false, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                u,
-                grad_u[1]);
-              gradients<2, true, false, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                u,
-                grad_u[2]);
+              co_gradients<0, true, false, false>(u, grad_u[0]);
+              co_gradients<1, true, false, false>(u, grad_u[1]);
+              co_gradients<2, true, false, false>(u, grad_u[2]);
 
               break;
             }
@@ -530,73 +495,43 @@ namespace CUDAWrappers
           case 1:
             {
               gradients<0, false, add, false>(
-                get_global_shape_gradients<Number>(mf_object_id),
-                grad_u[dim],
-                u);
+
+                grad_u[dim], u);
 
               break;
             }
           case 2:
             {
-              gradients<0, false, false, true>(
-                get_global_shape_gradients<Number>(mf_object_id),
-                grad_u[0],
-                grad_u[0]);
-              values<0, false, false, true>(get_global_shape_values<Number>(
-                                              mf_object_id),
-                                            grad_u[1],
-                                            grad_u[1]);
+              gradients<0, false, false, true>(grad_u[0], grad_u[0]);
+              values<0, false, false, true>(grad_u[1], grad_u[1]);
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, false, add, false>(
-                get_global_shape_values<Number>(mf_object_id), grad_u[0], u);
+              values<1, false, add, false>(grad_u[0], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              gradients<1, false, true, false>(
-                get_global_shape_gradients<Number>(mf_object_id), grad_u[1], u);
+              gradients<1, false, true, false>(grad_u[1], u);
 
               break;
             }
           case 3:
             {
-              gradients<0, false, false, true>(
-                get_global_shape_gradients<Number>(mf_object_id),
-                grad_u[0],
-                grad_u[0]);
-              values<0, false, false, true>(get_global_shape_values<Number>(
-                                              mf_object_id),
-                                            grad_u[1],
-                                            grad_u[1]);
-              values<0, false, false, true>(get_global_shape_values<Number>(
-                                              mf_object_id),
-                                            grad_u[2],
-                                            grad_u[2]);
+              gradients<0, false, false, true>(grad_u[0], grad_u[0]);
+              values<0, false, false, true>(grad_u[1], grad_u[1]);
+              values<0, false, false, true>(grad_u[2], grad_u[2]);
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, false, false, true>(get_global_shape_values<Number>(
-                                              mf_object_id),
-                                            grad_u[0],
-                                            grad_u[0]);
-              gradients<1, false, false, true>(
-                get_global_shape_gradients<Number>(mf_object_id),
-                grad_u[1],
-                grad_u[1]);
-              values<1, false, false, true>(get_global_shape_values<Number>(
-                                              mf_object_id),
-                                            grad_u[2],
-                                            grad_u[2]);
+              values<1, false, false, true>(grad_u[0], grad_u[0]);
+              gradients<1, false, false, true>(grad_u[1], grad_u[1]);
+              values<1, false, false, true>(grad_u[2], grad_u[2]);
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<2, false, add, false>(
-                get_global_shape_values<Number>(mf_object_id), grad_u[0], u);
+              values<2, false, add, false>(grad_u[0], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<2, false, true, false>(
-                get_global_shape_values<Number>(mf_object_id), grad_u[1], u);
+              values<2, false, true, false>(grad_u[1], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              gradients<2, false, true, false>(
-                get_global_shape_gradients<Number>(mf_object_id), grad_u[2], u);
+              gradients<2, false, true, false>(grad_u[2], u);
 
               break;
             }
@@ -624,65 +559,41 @@ namespace CUDAWrappers
         {
           case 1:
             {
-              gradients<0, false, true, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                grad_u[0],
-                u);
+              co_gradients<0, false, true, false>(grad_u[0], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<0, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, false, false, true>(u, u);
 
               break;
             }
           case 2:
             {
-              gradients<1, false, true, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                grad_u[1],
-                u);
+              co_gradients<1, false, true, false>(grad_u[1], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              gradients<0, false, true, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                grad_u[0],
-                u);
+              co_gradients<0, false, true, false>(grad_u[0], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<0, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               break;
             }
           case 3:
             {
-              gradients<2, false, true, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                grad_u[2],
-                u);
+              co_gradients<2, false, true, false>(grad_u[2], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              gradients<1, false, true, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                grad_u[1],
-                u);
+              co_gradients<1, false, true, false>(grad_u[1], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              gradients<0, false, true, false>(
-                get_global_co_shape_gradients<Number>(mf_object_id),
-                grad_u[0],
-                u);
+              co_gradients<0, false, true, false>(grad_u[0], u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<2, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<2, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<1, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<1, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<0, false, false, true>(
-                get_global_shape_values<Number>(mf_object_id), u, u);
+              values<0, false, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               break;

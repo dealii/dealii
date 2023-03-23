@@ -31,10 +31,6 @@ namespace CUDAWrappers
 {
   namespace internal
   {
-    __constant__ double
-      constraint_weights[(CUDAWrappers::mf_max_elem_degree + 1) *
-                         (CUDAWrappers::mf_max_elem_degree + 1)];
-
     //------------------------------------------------------------------------//
     // Functions for resolving the hanging node constraints on the GPU        //
     //------------------------------------------------------------------------//
@@ -62,6 +58,8 @@ namespace CUDAWrappers
               typename Number>
     DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_2d(
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
               constraint_mask,
       Number *values)
@@ -168,6 +166,8 @@ namespace CUDAWrappers
               typename Number>
     DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_3d(
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
               constraint_mask,
       Number *values)
@@ -317,28 +317,35 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, bool transpose, typename Number>
     DEAL_II_HOST_DEVICE void
     resolve_hanging_nodes(
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
               constraint_mask,
       Number *values)
     {
       if (dim == 2)
         {
-          interpolate_boundary_2d<fe_degree, 0, transpose>(constraint_mask,
+          interpolate_boundary_2d<fe_degree, 0, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
 
-          interpolate_boundary_2d<fe_degree, 1, transpose>(constraint_mask,
+          interpolate_boundary_2d<fe_degree, 1, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
         }
       else if (dim == 3)
         {
           // Interpolate y and z faces (x-direction)
-          interpolate_boundary_3d<fe_degree, 0, transpose>(constraint_mask,
+          interpolate_boundary_3d<fe_degree, 0, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
           // Interpolate x and z faces (y-direction)
-          interpolate_boundary_3d<fe_degree, 1, transpose>(constraint_mask,
+          interpolate_boundary_3d<fe_degree, 1, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
           // Interpolate x and y faces (z-direction)
-          interpolate_boundary_3d<fe_degree, 2, transpose>(constraint_mask,
+          interpolate_boundary_3d<fe_degree, 2, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
         }
     }
