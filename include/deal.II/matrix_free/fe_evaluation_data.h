@@ -1591,7 +1591,7 @@ FEEvaluationData<dim, Number, is_face>::get_scratch_data() const
 
 
 template <int dim, typename Number, bool is_face>
-std::uint8_t
+inline std::uint8_t
 FEEvaluationData<dim, Number, is_face>::get_face_no(const unsigned int v) const
 {
   Assert(is_face, ExcNotInitialized());
@@ -1617,7 +1617,7 @@ FEEvaluationData<dim, Number, is_face>::get_subface_index() const
 
 
 template <int dim, typename Number, bool is_face>
-std::uint8_t
+inline std::uint8_t
 FEEvaluationData<dim, Number, is_face>::get_face_orientation(
   const unsigned int v) const
 {
