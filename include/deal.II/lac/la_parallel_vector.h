@@ -516,7 +516,7 @@ namespace LinearAlgebra
        * after the second calculation will be zero.
        */
       virtual void
-      compress(::dealii::VectorOperation::values operation) override;
+      compress(VectorOperation::values operation) override;
 
       /**
        * Fills the data field for ghost indices with the values stored in the
@@ -560,9 +560,8 @@ namespace LinearAlgebra
        * LinearAlgebra::distributed::BlockVector).
        */
       void
-      compress_start(
-        const unsigned int                communication_channel = 0,
-        ::dealii::VectorOperation::values operation = VectorOperation::add);
+      compress_start(const unsigned int      communication_channel = 0,
+                     VectorOperation::values operation = VectorOperation::add);
 
       /**
        * For all requests that have been initiated in compress_start, wait for
@@ -583,7 +582,7 @@ namespace LinearAlgebra
        * the device after the call to compress_start will be lost.
        */
       void
-      compress_finish(::dealii::VectorOperation::values operation);
+      compress_finish(VectorOperation::values operation);
 
       /**
        * Initiates communication for the @p update_ghost_values() function

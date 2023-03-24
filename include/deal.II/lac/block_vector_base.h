@@ -508,7 +508,7 @@ public:
    * for more information.
    */
   void
-  compress(::dealii::VectorOperation::values operation);
+  compress(VectorOperation::values operation);
 
   /**
    * Access to a single block.
@@ -1527,8 +1527,7 @@ BlockVectorBase<VectorType>::collect_sizes()
 
 template <class VectorType>
 inline void
-BlockVectorBase<VectorType>::compress(
-  ::dealii::VectorOperation::values operation)
+BlockVectorBase<VectorType>::compress(VectorOperation::values operation)
 {
   for (unsigned int i = 0; i < n_blocks(); ++i)
     block(i).compress(operation);

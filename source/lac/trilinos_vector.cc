@@ -581,7 +581,7 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::compress(::dealii::VectorOperation::values given_last_action)
+    Vector::compress(VectorOperation::values given_last_action)
     {
       // Select which mode to send to Trilinos. Note that we use last_action if
       // available and ignore what the user tells us to detect wrongly mixed
@@ -591,9 +591,9 @@ namespace TrilinosWrappers
       Epetra_CombineMode mode = last_action;
       if (last_action == Zero)
         {
-          if (given_last_action == ::dealii::VectorOperation::add)
+          if (given_last_action == VectorOperation::add)
             mode = Add;
-          else if (given_last_action == ::dealii::VectorOperation::insert)
+          else if (given_last_action == VectorOperation::insert)
             mode = Insert;
           else
             Assert(
@@ -605,9 +605,9 @@ namespace TrilinosWrappers
         {
           Assert(
             ((last_action == Add) &&
-             (given_last_action == ::dealii::VectorOperation::add)) ||
+             (given_last_action == VectorOperation::add)) ||
               ((last_action == Insert) &&
-               (given_last_action == ::dealii::VectorOperation::insert)),
+               (given_last_action == VectorOperation::insert)),
             ExcMessage(
               "The last operation on the Vector and the given last action in the compress() call do not agree!"));
         }

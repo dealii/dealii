@@ -1034,7 +1034,7 @@ namespace TrilinosWrappers
      * for more information.
      */
     void
-    compress(::dealii::VectorOperation::values operation);
+    compress(VectorOperation::values operation);
 
     /**
      * Set the element (<i>i,j</i>) to @p value.

@@ -633,7 +633,7 @@ namespace TrilinosWrappers
        * for more information.
        */
       void
-      compress(::dealii::VectorOperation::values operation);
+      compress(VectorOperation::values operation);
 
       /**
        * Set all components of the vector to the given number @p s. Simply

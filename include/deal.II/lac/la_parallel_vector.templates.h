@@ -103,7 +103,7 @@ namespace LinearAlgebra
         static void
         import_elements(
           const ::dealii::LinearAlgebra::ReadWriteVector<Number> & /*V*/,
-          ::dealii::VectorOperation::values /*operation*/,
+          VectorOperation::values /*operation*/,
           const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner> &
           /*communication_pattern*/,
           const IndexSet & /*locally_owned_elem*/,
@@ -253,7 +253,7 @@ namespace LinearAlgebra
         static void
         import_elements(
           const ::dealii::LinearAlgebra::ReadWriteVector<Number> &V,
-          ::dealii::VectorOperation::values                       operation,
+          VectorOperation::values                                 operation,
           const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
             &             communication_pattern,
           const IndexSet &locally_owned_elem,
@@ -262,8 +262,8 @@ namespace LinearAlgebra
             &data)
         {
           Assert(
-            (operation == ::dealii::VectorOperation::add) ||
-              (operation == ::dealii::VectorOperation::insert),
+            (operation == VectorOperation::add) ||
+              (operation == VectorOperation::insert),
             ExcMessage(
               "Only VectorOperation::add and VectorOperation::insert are allowed"));
 
@@ -369,8 +369,8 @@ namespace LinearAlgebra
             &data)
         {
           Assert(
-            (operation == ::dealii::VectorOperation::add) ||
-              (operation == ::dealii::VectorOperation::insert),
+            (operation == VectorOperation::add) ||
+              (operation == VectorOperation::insert),
             ExcMessage(
               "Only VectorOperation::add and VectorOperation::insert are allowed"));
 
@@ -919,8 +919,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::compress(
-      ::dealii::VectorOperation::values operation)
+    Vector<Number, MemorySpaceType>::compress(VectorOperation::values operation)
     {
       compress_start(0, operation);
       compress_finish(operation);
@@ -967,8 +966,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::compress_start(
-      const unsigned int                communication_channel,
-      ::dealii::VectorOperation::values operation)
+      const unsigned int      communication_channel,
+      VectorOperation::values operation)
     {
       AssertIndexRange(communication_channel, 200);
       Assert(vector_is_ghosted == false,
@@ -1044,7 +1043,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::compress_finish(
-      ::dealii::VectorOperation::values operation)
+      VectorOperation::values operation)
     {
 #ifdef DEAL_II_WITH_MPI
       vector_is_ghosted = false;

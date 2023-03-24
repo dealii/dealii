@@ -1100,7 +1100,7 @@ namespace internal
         (void)data_others;
         (void)operation;
 
-        Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
+        Assert(operation == VectorOperation::add, ExcNotImplemented());
 
         requests.resize(sm_ghost_ranks.size() + sm_import_ranks.size() +
                         ghost_targets_data.size() + import_targets_data.size());
@@ -1224,7 +1224,7 @@ namespace internal
 
         (void)operation;
 
-        Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
+        Assert(operation == VectorOperation::add, ExcNotImplemented());
 
         AssertDimension(requests.size(),
                         sm_ghost_ranks.size() + sm_import_ranks.size() +

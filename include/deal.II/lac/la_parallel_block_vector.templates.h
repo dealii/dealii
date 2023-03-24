@@ -372,7 +372,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    BlockVector<Number>::compress(::dealii::VectorOperation::values operation)
+    BlockVector<Number>::compress(VectorOperation::values operation)
     {
       const unsigned int n_chunks =
         (this->n_blocks() + communication_block_size - 1) /

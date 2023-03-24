@@ -352,7 +352,7 @@ namespace LinearAlgebra
        * elements do not agree.
        */
       virtual void
-      compress(::dealii::VectorOperation::values operation) override;
+      compress(VectorOperation::values operation) override;
 
       /**
        * Fills the data field for ghost indices with the values stored in the

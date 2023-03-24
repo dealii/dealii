@@ -283,7 +283,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
               additional_data->relaxation * x_cell(row_cell);
         }
     }
-  dst.compress(dealii::VectorOperation::add);
+  dst.compress(VectorOperation::add);
 }
 
 

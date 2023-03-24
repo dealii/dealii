@@ -97,9 +97,9 @@ namespace LinearAlgebra
     {
       static void
       import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-               &                                     communication_pattern,
-             const Number *                          values,
-             const ::dealii::VectorOperation::values operation,
+               &                           communication_pattern,
+             const Number *                values,
+             const VectorOperation::values operation,
              ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
         (void)communication_pattern;
@@ -124,9 +124,9 @@ namespace LinearAlgebra
 
       static void
       import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-               &                                     communication_pattern,
-             const Number *                          values,
-             const ::dealii::VectorOperation::values operation,
+               &                           communication_pattern,
+             const Number *                values,
+             const VectorOperation::values operation,
              ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
@@ -167,9 +167,9 @@ namespace LinearAlgebra
 
       static void
       import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-               &                                     communication_pattern,
-             const Number *                          values,
-             const ::dealii::VectorOperation::values operation,
+               &                           communication_pattern,
+             const Number *                values,
+             const VectorOperation::values operation,
              ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(

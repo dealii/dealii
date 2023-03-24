@@ -587,7 +587,7 @@ namespace Utilities
         initialize_import_indices_plain_dev();
 #    endif
 
-      if (vector_operation != dealii::VectorOperation::insert)
+      if (vector_operation != VectorOperation::insert)
         AssertDimension(n_ghost_targets + n_import_targets, requests.size());
       // first wait for the receive to complete
       if (requests.size() > 0 && n_import_targets > 0)
@@ -603,7 +603,7 @@ namespace Utilities
                                                  MemorySpaceType,
                                                  MemorySpace::Default>::value)
             {
-              if (vector_operation == dealii::VectorOperation::add)
+              if (vector_operation == VectorOperation::add)
                 {
                   for (auto const &import_indices_plain :
                        import_indices_plain_dev)
@@ -627,7 +627,7 @@ namespace Utilities
                       read_position += chunk_size;
                     }
                 }
-              else if (vector_operation == dealii::VectorOperation::min)
+              else if (vector_operation == VectorOperation::min)
                 {
                   for (auto const &import_indices_plain :
                        import_indices_plain_dev)
@@ -654,7 +654,7 @@ namespace Utilities
                       read_position += chunk_size;
                     }
                 }
-              else if (vector_operation == dealii::VectorOperation::max)
+              else if (vector_operation == VectorOperation::max)
                 {
                   for (auto const &import_indices_plain :
                        import_indices_plain_dev)
@@ -700,13 +700,13 @@ namespace Utilities
               // local values. For insert, nothing is done here (but in debug
               // mode we assert that the specified value is either zero or
               // matches with the ones already present
-              if (vector_operation == dealii::VectorOperation::add)
+              if (vector_operation == VectorOperation::add)
                 for (const auto &import_range : import_indices_data)
                   for (unsigned int j = import_range.first;
                        j < import_range.second;
                        j++)
                     locally_owned_array[j] += *read_position++;
-              else if (vector_operation == dealii::VectorOperation::min)
+              else if (vector_operation == VectorOperation::min)
                 for (const auto &import_range : import_indices_data)
                   for (unsigned int j = import_range.first;
                        j < import_range.second;
@@ -717,7 +717,7 @@ namespace Utilities
                                           locally_owned_array[j]);
                       read_position++;
                     }
-              else if (vector_operation == dealii::VectorOperation::max)
+              else if (vector_operation == VectorOperation::max)
                 for (const auto &import_range : import_indices_data)
                   for (unsigned int j = import_range.first;
                        j < import_range.second;
