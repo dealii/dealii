@@ -195,22 +195,16 @@ AffineConstraints<number>::is_consistent_in_parallel(
 namespace internal
 {
   template <typename number>
-  std::vector<
-    std::tuple<types::global_dof_index,
-               number,
-               std::vector<std::pair<types::global_dof_index, number>>>>
+  std::vector<typename dealii::AffineConstraints<number>::ConstraintLine>
   compute_locally_relevant_constraints(
     const dealii::AffineConstraints<number> &constraints_in,
     const IndexSet &                         locally_owned_dofs,
     const IndexSet &                         locally_relevant_dofs,
     const MPI_Comm                           mpi_communicator)
   {
-    using ConstraintType =
-      std::tuple<types::global_dof_index,
-                 number,
-                 std::vector<std::pair<types::global_dof_index, number>>>;
-
     // The result vector filled step by step.
+    using ConstraintType =
+      typename dealii::AffineConstraints<number>::ConstraintLine;
     std::vector<ConstraintType> locally_relevant_constraints;
 
 #ifndef DEAL_II_WITH_MPI
@@ -227,17 +221,11 @@ namespace internal
     // helper function
     const auto sort_constraints = [&]() {
       std::sort(locally_relevant_constraints.begin(),
-                locally_relevant_constraints.end(),
-                [](const auto &a, const auto &b) {
-                  return std::get<0>(a) < std::get<0>(b);
-                });
+                locally_relevant_constraints.end());
 
       locally_relevant_constraints.erase(
         std::unique(locally_relevant_constraints.begin(),
-                    locally_relevant_constraints.end(),
-                    [](const auto &a, const auto &b) {
-                      return std::get<0>(a) == std::get<0>(b);
-                    }),
+                    locally_relevant_constraints.end()),
         locally_relevant_constraints.end());
     };
 
@@ -285,16 +273,14 @@ namespace internal
           const types::global_dof_index index =
             constrained_indices.nth_index_in_set(i);
 
-          std::get<0>(entry) = index;
+          entry.index = index;
 
           if (constraints_in.is_inhomogeneously_constrained(index))
-            std::get<1>(entry) = constraints_in.get_inhomogeneity(index);
+            entry.inhomogeneity = constraints_in.get_inhomogeneity(index);
 
-          const auto constraints = constraints_in.get_constraint_entries(index);
-
-          if (constraints)
-            for (const auto &i : *constraints)
-              std::get<2>(entry).push_back(i);
+          if (const auto constraints =
+                constraints_in.get_constraint_entries(index))
+            entry.entries = *constraints;
 
           if (constrained_indices_owners[i] == my_rank)
             locally_relevant_constraints.push_back(entry);
@@ -415,14 +401,14 @@ namespace internal
             {
               // note: at this stage locally_relevant_constraints still
               // contains only locally owned constraints
-              const auto prt =
+              const auto ptr =
                 std::find_if(locally_relevant_constraints.begin(),
                              locally_relevant_constraints.end(),
                              [index](const auto &a) {
-                               return std::get<0>(a) == index;
+                               return a.index == index;
                              });
-              if (prt != locally_relevant_constraints.end())
-                data.push_back(*prt);
+              if (ptr != locally_relevant_constraints.end())
+                data.push_back(*ptr);
             }
 
           send_data[rank_and_indices.first] = Utilities::pack(data, false);
@@ -525,19 +511,16 @@ AffineConstraints<number>::make_consistent_in_parallel(
   // 3) refill this constraint matrix
   for (const auto &line : temporal_constraint_matrix)
     {
-      const types::global_dof_index index = std::get<0>(line);
-
       // ... line
-      this->add_line(index);
+      this->add_line(line.index);
 
       // ... inhomogeneity
-      if (std::get<1>(line) != number())
-        this->set_inhomogeneity(index, std::get<1>(line));
+      if (line.inhomogeneity != number())
+        this->set_inhomogeneity(line.index, line.inhomogeneity);
 
       // ... entries
-      if (std::get<2>(line).size() > 0)
-        for (const auto &j : std::get<2>(line))
-          this->add_entry(index, j.first, j.second);
+      if (!line.entries.empty())
+        this->add_entries(line.index, line.entries);
     }
 
 #ifdef DEBUG
