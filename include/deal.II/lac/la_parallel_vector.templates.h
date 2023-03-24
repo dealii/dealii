@@ -1377,6 +1377,18 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::operator=( // NOLINT
+      Vector<Number, MemorySpaceType> &&v)
+    {
+      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      this->swap(v);
+      return *this;
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
     Vector<Number, MemorySpaceType>::operator=(const Number s)
     {
       const size_type this_size = locally_owned_size();
