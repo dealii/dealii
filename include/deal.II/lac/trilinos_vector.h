@@ -500,8 +500,12 @@ namespace TrilinosWrappers
       /**
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
+       *
+       * @note In order for this constructor to leave the moved-from object in a
+       * valid state it must allocate memory (in this case, an empty
+       * Epetra_FEVector) - hence it cannot be marked as noexcept.
        */
-      Vector(Vector &&v) noexcept;
+      Vector(Vector &&v); // NOLINT
 
       /**
        * Destructor.

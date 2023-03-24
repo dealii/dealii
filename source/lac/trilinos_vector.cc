@@ -98,10 +98,11 @@ namespace TrilinosWrappers
 
 
 
-    Vector::Vector(Vector &&v) noexcept
+    Vector::Vector(Vector &&v) // NOLINT
       : Vector()
     {
       // initialize a minimal, valid object and swap
+      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
       swap(v);
     }
 
@@ -499,6 +500,7 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator=(Vector &&v) noexcept
     {
+      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
       swap(v);
       return *this;
     }
