@@ -104,6 +104,38 @@ test_bounding_box()
     deallog << "Boxes should not be equal : " << (b2 != b) << std::endl;
   }
   deallog << std::endl;
+
+  // Initalize box with point
+  {
+    Point<spacedim> p;
+    for (unsigned int i = 0; i < spacedim; ++i)
+      p[i] = i + 1;
+
+    BoundingBox<spacedim> b(p);
+    deallog << "Boundary points: " << std::endl;
+    deallog << b.get_boundary_points().first << std::endl;
+    deallog << b.get_boundary_points().second << std::endl;
+  }
+  deallog << std::endl;
+
+  // Initalize box with box
+  {
+    BoundingBox<spacedim> bb(b);
+    deallog << "Boundary points: " << std::endl;
+    deallog << bb.get_boundary_points().first << std::endl;
+    deallog << bb.get_boundary_points().second << std::endl;
+  }
+  deallog << std::endl;
+
+  // Initalize box with box
+  {
+    BoundingBox<spacedim> bb;
+    bb = b;
+    deallog << "Boundary points: " << std::endl;
+    deallog << bb.get_boundary_points().first << std::endl;
+    deallog << bb.get_boundary_points().second << std::endl;
+  }
+  deallog << std::endl;
 }
 
 void
