@@ -278,11 +278,9 @@ namespace internal
           if (constraints_in.is_inhomogeneously_constrained(index))
             entry.inhomogeneity = constraints_in.get_inhomogeneity(index);
 
-          const auto constraints = constraints_in.get_constraint_entries(index);
-
-          if (constraints)
-            for (const auto &i : *constraints)
-              entry.entries.push_back(i);
+          if (const auto constraints =
+                constraints_in.get_constraint_entries(index))
+            entry.entries = *constraints;
 
           if (constrained_indices_owners[i] == my_rank)
             locally_relevant_constraints.push_back(entry);
