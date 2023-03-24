@@ -271,6 +271,30 @@ private:
  * the container. A reference to the external container is stored internally,
  * but keep in mind that if you change the container, you should rebuild the
  * tree.
+ *
+ * @warning This function does not work on Windows. As an alternative,
+ * build a tree with pairs of point and id. For instance to
+ * create an intersection between `BoundingBox<dim> box` and
+ * `std::vector<BoundingBox<dim>> boxes`, don't write:
+ * @code
+ * const auto tree = pack_rtree_of_indices(boxes);
+ *
+ * for (const auto &i : tree | bgi::adaptors::queried(bgi::intersects(box)))
+ *   std::cout << i << " " << boxes[i] << std::endl;
+ * @endcode
+ * but instead:
+ * @code
+ * std::vector<std::pair<BoundingBox<dim>, unsigned int>> boxes_and_ids;
+ *
+ * for(unsigned int i = 0; i < boxes.size(); ++i)
+ *   boxes_and_ids.emplace_back(boxes[i], i);
+ *
+ * const auto tree = pack_rtree(boxes_and_ids);
+ *
+ * for (const auto &i : tree | bgi::adaptors::queried(bgi::intersects(box)))
+ *   std::cout << i->second << " " << boxes[i->second] << std::endl;
+ * @endcode
+ *
  */
 template <typename IndexType = boost::geometry::index::linear<16>,
           typename ContainerType>
