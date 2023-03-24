@@ -137,7 +137,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
@@ -173,7 +175,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
@@ -203,7 +207,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
@@ -239,7 +245,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
@@ -267,7 +275,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
@@ -298,7 +308,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
@@ -620,7 +632,9 @@ namespace VectorTools
               typename MeshType,
               typename VectorType,
               typename value_type>
-    DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+    DEAL_II_CXX20_REQUIRES(
+      concepts::is_dealii_vector_type<VectorType>
+        &&concepts::is_triangulation_or_dof_handler<MeshType>)
     inline std::vector<value_type> evaluate_at_points(
       const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
       const MeshType &                                            mesh,
@@ -726,7 +740,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
@@ -769,7 +785,9 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,

@@ -2543,6 +2543,8 @@ namespace GridGenerator
   // intermediate type. This is only used when using MS VC++ and uses
   // the direct way of doing it otherwise
   template <template <int, int> class MeshType, int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   struct ExtractBoundaryMesh
   {
     using return_type =
@@ -2646,6 +2648,8 @@ namespace GridGenerator
    *
    */
   template <template <int, int> class MeshType, int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifdef DOXYGEN
   return_type
 #else
@@ -2656,10 +2660,10 @@ namespace GridGenerator
   typename ExtractBoundaryMesh<MeshType, dim, spacedim>::return_type
 #  endif
 #endif
-  extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
-                        MeshType<dim - 1, spacedim> &       surface_mesh,
-                        const std::set<types::boundary_id> &boundary_ids =
-                          std::set<types::boundary_id>());
+    extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
+                          MeshType<dim - 1, spacedim> &       surface_mesh,
+                          const std::set<types::boundary_id> &boundary_ids =
+                            std::set<types::boundary_id>());
 
   //** @} */
 

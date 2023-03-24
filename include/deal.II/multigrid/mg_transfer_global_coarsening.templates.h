@@ -253,10 +253,10 @@ namespace internal
   namespace
   {
     template <typename MeshType, typename OPType>
-    void
-    loop_over_active_or_level_cells(const MeshType &   tria,
-                                    const unsigned int level,
-                                    const OPType &     op)
+    DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+    void loop_over_active_or_level_cells(const MeshType &   tria,
+                                         const unsigned int level,
+                                         const OPType &     op)
     {
       if (level == numbers::invalid_unsigned_int)
         {

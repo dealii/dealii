@@ -450,7 +450,7 @@ namespace parallel
     // 4) determine the global indices of ghost cells
     std::vector<types::global_dof_index> is_ghost_vector;
     GridTools::exchange_cell_data_to_ghosts<types::global_cell_index>(
-      *this,
+      static_cast<dealii::Triangulation<dim, spacedim> &>(*this),
       [](const auto &cell) { return cell->global_active_cell_index(); },
       [&is_ghost_vector](const auto &cell, const auto &id) {
         cell->set_global_active_cell_index(id);
@@ -595,10 +595,15 @@ namespace parallel
 
     if (this->is_multilevel_hierarchy_constructed())
       GridTools::exchange_cell_data_to_level_ghosts<
-        std::vector<Point<spacedim>>>(*this, pack, unpack);
+        std::vector<Point<spacedim>>>(
+        static_cast<dealii::Triangulation<dim, spacedim> &>(*this),
+        pack,
+        unpack);
     else
       GridTools::exchange_cell_data_to_ghosts<std::vector<Point<spacedim>>>(
-        *this, pack, unpack);
+        static_cast<dealii::Triangulation<dim, spacedim> &>(*this),
+        pack,
+        unpack);
   }
 
 

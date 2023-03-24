@@ -8257,15 +8257,17 @@ namespace GridGenerator
 
 
   template <template <int, int> class MeshType, int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #  ifndef _MSC_VER
   std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
            typename MeshType<dim, spacedim>::face_iterator>
 #  else
   typename ExtractBoundaryMesh<MeshType, dim, spacedim>::return_type
 #  endif
-  extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
-                        MeshType<dim - 1, spacedim> &       surface_mesh,
-                        const std::set<types::boundary_id> &boundary_ids)
+    extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
+                          MeshType<dim - 1, spacedim> &       surface_mesh,
+                          const std::set<types::boundary_id> &boundary_ids)
   {
     Assert((dynamic_cast<
               const parallel::distributed::Triangulation<dim, spacedim> *>(

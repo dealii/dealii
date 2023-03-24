@@ -695,6 +695,7 @@ namespace LinearAlgebra
 #endif
 
 
+
 /**
  * A namespace that is used to declare concepts used in C++20-style
  * `requires` clauses.
@@ -821,6 +822,78 @@ namespace concepts
 
 #endif
 } // namespace concepts
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+class Triangulation;
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+class DoFHandler;
+
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int dim, int spacedim>
+    class Triangulation;
+  }
+  namespace shared
+  {
+    template <int dim, int spacedim>
+    class Triangulation;
+  }
+  namespace fullydistributed
+  {
+    template <int dim, int spacedim>
+    class Triangulation;
+  }
+} // namespace parallel
+
+namespace concepts
+{
+#if defined(DEAL_II_HAVE_CXX20) || defined(DOXYGEN)
+  namespace internal
+  {
+    template <typename T>
+    inline constexpr bool is_triangulation_or_dof_handler = false;
+
+    template <int dim, int spacedim>
+    inline constexpr bool
+      is_triangulation_or_dof_handler<Triangulation<dim, spacedim>> = true;
+
+    template <int dim, int spacedim>
+    inline constexpr bool is_triangulation_or_dof_handler<
+      parallel::distributed::Triangulation<dim, spacedim>> = true;
+
+    template <int dim, int spacedim>
+    inline constexpr bool is_triangulation_or_dof_handler<
+      parallel::shared::Triangulation<dim, spacedim>> = true;
+
+    template <int dim, int spacedim>
+    inline constexpr bool is_triangulation_or_dof_handler<
+      parallel::fullydistributed::Triangulation<dim, spacedim>> = true;
+
+    template <int dim, int spacedim>
+    inline constexpr bool
+      is_triangulation_or_dof_handler<DoFHandler<dim, spacedim>> = true;
+  } // namespace internal
+
+
+  /**
+   * A concept that is used to check whether the `MeshType` template
+   * type used in many functions in namespace GridTools and
+   * VectorTools is in fact a "mesh" in the sense expected by these
+   * functions. Specifically, this means that the type is either a
+   * Triangulation or a DoFHandler type.
+   */
+  template <typename MeshType>
+  concept is_triangulation_or_dof_handler =
+    internal::is_triangulation_or_dof_handler<MeshType>;
+#endif
+} // namespace concepts
+
 
 
 DEAL_II_NAMESPACE_CLOSE
