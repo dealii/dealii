@@ -96,11 +96,12 @@ namespace VectorTools
    * Thus, the elements in the component mask corresponding to the components
    * of these non-primitive shape functions must be @p false.
    *
-   * @note This function expects the same ComponentMask for all boundary
-   * indicators passed to this function. In case of multiple boundary
-   * indicators with different ComponentMask, this function needs to be called
-   * multiple times. For performance reasons, it might be reasonable to use
-   * the present function by grouping together all boundary indicators with
+   * @note This function applies the same ComponentMask to all parts of
+   * the boundary indicated by keys of the `function_map` argument.
+   * If you want to apply different component masks to parts of the boundary
+   * represented by different boundary indicators, this function needs to be
+   * called multiple times. For performance reasons, it might be reasonable to
+   * use the present function by grouping together all boundary indicators with
    * the same ComponentMask. An alternative is to use one of the other
    * functions with this name, which take only one boundary indicator with
    * corresponding boundary function, to be called separately for every
@@ -250,8 +251,9 @@ namespace VectorTools
    * conforming as is needed. See the discussion on conflicting constraints in
    * the module on @ref constraints.
    *
-   * TODO how to refer to interpolate_boundary_values() function with most
-   * detailed documentation (it appears on a different page in Doxygen)?
+   * For further information and details on the other function arguments, see
+   * the interpolate_boundary_values() function with `std::map` arguments and
+   * the general class documentation.
    *
    * @ingroup constraints
    */
