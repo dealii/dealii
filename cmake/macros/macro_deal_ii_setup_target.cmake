@@ -104,9 +104,7 @@ macro(deal_ii_setup_target _target)
       "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
       )
     shell_escape_option_groups(_link_options)
-    target_link_options(${_target} PRIVATE
-      $<$<LINK_LANGUAGE:CXX>:${_link_options}>
-      )
+    target_link_options(${_target} PRIVATE ${_link_options})
   endif()
 
   target_link_libraries(${_target} ${DEAL_II_TARGET_${_build}})
