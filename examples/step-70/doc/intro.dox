@@ -417,12 +417,12 @@ In step-60, the second through fourth steps above were computed by calling, in t
 - construct an FEValues object, with the given quadrature formula, and
  initialized with the cell obtained in the first step.
 
-Although this approach could work for the present case, it does not lends itself
+Although this approach could work for the present case, it does not lend itself
 readily to parallel simulations using distributed triangulations. Indeed,
 since the position of the quadrature points on the cells of the
 embedded domain $\Gamma$ do not match that of the embedding triangulation
 and since $\Gamma$ is constantly moving, this would require that the triangulation representing
-$\Gamma$ be stored in it's entirety for all of the processors. As the number
+$\Gamma$ be stored in its entirety for all of the processors. As the number
 of processor and the number of cells in $\Gamma$ increases, this leads
 to a severe bottleneck in terms of memory. Consequently, an alternative strategy is sought
 in this step.
