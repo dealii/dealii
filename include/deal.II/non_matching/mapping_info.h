@@ -616,7 +616,7 @@ namespace NonMatching
 
 
   template <int dim, int spacedim>
-  const ArrayView<const Point<dim>>
+  inline const ArrayView<const Point<dim>>
   MappingInfo<dim, spacedim>::get_unit_points(
     const unsigned int cell_index,
     const unsigned int face_number) const
@@ -703,7 +703,7 @@ namespace NonMatching
 
 
   template <int dim, int spacedim>
-  const typename MappingInfo<dim, spacedim>::MappingData &
+  inline const typename MappingInfo<dim, spacedim>::MappingData &
   MappingInfo<dim, spacedim>::get_mapping_data(
     const unsigned int cell_index,
     const unsigned int face_number) const
