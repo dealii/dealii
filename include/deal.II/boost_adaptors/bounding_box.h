@@ -71,7 +71,11 @@ namespace boost
         static inline void
         set(dealii::BoundingBox<dim, Number> &box, Number value)
         {
-          box.get_boundary_points().first[D] = value;
+          std::pair<dealii::Point<dim, Number>, dealii::Point<dim, Number>>
+            corner_points        = box.get_boundary_points();
+          corner_points.first[D] = value;
+
+          box = dealii::BoundingBox<dim, Number>(corner_points);
         }
       };
 
@@ -99,7 +103,11 @@ namespace boost
         static inline void
         set(dealii::BoundingBox<dim, Number> &box, Number value)
         {
-          box.get_boundary_points().second[D] = value;
+          std::pair<dealii::Point<dim, Number>, dealii::Point<dim, Number>>
+            corner_points         = box.get_boundary_points();
+          corner_points.second[D] = value;
+
+          box = dealii::BoundingBox<dim, Number>(corner_points);
         }
       };
     } // namespace traits
