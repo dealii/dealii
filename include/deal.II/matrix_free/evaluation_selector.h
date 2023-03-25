@@ -76,7 +76,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::evaluate(
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
-  internal::FEEvaluationImplEvaluateSelector<dim, Number>::template run<
+  internal::FEEvaluationImplSelector<dim, Number, false>::template run<
     fe_degree,
     n_q_points_1d>(n_components, evaluation_flag, values_dofs, eval);
 }
@@ -94,7 +94,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, Number>::integrate(
 {
   Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
-  internal::FEEvaluationImplIntegrateSelector<dim, Number>::
+  internal::FEEvaluationImplSelector<dim, Number, true>::
     template run<fe_degree, n_q_points_1d>(
       n_components, integration_flag, values_dofs, eval, sum_into_values_array);
 }

@@ -49,7 +49,7 @@ namespace internal
     const Number *                         values_dofs,
     FEEvaluationData<dim, Number, false> & fe_eval)
   {
-    instantiation_helper_run<1, FEEvaluationImplEvaluateSelector<dim, Number>>(
+    instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, false>>(
       fe_eval.get_shape_info().data[0].fe_degree,
       fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
@@ -69,7 +69,7 @@ namespace internal
     FEEvaluationData<dim, Number, false> & fe_eval,
     const bool                             sum_into_values_array)
   {
-    instantiation_helper_run<1, FEEvaluationImplIntegrateSelector<dim, Number>>(
+    instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, true>>(
       fe_eval.get_shape_info().data[0].fe_degree,
       fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,

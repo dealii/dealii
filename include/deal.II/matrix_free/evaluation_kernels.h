@@ -2247,8 +2247,8 @@ namespace internal
 
 
   /**
-   * This class chooses an appropriate evaluation strategy based on the
-   * template parameters and the shape_info variable which contains runtime
+   * This class chooses an appropriate evaluation/integration strategy based on
+   * the template parameters and the shape_info variable which contains runtime
    * parameters for the strategy underlying FEEvaluation::evaluate(), i.e.
    * this calls internal::FEEvaluationImpl::evaluate(),
    * internal::FEEvaluationImplCollocation::evaluate() or
@@ -2261,147 +2261,24 @@ namespace internal
    * currently supports $0\leq fe\_degree \leq 9$ and $degree+1\leq
    * n\_q\_points\_1d\leq fe\_degree+2$.
    */
-  template <int dim, typename Number>
-  struct FEEvaluationImplEvaluateSelector
+  template <int dim, typename Number, bool do_integrate>
+  struct FEEvaluationImplSelector
   {
-    template <int fe_degree, int n_q_points_1d>
+    template <int fe_degree, int n_q_points_1d, typename OtherNumber>
     static bool
     run(const unsigned int                     n_components,
         const EvaluationFlags::EvaluationFlags evaluation_flag,
-        const Number *                         values_dofs,
-        FEEvaluationData<dim, Number, false> & fe_eval)
-    {
-      const auto element_type = fe_eval.get_shape_info().element_type;
-      using ElementType       = MatrixFreeFunctions::ElementType;
-
-      Assert(fe_eval.get_shape_info().data.size() == 1 ||
-               (fe_eval.get_shape_info().data.size() == dim &&
-                element_type == ElementType::tensor_general) ||
-               element_type == ElementType::tensor_raviart_thomas,
-             ExcNotImplemented());
-
-      if (fe_degree >= 0 && fe_degree + 1 == n_q_points_1d &&
-          element_type == ElementType::tensor_symmetric_collocation)
-        {
-          FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
-            n_components, evaluation_flag, values_dofs, fe_eval);
-        }
-      // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
-      // shape_info.h for more details
-      else if (fe_degree >= 0 &&
-               use_collocation_evaluation(fe_degree, n_q_points_1d) &&
-               element_type <= ElementType::tensor_symmetric)
-        {
-          FEEvaluationImplTransformToCollocation<
-            dim,
-            fe_degree,
-            n_q_points_1d,
-            Number>::evaluate(n_components,
-                              evaluation_flag,
-                              values_dofs,
-                              fe_eval);
-        }
-      else if (fe_degree >= 0 &&
-               element_type <= ElementType::tensor_symmetric_no_collocation)
-        {
-          FEEvaluationImpl<ElementType::tensor_symmetric,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::evaluate(n_components,
-                                             evaluation_flag,
-                                             values_dofs,
-                                             fe_eval);
-        }
-      else if (element_type == ElementType::tensor_symmetric_plus_dg0)
-        {
-          FEEvaluationImpl<ElementType::tensor_symmetric_plus_dg0,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::evaluate(n_components,
-                                             evaluation_flag,
-                                             values_dofs,
-                                             fe_eval);
-        }
-      else if (element_type == ElementType::truncated_tensor)
-        {
-          FEEvaluationImpl<ElementType::truncated_tensor,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::evaluate(n_components,
-                                             evaluation_flag,
-                                             values_dofs,
-                                             fe_eval);
-        }
-      else if (element_type == ElementType::tensor_none)
-        {
-          FEEvaluationImpl<ElementType::tensor_none,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::evaluate(n_components,
-                                             evaluation_flag,
-                                             values_dofs,
-                                             fe_eval);
-        }
-      else if (element_type == ElementType::tensor_raviart_thomas)
-        {
-          FEEvaluationImpl<
-            ElementType::tensor_raviart_thomas,
-            dim,
-            (fe_degree == -1) ? 1 : fe_degree,
-            (n_q_points_1d < 1) ? 1 : n_q_points_1d,
-            Number>::template evaluate_or_integrate<false>(evaluation_flag,
-                                                           const_cast<Number *>(
-                                                             values_dofs),
-                                                           fe_eval);
-        }
-      else
-        {
-          FEEvaluationImpl<ElementType::tensor_general,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::evaluate(n_components,
-                                             evaluation_flag,
-                                             values_dofs,
-                                             fe_eval);
-        }
-
-      return false;
-    }
-  };
-
-
-
-  /**
-   * This class chooses an appropriate evaluation strategy based on the
-   * template parameters and the shape_info variable which contains runtime
-   * parameters for the strategy underlying FEEvaluation::integrate(), i.e.
-   * this calls internal::FEEvaluationImpl::integrate(),
-   * internal::FEEvaluationImplCollocation::integrate() or
-   * internal::FEEvaluationImplTransformToCollocation::integrate() with
-   * appropriate template parameters. In case the template parameters
-   * fe_degree and n_q_points_1d contain valid information (i.e. fe_degree>-1
-   * and n_q_points_1d>0), we simply pass these values to the respective
-   * template specializations.  Otherwise, we perform a runtime matching of
-   * the runtime parameters to find the correct specialization. This matching
-   * currently supports $0\leq fe\_degree \leq 9$ and $degree+1\leq
-   * n\_q\_points\_1d\leq fe\_degree+2$.
-   */
-  template <int dim, typename Number>
-  struct FEEvaluationImplIntegrateSelector
-  {
-    template <int fe_degree, int n_q_points_1d>
-    static bool
-    run(const unsigned int                     n_components,
-        const EvaluationFlags::EvaluationFlags integration_flag,
-        Number *                               values_dofs,
+        OtherNumber *                          values_dofs,
         FEEvaluationData<dim, Number, false> & fe_eval,
-        const bool                             sum_into_values_array)
+        const bool                             sum_into_values_array = false)
     {
+      // `OtherNumber` is either `const Number` (evaluate()) or `Number`
+      // (integrate())
+      static_assert(
+        std::is_same<Number,
+                     typename std::remove_const<OtherNumber>::type>::value,
+        "Type of Number and of OtherNumber do not match.");
+
       const auto element_type = fe_eval.get_shape_info().element_type;
       using ElementType       = MatrixFreeFunctions::ElementType;
 
@@ -2414,9 +2291,10 @@ namespace internal
       if (fe_degree >= 0 && fe_degree + 1 == n_q_points_1d &&
           element_type == ElementType::tensor_symmetric_collocation)
         {
-          FEEvaluationImplCollocation<dim, fe_degree, Number>::integrate(
+          evaluate_or_integrate<
+            FEEvaluationImplCollocation<dim, fe_degree, Number>>(
             n_components,
-            integration_flag,
+            evaluation_flag,
             values_dofs,
             fe_eval,
             sum_into_values_array);
@@ -2427,64 +2305,69 @@ namespace internal
                use_collocation_evaluation(fe_degree, n_q_points_1d) &&
                element_type <= ElementType::tensor_symmetric)
         {
-          FEEvaluationImplTransformToCollocation<
-            dim,
-            fe_degree,
-            n_q_points_1d,
-            Number>::integrate(n_components,
-                               integration_flag,
-                               values_dofs,
-                               fe_eval,
-                               sum_into_values_array);
+          evaluate_or_integrate<
+            FEEvaluationImplTransformToCollocation<dim,
+                                                   fe_degree,
+                                                   n_q_points_1d,
+                                                   Number>>(
+            n_components,
+            evaluation_flag,
+            values_dofs,
+            fe_eval,
+            sum_into_values_array);
         }
       else if (fe_degree >= 0 &&
                element_type <= ElementType::tensor_symmetric_no_collocation)
         {
-          FEEvaluationImpl<ElementType::tensor_symmetric,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate(n_components,
-                                              integration_flag,
-                                              values_dofs,
-                                              fe_eval,
-                                              sum_into_values_array);
+          evaluate_or_integrate<FEEvaluationImpl<ElementType::tensor_symmetric,
+                                                 dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 Number>>(
+            n_components,
+            evaluation_flag,
+            values_dofs,
+            fe_eval,
+            sum_into_values_array);
         }
       else if (element_type == ElementType::tensor_symmetric_plus_dg0)
         {
-          FEEvaluationImpl<ElementType::tensor_symmetric_plus_dg0,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate(n_components,
-                                              integration_flag,
-                                              values_dofs,
-                                              fe_eval,
-                                              sum_into_values_array);
+          evaluate_or_integrate<
+            FEEvaluationImpl<ElementType::tensor_symmetric_plus_dg0,
+                             dim,
+                             fe_degree,
+                             n_q_points_1d,
+                             Number>>(n_components,
+                                      evaluation_flag,
+                                      values_dofs,
+                                      fe_eval,
+                                      sum_into_values_array);
         }
       else if (element_type == ElementType::truncated_tensor)
         {
-          FEEvaluationImpl<ElementType::truncated_tensor,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate(n_components,
-                                              integration_flag,
-                                              values_dofs,
-                                              fe_eval,
-                                              sum_into_values_array);
+          evaluate_or_integrate<FEEvaluationImpl<ElementType::truncated_tensor,
+                                                 dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 Number>>(
+            n_components,
+            evaluation_flag,
+            values_dofs,
+            fe_eval,
+            sum_into_values_array);
         }
       else if (element_type == ElementType::tensor_none)
         {
-          FEEvaluationImpl<ElementType::tensor_none,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate(n_components,
-                                              integration_flag,
-                                              values_dofs,
-                                              fe_eval,
-                                              sum_into_values_array);
+          evaluate_or_integrate<FEEvaluationImpl<ElementType::tensor_none,
+                                                 dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 Number>>(
+            n_components,
+            evaluation_flag,
+            values_dofs,
+            fe_eval,
+            sum_into_values_array);
         }
       else if (element_type == ElementType::tensor_raviart_thomas)
         {
@@ -2493,26 +2376,77 @@ namespace internal
                            (fe_degree == -1) ? 1 : fe_degree,
                            (n_q_points_1d < 1) ? 1 : n_q_points_1d,
                            Number>::
-            template evaluate_or_integrate<true>(integration_flag,
-                                                 const_cast<Number *>(
-                                                   values_dofs),
-                                                 fe_eval,
-                                                 sum_into_values_array);
+            template evaluate_or_integrate<do_integrate>(evaluation_flag,
+                                                         const_cast<Number *>(
+                                                           values_dofs),
+                                                         fe_eval,
+                                                         sum_into_values_array);
         }
       else
         {
-          FEEvaluationImpl<ElementType::tensor_general,
-                           dim,
-                           fe_degree,
-                           n_q_points_1d,
-                           Number>::integrate(n_components,
-                                              integration_flag,
-                                              values_dofs,
-                                              fe_eval,
-                                              sum_into_values_array);
+          evaluate_or_integrate<FEEvaluationImpl<ElementType::tensor_general,
+                                                 dim,
+                                                 fe_degree,
+                                                 n_q_points_1d,
+                                                 Number>>(
+            n_components,
+            evaluation_flag,
+            values_dofs,
+            fe_eval,
+            sum_into_values_array);
         }
 
       return false;
+    }
+
+  private:
+    template <typename T>
+    static void
+    evaluate_or_integrate(
+      const unsigned int                     n_components,
+      const EvaluationFlags::EvaluationFlags evaluation_flag,
+      const Number *                         values_dofs,
+      FEEvaluationData<dim, Number, false> & fe_eval,
+      const bool                             sum_into_values_array,
+      std::integral_constant<bool, false>)
+    {
+      (void)sum_into_values_array;
+
+      T::evaluate(n_components, evaluation_flag, values_dofs, fe_eval);
+    }
+
+    template <typename T>
+    static void
+    evaluate_or_integrate(
+      const unsigned int                     n_components,
+      const EvaluationFlags::EvaluationFlags evaluation_flag,
+      Number *                               values_dofs,
+      FEEvaluationData<dim, Number, false> & fe_eval,
+      const bool                             sum_into_values_array,
+      std::integral_constant<bool, true>)
+    {
+      T::integrate(n_components,
+                   evaluation_flag,
+                   values_dofs,
+                   fe_eval,
+                   sum_into_values_array);
+    }
+
+    template <typename T, typename OtherNumber>
+    static void
+    evaluate_or_integrate(
+      const unsigned int                     n_components,
+      const EvaluationFlags::EvaluationFlags evaluation_flag,
+      OtherNumber *                          values_dofs,
+      FEEvaluationData<dim, Number, false> & fe_eval,
+      const bool                             sum_into_values_array)
+    {
+      evaluate_or_integrate<T>(n_components,
+                               evaluation_flag,
+                               values_dofs,
+                               fe_eval,
+                               sum_into_values_array,
+                               std::integral_constant<bool, do_integrate>());
     }
   };
 
