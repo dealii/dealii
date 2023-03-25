@@ -643,302 +643,223 @@ Quadrature<3>
 QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<2> &quadrature)
 {
-  const auto support_points_tri =
-    [](const std::pair<std::vector<Point<3>>, double> &face,
-       const unsigned char orientation) -> std::vector<Point<3>> {
-    const boost::container::small_vector<Point<3>, 8> temp =
-      ReferenceCells::Triangle.permute_by_combined_orientation<Point<3>>(
-        face.first, orientation);
-    return std::vector<Point<3>>(temp.begin(), temp.end());
+  const auto process = [&](const std::vector<std::vector<Point<3>>> &faces) {
+    // new (projected) quadrature points and weights
+    std::vector<Point<3>> points;
+    std::vector<double>   weights;
+
+    const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
+    const TensorProductPolynomials<2> poly_quad(
+      Polynomials::generate_complete_Lagrange_basis(
+        {Point<1>(0.0), Point<1>(1.0)}));
+
+    // loop over all faces (triangles) ...
+    for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
+      {
+        // We will use linear polynomials to map the reference quadrature
+        // points correctly to on faces. There are as many linear shape
+        // functions as there are vertices in the face.
+        const unsigned int n_linear_shape_functions = faces[face_no].size();
+
+        const auto &poly =
+          (n_linear_shape_functions == 3 ?
+             static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
+             static_cast<const ScalarPolynomialsBase<2> &>(poly_quad));
+
+        // ... and over all possible orientations
+        for (unsigned char orientation = 0;
+             orientation < reference_cell.n_face_orientations(face_no);
+             ++orientation)
+          {
+            const auto &face = faces[face_no];
+
+            const boost::container::small_vector<Point<3>, 8> support_points =
+              reference_cell.face_reference_cell(face_no)
+                .permute_by_combined_orientation<Point<3>>(face, orientation);
+
+            // the quadrature rule to be projected ...
+            const auto &sub_quadrature_points =
+              quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
+            const auto &sub_quadrature_weights =
+              quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
+
+            // loop over all quadrature points
+            for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
+              {
+                Point<3> mapped_point;
+
+                // map reference quadrature point
+                for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
+                  mapped_point +=
+                    support_points[i] *
+                    poly.compute_value(i, sub_quadrature_points[j]);
+
+                points.push_back(mapped_point);
+
+                // scale quadrature weight
+                const double scaling = [&]() {
+                  const unsigned int dim_     = 2;
+                  const unsigned int spacedim = 3;
+
+                  double result[spacedim][dim_];
+
+                  std::vector<Tensor<1, dim_>> shape_derivatives(
+                    n_linear_shape_functions);
+
+                  for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
+                    shape_derivatives[i] =
+                      poly.compute_1st_derivative(i, sub_quadrature_points[j]);
+
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      result[i][j] =
+                        shape_derivatives[0][j] * support_points[0][i];
+                  for (unsigned int k = 1; k < n_linear_shape_functions; ++k)
+                    for (unsigned int i = 0; i < spacedim; ++i)
+                      for (unsigned int j = 0; j < dim_; ++j)
+                        result[i][j] +=
+                          shape_derivatives[k][j] * support_points[k][i];
+
+                  DerivativeForm<1, dim_, spacedim> contravariant;
+
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      contravariant[i][j] = result[i][j];
+
+
+                  Tensor<1, spacedim> DX_t[dim_];
+                  for (unsigned int i = 0; i < spacedim; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      DX_t[j][i] = contravariant[i][j];
+
+                  Tensor<2, dim_> G;
+                  for (unsigned int i = 0; i < dim_; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      G[i][j] = DX_t[i] * DX_t[j];
+
+                  return std::sqrt(determinant(G));
+                }();
+
+                weights.push_back(sub_quadrature_weights[j] * scaling);
+              }
+          }
+      }
+
+    // construct new quadrature rule
+    return Quadrature<3>(points, weights);
   };
 
-  const auto support_points_quad =
-    [](const std::pair<std::vector<Point<3>>, double> &face,
-       const unsigned char orientation) -> std::vector<Point<3>> {
-    const boost::container::small_vector<Point<3>, 8> temp =
-      ReferenceCells::Quadrilateral.permute_by_combined_orientation<Point<3>>(
-        face.first, orientation);
-    return std::vector<Point<3>>(temp.begin(), temp.end());
-  };
-
-  const auto process =
-    [&](const std::vector<std::pair<std::vector<Point<3>>, double>> &faces) {
-      // new (projected) quadrature points and weights
-      std::vector<Point<3>> points;
-      std::vector<double>   weights;
-
-      const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
-      const TensorProductPolynomials<2> poly_quad(
-        Polynomials::generate_complete_Lagrange_basis(
-          {Point<1>(0.0), Point<1>(1.0)}));
-
-      // loop over all faces (triangles) ...
-      for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
+  if ((reference_cell == ReferenceCells::Tetrahedron) ||
+      (reference_cell == ReferenceCells::Wedge) ||
+      (reference_cell == ReferenceCells::Pyramid))
+    {
+      std::vector<std::vector<Point<3>>> face_vertex_locations(
+        reference_cell.n_faces());
+      for (unsigned int f : reference_cell.face_indices())
         {
-          // linear polynomial to map the reference quadrature points correctly
-          // on faces
-          const unsigned int n_shape_functions = faces[face_no].first.size();
-
-          const auto &poly =
-            n_shape_functions == 3 ?
-              static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
-              static_cast<const ScalarPolynomialsBase<2> &>(poly_quad);
-
-          // ... and over all possible orientations
-          for (unsigned char orientation = 0;
-               orientation < reference_cell.n_face_orientations(face_no);
-               ++orientation)
-            {
-              const auto &face = faces[face_no];
-
-              const auto support_points =
-                n_shape_functions == 3 ? support_points_tri(face, orientation) :
-                                         support_points_quad(face, orientation);
-
-              // the quadrature rule to be projected ...
-              const auto &sub_quadrature_points =
-                quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
-              const auto &sub_quadrature_weights =
-                quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
-
-              // loop over all quadrature points
-              for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
-                {
-                  Point<3> mapped_point;
-
-                  // map reference quadrature point
-                  for (unsigned int i = 0; i < n_shape_functions; ++i)
-                    mapped_point +=
-                      support_points[i] *
-                      poly.compute_value(i, sub_quadrature_points[j]);
-
-                  points.push_back(mapped_point);
-
-                  // scale quadrature weight
-                  const double scaling = [&]() {
-                    const auto &       supp_pts = support_points;
-                    const unsigned int dim_     = 2;
-                    const unsigned int spacedim = 3;
-
-                    double result[spacedim][dim_];
-
-                    std::vector<Tensor<1, dim_>> shape_derivatives(
-                      n_shape_functions);
-
-                    for (unsigned int i = 0; i < n_shape_functions; ++i)
-                      shape_derivatives[i] =
-                        poly.compute_1st_derivative(i,
-                                                    sub_quadrature_points[j]);
-
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        result[i][j] = shape_derivatives[0][j] * supp_pts[0][i];
-                    for (unsigned int k = 1; k < n_shape_functions; ++k)
-                      for (unsigned int i = 0; i < spacedim; ++i)
-                        for (unsigned int j = 0; j < dim_; ++j)
-                          result[i][j] +=
-                            shape_derivatives[k][j] * supp_pts[k][i];
-
-                    DerivativeForm<1, dim_, spacedim> contravariant;
-
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        contravariant[i][j] = result[i][j];
-
-
-                    Tensor<1, spacedim> DX_t[dim_];
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        DX_t[j][i] = contravariant[i][j];
-
-                    Tensor<2, dim_> G;
-                    for (unsigned int i = 0; i < dim_; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        G[i][j] = DX_t[i] * DX_t[j];
-
-                    return std::sqrt(determinant(G));
-                  }();
-
-                  weights.push_back(sub_quadrature_weights[j] * scaling);
-                }
-            }
+          face_vertex_locations[f].resize(
+            reference_cell.face_reference_cell(f).n_vertices());
+          for (unsigned int v :
+               reference_cell.face_reference_cell(f).vertex_indices())
+            face_vertex_locations[f][v] =
+              reference_cell.face_vertex_location<3>(f, v);
         }
 
-      // construct new quadrature rule
-      return Quadrature<3>(points, weights);
-    };
-
-  if (reference_cell == ReferenceCells::Tetrahedron)
-    {
-      // reference faces (defined by its support points and its area)
-      // note: the area is later not used as a scaling factor but recomputed
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0)}},
-          0.5},
-         {{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 1.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5 * sqrt(3.0) /*equilateral triangle*/}}};
-
-      return process(faces);
+      return process(face_vertex_locations);
     }
-  else if (reference_cell == ReferenceCells::Wedge)
-    {
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 1.0),
-            Point<3>(1.0, 0.0, 1.0),
-            Point<3>(0.0, 1.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0),
-            Point<3>(1.0, 0.0, 1.0)}},
-          1.0},
-         {{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0),
-            Point<3>(1.0, 0.0, 1.0),
-            Point<3>(0.0, 1.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(0.0, 1.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 1.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          1.0}}};
-
-      return process(faces);
-    }
-  else if (reference_cell == ReferenceCells::Pyramid)
-    {
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+1.0, +1.0, 0.0)}},
-          4.0},
-         {{{Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(+1.0, +1.0, 0.0),
-            Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+1.0, +1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)}}};
-
-      return process(faces);
-    }
-
-
-  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
-
-  const unsigned int dim = 3;
-
-  unsigned int n_points_total = 0;
-
-  if (quadrature.size() == 1)
-    n_points_total = quadrature[0].size() * GeometryInfo<dim>::faces_per_cell;
   else
     {
-      AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
-      for (unsigned int i = 0; i < quadrature.size(); ++i)
-        n_points_total += quadrature[i].size();
-    }
+      Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
-  n_points_total *= 8;
+      const unsigned int dim = 3;
 
-  // first fix quadrature points
-  std::vector<Point<dim>> q_points;
-  q_points.reserve(n_points_total);
-  std::vector<Point<dim>> help;
-  help.reserve(quadrature.max_n_quadrature_points());
+      unsigned int n_points_total = 0;
 
-  std::vector<double> weights;
-  weights.reserve(n_points_total);
-
-  // do the following for all possible
-  // mutations of a face (mutation==0
-  // corresponds to a face with standard
-  // orientation, no flip and no rotation)
-  for (unsigned int i = 0; i < 8; ++i)
-    {
-      // project to each face and append
-      // results
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      if (quadrature.size() == 1)
+        n_points_total =
+          quadrature[0].size() * GeometryInfo<dim>::faces_per_cell;
+      else
         {
-          SubQuadrature mutation;
-
-          const auto &quadrature_f =
-            quadrature[quadrature.size() == 1 ? 0 : face];
-          switch (i)
-            {
-              case 0:
-                mutation = quadrature_f;
-                break;
-              case 1:
-                mutation = internal::QProjector::rotate(quadrature_f, 1);
-                break;
-              case 2:
-                mutation = internal::QProjector::rotate(quadrature_f, 2);
-                break;
-              case 3:
-                mutation = internal::QProjector::rotate(quadrature_f, 3);
-                break;
-              case 4:
-                mutation = internal::QProjector::reflect(quadrature_f);
-                break;
-              case 5:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 3);
-                break;
-              case 6:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 2);
-                break;
-              case 7:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 1);
-                break;
-              default:
-                Assert(false, ExcInternalError())
-            }
-
-          help.resize(quadrature[quadrature.size() == 1 ? 0 : face].size());
-          project_to_face(reference_cell, mutation, face, help);
-          std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-
-          std::copy(mutation.get_weights().begin(),
-                    mutation.get_weights().end(),
-                    std::back_inserter(weights));
+          AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
+          for (unsigned int i = 0; i < quadrature.size(); ++i)
+            n_points_total += quadrature[i].size();
         }
+
+      n_points_total *= 8;
+
+      // first fix quadrature points
+      std::vector<Point<dim>> q_points;
+      q_points.reserve(n_points_total);
+      std::vector<Point<dim>> help;
+      help.reserve(quadrature.max_n_quadrature_points());
+
+      std::vector<double> weights;
+      weights.reserve(n_points_total);
+
+      // do the following for all possible
+      // mutations of a face (mutation==0
+      // corresponds to a face with standard
+      // orientation, no flip and no rotation)
+      for (unsigned int i = 0; i < 8; ++i)
+        {
+          // project to each face and append
+          // results
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+               ++face)
+            {
+              SubQuadrature mutation;
+
+              const auto &quadrature_f =
+                quadrature[quadrature.size() == 1 ? 0 : face];
+              switch (i)
+                {
+                  case 0:
+                    mutation = quadrature_f;
+                    break;
+                  case 1:
+                    mutation = internal::QProjector::rotate(quadrature_f, 1);
+                    break;
+                  case 2:
+                    mutation = internal::QProjector::rotate(quadrature_f, 2);
+                    break;
+                  case 3:
+                    mutation = internal::QProjector::rotate(quadrature_f, 3);
+                    break;
+                  case 4:
+                    mutation = internal::QProjector::reflect(quadrature_f);
+                    break;
+                  case 5:
+                    mutation = internal::QProjector::rotate(
+                      internal::QProjector::reflect(quadrature_f), 3);
+                    break;
+                  case 6:
+                    mutation = internal::QProjector::rotate(
+                      internal::QProjector::reflect(quadrature_f), 2);
+                    break;
+                  case 7:
+                    mutation = internal::QProjector::rotate(
+                      internal::QProjector::reflect(quadrature_f), 1);
+                    break;
+                  default:
+                    Assert(false, ExcInternalError())
+                }
+
+              help.resize(quadrature[quadrature.size() == 1 ? 0 : face].size());
+              project_to_face(reference_cell, mutation, face, help);
+              std::copy(help.begin(), help.end(), std::back_inserter(q_points));
+
+              std::copy(mutation.get_weights().begin(),
+                        mutation.get_weights().end(),
+                        std::back_inserter(weights));
+            }
+        }
+
+
+      Assert(q_points.size() == n_points_total, ExcInternalError());
+      Assert(weights.size() == n_points_total, ExcInternalError());
+
+      return Quadrature<dim>(q_points, weights);
     }
-
-
-  Assert(q_points.size() == n_points_total, ExcInternalError());
-  Assert(weights.size() == n_points_total, ExcInternalError());
-
-  return Quadrature<dim>(q_points, weights);
 }
 
 
