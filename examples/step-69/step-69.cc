@@ -2758,14 +2758,12 @@ namespace Step69
 
     schlieren_postprocessor.compute_schlieren(output_vector);
 
-    auto data_out = std::make_shared<DataOut<dim>>();
-
+    std::unique_ptr<DataOut<dim>> data_out = std::make_unique<DataOut<dim>>();
     data_out->attach_dof_handler(offline_data.dof_handler);
 
-    const auto &component_names = ProblemDescription<dim>::component_names;
-
     for (unsigned int i = 0; i < n_solution_variables; ++i)
-      data_out->add_data_vector(output_vector[i], component_names[i]);
+      data_out->add_data_vector(output_vector[i],
+                                ProblemDescription<dim>::component_names[i]);
 
     data_out->add_data_vector(schlieren_postprocessor.schlieren,
                               "schlieren_plot");
@@ -2778,16 +2776,31 @@ namespace Step69
     // the <code>this</code> pointer as well as most of the arguments of
     // the output function by value so that we have access to them inside
     // the lambda function.
-    const auto output_worker = [this, name, t, cycle, data_out]() {
-      DataOutBase::VtkFlags flags(t,
-                                  cycle,
-                                  true,
-                                  DataOutBase::CompressionLevel::best_speed);
-      data_out->set_flags(flags);
+    //
+    // The first capture argument of the lambda function, `data_out_copy`
+    // in essence creates a local variable inside the lambda function into
+    // which we "move" the `data_out` variable from above. The way this works
+    // is that we create a `std::unique_ptr` above that points to the DataOut
+    // object. But we have no use for it any more after this point: We really
+    // just want to move ownership from the current function to the lambda
+    // function implemented in the following few lines. We could have done
+    // this by using a `std::shared_ptr` above and giving the lambda function
+    // a copy of that shared pointer; once the current function returns (but
+    // maybe while the lambda function is still running), our local shared
+    // pointer would go out of scope and stop pointing at the actual
+    // object, at which point the lambda function simply becomes the sole
+    // owner. But using the `std::unique_ptr` is conceptually cleaner as it
+    // makes it clear that the current function's `data_out` variable isn't
+    // even pointing to the object any more.
+    auto output_worker =
+      [data_out_copy = std::move(data_out), this, name, t, cycle]() {
+        const DataOutBase::VtkFlags flags(
+          t, cycle, true, DataOutBase::CompressionLevel::best_speed);
+        data_out_copy->set_flags(flags);
 
-      data_out->write_vtu_with_pvtu_record(
-        "", name + "-solution", cycle, mpi_communicator, 6);
-    };
+        data_out_copy->write_vtu_with_pvtu_record(
+          "", name + "-solution", cycle, mpi_communicator, 6);
+      };
 
     // If the asynchronous writeback option is set we launch a new
     // background thread with the help of
@@ -2801,7 +2814,8 @@ namespace Step69
     // run in the background.
     if (asynchronous_writeback)
       {
-        background_thread_state = std::async(std::launch::async, output_worker);
+        background_thread_state =
+          std::async(std::launch::async, std::move(output_worker));
       }
     else
       {
