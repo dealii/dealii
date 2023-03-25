@@ -630,9 +630,12 @@ public:
   unit_point(const unsigned int point_index) const;
 
   /**
-   * Number of quadrature points of the current cell/face.
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to n_quadrature_points. This allows to write code using
+   * range-based for loops.
    */
-  const unsigned int n_q_points;
+  inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  quadrature_point_indices() const;
 
 private:
   /**
@@ -645,6 +648,11 @@ private:
    */
   void
   setup(const unsigned int first_selected_component);
+
+  /**
+   * Number of quadrature points of the current cell/face.
+   */
+  const unsigned int n_q_points;
 
   /**
    * Pointer to the Mapping object passed to the constructor.
@@ -1404,6 +1412,16 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::unit_point(
 {
   AssertIndexRange(point_index, unit_points.size());
   return unit_points[point_index];
+}
+
+
+
+template <int n_components, int dim, int spacedim, typename Number>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEPointEvaluation<n_components, dim, spacedim, Number>::
+  quadrature_point_indices() const
+{
+  return {0U, n_q_points};
 }
 
 DEAL_II_NAMESPACE_CLOSE

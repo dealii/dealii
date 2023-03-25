@@ -209,7 +209,7 @@ test(const bool filtered_compression)
         fe_point.evaluate(solution_values_in,
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
-        for (unsigned int q = 0; q < fe_point.n_q_points; ++q)
+        for (const auto q : fe_point.quadrature_point_indices())
           {
             fe_point.submit_value(fe_point.JxW(q) * fe_point.get_value(q), q);
             fe_point.submit_gradient(fe_point.JxW(q) * fe_point.get_gradient(q),
@@ -245,7 +245,7 @@ test(const bool filtered_compression)
                                     EvaluationFlags::values |
                                       EvaluationFlags::gradients);
 
-          for (unsigned int q = 0; q < fe_point_faces_m.n_q_points; ++q)
+          for (const auto q : fe_point_faces_m.quadrature_point_indices())
             {
               fe_point_faces_m.submit_value(fe_point_faces_m.JxW(q) *
                                               (fe_point_faces_m.get_value(q) -
