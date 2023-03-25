@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 // Check the path of SolverGMRES with distributed vectors and
-// OrthogonalizationStrategy::classical_gram_schmidt.
+// LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt.
 
 
 #include <deal.II/lac/diagonal_matrix.h>
@@ -108,8 +108,7 @@ main()
     SolverGMRES<LinearAlgebra::distributed::Vector<double>>::AdditionalData
       data3(8);
     data3.orthogonalization_strategy =
-      SolverGMRES<LinearAlgebra::distributed::Vector<double>>::AdditionalData::
-        OrthogonalizationStrategy::classical_gram_schmidt;
+      LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
     SolverGMRES<LinearAlgebra::distributed::Vector<double>> solver(control,
                                                                    data3);
     solver.connect(&monitor_norm);
@@ -131,8 +130,7 @@ main()
     SolverGMRES<LinearAlgebra::distributed::BlockVector<double>>::AdditionalData
       data3(8);
     data3.orthogonalization_strategy =
-      SolverGMRES<LinearAlgebra::distributed::BlockVector<double>>::
-        AdditionalData::OrthogonalizationStrategy::classical_gram_schmidt;
+      LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
     SolverGMRES<LinearAlgebra::distributed::BlockVector<double>> solver(control,
                                                                         data3);
     solver.connect(&monitor_norm_block);
