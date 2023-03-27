@@ -459,7 +459,7 @@ namespace parallel
        * `find_point_owner_rank(const std::vector<Point<dim>> &points)`.
        */
       types::subdomain_id
-      find_point_owner_rank(const Point<dim> &p);
+      find_point_owner_rank(const Point<dim> &p) const;
 
       /**
        * Find the MPI rank of the cells that contain the input points in a
@@ -478,7 +478,7 @@ namespace parallel
        * @return list of owner ranks
        */
       std::vector<types::subdomain_id>
-      find_point_owner_rank(const std::vector<Point<dim>> &points);
+      find_point_owner_rank(const std::vector<Point<dim>> &points) const;
 
       /**
        * Coarsen and refine the mesh according to refinement and coarsening
@@ -967,6 +967,12 @@ namespace parallel
       coarse_cell_index_to_coarse_cell_id(
         const unsigned int coarse_cell_index) const override;
 
+      types::subdomain_id
+      find_point_owner_rank(const Point<1> &p) const;
+
+      std::vector<types::subdomain_id>
+      find_point_owner_rank(const std::vector<Point<1>> &) const;
+
       template <int, int>
       friend class TemporarilyMatchRefineFlags;
     };
@@ -1072,6 +1078,26 @@ namespace parallel
       virtual void
       update_cell_relations() override
       {}
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      types::subdomain_id
+      find_point_owner_rank(const Point<dim> &) const
+      {
+        return {};
+      }
+
+      /**
+       * Dummy replacement to allow for better error messages when compiling
+       * this class.
+       */
+      std::vector<types::subdomain_id>
+      find_point_owner_rank(const std::vector<Point<dim>> &) const
+      {
+        return {};
+      }
     };
   } // namespace distributed
 } // namespace parallel
