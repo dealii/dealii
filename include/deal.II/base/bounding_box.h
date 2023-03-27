@@ -384,6 +384,10 @@ public:
   serialize(Archive &ar, const unsigned int version);
 
 private:
+  /**
+   * A pair of points that denote the bottom-left and top-right corners of
+   * the bounding box.
+   */
   std::pair<Point<spacedim, Number>, Point<spacedim, Number>> boundary_points;
 };
 
