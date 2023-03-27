@@ -383,7 +383,20 @@ namespace internal
              const unsigned int                  base_element = 0);
 
       /**
-       * Return which kinds of elements are supported by MatrixFree.
+       * Return whether an element is supported by MatrixFree.
+       *
+       * The following scalar elements are supported:
+       * - FENothing, FE_DGP, and FE_Q_DG0
+       * - polynomial tensor-product elements based on
+       *   Polynomials::Polynomial (FE_Q, FE_DG_Q, FE_DGQArbitraryNodes,
+       *   FE_DGQHermite, FE_DGQLegendre) or Polynomials::PiecewisePolynomial
+       *   (FE_Q_iso_Q1).
+       * - elements for simplex, pyramids, and wedges (FE_SimplexP,
+       *   FE_SimplexDGP, FE_PyramidP, FE_PyramidDGP, FE_WedgeP, FE_WedgeDGP)
+       *
+       * In the case of vectorial elements, FE_RaviartThomasNodal
+       * and FESystem with base elements from the scalar elements
+       * listed above are supported.
        */
       template <int dim, int spacedim>
       static bool
