@@ -44,7 +44,10 @@ test(std::ostream &logfile)
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  GridOut grid_out;
+  GridOut           grid_out;
+  GridOutFlags::Vtu vtu_flags;
+  vtu_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+  grid_out.set_flags(vtu_flags);
   grid_out.write_vtu(tria, logfile);
 }
 

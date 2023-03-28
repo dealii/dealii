@@ -3718,9 +3718,9 @@ GridOut::write_mesh_per_processor_as_vtu(
                unsigned int,
                std::string,
                DataComponentInterpretation::DataComponentInterpretation>>
-                        vector_data_ranges;
-  DataOutBase::VtkFlags flags;
-  DataOutBase::write_vtu(patches, data_names, vector_data_ranges, flags, out);
+    vector_data_ranges;
+  DataOutBase::write_vtu(
+    patches, data_names, vector_data_ranges, vtu_flags, out);
 }
 
 

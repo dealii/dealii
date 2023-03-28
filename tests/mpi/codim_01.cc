@@ -89,12 +89,16 @@ test(std::ostream & /*out*/)
   dh.distribute_dofs(fe);
   deallog << "dofs " << dh.n_dofs() << std::endl;
 
+  DataOutBase::VtkFlags vtk_flags;
+  vtk_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+
   DataOut<dim, spacedim> data_out;
   data_out.attach_triangulation(tr);
   Vector<float> subdomain(tr.n_active_cells());
   for (unsigned int i = 0; i < subdomain.size(); ++i)
     subdomain(i) = tr.locally_owned_subdomain();
   data_out.add_data_vector(subdomain, "subdomain");
+  data_out.set_flags(vtk_flags);
 
   std::string name = "f0.vtu";
   name[1] += tr.locally_owned_subdomain();

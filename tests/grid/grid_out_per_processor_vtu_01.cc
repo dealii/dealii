@@ -46,7 +46,10 @@ output(const parallel::distributed::Triangulation<dim> &tr,
        const bool                                       view_levels,
        const bool                                       include_artificial)
 {
-  GridOut out;
+  GridOut           out;
+  GridOutFlags::Vtu vtu_flags;
+  vtu_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+  out.set_flags(vtu_flags);
   out.write_mesh_per_processor_as_vtu(tr,
                                       filename,
                                       view_levels,
