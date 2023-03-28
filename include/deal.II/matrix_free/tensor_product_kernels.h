@@ -2983,6 +2983,58 @@ namespace internal
 
 
   /**
+   * Interpolate inner dimensions of tensor product shape functions.
+   */
+  template <int dim, int length, typename Number2, typename Number>
+  inline std::array<typename ProductTypeNoPoint<Number, Number2>::type, 3>
+  do_interpolate_xy(const std::vector<Number> &                  values,
+                    const std::vector<unsigned int> &            renumber,
+                    const dealii::ndarray<Number2, 200, 2, dim> &shapes,
+                    const int n_shapes_runtime,
+                    int &     i)
+  {
+    const int n_shapes = length > 0 ? length : n_shapes_runtime;
+    using Number3      = typename ProductTypeNoPoint<Number, Number2>::type;
+    std::array<Number3, 3> result = {};
+    for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+      {
+        // Interpolation + derivative x direction
+        Number3 value = {}, deriv = {};
+
+        // Distinguish the inner loop based on whether we have a
+        // renumbering or not
+        if (renumber.empty())
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            {
+              value += shapes[i0][0][0] * values[i];
+              deriv += shapes[i0][1][0] * values[i];
+            }
+        else
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            {
+              value += shapes[i0][0][0] * values[renumber[i]];
+              deriv += shapes[i0][1][0] * values[renumber[i]];
+            }
+
+        if (dim > 1)
+          {
+            // Interpolation + derivative in y direction
+            result[0] += value * shapes[i1][0][1];
+            result[1] += deriv * shapes[i1][0][1];
+            result[2] += value * shapes[i1][1][1];
+          }
+        else
+          {
+            result[0] = value;
+            result[1] = deriv;
+          }
+      }
+    return result;
+  }
+
+
+
+  /**
    * Compute the polynomial interpolation of a tensor product shape function
    * $\varphi_i$ given a vector of coefficients $u_i$ in the form
    * $u_h(\mathbf{x}) = \sum_{i=1}^{k^d} \varphi_i(\mathbf{x}) u_i$. The shape
@@ -3104,53 +3156,41 @@ namespace internal
     std::pair<Number3, Tensor<1, dim, Number3>> result = {};
     for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
       {
-        Number3 value_y = {}, deriv_x = {}, deriv_y = {};
-        for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
-          {
-            // Interpolation + derivative x direction
-            Number3 value = {}, deriv = {};
-
-            // Distinguish the inner loop based on whether we have a
-            // renumbering or not
-            if (renumber.empty())
-              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                {
-                  value += shapes[i0][0][0] * values[i];
-                  deriv += shapes[i0][1][0] * values[i];
-                }
-            else
-              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                {
-                  value += shapes[i0][0][0] * values[renumber[i]];
-                  deriv += shapes[i0][1][0] * values[renumber[i]];
-                }
-
-            // Interpolation + derivative in y direction
-            if (dim > 1)
-              {
-                value_y += value * shapes[i1][0][1];
-                deriv_x += deriv * shapes[i1][0][1];
-                deriv_y += value * shapes[i1][1][1];
-              }
-            else
-              {
-                result.first     = value;
-                result.second[0] = deriv;
-              }
-          }
+        std::array<Number3, 3> inner_result;
+        // Generate separate code with known loop bounds for the most common
+        // cases
+        if (n_shapes == 2)
+          inner_result = do_interpolate_xy<dim, 2, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 3)
+          inner_result = do_interpolate_xy<dim, 3, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 4)
+          inner_result = do_interpolate_xy<dim, 4, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 5)
+          inner_result = do_interpolate_xy<dim, 5, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 6)
+          inner_result = do_interpolate_xy<dim, 6, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else
+          inner_result = do_interpolate_xy<dim, -1, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
         if (dim == 3)
           {
             // Interpolation + derivative in z direction
-            result.first += value_y * shapes[i2][0][2];
-            result.second[0] += deriv_x * shapes[i2][0][2];
-            result.second[1] += deriv_y * shapes[i2][0][2];
-            result.second[2] += value_y * shapes[i2][1][2];
+            result.first += inner_result[0] * shapes[i2][0][2];
+            result.second[0] += inner_result[1] * shapes[i2][0][2];
+            result.second[1] += inner_result[2] * shapes[i2][0][2];
+            result.second[2] += inner_result[0] * shapes[i2][1][2];
           }
-        else if (dim == 2)
+        else
           {
-            result.first     = value_y;
-            result.second[0] = deriv_x;
-            result.second[1] = deriv_y;
+            result.first     = inner_result[0];
+            result.second[0] = inner_result[1];
+            if (dim > 1)
+              result.second[1] = inner_result[2];
           }
       }
 
@@ -3261,6 +3301,45 @@ namespace internal
 
 
   /**
+   * Test inner dimensions of tensor product shape functions and accumulate.
+   */
+  template <int dim, int length, typename Number2, typename Number>
+  inline void
+  do_apply_test_functions_xy(AlignedVector<Number2> &         values,
+                             const std::vector<unsigned int> &renumber,
+                             const dealii::ndarray<Number, 200, 2, dim> &shapes,
+                             const std::array<Number2, 3> &test_grads_value,
+                             const int                     n_shapes_runtime,
+                             int &                         i)
+  {
+    const int n_shapes = length > 0 ? length : n_shapes_runtime;
+    for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+      {
+        const Number2 test_value_y =
+          dim > 1 ? (test_grads_value[2] * shapes[i1][0][1] +
+                     test_grads_value[1] * shapes[i1][1][1]) :
+                    test_grads_value[2];
+        const Number2 test_grad_xy = dim > 1 ?
+                                       test_grads_value[0] * shapes[i1][0][1] :
+                                       test_grads_value[0];
+        if (renumber.empty())
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            {
+              values[i] += shapes[i0][0][0] * test_value_y;
+              values[i] += shapes[i0][1][0] * test_grad_xy;
+            }
+        else
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            {
+              values[renumber[i]] += shapes[i0][0][0] * test_value_y;
+              values[renumber[i]] += shapes[i0][1][0] * test_grad_xy;
+            }
+      }
+  }
+
+
+
+  /**
    * Same as evaluate_tensor_product_value_and_gradient() but for integration.
    */
   template <int dim, typename Number, typename Number2>
@@ -3292,36 +3371,44 @@ namespace internal
       poly[i].values_of_array(point, 1, &shapes[i][0]);
 
     // Implement the transpose of the function above
+    std::array<Number2, 3> test_grads_value;
     for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
       {
-        const Number2 test_value_z =
+        // test grad x
+        test_grads_value[0] =
+          dim > 2 ? gradient[0] * shapes[i2][0][2] : gradient[0];
+        // test grad y
+        test_grads_value[1] = dim > 2 ? gradient[1] * shapes[i2][0][2] :
+                                        (dim > 1 ? gradient[1] : Number2());
+        // test value z
+        test_grads_value[2] =
           dim > 2 ?
             (value * shapes[i2][0][2] + gradient[2] * shapes[i2][1][2]) :
             value;
-        const Number2 test_grad_x =
-          dim > 2 ? gradient[0] * shapes[i2][0][2] : gradient[0];
-        const Number2 test_grad_y = dim > 2 ?
-                                      gradient[1] * shapes[i2][0][2] :
-                                      (dim > 1 ? gradient[1] : Number2());
-        for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
-          {
-            const Number2 test_value_y = dim > 1 ?
-                                           (test_value_z * shapes[i1][0][1] +
-                                            test_grad_y * shapes[i1][1][1]) :
-                                           test_value_z;
-            const Number2 test_grad_xy =
-              dim > 1 ? test_grad_x * shapes[i1][0][1] : test_grad_x;
-            if (renumber.empty())
-              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                values[i] += shapes[i0][0][0] * test_value_y +
-                             shapes[i0][1][0] * test_grad_xy;
-            else
-              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                values[renumber[i]] += shapes[i0][0][0] * test_value_y +
-                                       shapes[i0][1][0] * test_grad_xy;
-          }
+
+        // Generate separate code with known loop bounds for the most common
+        // cases
+        if (n_shapes == 2)
+          do_apply_test_functions_xy<dim, 2, Number2, Number>(
+            values, renumber, shapes, test_grads_value, n_shapes, i);
+        else if (n_shapes == 3)
+          do_apply_test_functions_xy<dim, 3, Number2, Number>(
+            values, renumber, shapes, test_grads_value, n_shapes, i);
+        else if (n_shapes == 4)
+          do_apply_test_functions_xy<dim, 4, Number2, Number>(
+            values, renumber, shapes, test_grads_value, n_shapes, i);
+        else if (n_shapes == 5)
+          do_apply_test_functions_xy<dim, 5, Number2, Number>(
+            values, renumber, shapes, test_grads_value, n_shapes, i);
+        else if (n_shapes == 6)
+          do_apply_test_functions_xy<dim, 6, Number2, Number>(
+            values, renumber, shapes, test_grads_value, n_shapes, i);
+        else
+          do_apply_test_functions_xy<dim, -1, Number2, Number>(
+            values, renumber, shapes, test_grads_value, n_shapes, i);
       }
   }
+
 
 
   template <int dim, int n_points_1d_template, typename Number>
