@@ -639,8 +639,6 @@ namespace Step70
     DoFHandler<spacedim>      fluid_dh;
     DoFHandler<dim, spacedim> solid_dh;
 
-    std::unique_ptr<MappingFEField<dim, spacedim>> solid_mapping;
-
     // Similarly to how things are done in step-22, we use a block system to
     // treat the Stokes part of the problem, and follow very closely what was
     // done there.
