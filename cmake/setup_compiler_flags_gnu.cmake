@@ -61,11 +61,6 @@ endif()
 enable_if_supported(DEAL_II_CXX_FLAGS "-pedantic")
 
 #
-# Set the pic flag.
-#
-enable_if_supported(DEAL_II_CXX_FLAGS "-fPIC")
-
-#
 # Setup various warnings:
 #
 enable_if_supported(DEAL_II_CXX_FLAGS "-Wall")

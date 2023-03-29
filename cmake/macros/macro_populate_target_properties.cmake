@@ -88,6 +88,18 @@ function(populate_target_properties _target _build)
     )
 
   #
+  # Add target properties:
+  #
+  #  - set POSITION_INDEPENDENT_CODE to true to compile everything with
+  #    the -fpic/-fPIC compiler flag. This ensures that we can link all
+  #    object targets into a relocatable library at the end.
+  #
+
+  set_target_properties(${_target} PROPERTIES
+    POSITION_INDEPENDENT_CODE TRUE
+    )
+
+  #
   # Add compile and link options with private scope, and add the link
   # interface:
   #
