@@ -296,3 +296,9 @@ linear system solver we use in this program is not perfect -- its run
 time grows faster than proportional to the linear system size -- and
 picking a better linear solver might be appropriate for this kind of
 comparison.
+
+To see how a comparison of this kind could work, take a look at
+@cite KronbichlerWall2018 , and specifically Figure 5
+that illustrates the error as a function of compute time for
+a number of polynomial degrees (as well as a number of different ways
+to discretize the equation used there).
