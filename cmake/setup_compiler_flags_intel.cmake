@@ -35,11 +35,6 @@ endif()
 ########################
 
 #
-# Set the pic flag.
-#
-enable_if_supported(DEAL_II_CXX_FLAGS "-fpic")
-
-#
 # Enable verbose warnings:
 #
 enable_if_supported(DEAL_II_CXX_FLAGS "-w2")
