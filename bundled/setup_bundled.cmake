@@ -57,7 +57,7 @@ macro(feature_boost_configure_bundled)
     list(APPEND DEAL_II_DEFINITIONS "BOOST_ALL_NO_LIB")
   endif()
 
-  enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
+  enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-unused-local-typedefs")
 
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
 endmacro()
@@ -135,7 +135,7 @@ macro(feature_tbb_configure_bundled)
   #
   # We have to disable a bunch of warnings:
   #
-  enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-parentheses")
+  enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-parentheses")
 
   #
   # tbb uses dlopen/dlclose, so link against libdl.so as well:

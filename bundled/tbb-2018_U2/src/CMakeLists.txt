@@ -14,11 +14,11 @@
 ## ---------------------------------------------------------------------
 
 #
-# Remove -Wall and -pedantic from DEAL_II_CXX_FLAGS (in directory scope) to
+# Remove -Wall and -pedantic from DEAL_II_WARNING_FLAGS (in directory scope) to
 # avoid some annoying warnings...
 #
-strip_flag(DEAL_II_CXX_FLAGS "-Wall")
-strip_flag(DEAL_II_CXX_FLAGS "-pedantic")
+strip_flag(DEAL_II_WARNING_FLAGS "-Wall")
+strip_flag(DEAL_II_WARNING_FLAGS "-pedantic")
 
 #
 # As discussed in
@@ -36,10 +36,10 @@ enable_if_supported(DEAL_II_CXX_FLAGS "-flifetime-dse=1")
 #
 # Disable other warnings:
 #
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-implicit-fallthrough")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-stringop-overflow")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-deprecated-copy")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-tautological-overlap-compare")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-implicit-fallthrough")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-stringop-overflow")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-deprecated-copy")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-tautological-overlap-compare")
 
 
 

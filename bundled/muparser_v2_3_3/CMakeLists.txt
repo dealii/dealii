@@ -16,13 +16,13 @@
 #
 # avoid some annoying warnings...
 #
-strip_flag(DEAL_II_CXX_FLAGS "-Wall")
-strip_flag(DEAL_II_CXX_FLAGS "-pedantic")
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-switch)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-nested-anon-types)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-implicit-fallthrough)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-cast-function-type)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-float-conversion)
+strip_flag(DEAL_II_WARNING_FLAGS "-Wall")
+strip_flag(DEAL_II_WARNING_FLAGS "-pedantic")
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-switch)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-nested-anon-types)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-implicit-fallthrough)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-cast-function-type)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-float-conversion)
 
 include_directories(
   include/
