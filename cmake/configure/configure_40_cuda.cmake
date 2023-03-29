@@ -95,7 +95,7 @@ macro(feature_cuda_configure_external)
   # produces a lot of warnings when pedantic is enabled. So filter out the
   # flag:
   #
-  string(REPLACE "-pedantic" "" DEAL_II_CXX_FLAGS "${DEAL_II_CXX_FLAGS}")
+  string(REPLACE "-pedantic" "" DEAL_II_WARNING_FLAGS "${DEAL_II_WARNING_FLAGS}")
 endmacro()
 
 
