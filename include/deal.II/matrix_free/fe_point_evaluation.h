@@ -977,9 +977,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const ArrayView<const Number> &         solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flag)
 {
-  if (!is_reinitialized)
-    reinit(numbers::invalid_unsigned_int);
-
   if (n_q_points == 0)
     return;
 
@@ -989,6 +986,14 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
       fast_path)
     {
       // fast path with tensor product evaluation
+      const auto unit_points =
+        mapping_info->get_unit_points(current_cell_index, current_face_number);
+
+      // we need to call reinit() here if we reuse the same MappingInfo object
+      // for several FEPointEvaluation objects to resize the data fields
+      if (!is_reinitialized || n_q_points != unit_points.size())
+        reinit(numbers::invalid_unsigned_int);
+
       if (solution_renumbered.size() != dofs_per_component)
         solution_renumbered.resize(dofs_per_component);
       for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -1005,9 +1010,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
       // path
       unit_gradients.resize(n_q_points,
                             numbers::signaling_nan<gradient_type>());
-
-      const auto unit_points =
-        mapping_info->get_unit_points(current_cell_index, current_face_number);
 
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<Number>::size();
@@ -1120,9 +1122,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const ArrayView<Number> &               solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
-  if (!is_reinitialized)
-    reinit(numbers::invalid_unsigned_int);
-
   if (n_q_points == 0) // no evaluation points provided
     {
       std::fill(solution_values.begin(), solution_values.end(), 0.0);
@@ -1135,6 +1134,13 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
       fast_path)
     {
       // fast path with tensor product integration
+      const auto unit_points =
+        mapping_info->get_unit_points(current_cell_index, current_face_number);
+
+      // we need to call reinit() here if we reuse the same MappingInfo object
+      // for several FEPointEvaluation objects to resize the data fields
+      if (!is_reinitialized || n_q_points != unit_points.size())
+        reinit(numbers::invalid_unsigned_int);
 
       if (integration_flags & EvaluationFlags::values)
         AssertIndexRange(n_q_points, values.size() + 1);
@@ -1149,9 +1155,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           dim,
           n_components,
           VectorizedArray<Number>>::value_type());
-
-      const auto unit_points =
-        mapping_info->get_unit_points(current_cell_index, current_face_number);
 
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<Number>::size();
