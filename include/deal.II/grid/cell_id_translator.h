@@ -158,6 +158,7 @@ namespace internal
 #endif
 
     // Now do the whole computation again, but for real:
+    tree_sizes.reserve(n_global_levels + 1);
     tree_sizes.push_back(0);
     for (unsigned int i = 0; i < n_global_levels; ++i)
       tree_sizes.push_back(tree_sizes.back() +
