@@ -133,7 +133,7 @@ _detailed("#  Library targets:\n")
 foreach(_build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER "${_build}" _build_lowercase)
   _detailed("#\n")
-  _print_target(${DEAL_II_NAMESPACE}_${_build_lowercase})
+  _print_target(${DEAL_II_TARGET_NAME}_${_build_lowercase})
 endforeach()
 _detailed("#\n")
 

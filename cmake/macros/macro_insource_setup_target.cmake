@@ -55,5 +55,5 @@ function(insource_setup_target _target _build)
       ${DEAL_II_INCLUDE_DIRS}
     )
 
-  target_link_libraries(${_target} ${DEAL_II_NAMESPACE}_${_build_lowercase})
+  target_link_libraries(${_target} ${DEAL_II_TARGET_NAME}_${_build_lowercase})
 endfunction()

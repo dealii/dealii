@@ -81,7 +81,7 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
     endif()
   endif()
 
-  set(CONFIG_TARGET_${_build} ${DEAL_II_NAMESPACE}::${DEAL_II_NAMESPACE}_${_build_lowercase})
+  set(CONFIG_TARGET_${_build} ${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_${_build_lowercase})
   list(APPEND CONFIG_TARGET ${_keyword} \${DEAL_II_TARGET_${_build}})
 endforeach()
 
