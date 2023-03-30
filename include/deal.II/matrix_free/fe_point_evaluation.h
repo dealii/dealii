@@ -832,6 +832,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , is_reinitialized(false)
 {
   setup(first_selected_component);
+  mapping_info.is_reinitialized.connect(
+    [this]() { this->is_reinitialized = false; });
 }
 
 

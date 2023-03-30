@@ -182,6 +182,13 @@ namespace NonMatching
     UpdateFlags
     get_update_flags() const;
 
+      /**
+   * This signal is triggered right after
+   * this object is reinitialized, to let dependent
+   * objects know that they need to reinitialize as well.
+   */
+  boost::signals2::signal<void()> is_reinitialized;
+
   private:
     /**
      * Enum class for reinitialized states.
@@ -336,6 +343,8 @@ namespace NonMatching
                                             mapping_data[0]);
 
     state = State::single_cell;
+
+    is_reinitialized();
   }
 
 
@@ -413,6 +422,7 @@ namespace NonMatching
       }
 
     state = State::cell_vector;
+    is_reinitialized();
   }
 
 
@@ -509,6 +519,7 @@ namespace NonMatching
       }
 
     state = State::cell_vector;
+    is_reinitialized();
   }
 
 
@@ -611,6 +622,7 @@ namespace NonMatching
       }
 
     state = State::faces_on_cells_in_vector;
+    is_reinitialized();
   }
 
 
