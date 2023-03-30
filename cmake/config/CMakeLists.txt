@@ -49,6 +49,8 @@ set(_macros
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_shell_escape_option_groups.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_target_compile_flags.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_target_link_flags.cmake
   )
 file(COPY ${_macros}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
