@@ -99,6 +99,16 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   #
   populate_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase} ${build})
 
+  #
+  # Record the expected C++ standard as a compile feature. This target
+  # property ensures that support for our expected C++ standard is always
+  # enabled in client user code irrespective of what compile flags/options
+  # they have set.
+  #
+  target_compile_features(${DEAL_II_NAMESPACE}_${build_lowercase}
+    INTERFACE cxx_std_${CMAKE_CXX_STANDARD}
+    )
+
   if(BUILD_SHARED_LIBS)
     #
     # Add all object targets as private link targets
@@ -107,7 +117,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     target_link_libraries(${DEAL_II_NAMESPACE}_${build_lowercase}
       PRIVATE ${_object_targets}
       )
-    endif()
+  endif()
 
   set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
     PROPERTIES
