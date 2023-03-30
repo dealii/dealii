@@ -266,7 +266,7 @@ SYM_RANKS := { 2; 4 }
 
 // Flags that are allowed in DataOutInterface::set_flags
 OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
-                       GmvFlags; TecplotFlags; VtkFlags; SvgFlags;
+                       GmvFlags; Hdf5Flags; TecplotFlags; VtkFlags; SvgFlags;
                        Deal_II_IntermediateFlags }
 
 // CGAL Kernels

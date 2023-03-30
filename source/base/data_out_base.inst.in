@@ -222,10 +222,11 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
       template void
       write_hdf5_parallel(
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
-          &                  patches,
-        const DataOutFilter &data_filter,
-        const std::string &  filename,
-        const MPI_Comm &     comm);
+          &                           patches,
+        const DataOutFilter &         data_filter,
+        const DataOutBase::Hdf5Flags &flags,
+        const std::string &           filename,
+        const MPI_Comm &              comm);
 
       template void
       write_filtered_data(
