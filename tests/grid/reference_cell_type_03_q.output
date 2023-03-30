@@ -1,4 +1,5 @@
 
+DEAL:0D::0D quadrature size: 1
 DEAL:1D::ReferenceCell: Line
 DEAL:1D::  computed barycenter = 0.500000
 DEAL:1D::  self-reported barycenter = 0.500000

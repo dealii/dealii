@@ -67,6 +67,16 @@ main()
   initlog();
 
   {
+    deallog.push("0D");
+    // It doesn't make sense to integrate in 0D, but make sure that
+    // get_gauss_type_quadrature() still works
+    deallog << "0D quadrature size: "
+            << ReferenceCells::Vertex.get_gauss_type_quadrature<0>(1).size()
+            << std::endl;
+    deallog.pop();
+  }
+
+  {
     deallog.push("1D");
     test<1>(ReferenceCells::Line);
     deallog.pop();
