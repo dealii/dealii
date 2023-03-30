@@ -292,8 +292,6 @@ macro(_test_cxx14_support)
      (void) m0;
      constexpr auto m1 = std::is_standard_layout<double>::value;
      (void) m1;
-     constexpr auto m2 = std::is_pod<double>::value;
-     (void) m2;
     }
     "
     DEAL_II_HAVE_CXX11_FEATURES)
