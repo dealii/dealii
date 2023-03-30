@@ -119,6 +119,7 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
   _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:      ${DEAL_II_CXX_FLAGS_DEBUG}\n")
 endif()
+_detailed("#        DEAL_II_WARNING_FLAGS:        ${DEAL_II_WARNING_FLAGS}\n")
 
 _detailed("#        DEAL_II_LINKER_FLAGS:         ${DEAL_II_LINKER_FLAGS}\n")
 if(CMAKE_BUILD_TYPE MATCHES "Release")

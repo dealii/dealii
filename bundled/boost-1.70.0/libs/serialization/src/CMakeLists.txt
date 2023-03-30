@@ -54,8 +54,8 @@ set(src_boost_serialization
   xml_wiarchive.cpp
   xml_woarchive.cpp
   )
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-c11-extensions)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-deprecated-copy)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-uninitialized)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-c11-extensions)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-deprecated-copy)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-uninitialized)
 
 define_object_library(bundled_boost_serialization OBJECT ${src_boost_serialization})

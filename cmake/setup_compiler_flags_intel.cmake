@@ -37,13 +37,13 @@ endif()
 #
 # Enable verbose warnings:
 #
-enable_if_supported(DEAL_II_CXX_FLAGS "-w2")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-w2")
 
 #
 # Disable remarks like "Inlining inhibited by limit max-size"
 #
-enable_if_supported(DEAL_II_CXX_FLAGS "-diag-disable=remark")
-enable_if_supported(DEAL_II_CXX_FLAGS "-diag-disable=16219")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-diag-disable=remark")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-diag-disable=16219")
 
 #
 # Disable some warnings that lead to a lot of false positives:
@@ -97,27 +97,27 @@ enable_if_supported(DEAL_II_CXX_FLAGS "-diag-disable=16219")
 #   -w15531 A portion of SIMD loop is serialized
 #   -w15552 loop was not vectorized with "simd"
 #
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd21")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd68")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd135")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd175")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd177")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd191")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd193")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd279")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd327")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd383")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd854")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd981")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd1418")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd1478")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd1572")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd2259")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd2536")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd2651")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd3415")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd15531")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd15552")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd21")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd68")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd135")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd175")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd177")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd191")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd193")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd279")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd327")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd383")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd854")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd981")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd1418")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd1478")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd1572")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd2259")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd2536")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd2651")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd3415")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd15531")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd15552")
 
 
 #
@@ -136,11 +136,11 @@ enable_if_supported(DEAL_II_CXX_FLAGS "-wd15552")
 #   -w280 selector expression is constant
 #         When writing 'switch(dim)'
 #
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd111")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd128")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd185")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd186")
-enable_if_supported(DEAL_II_CXX_FLAGS "-wd280")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd111")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd128")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd185")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd186")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-wd280")
 
 
 #############################

@@ -292,8 +292,6 @@ macro(_test_cxx14_support)
      (void) m0;
      constexpr auto m1 = std::is_standard_layout<double>::value;
      (void) m1;
-     constexpr auto m2 = std::is_pod<double>::value;
-     (void) m2;
     }
     "
     DEAL_II_HAVE_CXX11_FEATURES)
@@ -365,12 +363,13 @@ _test_cxx20_support()
 #
 # Some compilers are too generous in accepting some of the language
 # features that we test below and do not issue an error but a warning. Set
-# -Werror to make the feature detection more reliable.
+# -pedantic -Werror to make the feature detection more reliable.
 #
 set(_werror_flag "")
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   enable_if_supported(_werror_flag "/WX /EHsc")
 else()
+  enable_if_supported(_werror_flag "-pedantic")
   enable_if_supported(_werror_flag "-Werror")
   enable_if_supported(_werror_flag "-Wno-unused-command-line-argument")
 endif()

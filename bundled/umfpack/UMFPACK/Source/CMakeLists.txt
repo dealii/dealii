@@ -285,11 +285,12 @@
 # *Shush!*
 # (Remove locally in this subdirectory)
 #
-strip_flag(DEAL_II_CXX_FLAGS "-pedantic")
-strip_flag(DEAL_II_CXX_FLAGS "-Wall")
-strip_flag(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-sign-compare")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-write-strings")
+strip_flag(DEAL_II_WARNING_FLAGS "-pedantic")
+strip_flag(DEAL_II_WARNING_FLAGS "-Wall")
+strip_flag(DEAL_II_WARNING_FLAGS "-Wextra")
+strip_flag(DEAL_II_WARNING_FLAGS "-Wfloat-conversion")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-sign-compare")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-write-strings")
 
 
 #

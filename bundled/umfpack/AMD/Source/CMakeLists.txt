@@ -13,7 +13,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-strip_flag(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
+strip_flag(DEAL_II_WARNING_FLAGS "-Wfloat-conversion")
 
 set(src_amd
   amd_1.cc

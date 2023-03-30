@@ -64,9 +64,9 @@ set(src_kokkos
   containers/src/impl/Kokkos_UnorderedMap_impl.cpp
 )
 
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-float-conversion)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-missing-field-initializers)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-suggest-override)
-enable_if_supported(DEAL_II_CXX_FLAGS -Wno-unused-but-set-parameter)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-float-conversion)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-missing-field-initializers)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-suggest-override)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-unused-but-set-parameter)
 
 define_object_library(bundled_kokkos OBJECT ${src_kokkos})

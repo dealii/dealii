@@ -91,7 +91,7 @@ macro(deal_ii_setup_target _target)
   endif()
 
   separate_arguments(_compile_options UNIX_COMMAND
-    "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+    "${DEAL_II_WARNING_FLAGS} ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
     )
   shell_escape_option_groups(_compile_options)
   target_compile_options(${_target} PRIVATE

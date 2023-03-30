@@ -118,6 +118,9 @@ set(DEAL_II_CXX_FLAGS_DEBUG "@DEAL_II_CXX_FLAGS_DEBUG@")
 # _additionally_ used for release targets:
 set(DEAL_II_CXX_FLAGS_RELEASE "@DEAL_II_CXX_FLAGS_RELEASE@")
 
+# warning flags used for all targets:
+set(DEAL_II_WARNING_FLAGS "@DEAL_II_WARNING_FLAGS@")
+
 # used for all targets:
 set(DEAL_II_LINKER_FLAGS "@DEAL_II_LINKER_FLAGS@")
 
