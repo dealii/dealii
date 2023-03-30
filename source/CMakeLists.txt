@@ -75,8 +75,27 @@ add_subdirectory(sundials)
 add_subdirectory(trilinos)
 add_subdirectory(arborx)
 
+#
+# Define a "dealii", i.e., "${DEAL_II_TARGET_NAME}", target that contains
+# DEAL_II_CXX_FLAGS[_DEBUG|_RELEASE] and otherwsie aliases dealii_debug or
+# dealii_release depending on the downstream CMAKE_BUILD_TYPE.
+#
+
+add_library(${DEAL_II_TARGET_NAME} INTERFACE)
+separate_arguments(_compile_options UNIX_COMMAND "${DEAL_II_CXX_FLAGS}")
+shell_escape_option_groups(_compile_options)
+target_compile_options(${DEAL_II_TARGET_NAME} INTERFACE
+  $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
+  )
+
+
 foreach(build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${build} build_lowercase)
+  if("${build}" MATCHES "DEBUG")
+    set(build_camelcase "Debug")
+  elseif("${build}" MATCHES "RELEASE")
+    set(build_camelcase "Release")
+  endif()
 
   #
   # Combine all ${build} OBJECT targets to a ${build} library:
@@ -127,6 +146,14 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 
+  separate_arguments(_compile_options UNIX_COMMAND
+    "${DEAL_II_CXX_FLAGS_${build}}"
+    )
+  shell_escape_option_groups(_compile_options)
+  target_compile_options(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<$<CONFIG:${build_camelcase}>:$<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>>"
+    )
+
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
       PROPERTIES
@@ -170,7 +197,26 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     )
+
+  target_link_libraries(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<$<CONFIG:${build_camelcase}>:${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_${build_lowercase}>"
+    )
 endforeach()
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR})
+export(TARGETS ${DEAL_II_TARGET_NAME}
+  NAMESPACE "${DEAL_II_TARGET_NAME}::"
+  FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+  APPEND
+)
+
+install(TARGETS ${DEAL_II_TARGET_NAME}
+  COMPONENT library
+  EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+  RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
+  LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+  ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+)
 
 install(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
   NAMESPACE "${DEAL_II_TARGET_NAME}::"
