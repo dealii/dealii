@@ -57,9 +57,8 @@ endmacro()
 # Wrap the following checks into a macro to make it easier to rerun them.
 #
 macro(_test_cxx20_support)
-
   unset_if_changed(CHECK_CXX20_FEATURES_FLAGS_SAVED
-    "${CMAKE_REQUIRED_FLAGS}"
+    "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
     DEAL_II_HAVE_CXX20_FEATURES
     )
 
@@ -96,7 +95,7 @@ macro(_test_cxx20_support)
 
     template <int dim, int spacedim>
     requires is_valid_dim_spacedim<dim,spacedim>
-    class Triangulation 
+    class Triangulation
     {};
 
     Triangulation<1,3> t;
@@ -111,6 +110,7 @@ macro(_test_cxx20_support)
   if(DEAL_II_HAVE_CXX20_FEATURES)
     message(STATUS "C++20 support is enabled.")
     set(DEAL_II_HAVE_CXX20 TRUE)
+    set(_cxx_standard 20)
   else()
     message(STATUS "C++20 support is disabled.")
     set(DEAL_II_HAVE_CXX20 FALSE)
@@ -122,9 +122,8 @@ endmacro()
 # Wrap the following checks into a macro to make it easier to rerun them.
 #
 macro(_test_cxx17_support)
-
   unset_if_changed(CHECK_CXX17_FEATURES_FLAGS_SAVED
-    "${CMAKE_REQUIRED_FLAGS}"
+    "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
     DEAL_II_HAVE_CXX17_FEATURES
     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
     )
@@ -201,6 +200,7 @@ macro(_test_cxx17_support)
      DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
     message(STATUS "C++17 support is enabled.")
     set(DEAL_II_HAVE_CXX17 TRUE)
+    set(_cxx_standard 17)
   else()
     message(STATUS "C++17 support is disabled.")
     set(DEAL_II_HAVE_CXX17 FALSE)
@@ -213,7 +213,7 @@ endmacro()
 #
 macro(_test_cxx14_support)
   unset_if_changed(CHECK_CXX14_FEATURES_FLAGS_SAVED
-    "${CMAKE_REQUIRED_FLAGS}"
+    "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
     DEAL_II_HAVE_CXX14_FEATURES
     DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
     DEAL_II_HAVE_CXX11_FEATURES
@@ -313,6 +313,7 @@ macro(_test_cxx14_support)
      DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
     message(STATUS "C++14 support is enabled.")
     set(DEAL_II_HAVE_CXX14 TRUE)
+    set(_cxx_standard 14)
   else()
     message(STATUS "C++14 support is disabled.")
     set(DEAL_II_HAVE_CXX14 FALSE)
@@ -331,11 +332,12 @@ if(NOT DEAL_II_HAVE_CXX14)
   #
   # We failed to detect C++14 support. Let's make an attempt to set the
   # -std= compiler flag. (But in order to minimize confusion let's not
-  # override any manually specified -std= variable set by the user.)
+  # override any manually specified -std= flag or CMAKE_CXX_STANDARD
+  # variable set by the user.)
   #
-  if(NOT "${DEAL_II_CXX_FLAGS_SAVED}" MATCHES "-std=")
+  if(NOT "${DEAL_II_CXX_FLAGS_SAVED}" MATCHES "-std=" AND "${CMAKE_CXX_STANDARD}" STREQUAL "")
     message(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
-    enable_if_supported(DEAL_II_CXX_FLAGS_SAVED "-std=c++14")
+    set(CMAKE_CXX_STANDARD 14) # manually set the C++ standard
     _set_up_cmake_required()
     _test_cxx14_support()
   endif()
@@ -347,12 +349,26 @@ if(NOT DEAL_II_HAVE_CXX14)
     "C++14 support. Make sure to use a modern enough compiler (GCC version "
     "5 onwards, Clang version 4 onwards, or Microsoft MS VS 2015 onwards) "
     "and check that the compiler flag \"-std=\" is either unset, or set to "
-    "at least c++14.\n\n"
+    "at least c++14. Similarly, please make sure that the CMake variable "
+    "CMAKE_CXX_STANDARD is either unset, or set at least to 14.\n\n"
     )
 endif()
 
 _test_cxx17_support()
 _test_cxx20_support()
+
+set_if_empty(CMAKE_CXX_STANDARD "${_cxx_standard}")
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "${_cxx_standard}")
+  message(FATAL_ERROR
+    "\nThe current version of deal.II was configured with CMAKE_CXX_STANDARD "
+    "set to »${CMAKE_CXX_STANDARD}«, but we detected only support for standard "
+    "version »${_cxx_standard}«. Either unset the CMake variable "
+    "CMAKE_CXX_STANDARD, or ensure that it is at most set to »${_cxx_standard}«.\n\n"
+    )
+endif()
 
 
 ########################################################################
@@ -377,7 +393,7 @@ endif()
 add_flags(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
 
 unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
-  "${CMAKE_REQUIRED_FLAGS}"
+  "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
   DEAL_II_HAVE_CXX17_ATTRIBUTE_DEPRECATED
