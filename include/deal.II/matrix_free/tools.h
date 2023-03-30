@@ -234,15 +234,15 @@ namespace MatrixFreeTools
                 const MatrixFree<dim, Number, VectorizedArrayType> &,
                 VectorTypeOut &,
                 const VectorTypeIn &,
-                const std::pair<unsigned int, unsigned int>)> &cell_operation,
-              VectorTypeOut &                                  dst,
-              const VectorTypeIn &                             src,
-              const bool zero_dst_vector = false)
+                const std::pair<unsigned int, unsigned int> &)> &cell_operation,
+              VectorTypeOut &                                    dst,
+              const VectorTypeIn &                               src,
+              const bool zero_dst_vector = false) const
     {
       const auto ebd_cell_operation = [&](const auto &matrix_free,
                                           auto &      dst,
                                           const auto &src,
-                                          const auto  range) {
+                                          const auto &range) {
         const auto category = matrix_free.get_cell_range_category(range);
 
         if (category != fe_index_valid)
@@ -268,26 +268,26 @@ namespace MatrixFreeTools
            void(const MatrixFree<dim, Number, VectorizedArrayType> &,
                 VectorTypeOut &,
                 const VectorTypeIn &,
-                const std::pair<unsigned int, unsigned int>)> &cell_operation,
+                const std::pair<unsigned int, unsigned int> &)> &cell_operation,
          const std::function<
            void(const MatrixFree<dim, Number, VectorizedArrayType> &,
                 VectorTypeOut &,
                 const VectorTypeIn &,
-                const std::pair<unsigned int, unsigned int>)> &face_operation,
+                const std::pair<unsigned int, unsigned int> &)> &face_operation,
          const std::function<
            void(const MatrixFree<dim, Number, VectorizedArrayType> &,
                 VectorTypeOut &,
                 const VectorTypeIn &,
-                const std::pair<unsigned int, unsigned int>,
+                const std::pair<unsigned int, unsigned int> &,
                 const bool)> &boundary_operation,
          VectorTypeOut &      dst,
          const VectorTypeIn & src,
-         const bool           zero_dst_vector = false)
+         const bool           zero_dst_vector = false) const
     {
       const auto ebd_cell_operation = [&](const auto &matrix_free,
                                           auto &      dst,
                                           const auto &src,
-                                          const auto  range) {
+                                          const auto &range) {
         const auto category = matrix_free.get_cell_range_category(range);
 
         if (category != fe_index_valid)
@@ -300,7 +300,7 @@ namespace MatrixFreeTools
         [&](const auto &matrix_free,
             auto &      dst,
             const auto &src,
-            const auto  range) {
+            const auto &range) {
           const auto category = matrix_free.get_face_range_category(range);
 
           const unsigned int type =
