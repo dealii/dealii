@@ -88,7 +88,6 @@ target_compile_options(${DEAL_II_TARGET_NAME} INTERFACE
   $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
   )
 
-
 foreach(build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${build} build_lowercase)
   if("${build}" MATCHES "DEBUG")
