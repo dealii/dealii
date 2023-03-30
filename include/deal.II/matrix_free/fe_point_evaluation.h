@@ -472,6 +472,13 @@ public:
 
   /**
    * Reinitialize the evaluator to point to the correct precomputed mapping of
+   * the single cell in the MappingInfo object.
+   */
+  void
+  reinit();
+
+  /**
+   * Reinitialize the evaluator to point to the correct precomputed mapping of
    * the cell in the MappingInfo object.
    */
   void
@@ -832,7 +839,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , is_reinitialized(false)
 {
   setup(first_selected_component);
-  mapping_info.is_reinitialized.connect(
+  mapping_info.connect_is_reinitialized(
     [this]() { this->is_reinitialized = false; });
 }
 
@@ -939,6 +946,18 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 
 template <int n_components, int dim, int spacedim, typename Number>
 void
+FEPointEvaluation<n_components, dim, spacedim, Number>::reinit()
+{
+  current_cell_index  = numbers::invalid_unsigned_int;
+  current_face_number = numbers::invalid_unsigned_int;
+
+  do_reinit();
+}
+
+
+
+template <int n_components, int dim, int spacedim, typename Number>
+void
 FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   const unsigned int cell_index)
 {
@@ -1014,7 +1033,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const EvaluationFlags::EvaluationFlags &evaluation_flag)
 {
   if (!is_reinitialized)
-    reinit(numbers::invalid_unsigned_int);
+    reinit();
 
   if (n_q_points == 0)
     return;
@@ -1168,6 +1187,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const ArrayView<Number> &               solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
+  if (!is_reinitialized)
+    reinit();
+
   if (n_q_points == 0) // no evaluation points provided
     {
       std::fill(solution_values.begin(), solution_values.end(), 0.0);

@@ -182,12 +182,11 @@ namespace NonMatching
     UpdateFlags
     get_update_flags() const;
 
-      /**
-   * This signal is triggered right after
-   * this object is reinitialized, to let dependent
-   * objects know that they need to reinitialize as well.
-   */
-  boost::signals2::signal<void()> is_reinitialized;
+    /**
+     * Connects to is_reinitialized().
+     */
+    boost::signals2::connection
+    connect_is_reinitialized(const std::function<void()> &set_is_reinitialized);
 
   private:
     /**
@@ -288,6 +287,12 @@ namespace NonMatching
      * A bool that determines weather cell index compression should be done.
      */
     bool do_cell_index_compression;
+
+    /**
+     * This signal is triggered right after this object is reinitialized, to let
+     * dependent objects know that they need to reinitialize as well.
+     */
+    boost::signals2::signal<void()> is_reinitialized;
   };
 
   // ----------------------- template functions ----------------------
@@ -343,7 +348,6 @@ namespace NonMatching
                                             mapping_data[0]);
 
     state = State::single_cell;
-
     is_reinitialized();
   }
 
@@ -789,6 +793,16 @@ namespace NonMatching
   MappingInfo<dim, spacedim>::get_update_flags() const
   {
     return update_flags;
+  }
+
+
+
+  template <int dim, int spacedim>
+  boost::signals2::connection
+  MappingInfo<dim, spacedim>::connect_is_reinitialized(
+    const std::function<void()> &set_is_reinitialized)
+  {
+    return is_reinitialized.connect(set_is_reinitialized);
   }
 
 
