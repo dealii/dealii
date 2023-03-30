@@ -130,7 +130,7 @@ function(define_interface_target _feature)
     endif()
 
     export(TARGETS ${_interface_target}
-      NAMESPACE "${DEAL_II_NAMESPACE}::"
+      NAMESPACE "${DEAL_II_TARGET_NAME}::"
       FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
       APPEND
       )

@@ -37,15 +37,15 @@
 
 function(populate_target_properties _target _build)
 
-  if(NOT "${_target}" MATCHES "^(object|bundled|${DEAL_II_NAMESPACE})_")
+  if(NOT "${_target}" MATCHES "^(object|bundled|${DEAL_II_TARGET_NAME})_")
     message(FATAL_ERROR
       "Internal error: The specified target name must begin with object_, "
-      "bundled_, or ${DEAL_II_NAMESPACE}_. Encountered: ${_target}"
+      "bundled_, or ${DEAL_II_TARGET_NAME}_. Encountered: ${_target}"
       )
   endif()
 
   set(_visibility PRIVATE)
-  if("${_target}" MATCHES "^${DEAL_II_NAMESPACE}")
+  if("${_target}" MATCHES "^${DEAL_II_TARGET_NAME}")
     set(_visibility PUBLIC)
   endif()
 

@@ -169,7 +169,7 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   add_dependencies(test setup_tests_quick_tests)
   foreach(_build ${DEAL_II_BUILD_TYPES})
     string(TOLOWER ${_build} _build_lowercase)
-    add_dependencies(test ${DEAL_II_NAMESPACE}_${_build_lowercase})
+    add_dependencies(test ${DEAL_II_TARGET_NAME}_${_build_lowercase})
   endforeach()
 
   #
