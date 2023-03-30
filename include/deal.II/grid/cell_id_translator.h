@@ -124,6 +124,14 @@ namespace internal
     : n_coarse_cells(n_coarse_cells)
     , n_global_levels(n_global_levels)
   {
+    // The class stores indices as types::global_cell_index variables,
+    // but when configuring deal.II with default flags, this is a 32-bit
+    // data type and it is possible with highly (locally) refined meshes
+    // that we exceed the maximal 32-bit numbers even with relatively
+    // modest numbers of cells. Check for this by first calculating
+    // the maximal index we will get in 64-bit arithmetic and testing
+    // that it is representable in 32-bit arithmetic:
+#ifdef DEBUG
     std::uint64_t max_cell_index = 0;
 
     for (unsigned int i = 0; i < n_global_levels; ++i)
@@ -147,7 +155,9 @@ namespace internal
         " indices. You may want to consider to build deal.II with 64bit "
         "indices (-D DEAL_II_WITH_64BIT_INDICES=\"ON\") to increase the limit "
         "of indices."));
+#endif
 
+    // Now do the whole computation again, but for real:
     tree_sizes.push_back(0);
     for (unsigned int i = 0; i < n_global_levels; ++i)
       tree_sizes.push_back(tree_sizes.back() +
