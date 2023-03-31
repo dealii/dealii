@@ -509,9 +509,6 @@ namespace PETScWrappers
     // indicate that we're back to a
     // pristine state
     last_action = VectorOperation::unknown;
-
-    // update ghost values if needed
-    update_ghost_values();
   }
 
 
@@ -779,9 +776,6 @@ namespace PETScWrappers
     const PetscErrorCode ierr = VecScale(vector, a);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    // update ghost values if needed
-    update_ghost_values();
-
     return *this;
   }
 
@@ -799,9 +793,6 @@ namespace PETScWrappers
     const PetscErrorCode ierr = VecScale(vector, factor);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    // update ghost values if needed
-    update_ghost_values();
-
     return *this;
   }
 
@@ -813,9 +804,6 @@ namespace PETScWrappers
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecAXPY(vector, 1, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    // update ghost values if needed
-    update_ghost_values();
 
     return *this;
   }
@@ -829,8 +817,6 @@ namespace PETScWrappers
     const PetscErrorCode ierr = VecAXPY(vector, -1, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    // update ghost values if needed
-    update_ghost_values();
     return *this;
   }
 
@@ -844,9 +830,6 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = VecShift(vector, s);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    // update ghost values if needed
-    update_ghost_values();
   }
 
 
@@ -859,9 +842,6 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = VecAXPY(vector, a, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    // update ghost values if needed
-    update_ghost_values();
   }
 
 
@@ -881,9 +861,6 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = VecMAXPY(vector, 2, weights, addends);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    // update ghost values if needed
-    update_ghost_values();
   }
 
 
@@ -896,9 +873,6 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr = VecAYPX(vector, s, v);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    // update ghost values if needed
-    update_ghost_values();
   }
 
 
@@ -927,9 +901,6 @@ namespace PETScWrappers
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     const PetscErrorCode ierr = VecPointwiseMult(vector, factors, vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    // update ghost values if needed
-    update_ghost_values();
   }
 
 
