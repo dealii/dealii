@@ -131,6 +131,9 @@ endif()
 
 _detailed("#  Library targets:\n")
 
+_detailed("#\n")
+_print_target(${DEAL_II_TARGET_NAME})
+
 foreach(_build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER "${_build}" _build_lowercase)
   _detailed("#\n")

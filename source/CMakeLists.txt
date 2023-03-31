@@ -82,12 +82,10 @@ add_subdirectory(arborx)
 #
 
 add_library(${DEAL_II_TARGET_NAME} INTERFACE)
-separate_arguments(_compile_options UNIX_COMMAND "${DEAL_II_CXX_FLAGS}")
-shell_escape_option_groups(_compile_options)
-target_compile_options(${DEAL_II_TARGET_NAME} INTERFACE
-  $<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>
+target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
+  "$<COMPILE_LANGUAGE:CXX>" "${DEAL_II_CXX_FLAGS}"
   )
-
+target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE "${DEAL_II_LINKER_FLAGS}")
 
 foreach(build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${build} build_lowercase)
@@ -156,12 +154,12 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 
-  separate_arguments(_compile_options UNIX_COMMAND
+  target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<AND:$<CONFIG:${build_camelcase}>,$<COMPILE_LANGUAGE:CXX>>"
     "${DEAL_II_CXX_FLAGS_${build}}"
     )
-  shell_escape_option_groups(_compile_options)
-  target_compile_options(${DEAL_II_TARGET_NAME} INTERFACE
-    "$<$<CONFIG:${build_camelcase}>:$<$<COMPILE_LANGUAGE:CXX>:${_compile_options}>>"
+  target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<CONFIG:${build_camelcase}>" "${DEAL_II_LINKER_FLAGS_${build}}"
     )
 
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
