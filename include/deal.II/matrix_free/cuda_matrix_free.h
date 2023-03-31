@@ -630,8 +630,7 @@ namespace CUDAWrappers
 
 
 
-  // TODO find a better place to put these things
-
+  // TODO We should rework this to use scratch memory
   /**
    * Structure to pass the shared memory into a general user function.
    */
@@ -639,27 +638,20 @@ namespace CUDAWrappers
   struct SharedData
   {
     /**
-     * Constructor.
+     * Memory for dof and quad values.
      */
-    DEAL_II_HOST_DEVICE
-    SharedData(Number *vd, Number *gq[dim])
-      : values(vd)
-    {
-      for (unsigned int d = 0; d < dim; ++d)
-        gradients[d] = gq[d];
-    }
+    Kokkos::Subview<Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+                    Kokkos::pair<int, int>>
+      values;
 
     /**
-     * Shared memory for dof and quad values.
+     * Memory for computed gradients in reference coordinate system.
      */
-    Number *values;
-
-    /**
-     * Shared memory for computed gradients in reference coordinate system.
-     * The gradient in each direction is saved in a struct-of-array
-     * format, i.e. first, all gradients in the x-direction come...
-     */
-    Number *gradients[dim];
+    Kokkos::Subview<
+      Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>,
+      Kokkos::pair<int, int>,
+      Kokkos::pair<int, int>>
+      gradients;
   };
 
 

@@ -290,8 +290,14 @@ namespace CUDAWrappers
       constraint_weights;
 
     // Internal buffer
-    Number *values;
-    Number *gradients[dim];
+    Kokkos::Subview<Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+                    Kokkos::pair<int, int>>
+      values;
+    Kokkos::Subview<
+      Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>,
+      Kokkos::pair<int, int>,
+      Kokkos::pair<int, int>>
+      gradients;
   };
 
 
@@ -329,10 +335,8 @@ namespace CUDAWrappers
     , co_shape_gradients(data->co_shape_gradients)
     , constraint_weights(data->constraint_weights)
     , values(shdata->values)
-  {
-    for (unsigned int i = 0; i < dim; ++i)
-      gradients[i] = shdata->gradients[i];
-  }
+    , gradients(shdata->gradients)
+  {}
 
 
 
@@ -350,9 +354,8 @@ namespace CUDAWrappers
     const unsigned int idx = internal::compute_index<dim, n_q_points_1d>();
 
     const types::global_dof_index src_idx = local_to_global[idx];
-    // Use the read-only data cache.
-    KOKKOS_IF_ON_DEVICE(values[idx] = __ldg(&src[src_idx]); __syncthreads();)
-    KOKKOS_IF_ON_HOST(values[idx] = src[src_idx];)
+    values[idx]                           = src[src_idx];
+    KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
     internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_weights,
                                                            constraint_mask,
@@ -559,7 +562,7 @@ namespace CUDAWrappers
       {
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jac(q_point, d_2, d_1) * gradients[d_2][q_point];
+          tmp += inv_jac(q_point, d_2, d_1) * gradients(q_point, d_2);
         grad[d_1] = tmp;
       }
 
@@ -584,7 +587,7 @@ namespace CUDAWrappers
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
           tmp += inv_jac(q_point, d_1, d_2) * grad_in[d_2];
-        gradients[d_1][q_point] = tmp * JxW[q_point];
+        gradients(q_point, d_1) = tmp * JxW[q_point];
       }
   }
 

@@ -55,11 +55,14 @@ namespace CUDAWrappers
               int  direction,
               bool dof_to_quad,
               bool add,
-              bool in_place>
+              bool in_place,
+              typename ViewTypeIn,
+              typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
-    apply(Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_data,
-          const Number *                                             in,
-          Number *                                                   out)
+    apply(const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+                           shape_data,
+          const ViewTypeIn in,
+          ViewTypeOut      out)
     {
       KOKKOS_IF_ON_DEVICE(
         const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
@@ -89,7 +92,7 @@ namespace CUDAWrappers
           (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
                              (i + n_q_points_1d * (j + n_q_points_1d * q));
 
-        if (add) out[destination_idx] += t;
+        if (add) Kokkos::atomic_add(&out[destination_idx], t);
         else out[destination_idx] = t;)
     }
 
@@ -134,74 +137,101 @@ namespace CUDAWrappers
        * Evaluate the values of a finite element function at the quadrature
        * points.
        */
-      template <int direction, bool dof_to_quad, bool add, bool in_place>
+      template <int  direction,
+                bool dof_to_quad,
+                bool add,
+                bool in_place,
+                typename ViewTypeIn,
+                typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      values(const Number *in, Number *out) const;
+      values(const ViewTypeIn in, ViewTypeOut out) const;
 
       /**
        * Evaluate the gradient of a finite element function at the quadrature
        * points for a given @p direction.
        */
-      template <int direction, bool dof_to_quad, bool add, bool in_place>
+      template <int  direction,
+                bool dof_to_quad,
+                bool add,
+                bool in_place,
+                typename ViewTypeIn,
+                typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      gradients(const Number *in, Number *out) const;
+      gradients(const ViewTypeIn in, ViewTypeOut out) const;
 
       /**
-       * TODO
+       * Evaluate the gradient of a finite element function at the quadrature
+       * points for a given @p direction for collocation methods.
        */
-      template <int direction, bool dof_to_quad, bool add, bool in_place>
+      template <int  direction,
+                bool dof_to_quad,
+                bool add,
+                bool in_place,
+                typename ViewTypeIn,
+                typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      co_gradients(const Number *in, Number *out) const;
+      co_gradients(const ViewTypeIn in, ViewTypeOut out) const;
 
       /**
        * Evaluate the finite element function at the quadrature points.
        */
+      template <typename ViewType>
       DEAL_II_HOST_DEVICE void
-      value_at_quad_pts(Number *u);
+      value_at_quad_pts(ViewType u);
 
       /**
        * Helper function for integrate(). Integrate the finite element function.
        */
+      template <typename ViewType>
       DEAL_II_HOST_DEVICE void
-      integrate_value(Number *u);
+      integrate_value(ViewType u);
 
       /**
        * Evaluate the gradients of the finite element function at the quadrature
        * points.
        */
+      template <typename ViewTypeIn, typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      gradient_at_quad_pts(const Number *const u, Number *grad_u[dim]);
+      gradient_at_quad_pts(const ViewTypeIn u, ViewTypeOut grad_u);
 
       /**
        * Evaluate the values and the gradients of the finite element function at
        * the quadrature points.
        */
+      template <typename ViewType1, typename ViewType2>
       DEAL_II_HOST_DEVICE void
-      value_and_gradient_at_quad_pts(Number *const u, Number *grad_u[dim]);
+      value_and_gradient_at_quad_pts(ViewType1 u, ViewType2 grad_u);
 
       /**
        * Helper function for integrate(). Integrate the gradients of the finite
        * element function.
        */
-      template <bool add>
+      template <bool add, typename ViewType1, typename ViewType2>
       DEAL_II_HOST_DEVICE void
-      integrate_gradient(Number *u, Number *grad_u[dim]);
+      integrate_gradient(ViewType1 u, ViewType2 grad_u);
 
       /**
        * Helper function for integrate(). Integrate the values and the gradients
        * of the finite element function.
        */
+      template <typename ViewType1, typename ViewType2>
       DEAL_II_HOST_DEVICE void
-      integrate_value_and_gradient(Number *u, Number *grad_u[dim]);
+      integrate_value_and_gradient(ViewType1 u, ViewType2 grad_u);
 
-      // TODO shape values
+      /**
+       * Values of the shape functions.
+       */
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
 
-      // TODO shape gradients
+      /**
+       * Values of the shape function gradients.
+       */
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         shape_gradients;
 
-      // TODO shape gradients for collocation methods
+      /**
+       * Values of the shape function gradients for collocation methods.
+       */
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         co_shape_gradients;
     };
@@ -229,13 +259,19 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    template <int direction, bool dof_to_quad, bool add, bool in_place>
+    template <int  direction,
+              bool dof_to_quad,
+              bool add,
+              bool in_place,
+              typename ViewTypeIn,
+              typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::values(const Number *in, Number *out) const
+                           Number>::values(const ViewTypeIn in,
+                                           ViewTypeOut      out) const
     {
       apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
         shape_values, in, out);
@@ -244,14 +280,19 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    template <int direction, bool dof_to_quad, bool add, bool in_place>
+    template <int  direction,
+              bool dof_to_quad,
+              bool add,
+              bool in_place,
+              typename ViewTypeIn,
+              typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::gradients(const Number *in,
-                                              Number *      out) const
+                           Number>::gradients(const ViewTypeIn in,
+                                              ViewTypeOut      out) const
     {
       apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
         shape_gradients, in, out);
@@ -260,14 +301,19 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    template <int direction, bool dof_to_quad, bool add, bool in_place>
+    template <int  direction,
+              bool dof_to_quad,
+              bool add,
+              bool in_place,
+              typename ViewTypeIn,
+              typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::co_gradients(const Number *in,
-                                                 Number *      out) const
+                           Number>::co_gradients(const ViewTypeIn in,
+                                                 ViewTypeOut      out) const
     {
       apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
         co_shape_gradients, in, out);
@@ -276,12 +322,13 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <typename ViewType>
     DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::value_at_quad_pts(Number *u)
+                           Number>::value_at_quad_pts(ViewType u)
     {
       switch (dim)
         {
@@ -320,12 +367,13 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <typename ViewType>
     DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::integrate_value(Number *u)
+                           Number>::integrate_value(ViewType u)
     {
       switch (dim)
         {
@@ -364,51 +412,74 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <typename ViewTypeIn, typename ViewTypeOut>
     DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::gradient_at_quad_pts(const Number *const u,
-                                                         Number *grad_u[dim])
+                           Number>::gradient_at_quad_pts(const ViewTypeIn u,
+                                                         ViewTypeOut grad_u)
     {
       switch (dim)
         {
           case 1:
             {
-              gradients<0, true, false, false>(u, grad_u[0]);
+              gradients<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
 
               break;
             }
           case 2:
             {
-              gradients<0, true, false, false>(u, grad_u[0]);
-              values<0, true, false, false>(u, grad_u[1]);
+              gradients<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              values<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, true, false, true>(grad_u[0], grad_u[0]);
-              gradients<1, true, false, true>(grad_u[1], grad_u[1]);
+              values<1, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              gradients<1, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                Kokkos::subview(grad_u, Kokkos::ALL, 1));
 
               break;
             }
           case 3:
             {
-              gradients<0, true, false, false>(u, grad_u[0]);
-              values<0, true, false, false>(u, grad_u[1]);
-              values<0, true, false, false>(u, grad_u[2]);
+              gradients<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              values<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
+              values<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, true, false, true>(grad_u[0], grad_u[0]);
-              gradients<1, true, false, true>(grad_u[1], grad_u[1]);
-              values<1, true, false, true>(grad_u[2], grad_u[2]);
+              values<1, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              gradients<1, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                Kokkos::subview(grad_u, Kokkos::ALL, 1));
+              values<1, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 2),
+                Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<2, true, false, true>(grad_u[0], grad_u[0]);
-              values<2, true, false, true>(grad_u[1], grad_u[1]);
-              gradients<2, true, false, true>(grad_u[2], grad_u[2]);
+              values<2, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              values<2, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                Kokkos::subview(grad_u, Kokkos::ALL, 1));
+              gradients<2, true, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 2),
+                Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
               break;
             }
@@ -423,14 +494,15 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <typename ViewType1, typename ViewType2>
     DEAL_II_HOST_DEVICE inline void
-    EvaluatorTensorProduct<
-      evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>::value_and_gradient_at_quad_pts(Number *const u,
-                                              Number *      grad_u[dim])
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::value_and_gradient_at_quad_pts(ViewType1 u,
+                                                                   ViewType2
+                                                                     grad_u)
     {
       switch (dim)
         {
@@ -439,7 +511,8 @@ namespace CUDAWrappers
               values<0, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              co_gradients<0, true, false, false>(u, grad_u[0]);
+              co_gradients<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
 
               break;
             }
@@ -450,8 +523,10 @@ namespace CUDAWrappers
               values<1, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              co_gradients<0, true, false, false>(u, grad_u[0]);
-              co_gradients<1, true, false, false>(u, grad_u[1]);
+              co_gradients<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              co_gradients<1, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
 
               break;
             }
@@ -464,9 +539,12 @@ namespace CUDAWrappers
               values<2, true, false, true>(u, u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              co_gradients<0, true, false, false>(u, grad_u[0]);
-              co_gradients<1, true, false, false>(u, grad_u[1]);
-              co_gradients<2, true, false, false>(u, grad_u[2]);
+              co_gradients<0, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              co_gradients<1, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
+              co_gradients<2, true, false, false>(
+                u, Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
               break;
             }
@@ -481,57 +559,77 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    template <bool add>
+    template <bool add, typename ViewType1, typename ViewType2>
     DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::integrate_gradient(Number *u,
-                                                       Number *grad_u[dim])
+                           Number>::integrate_gradient(ViewType1 u,
+                                                       ViewType2 grad_u)
     {
       switch (dim)
         {
           case 1:
             {
               gradients<0, false, add, false>(
-
-                grad_u[dim], u);
+                Kokkos::subview(grad_u, Kokkos::ALL, dim), u);
 
               break;
             }
           case 2:
             {
-              gradients<0, false, false, true>(grad_u[0], grad_u[0]);
-              values<0, false, false, true>(grad_u[1], grad_u[1]);
+              gradients<0, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              values<0, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                Kokkos::subview(grad_u, Kokkos::ALL, 1));
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, false, add, false>(grad_u[0], u);
+              values<1, false, add, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              gradients<1, false, true, false>(grad_u[1], u);
+              gradients<1, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
 
               break;
             }
           case 3:
             {
-              gradients<0, false, false, true>(grad_u[0], grad_u[0]);
-              values<0, false, false, true>(grad_u[1], grad_u[1]);
-              values<0, false, false, true>(grad_u[2], grad_u[2]);
+              gradients<0, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              values<0, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                Kokkos::subview(grad_u, Kokkos::ALL, 1));
+              values<0, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 2),
+                Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<1, false, false, true>(grad_u[0], grad_u[0]);
-              gradients<1, false, false, true>(grad_u[1], grad_u[1]);
-              values<1, false, false, true>(grad_u[2], grad_u[2]);
+              values<1, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                Kokkos::subview(grad_u, Kokkos::ALL, 0));
+              gradients<1, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                Kokkos::subview(grad_u, Kokkos::ALL, 1));
+              values<1, false, false, true>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 2),
+                Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
-              values<2, false, add, false>(grad_u[0], u);
+              values<2, false, add, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              values<2, false, true, false>(grad_u[1], u);
+              values<2, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              gradients<2, false, true, false>(grad_u[2], u);
+              gradients<2, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
 
               break;
             }
@@ -546,20 +644,22 @@ namespace CUDAWrappers
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <typename ViewType1, typename ViewType2>
     DEAL_II_HOST_DEVICE inline void
     EvaluatorTensorProduct<evaluate_general,
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::integrate_value_and_gradient(Number *u,
-                                                                 Number
-                                                                   *grad_u[dim])
+                           Number>::integrate_value_and_gradient(ViewType1 u,
+                                                                 ViewType2
+                                                                   grad_u)
     {
       switch (dim)
         {
           case 1:
             {
-              co_gradients<0, false, true, false>(grad_u[0], u);
+              co_gradients<0, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<0, false, false, true>(u, u);
@@ -568,9 +668,11 @@ namespace CUDAWrappers
             }
           case 2:
             {
-              co_gradients<1, false, true, false>(grad_u[1], u);
+              co_gradients<1, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              co_gradients<0, false, true, false>(grad_u[0], u);
+              co_gradients<0, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<1, false, false, true>(u, u);
@@ -582,11 +684,14 @@ namespace CUDAWrappers
             }
           case 3:
             {
-              co_gradients<2, false, true, false>(grad_u[2], u);
+              co_gradients<2, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              co_gradients<1, false, true, false>(grad_u[1], u);
+              co_gradients<1, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
-              co_gradients<0, false, true, false>(grad_u[0], u);
+              co_gradients<0, false, true, false>(
+                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
               KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
               values<2, false, false, true>(u, u);

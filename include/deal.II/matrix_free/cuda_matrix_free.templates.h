@@ -374,35 +374,36 @@ namespace CUDAWrappers
 
     template <int dim, typename Number, typename Functor>
     __global__ void
-    apply_kernel_shmem(Functor                                      func,
-                       const typename MatrixFree<dim, Number>::Data gpu_data,
-                       const Number *                               src,
-                       Number *                                     dst)
+    apply_kernel_shmem(
+      Functor                                                         func,
+      const typename MatrixFree<dim, Number>::Data                    gpu_data,
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>      values,
+      Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space> gradients,
+      Number *const                                                   src,
+      Number *                                                        dst)
     {
       constexpr unsigned int cells_per_block =
         cells_per_block_shmem(dim, Functor::n_dofs_1d - 1);
-
-      constexpr unsigned int n_dofs_per_block =
-        cells_per_block * Functor::n_local_dofs;
-      constexpr unsigned int n_q_points_per_block =
-        cells_per_block * Functor::n_q_points;
-      // TODO make use of dynamically allocated shared memory
-      __shared__ Number values[n_dofs_per_block];
-      __shared__ Number gradients[dim][n_q_points_per_block];
 
       const unsigned int local_cell = threadIdx.x / Functor::n_dofs_1d;
       const unsigned int cell =
         local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);
 
-      Number *gq[dim];
-      for (unsigned int d = 0; d < dim; ++d)
-        gq[d] = &gradients[d][local_cell * Functor::n_q_points];
-
-      SharedData<dim, Number> shared_data(
-        &values[local_cell * Functor::n_local_dofs], gq);
-
       if (cell < gpu_data.n_cells)
-        func(cell, &gpu_data, &shared_data, src, dst);
+        {
+          SharedData<dim, Number> shared_data(
+            {Kokkos::subview(
+               values,
+               Kokkos::pair<int, int>(cell * Functor::n_local_dofs,
+                                      (cell + 1) * Functor::n_local_dofs)),
+             Kokkos::subview(gradients,
+                             Kokkos::pair<int, int>(cell * Functor::n_q_points,
+                                                    (cell + 1) *
+                                                      Functor::n_q_points),
+                             Kokkos::pair<int, int>(0, dim))});
+
+          func(cell, &gpu_data, &shared_data, src, dst);
+        }
     }
 
 
@@ -1007,17 +1008,38 @@ namespace CUDAWrappers
                                             const VectorType &src,
                                             VectorType &      dst) const
   {
+    std::vector<Kokkos::View<Number *, MemorySpace::Default::kokkos_space>>
+      values_colors(n_colors);
+    std::vector<Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>>
+      gradients_colors(n_colors);
     // Execute the loop on the cells
     for (unsigned int i = 0; i < n_colors; ++i)
       if (n_cells[i] > 0)
         {
+          const unsigned int size =
+            (grid_dim[i].x * grid_dim[i].y * grid_dim[i].z) * cells_per_block *
+            Functor::n_local_dofs;
+          // std::cout << "color " << i << " " << size << std::endl;
+          values_colors[i] =
+            Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+              Kokkos::view_alloc("values_" + std::to_string(i),
+                                 Kokkos::WithoutInitializing),
+              size);
+          gradients_colors[i] =
+            Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>(
+              Kokkos::view_alloc("gradients_" + std::to_string(i),
+                                 Kokkos::WithoutInitializing),
+              size);
           internal::apply_kernel_shmem<dim, Number, Functor>
             <<<grid_dim[i], block_dim[i]>>>(func,
                                             get_data(i),
+                                            values_colors[i],
+                                            gradients_colors[i],
                                             src.get_values(),
                                             dst.get_values());
           AssertCudaKernel();
         }
+    cudaDeviceSynchronize();
   }
 
 
@@ -1039,13 +1061,30 @@ namespace CUDAWrappers
         if (overlap_communication_computation)
           {
             src.update_ghost_values_start(0);
+
+            Kokkos::View<Number *, MemorySpace::Default::kokkos_space> values;
+            Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>
+              gradients;
             // In parallel, it's possible that some processors do not own any
             // cells.
             if (n_cells[0] > 0)
               {
+                const unsigned int size =
+                  (grid_dim[0].x * grid_dim[0].y * grid_dim[0].z) *
+                  cells_per_block * Functor::n_local_dofs;
+                values =
+                  Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                    Kokkos::view_alloc("values", Kokkos::WithoutInitializing),
+                    size);
+                gradients = Kokkos::View<Number *[dim],
+                                         MemorySpace::Default::kokkos_space>(
+                  Kokkos::view_alloc("gradients", Kokkos::WithoutInitializing),
+                  size);
                 internal::apply_kernel_shmem<dim, Number, Functor>
                   <<<grid_dim[0], block_dim[0]>>>(func,
                                                   get_data(0),
+                                                  values,
+                                                  gradients,
                                                   src.get_values(),
                                                   dst.get_values());
                 AssertCudaKernel();
@@ -1056,9 +1095,22 @@ namespace CUDAWrappers
             // cells
             if (n_cells[1] > 0)
               {
+                const unsigned int size =
+                  (grid_dim[1].x * grid_dim[1].y * grid_dim[1].z) *
+                  cells_per_block * Functor::n_local_dofs;
+                values =
+                  Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                    Kokkos::view_alloc("values", Kokkos::WithoutInitializing),
+                    size);
+                gradients = Kokkos::View<Number *[dim],
+                                         MemorySpace::Default::kokkos_space>(
+                  Kokkos::view_alloc("gradients", Kokkos::WithoutInitializing),
+                  size);
                 internal::apply_kernel_shmem<dim, Number, Functor>
                   <<<grid_dim[1], block_dim[1]>>>(func,
                                                   get_data(1),
+                                                  values,
+                                                  gradients,
                                                   src.get_values(),
                                                   dst.get_values());
                 AssertCudaKernel();
@@ -1073,9 +1125,22 @@ namespace CUDAWrappers
             // not own any cells
             if (n_cells[2] > 0)
               {
+                const unsigned int size =
+                  (grid_dim[2].x * grid_dim[2].y * grid_dim[2].z) *
+                  cells_per_block * Functor::n_local_dofs;
+                values =
+                  Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                    Kokkos::view_alloc("values", Kokkos::WithoutInitializing),
+                    size);
+                gradients = Kokkos::View<Number *[dim],
+                                         MemorySpace::Default::kokkos_space>(
+                  Kokkos::view_alloc("gradients", Kokkos::WithoutInitializing),
+                  size);
                 internal::apply_kernel_shmem<dim, Number, Functor>
                   <<<grid_dim[2], block_dim[2]>>>(func,
                                                   get_data(2),
+                                                  values,
+                                                  gradients,
                                                   src.get_values(),
                                                   dst.get_values());
                 AssertCudaKernel();
@@ -1085,14 +1150,36 @@ namespace CUDAWrappers
         else
           {
             src.update_ghost_values();
+            std::vector<
+              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>>
+              values_colors(n_colors);
+            std::vector<
+              Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>>
+              gradients_colors(n_colors);
 
             // Execute the loop on the cells
             for (unsigned int i = 0; i < n_colors; ++i)
               if (n_cells[i] > 0)
                 {
+                  const unsigned int size =
+                    (grid_dim[i].x * grid_dim[i].y * grid_dim[i].z) *
+                    cells_per_block * Functor::n_local_dofs;
+                  values_colors[i] =
+                    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                      Kokkos::view_alloc("values_" + std::to_string(i),
+                                         Kokkos::WithoutInitializing),
+                      size);
+                  gradients_colors[i] =
+                    Kokkos::View<Number *[dim],
+                                 MemorySpace::Default::kokkos_space>(
+                      Kokkos::view_alloc("gradients_" + std::to_string(i),
+                                         Kokkos::WithoutInitializing),
+                      size);
                   internal::apply_kernel_shmem<dim, Number, Functor>
                     <<<grid_dim[i], block_dim[i]>>>(func,
                                                     get_data(i),
+                                                    values_colors[i],
+                                                    gradients_colors[i],
                                                     src.get_values(),
                                                     dst.get_values());
                 }
@@ -1110,13 +1197,33 @@ namespace CUDAWrappers
         ghosted_src = src;
         ghosted_dst = dst;
 
+        std::vector<Kokkos::View<Number *, MemorySpace::Default::kokkos_space>>
+          values_colors(n_colors);
+        std::vector<
+          Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>>
+          gradients_colors(n_colors);
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
           if (n_cells[i] > 0)
             {
+              const unsigned int size =
+                (grid_dim[i].x * grid_dim[i].y * grid_dim[i].z) *
+                cells_per_block * Functor::n_local_dofs;
+              values_colors[i] =
+                Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                  Kokkos::view_alloc("values_" + std::to_string(i),
+                                     Kokkos::WithoutInitializing),
+                  size);
+              gradients_colors[i] =
+                Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>(
+                  Kokkos::view_alloc("gradients_" + std::to_string(i),
+                                     Kokkos::WithoutInitializing),
+                  size);
               internal::apply_kernel_shmem<dim, Number, Functor>
                 <<<grid_dim[i], block_dim[i]>>>(func,
                                                 get_data(i),
+                                                values_colors[i],
+                                                gradients_colors[i],
                                                 ghosted_src.get_values(),
                                                 ghosted_dst.get_values());
               AssertCudaKernel();

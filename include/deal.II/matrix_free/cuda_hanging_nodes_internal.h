@@ -61,8 +61,10 @@ namespace CUDAWrappers
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-              constraint_mask,
-      Number *values)
+        constraint_mask,
+      Kokkos::Subview<
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+        Kokkos::pair<int, int>> values)
     {
       const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
       const unsigned int y_idx = threadIdx.y;
@@ -169,8 +171,10 @@ namespace CUDAWrappers
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-              constraint_mask,
-      Number *values)
+        constraint_mask,
+      Kokkos::Subview<
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+        Kokkos::pair<int, int>> values)
     {
       const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
       const unsigned int y_idx = threadIdx.y;
@@ -320,8 +324,10 @@ namespace CUDAWrappers
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-              constraint_mask,
-      Number *values)
+        constraint_mask,
+      Kokkos::Subview<
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+        Kokkos::pair<int, int>> values)
     {
       if (dim == 2)
         {
