@@ -40,10 +40,10 @@
 
 using namespace dealii;
 
+template <int dim>
 void
 test(const bool filtered_compression)
 {
-  constexpr unsigned int dim    = 2;
   constexpr unsigned int degree = 1;
 
   FE_Q<dim> fe_q(degree);
@@ -471,7 +471,11 @@ main(int argc, char **argv)
 
   initlog();
 
-  test(true);
+  test<2>(true);
   deallog << std::endl;
-  test(false);
+  test<2>(false);
+  deallog << std::endl;
+  test<3>(true);
+  deallog << std::endl;
+  test<3>(false);
 }
