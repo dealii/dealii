@@ -472,6 +472,13 @@ public:
 
   /**
    * Reinitialize the evaluator to point to the correct precomputed mapping of
+   * the single cell in the MappingInfo object.
+   */
+  void
+  reinit();
+
+  /**
+   * Reinitialize the evaluator to point to the correct precomputed mapping of
    * the cell in the MappingInfo object.
    */
   void
@@ -650,6 +657,14 @@ private:
   setup(const unsigned int first_selected_component);
 
   /**
+   * Shared functionality of all @p reinit() functions. Resizes data fields and
+   * precomputes the @p shapes vector, holding the evaluation of 1D basis
+   * functions of tensor product polynomials, if necessary.
+   */
+  void
+  do_reinit();
+
+  /**
    * Number of quadrature points of the current cell/face.
    */
   const unsigned int n_q_points;
@@ -775,6 +790,12 @@ private:
    * Bool indicating if class is reinitialized and data vectors a resized.
    */
   bool is_reinitialized;
+
+  /**
+   * Vector containing tensor product shape functions evaluated (during
+   * reinit()) at the vectorized unit points.
+   */
+  AlignedVector<dealii::ndarray<VectorizedArray<Number>, 2, dim>> shapes;
 };
 
 // ----------------------- template and inline function ----------------------
@@ -818,6 +839,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , is_reinitialized(false)
 {
   setup(first_selected_component);
+  mapping_info.connect_is_reinitialized(
+    [this]() { this->is_reinitialized = false; });
 }
 
 
@@ -829,6 +852,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::setup(
 {
   AssertIndexRange(first_selected_component + n_components,
                    fe->n_components() + 1);
+
+  shapes.reserve(100);
 
   bool         same_base_element   = true;
   unsigned int base_element_number = 0;
@@ -914,14 +939,19 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
       fe_values->reinit(cell);
     }
 
-  const_cast<unsigned int &>(n_q_points) = unit_points.size();
+  do_reinit();
+}
 
-  if (update_flags & update_values)
-    values.resize(n_q_points, numbers::signaling_nan<value_type>());
-  if (update_flags & update_gradients)
-    gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
 
-  is_reinitialized = true;
+
+template <int n_components, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components, dim, spacedim, Number>::reinit()
+{
+  current_cell_index  = numbers::invalid_unsigned_int;
+  current_face_number = numbers::invalid_unsigned_int;
+
+  do_reinit();
 }
 
 
@@ -934,16 +964,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   current_cell_index  = cell_index;
   current_face_number = numbers::invalid_unsigned_int;
 
-  const_cast<unsigned int &>(n_q_points) =
-    mapping_info->get_unit_points(current_cell_index, current_face_number)
-      .size();
-
-  if (update_flags & update_values)
-    values.resize(n_q_points, numbers::signaling_nan<value_type>());
-  if (update_flags & update_gradients)
-    gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
-
-  is_reinitialized = true;
+  do_reinit();
 }
 
 
@@ -957,14 +978,48 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   current_cell_index  = cell_index;
   current_face_number = face_number;
 
-  const_cast<unsigned int &>(n_q_points) =
-    mapping_info->get_unit_points(current_cell_index, current_face_number)
-      .size();
+  do_reinit();
+}
+
+
+
+template <int n_components, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
+{
+  const auto unit_points =
+    mapping_info->get_unit_points(current_cell_index, current_face_number);
+
+  const_cast<unsigned int &>(n_q_points) = unit_points.size();
 
   if (update_flags & update_values)
     values.resize(n_q_points, numbers::signaling_nan<value_type>());
   if (update_flags & update_gradients)
     gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
+
+  if (!polynomials_are_hat_functions)
+    {
+      const std::size_t n_points = unit_points.size();
+      const std::size_t n_lanes  = VectorizedArray<Number>::size();
+      const std::size_t n_batches =
+        n_points / n_lanes + (n_points % n_lanes > 0 ? 1 : 0);
+      const std::size_t n_shapes = poly.size();
+      shapes.resize_fast(n_batches * n_shapes);
+      for (unsigned int i = 0, qb = 0; i < n_points; i += n_lanes, ++qb)
+        {
+          // convert to vectorized format
+          Point<dim, VectorizedArray<Number>> vectorized_points;
+          for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+            for (unsigned int d = 0; d < dim; ++d)
+              vectorized_points[d][j] = unit_points[i + j][d];
+
+          auto view =
+            make_array_view(shapes.begin() + qb * n_shapes,
+                            shapes.begin() + (qb * n_shapes + n_shapes));
+
+          internal::compute_values_of_array(view, poly, vectorized_points);
+        }
+    }
 
   is_reinitialized = true;
 }
@@ -977,6 +1032,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const ArrayView<const Number> &         solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flag)
 {
+  if (!is_reinitialized)
+    reinit();
+
   if (n_q_points == 0)
     return;
 
@@ -986,14 +1044,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
       fast_path)
     {
       // fast path with tensor product evaluation
-      const auto unit_points =
-        mapping_info->get_unit_points(current_cell_index, current_face_number);
-
-      // we need to call reinit() here if we reuse the same MappingInfo object
-      // for several FEPointEvaluation objects to resize the data fields
-      if (!is_reinitialized || n_q_points != unit_points.size())
-        reinit(numbers::invalid_unsigned_int);
-
       if (solution_renumbered.size() != dofs_per_component)
         solution_renumbered.resize(dofs_per_component);
       for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -1011,23 +1061,41 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
       unit_gradients.resize(n_q_points,
                             numbers::signaling_nan<gradient_type>());
 
+      const auto unit_points =
+        mapping_info->get_unit_points(current_cell_index, current_face_number);
+      const auto &mapping_data =
+        mapping_info->get_mapping_data(current_cell_index, current_face_number);
+
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<Number>::size();
-      for (unsigned int i = 0; i < n_points; i += n_lanes)
+      for (unsigned int i = 0, qb = 0; i < n_points; i += n_lanes, ++qb)
         {
-          // convert to vectorized format
-          Point<dim, VectorizedArray<Number>> vectorized_points;
-          for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-            for (unsigned int d = 0; d < dim; ++d)
-              vectorized_points[d][j] = unit_points[i + j][d];
-
           // compute
-          const auto val_and_grad =
-            internal::evaluate_tensor_product_value_and_gradient(
-              poly,
-              solution_renumbered,
-              vectorized_points,
-              polynomials_are_hat_functions);
+          const unsigned int n_shapes     = poly.size();
+          const auto         val_and_grad = [&]() {
+            if (polynomials_are_hat_functions)
+              {
+                // convert to vectorized format
+                Point<dim, VectorizedArray<Number>> vectorized_points;
+                for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                  for (unsigned int d = 0; d < dim; ++d)
+                    vectorized_points[d][j] = unit_points[i + j][d];
+
+                return internal::
+                  evaluate_tensor_product_value_and_gradient_linear(
+                    poly, solution_renumbered, vectorized_points);
+              }
+            else
+              return internal::
+                evaluate_tensor_product_value_and_gradient_shapes<
+                  dim,
+                  value_type,
+                  VectorizedArray<Number>>(
+                  make_array_view(shapes.begin() + qb * n_shapes,
+                                  shapes.begin() + (qb * n_shapes + n_shapes)),
+                  poly.size(),
+                  solution_renumbered);
+          }();
 
           // convert back to standard format
           if (evaluation_flag & EvaluationFlags::values)
@@ -1048,9 +1116,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                     Number>::set_gradient(val_and_grad.second,
                                           j,
                                           unit_gradients[i + j]);
-                  const auto &mapping_data =
-                    mapping_info->get_mapping_data(current_cell_index,
-                                                   current_face_number);
                   gradients[i + j] = apply_transformation(
                     mapping_data.inverse_jacobians[i + j].transpose(),
                     unit_gradients[i + j]);
@@ -1122,6 +1187,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const ArrayView<Number> &               solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
+  if (!is_reinitialized)
+    reinit();
+
   if (n_q_points == 0) // no evaluation points provided
     {
       std::fill(solution_values.begin(), solution_values.end(), 0.0);
@@ -1134,13 +1202,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
       fast_path)
     {
       // fast path with tensor product integration
-      const auto unit_points =
-        mapping_info->get_unit_points(current_cell_index, current_face_number);
-
-      // we need to call reinit() here if we reuse the same MappingInfo object
-      // for several FEPointEvaluation objects to resize the data fields
-      if (!is_reinitialized || n_q_points != unit_points.size())
-        reinit(numbers::invalid_unsigned_int);
 
       if (integration_flags & EvaluationFlags::values)
         AssertIndexRange(n_q_points, values.size() + 1);
@@ -1156,16 +1217,15 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           n_components,
           VectorizedArray<Number>>::value_type());
 
+      const auto unit_points =
+        mapping_info->get_unit_points(current_cell_index, current_face_number);
+      const auto &mapping_data =
+        mapping_info->get_mapping_data(current_cell_index, current_face_number);
+
       const std::size_t n_points = unit_points.size();
       const std::size_t n_lanes  = VectorizedArray<Number>::size();
-      for (unsigned int i = 0; i < n_points; i += n_lanes)
+      for (unsigned int i = 0, qb = 0; i < n_points; i += n_lanes, ++qb)
         {
-          // convert to vectorized format
-          Point<dim, VectorizedArray<Number>> vectorized_points;
-          for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-            for (unsigned int d = 0; d < dim; ++d)
-              vectorized_points[d][j] = unit_points[i + j][d];
-
           typename internal::ProductTypeNoPoint<value_type,
                                                 VectorizedArray<Number>>::type
             value = {};
@@ -1184,9 +1244,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           if (integration_flags & EvaluationFlags::gradients)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               {
-                const auto &mapping_data =
-                  mapping_info->get_mapping_data(current_cell_index,
-                                                 current_face_number);
                 gradients[i + j] =
                   apply_transformation(mapping_data.inverse_jacobians[i + j],
                                        gradients[i + j]);
@@ -1196,12 +1253,34 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
               }
 
           // compute
-          internal::integrate_add_tensor_product_value_and_gradient(
-            poly,
-            value,
-            gradient,
-            vectorized_points,
-            solution_renumbered_vectorized);
+          const unsigned int n_shapes = poly.size();
+          if (polynomials_are_hat_functions)
+            {
+              // convert to vectorized format
+              Point<dim, VectorizedArray<Number>> vectorized_points;
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                for (unsigned int d = 0; d < dim; ++d)
+                  vectorized_points[d][j] = unit_points[i + j][d];
+
+              internal::integrate_add_tensor_product_value_and_gradient_linear(
+                poly,
+                value,
+                gradient,
+                solution_renumbered_vectorized,
+                vectorized_points);
+            }
+          else
+            internal::integrate_add_tensor_product_value_and_gradient_shapes<
+              dim,
+              VectorizedArray<Number>,
+              typename internal::
+                ProductTypeNoPoint<value_type, VectorizedArray<Number>>::type>(
+              make_array_view(shapes.begin() + qb * n_shapes,
+                              shapes.begin() + (qb * n_shapes + n_shapes)),
+              n_shapes,
+              value,
+              gradient,
+              solution_renumbered_vectorized);
         }
 
       // add between the lanes and write into the result

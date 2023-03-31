@@ -182,6 +182,12 @@ namespace NonMatching
     UpdateFlags
     get_update_flags() const;
 
+    /**
+     * Connects to is_reinitialized().
+     */
+    boost::signals2::connection
+    connect_is_reinitialized(const std::function<void()> &set_is_reinitialized);
+
   private:
     /**
      * Enum class for reinitialized states.
@@ -281,6 +287,12 @@ namespace NonMatching
      * A bool that determines weather cell index compression should be done.
      */
     bool do_cell_index_compression;
+
+    /**
+     * This signal is triggered right after this object is reinitialized, to let
+     * dependent objects know that they need to reinitialize as well.
+     */
+    boost::signals2::signal<void()> is_reinitialized;
   };
 
   // ----------------------- template functions ----------------------
@@ -336,6 +348,7 @@ namespace NonMatching
                                             mapping_data[0]);
 
     state = State::single_cell;
+    is_reinitialized();
   }
 
 
@@ -413,6 +426,7 @@ namespace NonMatching
       }
 
     state = State::cell_vector;
+    is_reinitialized();
   }
 
 
@@ -509,6 +523,7 @@ namespace NonMatching
       }
 
     state = State::cell_vector;
+    is_reinitialized();
   }
 
 
@@ -611,12 +626,13 @@ namespace NonMatching
       }
 
     state = State::faces_on_cells_in_vector;
+    is_reinitialized();
   }
 
 
 
   template <int dim, int spacedim>
-  const ArrayView<const Point<dim>>
+  inline const ArrayView<const Point<dim>>
   MappingInfo<dim, spacedim>::get_unit_points(
     const unsigned int cell_index,
     const unsigned int face_number) const
@@ -703,7 +719,7 @@ namespace NonMatching
 
 
   template <int dim, int spacedim>
-  const typename MappingInfo<dim, spacedim>::MappingData &
+  inline const typename MappingInfo<dim, spacedim>::MappingData &
   MappingInfo<dim, spacedim>::get_mapping_data(
     const unsigned int cell_index,
     const unsigned int face_number) const
@@ -777,6 +793,16 @@ namespace NonMatching
   MappingInfo<dim, spacedim>::get_update_flags() const
   {
     return update_flags;
+  }
+
+
+
+  template <int dim, int spacedim>
+  boost::signals2::connection
+  MappingInfo<dim, spacedim>::connect_is_reinitialized(
+    const std::function<void()> &set_is_reinitialized)
+  {
+    return is_reinitialized.connect(set_is_reinitialized);
   }
 
 

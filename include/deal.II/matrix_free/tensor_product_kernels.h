@@ -2983,13 +2983,36 @@ namespace internal
 
 
   /**
+   * Computes the values and derivatives of the 1d polynomials @p poly at the
+   * specified point @p p and stores it in @p shapes.
+   */
+  template <int dim, typename Number>
+  inline void
+  compute_values_of_array(
+    ArrayView<dealii::ndarray<Number, 2, dim>> &        shapes,
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const Point<dim, Number> &                          p)
+  {
+    const int n_shapes = poly.size();
+
+    // Evaluate 1d polynomials and their derivatives
+    std::array<Number, dim> point;
+    for (unsigned int d = 0; d < dim; ++d)
+      point[d] = p[d];
+    for (int i = 0; i < n_shapes; ++i)
+      poly[i].values_of_array(point, 1, &shapes[i][0]);
+  }
+
+
+
+  /**
    * Interpolate inner dimensions of tensor product shape functions.
    */
   template <int dim, int length, typename Number2, typename Number>
   inline std::array<typename ProductTypeNoPoint<Number, Number2>::type, 3>
-  do_interpolate_xy(const std::vector<Number> &                  values,
-                    const std::vector<unsigned int> &            renumber,
-                    const dealii::ndarray<Number2, 200, 2, dim> &shapes,
+  do_interpolate_xy(const std::vector<Number> &                        values,
+                    const std::vector<unsigned int> &                  renumber,
+                    const ArrayView<dealii::ndarray<Number2, 2, dim>> &shapes,
                     const int n_shapes_runtime,
                     int &     i)
   {
@@ -3030,6 +3053,148 @@ namespace internal
           }
       }
     return result;
+  }
+
+
+
+  /**
+   * Interpolates the values and gradients into the points specified in
+   * @p compute_values_of_array() with help of the precomputed @p shapes.
+   */
+  template <int dim, typename Number, typename Number2>
+  inline std::pair<
+    typename ProductTypeNoPoint<Number, Number2>::type,
+    Tensor<1, dim, typename ProductTypeNoPoint<Number, Number2>::type>>
+  evaluate_tensor_product_value_and_gradient_shapes(
+    const ArrayView<dealii::ndarray<Number2, 2, dim>> &shapes,
+    const int                                          n_shapes,
+    const std::vector<Number> &                        values,
+    const std::vector<unsigned int> &                  renumber = {})
+  {
+    static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
+
+    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
+
+    AssertDimension(Utilities::pow(n_shapes, dim), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    // Go through the tensor product of shape functions and interpolate
+    // with optimal algorithm
+    std::pair<Number3, Tensor<1, dim, Number3>> result = {};
+    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+      {
+        std::array<Number3, 3> inner_result;
+        // Generate separate code with known loop bounds for the most common
+        // cases
+        if (n_shapes == 2)
+          inner_result = do_interpolate_xy<dim, 2, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 3)
+          inner_result = do_interpolate_xy<dim, 3, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 4)
+          inner_result = do_interpolate_xy<dim, 4, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 5)
+          inner_result = do_interpolate_xy<dim, 5, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 6)
+          inner_result = do_interpolate_xy<dim, 6, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        else
+          inner_result = do_interpolate_xy<dim, -1, Number2, Number>(
+            values, renumber, shapes, n_shapes, i);
+        if (dim == 3)
+          {
+            // Interpolation + derivative in z direction
+            result.first += inner_result[0] * shapes[i2][0][2];
+            result.second[0] += inner_result[1] * shapes[i2][0][2];
+            result.second[1] += inner_result[2] * shapes[i2][0][2];
+            result.second[2] += inner_result[0] * shapes[i2][1][2];
+          }
+        else
+          {
+            result.first     = inner_result[0];
+            result.second[0] = inner_result[1];
+            if (dim > 1)
+              result.second[1] = inner_result[2];
+          }
+      }
+
+    return result;
+  }
+
+
+
+  /**
+   * Specializes @p evaluate_tensor_product_value_and_gradient() for linear
+   * polynomials which massively reduces the necessary instructions.
+   */
+  template <int dim, typename Number, typename Number2>
+  inline std::pair<
+    typename ProductTypeNoPoint<Number, Number2>::type,
+    Tensor<1, dim, typename ProductTypeNoPoint<Number, Number2>::type>>
+  evaluate_tensor_product_value_and_gradient_linear(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const std::vector<Number> &                         values,
+    const Point<dim, Number2> &                         p,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    (void)poly;
+    static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
+
+    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
+
+    AssertDimension(Utilities::pow(poly.size(), dim), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    AssertDimension(poly.size(), 2);
+    for (unsigned int i = 0; i < renumber.size(); ++i)
+      AssertDimension(renumber[i], i);
+
+    if (dim == 1)
+      {
+        Tensor<1, dim, Number3> derivative;
+        derivative[0] = values[1] - values[0];
+        return std::make_pair((1. - p[0]) * values[0] + p[0] * values[1],
+                              derivative);
+      }
+    else if (dim == 2)
+      {
+        const Number2           x0 = 1. - p[0], x1 = p[0];
+        const Number3           tmp0   = x0 * values[0] + x1 * values[1];
+        const Number3           tmp1   = x0 * values[2] + x1 * values[3];
+        const Number3           mapped = (1. - p[1]) * tmp0 + p[1] * tmp1;
+        Tensor<1, dim, Number3> derivative;
+        derivative[0] = (1. - p[1]) * (values[1] - values[0]) +
+                        p[1] * (values[3] - values[2]);
+        derivative[1] = tmp1 - tmp0;
+        return std::make_pair(mapped, derivative);
+      }
+    else if (dim == 3)
+      {
+        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
+                      z0 = 1. - p[2], z1 = p[2];
+        const Number3           tmp0   = x0 * values[0] + x1 * values[1];
+        const Number3           tmp1   = x0 * values[2] + x1 * values[3];
+        const Number3           tmpy0  = y0 * tmp0 + y1 * tmp1;
+        const Number3           tmp2   = x0 * values[4] + x1 * values[5];
+        const Number3           tmp3   = x0 * values[6] + x1 * values[7];
+        const Number3           tmpy1  = y0 * tmp2 + y1 * tmp3;
+        const Number3           mapped = z0 * tmpy0 + z1 * tmpy1;
+        Tensor<1, dim, Number3> derivative;
+        derivative[2] = tmpy1 - tmpy0;
+        derivative[1] = z0 * (tmp1 - tmp0) + z1 * (tmp3 - tmp2);
+        derivative[0] =
+          z0 * (y0 * (values[1] - values[0]) + y1 * (values[3] - values[2])) +
+          z1 * (y0 * (values[5] - values[4]) + y1 * (values[7] - values[6]));
+        return std::make_pair(mapped, derivative);
+      }
+
+    // work around a compile error: missing return statement
+    return std::make_pair(Number3(), Tensor<1, dim, Number3>());
   }
 
 
@@ -3079,122 +3244,26 @@ namespace internal
     const bool                                          d_linear = false,
     const std::vector<unsigned int> &                   renumber = {})
   {
-    static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
-
-    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
-
-    // use `int` type for this variable and the loops below to inform the
-    // compiler that the loops below will never overflow, which allows it to
-    // generate more optimized code for the variable loop bounds in the
-    // present context
-    const int n_shapes = poly.size();
-    AssertDimension(Utilities::pow(n_shapes, dim), values.size());
-    Assert(renumber.empty() || renumber.size() == values.size(),
-           ExcDimensionMismatch(renumber.size(), values.size()));
-
-    // shortcut for linear interpolation to speed up evaluation
     if (d_linear)
       {
-        AssertDimension(poly.size(), 2);
-        for (unsigned int i = 0; i < renumber.size(); ++i)
-          AssertDimension(renumber[i], i);
-
-        if (dim == 1)
-          {
-            Tensor<1, dim, Number3> derivative;
-            derivative[0] = values[1] - values[0];
-            return std::make_pair((1. - p[0]) * values[0] + p[0] * values[1],
-                                  derivative);
-          }
-        else if (dim == 2)
-          {
-            const Number2           x0 = 1. - p[0], x1 = p[0];
-            const Number3           tmp0   = x0 * values[0] + x1 * values[1];
-            const Number3           tmp1   = x0 * values[2] + x1 * values[3];
-            const Number3           mapped = (1. - p[1]) * tmp0 + p[1] * tmp1;
-            Tensor<1, dim, Number3> derivative;
-            derivative[0] = (1. - p[1]) * (values[1] - values[0]) +
-                            p[1] * (values[3] - values[2]);
-            derivative[1] = tmp1 - tmp0;
-            return std::make_pair(mapped, derivative);
-          }
-        else if (dim == 3)
-          {
-            const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                          z0 = 1. - p[2], z1 = p[2];
-            const Number3           tmp0   = x0 * values[0] + x1 * values[1];
-            const Number3           tmp1   = x0 * values[2] + x1 * values[3];
-            const Number3           tmpy0  = y0 * tmp0 + y1 * tmp1;
-            const Number3           tmp2   = x0 * values[4] + x1 * values[5];
-            const Number3           tmp3   = x0 * values[6] + x1 * values[7];
-            const Number3           tmpy1  = y0 * tmp2 + y1 * tmp3;
-            const Number3           mapped = z0 * tmpy0 + z1 * tmpy1;
-            Tensor<1, dim, Number3> derivative;
-            derivative[2] = tmpy1 - tmpy0;
-            derivative[1] = z0 * (tmp1 - tmp0) + z1 * (tmp3 - tmp2);
-            derivative[0] =
-              z0 *
-                (y0 * (values[1] - values[0]) + y1 * (values[3] - values[2])) +
-              z1 *
-                (y0 * (values[5] - values[4]) + y1 * (values[7] - values[6]));
-            return std::make_pair(mapped, derivative);
-          }
+        return evaluate_tensor_product_value_and_gradient_linear(poly,
+                                                                 values,
+                                                                 p,
+                                                                 renumber);
       }
-
-    AssertIndexRange(n_shapes, 200);
-    dealii::ndarray<Number2, 200, 2, dim> shapes;
-
-    // Evaluate 1d polynomials and their derivatives
-    std::array<Number2, dim> point;
-    for (unsigned int d = 0; d < dim; ++d)
-      point[d] = p[d];
-    for (int i = 0; i < n_shapes; ++i)
-      poly[i].values_of_array(point, 1, &shapes[i][0]);
-
-    // Go through the tensor product of shape functions and interpolate
-    // with optimal algorithm
-    std::pair<Number3, Tensor<1, dim, Number3>> result = {};
-    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+    else
       {
-        std::array<Number3, 3> inner_result;
-        // Generate separate code with known loop bounds for the most common
-        // cases
-        if (n_shapes == 2)
-          inner_result = do_interpolate_xy<dim, 2, Number2, Number>(
-            values, renumber, shapes, n_shapes, i);
-        else if (n_shapes == 3)
-          inner_result = do_interpolate_xy<dim, 3, Number2, Number>(
-            values, renumber, shapes, n_shapes, i);
-        else if (n_shapes == 4)
-          inner_result = do_interpolate_xy<dim, 4, Number2, Number>(
-            values, renumber, shapes, n_shapes, i);
-        else if (n_shapes == 5)
-          inner_result = do_interpolate_xy<dim, 5, Number2, Number>(
-            values, renumber, shapes, n_shapes, i);
-        else if (n_shapes == 6)
-          inner_result = do_interpolate_xy<dim, 6, Number2, Number>(
-            values, renumber, shapes, n_shapes, i);
-        else
-          inner_result = do_interpolate_xy<dim, -1, Number2, Number>(
-            values, renumber, shapes, n_shapes, i);
-        if (dim == 3)
-          {
-            // Interpolation + derivative in z direction
-            result.first += inner_result[0] * shapes[i2][0][2];
-            result.second[0] += inner_result[1] * shapes[i2][0][2];
-            result.second[1] += inner_result[2] * shapes[i2][0][2];
-            result.second[2] += inner_result[0] * shapes[i2][1][2];
-          }
-        else
-          {
-            result.first     = inner_result[0];
-            result.second[0] = inner_result[1];
-            if (dim > 1)
-              result.second[1] = inner_result[2];
-          }
-      }
+        std::array<dealii::ndarray<Number2, 2, dim>, 200> shapes;
 
-    return result;
+        auto view = make_array_view(shapes);
+
+        compute_values_of_array(view, poly, p);
+
+        return evaluate_tensor_product_value_and_gradient_shapes<dim,
+                                                                 Number,
+                                                                 Number2>(
+          view, poly.size(), values, renumber);
+      }
   }
 
 
@@ -3305,12 +3374,13 @@ namespace internal
    */
   template <int dim, int length, typename Number2, typename Number>
   inline void
-  do_apply_test_functions_xy(AlignedVector<Number2> &         values,
-                             const std::vector<unsigned int> &renumber,
-                             const dealii::ndarray<Number, 200, 2, dim> &shapes,
-                             const std::array<Number2, 3> &test_grads_value,
-                             const int                     n_shapes_runtime,
-                             int &                         i)
+  do_apply_test_functions_xy(
+    AlignedVector<Number2> &                          values,
+    const std::vector<unsigned int> &                 renumber,
+    const ArrayView<dealii::ndarray<Number, 2, dim>> &shapes,
+    const std::array<Number2, 3> &                    test_grads_value,
+    const int                                         n_shapes_runtime,
+    int &                                             i)
   {
     const int n_shapes = length > 0 ? length : n_shapes_runtime;
     for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
@@ -3344,31 +3414,20 @@ namespace internal
    */
   template <int dim, typename Number, typename Number2>
   inline void
-  integrate_add_tensor_product_value_and_gradient(
-    const std::vector<Polynomials::Polynomial<double>> &poly,
-    const Number2 &                                     value,
-    const Tensor<1, dim, Number2> &                     gradient,
-    const Point<dim, Number> &                          p,
-    AlignedVector<Number2> &                            values,
-    const std::vector<unsigned int> &                   renumber = {})
+  integrate_add_tensor_product_value_and_gradient_shapes(
+    const ArrayView<dealii::ndarray<Number, 2, dim>> &shapes,
+    const int                                         n_shapes,
+    const Number2 &                                   value,
+    const Tensor<1, dim, Number2> &                   gradient,
+    AlignedVector<Number2> &                          values,
+    const std::vector<unsigned int> &                 renumber = {})
   {
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
     // as in evaluate, use `int` type to produce better code in this context
-    const int n_shapes = poly.size();
     AssertDimension(Utilities::pow(n_shapes, dim), values.size());
     Assert(renumber.empty() || renumber.size() == values.size(),
            ExcDimensionMismatch(renumber.size(), values.size()));
-
-    AssertIndexRange(n_shapes, 200);
-    dealii::ndarray<Number, 200, 2, dim> shapes;
-
-    // Evaluate 1d polynomials and their derivatives
-    std::array<Number, dim> point;
-    for (unsigned int d = 0; d < dim; ++d)
-      point[d] = p[d];
-    for (int i = 0; i < n_shapes; ++i)
-      poly[i].values_of_array(point, 1, &shapes[i][0]);
 
     // Implement the transpose of the function above
     std::array<Number2, 3> test_grads_value;
@@ -3406,6 +3465,86 @@ namespace internal
         else
           do_apply_test_functions_xy<dim, -1, Number2, Number>(
             values, renumber, shapes, test_grads_value, n_shapes, i);
+      }
+  }
+
+
+
+  /**
+   * Specializes @p evaluate_tensor_product_value_and_gradient() for linear
+   * polynomials which massively reduces the necessary instructions.
+   */
+  template <int dim, typename Number, typename Number2>
+  inline void
+  integrate_add_tensor_product_value_and_gradient_linear(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const Number2 &                                     value,
+    const Tensor<1, dim, Number2> &                     gradient,
+    AlignedVector<Number2> &                            values,
+    const Point<dim, Number> &                          p,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    (void)poly;
+    static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
+
+    AssertDimension(Utilities::pow(poly.size(), dim), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    AssertDimension(poly.size(), 2);
+    for (unsigned int i = 0; i < renumber.size(); ++i)
+      AssertDimension(renumber[i], i);
+
+    if (dim == 1)
+      {
+        const auto x0 = 1. - p[0], x1 = p[0];
+
+        values[0] = value * x0 - gradient[0];
+        values[1] = value * x1 + gradient[0];
+      }
+    else if (dim == 2)
+      {
+        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
+
+        const auto test_value_y0 = value * y0 - gradient[1];
+        const auto test_grad_xy0 = gradient[0] * y0;
+        const auto test_value_y1 = value * y1 + gradient[1];
+        const auto test_grad_xy1 = gradient[0] * y1;
+
+        values[0] += x0 * test_value_y0 - test_grad_xy0;
+        values[1] += x1 * test_value_y0 + test_grad_xy0;
+        values[2] += x0 * test_value_y1 - test_grad_xy1;
+        values[3] += x1 * test_value_y1 + test_grad_xy1;
+      }
+    else if (dim == 3)
+      {
+        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
+                   z0 = 1. - p[2], z1 = p[2];
+
+        const auto test_value_z0 = value * z0 - gradient[2];
+        const auto test_grad_x0  = gradient[0] * z0;
+        const auto test_grad_y0  = gradient[1] * z0;
+        const auto test_value_z1 = value * z1 + gradient[2];
+        const auto test_grad_x1  = gradient[0] * z1;
+        const auto test_grad_y1  = gradient[1] * z1;
+
+        const auto test_value_y00 = test_value_z0 * y0 - test_grad_y0;
+        const auto test_grad_xy00 = test_grad_x0 * y0;
+        const auto test_value_y01 = test_value_z0 * y1 + test_grad_y0;
+        const auto test_grad_xy01 = test_grad_x0 * y1;
+        const auto test_value_y10 = test_value_z1 * y0 - test_grad_y1;
+        const auto test_grad_xy10 = test_grad_x1 * y0;
+        const auto test_value_y11 = test_value_z1 * y1 + test_grad_y1;
+        const auto test_grad_xy11 = test_grad_x1 * y1;
+
+        values[0] += x0 * test_value_y00 - test_grad_xy00;
+        values[1] += x1 * test_value_y00 + test_grad_xy00;
+        values[2] += x0 * test_value_y01 - test_grad_xy01;
+        values[3] += x1 * test_value_y01 + test_grad_xy01;
+        values[4] += x0 * test_value_y10 - test_grad_xy10;
+        values[5] += x1 * test_value_y10 + test_grad_xy10;
+        values[6] += x0 * test_value_y11 - test_grad_xy11;
+        values[7] += x1 * test_value_y11 + test_grad_xy11;
       }
   }
 
