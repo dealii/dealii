@@ -122,7 +122,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   # enabled in client user code irrespective of what compile flags/options
   # they have set.
   #
-  target_compile_features(${DEAL_II_NAMESPACE}_${build_lowercase}
+  target_compile_features(${DEAL_II_TARGET_NAME}_${build_lowercase}
     INTERFACE cxx_std_${CMAKE_CXX_STANDARD}
     )
 
