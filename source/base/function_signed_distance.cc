@@ -332,6 +332,27 @@ namespace Functions
 
       return evaluate_ellipsoid(point) < 0.0 ? -distance : distance;
     }
+
+
+
+    template <int dim>
+    Rectangle<dim>::Rectangle(const Point<dim> &bottom_left,
+                              const Point<dim> &top_right)
+      : bounding_box({bottom_left, top_right})
+    {}
+
+
+
+    template <int dim>
+    double
+    Rectangle<dim>::value(const Point<dim> & p,
+                          const unsigned int component) const
+    {
+      AssertDimension(component, 0);
+      (void)component;
+
+      return bounding_box.signed_distance(p);
+    }
   } // namespace SignedDistance
 } // namespace Functions
 

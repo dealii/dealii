@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/function.h>
 
 #include <array>
@@ -211,6 +212,47 @@ namespace Functions
       const std::array<double, dim> radii;
       const double                  tolerance;
       const unsigned int            max_iter;
+    };
+
+
+    /**
+     * Signed-distance level set function of a rectangle.
+     *
+     * This function is zero on the rectangle, negative "inside" and positive
+     * in the rest of $\mathbb{R}^{dim}$.
+     *
+     * Contour surfaces of the signed distance function of a 3D rectangle are
+     * illustrated below:
+     *
+     * @image html signed_distance_hyper_rectangle.png
+     *
+     * @ingroup functions
+     */
+    template <int dim>
+    class Rectangle : public Function<dim>
+    {
+    public:
+      /**
+       * Constructor, takes the bottom left point and the top right
+       * point of the rectangle.
+       *
+       * @param bottom_left Bottom left point of the rectangle.
+       * @param top_right Top right point of the rectangle.
+       */
+      Rectangle(const Point<dim> &bottom_left, const Point<dim> &top_right);
+
+      /**
+       * Calculates the signed distance from a given point @p p to the rectangle.
+       * The signed distance is negative for points inside the rectangle, zero
+       * for points on the rectangle and positive for points outside the
+       * rectangle.
+       */
+      double
+      value(const Point<dim> & p,
+            const unsigned int component = 0) const override;
+
+    private:
+      const BoundingBox<dim> bounding_box;
     };
   } // namespace SignedDistance
 } // namespace Functions
