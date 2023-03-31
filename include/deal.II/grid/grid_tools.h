@@ -964,7 +964,7 @@ namespace GridTools
    * to global indices into @p points .
    *
    * @param[in] cache The triangulation's GridTools::Cache .
-   * @param[in] points The point's vector.
+   * @param[in] points A vector of points.
    * @param[in] cell_hint (optional) A cell iterator for a cell which likely
    * contains the first point of @p points.
    *
@@ -974,7 +974,10 @@ namespace GridTools
    *  - @p qpoints : A vector of vectors of points. @p qpoints[i] contains
    *   the reference positions of all points that fall within the cell @p cells[i] .
    *  - @p indices : A vector of vectors of integers, containing the mapping between
-   *   local numbering in @p qpoints , and global index in @p points .
+   *   local numbering the @p cells array (the first component of the returned
+   *   tuple), and global index in the input array @p points . In other words,
+   *   the indices stored in the array `indices[c]` correspond to those points
+   *   of the input argument `points` that are located on `cells[c]`.
    *
    * If @p points[a] and @p points[b] are the only two points that fall in @p cells[c],
    * then @p qpoints[c][0] and @p qpoints[c][1] are the reference positions of
@@ -3316,7 +3319,7 @@ namespace GridTools
    * In this collective operation each process provides a vector
    * of bounding boxes and a communicator.
    * All these vectors are gathered on each of the processes,
-   * organized in a search tree which, and then returned.
+   * organized in a search tree, and then returned.
    *
    * The idea is that the vector of bounding boxes describes a
    * relevant property of the computations on each process
@@ -3329,8 +3332,8 @@ namespace GridTools
    * parallel::distributed::Triangulation object. While these may
    * overlap the bounding boxes of other processes, finding which
    * process owns the cell that encloses a given point is vastly
-   * easier if the process trying to figure this out has a list of
-   * bounding boxes for each of the other processes at hand.
+   * easier if the process trying to figure this out has a (relatively
+   * small) list of processes whose bounding boxes contain that point.
    *
    * The returned search tree object is an r-tree with packing
    * algorithm, which is provided by boost library. See
@@ -3339,8 +3342,8 @@ namespace GridTools
    *
    * In the returned tree, each node contains a pair of elements:
    * the first being a bounding box,
-   * the second being the rank of the process whose local description
-   * contains the bounding box.
+   * the second being the rank of the process for which at least some
+   * of the locally owned cells overlap with the bounding box.
    *
    * @note This function is a collective operation.
    */
