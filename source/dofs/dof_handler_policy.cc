@@ -3034,6 +3034,12 @@ namespace internal
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
+        AssertThrow((tr->is_multilevel_hierarchy_constructed()),
+                    ExcMessage(
+                      "Multigrid DoFs can only be distributed on a parallel "
+                      "Triangulation if the flag construct_multigrid_hierarchy "
+                      "is set in the constructor."));
+
         const unsigned int n_procs =
           Utilities::MPI::n_mpi_processes(tr->get_communicator());
         const unsigned int n_levels = tr->n_global_levels();
