@@ -848,7 +848,12 @@ operator>>(std::istream &in, ReferenceCell &reference_cell)
   return in;
 }
 
-
+// explicitly instantiate dimension 0 quadrature in addition to the standard
+// dimensions
+template Quadrature<0>
+ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const;
+template const Quadrature<0> &
+ReferenceCell::get_nodal_type_quadrature() const;
 
 #include "reference_cell.inst"
 

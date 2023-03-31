@@ -1226,7 +1226,7 @@ ReferenceCell::vertex(const unsigned int v) const
       case 0:
         {
           if (*this == ReferenceCells::Vertex)
-            return Point<dim>(0);
+            return Point<dim>();
           break;
         }
       case 1:
