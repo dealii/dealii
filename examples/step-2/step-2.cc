@@ -184,7 +184,7 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   // Now that we have associated a degree of freedom with a global
   // number to each vertex, Let us output this information using the
   // function above:
-  write_dof_locations(dof_handler, "dof_locations_1.gnuplot");
+  write_dof_locations(dof_handler, "dof-locations-1.gnuplot");
 
   // In practice, we do not often care about where a degree of freedom
   // is geometrically located, and so other than seeing it once via
@@ -288,7 +288,7 @@ void renumber_dofs(DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee(dof_handler);
 
-  write_dof_locations(dof_handler, "dof_locations_2.gnuplot");
+  write_dof_locations(dof_handler, "dof-locations-2.gnuplot");
 
 
   DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),

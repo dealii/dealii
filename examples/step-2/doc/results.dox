@@ -11,7 +11,7 @@ programs; maybe not the easiest to use since it is command line driven, but
 also universally available on all Linux and other Unix-like systems). The
 command that produces the following pictures reads as follows:
 ```
-plot [-0.1:2.1][-1.1:1.1] "mesh.gnuplot" with lines, "dof_locations_1.gnuplot" using 1:2:3 with labels point offset .3,.2 font "4,6"
+plot [-0.1:2.1][-1.1:1.1] "mesh.gnuplot" with lines, "dof-locations-1.gnuplot" using 1:2:3 with labels point offset .3,.2 font "4,6"
 ```
 This may be cryptic, but what exactly this does is also not particularly important and you shouldn't
 spend too much time understanding what it does. Rather, the important part is
