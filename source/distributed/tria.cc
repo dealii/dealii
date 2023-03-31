@@ -3083,6 +3083,7 @@ namespace parallel
                    ExcInternalError());
           }
 
+#  ifdef DEBUG
         // count the number of owned, active cells and compare with p4est.
         unsigned int n_owned = 0;
         for (const auto &cell : this->active_cell_iterators())
@@ -3094,6 +3095,7 @@ namespace parallel
         Assert(static_cast<unsigned int>(
                  parallel_forest->local_num_quadrants) == n_owned,
                ExcInternalError());
+#  endif
       }
 
       this->smooth_grid = save_smooth;
