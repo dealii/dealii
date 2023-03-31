@@ -46,12 +46,12 @@ namespace MemorySpace
     using kokkos_space = ::Kokkos::DefaultExecutionSpace::memory_space;
   };
 
+#ifdef DEAL_II_WITH_CUDA
   /**
    * Structure describing CUDA memory space.
    */
-  // FIXME Only enable if CUDA is enabled in deal.II.
   using CUDA = Default;
-
+#endif
 } // namespace MemorySpace
 
 DEAL_II_NAMESPACE_CLOSE

@@ -18,7 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/cuda_size.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/table.h>

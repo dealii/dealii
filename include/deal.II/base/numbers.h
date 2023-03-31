@@ -450,7 +450,7 @@ namespace numbers
      * template is selected if number is not a complex data type, this
      * function simply returns the given number.
      *
-     * @note This function can also be used in CUDA device code.
+     * @note This function can also be used in device code.
      */
     static constexpr DEAL_II_HOST_DEVICE const number &
                                                conjugate(const number &x);
@@ -460,7 +460,7 @@ namespace numbers
      * general template is chosen for types not equal to std::complex, this
      * function simply returns the square of the given number.
      *
-     * @note If the template type can be used in CUDA device code, the same holds true
+     * @note If the template type can be used in device code, the same holds true
      * for this function.
      */
     static constexpr DEAL_II_HOST_DEVICE real_type
