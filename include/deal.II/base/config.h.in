@@ -467,12 +467,24 @@
 #endif
 
 /***********************************************************************
- * Two macro names that we put at the top and bottom of all deal.II files
- * and that will be expanded to "namespace dealii {" and "}".
+ * Two macro names that we put at the top and bottom of all deal.III files
+ * and that will be expanded to "namespace dealiii {" and "}".
  */
 
-#define DEAL_II_NAMESPACE_OPEN namespace dealii {
+#define DEAL_II_NAMESPACE_OPEN namespace dealiii {
 #define DEAL_II_NAMESPACE_CLOSE }
+
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
+/***********************************************************************
+ * Support the old namespace for backwards compatibility.
+ */
+namespace DEAL_II_DEPRECATED dealii
+{
+  using namespace dealiii;
+}
+
 
 /***********************************************************************
  * Two macros to guard external header includes.
