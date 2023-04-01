@@ -1694,7 +1694,6 @@ namespace parallel
 {
   namespace distributed
   {
-    /*----------------- class Triangulation<dim,spacedim> ---------------\*/
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::Triangulation(
       const MPI_Comm &mpi_communicator,
@@ -4189,7 +4188,6 @@ namespace parallel
     {
       Assert(false, ExcNotImplemented());
     }
-
   } // namespace distributed
 } // namespace parallel
 
