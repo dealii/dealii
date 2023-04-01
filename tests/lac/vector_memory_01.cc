@@ -15,8 +15,8 @@
 
 
 // Test that we can successfully fill a GrowingVectorMemory pool
-// with LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> objects.
-// Partially copied from lac/vector_memory.cc
+// with LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+// objects. Partially copied from lac/vector_memory.cc
 
 
 #include <deal.II/base/exceptions.h>
@@ -69,8 +69,8 @@ main(int argc, char *argv[])
   initlog();
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
-  test_stat<LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>();
-  test_stat<LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>();
+  test_stat<LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>();
+  test_stat<LinearAlgebra::distributed::Vector<float, MemorySpace::Default>>();
 
   return 0;
 }

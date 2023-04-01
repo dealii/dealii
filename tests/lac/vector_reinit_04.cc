@@ -114,5 +114,5 @@ main(int argc, char **argv)
   initlog();
 
   do_test<
-    LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>>();
+    LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::Default>>();
 }
