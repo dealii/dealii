@@ -107,7 +107,7 @@ namespace LinearAlgebra
      *
      * In case Kokkos was configured with GPU support, this class performs its
      * actions on the GPU. In particular, there is no need for manually
-     * synchronizing memory between host and device.
+     * synchronizing memory between host and @ref GlossDevice "device".
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors

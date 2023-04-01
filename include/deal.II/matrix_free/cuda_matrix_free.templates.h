@@ -171,7 +171,7 @@ namespace CUDAWrappers
 
 
     /**
-     * Allocate an array to the device and copy @p array_host to the device.
+     * Allocate an array on the @ref GlossDevice "device" and copy @p array_host to the @ref GlossDevice "device".
      */
     template <typename Number1>
     void

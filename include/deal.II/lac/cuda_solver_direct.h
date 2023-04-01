@@ -54,7 +54,7 @@ namespace CUDAWrappers
       /**
        * Set the solver type. Possibilities are:
        * <ul>
-       * <li> "Cholesky" which performs a Cholesky decomposition on the device
+       * <li> "Cholesky" which performs a Cholesky decomposition on the @ref GlossDevice "device"
        * </li>
        * <li> "LU_dense" which converts the sparse matrix to a dense
        * matrix and uses LU factorization </li>

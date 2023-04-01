@@ -79,7 +79,7 @@ namespace CUDAWrappers
 
     /**
      * Constructor. Takes a Utilities::CUDA::Handle and a sparse matrix on the
-     * host. The sparse matrix on the host is copied on the device and the
+     * host. The sparse matrix on the host is copied on the @ref GlossDevice "device" and the
      * elements are reordered according to the format supported by cuSPARSE.
      */
     SparseMatrix(Utilities::CUDA::Handle &             handle,
@@ -115,7 +115,7 @@ namespace CUDAWrappers
 
     /**
      * Reinitialize the sparse matrix. The sparse matrix on the host is copied
-     * to the device and the elementes are reordered according to the format
+     * to the @ref GlossDevice "device" and the elementes are reordered according to the format
      * supported by cuSPARSE.
      */
     void
@@ -349,17 +349,17 @@ namespace CUDAWrappers
     int n_cols;
 
     /**
-     * Pointer to the values (on the device) of the sparse matrix.
+     * Pointer to the values (on the @ref GlossDevice "device") of the sparse matrix.
      */
     std::unique_ptr<Number[], void (*)(Number *)> val_dev;
 
     /**
-     * Pointer to the column indices (on the device) of the sparse matrix.
+     * Pointer to the column indices (on the @ref GlossDevice "device") of the sparse matrix.
      */
     std::unique_ptr<int[], void (*)(int *)> column_index_dev;
 
     /**
-     * Pointer to the row pointer (on the device) of the sparse matrix.
+     * Pointer to the row pointer (on the @ref GlossDevice "device") of the sparse matrix.
      */
     std::unique_ptr<int[], void (*)(int *)> row_ptr_dev;
 

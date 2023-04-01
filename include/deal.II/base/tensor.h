@@ -141,7 +141,7 @@ public:
   /**
    * Constructor. Set to zero.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
   Tensor();
@@ -151,7 +151,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE
@@ -160,7 +160,7 @@ public:
   /**
    * Constructor, where the data is copied from a C-style array.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE
@@ -236,7 +236,7 @@ public:
    * This is the non-const conversion operator that returns a writable
    * reference.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
   operator Number &();
@@ -247,7 +247,7 @@ public:
    *
    * This is the const conversion operator that returns a read-only reference.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE operator const Number &() const;
 
@@ -256,7 +256,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -269,7 +269,7 @@ public:
    * copy constructor for Sacado::Rad::ADvar types automatically.
    * See https://github.com/dealii/dealii/pull/5865.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor &
                                 operator=(const Tensor<0, dim, Number> &rhs);
@@ -287,7 +287,7 @@ public:
    * This operator assigns a scalar to a tensor. This obviously requires
    * that the @p OtherNumber type is convertible to @p Number.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -319,7 +319,7 @@ public:
   /**
    * Add another scalar.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -328,7 +328,7 @@ public:
   /**
    * Subtract another scalar.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -337,7 +337,7 @@ public:
   /**
    * Multiply the scalar with a <tt>factor</tt>.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -346,7 +346,7 @@ public:
   /**
    * Divide the scalar by <tt>factor</tt>.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -355,7 +355,7 @@ public:
   /**
    * Tensor with inverted entries.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor
   operator-() const;
@@ -387,7 +387,7 @@ public:
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE real_type
   norm_square() const;
@@ -558,7 +558,7 @@ public:
   /**
    * Constructor. Initialize all entries to zero.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   Tensor();
@@ -566,7 +566,7 @@ public:
   /**
    * A constructor where the data is copied from a C-style array.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE explicit Tensor(const array_type &initializer);
 
@@ -581,7 +581,7 @@ public:
    * either equal to @p Number, or is convertible to @p Number.
    * Number.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename ElementType, typename MemorySpace>
   constexpr DEAL_II_HOST_DEVICE explicit Tensor(
@@ -592,7 +592,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE
@@ -627,7 +627,7 @@ public:
   /**
    * Read-Write access operator.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE value_type &
                                 operator[](const unsigned int i);
@@ -635,7 +635,7 @@ public:
   /**
    * Read-only access operator.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE const value_type &
                                       operator[](const unsigned int i) const;
@@ -681,7 +681,7 @@ public:
    * This obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -735,7 +735,7 @@ public:
   /**
    * Add another tensor.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -744,7 +744,7 @@ public:
   /**
    * Subtract another tensor.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -754,7 +754,7 @@ public:
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -763,7 +763,7 @@ public:
   /**
    * Scale the vector by <tt>1/factor</tt>.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -772,7 +772,7 @@ public:
   /**
    * Unary minus operator. Negate all entries of a tensor.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor
   operator-() const;
@@ -797,7 +797,7 @@ public:
    * the absolute squares of all entries. For the present case of rank-1
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE
   typename numbers::NumberTraits<Number>::real_type
@@ -807,7 +807,7 @@ public:
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
     typename numbers::NumberTraits<Number>::real_type
@@ -897,7 +897,7 @@ private:
    * This constructor is for internal use. It provides a way
    * to create constexpr constructors for Tensor<rank, dim, Number>
    *
-   * @note This function can also be used in device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename ArrayLike, std::size_t... Indices>
   constexpr DEAL_II_HOST_DEVICE
@@ -1961,7 +1961,7 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -1981,7 +1981,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2001,7 +2001,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * OtherNumber that are stored within the Tensor and multiplies them. It
  * returns an unwrapped number of product type.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2019,7 +2019,7 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Division of a tensor of rank 0 by a scalar number.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2038,7 +2038,7 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Add two tensors of rank 0.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2055,7 +2055,7 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 /**
  * Subtract two tensors of rank 0.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2077,7 +2077,7 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2105,7 +2105,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2176,7 +2176,7 @@ namespace internal
  * discussion on operator*() above for more information about template
  * arguments and the return type.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2197,7 +2197,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  *
  * @tparam rank The rank of both tensors.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2221,7 +2221,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  *
  * @tparam rank The rank of both tensors.
  *
- * @note This function can also be used in device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */

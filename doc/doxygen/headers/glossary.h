@@ -728,6 +728,16 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossDevice <b>Device</b></dt>
+ *
+ * <dd> We commonly refer to GPUs as "devices" in deal.II. The context is
+ * always related to Kokkos or CUDA that motivated using this term.
+ * Occasionally, we also call data corresponding to MemorySpace::Default "device data"
+ * (even though it is allocated in CPU memory if Kokkos was configured without
+ * a GPU backend) to distinguish between MemorySpace::Default and MemorySpace::Host.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossDimension <b>Dimensions `dim` and `spacedim`</b></dt>
  *
  * <dd> Many classes and functions in deal.II have two template parameters,

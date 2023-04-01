@@ -220,8 +220,8 @@ namespace LinearAlgebra
      * necessary. Since an MPI communication may be performed, import needs to
      * be called on all the processors.
      *
-     * @note By default, the GPU device id is chosen in a round-robin fashion
-     * according to the local MPI rank id. To choose a different device, Kokkos
+     * @note By default, the GPU @ref GlossDevice "device" id is chosen in a round-robin fashion
+     * according to the local MPI rank id. To choose a different @ref GlossDevice "device", Kokkos
      * has to be initialized explicitly providing the respective devide id
      * explicitly.
      *
@@ -578,7 +578,7 @@ namespace LinearAlgebra
        * Must follow a call to the @p compress_start function.
        *
        * When the MemorySpace is Default and MPI is not GPU-aware, data changed
-       * on the device after the call to compress_start will be lost.
+       * on the @ref GlossDevice "device" after the call to compress_start will be lost.
        */
       void
       compress_finish(VectorOperation::values operation);
@@ -734,7 +734,7 @@ namespace LinearAlgebra
        * improve performance.
        *
        * @note If the MemorySpace is Default, the data in the ReadWriteVector will
-       * be moved to the device.
+       * be moved to the @ref GlossDevice "device".
        */
       virtual void
       import(const LinearAlgebra::ReadWriteVector<Number> &V,
@@ -968,7 +968,7 @@ namespace LinearAlgebra
        * It holds that end() - begin() == locally_owned_size().
        *
        * @note For the Default memory space, the iterator might point to memory
-       * on the device.
+       * on the @ref GlossDevice "device".
        */
       iterator
       begin();
@@ -978,7 +978,7 @@ namespace LinearAlgebra
        * of the vector.
        *
        * @note For the Default memory space, the iterator might point to memory
-       * on the device.
+       * on the @ref GlossDevice "device".
        */
       const_iterator
       begin() const;
@@ -988,7 +988,7 @@ namespace LinearAlgebra
        * of locally owned entries.
        *
        * @note For the Default memory space, the iterator might point to memory
-       * on the device.
+       * on the @ref GlossDevice "device".
        */
       iterator
       end();
@@ -998,7 +998,7 @@ namespace LinearAlgebra
        * the array of the locally owned entries.
        *
        * @note For the Default memory space, the iterator might point to memory
-       * on the device.
+       * on the @ref GlossDevice "device".
        */
       const_iterator
       end() const;
@@ -1072,7 +1072,7 @@ namespace LinearAlgebra
        * Return the pointer to the underlying raw array.
        *
        * @note For the Default memory space, the pointer might point to memory
-       * on the device.
+       * on the @ref GlossDevice "device".
        */
       Number *
       get_values() const;
