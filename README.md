@@ -1,7 +1,7 @@
-What is deal.II?
+What is deal.III?
 ================
 
-deal.II is a C++ program library targeted at the computational solution
+deal.III is a C++ program library targeted at the computational solution
 of partial differential equations using adaptive finite elements. It uses
 state-of-the-art programming techniques to offer you a modern interface
 to the complex data structures and algorithms required.
@@ -9,8 +9,8 @@ to the complex data structures and algorithms required.
 For the impatient:
 ------------------
 
-Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources. 
-Then configure, compile, and install the deal.II library with:
+Let's say you've unpacked the .tar.gz file into a directory /path/to/dealii/sources.
+Then configure, compile, and install the deal.III library with:
 
     $ mkdir build
     $ cd build
@@ -34,10 +34,10 @@ Getting started:
 
 The tutorial steps are located under examples/ of the installation.
 Information about the tutorial steps can be found at
-[./doc/doxygen/tutorial/index.html](https://dealii.org/developer/doxygen/deal.II/Tutorial.html)
+[./doc/doxygen/tutorial/index.html](https://dealii.org/developer/doxygen/deal.III/Tutorial.html)
 or at https://www.dealii.org/.
 
-deal.II includes support for pretty-printing deal.II objects inside GDB.
+deal.III includes support for pretty-printing deal.III objects inside GDB.
 See [`contrib/utilities/dotgdbinit.py`](contrib/utilities/dotgdbinit.py) or
 the new documentation page (under 'information for users') for instructions
 on how to set this up.
@@ -67,7 +67,7 @@ Continuous Integration Status:
 | MacOS  | [![Build Status](https://github.com/dealii/dealii/workflows/github-OSX/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-OSX)                                                                                         | See https://github.com/dealii/dealii/actions                                          |
 | MSVC   | [![Build status](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows)                                                                                 | See https://github.com/dealii/dealii/actions                                          |
 | Docker | [![Build status](https://github.com/dealii/dealii/workflows/github-docker/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-docker)                                                                                   | See https://github.com/dealii/dealii/actions                                          |
-| CDash  | [![cdash](https://img.shields.io/website?down_color=lightgrey&down_message=offline&label=CDash&up_color=green&up_message=up&url=https%3A%2F%2Fcdash.dealii.org%2Findex.php%3Fproject%3Ddeal.II)](https://cdash.dealii.org/index.php?project=deal.II) | Various builds and configurations on https://cdash.dealii.org/index.php?project=deal.II |
+| CDash  | [![cdash](https://img.shields.io/website?down_color=lightgrey&down_message=offline&label=CDash&up_color=green&up_message=up&url=https%3A%2F%2Fcdash.dealii.org%2Findex.php%3Fproject%3Ddeal.III)](https://cdash.dealii.org/index.php?project=deal.III) | Various builds and configurations on https://cdash.dealii.org/index.php?project=deal.III |
 
 Docker Images:
 -------------
@@ -81,6 +81,6 @@ by running, for example:
     $ docker run --rm -t -i dealii/dealii:master-focal
 
 The above command would drop you into an isolated environment, in which you 
-will find the latest version of deal.II (master development branch) installed
+will find the latest version of deal.III (master development branch) installed
 under `/usr/local`.
 
