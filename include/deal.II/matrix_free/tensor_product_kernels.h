@@ -3376,34 +3376,60 @@ namespace internal
   inline void
   do_apply_test_functions_xy(
     AlignedVector<Number2> &                          values,
-    const std::vector<unsigned int> &                 renumber,
     const ArrayView<dealii::ndarray<Number, 2, dim>> &shapes,
     const std::array<Number2, 3> &                    test_grads_value,
     const int                                         n_shapes_runtime,
     int &                                             i)
   {
-    const int n_shapes = length > 0 ? length : n_shapes_runtime;
-    for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+    if (length > 0)
       {
-        const Number2 test_value_y =
-          dim > 1 ? (test_grads_value[2] * shapes[i1][0][1] +
-                     test_grads_value[1] * shapes[i1][1][1]) :
-                    test_grads_value[2];
-        const Number2 test_grad_xy = dim > 1 ?
-                                       test_grads_value[0] * shapes[i1][0][1] :
-                                       test_grads_value[0];
-        if (renumber.empty())
-          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-            {
-              values[i] += shapes[i0][0][0] * test_value_y;
-              values[i] += shapes[i0][1][0] * test_grad_xy;
-            }
-        else
-          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-            {
-              values[renumber[i]] += shapes[i0][0][0] * test_value_y;
-              values[renumber[i]] += shapes[i0][1][0] * test_grad_xy;
-            }
+        constexpr unsigned int         array_size = length > 0 ? length : 1;
+        std::array<Number, array_size> shape_values_x;
+        std::array<Number, array_size> shape_derivs_x;
+        for (unsigned int i = 0; i < array_size; ++i)
+          {
+            shape_values_x[i] = shapes[i][0][0];
+            shape_derivs_x[i] = shapes[i][1][0];
+          }
+        for (unsigned int i1 = 0; i1 < (dim > 1 ? length : 1); ++i1)
+          {
+            const Number2 test_value_y =
+              dim > 1 ? (test_grads_value[2] * shapes[i1][0][1] +
+                         test_grads_value[1] * shapes[i1][1][1]) :
+                        test_grads_value[2];
+            const Number2 test_grad_xy =
+              dim > 1 ? test_grads_value[0] * shapes[i1][0][1] :
+                        test_grads_value[0];
+
+            Number2 *values_ptr = values.data() + i + i1 * length;
+            for (unsigned int i0 = 0; i0 < length; ++i0)
+              {
+                values_ptr[i0] += shape_values_x[i0] * test_value_y;
+                values_ptr[i0] += shape_derivs_x[i0] * test_grad_xy;
+              }
+          }
+        i += (dim > 1 ? length * length : length);
+      }
+    else
+      {
+        for (int i1 = 0; i1 < (dim > 1 ? n_shapes_runtime : 1); ++i1)
+          {
+            const Number2 test_value_y =
+              dim > 1 ? (test_grads_value[2] * shapes[i1][0][1] +
+                         test_grads_value[1] * shapes[i1][1][1]) :
+                        test_grads_value[2];
+            const Number2 test_grad_xy =
+              dim > 1 ? test_grads_value[0] * shapes[i1][0][1] :
+                        test_grads_value[0];
+
+            Number2 *values_ptr = values.data() + i + i1 * n_shapes_runtime;
+            for (int i0 = 0; i0 < n_shapes_runtime; ++i0)
+              {
+                values_ptr[i0] += shapes[i0][0][0] * test_value_y;
+                values_ptr[i0] += shapes[i0][1][0] * test_grad_xy;
+              }
+          }
+        i += (dim > 1 ? n_shapes_runtime * n_shapes_runtime : n_shapes_runtime);
       }
   }
 
@@ -3419,15 +3445,12 @@ namespace internal
     const int                                         n_shapes,
     const Number2 &                                   value,
     const Tensor<1, dim, Number2> &                   gradient,
-    AlignedVector<Number2> &                          values,
-    const std::vector<unsigned int> &                 renumber = {})
+    AlignedVector<Number2> &                          values)
   {
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
     // as in evaluate, use `int` type to produce better code in this context
     AssertDimension(Utilities::pow(n_shapes, dim), values.size());
-    Assert(renumber.empty() || renumber.size() == values.size(),
-           ExcDimensionMismatch(renumber.size(), values.size()));
 
     // Implement the transpose of the function above
     std::array<Number2, 3> test_grads_value;
@@ -3449,22 +3472,22 @@ namespace internal
         // cases
         if (n_shapes == 2)
           do_apply_test_functions_xy<dim, 2, Number2, Number>(
-            values, renumber, shapes, test_grads_value, n_shapes, i);
+            values, shapes, test_grads_value, n_shapes, i);
         else if (n_shapes == 3)
           do_apply_test_functions_xy<dim, 3, Number2, Number>(
-            values, renumber, shapes, test_grads_value, n_shapes, i);
+            values, shapes, test_grads_value, n_shapes, i);
         else if (n_shapes == 4)
           do_apply_test_functions_xy<dim, 4, Number2, Number>(
-            values, renumber, shapes, test_grads_value, n_shapes, i);
+            values, shapes, test_grads_value, n_shapes, i);
         else if (n_shapes == 5)
           do_apply_test_functions_xy<dim, 5, Number2, Number>(
-            values, renumber, shapes, test_grads_value, n_shapes, i);
+            values, shapes, test_grads_value, n_shapes, i);
         else if (n_shapes == 6)
           do_apply_test_functions_xy<dim, 6, Number2, Number>(
-            values, renumber, shapes, test_grads_value, n_shapes, i);
+            values, shapes, test_grads_value, n_shapes, i);
         else
           do_apply_test_functions_xy<dim, -1, Number2, Number>(
-            values, renumber, shapes, test_grads_value, n_shapes, i);
+            values, shapes, test_grads_value, n_shapes, i);
       }
   }
 
@@ -3481,19 +3504,14 @@ namespace internal
     const Number2 &                                     value,
     const Tensor<1, dim, Number2> &                     gradient,
     AlignedVector<Number2> &                            values,
-    const Point<dim, Number> &                          p,
-    const std::vector<unsigned int> &                   renumber = {})
+    const Point<dim, Number> &                          p)
   {
     (void)poly;
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
     AssertDimension(Utilities::pow(poly.size(), dim), values.size());
-    Assert(renumber.empty() || renumber.size() == values.size(),
-           ExcDimensionMismatch(renumber.size(), values.size()));
 
     AssertDimension(poly.size(), 2);
-    for (unsigned int i = 0; i < renumber.size(); ++i)
-      AssertDimension(renumber[i], i);
 
     if (dim == 1)
       {
