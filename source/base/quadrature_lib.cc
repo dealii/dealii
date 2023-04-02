@@ -2266,6 +2266,10 @@ template Quadrature<3>
 QSimplex<3>::compute_affine_transformation(
   const std::array<Point<3>, 3 + 1> &vertices) const;
 
+template Quadrature<2>
+QSimplex<1>::mapped_quadrature(
+  const std::vector<std::array<Point<2>, 1 + 1>> &simplices) const;
+
 template Quadrature<3>
 QSimplex<1>::mapped_quadrature(
   const std::vector<std::array<Point<3>, 1 + 1>> &simplices) const;
