@@ -458,7 +458,7 @@ MGLevelGlobalTransfer<
 
 
 // explicit instantiation
-#include "mg_level_global_transfer.inst"
+#include "../multigrid/mg_level_global_transfer.inst"
 
 // create an additional instantiation currently not supported by the automatic
 // template instantiation scheme

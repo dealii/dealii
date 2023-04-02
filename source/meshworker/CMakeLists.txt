@@ -13,12 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  mesh_worker.cc
-  mesh_worker_info.cc
-  mesh_worker_vector_selector.cc
-  scratch_data.cc
-  )
 
 set(_inst
   mesh_worker_info.inst.in

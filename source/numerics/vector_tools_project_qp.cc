@@ -20,6 +20,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------
-#include "vector_tools_project_qp.inst"
+#include "../numerics/vector_tools_project_qp.inst"
 
 DEAL_II_NAMESPACE_CLOSE

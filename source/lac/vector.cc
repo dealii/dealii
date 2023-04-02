@@ -18,7 +18,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
-#  include "vector.inst"
+#  include "../lac/vector.inst"
 
 #  ifndef DEAL_II_WITH_COMPLEX_VALUES
 // instantiate for std::complex<double> since we are using it internally in

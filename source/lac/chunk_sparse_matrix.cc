@@ -17,5 +17,5 @@
 #include <deal.II/lac/chunk_sparse_matrix.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
-#include "chunk_sparse_matrix.inst"
+#include "../lac/chunk_sparse_matrix.inst"
 DEAL_II_NAMESPACE_CLOSE

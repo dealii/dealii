@@ -13,10 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  kinematics.cc
-  standard_tensors.cc
-  )
 
 set(_inst
   kinematics.inst.in

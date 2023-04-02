@@ -18,7 +18,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_tools_extrapolate.inst"
+#include "../fe/fe_tools_extrapolate.inst"
 
 
 /*----------------------------   fe_tools.cc     ---------------------------*/

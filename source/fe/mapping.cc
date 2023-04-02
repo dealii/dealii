@@ -301,7 +301,7 @@ get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation)
 
 
 // explicit instantiations
-#include "mapping.inst"
+#include "../fe/mapping.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

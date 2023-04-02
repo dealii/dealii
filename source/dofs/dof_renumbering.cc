@@ -2894,7 +2894,7 @@ namespace DoFRenumbering
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "dof_renumbering.inst"
+#include "../dofs/dof_renumbering.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

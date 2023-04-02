@@ -103,6 +103,6 @@ namespace Functions
 
 
 // Explicit instantiations
-#include "incremental_function.inst"
+#include "../base/incremental_function.inst"
 } // namespace Functions
 DEAL_II_NAMESPACE_CLOSE

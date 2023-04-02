@@ -1407,7 +1407,7 @@ FiniteElement<dim, spacedim>::base_element(const unsigned int index) const
 
 
 /*------------------------------- Explicit Instantiations -------------*/
-#include "fe.inst"
+#include "../fe/fe.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

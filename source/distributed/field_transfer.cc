@@ -320,7 +320,7 @@ namespace parallel
 } // namespace parallel
 
 // explicit instantiations
-#  include "field_transfer.inst"
+#  include "../distributed/field_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

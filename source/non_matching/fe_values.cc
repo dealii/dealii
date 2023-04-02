@@ -479,7 +479,7 @@ namespace NonMatching
   }
 
 
-#include "fe_values.inst"
+#include "../non_matching/fe_values.inst"
 
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE

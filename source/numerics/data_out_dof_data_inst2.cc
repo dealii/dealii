@@ -31,6 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 
 #define SPLIT_INSTANTIATIONS_COUNT 2
 #define SPLIT_INSTANTIATIONS_INDEX 1
-#include "data_out_dof_data.inst"
+#include "../numerics/data_out_dof_data.inst"
 
 DEAL_II_NAMESPACE_CLOSE

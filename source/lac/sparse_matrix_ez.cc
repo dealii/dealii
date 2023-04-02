@@ -17,5 +17,5 @@
 #include <deal.II/lac/sparse_matrix_ez.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
-#include "sparse_matrix_ez.inst"
+#include "../lac/sparse_matrix_ez.inst"
 DEAL_II_NAMESPACE_CLOSE

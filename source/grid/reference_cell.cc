@@ -855,6 +855,6 @@ ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const;
 template const Quadrature<0> &
 ReferenceCell::get_nodal_type_quadrature() const;
 
-#include "reference_cell.inst"
+#include "../grid/reference_cell.inst"
 
 DEAL_II_NAMESPACE_CLOSE

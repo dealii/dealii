@@ -1936,7 +1936,7 @@ MappingQ<dim, spacedim>::is_compatible_with(
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q.inst"
+#include "../fe/mapping_q.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -296,7 +296,7 @@ FE_DGP<dim, spacedim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_dgp.inst"
+#include "../fe/fe_dgp.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

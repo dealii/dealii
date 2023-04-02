@@ -622,6 +622,6 @@ namespace SmoothnessEstimator
 
 
 // explicit instantiations
-#include "smoothness_estimator.inst"
+#include "../numerics/smoothness_estimator.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -135,6 +135,6 @@ FE_RannacherTurek<dim>::convert_generalized_support_point_values_to_dof_values(
 
 
 // explicit instantiations
-#include "fe_rannacher_turek.inst"
+#include "../fe/fe_rannacher_turek.inst"
 
 DEAL_II_NAMESPACE_CLOSE

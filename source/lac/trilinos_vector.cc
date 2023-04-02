@@ -873,7 +873,7 @@ namespace TrilinosWrappers
 
     // explicit instantiations
 #  ifndef DOXYGEN
-#    include "trilinos_vector.inst"
+#    include "../lac/trilinos_vector.inst"
 #  endif
   } // namespace MPI
 } // namespace TrilinosWrappers

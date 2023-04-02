@@ -3193,7 +3193,7 @@ unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level() const
 }
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "dof_handler.inst"
+#include "../dofs/dof_handler.inst"
 
 
 

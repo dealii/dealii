@@ -221,6 +221,6 @@ namespace parallel
 
 
 // explicit instantiations
-#include "cell_weights.inst"
+#include "../distributed/cell_weights.inst"
 
 DEAL_II_NAMESPACE_CLOSE

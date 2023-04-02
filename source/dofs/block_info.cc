@@ -78,6 +78,6 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
 }
 
 // explicit instantiations
-#include "block_info.inst"
+#include "../dofs/block_info.inst"
 
 DEAL_II_NAMESPACE_CLOSE

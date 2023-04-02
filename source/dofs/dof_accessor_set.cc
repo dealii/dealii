@@ -317,6 +317,6 @@ DoFCellAccessor<dim, spacedim, lda>::
 
 // --------------------------------------------------------------------------
 // explicit instantiations
-#include "dof_accessor_set.inst"
+#include "../dofs/dof_accessor_set.inst"
 
 DEAL_II_NAMESPACE_CLOSE

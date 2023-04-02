@@ -722,7 +722,7 @@ FE_RaviartThomas<dim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_raviart_thomas.inst"
+#include "../fe/fe_raviart_thomas.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -13,12 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_unity_include_src
-  fe_collection.cc
-  fe_values.cc
-  mapping_collection.cc
-  refinement.cc
-  )
 
 set(_separate_src
   )

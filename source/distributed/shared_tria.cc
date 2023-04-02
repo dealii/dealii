@@ -580,6 +580,6 @@ namespace internal
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "shared_tria.inst"
+#include "../distributed/shared_tria.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -968,7 +968,7 @@ namespace internal
 #endif // DEAL_II_WITH_P4EST
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "p4est_wrappers.inst"
+#include "../distributed/p4est_wrappers.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

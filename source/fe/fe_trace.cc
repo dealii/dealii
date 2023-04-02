@@ -290,7 +290,7 @@ FE_TraceQ<1, spacedim>::get_name() const
 
 
 // explicit instantiations
-#include "fe_trace.inst"
+#include "../fe/fe_trace.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

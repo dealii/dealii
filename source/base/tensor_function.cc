@@ -18,6 +18,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-#include "tensor_function.inst"
+#include "../base/tensor_function.inst"
 
 DEAL_II_NAMESPACE_CLOSE

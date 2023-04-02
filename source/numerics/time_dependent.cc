@@ -1268,7 +1268,7 @@ TimeStepBase_Tria_Flags::RefinementData<dim>::RefinementData(
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "time_dependent.inst"
+#include "../numerics/time_dependent.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

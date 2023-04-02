@@ -13,53 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_unity_include_src
-  data_out.cc
-  data_out_faces.cc
-  data_out_rotation.cc
-  data_out_stack.cc
-  data_postprocessor.cc
-  dof_output_operator.cc
-  histogram.cc
-  matrix_tools_once.cc
-  matrix_tools.cc
-  time_dependent.cc
-  vector_tools_boundary.cc
-  vector_tools_constraints.cc
-  vector_tools_mean_value.cc
-  vector_tools_point_gradient.cc
-  vector_tools_rhs.cc
-  )
-
-set(_separate_src
-  cell_data_transfer.cc
-  data_out_dof_data.cc
-  data_out_dof_data_inst2.cc
-  data_out_dof_data_codim.cc
-  data_out_resample.cc
-  derivative_approximation.cc
-  error_estimator_1d.cc
-  error_estimator.cc
-  error_estimator_inst2.cc
-  fe_field_function.cc
-  matrix_creator.cc
-  matrix_creator_inst2.cc
-  matrix_creator_inst3.cc
-  point_value_history.cc
-  smoothness_estimator.cc
-  solution_transfer.cc
-  solution_transfer_inst2.cc
-  solution_transfer_inst3.cc
-  solution_transfer_inst4.cc
-  vector_tools_integrate_difference.cc
-  vector_tools_interpolate.cc
-  vector_tools_point_value.cc
-  vector_tools_project.cc
-  vector_tools_project_hp.cc
-  vector_tools_project_codim.cc
-  vector_tools_project_qp.cc
-  vector_tools_project_qpmf.cc
-  )
 
 # determined by profiling
 set(_n_includes_per_unity_file 8)

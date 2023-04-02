@@ -4223,7 +4223,7 @@ namespace internal
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "dof_handler_policy.inst"
+#include "../dofs/dof_handler_policy.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

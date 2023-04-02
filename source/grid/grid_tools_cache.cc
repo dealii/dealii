@@ -233,7 +233,7 @@ namespace GridTools
     return vertices_with_ghost_neighbors;
   }
 
-#include "grid_tools_cache.inst"
+#include "../grid/grid_tools_cache.inst"
 
 } // namespace GridTools
 

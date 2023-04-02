@@ -2771,6 +2771,6 @@ FESystem<dim, spacedim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_system.inst"
+#include "../fe/fe_system.inst"
 
 DEAL_II_NAMESPACE_CLOSE

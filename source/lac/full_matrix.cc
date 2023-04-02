@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "full_matrix.inst"
+#include "../lac/full_matrix.inst"
 
 #ifndef DOXYGEN
 

@@ -316,6 +316,6 @@ namespace FESeries
 
 
 // explicit instantiations
-#include "fe_series_fourier.inst"
+#include "../fe/fe_series_fourier.inst"
 
 DEAL_II_NAMESPACE_CLOSE

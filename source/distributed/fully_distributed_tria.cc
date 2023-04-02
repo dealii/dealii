@@ -776,7 +776,7 @@ namespace parallel
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fully_distributed_tria.inst"
+#include "../distributed/fully_distributed_tria.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

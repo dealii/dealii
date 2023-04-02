@@ -4872,6 +4872,6 @@ namespace
 
 
 // explicit instantiations
-#include "grid_in.inst"
+#include "../grid/grid_in.inst"
 
 DEAL_II_NAMESPACE_CLOSE

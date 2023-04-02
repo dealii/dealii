@@ -58,7 +58,7 @@ namespace hp
 
 
 // explicit instantiations
-#include "mapping_collection.inst"
+#include "../hp/mapping_collection.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

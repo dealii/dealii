@@ -5184,7 +5184,7 @@ GridOut::write(const Triangulation<dim, spacedim> &tria,
 
 
 // explicit instantiations
-#include "grid_out.inst"
+#include "../grid/grid_out.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

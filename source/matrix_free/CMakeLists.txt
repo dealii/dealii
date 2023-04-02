@@ -13,30 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  dof_info.cc
-  evaluation_template_factory.cc
-  evaluation_template_factory_inst2.cc
-  evaluation_template_factory_inst3.cc
-  evaluation_template_factory_inst4.cc
-  evaluation_template_factory_inst5.cc
-  evaluation_template_factory_inst6.cc
-  evaluation_template_factory_hanging_nodes.cc
-  evaluation_template_face_factory.cc
-  evaluation_template_face_factory_inst2.cc
-  evaluation_template_face_factory_inst3.cc
-  evaluation_template_face_factory_inst4.cc
-  evaluation_template_face_factory_inst5.cc
-  evaluation_template_face_factory_inst6.cc
-  fe_point_evaluation.cc
-  mapping_info.cc
-  mapping_info_inst2.cc
-  mapping_info_inst3.cc
-  matrix_free.cc
-  shape_info.cc
-  task_info.cc
-  vector_data_exchange.cc
-  )
 
 set(_inst
   evaluation_template_factory.inst.in

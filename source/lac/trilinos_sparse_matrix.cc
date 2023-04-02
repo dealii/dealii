@@ -3005,7 +3005,7 @@ namespace TrilinosWrappers
 
 
 // explicit instantiations
-#  include "trilinos_sparse_matrix.inst"
+#  include "../lac/trilinos_sparse_matrix.inst"
 
 #  ifndef DOXYGEN
 // TODO: put these instantiations into generic file

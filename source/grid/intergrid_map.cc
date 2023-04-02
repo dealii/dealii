@@ -212,6 +212,6 @@ std::size_t InterGridMap<MeshType>::memory_consumption() const
 
 
 // explicit instantiations
-#include "intergrid_map.inst"
+#include "../grid/intergrid_map.inst"
 
 DEAL_II_NAMESPACE_CLOSE

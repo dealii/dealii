@@ -18,7 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "read_write_vector.inst"
+#include "../lac/read_write_vector.inst"
 
 namespace LinearAlgebra
 {

@@ -668,7 +668,7 @@ FE_DGPNonparametric<dim, spacedim>::get_degree() const
 
 
 // explicit instantiations
-#include "fe_dgp_nonparametric.inst"
+#include "../fe/fe_dgp_nonparametric.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

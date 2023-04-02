@@ -25,7 +25,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-#include "mesh_worker_info.inst"
+#include "../meshworker/mesh_worker_info.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

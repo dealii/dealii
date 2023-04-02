@@ -352,7 +352,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
 
 
 // explicit instantiations
-#include "fe_rt_bubbles.inst"
+#include "../fe/fe_rt_bubbles.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

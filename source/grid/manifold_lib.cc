@@ -2629,6 +2629,6 @@ TransfiniteInterpolationManifold<dim, spacedim>::get_new_points(
 
 
 // explicit instantiations
-#include "manifold_lib.inst"
+#include "../grid/manifold_lib.inst"
 
 DEAL_II_NAMESPACE_CLOSE

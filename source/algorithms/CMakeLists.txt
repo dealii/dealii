@@ -13,11 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  general_data_storage.cc
-  operator.cc
-  timestep_control.cc
-  )
 
 set(_inst
   operator.inst.in

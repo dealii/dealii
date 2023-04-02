@@ -2326,7 +2326,7 @@ MappingFE<dim, spacedim>::is_compatible_with(
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_fe.inst"
+#include "../fe/mapping_fe.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

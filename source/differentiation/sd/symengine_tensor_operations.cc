@@ -294,7 +294,7 @@ namespace Differentiation
 
 /* --- Explicit instantiations --- */
 
-#  include "symengine_tensor_operations.inst"
+#  include "../differentiation/sd/symengine_tensor_operations.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

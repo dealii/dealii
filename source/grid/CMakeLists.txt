@@ -29,35 +29,6 @@ if(DEAL_II_WITH_CGAL)
     )
 endif()
 
-set(_unity_include_src
-  cell_id.cc
-  grid_refinement.cc
-  grid_reordering.cc
-  intergrid_map.cc
-  manifold.cc
-  manifold_lib.cc
-  persistent_tria.cc
-  reference_cell.cc
-  tria_accessor.cc
-  tria_description.cc
-  tria_faces.cc
-  tria_levels.cc
-  tria_objects.cc
-  )
-
-set(_separate_src
-  grid_generator.cc
-  grid_generator_cgal.cc
-  grid_generator_from_name.cc
-  grid_generator_pipe_junction.cc
-  grid_in.cc
-  grid_out.cc
-  grid_tools_cache.cc
-  grid_tools.cc
-  grid_tools_dof_handlers.cc
-  grid_tools_nontemplates.cc
-  tria.cc
-  )
 
 # include all files in the unity file
 set(_n_includes_per_unity_file 20)

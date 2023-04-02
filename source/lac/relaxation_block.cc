@@ -18,5 +18,5 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
-#include "relaxation_block.inst"
+#include "../lac/relaxation_block.inst"
 DEAL_II_NAMESPACE_CLOSE

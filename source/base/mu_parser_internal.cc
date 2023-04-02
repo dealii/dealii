@@ -475,7 +475,7 @@ namespace internal
     }
 
 // explicit instantiations
-#include "mu_parser_internal.inst"
+#include "../base/mu_parser_internal.inst"
 
   } // namespace FunctionParser
 } // namespace internal

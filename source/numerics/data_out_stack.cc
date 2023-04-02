@@ -494,7 +494,7 @@ DataOutStack<dim, spacedim>::get_dataset_names() const
 
 
 // explicit instantiations
-#include "data_out_stack.inst"
+#include "../numerics/data_out_stack.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -27,6 +27,6 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-#include "mapping_info.inst"
+#include "../matrix_free/mapping_info.inst"
 
 DEAL_II_NAMESPACE_CLOSE

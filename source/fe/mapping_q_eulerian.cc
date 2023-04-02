@@ -217,7 +217,7 @@ MappingQEulerian<dim, VectorType, spacedim>::fill_fe_values(
 
 
 // explicit instantiations
-#include "mapping_q_eulerian.inst"
+#include "../fe/mapping_q_eulerian.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

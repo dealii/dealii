@@ -639,6 +639,6 @@ namespace GridGenerator
 
 
 // explicit instantiations
-#include "grid_generator_pipe_junction.inst"
+#include "../grid/grid_generator_pipe_junction.inst"
 
 DEAL_II_NAMESPACE_CLOSE

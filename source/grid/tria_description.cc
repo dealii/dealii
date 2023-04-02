@@ -1095,7 +1095,7 @@ namespace TriangulationDescription
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "tria_description.inst"
+#include "../grid/tria_description.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

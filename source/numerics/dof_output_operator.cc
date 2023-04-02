@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Algorithms
 {
-#include "dof_output_operator.inst"
+#include "../numerics/dof_output_operator.inst"
 }
 
 DEAL_II_NAMESPACE_CLOSE

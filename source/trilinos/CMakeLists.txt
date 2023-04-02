@@ -15,9 +15,6 @@
 
 include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-set(_src
-  nox.cc
-  )
 
 set(_inst
   nox.inst.in

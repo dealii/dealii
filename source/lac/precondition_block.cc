@@ -17,5 +17,5 @@
 #include <deal.II/lac/sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
-#include "precondition_block.inst"
+#include "../lac/precondition_block.inst"
 DEAL_II_NAMESPACE_CLOSE

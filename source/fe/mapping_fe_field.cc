@@ -2451,7 +2451,7 @@ MappingFEField<dim, spacedim, VectorType>::update_internal_dofs(
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-#include "mapping_fe_field.inst"
+#include "../fe/mapping_fe_field.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

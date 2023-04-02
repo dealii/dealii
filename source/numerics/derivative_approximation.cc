@@ -1140,7 +1140,7 @@ namespace DerivativeApproximation
 
 
 // --------------------------- explicit instantiations ---------------------
-#include "derivative_approximation.inst"
+#include "../numerics/derivative_approximation.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

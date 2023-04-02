@@ -913,7 +913,7 @@ namespace OpenCASCADE
     tria.create_triangulation(vertices, cells, t);
   }
 
-#  include "utilities.inst"
+#  include "../opencascade/utilities.inst"
 
 } // namespace OpenCASCADE
 

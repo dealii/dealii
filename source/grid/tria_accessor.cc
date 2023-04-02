@@ -3539,6 +3539,6 @@ InvalidAccessor<structdim, dim, spacedim>::index()
 
 
 // explicit instantiations
-#include "tria_accessor.inst"
+#include "../grid/tria_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE

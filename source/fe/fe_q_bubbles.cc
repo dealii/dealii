@@ -551,6 +551,6 @@ FE_Q_Bubbles<dim, spacedim>::compare_for_domination(
 
 
 // explicit instantiations
-#include "fe_q_bubbles.inst"
+#include "../fe/fe_q_bubbles.inst"
 
 DEAL_II_NAMESPACE_CLOSE

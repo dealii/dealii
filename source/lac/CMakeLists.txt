@@ -13,51 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_unity_include_src
-  affine_constraints.cc
-  block_sparse_matrix.cc
-  block_sparse_matrix_ez.cc
-  block_sparsity_pattern.cc
-  block_vector.cc
-  chunk_sparse_matrix.cc
-  chunk_sparsity_pattern.cc
-  dynamic_sparsity_pattern.cc
-  exceptions.cc
-  scalapack.cc
-  la_vector.cc
-  la_parallel_vector.cc
-  la_parallel_block_vector.cc
-  matrix_out.cc
-  precondition_block.cc
-  precondition_block_ez.cc
-  relaxation_block.cc
-  read_write_vector.cc
-  solver.cc
-  solver_control.cc
-  sparse_decomposition.cc
-  sparse_direct.cc
-  sparse_ilu.cc
-  sparse_matrix_ez.cc
-  sparse_mic.cc
-  sparse_vanka.cc
-  sparsity_pattern_base.cc
-  sparsity_pattern.cc
-  sparsity_tools.cc
-  tensor_product_matrix.cc
-  vector.cc
-  vector_memory.cc
-  )
-
-# make sure that files requiring the LAPACK wrappers are compiled separately.
-set(_separate_src
-  full_matrix.cc
-  lapack_full_matrix.cc
-  qr.cc
-  sparse_matrix.cc
-  sparse_matrix_inst2.cc
-  tridiagonal_matrix.cc
-  utilities.cc
-  )
 
 # Add CUDA wrapper files
 if(DEAL_II_WITH_CUDA)

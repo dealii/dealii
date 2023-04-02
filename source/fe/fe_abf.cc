@@ -652,6 +652,6 @@ FE_ABF<dim>::memory_consumption() const
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_abf.inst"
+#include "../fe/fe_abf.inst"
 
 DEAL_II_NAMESPACE_CLOSE

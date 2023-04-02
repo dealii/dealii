@@ -42,7 +42,7 @@ namespace internal
 {
   namespace DoFHandlerImplementation
   {
-#include "dof_objects.inst"
+#include "../dofs/dof_objects.inst"
   }
 } // namespace internal
 

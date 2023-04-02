@@ -270,6 +270,6 @@ namespace Utilities
   } // end of namespace MPI
 } // end of namespace Utilities
 
-#include "mpi_remote_point_evaluation.inst"
+#include "../base/mpi_remote_point_evaluation.inst"
 
 DEAL_II_NAMESPACE_CLOSE

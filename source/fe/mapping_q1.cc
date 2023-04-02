@@ -36,7 +36,7 @@ MappingQ1<dim, spacedim>::clone() const
 }
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q1.inst"
+#include "../fe/mapping_q1.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

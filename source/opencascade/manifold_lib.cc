@@ -566,7 +566,7 @@ namespace OpenCASCADE
   }
 
 // Explicit instantiations
-#  include "manifold_lib.inst"
+#  include "../opencascade/manifold_lib.inst"
 } // end namespace OpenCASCADE
 
 DEAL_II_NAMESPACE_CLOSE

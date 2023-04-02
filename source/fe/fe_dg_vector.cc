@@ -101,6 +101,6 @@ FE_DGBDM<dim, spacedim>::get_name() const
 }
 
 
-#include "fe_dg_vector.inst"
+#include "../fe/fe_dg_vector.inst"
 
 DEAL_II_NAMESPACE_CLOSE

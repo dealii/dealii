@@ -29,7 +29,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "vector_memory.inst"
+#include "../lac/vector_memory.inst"
 template class VectorMemory<
   LinearAlgebra::distributed::Vector<float, MemorySpace::Default>>;
 template class VectorMemory<
@@ -51,7 +51,7 @@ namespace internal
     void
     release_all_unused_memory()
     {
-#include "vector_memory_release.inst"
+#include "../lac/vector_memory_release.inst"
       dealii::GrowingVectorMemory<dealii::LinearAlgebra::distributed::Vector<
         float,
         MemorySpace::Default>>::release_unused_memory();

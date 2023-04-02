@@ -21,7 +21,7 @@ namespace internal
 {
   namespace TensorProductMatrixSymmetricSum
   {
-#include "tensor_product_matrix.inst"
+#include "../lac/tensor_product_matrix.inst"
 
   }
 } // namespace internal

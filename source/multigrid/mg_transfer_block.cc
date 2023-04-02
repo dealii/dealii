@@ -640,7 +640,7 @@ MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
 
 
 // explicit instantiations
-#include "mg_transfer_block.inst"
+#include "../multigrid/mg_transfer_block.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

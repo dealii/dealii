@@ -638,7 +638,7 @@ namespace parallel
 
 
 // explicit instantiations
-#  include "grid_refinement.inst"
+#  include "../distributed/grid_refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

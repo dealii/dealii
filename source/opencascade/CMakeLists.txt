@@ -13,10 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  utilities.cc
-  manifold_lib.cc
-  )
 
 set(_inst
   manifold_lib.inst.in

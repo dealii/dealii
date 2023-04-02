@@ -295,6 +295,6 @@ FE_SimplexP_Bubbles<dim, spacedim>::clone() const
 }
 
 // explicit instantiations
-#include "fe_simplex_p_bubbles.inst"
+#include "../fe/fe_simplex_p_bubbles.inst"
 
 DEAL_II_NAMESPACE_CLOSE

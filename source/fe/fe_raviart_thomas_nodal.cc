@@ -782,7 +782,7 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
 
 
 // explicit instantiations
-#include "fe_raviart_thomas_nodal.inst"
+#include "../fe/fe_raviart_thomas_nodal.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

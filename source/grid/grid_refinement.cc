@@ -492,6 +492,6 @@ GridRefinement::refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
 
 
 // explicit instantiations
-#include "grid_refinement.inst"
+#include "../grid/grid_refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE

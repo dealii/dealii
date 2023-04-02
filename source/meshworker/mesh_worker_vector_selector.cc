@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "mesh_worker_vector_selector.inst"
+#include "../meshworker/mesh_worker_vector_selector.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

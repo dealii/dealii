@@ -20,7 +20,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
   // explicit instantiations
-#  include "symbolic_function.inst"
+#  include "../base/symbolic_function.inst"
 } // namespace Functions
 #endif
 DEAL_II_NAMESPACE_CLOSE

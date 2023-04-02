@@ -853,7 +853,7 @@ namespace CGALWrappers
                                                                tol);
   }
 
-#  include "intersections.inst"
+#  include "../cgal/intersections.inst"
 
 } // namespace CGALWrappers
 

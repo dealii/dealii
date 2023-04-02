@@ -25,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 // see https://github.com/dealii/dealii/issues/2875
 #ifndef DEAL_II_MSVC
 
-#  include "la_parallel_block_vector.inst"
+#  include "../lac/la_parallel_block_vector.inst"
 
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same

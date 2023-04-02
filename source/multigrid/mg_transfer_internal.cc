@@ -1001,6 +1001,6 @@ namespace internal
 
 // Explicit instantiations
 
-#include "mg_transfer_internal.inst"
+#include "../multigrid/mg_transfer_internal.inst"
 
 DEAL_II_NAMESPACE_CLOSE

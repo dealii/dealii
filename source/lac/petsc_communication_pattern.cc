@@ -485,7 +485,7 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 
 // Explicit instantiations
-#  include "petsc_communication_pattern.inst"
+#  include "../lac/petsc_communication_pattern.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -24,7 +24,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "shape_info.inst"
+#include "../matrix_free/shape_info.inst"
 
 template struct internal::MatrixFreeFunctions::ShapeInfo<double>;
 template struct internal::MatrixFreeFunctions::ShapeInfo<float>;

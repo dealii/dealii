@@ -2459,7 +2459,7 @@ FE_Q_Hierarchical<dim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_q_hierarchical.inst"
+#include "../fe/fe_q_hierarchical.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

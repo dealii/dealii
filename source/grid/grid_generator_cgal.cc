@@ -214,7 +214,7 @@ namespace GridGenerator
 } // namespace GridGenerator
 
 // explicit instantiations
-#  include "grid_generator_cgal.inst"
+#  include "../grid/grid_generator_cgal.inst"
 
 #endif // DOXYGEN
 

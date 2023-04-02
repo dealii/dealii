@@ -187,6 +187,6 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
 
 // --------------------------------------------------------------------------
 // explicit instantiations
-#include "dof_accessor_get.inst"
+#include "../dofs/dof_accessor_get.inst"
 
 DEAL_II_NAMESPACE_CLOSE

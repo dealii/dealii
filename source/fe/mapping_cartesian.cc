@@ -1247,7 +1247,7 @@ MappingCartesian<dim, spacedim>::clone() const
 
 //---------------------------------------------------------------------------
 // explicit instantiations
-#include "mapping_cartesian.inst"
+#include "../fe/mapping_cartesian.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

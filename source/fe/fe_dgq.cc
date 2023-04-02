@@ -1060,7 +1060,7 @@ FE_DGQHermite<dim, spacedim>::clone() const
 
 
 // explicit instantiations
-#include "fe_dgq.inst"
+#include "../fe/fe_dgq.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -24,9 +24,9 @@ DEAL_II_NAMESPACE_OPEN
 
 /*---------------------- Explicit Instantiations ----------------------*/
 
-#  include "sacado_number_types.inst1"
+#  include "../differentiation/ad/sacado_number_types.inst1"
 #  ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
-#    include "sacado_number_types.inst2"
+#    include "../differentiation/ad/sacado_number_types.inst2"
 #  endif
 
 DEAL_II_NAMESPACE_CLOSE

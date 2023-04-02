@@ -23,6 +23,6 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-#include "matrix_creator.inst"
+#include "../numerics/matrix_creator.inst"
 
 DEAL_II_NAMESPACE_CLOSE

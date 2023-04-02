@@ -19,6 +19,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_tools_interpolate.inst"
+#include "../fe/fe_tools_interpolate.inst"
 
 DEAL_II_NAMESPACE_CLOSE

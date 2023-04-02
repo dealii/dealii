@@ -303,6 +303,6 @@ namespace ArborX
 } // namespace ArborX
 
 // ----------------------- Instantiations --------------------//
-#  include "access_traits.inst"
+#  include "../arborx/access_traits.inst"
 
 #endif

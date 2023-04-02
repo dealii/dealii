@@ -400,6 +400,6 @@ namespace GridGenerator
   }
 } // namespace GridGenerator
 
-#include "grid_generator_from_name.inst"
+#include "../grid/grid_generator_from_name.inst"
 
 DEAL_II_NAMESPACE_CLOSE

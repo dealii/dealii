@@ -348,5 +348,5 @@ create_unit_bounding_box()
 }
 
 
-#include "bounding_box.inst"
+#include "../base/bounding_box.inst"
 DEAL_II_NAMESPACE_CLOSE

@@ -482,7 +482,7 @@ namespace parallel
 
 
 // explicit instantiations
-#  include "solution_transfer.inst"
+#  include "../distributed/solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

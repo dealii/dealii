@@ -19,6 +19,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------
-#include "vector_tools_point_gradient.inst"
+#include "../numerics/vector_tools_point_gradient.inst"
 
 DEAL_II_NAMESPACE_CLOSE

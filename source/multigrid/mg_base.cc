@@ -59,6 +59,6 @@ MGTransferBase<VectorType>::prolongate_and_add(const unsigned int to_level,
 
 // Explicit instantiations
 
-#include "mg_base.inst"
+#include "../multigrid/mg_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

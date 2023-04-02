@@ -1287,7 +1287,7 @@ namespace Utilities
     compute_set_union(const std::set<unsigned int> &set, const MPI_Comm &comm);
 #endif
 
-#include "mpi.inst"
+#include "../base/mpi.inst"
   } // end of namespace MPI
 } // end of namespace Utilities
 

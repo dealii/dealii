@@ -2813,7 +2813,7 @@ namespace DoFTools
 
 // explicit instantiations
 
-#include "dof_tools.inst"
+#include "../dofs/dof_tools.inst"
 
 
 

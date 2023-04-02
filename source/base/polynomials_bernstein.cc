@@ -49,6 +49,6 @@ PolynomialsBernstein<number>::PolynomialsBernstein(const unsigned int index,
 {}
 
 
-#include "polynomials_bernstein.inst"
+#include "../base/polynomials_bernstein.inst"
 
 DEAL_II_NAMESPACE_CLOSE

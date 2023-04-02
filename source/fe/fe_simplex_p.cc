@@ -924,6 +924,6 @@ FE_SimplexDGP<dim, spacedim>::hp_line_dof_identities(
 }
 
 // explicit instantiations
-#include "fe_simplex_p.inst"
+#include "../fe/fe_simplex_p.inst"
 
 DEAL_II_NAMESPACE_CLOSE

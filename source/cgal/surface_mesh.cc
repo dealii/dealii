@@ -190,7 +190,7 @@ namespace CGALWrappers
         Assert(false, ExcImpossibleInDimSpacedim(dim, spacedim));
       }
   } // explicit instantiations
-#    include "surface_mesh.inst"
+#    include "../cgal/surface_mesh.inst"
 
 } // namespace CGALWrappers
 #  endif

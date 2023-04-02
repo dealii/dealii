@@ -818,7 +818,7 @@ MGTransferBlockMatrixFree<dim, Number>::clear()
 
 
 // explicit instantiation
-#include "mg_transfer_matrix_free.inst"
+#include "../multigrid/mg_transfer_matrix_free.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

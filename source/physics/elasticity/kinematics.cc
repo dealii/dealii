@@ -18,6 +18,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-#include "kinematics.inst"
+#include "../physics/elasticity/kinematics.inst"
 
 DEAL_II_NAMESPACE_CLOSE

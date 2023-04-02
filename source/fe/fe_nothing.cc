@@ -340,7 +340,7 @@ FE_Nothing<dim, spacedim>::get_constant_modes() const
 
 
 // explicit instantiations
-#include "fe_nothing.inst"
+#include "../fe/fe_nothing.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

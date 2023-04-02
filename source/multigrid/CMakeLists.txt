@@ -13,22 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_unity_include_src
-  mg_base.cc
-  mg_level_global_transfer.cc
-  mg_transfer_block.cc
-  mg_transfer_component.cc
-  mg_transfer_global_coarsening.cc
-  mg_transfer_internal.cc
-  mg_transfer_prebuilt.cc
-  multigrid.cc
-  )
-
-set(_separate_src
-  mg_tools.cc
-  mg_transfer_matrix_free.cc
-  )
-
 # concatenate all unity inclusion files in one file
 set(_n_includes_per_unity_file 15)
 

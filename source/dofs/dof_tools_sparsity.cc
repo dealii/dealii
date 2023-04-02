@@ -1477,7 +1477,7 @@ namespace DoFTools
 
 // --------------------------------------------------- explicit instantiations
 
-#include "dof_tools_sparsity.inst"
+#include "../dofs/dof_tools_sparsity.inst"
 
 
 

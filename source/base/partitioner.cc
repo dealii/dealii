@@ -580,6 +580,6 @@ namespace Utilities
 
 
 // explicit instantiations from .templates.h file
-#include "partitioner.inst"
+#include "../base/partitioner.inst"
 
 DEAL_II_NAMESPACE_CLOSE

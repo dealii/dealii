@@ -200,6 +200,6 @@ PolynomialsRannacherTurek<dim>::clone() const
 
 
 // explicit instantiations
-#include "polynomials_rannacher_turek.inst"
+#include "../base/polynomials_rannacher_turek.inst"
 
 DEAL_II_NAMESPACE_CLOSE

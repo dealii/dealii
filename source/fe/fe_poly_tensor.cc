@@ -2504,7 +2504,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
 
 
 // explicit instantiations
-#include "fe_poly_tensor.inst"
+#include "../fe/fe_poly_tensor.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

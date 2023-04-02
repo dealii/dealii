@@ -23,6 +23,6 @@ DEAL_II_NAMESPACE_OPEN
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
 
-#include "evaluation_template_factory.inst"
+#include "../matrix_free/evaluation_template_factory.inst"
 
 DEAL_II_NAMESPACE_CLOSE

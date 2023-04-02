@@ -163,6 +163,6 @@ CellId::to_string() const
 
 
 // explicit instantiations
-#include "cell_id.inst"
+#include "../grid/cell_id.inst"
 
 DEAL_II_NAMESPACE_CLOSE

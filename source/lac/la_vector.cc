@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
-#  include "la_vector.inst"
+#  include "../lac/la_vector.inst"
 
   // do a few functions that currently don't fit the scheme because they have
   // two template arguments that need to be different (the case of same

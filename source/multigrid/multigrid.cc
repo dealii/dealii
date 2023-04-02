@@ -302,7 +302,7 @@ MGTransferBlockSelect<number>::restrict_and_add(const unsigned int from_level,
 
 // Explicit instantiations
 
-#include "multigrid.inst"
+#include "../multigrid/multigrid.inst"
 
 template class MGTransferBlock<float>;
 template class MGTransferBlock<double>;

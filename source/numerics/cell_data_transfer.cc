@@ -20,6 +20,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-#include "cell_data_transfer.inst"
+#include "../numerics/cell_data_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -4282,7 +4282,7 @@ namespace parallel
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "tria.inst"
+#include "../distributed/tria.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -221,7 +221,7 @@ namespace NonMatching
 
 
 #ifndef DOXYGEN
-#  include "fe_immersed_values.inst"
+#  include "../non_matching/fe_immersed_values.inst"
 #endif
 
 } // namespace NonMatching

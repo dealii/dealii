@@ -22,7 +22,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /* --- Explicit instantiations --- */
-#  include "symengine_number_visitor_internal.inst"
+#  include "../differentiation/sd/symengine_number_visitor_internal.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -19,7 +19,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "affine_constraints.inst"
+#include "../lac/affine_constraints.inst"
 
 /*
  * Note: You probably do not want to add your custom instantiation down

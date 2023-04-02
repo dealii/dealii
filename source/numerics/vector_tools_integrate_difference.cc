@@ -19,6 +19,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------
-#include "vector_tools_integrate_difference.inst"
+#include "../numerics/vector_tools_integrate_difference.inst"
 
 DEAL_II_NAMESPACE_CLOSE

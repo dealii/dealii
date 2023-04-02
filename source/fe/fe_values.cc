@@ -4916,6 +4916,6 @@ FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-#include "fe_values.inst"
+#include "../fe/fe_values.inst"
 
 DEAL_II_NAMESPACE_CLOSE

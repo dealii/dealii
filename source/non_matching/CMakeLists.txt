@@ -13,14 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  fe_immersed_values.cc
-  fe_values.cc
-  mesh_classifier.cc
-  quadrature_generator.cc
-  coupling.cc
-  immersed_surface_quadrature.cc
-  )
 
   set(_inst
   fe_immersed_values.inst.in

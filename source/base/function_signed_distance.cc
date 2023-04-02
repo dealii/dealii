@@ -335,6 +335,6 @@ namespace Functions
   } // namespace SignedDistance
 } // namespace Functions
 
-#include "function_signed_distance.inst"
+#include "../base/function_signed_distance.inst"
 
 DEAL_II_NAMESPACE_CLOSE

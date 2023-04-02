@@ -640,7 +640,7 @@ namespace hp
 
 
 // explicit instantiations
-#include "fe_values.inst"
+#include "../hp/fe_values.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

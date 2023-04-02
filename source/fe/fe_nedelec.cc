@@ -4181,7 +4181,7 @@ FE_Nedelec<dim>::get_embedding_dofs(const unsigned int sub_degree) const
 
 
 // explicit instantiations
-#include "fe_nedelec.inst"
+#include "../fe/fe_nedelec.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

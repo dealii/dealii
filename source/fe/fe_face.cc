@@ -1026,7 +1026,7 @@ FE_FaceP<1, spacedim>::get_name() const
 
 
 // explicit instantiations
-#include "fe_face.inst"
+#include "../fe/fe_face.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

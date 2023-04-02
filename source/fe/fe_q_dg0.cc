@@ -339,6 +339,6 @@ FE_Q_DG0<dim, spacedim>::compare_for_domination(
 
 
 // explicit instantiations
-#include "fe_q_dg0.inst"
+#include "../fe/fe_q_dg0.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -13,14 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  data_out.cc
-  particle.cc
-  particle_handler.cc
-  generators.cc
-  property_pool.cc
-  utilities.cc
-  )
 
 set(_inst
   data_out.inst.in

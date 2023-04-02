@@ -18,6 +18,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiation
-#include "function_time.inst"
+#include "../base/function_time.inst"
 
 DEAL_II_NAMESPACE_CLOSE

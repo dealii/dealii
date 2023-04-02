@@ -359,6 +359,6 @@ FE_WedgeDGP<dim, spacedim>::get_name() const
 }
 
 // explicit instantiations
-#include "fe_wedge_p.inst"
+#include "../fe/fe_wedge_p.inst"
 
 DEAL_II_NAMESPACE_CLOSE

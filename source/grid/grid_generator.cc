@@ -8733,7 +8733,7 @@ namespace GridGenerator
 } // namespace GridGenerator
 
 // explicit instantiations
-#  include "grid_generator.inst"
+#  include "../grid/grid_generator.inst"
 
 #endif // DOXYGEN
 

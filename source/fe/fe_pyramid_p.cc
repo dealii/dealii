@@ -339,6 +339,6 @@ FE_PyramidDGP<dim, spacedim>::get_name() const
 }
 
 // explicit instantiations
-#include "fe_pyramid_p.inst"
+#include "../fe/fe_pyramid_p.inst"
 
 DEAL_II_NAMESPACE_CLOSE

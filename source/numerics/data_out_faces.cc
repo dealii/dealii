@@ -497,6 +497,6 @@ DataOutFaces<dim, spacedim>::next_face(const FaceDescriptor &old_face)
 
 
 // explicit instantiations
-#include "data_out_faces.inst"
+#include "../numerics/data_out_faces.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -200,5 +200,5 @@ namespace Functions
 
 
 } // namespace Functions
-#include "function_restriction.inst"
+#include "../base/function_restriction.inst"
 DEAL_II_NAMESPACE_CLOSE

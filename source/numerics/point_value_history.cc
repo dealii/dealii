@@ -1506,7 +1506,7 @@ PointValueHistory<dim>::tria_change_listener()
 
 
 // explicit instantiations
-#include "point_value_history.inst"
+#include "../numerics/point_value_history.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

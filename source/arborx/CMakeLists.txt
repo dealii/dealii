@@ -13,9 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_src
-  access_traits.cc
-  )
 
 set(_inst
   access_traits.inst.in

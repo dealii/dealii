@@ -37,6 +37,6 @@ FE_Poly<dim, spacedim>::FE_Poly(const FE_Poly &fe)
 
 
 
-#include "fe_poly.inst"
+#include "../fe/fe_poly.inst"
 
 DEAL_II_NAMESPACE_CLOSE

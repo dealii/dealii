@@ -233,7 +233,7 @@ namespace DataPostprocessors
 
 
 // explicit instantiation
-#include "data_postprocessor.inst"
+#include "../numerics/data_postprocessor.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

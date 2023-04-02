@@ -862,7 +862,7 @@ namespace hp
 
 
 // explicit instantiations
-#include "fe_collection.inst"
+#include "../hp/fe_collection.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

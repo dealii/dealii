@@ -497,6 +497,6 @@ namespace NonMatching
 
 } // namespace NonMatching
 
-#include "mesh_classifier.inst"
+#include "../non_matching/mesh_classifier.inst"
 
 DEAL_II_NAMESPACE_CLOSE

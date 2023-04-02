@@ -2172,12 +2172,12 @@ namespace Differentiation
 
 
 /* --- Explicit instantiations --- */
-#  include "ad_drivers.inst"
+#  include "../differentiation/ad/ad_drivers.inst"
 #  ifdef DEAL_II_WITH_ADOLC
-#    include "ad_drivers.inst1"
+#    include "../differentiation/ad/ad_drivers.inst1"
 #  endif
 #  ifdef DEAL_II_TRILINOS_WITH_SACADO
-#    include "ad_drivers.inst2"
+#    include "../differentiation/ad/ad_drivers.inst2"
 #  endif
 
 

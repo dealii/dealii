@@ -132,6 +132,6 @@ TensorFunctionParser<rank, dim, Number>::value_list(
 }
 
 // explicit instantiations
-#include "tensor_function_parser.inst"
+#include "../base/tensor_function_parser.inst"
 
 DEAL_II_NAMESPACE_CLOSE

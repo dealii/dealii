@@ -13,22 +13,6 @@
 ##
 ## ---------------------------------------------------------------------
 
-set(_unity_include_src
-  grid_refinement.cc
-  cell_weights.cc
-  cell_data_transfer.cc
-  fully_distributed_tria.cc
-  repartitioning_policy_tools.cc
-  solution_transfer.cc
-  tria.cc
-  tria_base.cc
-  shared_tria.cc
-  p4est_wrappers.cc
-  field_transfer.cc
-  )
-
-set(_separate_src
-  )
 
 # concatenate all unity inclusion files in one file
 set(_n_includes_per_unity_file 15)

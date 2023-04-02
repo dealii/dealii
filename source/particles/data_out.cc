@@ -254,6 +254,6 @@ namespace Particles
 
 } // namespace Particles
 
-#include "data_out.inst"
+#include "../particles/data_out.inst"
 
 DEAL_II_NAMESPACE_CLOSE

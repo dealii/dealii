@@ -30,6 +30,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "solver.inst"
+#include "../lac/solver.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -50,7 +50,7 @@ namespace Algorithms
     notifications.clear();
   }
 
-#include "operator.inst"
+#include "../algorithms/operator.inst"
 } // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE

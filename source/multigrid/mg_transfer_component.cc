@@ -695,7 +695,7 @@ MGTransferSelect<number>::build(
 
 
 // explicit instantiations
-#include "mg_transfer_component.inst"
+#include "../multigrid/mg_transfer_component.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

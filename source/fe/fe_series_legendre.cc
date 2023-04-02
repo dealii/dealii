@@ -319,6 +319,6 @@ namespace FESeries
 
 
 // explicit instantiations
-#include "fe_series_legendre.inst"
+#include "../fe/fe_series_legendre.inst"
 
 DEAL_II_NAMESPACE_CLOSE

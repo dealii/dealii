@@ -24,7 +24,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#  include "n_vector.inst"
+#  include "../sundials/n_vector.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

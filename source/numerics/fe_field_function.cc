@@ -32,7 +32,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#include "fe_field_function.inst"
+#include "../numerics/fe_field_function.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

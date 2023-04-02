@@ -18,6 +18,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-#include "function.inst"
+#include "../base/function.inst"
 
 DEAL_II_NAMESPACE_CLOSE

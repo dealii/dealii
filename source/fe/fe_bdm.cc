@@ -428,6 +428,6 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_bdm.inst"
+#include "../fe/fe_bdm.inst"
 
 DEAL_II_NAMESPACE_CLOSE

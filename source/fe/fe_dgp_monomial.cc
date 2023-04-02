@@ -511,7 +511,7 @@ FE_DGPMonomial<dim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_dgp_monomial.inst"
+#include "../fe/fe_dgp_monomial.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

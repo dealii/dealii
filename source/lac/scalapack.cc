@@ -3513,7 +3513,7 @@ ScaLAPACKMatrix<NumberType>::scale_rows(const InputVector &factors)
 
 
 // instantiations
-#  include "scalapack.inst"
+#  include "../lac/scalapack.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

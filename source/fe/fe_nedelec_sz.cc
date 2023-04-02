@@ -3108,6 +3108,6 @@ FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
 
 
 // explicit instantiations
-#include "fe_nedelec_sz.inst"
+#include "../fe/fe_nedelec_sz.inst"
 
 DEAL_II_NAMESPACE_CLOSE

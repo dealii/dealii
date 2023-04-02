@@ -29,6 +29,6 @@
 DEAL_II_NAMESPACE_OPEN
 namespace TimeStepping
 {
-#include "time_stepping.inst"
+#include "../base/time_stepping.inst"
 }
 DEAL_II_NAMESPACE_CLOSE

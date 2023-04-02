@@ -83,7 +83,7 @@ namespace numbers
 
 /*---------------------- Explicit Instantiations ----------------------*/
 
-#  include "adolc_number_types.inst"
+#  include "../differentiation/ad/adolc_number_types.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

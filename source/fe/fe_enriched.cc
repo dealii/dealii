@@ -1527,6 +1527,6 @@ namespace ColorEnriched
 
 
 // explicit instantiations
-#include "fe_enriched.inst"
+#include "../fe/fe_enriched.inst"
 
 DEAL_II_NAMESPACE_CLOSE

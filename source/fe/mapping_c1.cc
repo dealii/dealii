@@ -210,7 +210,7 @@ MappingC1<dim, spacedim>::clone() const
 
 
 // explicit instantiations
-#include "mapping_c1.inst"
+#include "../fe/mapping_c1.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

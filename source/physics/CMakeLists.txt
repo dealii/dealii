@@ -16,9 +16,6 @@
 # Expand instantiations in subdirectories
 add_subdirectory("elasticity")
 
-set(_src
-  transformations.cc
-  )
 
 set(_inst
   transformations.inst.in

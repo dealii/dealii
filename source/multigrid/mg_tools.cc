@@ -1829,6 +1829,6 @@ namespace MGTools
 
 
 // explicit instantiations
-#include "mg_tools.inst"
+#include "../multigrid/mg_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

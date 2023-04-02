@@ -180,6 +180,6 @@ FE_Q_iso_Q1<dim, spacedim>::compare_for_domination(
 
 
 // explicit instantiations
-#include "fe_q_iso_q1.inst"
+#include "../fe/fe_q_iso_q1.inst"
 
 DEAL_II_NAMESPACE_CLOSE

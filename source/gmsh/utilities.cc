@@ -135,7 +135,7 @@ namespace Gmsh
 
   // explicit instantiations
 #  ifdef DEAL_II_WITH_OPENCASCADE
-#    include "utilities.inst"
+#    include "../gmsh/utilities.inst"
 #  endif
 } // namespace Gmsh
 
