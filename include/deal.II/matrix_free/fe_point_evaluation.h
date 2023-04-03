@@ -400,13 +400,18 @@ namespace internal
  * by this class is similar (or sometimes even somewhat lower) than using
  * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
  */
-template <int n_components,
+template <int n_components_,
           int dim,
           int spacedim    = dim,
           typename Number = double>
 class FEPointEvaluation
 {
 public:
+  static constexpr unsigned int dimension    = dim;
+  static constexpr unsigned int n_components = n_components_;
+
+  using number_type = Number;
+
   using value_type = typename internal::FEPointEvaluation::
     EvaluatorTypeTraits<dim, n_components, Number>::value_type;
   using gradient_type = typename internal::FEPointEvaluation::
