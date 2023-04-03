@@ -188,14 +188,13 @@ namespace LinearAlgebra
      * <h4>GPU support</h4>
      *
      * This vector class supports two different memory spaces: Host and Default.
-     * By default, the memory space is Host and all the data is allocated on the
-     * CPU. When the memory space is Default, all the data is allocated on
-     * Kokkos' default memory space. That means that if Kokkos was configured
-     * with a GPU backend, the data is allocated on a GPU. The operations on the
-     * vector are performed on the chosen memory space. From the host, there are
-     * two methods to access the elements of the Vector when using the Default
-     * memory space:
-     * <ul>
+     * If the MemorySpace template argument is not specified, the memory space
+     * is Host and all the data is allocated on the CPU. When the memory space
+     * is Default, all the data is allocated on Kokkos' default memory space.
+     * That means that if Kokkos was configured with a GPU backend, the data is
+     * allocated on a GPU. The operations on the vector are performed on the
+     * chosen memory space. From the host, there are two methods to access the
+     * elements of the Vector when using the Default memory space: <ul>
      * <li> use get_values():
      * @code
      * Vector<double, MemorySpace::Default> vector(local_range, comm);
