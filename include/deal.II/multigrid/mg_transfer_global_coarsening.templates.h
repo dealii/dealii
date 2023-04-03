@@ -21,7 +21,6 @@
 
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
-#include <deal.II/base/mpi_remote_point_evaluation.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/repartitioning_policy_tools.h>
@@ -32,6 +31,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/cell_id_translator.h>
 #include <deal.II/grid/filtered_iterator.h>
@@ -3181,8 +3181,6 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     }
 }
 
-
-
 template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
@@ -3470,6 +3468,373 @@ MGTransferBlockGlobalCoarsening<dim, VectorType>::get_matrix_free_transfer(
   (void)b;
   AssertDimension(b, 0);
   return transfer_operator;
+}
+
+namespace internal
+{
+  namespace
+  {
+    template <int dim>
+    std::shared_ptr<NonMatching::MappingInfo<dim>>
+    fill_mapping_info(const Utilities::MPI::RemotePointEvaluation<dim> &rpe)
+    {
+      const auto &cell_data = rpe.get_cell_data();
+
+      std::vector<typename Triangulation<dim>::active_cell_iterator>
+                                           cell_iterators;
+      std::vector<std::vector<Point<dim>>> unit_points_vector;
+
+      for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
+        {
+          typename Triangulation<dim>::active_cell_iterator cell = {
+            &rpe.get_triangulation(),
+            cell_data.cells[i].first,
+            cell_data.cells[i].second};
+
+          const ArrayView<const Point<dim>> unit_points(
+            cell_data.reference_point_values.data() +
+              cell_data.reference_point_ptrs[i],
+            cell_data.reference_point_ptrs[i + 1] -
+              cell_data.reference_point_ptrs[i]);
+
+          std::vector<Point<dim>> unit_points_vector_cell;
+
+          unit_points_vector_cell.insert(unit_points_vector_cell.begin(),
+                                         unit_points.begin(),
+                                         unit_points.end());
+
+          cell_iterators.emplace_back(cell);
+          unit_points_vector.emplace_back(unit_points_vector_cell);
+        }
+
+      auto mapping_info =
+        std::make_shared<NonMatching::MappingInfo<dim>>(rpe.get_mapping(),
+                                                        update_values);
+      mapping_info->reinit_cells(cell_iterators, unit_points_vector);
+
+      return mapping_info;
+    }
+  } // namespace
+} // namespace internal
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  reinit(const DoFHandler<dim> &          dof_handler_fine,
+         const DoFHandler<dim> &          dof_handler_coarse,
+         const Mapping<dim> &             mapping_fine,
+         const Mapping<dim> &             mapping_coarse,
+         const AffineConstraints<Number> &constraint_fine,
+         const AffineConstraints<Number> &constraint_coarse)
+{
+  AssertThrow(dof_handler_coarse.get_fe().has_support_points(),
+              ExcNotImplemented());
+  Assert(dof_handler_coarse.get_fe().n_components() > 0 &&
+           dof_handler_fine.get_fe().n_components() > 0,
+         ExcNotImplemented());
+  Assert(dof_handler_fine.n_dofs() > dof_handler_coarse.n_dofs(),
+         ExcMessage(
+           "The coarser DoFHandler has more DoFs than the finer DoFHandler."));
+
+  this->fine_element_is_continuous = true;
+
+  // create partitioners and internal vectors
+  {
+    IndexSet locally_relevant_dofs;
+    DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
+                                            locally_relevant_dofs);
+    this->partitioner_coarse.reset(
+      new Utilities::MPI::Partitioner(dof_handler_coarse.locally_owned_dofs(),
+                                      locally_relevant_dofs,
+                                      dof_handler_coarse.get_communicator()));
+
+    this->vec_coarse.reinit(this->partitioner_coarse);
+  }
+  {
+    this->partitioner_fine.reset(
+      new Utilities::MPI::Partitioner(dof_handler_fine.locally_owned_dofs(),
+                                      dof_handler_fine.get_communicator()));
+
+    this->vec_fine.reinit(this->partitioner_fine);
+  }
+
+
+  // Loop over fine cells and collect points, removing possible duplicates
+  auto &      fe_space = dof_handler_fine.get_fe();
+  const auto &unit_pts = fe_space.get_unit_support_points();
+  std::vector<std::pair<types::global_dof_index, Point<dim>>> points_all;
+  std::vector<Point<dim>>                                     points;
+  std::vector<types::global_dof_index>                        dof_indices(
+    dof_handler_fine.get_fe().n_dofs_per_cell());
+
+  const auto &local_indices_fine = dof_handler_fine.locally_owned_dofs();
+
+  Quadrature<dim> quadrature(unit_pts);
+  FEValues<dim>   fe_values(mapping_fine,
+                          fe_space,
+                          quadrature,
+                          update_quadrature_points);
+
+  for (const auto &cell : dof_handler_fine.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    {
+      fe_values.reinit(cell);
+      cell->get_dof_indices(dof_indices);
+
+      for (unsigned int i = 0; i < dof_indices.size(); ++i)
+        if (local_indices_fine.is_element(dof_indices[i]) &&
+            (constraint_fine.is_constrained(dof_indices[i]) == false))
+          points_all.emplace_back(local_indices_fine.index_within_set(
+                                    dof_indices[i]),
+                                  fe_values.quadrature_point(i));
+    }
+
+  std::sort(points_all.begin(),
+            points_all.end(),
+            [](const auto &a, const auto &b) { return a.first < b.first; });
+  points_all.erase(std::unique(points_all.begin(),
+                               points_all.end(),
+                               [](const auto &a, const auto &b) {
+                                 return a.first == b.first;
+                               }),
+                   points_all.end());
+
+  for (const auto &i : points_all)
+    {
+      this->level_dof_indices_fine.push_back(i.first);
+      points.push_back(i.second);
+    }
+
+  // Duplicates support points have been removed, hand them over to rpe.
+  rpe.reinit(points, dof_handler_coarse.get_triangulation(), mapping_coarse);
+
+  // set up MappingInfo for easier data access
+  mapping_info = internal::fill_mapping_info(rpe);
+
+  // set up constraints
+  const auto &cell_data = rpe.get_cell_data();
+
+  constraint_info.reinit(dof_handler_coarse,
+                         cell_data.cells.size(),
+                         false /*TODO*/);
+
+  for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
+    {
+      typename DoFHandler<dim>::active_cell_iterator cell = {
+        &rpe.get_triangulation(),
+        cell_data.cells[i].first,
+        cell_data.cells[i].second,
+        &dof_handler_coarse};
+
+      constraint_info.read_dof_indices(i,
+                                       numbers::invalid_unsigned_int,
+                                       cell,
+                                       constraint_coarse,
+                                       this->partitioner_coarse);
+    }
+
+  constraint_info.finalize();
+
+  const auto &fe_base = dof_handler_coarse.get_fe().base_element(0);
+
+  if (const auto fe = dynamic_cast<const FE_Q<dim> *>(&fe_base))
+    fe_coarse = std::make_unique<FE_DGQ<dim>>(fe->get_degree());
+  else if (const auto fe = dynamic_cast<const FE_DGQ<dim> *>(&fe_base))
+    fe_coarse = fe->clone();
+  else
+    AssertThrow(false, ExcMessage(dof_handler_coarse.get_fe().get_name()));
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  prolongate_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const
+{
+  std::vector<Number> evaluation_point_results;
+  std::vector<Number> buffer;
+
+  const auto evaluation_function = [&](auto &values, const auto &cell_data) {
+    std::vector<Number> solution_values;
+
+    FEPointEvaluation<1, dim, dim, Number> evaluator(*mapping_info, *fe_coarse);
+
+    for (unsigned int cell = 0; cell < cell_data.cells.size(); ++cell)
+      {
+        solution_values.resize(fe_coarse->n_dofs_per_cell());
+
+        // gather and resolve constraints
+        internal::VectorReader<Number, VectorizedArrayType> reader;
+        constraint_info.read_write_operation(
+          reader,
+          src,
+          reinterpret_cast<VectorizedArrayType *>(solution_values.data()),
+          cell,
+          1,
+          solution_values.size(),
+          true);
+
+        // evaluate and scatter
+        evaluator.reinit(cell);
+
+        evaluator.evaluate(solution_values, dealii::EvaluationFlags::values);
+
+        for (const auto q : evaluator.quadrature_point_indices())
+          values[q + cell_data.reference_point_ptrs[cell]] =
+            evaluator.get_value(q);
+      }
+  };
+
+  rpe.template evaluate_and_process<Number>(evaluation_point_results,
+                                            buffer,
+                                            evaluation_function);
+
+  // Weight operator in case some points are owned by multiple cells.
+  if (rpe.is_map_unique() == false)
+    {
+      const auto evaluation_point_results_temp = evaluation_point_results;
+      evaluation_point_results.assign(rpe.get_point_ptrs().size() - 1, 0);
+
+      const auto &ptr = rpe.get_point_ptrs();
+
+      for (unsigned int i = 0; i < ptr.size() - 1; ++i)
+        {
+          const auto n_entries = ptr[i + 1] - ptr[i];
+          if (n_entries == 0)
+            continue;
+
+          Number result = 0.0;
+
+          for (unsigned int j = 0; j < n_entries; ++j)
+            result += evaluation_point_results_temp[ptr[i] + j];
+          result /= n_entries;
+
+          evaluation_point_results[i] = result;
+        }
+    }
+
+  for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
+    dst.local_element(this->level_dof_indices_fine[j]) +=
+      evaluation_point_results[j];
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  restrict_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const
+{
+  std::vector<Number> evaluation_point_results;
+  std::vector<Number> buffer;
+
+  evaluation_point_results.resize(rpe.get_point_ptrs().size() - 1);
+
+  for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
+    evaluation_point_results[j] =
+      src.local_element(this->level_dof_indices_fine[j]);
+
+  // Weight operator in case some points are owned by multiple cells.
+  if (rpe.is_map_unique() == false)
+    {
+      const auto &ptr = rpe.get_point_ptrs();
+
+      for (unsigned int i = 0; i < ptr.size() - 1; ++i)
+        {
+          const auto n_entries = ptr[i + 1] - ptr[i];
+          if (n_entries == 0)
+            continue;
+
+          evaluation_point_results[i] /= n_entries;
+        }
+    }
+
+  const auto evaluation_function = [&](const auto &values,
+                                       const auto &cell_data) {
+    std::vector<Number>                    solution_values;
+    FEPointEvaluation<1, dim, dim, Number> evaluator(*mapping_info, *fe_coarse);
+
+    for (unsigned int cell = 0; cell < cell_data.cells.size(); ++cell)
+      {
+        solution_values.resize(fe_coarse->n_dofs_per_cell());
+
+        // gather and integrate
+        evaluator.reinit(cell);
+
+        for (const auto q : evaluator.quadrature_point_indices())
+          evaluator.submit_value(
+            values[q + cell_data.reference_point_ptrs[cell]], q);
+
+        evaluator.integrate(solution_values, EvaluationFlags::values);
+
+        // resolve constraints and scatter
+        internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>
+          writer;
+        constraint_info.read_write_operation(
+          writer,
+          dst,
+          reinterpret_cast<VectorizedArrayType *>(solution_values.data()),
+          cell,
+          1,
+          solution_values.size(),
+          true);
+      }
+  };
+
+  rpe.template process_and_evaluate<Number>(evaluation_point_results,
+                                            buffer,
+                                            evaluation_function);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
+              const LinearAlgebra::distributed::Vector<Number> &src) const
+{
+  AssertThrow(false, ExcNotImplemented());
+  (void)dst;
+  (void)src;
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &external_partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &external_partitioner_fine)
+{
+  this->internal_enable_inplace_operations_if_possible(
+    external_partitioner_coarse, external_partitioner_fine, constraint_info);
+}
+
+
+
+template <int dim, typename Number>
+std::size_t
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  memory_consumption() const
+{
+  std::size_t size = 0;
+
+  size += this->partitioner_coarse->memory_consumption();
+  size += this->vec_coarse.memory_consumption();
+  size += MemoryConsumption::memory_consumption(this->level_dof_indices_fine);
+  // TODO: add consumption for rpe, mapping_info and constraint_info.
+
+  return size;
 }
 
 

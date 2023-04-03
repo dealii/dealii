@@ -17,6 +17,7 @@
 #define dealii_mg_transfer_global_coarsening_h
 
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/mpi_remote_point_evaluation.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -29,6 +30,8 @@
 
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
+
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -642,6 +645,145 @@ private:
   unsigned int n_components;
 
   friend class internal::MGTwoLevelTransferImplementation;
+};
+
+
+
+/**
+ * Class for transfer between two non-nested multigrid levels.
+ *
+ */
+template <int dim, typename VectorType>
+class MGTwoLevelTransferNonNested : public MGTwoLevelTransferBase<VectorType>
+{
+public:
+  /**
+   * Perform prolongation.
+   */
+  void
+  prolongate_and_add(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * Perform restriction.
+   */
+  void
+  restrict_and_add(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix).
+   */
+  void
+  interpolate(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const override;
+};
+
+
+
+/**
+ * Class for transfer between two non-nested multigrid levels.
+ *
+ * Specialization for LinearAlgebra::distributed::Vector.
+ *
+ */
+template <int dim, typename Number>
+class MGTwoLevelTransferNonNested<dim,
+                                  LinearAlgebra::distributed::Vector<Number>>
+  : public MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
+{
+private:
+  using VectorizedArrayType = VectorizedArray<Number, 1>;
+
+public:
+  /**
+   * Set up transfer operator between the given DoFHandler objects (
+   * @p dof_handler_fine and @p dof_handler_coarse).
+   */
+  void
+  reinit(const DoFHandler<dim> &          dof_handler_fine,
+         const DoFHandler<dim> &          dof_handler_coarse,
+         const Mapping<dim> &             mapping_fine,
+         const Mapping<dim> &             mapping_coarse,
+         const AffineConstraints<Number> &constraint_fine =
+           AffineConstraints<Number>(),
+         const AffineConstraints<Number> &constraint_coarse =
+           AffineConstraints<Number>());
+
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix).
+   */
+  void
+  interpolate(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  void
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+    override;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const override;
+
+protected:
+  /**
+   * Perform prolongation.
+   */
+  void
+  prolongate_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+
+  /**
+   * Perform restriction.
+   */
+  void
+  restrict_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+
+private:
+  /**
+   * Object to evaluate shape functions on one mesh on visited support points of
+   * the other mesh.
+   */
+  Utilities::MPI::RemotePointEvaluation<dim> rpe;
+
+  /**
+   * MappingInfo object needed as Mapping argument by FEPointEvaluation.
+   */
+  std::shared_ptr<NonMatching::MappingInfo<dim, dim>> mapping_info;
+
+  /**
+   * Helper class for reading from and writing to global vectors and for
+   * applying constraints.
+   */
+  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArrayType>
+    constraint_info;
+
+  /**
+   * Finite element of the coarse DoFHandler passed to reinit().
+   */
+  std::unique_ptr<FiniteElement<dim>> fe_coarse;
 };
 
 
