@@ -456,6 +456,11 @@ public:
                     const unsigned int first_selected_component = 0);
 
   /**
+   * Destructor.
+   */
+  ~FEPointEvaluation();
+
+  /**
    * Set up the mapping information for the given cell, e.g., by computing the
    * Jacobian of the mapping for the given points if gradients of the functions
    * are requested.
@@ -787,6 +792,12 @@ private:
   bool fast_path;
 
   /**
+   * Connection to NonMatching::MappingInfo to check wheter mapping data
+   * has been invalidated.
+   */
+  boost::signals2::connection connection_is_reinitialized;
+
+  /**
    * Bool indicating if class is reinitialized and data vectors a resized.
    */
   bool is_reinitialized;
@@ -839,8 +850,16 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , is_reinitialized(false)
 {
   setup(first_selected_component);
-  mapping_info.connect_is_reinitialized(
+  connection_is_reinitialized = mapping_info.connect_is_reinitialized(
     [this]() { this->is_reinitialized = false; });
+}
+
+
+
+template <int n_components, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components, dim, spacedim, Number>::~FEPointEvaluation()
+{
+  connection_is_reinitialized.disconnect();
 }
 
 
