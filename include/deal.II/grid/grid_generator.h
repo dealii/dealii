@@ -2078,11 +2078,11 @@ namespace GridGenerator
 
   /**
    * Extrude the Triangulation @p input in the $z$ direction from $z = 0$ to $z =
-   * \text{height}$ and store it in @p result.
+   * \text{height}$ and store it in @p result. This is done by replicating the
+   * input triangulation `n_slices` times in $z$ direction, and then forming
+   * `(n_slices-1)` layers of cells out of these replicates.
    *
-   * The number of <em>slices</em>, or layers of cells
-   * perpendicular to the $z = 0$ plane, will be @p n_slices slices (minimum is
-   * 2). The boundary indicators of the faces of @p input will be assigned to
+   * The boundary indicators of the faces of @p input will be assigned to
    * the corresponding side walls in $z$ direction. The bottom and top get the
    * next two free boundary indicators: i.e., if @p input has boundary ids of
    * $0$, $1$, and $42$, then the $z = 0$ boundary id of @p result will be $43$
@@ -2122,6 +2122,17 @@ namespace GridGenerator
    * </ol>
    * Note that numbers::flat_manifold_id (should it be a manifold id of @p
    * input) will always be the last entry in the first category.
+   *
+   * @param[in] input A two-dimensional input triangulation.
+   * @param[in] n_slices The number of times the input triangulation will
+   *   be replicated in $z$ direction. These slices will then be connected
+   *   into `(n_slices-1)` layers of three-dimensional cells. Clearly,
+   *   `n_slices` must be at least two.
+   * @param[in] height The distance in $z$ direction between the individual
+   *   slices.
+   * @param[out] result The resulting three-dimensional triangulation.
+   * @param[in] copy_manifold_ids See the description above.
+   * @param[in] manifold_priorities See the description above.
    *
    * @pre The 2d input triangulation @p input must be a
    * @ref GlossCoarseMesh "coarse mesh",
