@@ -590,8 +590,9 @@ namespace CUDAWrappers
         // When working with distributed vectors, the constrained dofs are
         // computed for ghosted vectors but we want to copy the values of the
         // constrained dofs of non-ghosted vectors.
-        if (constr_dofs[dof] < size)
-          dst_ptr[constr_dofs[dof]] = src_ptr[constr_dofs[dof]];
+        const auto constrained_dof = constr_dofs[dof];
+        if (constrained_dof < size)
+          dst_ptr[constrained_dof] = src_ptr[constrained_dof];
       });
   }
 
@@ -1019,7 +1020,6 @@ namespace CUDAWrappers
           const unsigned int size =
             (grid_dim[i].x * grid_dim[i].y * grid_dim[i].z) * cells_per_block *
             Functor::n_local_dofs;
-          // std::cout << "color " << i << " " << size << std::endl;
           values_colors[i] =
             Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
               Kokkos::view_alloc("values_" + std::to_string(i),

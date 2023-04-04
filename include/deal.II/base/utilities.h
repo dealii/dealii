@@ -449,16 +449,16 @@ namespace Utilities
 #if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
-    KOKKOS_IF_ON_HOST(if (!(iexp >= 0))::dealii::deal_II_exceptions::internals::
-                        issue_error_noreturn(
-                          ::dealii::deal_II_exceptions::internals::
-                            ExceptionHandling::abort_or_throw_on_exception,
-                          __FILE__,
-                          __LINE__,
-                          __PRETTY_FUNCTION__,
-                          "iexp>=0",
-                          "ExcMessage(\"The exponent must not be negative!\")",
-                          ExcMessage("The exponent must not be negative!"));)
+    KOKKOS_IF_ON_HOST((if (!(iexp >= 0))::dealii::deal_II_exceptions::
+                         internals::issue_error_noreturn(
+                           ::dealii::deal_II_exceptions::internals::
+                             ExceptionHandling::abort_or_throw_on_exception,
+                           __FILE__,
+                           __LINE__,
+                           __PRETTY_FUNCTION__,
+                           "iexp>=0",
+                           "ExcMessage(\"The exponent must not be negative!\")",
+                           ExcMessage("The exponent must not be negative!"));))
 #endif
     // The "exponentiation by squaring" algorithm used below has to be
     // compressed to one statement due to C++11's restrictions on constexpr

@@ -71,8 +71,8 @@ namespace CUDAWrappers
                                (dim == 2) ? threadIdx.y :
                                             threadIdx.z;
 
-        // This loop simply multiply the shape function at the quadrature point
-        // by the value finite element coefficient.
+        // This loop simply multiplies the shape function at the quadrature
+        // point by the value finite element coefficient.
         Number t = 0;
         for (int k = 0; k < n_q_points_1d; ++k) {
           const unsigned int shape_idx =
