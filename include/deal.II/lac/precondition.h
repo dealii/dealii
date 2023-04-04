@@ -3402,7 +3402,7 @@ namespace internal
     template <typename Number>
     void
     set_initial_guess(
-      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
         &vector)
     {
       // Choose a high-frequency mode consisting of numbers between 0 and 1
@@ -3707,7 +3707,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
          false) ||
         (std::is_same<VectorType,
                       LinearAlgebra::distributed::
-                        Vector<NumberType, MemorySpace::CUDA>>::value ==
+                        Vector<NumberType, MemorySpace::Default>>::value ==
          false))))
     temp_vector2.reinit(src, true);
   else

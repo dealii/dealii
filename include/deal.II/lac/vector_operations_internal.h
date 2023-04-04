@@ -26,8 +26,6 @@
 #include <deal.II/base/types.h>
 #include <deal.II/base/vectorization.h>
 
-#include <deal.II/lac/cuda_kernels.h>
-#include <deal.II/lac/cuda_kernels.templates.h>
 #include <deal.II/lac/vector_operation.h>
 
 #include <cstdio>

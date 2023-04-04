@@ -839,7 +839,7 @@ namespace CUDAWrappers
 
 
   /**
-   * Copy @p data from the device to the device. @p update_flags should be
+   * Copy @p data from the @ref GlossDevice "device" to the host. @p update_flags should be
    * identical to the one used in MatrixFree::AdditionalData.
    *
    * @relates CUDAWrappers::MatrixFree

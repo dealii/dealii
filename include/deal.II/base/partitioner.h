@@ -677,7 +677,7 @@ namespace Utilities
     private:
       /**
        * Initialize import_indices_plain_dev from import_indices_data. This
-       * function is only used when using device-aware MPI.
+       * function is only used when using @ref GlossDevice "device"-aware MPI.
        */
       void
       initialize_import_indices_plain_dev() const;
@@ -729,7 +729,7 @@ namespace Utilities
        * The set of (local) indices that we are importing during compress(),
        * i.e., others' ghosts that belong to the local range. The data stored is
        * the same as in import_indices_data but the data is expanded in plain
-       * arrays. This variable is only used when using device-aware MPI.
+       * arrays. This variable is only used when using @ref GlossDevice "device"-aware MPI.
        */
       // The variable is mutable to enable lazy initialization in
       // export_to_ghosted_array_start().

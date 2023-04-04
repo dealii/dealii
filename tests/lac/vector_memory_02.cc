@@ -15,7 +15,7 @@
 
 
 // Test that memory leaks are detected correctly for a GrowingVectorMemory pool
-// with LinearAlgebra::distributed<Number, MemorySpace::CUDA> objects.
+// with LinearAlgebra::distributed<Number, MemorySpace::Default> objects.
 // Partially copied from lac/vector_memory.cc
 
 
@@ -48,8 +48,9 @@ main(int argc, char *argv[])
   try
     {
       test_leak<
-        LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>();
-      test_leak<LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>();
+        LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>();
+      test_leak<
+        LinearAlgebra::distributed::Vector<float, MemorySpace::Default>>();
     }
   catch (const StandardExceptions::ExcMemoryLeak &e)
     {

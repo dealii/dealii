@@ -113,7 +113,7 @@ public:
    * Standard constructor. Creates an object that corresponds to the origin,
    * i.e., all coordinates are set to zero.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE
   Point();
@@ -130,7 +130,7 @@ public:
    * <tt>dim!=1</tt> as it would leave some components of the point
    * coordinates uninitialized.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   explicit DEAL_II_HOST_DEVICE
   Point(const Number x);
@@ -142,7 +142,7 @@ public:
    * coordinates uninitialized (if dim>2) or would not use some arguments (if
    * dim<2).
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE
   Point(const Number x, const Number y);
@@ -154,7 +154,7 @@ public:
    * point coordinates uninitialized (if dim>3) or would not use some
    * arguments (if dim<3).
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE
   Point(const Number x, const Number y, const Number z);
@@ -172,7 +172,7 @@ public:
    * that is zero in all coordinates except for a single 1 in the <tt>i</tt>th
    * coordinate.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   static DEAL_II_HOST_DEVICE Point<dim, Number>
                              unit_vector(const unsigned int i);
@@ -180,7 +180,7 @@ public:
   /**
    * Read access to the <tt>index</tt>th coordinate.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Number
   operator()(const unsigned int index) const;
@@ -188,7 +188,7 @@ public:
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Number &
                       operator()(const unsigned int index);
@@ -210,7 +210,7 @@ public:
   /**
    * Add an offset given as Tensor<1,dim,Number> to a point.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Point<dim, Number>
                       operator+(const Tensor<1, dim, Number> &) const;
@@ -222,7 +222,7 @@ public:
    * origin) and, consequently, the result is returned as a Tensor@<1,dim@>
    * rather than as a Point@<dim@>.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Tensor<1, dim, Number>
                       operator-(const Point<dim, Number> &) const;
@@ -233,7 +233,7 @@ public:
    * documentation of this class, the result is then naturally returned as a
    * Point@<dim@> object rather than as a Tensor@<1,dim@>.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Point<dim, Number>
                       operator-(const Tensor<1, dim, Number> &) const;
@@ -241,7 +241,7 @@ public:
   /**
    * The opposite vector.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Point<dim, Number>
                       operator-() const;
@@ -258,7 +258,7 @@ public:
   /**
    * Multiply the current point by a factor.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    *
    * @relatesalso EnableIfScalar
    */
@@ -272,7 +272,7 @@ public:
   /**
    * Divide the current point by a factor.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   DEAL_II_HOST_DEVICE Point<
@@ -284,7 +284,7 @@ public:
   /**
    * Return the scalar product of the vectors representing two points.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Number
   operator*(const Tensor<1, dim, Number> &p) const;
@@ -299,7 +299,7 @@ public:
    * Tensor<rank,dim,Number>::norm_square() which returns the square of the
    * Frobenius norm.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
   square() const;
@@ -309,7 +309,7 @@ public:
    * <tt>p</tt>, i.e. the $l_2$ norm of the difference between the
    * vectors representing the two points.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
   distance(const Point<dim, Number> &p) const;
@@ -318,7 +318,7 @@ public:
    * Return the squared Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
   distance_square(const Point<dim, Number> &p) const;
@@ -648,7 +648,7 @@ inline void Point<dim, Number>::serialize(Archive &ar, const unsigned int)
 /**
  * Global operator scaling a point vector by a scalar.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relates Point
  */
