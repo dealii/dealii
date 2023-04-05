@@ -898,8 +898,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   , shapes(other.shapes)
 {
   if (other.mapping_info_on_the_fly)
-    mapping_info_on_the_fly.reset(new NonMatching::MappingInfo<dim, spacedim>(*mapping,
-                                                                update_flags));
+    mapping_info_on_the_fly.reset(
+      new NonMatching::MappingInfo<dim, spacedim>(*mapping, update_flags));
 
   connection_is_reinitialized = mapping_info->connect_is_reinitialized(
     [this]() { this->is_reinitialized = false; });
