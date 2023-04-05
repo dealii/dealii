@@ -67,6 +67,7 @@ check_all(std::ostream &log)
 
   char                  name[100];
   DataOutBase::VtkFlags flags;
+  flags.compression_level = DataOutBase::CompressionLevel::best_compression;
   if (true)
     {
       sprintf(name, "%d%d.vtu", dim, spacedim);

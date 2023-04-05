@@ -53,6 +53,7 @@ check(std::ostream &log, unsigned cell_order)
 
   DataOutBase::VtkFlags flags;
   flags.write_higher_order_cells = true;
+  flags.compression_level = DataOutBase::CompressionLevel::best_compression;
 
   DataOut<dim> data_out;
   data_out.set_flags(flags);

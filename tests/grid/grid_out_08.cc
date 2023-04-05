@@ -71,7 +71,10 @@ test()
 
   tria.refine_global(1);
 
-  GridOut grid_out;
+  GridOut           grid_out;
+  GridOutFlags::Vtu vtu_flags;
+  vtu_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+  grid_out.set_flags(vtu_flags);
   grid_out.write_vtu(tria, deallog.get_file_stream());
 }
 

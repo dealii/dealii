@@ -73,12 +73,16 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
                            RightHandSideFunction<dim>(n_components),
                            solution);
 
+  DataOutBase::VtkFlags vtk_flags;
+  vtk_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+
   for (unsigned int n_subdivisions = 1; n_subdivisions <= 2; ++n_subdivisions)
     {
       DataOut<dim> data_out;
 
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(solution, "solution");
+      data_out.set_flags(vtk_flags);
 
 
       data_out.build_patches(mapping, n_subdivisions);

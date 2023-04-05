@@ -1188,7 +1188,7 @@ namespace DataOutBase
 
     /**
      * Flag determining the compression level at which zlib, if available, is
-     * run. The default is <tt>best_compression</tt>.
+     * run. The default is <tt>best_speed</tt>.
      */
     DataOutBase::CompressionLevel compression_level;
 
@@ -1242,9 +1242,8 @@ namespace DataOutBase
       const double           time  = std::numeric_limits<double>::min(),
       const unsigned int     cycle = std::numeric_limits<unsigned int>::min(),
       const bool             print_date_and_time = true,
-      const CompressionLevel compression_level =
-        CompressionLevel::best_compression,
-      const bool write_higher_order_cells                      = false,
+      const CompressionLevel compression_level   = CompressionLevel::best_speed,
+      const bool             write_higher_order_cells          = false,
       const std::map<std::string, std::string> &physical_units = {});
   };
 

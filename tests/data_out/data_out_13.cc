@@ -166,6 +166,9 @@ check()
   std::vector<std::string> component_name(dim + dim * dim, "tensor");
   std::fill(component_name.begin(), component_name.begin() + dim, "vector");
 
+  DataOutBase::VtkFlags vtk_flags;
+  vtk_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(v,
@@ -173,6 +176,7 @@ check()
                            DataOut<dim>::type_dof_data,
                            data_component_interpretation);
   data_out.build_patches();
+  data_out.set_flags(vtk_flags);
 
   std::vector<std::string> filenames;
   filenames.push_back("output_" + Utilities::int_to_string(dim) + "d.vtu");
