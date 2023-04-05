@@ -2496,11 +2496,22 @@ FEInterfaceValues<dim, spacedim>::reinit(
           {cell->active_fe_index(), cell_neighbor->active_fe_index()});
 
       const unsigned int used_q_index =
-        (q_index == numbers::invalid_unsigned_int ? dominated_fe_index :
-                                                    q_index);
+        [q_index, dominated_fe_index, &cell]() -> unsigned int {
+        if (q_index != numbers::invalid_unsigned_int)
+          return q_index;
+        if (dominated_fe_index != numbers::invalid_fe_index)
+          return dominated_fe_index;
+        return cell->active_fe_index();
+      }();
+
       const unsigned int used_mapping_index =
-        (mapping_index == numbers::invalid_unsigned_int ? dominated_fe_index :
-                                                          mapping_index);
+        [mapping_index, dominated_fe_index, &cell]() -> unsigned int {
+        if (mapping_index != numbers::invalid_unsigned_int)
+          return mapping_index;
+        if (dominated_fe_index != numbers::invalid_fe_index)
+          return dominated_fe_index;
+        return cell->active_fe_index();
+      }();
 
       // Same as if above, but when hp is enabled.
       if (sub_face_no == numbers::invalid_unsigned_int)
