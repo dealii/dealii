@@ -463,12 +463,12 @@ public:
   /**
    * Copy constructor.
    */
-  FEPointEvaluation(FEPointEvaluation &other);
+  FEPointEvaluation(FEPointEvaluation &other) noexcept;
 
   /**
    * Move constructor.
    */
-  FEPointEvaluation(FEPointEvaluation &&other);
+  FEPointEvaluation(FEPointEvaluation &&other) noexcept;
 
   /**
    * Destructor.
@@ -873,7 +873,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
-  FEPointEvaluation<n_components_, dim, spacedim, Number> &other)
+  FEPointEvaluation<n_components_, dim, spacedim, Number> &other) noexcept
   : n_q_points(other.n_q_points)
   , mapping(other.mapping)
   , fe(other.fe)
@@ -909,7 +909,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
-  FEPointEvaluation<n_components_, dim, spacedim, Number> &&other)
+  FEPointEvaluation<n_components_, dim, spacedim, Number> &&other) noexcept
   : n_q_points(other.n_q_points)
   , mapping(other.mapping)
   , fe(other.fe)
