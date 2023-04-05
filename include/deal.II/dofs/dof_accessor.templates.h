@@ -437,7 +437,7 @@ namespace internal
         Assert(fe_index_local_ptr !=
                  dof_handler.hp_object_fe_indices[structdim].begin() +
                    dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
-               ExcNotImplemented());
+               ExcMessage("Call distribute_dofs() first."));
 
         const types::fe_index fe_index_local =
           std::distance(dof_handler.hp_object_fe_indices[structdim].begin() +
