@@ -1116,6 +1116,8 @@ namespace internal
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       std::vector<Point<spacedim>> &                 quadrature_points,
+      std::vector<DerivativeForm<1, dim, spacedim>> &jacobians,
+      std::vector<DerivativeForm<1, spacedim, dim>> &inverse_jacobians,
       std::vector<DerivativeForm<2, dim, spacedim>> &jacobian_grads)
     {
       const UpdateFlags update_flags = data.update_each;
@@ -1246,6 +1248,26 @@ namespace internal
             data.volume_elements[point] =
               data.contravariant[point].determinant();
 
+      // copy values from InternalData to vector given by reference
+      if (update_flags & update_jacobians)
+        {
+          const unsigned int n_q_points = data.contravariant.size();
+          AssertDimension(jacobians.size(), n_q_points);
+          if (cell_similarity != CellSimilarity::translation)
+            for (unsigned int point = 0; point < n_q_points; ++point)
+              jacobians[point] = data.contravariant[point];
+        }
+
+      // copy values from InternalData to vector given by reference
+      if (update_flags & update_inverse_jacobians)
+        {
+          const unsigned int n_q_points = data.contravariant.size();
+          AssertDimension(inverse_jacobians.size(), n_q_points);
+          if (cell_similarity != CellSimilarity::translation)
+            for (unsigned int point = 0; point < n_q_points; ++point)
+              inverse_jacobians[point] = data.covariant[point].transpose();
+        }
+
       if (evaluation_flag & EvaluationFlags::hessians)
         {
           constexpr int desymmetrize_3d[6][2] = {
@@ -1286,112 +1308,114 @@ namespace internal
     }
 
 
-    /**
-     * Compute the locations of quadrature points on the object described by
-     * the first argument (and the cell for which the mapping support points
-     * have already been set), but only if the update_flags of the @p data
-     * argument indicate so.
-     */
+
     template <int dim, int spacedim>
     inline void
-    maybe_compute_q_points(
-      const typename QProjector<dim>::DataSetDescriptor             data_set,
+    maybe_update_q_points_Jacobians_generic(
+      const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      std::vector<Point<spacedim>> &quadrature_points)
+      const ArrayView<const Point<dim>> &                           unit_points,
+      const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
+      const unsigned int                                  polynomial_degree,
+      const std::vector<unsigned int> &renumber_lexicographic_to_hierarchic,
+      std::vector<Point<spacedim>> &   quadrature_points,
+      std::vector<DerivativeForm<1, dim, spacedim>> &jacobians,
+      std::vector<DerivativeForm<1, spacedim, dim>> &inverse_jacobians)
     {
-      const UpdateFlags update_flags = data.update_each;
+      const UpdateFlags                   update_flags = data.update_each;
+      const std::vector<Point<spacedim>> &support_points =
+        data.mapping_support_points;
 
-      if (update_flags & update_quadrature_points)
-        for (unsigned int point = 0; point < quadrature_points.size(); ++point)
+      const unsigned int n_points = unit_points.size();
+      const unsigned int n_lanes  = VectorizedArray<double>::size();
+
+      // Use the more heavy VectorizedArray code path if there is more than
+      // one point left to compute
+      for (unsigned int i = 0; i < n_points; i += n_lanes)
+        if (n_points - i > 1)
           {
-            const double *  shape = &data.shape(point + data_set, 0);
-            Point<spacedim> result =
-              (shape[0] * data.mapping_support_points[0]);
-            for (unsigned int k = 1; k < data.n_shape_functions; ++k)
-              for (unsigned int i = 0; i < spacedim; ++i)
-                result[i] += shape[k] * data.mapping_support_points[k][i];
-            quadrature_points[point] = result;
+            Point<dim, VectorizedArray<double>> p_vec;
+            for (unsigned int j = 0; j < n_lanes; ++j)
+              if (i + j < n_points)
+                for (unsigned int d = 0; d < dim; ++d)
+                  p_vec[d][j] = unit_points[i + j][d];
+              else
+                for (unsigned int d = 0; d < dim; ++d)
+                  p_vec[d][j] = unit_points[i][d];
+
+            const auto result =
+              internal::evaluate_tensor_product_value_and_gradient(
+                polynomials_1d,
+                support_points,
+                p_vec,
+                polynomial_degree == 1,
+                renumber_lexicographic_to_hierarchic);
+
+            if (update_flags & update_quadrature_points)
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                for (unsigned int d = 0; d < spacedim; ++d)
+                  quadrature_points[i + j][d] = result.first[d][j];
+
+            if (cell_similarity == CellSimilarity::translation)
+              continue;
+
+            if (update_flags & update_contravariant_transformation)
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                for (unsigned int d = 0; d < spacedim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    data.contravariant[i + j][d][e] = result.second[e][d][j];
+
+            if (update_flags & update_volume_elements)
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                data.volume_elements[i + j] =
+                  data.contravariant[i + j].determinant();
+
+            if (update_flags & update_jacobians)
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                jacobians[i + j] = data.contravariant[i + j];
+
+            if (update_flags & update_covariant_transformation)
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                data.covariant[i + j] =
+                  data.contravariant[i + j].covariant_form();
+
+            if (update_flags & update_inverse_jacobians)
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                inverse_jacobians[i + j] = data.covariant[i + j].transpose();
           }
-    }
-
-
-
-    /**
-     * Update the co- and contravariant matrices as well as their determinant,
-     * for the cell
-     * described stored in the data object, but only if the update_flags of the @p data
-     * argument indicate so.
-     *
-     * Skip the computation if possible as indicated by the first argument.
-     */
-    template <int dim, int spacedim>
-    inline void
-    maybe_update_Jacobians(
-      const CellSimilarity::Similarity                          cell_similarity,
-      const typename dealii::QProjector<dim>::DataSetDescriptor data_set,
-      const typename dealii::MappingQ<dim, spacedim>::InternalData &data)
-    {
-      const UpdateFlags update_flags = data.update_each;
-
-      if (update_flags & update_contravariant_transformation)
-        // if the current cell is just a
-        // translation of the previous one, no
-        // need to recompute jacobians...
-        if (cell_similarity != CellSimilarity::translation)
+        else
           {
-            const unsigned int n_q_points = data.contravariant.size();
+            const auto result =
+              internal::evaluate_tensor_product_value_and_gradient(
+                polynomials_1d,
+                support_points,
+                unit_points[i],
+                polynomial_degree == 1,
+                renumber_lexicographic_to_hierarchic);
 
-            std::fill(data.contravariant.begin(),
-                      data.contravariant.end(),
-                      DerivativeForm<1, dim, spacedim>());
+            if (update_flags & update_quadrature_points)
+              quadrature_points[i] = result.first;
 
-            Assert(data.n_shape_functions > 0, ExcInternalError());
+            if (cell_similarity == CellSimilarity::translation)
+              continue;
 
-            for (unsigned int point = 0; point < n_q_points; ++point)
+            if (update_flags & update_contravariant_transformation)
               {
-                double result[spacedim][dim];
-
-                // peel away part of sum to avoid zeroing the
-                // entries and adding for the first time
-                for (unsigned int i = 0; i < spacedim; ++i)
-                  for (unsigned int j = 0; j < dim; ++j)
-                    result[i][j] = data.derivative(point + data_set, 0)[j] *
-                                   data.mapping_support_points[0][i];
-                for (unsigned int k = 1; k < data.n_shape_functions; ++k)
-                  for (unsigned int i = 0; i < spacedim; ++i)
-                    for (unsigned int j = 0; j < dim; ++j)
-                      result[i][j] += data.derivative(point + data_set, k)[j] *
-                                      data.mapping_support_points[k][i];
-
-                // write result into contravariant data. for
-                // j=dim in the case dim<spacedim, there will
-                // never be any nonzero data that arrives in
-                // here, so it is ok anyway because it was
-                // initialized to zero at the initialization
-                for (unsigned int i = 0; i < spacedim; ++i)
-                  for (unsigned int j = 0; j < dim; ++j)
-                    data.contravariant[point][i][j] = result[i][j];
+                DerivativeForm<1, spacedim, dim> jac_transposed = result.second;
+                data.contravariant[i] = jac_transposed.transpose();
               }
-          }
 
-      if (update_flags & update_covariant_transformation)
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
-            for (unsigned int point = 0; point < n_q_points; ++point)
-              {
-                data.covariant[point] =
-                  (data.contravariant[point]).covariant_form();
-              }
-          }
+            if (update_flags & update_volume_elements)
+              data.volume_elements[i] = data.contravariant[i].determinant();
 
-      if (update_flags & update_volume_elements)
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
-            for (unsigned int point = 0; point < n_q_points; ++point)
-              data.volume_elements[point] =
-                data.contravariant[point].determinant();
+            if (update_flags & update_jacobians)
+              jacobians[i] = data.contravariant[i];
+
+            if (update_flags & update_covariant_transformation)
+              data.covariant[i] = data.contravariant[i].covariant_form();
+
+            if (update_flags & update_inverse_jacobians)
+              inverse_jacobians[i] = data.covariant[i].transpose();
           }
     }
 
@@ -2012,17 +2036,9 @@ namespace internal
               output_data.normal_vectors[i] =
                 Point<spacedim>(output_data.boundary_forms[i] /
                                 output_data.boundary_forms[i].norm());
-
-          if (update_flags & update_jacobians)
-            for (unsigned int point = 0; point < n_q_points; ++point)
-              output_data.jacobians[point] = data.contravariant[point];
-
-          if (update_flags & update_inverse_jacobians)
-            for (unsigned int point = 0; point < n_q_points; ++point)
-              output_data.inverse_jacobians[point] =
-                data.covariant[point].transpose();
         }
     }
+
 
 
     /**
@@ -2041,6 +2057,9 @@ namespace internal
       const typename QProjector<dim>::DataSetDescriptor             data_set,
       const Quadrature<dim - 1> &                                   quadrature,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
+      const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
+      const unsigned int                                  polynomial_degree,
+      const std::vector<unsigned int> &renumber_lexicographic_to_hierarchic,
       internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
         &output_data)
     {
@@ -2050,16 +2069,25 @@ namespace internal
             CellSimilarity::none,
             data,
             output_data.quadrature_points,
+            output_data.jacobians,
+            output_data.inverse_jacobians,
             output_data.jacobian_grads);
         }
       else
         {
-          maybe_compute_q_points<dim, spacedim>(data_set,
-                                                data,
-                                                output_data.quadrature_points);
-          maybe_update_Jacobians<dim, spacedim>(CellSimilarity::none,
-                                                data_set,
-                                                data);
+          internal::MappingQImplementation::
+            maybe_update_q_points_Jacobians_generic(
+              CellSimilarity::none,
+              data,
+              make_array_view(&data.quadrature_points[data_set],
+                              &data.quadrature_points[data_set] +
+                                quadrature.size()),
+              polynomials_1d,
+              polynomial_degree,
+              renumber_lexicographic_to_hierarchic,
+              output_data.quadrature_points,
+              output_data.jacobians,
+              output_data.inverse_jacobians);
           maybe_update_jacobian_grads<dim, spacedim>(
             CellSimilarity::none, data_set, data, output_data.jacobian_grads);
         }

@@ -110,6 +110,20 @@ public:
                   const unsigned int   face_no);
 
   /**
+   * Compute the cell quadrature formula corresponding to using
+   * <tt>quadrature</tt> on face <tt>face_no</tt> taking into account the
+   * orientation of the face. For further details, see the general doc for this
+   * class.
+   */
+  static Quadrature<dim>
+  project_to_oriented_face(const ReferenceCell &reference_cell,
+                           const SubQuadrature &quadrature,
+                           const unsigned int   face_no,
+                           const bool           face_orientation,
+                           const bool           face_flip,
+                           const bool           face_rotation);
+
+  /**
    * Compute the quadrature points on the cell if the given quadrature formula
    * is used on face <tt>face_no</tt>, subface number <tt>subface_no</tt>
    * corresponding to RefineCase::Type <tt>ref_case</tt>. The last argument is
@@ -147,6 +161,25 @@ public:
                      const unsigned int             subface_no,
                      const RefinementCase<dim - 1> &ref_case =
                        RefinementCase<dim - 1>::isotropic_refinement);
+
+  /**
+   * Compute the cell quadrature formula corresponding to using
+   * <tt>quadrature</tt> on subface <tt>subface_no</tt> of face
+   * <tt>face_no</tt> with SubfaceCase<dim> <tt>ref_case</tt>. The last
+   * argument is only used in 3d.
+   *
+   * @note Only the points are transformed. The quadrature weights are the
+   * same as those of the original rule.
+   */
+  static Quadrature<dim>
+  project_to_oriented_subface(const ReferenceCell &            reference_cell,
+                              const SubQuadrature &            quadrature,
+                              const unsigned int               face_no,
+                              const unsigned int               subface_no,
+                              const bool                       face_orientation,
+                              const bool                       face_flip,
+                              const bool                       face_rotation,
+                              const internal::SubfaceCase<dim> ref_case);
 
   /**
    * Take a collection of face quadrature formulas and generate a cell
