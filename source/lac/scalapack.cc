@@ -753,7 +753,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(
    * The routine pgemr2d requires a BLACS context resembling at least the union
    * of process grids described by the BLACS contexts held by the ProcessGrids
    * of matrix A and B. As A and B share the same MPI communicator, there is no
-   * need to create a union MPI communicator to initialise the BLACS context
+   * need to create a union MPI communicator to initialize the BLACS context
    */
   int union_blacs_context = Csys2blacs_handle(this->grid->mpi_communicator);
   const char *order       = "Col";
