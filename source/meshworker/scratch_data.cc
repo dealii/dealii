@@ -317,10 +317,17 @@ namespace MeshWorker
         // then we defer to the dominance of one FE over another. This should
         // ensure that the optimal integration order and mapping order are
         // selected for this situation.
-        const unsigned int dominated_fe_index =
+        unsigned int dominated_fe_index =
           fe_collection->find_dominated_fe({cell->active_fe_index(),
                                             neighbor_cell->active_fe_index()},
                                            /*codim =*/1);
+
+        // TODO: find_dominated_fe returns invalid_fe_index when no dominated FE
+        // has been found. We want to pass this value to FEFaceValues, but it
+        // expects an invalid_unsigned_int in this case. We need to match the
+        // interfaces in the future.
+        if (dominated_fe_index == numbers::invalid_fe_index)
+          dominated_fe_index = numbers::invalid_unsigned_int;
 
         hp_fe_face_values->reinit(cell,
                                   face_no,
