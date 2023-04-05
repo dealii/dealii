@@ -291,7 +291,7 @@ namespace Differentiation
                              const unsigned int n_independent_variables,
                              ad_type &          out)
         {
-          // It is required that we first initialise the outer number before
+          // It is required that we first initialize the outer number before
           // any of the nested ones.
           out = ad_type(n_independent_variables, index, in);
 

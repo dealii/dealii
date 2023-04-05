@@ -1482,17 +1482,17 @@ public:
    * @param[in] q_index If left at its default, use the quadrature formula
    * within the hp::QCollection passed to the constructor as given by the
    * dominating finite element across the interface (only used if the
-   * FEInterface object is initialised with an hp::FECollection, an
+   * FEInterface object is initialized with an hp::FECollection, an
    * hp::QCollection, and possibly an hp::MappingCollection).
    * @param[in] mapping_index If left at its default, use the mapping within the
    * hp::MappingCollection passed to the constructor as given by the dominating
    * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
+   * is initialized with an hp::FECollection, an hp::QCollection, and possibly
    * an hp::MappingCollection).
    * @param[in] fe_index If left at its default, use the finite element within
    * the hp::FECollection passed to the constructor as given by the dominating
    * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
+   * is initialized with an hp::FECollection, an hp::QCollection, and possibly
    * an hp::MappingCollection).
    */
   template <class CellIteratorType, class CellNeighborIteratorType>
@@ -1524,17 +1524,17 @@ public:
    * @param[in] q_index If left at its default, use the quadrature formula
    * within the hp::QCollection passed to the constructor as given by the
    * dominating finite element across the interface (only used if the
-   * FEInterface object is initialised with an hp::FECollection, an
+   * FEInterface object is initialized with an hp::FECollection, an
    * hp::QCollection, and possibly an hp::MappingCollection).
    * @param[in] mapping_index If left at its default, use the mapping within the
    * hp::MappingCollection passed to the constructor as given by the dominating
    * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
+   * is initialized with an hp::FECollection, an hp::QCollection, and possibly
    * an hp::MappingCollection).
    * @param[in] fe_index If left at its default, use the finite element within
    * the hp::FECollection passed to the constructor as given by the dominating
    * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
+   * is initialized with an hp::FECollection, an hp::QCollection, and possibly
    * an hp::MappingCollection).
    */
   template <class CellIteratorType>

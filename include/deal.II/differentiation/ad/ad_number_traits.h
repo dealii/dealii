@@ -347,7 +347,7 @@ namespace Differentiation
          * Initialize the state of an independent variable.
          *
          * With a nested marking approach it is sometimes
-         * necessary to initialise the value of an intermediate
+         * necessary to initialize the value of an intermediate
          * value that may be a floating point number.
          */
         template <typename ADNumberType>
