@@ -197,21 +197,19 @@ namespace PETScWrappers
       {
         Vec          tvector;
         PetscScalar *array;
-        PetscInt     st, en, N, ln;
+        PetscInt     ghost_start_index, end_index, n_elements_stored_locally;
 
         ierr = VecGhostRestoreLocalForm(vector, &ghosted_vec);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        ierr = VecGetSize(vector, &N);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
-        ierr = VecGetOwnershipRange(vector, &st, &en);
+        ierr = VecGetOwnershipRange(vector, &ghost_start_index, &end_index);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = VecDuplicate(vector, &tvector);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = VecGetArray(tvector, &array);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
-        for (PetscInt i = 0; i < en - st; i++)
-          array[i] = st + i;
+        for (PetscInt i = 0; i < end_index - ghost_start_index; i++)
+          array[i] = ghost_start_index + i;
         ierr = VecRestoreArray(tvector, &array);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = VecGhostUpdateBegin(tvector, INSERT_VALUES, SCATTER_FORWARD);
@@ -220,15 +218,17 @@ namespace PETScWrappers
         AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = VecGhostGetLocalForm(tvector, &ghosted_vec);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
-        ierr = VecGetLocalSize(ghosted_vec, &ln);
+        ierr = VecGetLocalSize(ghosted_vec, &n_elements_stored_locally);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = VecGetArrayRead(ghosted_vec, (const PetscScalar **)&array);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         // Populate ghosted and ghost_indices
         ghosted = true;
-        ghost_indices.set_size(N);
-        for (PetscInt i = en - st; i < ln; i++)
+        ghost_indices.set_size(this->size());
+        for (PetscInt i = end_index - ghost_start_index;
+             i < n_elements_stored_locally;
+             i++)
           ghost_indices.add_index(static_cast<IndexSet::size_type>(array[i]));
         ghost_indices.compress();
 
