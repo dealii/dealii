@@ -49,7 +49,7 @@ test()
     Triangulation<dim>::none,
     false,
     parallel::shared::Triangulation<dim>::Settings::partition_zoltan);
-  GridGenerator::hyper_cube(tria);
+  GridGenerator::hyper_cube(tria, -3, -2);
   tria.refine_global(std::max(8 - dim, 3));
 
 
