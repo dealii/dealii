@@ -337,6 +337,24 @@ public:
    */
   Point<spacedim, Number>
   unit_to_real(const Point<spacedim, Number> &point) const;
+  /**
+   * Returns the signed distance from a @p point orthogonal to the bounds of the
+   * box in @p direction. The signed distance is negative for points inside the
+   * interval described by the bounds of the rectangle in the respective
+   * direction, zero for points on the interval boundary and positive for points
+   * outside.
+   */
+  Number
+  signed_distance(const Point<spacedim, Number> &point,
+                  const unsigned int             direction) const;
+
+  /**
+   * Returns the signed distance from a @p point to the bounds of the box. The
+   * signed distance is negative for points inside the rectangle, zero for
+   * points on the rectangle and positive for points outside the rectangle.
+   */
+  Number
+  signed_distance(const Point<spacedim, Number> &point) const;
 
   /**
    * Write or read the data of this object to or from a stream for the
