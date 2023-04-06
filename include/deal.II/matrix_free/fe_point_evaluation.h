@@ -890,6 +890,12 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   , nonzero_shape_function_component(other.nonzero_shape_function_component)
   , update_flags(other.update_flags)
   , fe_values(other.fe_values)
+  , mapping_info_on_the_fly(
+      other.mapping_info_on_the_fly ?
+        std::make_unique<NonMatching::MappingInfo<dim, spacedim>>(
+          *mapping,
+          update_flags) :
+        nullptr)
   , mapping_info(other.mapping_info)
   , current_cell_index(other.current_cell_index)
   , current_face_number(other.current_face_number)
@@ -897,10 +903,6 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   , is_reinitialized(false)
   , shapes(other.shapes)
 {
-  if (other.mapping_info_on_the_fly)
-    mapping_info_on_the_fly.reset(
-      new NonMatching::MappingInfo<dim, spacedim>(*mapping, update_flags));
-
   connection_is_reinitialized = mapping_info->connect_is_reinitialized(
     [this]() { this->is_reinitialized = false; });
 }
@@ -926,6 +928,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   , nonzero_shape_function_component(other.nonzero_shape_function_component)
   , update_flags(other.update_flags)
   , fe_values(other.fe_values)
+  , mapping_info_on_the_fly(std::move(other.mapping_info_on_the_fly))
   , mapping_info(other.mapping_info)
   , current_cell_index(other.current_cell_index)
   , current_face_number(other.current_face_number)
@@ -933,8 +936,6 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   , is_reinitialized(false)
   , shapes(other.shapes)
 {
-  mapping_info_on_the_fly.swap(other.mapping_info_on_the_fly);
-
   connection_is_reinitialized = mapping_info->connect_is_reinitialized(
     [this]() { this->is_reinitialized = false; });
 }

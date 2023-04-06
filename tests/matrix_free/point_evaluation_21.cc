@@ -56,7 +56,8 @@ test(const unsigned int degree)
   deallog << "Mapping of degree " << degree << std::endl;
 
   std::vector<Point<dim>> unit_points;
-  for (unsigned int i = 0; i < 13; ++i)
+  const unsigned int      n_q_points = 13;
+  for (unsigned int i = 0; i < n_q_points; ++i)
     {
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
@@ -64,12 +65,7 @@ test(const unsigned int degree)
       unit_points.push_back(p);
     }
 
-  FE_Q<dim>     fe(degree);
-  FEValues<dim> fe_values(mapping,
-                          fe,
-                          Quadrature<dim>(unit_points),
-                          update_values | update_gradients);
-
+  FE_Q<dim>       fe(degree);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
   Vector<Number> vector(dof_handler.n_dofs());
@@ -89,9 +85,7 @@ test(const unsigned int degree)
                            Functions::Monomial<dim, Number>(exponents),
                            vector);
 
-  std::vector<Number>                 solution_values(fe.dofs_per_cell);
-  std::vector<Number>                 function_values(unit_points.size());
-  std::vector<Tensor<1, dim, Number>> function_gradients(unit_points.size());
+  std::vector<Number> solution_values(fe.dofs_per_cell);
 
   // For float numbers that are sensitive to roundoff in the numdiff
   // tolerances (absolute 1e-8), we multiply by 1e-3 to ensure that the test
@@ -100,10 +94,6 @@ test(const unsigned int degree)
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      fe_values.reinit(cell);
-      fe_values.get_function_values(vector, function_values);
-      fe_values.get_function_gradients(vector, function_gradients);
-
       cell->get_dof_values(vector,
                            solution_values.begin(),
                            solution_values.end());
@@ -112,22 +102,32 @@ test(const unsigned int degree)
       evaluator.evaluate(solution_values,
                          EvaluationFlags::values | EvaluationFlags::gradients);
 
+      evaluator_move.reinit(cell, unit_points);
+      evaluator_move.evaluate(solution_values,
+                              EvaluationFlags::values |
+                                EvaluationFlags::gradients);
+
       deallog << "Cell with center " << cell->center(true) << std::endl;
-      for (unsigned int i = 0; i < function_values.size(); ++i)
+      for (unsigned int i = 0; i < n_q_points; ++i)
         deallog << mapping.transform_unit_to_real_cell(cell, unit_points[i])
                 << ": " << factor_float * evaluator.get_value(i)
-                << " error value "
-                << factor_float * (function_values[i] - evaluator.get_value(i))
-                << " error grad "
+                << " evaluator difference "
                 << factor_float *
-                     (evaluator.get_gradient(i) - function_gradients[i]).norm()
+                     (evaluator.get_value(i) - evaluator_move.get_value(i))
+                << " evaluator gradient difference "
+                << factor_float * (evaluator.get_gradient(i) -
+                                   evaluator_move.get_gradient(i))
+                                    .norm()
                 << std::endl;
       deallog << std::endl;
 
-      for (unsigned int i = 0; i < unit_points.size(); ++i)
+      for (unsigned int i = 0; i < n_q_points; ++i)
         {
           evaluator.submit_value(evaluator.get_value(i), i);
           evaluator.submit_gradient(evaluator.get_gradient(i), i);
+
+          evaluator_move.submit_value(evaluator_move.get_value(i), i);
+          evaluator_move.submit_gradient(evaluator_move.get_gradient(i), i);
         }
 
       evaluator.integrate(solution_values,
@@ -135,6 +135,16 @@ test(const unsigned int degree)
 
       for (const auto i : solution_values)
         deallog << factor_float * i << ' ';
+
+      evaluator_move.integrate(solution_values,
+                               EvaluationFlags::values |
+                                 EvaluationFlags::gradients);
+
+      deallog << std::endl;
+
+      for (const auto i : solution_values)
+        deallog << factor_float * i << ' ';
+
       deallog << std::endl;
     }
 }
