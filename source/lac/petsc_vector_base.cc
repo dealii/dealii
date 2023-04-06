@@ -149,11 +149,11 @@ namespace PETScWrappers
     , ghosted(false)
     , last_action(VectorOperation::unknown)
   {
-    /* TODO GHOSTED */
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(vector));
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
     (void)ierr;
+    this->determine_ghost_indices();
   }
 
 
@@ -170,7 +170,6 @@ namespace PETScWrappers
   void
   VectorBase::reinit(Vec v)
   {
-    /* TODO GHOSTED */
     AssertThrow(last_action == VectorOperation::unknown,
                 ExcMessage("Cannot assign a new Vec"));
     PetscErrorCode ierr =
@@ -179,7 +178,74 @@ namespace PETScWrappers
     ierr = VecDestroy(&vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     vector = v;
+    this->determine_ghost_indices();
   }
+
+  void
+  VectorBase::determine_ghost_indices()
+  {
+    // Reset ghost data
+    ghosted = false;
+    ghost_indices.clear();
+
+    // There's no API to infer ghost indices from a PETSc Vec
+    PetscErrorCode ierr;
+    Vec            ghosted_vec;
+    ierr = VecGhostGetLocalForm(vector, &ghosted_vec);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    if (ghosted_vec && ghosted_vec != vector)
+      {
+        Vec          tvector;
+        PetscScalar *array;
+        PetscInt     st, en, N, ln;
+
+        ierr = VecGhostRestoreLocalForm(vector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecGetSize(vector, &N);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetOwnershipRange(vector, &st, &en);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecDuplicate(vector, &tvector);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetArray(tvector, &array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        for (PetscInt i = 0; i < en - st; i++)
+          array[i] = st + i;
+        ierr = VecRestoreArray(tvector, &array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostUpdateBegin(tvector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostUpdateEnd(tvector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostGetLocalForm(tvector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetLocalSize(ghosted_vec, &ln);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetArrayRead(ghosted_vec, (const PetscScalar **)&array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        // Populate ghosted and ghost_indices
+        ghosted = true;
+        ghost_indices.set_size(N);
+        for (PetscInt i = en - st; i < ln; i++)
+          ghost_indices.add_index(static_cast<IndexSet::size_type>(array[i]));
+        ghost_indices.compress();
+
+        ierr = VecRestoreArrayRead(ghosted_vec, (const PetscScalar **)&array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostRestoreLocalForm(tvector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecDestroy(&tvector);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+    else
+      {
+        ierr = VecGhostRestoreLocalForm(vector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+  }
+
 
   void
   VectorBase::clear()
@@ -821,7 +887,7 @@ namespace PETScWrappers
     AssertIsFinite(a);
 
     // there is nothing like a AXPAY
-    // operation in Petsc, so do it in two
+    // operation in PETSc, so do it in two
     // steps
     *this *= s;
     add(a, v);
@@ -847,13 +913,8 @@ namespace PETScWrappers
 
     Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-    // there is no simple operation for this
-    // in PETSc. there are multiple ways to
-    // emulate it, we choose this one:
-    const PetscErrorCode ierr = VecCopy(v.vector, vector);
+    const PetscErrorCode ierr = VecAXPBY(vector, a, 0.0, v.vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    *this *= a;
   }
 
 
@@ -926,8 +987,13 @@ namespace PETScWrappers
   void
   VectorBase::swap(VectorBase &v)
   {
-    const PetscErrorCode ierr = VecSwap(vector, v.vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    std::swap(this->vector, v.vector);
+    std::swap(this->ghosted, v.ghosted);
+    std::swap(this->last_action, v.last_action);
+    // missing swap for IndexSet
+    IndexSet t(this->ghost_indices);
+    this->ghost_indices = v.ghost_indices;
+    v.ghost_indices     = t;
   }
 
 

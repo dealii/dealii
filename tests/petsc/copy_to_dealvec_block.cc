@@ -65,6 +65,33 @@ test()
   vb_one *= 2.0;
   v_one = vb_one;
 
+  // Create a copy of v_one using the internal Vec
+  PETScWrappers::MPI::Vector v_one_from_vec(v_one.petsc_vector());
+  Assert(v_one.size() == v_one_from_vec.size(), ExcInternalError());
+  Assert(v_one.locally_owned_size() == v_one_from_vec.locally_owned_size(),
+         ExcInternalError());
+  Assert(v_one.has_ghost_elements() == v_one_from_vec.has_ghost_elements(),
+         ExcInternalError());
+  Assert(v_one.ghost_elements() == v_one_from_vec.ghost_elements(),
+         ExcInternalError());
+
+  // Test swap
+  IndexSet local_active_2(numproc * 4);
+  local_active_2.add_range(myid * 4, myid * 4 + 4);
+  PETScWrappers::MPI::Vector vs1(local_active, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector vs2(local_active_2,
+                                 local_relevant,
+                                 MPI_COMM_WORLD);
+  vs1.swap(vs2);
+  Assert(vs1.size() == numproc * 4, ExcInternalError());
+  Assert(vs2.size() == numproc * 2, ExcInternalError());
+  Assert(vs1.locally_owned_size() == 4, ExcInternalError());
+  Assert(vs2.locally_owned_size() == 2, ExcInternalError());
+  Assert(vs1.has_ghost_elements() == true, ExcInternalError());
+  Assert(vs2.has_ghost_elements() == false, ExcInternalError());
+  Assert(vs1.ghost_elements() == v_one.ghost_elements(), ExcInternalError());
+
+  // Now BlockVectors
   PETScWrappers::MPI::BlockVector vb, v;
   vb.reinit(2);
   v.reinit(2);
@@ -127,6 +154,13 @@ test()
       Assert(vb2.block(bl).petsc_vector() == v.block(bl).petsc_vector(),
              ExcInternalError());
     }
+
+  // Test swap
+  auto old_v_vb2 = vb2.petsc_vector();
+  auto old_v_vb  = vb.petsc_vector();
+  vb.swap(vb2);
+  Assert(vb.petsc_vector() == old_v_vb2, ExcInternalError());
+  Assert(vb2.petsc_vector() == old_v_vb, ExcInternalError());
 
   // done
   if (myid == 0)

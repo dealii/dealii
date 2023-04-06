@@ -426,10 +426,13 @@ namespace PETScWrappers
     has_ghost_elements() const;
 
     /**
-     * This function only exists for compatibility with the @p
-     * LinearAlgebra::distributed::Vector class and does nothing: this class
-     * implements ghost value updates in a different way that is a better fit
-     * with the underlying PETSc vector object.
+     * Return the IndexSet of ghost elements.
+     */
+    const IndexSet &
+    ghost_elements() const;
+
+    /**
+     * Update ghosted elements.
      */
     void
     update_ghost_values() const;
@@ -847,6 +850,12 @@ namespace PETScWrappers
                          const size_type *  indices,
                          const PetscScalar *values,
                          const bool         add_values);
+
+    /**
+     * Determine ghost indices from the internal PETSc Vec
+     */
+    void
+    determine_ghost_indices();
   };
 
 
@@ -1116,10 +1125,26 @@ namespace PETScWrappers
   }
 
 
+  inline const IndexSet &
+  VectorBase::ghost_elements() const
+  {
+    return ghost_indices;
+  }
+
 
   inline void
   VectorBase::update_ghost_values() const
-  {}
+  {
+    if (ghosted)
+      {
+        PetscErrorCode ierr;
+
+        ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+  }
 
 
 
