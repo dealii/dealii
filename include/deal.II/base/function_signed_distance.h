@@ -240,6 +240,12 @@ namespace Functions
        * @param top_right Top right point of the rectangle.
        */
       Rectangle(const Point<dim> &bottom_left, const Point<dim> &top_right);
+      /**
+       * Constructor, takes a bounding box.
+       *
+       * @param bounding_box Bounding box.
+       */
+      Rectangle(const BoundingBox<dim> bounding_box);
 
       /**
        * Calculates the signed distance from a given point @p p to the rectangle.
@@ -253,6 +259,63 @@ namespace Functions
 
     private:
       const BoundingBox<dim> bounding_box;
+    };
+
+
+    /**
+     * Signed-distance level set function of Zalesak's disk proposed in
+     * @cite zalesak1979fully.
+     *
+     * It is calculated by the set difference $\psi(x) = \max(\psi_{S}(x),
+     * -\psi_{N}(x))$ of the level set functions of a sphere $\psi_{S}$ and a
+     * rectangle $\psi_{N}$. This function is zero on the surface of the disk,
+     * negative "inside" and positive in the rest of $\mathbb{R}^{dim}$.
+     *
+     * Contour surfaces of the signed distance function of a 3D Zalesak's disk
+     * are illustrated below:
+     *
+     * @image html https://www.dealii.org/images/grids/signed_distance_zalesak_disk.png
+     *
+     * @ingroup functions
+     */
+    template <int dim>
+    class ZalesakDisk : public Function<dim>
+    {
+    public:
+      /**
+       * Constructor, takes the radius and center of the disk together
+       * with the width and the height of the notch.
+       *
+       * @param radius Radius of the disk.
+       * @param center Center of the disk.
+       * @param notch_width Width of the notch of the disk.
+       * @param notch_height Height of the notch of the disk.
+       */
+      ZalesakDisk(const Point<dim> &center,
+                  const double      radius,
+                  const double      notch_width,
+                  const double      notch_height);
+
+      /**
+       * Calculates the signed distance from a given point @p p to the disk.
+       * The signed distance is negative for points inside the disk, zero
+       * for points on the disk and positive for points outside the
+       * disk.
+       */
+      double
+      value(const Point<dim> & p,
+            const unsigned int component = 0) const override;
+
+    private:
+      /**
+       * Disk described by a sphere.
+       */
+      const Functions::SignedDistance::Sphere<dim> sphere;
+
+      /**
+       * Notch described by a rectangle.
+       */
+      const Functions::SignedDistance::Rectangle<dim> notch;
     };
   } // namespace SignedDistance
 } // namespace Functions

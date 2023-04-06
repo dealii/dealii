@@ -1,0 +1,4 @@
+New: Added Functions::SignedDistance::ZalesakDisk()
+to compute the signed distance function of Zalesak's disk.
+<br>
+(Magdalena Schreter, Simon Sticko, Peter Munch, 2023/04/06)
