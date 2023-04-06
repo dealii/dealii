@@ -2493,7 +2493,8 @@ FEInterfaceValues<dim, spacedim>::reinit(
     {
       const unsigned int dominated_fe_index =
         internal_hp_fe_face_values->get_fe_collection().find_dominated_fe(
-          {cell->active_fe_index(), cell_neighbor->active_fe_index()});
+          {cell->active_fe_index(), cell_neighbor->active_fe_index()},
+          /*codim = */ 1);
 
       const unsigned int used_q_index =
         (q_index == numbers::invalid_unsigned_int ? dominated_fe_index :

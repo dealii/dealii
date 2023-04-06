@@ -318,8 +318,9 @@ namespace MeshWorker
         // ensure that the optimal integration order and mapping order are
         // selected for this situation.
         const unsigned int dominated_fe_index =
-          fe_collection->find_dominated_fe(
-            {cell->active_fe_index(), neighbor_cell->active_fe_index()});
+          fe_collection->find_dominated_fe({cell->active_fe_index(),
+                                            neighbor_cell->active_fe_index()},
+                                           /*codim =*/1);
 
         hp_fe_face_values->reinit(cell,
                                   face_no,
