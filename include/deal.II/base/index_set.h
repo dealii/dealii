@@ -174,6 +174,11 @@ public:
 
   /**
    * Add an individual index to the set of indices.
+   *
+   * If you have many indices to add to the set, consider calling the
+   * add_indices() function below. It is considerably more efficient,
+   * particularly if the indices to be added are stored in an array
+   * that is already sorted.
    */
   void
   add_index(const size_type index);
@@ -183,9 +188,17 @@ public:
    * the iterator range <code>[begin,end)</code>.
    *
    * @param[in] begin Iterator to the first element of range of indices to be
-   * added
+   * added.
    * @param[in] end The past-the-end iterator for the range of elements to be
-   * added. @pre The condition <code>begin@<=end</code> needs to be satisfied.
+   * added.
+   *
+   * @pre The condition <code>begin@<=end</code> needs to be satisfied. They
+   * also obviously have to point into the same container.
+   *
+   * @note The operations of this function are substantially more efficient if
+   *   if the indices pointed to by the range of iterators are already sorted.
+   *   As a consequence, it is often worth sorting the range of indices
+   *   before calling this function.
    */
   template <typename ForwardIterator>
   void
@@ -1726,6 +1739,11 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
   bool ranges_are_sorted = true;
   for (ForwardIterator p = begin; p != end;)
     {
+      // Starting with the current iterator 'p', find an iterator
+      // 'q' so that the indices pointed to by the iterators in
+      // the range [p,q) are consecutive. These indices then form
+      // a range that is contiguous, and that can be added all
+      // at once.
       const size_type begin_index = *p;
       size_type       end_index   = begin_index + 1;
       ForwardIterator q           = p;
@@ -1736,13 +1754,15 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
           ++q;
         }
 
+      // Add this range:
       tmp_ranges.emplace_back(begin_index, end_index);
-      p = q;
 
-      // if the starting index of the next go-around of the for loop is less
+      // Then move on to the next element in the input range.
+      // If the starting index of the next go-around of the for loop is less
       // than the end index of the one just identified, then we will have at
       // least one pair of ranges that are not sorted, and consequently the
       // whole collection of ranges is not sorted.
+      p = q;
       if (p != end && static_cast<size_type>(*p) < end_index)
         ranges_are_sorted = false;
     }
