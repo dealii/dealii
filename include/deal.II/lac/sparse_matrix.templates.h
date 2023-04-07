@@ -574,7 +574,12 @@ SparseMatrix<number>::add(const size_type  row,
               ++post_diag;
             }
 
-          // add indices before diagonal
+          // Add indices before diagonal. Because the input array
+          // is sorted, and because the entries in this matrix row
+          // are sorted, we can just linearly walk the colnums array
+          // and the input array in parallel, stopping whenever the
+          // former matches the column index of the next index in
+          // the input array:
           size_type counter = 1;
           for (size_type i = 0; i < diag; ++i)
             {
@@ -589,7 +594,7 @@ SparseMatrix<number>::add(const size_type  row,
               val_ptr[counter] += values[i];
             }
 
-          // add indices after diagonal
+          // Then do the same to add indices after the diagonal:
           for (size_type i = post_diag; i < n_cols; ++i)
             {
               while (this_cols[counter] < col_indices[i] &&
@@ -609,6 +614,9 @@ SparseMatrix<number>::add(const size_type  row,
         }
       else
         {
+          // Use the same algorithm as above, but because the matrix is
+          // not square, we can now do without the split for diagonal/
+          // entries before the diagional/entries are the diagonal.
           size_type counter = 0;
           for (size_type i = 0; i < n_cols; ++i)
             {
