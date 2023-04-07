@@ -461,6 +461,16 @@ public:
                     const unsigned int first_selected_component = 0);
 
   /**
+   * Copy constructor.
+   */
+  FEPointEvaluation(FEPointEvaluation &other) noexcept;
+
+  /**
+   * Move constructor.
+   */
+  FEPointEvaluation(FEPointEvaluation &&other) noexcept;
+
+  /**
    * Destructor.
    */
   ~FEPointEvaluation();
@@ -856,6 +866,77 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
 {
   setup(first_selected_component);
   connection_is_reinitialized = mapping_info.connect_is_reinitialized(
+    [this]() { this->is_reinitialized = false; });
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
+  FEPointEvaluation<n_components_, dim, spacedim, Number> &other) noexcept
+  : n_q_points(other.n_q_points)
+  , mapping(other.mapping)
+  , fe(other.fe)
+  , poly(other.poly)
+  , polynomials_are_hat_functions(other.polynomials_are_hat_functions)
+  , renumber(other.renumber)
+  , solution_renumbered(other.solution_renumbered)
+  , solution_renumbered_vectorized(other.solution_renumbered_vectorized)
+  , values(other.values)
+  , unit_gradients(other.unit_gradients)
+  , gradients(other.gradients)
+  , dofs_per_component(other.dofs_per_component)
+  , component_in_base_element(other.component_in_base_element)
+  , nonzero_shape_function_component(other.nonzero_shape_function_component)
+  , update_flags(other.update_flags)
+  , fe_values(other.fe_values)
+  , mapping_info_on_the_fly(
+      other.mapping_info_on_the_fly ?
+        std::make_unique<NonMatching::MappingInfo<dim, spacedim>>(
+          *mapping,
+          update_flags) :
+        nullptr)
+  , mapping_info(other.mapping_info)
+  , current_cell_index(other.current_cell_index)
+  , current_face_number(other.current_face_number)
+  , fast_path(other.fast_path)
+  , is_reinitialized(false)
+  , shapes(other.shapes)
+{
+  connection_is_reinitialized = mapping_info->connect_is_reinitialized(
+    [this]() { this->is_reinitialized = false; });
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
+  FEPointEvaluation<n_components_, dim, spacedim, Number> &&other) noexcept
+  : n_q_points(other.n_q_points)
+  , mapping(other.mapping)
+  , fe(other.fe)
+  , poly(other.poly)
+  , polynomials_are_hat_functions(other.polynomials_are_hat_functions)
+  , renumber(other.renumber)
+  , solution_renumbered(other.solution_renumbered)
+  , solution_renumbered_vectorized(other.solution_renumbered_vectorized)
+  , values(other.values)
+  , unit_gradients(other.unit_gradients)
+  , gradients(other.gradients)
+  , dofs_per_component(other.dofs_per_component)
+  , component_in_base_element(other.component_in_base_element)
+  , nonzero_shape_function_component(other.nonzero_shape_function_component)
+  , update_flags(other.update_flags)
+  , fe_values(other.fe_values)
+  , mapping_info_on_the_fly(std::move(other.mapping_info_on_the_fly))
+  , mapping_info(other.mapping_info)
+  , current_cell_index(other.current_cell_index)
+  , current_face_number(other.current_face_number)
+  , fast_path(other.fast_path)
+  , is_reinitialized(false)
+  , shapes(other.shapes)
+{
+  connection_is_reinitialized = mapping_info->connect_is_reinitialized(
     [this]() { this->is_reinitialized = false; });
 }
 
