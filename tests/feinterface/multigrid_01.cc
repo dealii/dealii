@@ -22,7 +22,6 @@
 #include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
 
@@ -30,6 +29,8 @@
 #include <iostream>
 
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 
 template <int dim>
@@ -66,27 +67,6 @@ inspect_fiv(FEInterfaceValues<dim> &fiv)
   deallog << std::endl;
 }
 
-void
-make_2_cells(Triangulation<2> &tria)
-{
-  const unsigned int        dim         = 2;
-  std::vector<unsigned int> repetitions = {2, 1};
-  Point<dim>                p1;
-  Point<dim>                p2(2.0, 1.0);
-
-  GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
-}
-
-void
-make_2_cells(Triangulation<3> &tria)
-{
-  const unsigned int        dim         = 3;
-  std::vector<unsigned int> repetitions = {2, 1, 1};
-  Point<dim>                p1;
-  Point<dim>                p2(2.0, 1.0, 1.0);
-
-  GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
-}
 
 
 template <int dim>
@@ -95,7 +75,7 @@ test()
 {
   Triangulation<dim> tria(
     Triangulation<dim>::limit_level_difference_at_vertices);
-  make_2_cells(tria);
+  TestGrids::hyper_line(tria, 2);
   tria.refine_global();
 
 
