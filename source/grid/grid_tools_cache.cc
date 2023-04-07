@@ -155,7 +155,12 @@ namespace GridTools
           BoundingBox<spacedim>,
           typename Triangulation<dim, spacedim>::active_cell_iterator>>
           boxes;
-        boxes.reserve(tria->n_active_cells());
+        if (const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+                &*tria))
+          boxes.reserve(parallel_tria->n_locally_owned_active_cells());
+        else
+          boxes.reserve(tria->n_active_cells());
         for (const auto &cell : tria->active_cell_iterators() |
                                   IteratorFilters::LocallyOwnedCell())
           boxes.emplace_back(mapping->get_bounding_box(cell), cell);
