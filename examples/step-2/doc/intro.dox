@@ -3,10 +3,29 @@
 
 @dealiiVideoLecture{9}
 
-After we have created a grid in the previous tutorial program (in step-1),
-we now show how to define degrees of freedom on this mesh. For this example, we
-will use the lowest order ($Q_1$) finite elements, for which the degrees
-of freedom are associated with the vertices of the mesh. Later
+The finite element method is based on approximating the solution $u$ of a
+differential equation such as $-\Delta u=f$ by a function $u_h$ that is
+"piecewise" polynomial; that is, we subdivide the domain $\Omega$ on which
+the equation is posed into small cells that in the documentation we will
+generally denote by the symbol $K$. On each cell $K$, the approximating
+function $u_h$ we seek is then a polynomial. (Or, strictly speaking, a function
+that is the image of a polynomial from a "reference cell", but let us not make
+things more complicated than necessary for now.)
+
+In the previous tutorial program (in step-1), we showed how we should think of
+the subdivision of the domain into cells as a "mesh" represented by the
+Triangulation class, and how this looks like in code. In the current tutorial program,
+we now show how one represents piecewise polynomial functions through the
+concept of degrees of freedom defined on this mesh. For this example, we
+will use the lowest order ($Q_1$) finite elements, that is the approximating
+function $u_h$ we are looking for will be "bi-linear" on each quadrilateral
+cell $K$ of the mesh. (They would be linear if we would work on triangles.)
+
+In practice, we represent the function as a linear combination of shape
+functions $\varphi_j(\mathbf x)$ with multipliers $U_j$ that we call the
+"degrees of freedom". For the bi-linear functions we consider here, each
+of these shape functions and degrees of freedom is associated with a
+vertex of the mesh. Later
 examples will demonstrate higher order elements where degrees of freedom are
 not necessarily associated with vertices any more, but can be associated
 with edges, faces, or cells.
@@ -22,14 +41,18 @@ second meaning of the term can be explained as follows: A mathematical
 description of finite element problems is often to say that we are looking for
 a finite dimensional function $u_h \in V_h$ that satisfies some set of equations
 (e.g. $a(u_h,\varphi_h)=(f,\varphi_h)$ for all test functions $\varphi_h\in
-V_h$). In other words, all we say here that the solution needs to lie in some
+V_h$). In other words, all we say here is that the solution needs to lie in some
 space $V_h$. However, to actually solve this problem on a computer we need to
 choose a basis of this space; this is the set of shape functions
 $\varphi_j(\mathbf x)$ we have used above in the expansion of $u_h(\mathbf x)$
 with coefficients $U_j$. There are of course many bases of the space $V_h$,
 but we will specifically choose the one that is described by the finite
 element functions that are traditionally defined locally on the cells of the
-mesh. Describing "degrees of freedom" in this context requires us to simply
+mesh.
+
+<h3> Enumerating degrees of freedom </h3>
+
+Describing "degrees of freedom" in this context requires us to simply
 <i>enumerate</i> the basis functions of the space $V_h$. For $Q_1$ elements
 this means simply enumerating the vertices of the mesh in some way, but for
 higher order elements, one also has to enumerate the shape functions that are
@@ -38,12 +61,12 @@ the enumeration of degrees of freedom is an entirely separate thing from the
 indices we use for vertices. The class that
 provides this enumeration of the basis functions of $V_h$ is called DoFHandler.
 
-Defining degrees of freedom ("DoF"s in short) on a mesh is a rather
+Defining degrees of freedom ("DoF"s in short) on a mesh is, in practice, a rather
 simple task, since the library does all the work for you. Essentially,
 all you have to do is create a finite element object (from one of the
 many finite element classes deal.II already has, see for example the
 @ref fe documentation) and give it to a DoFHandler object through the
-DoFHandler::distribute_dofs function ("distributing DoFs" is the term we use
+DoFHandler::distribute_dofs() function ("distributing DoFs" is the term we use
 to describe the process of <i>enumerating</i> the basis functions as discussed
 above). The DoFHandler is a class that
 knows which degrees of freedom live where, i.e., it can answer
@@ -52,6 +75,23 @@ questions like "how many degrees of freedom are there globally" and
 live here". This is the sort of information you need when determining
 how big your system matrix should be, and when copying the
 contributions of a single cell into the global matrix.
+
+The first task of the current program is therefore to take a mesh
+and a finite element, and enumerate the degrees of freedom. In the
+current context, this means simply giving each vertex of the mesh a
+DoF index. Once that has happened, we will output in a picture which
+vertex ended up with which DoF index. You can find the corresponding
+pictures in the <a href="#Results">results section</a> of this tutorial.
+
+It is probably worth pointing out that where each DoF is geometrically
+located is not a question we typically ask in finite element
+codes. Most often, we only care about the fact that there *is* an
+enumeration of all degrees of freedom, but not which DoF is where.
+(We will also come back to this below
+where we talk about renumbering degrees of freedom.) At the same
+time, it is probably instructive to see this once, and so this program
+shows such a figure.
+
 
 <h3> Sparsity </h3>
 
@@ -114,8 +154,10 @@ neighbors of a cell on which the function is defined.)
 
 <h3> How degrees of freedom are enumerated </h3>
 
-By default, the DoFHandler class enumerates degrees of freedom on a mesh in a
-rather random way; consequently, the sparsity pattern is also not
+By default, the DoFHandler class enumerates degrees of freedom on a mesh using
+an algorithm that is difficult to describe and leads to results that do look
+right if you know what it is doing but otherwise appears rather random;
+consequently, the sparsity pattern is also not
 optimized for any particular purpose. To show this, the code below will
 demonstrate a simple way to output the "sparsity pattern" that corresponds to
 a DoFHandler, i.e., an object that represents all of the potentially nonzero
