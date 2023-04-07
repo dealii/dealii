@@ -709,7 +709,7 @@ namespace Step60
     //
     // With the mapping in place, it is now possible to query what is the
     // location of all support points associated with the `embedded_dh`, by
-    // calling the method DoFTools::map_dofs_to_support_points.
+    // calling the method DoFTools::map_dofs_to_support_points().
     //
     // This method has two variants. One that does *not* take a Mapping, and
     // one that takes a Mapping. If you use the second type, like we are doing
