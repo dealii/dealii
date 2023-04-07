@@ -181,6 +181,8 @@ namespace PETScWrappers
     this->determine_ghost_indices();
   }
 
+
+
   void
   VectorBase::determine_ghost_indices()
   {
@@ -223,13 +225,28 @@ namespace PETScWrappers
         ierr = VecGetArrayRead(ghosted_vec, (const PetscScalar **)&array);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        // Populate ghosted and ghost_indices
+        // Populate the 'ghosted' flag and the ghost_indices variable. The
+        // latter is an index set that is most efficiently filled by
+        // sorting the indices to add. At the same time, we don't want to
+        // sort the indices stored in a PETSc-owned array; so if the array
+        // is already sorted, pass that to the IndexSet variable, and if
+        // not then copy the indices, sort them, and then add those.
         ghosted = true;
         ghost_indices.set_size(this->size());
-        for (PetscInt i = end_index - ghost_start_index;
-             i < n_elements_stored_locally;
-             i++)
-          ghost_indices.add_index(static_cast<IndexSet::size_type>(array[i]));
+
+        if (std::is_sorted(&array[end_index - ghost_start_index],
+                           &array[n_elements_stored_locally]))
+          ghost_indices.add_indices(&array[end_index - ghost_start_index],
+                                    &array[n_elements_stored_locally]);
+        else
+          {
+            std::vector<PetscInt> sorted_indices(
+              &array[end_index - ghost_start_index],
+              &array[n_elements_stored_locally]);
+            std::sort(sorted_indices.begin(), sorted_indices.end());
+            ghost_indices.add_indices(sorted_indices.begin(),
+                                      sorted_indices.end());
+          }
         ghost_indices.compress();
 
         ierr = VecRestoreArrayRead(ghosted_vec, (const PetscScalar **)&array);
