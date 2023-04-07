@@ -1997,7 +1997,8 @@ SparseMatrix<number>::add(const size_type               row,
       col_indices.size(),
       col_indices.data(),
       values.data(),
-      elide_zero_values);
+      elide_zero_values,
+      std::is_sorted(col_indices.begin(), col_indices.end()));
 }
 
 
