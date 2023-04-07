@@ -2293,8 +2293,9 @@ namespace DoFTools
   }
 
 
+  // This functino is deprecated:
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2313,8 +2314,9 @@ namespace DoFTools
   }
 
 
+  // This functino is deprecated:
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &        mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2328,6 +2330,34 @@ namespace DoFTools
     support_points =
       internal::map_dofs_to_support_points(mapping, dof_handler, mask);
   }
+
+
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask &            mask)
+  {
+    // Let the internal function do all the work, just make sure that it
+    // gets a MappingCollection
+    const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+
+    return internal::map_dofs_to_support_points(mapping_collection,
+                                                dof_handler,
+                                                mask);
+  }
+
+
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof_handler,
+    const ComponentMask &                       mask)
+  {
+    return internal::map_dofs_to_support_points(mapping, dof_handler, mask);
+  }
+
 
   template <int spacedim>
   void

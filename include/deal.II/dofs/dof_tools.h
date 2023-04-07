@@ -2274,17 +2274,37 @@ namespace DoFTools
    * is of course dense, i.e., every DoF is to be found in it.
    *
    * @param[in] mapping The mapping from the reference cell to the real cell on
-   * which DoFs are defined.
+   *   which DoFs are defined.
    * @param[in] dof_handler The object that describes which DoF indices live on
-   * which cell of the triangulation.
-   * @param[in,out] support_points A map that for every locally relevant DoF
-   * index contains the corresponding location in real space coordinates.
-   * Previous content of this object is deleted in this function.
+   *   which cell of the triangulation.
    * @param[in] mask An optional component mask that restricts the
-   * components from which the support points are extracted.
+   *   components from which the support points are extracted.
+   * @return A map that for every locally relevant DoF
+   *   index contains the corresponding location in real space coordinates.
    */
   template <int dim, int spacedim>
-  void
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask &mask = ComponentMask());
+
+  /**
+   * Same as the previous function but for the hp-case.
+   */
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(
+    const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &                   dof_handler,
+    const ComponentMask &                               mask = ComponentMask());
+
+  /**
+   * A version of the function of same name that returns the map via its third
+   * argument. This function is deprecated.
+   * @deprecated Use the function that returns the `std::map` instead.
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2292,10 +2312,12 @@ namespace DoFTools
     const ComponentMask &                               mask = ComponentMask());
 
   /**
-   * Same as the previous function but for the hp-case.
+   * A version of the function of same name that returns the map via its third
+   * argument. This function is deprecated.
+   * @deprecated Use the function that returns the `std::map` instead.
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
     const dealii::hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
