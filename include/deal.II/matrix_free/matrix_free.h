@@ -3401,7 +3401,7 @@ namespace internal
                               const VectorType & vec)
     {
       (void)component_in_block_vector;
-      bool ghosts_set = vec.has_ghost_elements();
+      const bool ghosts_set = vec.has_ghost_elements();
 
       Assert(matrix_free.get_task_info().allow_ghosted_vectors_in_loops ||
                ghosts_set == false,
@@ -3429,7 +3429,7 @@ namespace internal
                               const VectorType & vec)
     {
       (void)component_in_block_vector;
-      bool ghosts_set = vec.has_ghost_elements();
+      const bool ghosts_set = vec.has_ghost_elements();
 
       Assert(matrix_free.get_task_info().allow_ghosted_vectors_in_loops ||
                ghosts_set == false,
@@ -3461,7 +3461,7 @@ namespace internal
         std::is_same<Number, typename VectorType::value_type>::value,
         "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
-      bool ghosts_set = vec.has_ghost_elements();
+      const bool ghosts_set = vec.has_ghost_elements();
 
       Assert(matrix_free.get_task_info().allow_ghosted_vectors_in_loops ||
                ghosts_set == false,
@@ -4078,9 +4078,16 @@ namespace internal
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
       {
-        // don't forget to set ghosts_were_set, that otherwise happens
-        // inside VectorDataExchange::update_ghost_values_start()
-        exchanger.ghosts_were_set = vec.has_ghost_elements();
+        const bool ghosts_set = vec.has_ghost_elements();
+
+        Assert(exchanger.matrix_free.get_task_info()
+                   .allow_ghosted_vectors_in_loops ||
+                 ghosts_set == false,
+               ExcNotImplemented());
+
+        if (ghosts_set)
+          exchanger.ghosts_were_set = true;
+
         vec.update_ghost_values();
       }
     else
