@@ -3345,10 +3345,21 @@ namespace internal
           {
             while (matrix_values->column() < column)
               ++matrix_values;
+
+            // Ensure that we haven't walked off the end of the row and
+            // accidentally found the column in a later row. This should
+            // not have happened since we believed we know that we enter
+            // entries sorted by column, and that all columns are represented
+            // in the current matrix row. But it's worth checking.
+            Assert(matrix_values->row() == row, ExcInternalError());
+
+            // Then also assert that the column index actually exists.
             Assert(matrix_values->column() == column,
                    typename SparseMatrix<
                      typename SparseMatrixIterator::MatrixType::value_type>::
                      ExcInvalidIndex(row, column));
+
+            // Now so convinced, let us add the relevant value:
             matrix_values->value() += value;
           }
       }
