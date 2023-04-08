@@ -221,7 +221,7 @@ namespace CGALWrappers
    * @param [in] bool_op The BooleanOperation to be performed.
    * @param [in] mapping0 Mapping object for the first cell.
    * @param [in] mapping1 Mapping object for the first cell.
-   * @return [out] Quadrature<spacedim> The global quadrature rule on the polygon/polyhedron.
+   * @return The global quadrature rule on the polygon/polyhedron.
    */
   template <int dim0, int dim1, int spacedim>
   dealii::Quadrature<spacedim>
@@ -250,7 +250,7 @@ namespace CGALWrappers
    * @param [in] mapping0 Mapping object for the first cell.
    * @param [in] mapping1 Mapping object for the first cell.
    * @param [in] degree The degree of accuracy you wish to get for the global quadrature formula.
-   * @return [out] Quadrature<spacedim> The global quadrature rule on the polygon/polyhedron.
+   * @return The global quadrature rule on the polygon/polyhedron.
    */
   template <int dim0, int dim1, int spacedim>
   dealii::Quadrature<spacedim>
