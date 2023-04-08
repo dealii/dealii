@@ -30,14 +30,20 @@ macro(feature_slepc_find_external var)
     # and VERSION_MINOR of PETSc and SLEPc are
     # equivalent; and where VERSION_SUBMINORs are allowed to differ.
     #
+
     if( ("${SLEPC_VERSION_MAJOR}" STREQUAL "${PETSC_VERSION_MAJOR}")
        AND
        ("${SLEPC_VERSION_MINOR}" STREQUAL "${PETSC_VERSION_MINOR}"))
       set(${var} TRUE)
     else()
 
+      set(SLEPC_VERSION_STR "${SLEPC_VERSION_MAJOR}.${SLEPC_VERSION_MINOR}")
+      set(PETSC_VERSION_STR "${PETSC_VERSION_MAJOR}.${PETSC_VERSION_MINOR}")
       message(STATUS "Could not find a sufficient SLEPc installation: "
-        "The SLEPc library must have the same version as the PETSc library."
+        "The SLEPc library "
+        ${SLEPC_VERSION_STR}
+        " must have the same version as the PETSc library "
+        ${PETSC_VERSION_STR}
         )
       set(SLEPC_ADDITIONAL_ERROR_STRING
         "Could not find a sufficient SLEPc installation: "
