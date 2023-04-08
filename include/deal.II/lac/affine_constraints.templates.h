@@ -3995,8 +3995,12 @@ AffineConstraints<number>::distribute_local_to_global(
                                                           val_ptr);
           const size_type n_values = col_ptr - cols.data();
           if (n_values > 0)
-            global_matrix.add(
-              row, n_values, cols.data(), vals.data(), false, true);
+            global_matrix.add(row,
+                              n_values,
+                              cols.data(),
+                              vals.data(),
+                              /* elide zero additions */ false,
+                              /* sorted by column index */ true);
         }
       else
         internal::AffineConstraints::resolve_matrix_row(
