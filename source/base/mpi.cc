@@ -791,10 +791,10 @@ namespace Utilities
 #else
         threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
 #endif
-        std::string threads_flag_string = threads_flag.str();
+        const std::string threads_flag_string = threads_flag.str();
         argv_new[argc]     = const_cast<char *>(threads_flag_string.c_str());
         argv_new[argc + 1] = nullptr;
-        // The first argument in Kokkos::initialzie is of type int&. Hence, we
+        // The first argument in Kokkos::initialize is of type int&. Hence, we
         // need to define a new variable to pass to it (insted of using argc+1
         // inline).
         int argc_new = argc + 1;
