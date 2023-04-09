@@ -190,6 +190,13 @@ public:
              const std::vector<double> &    weights);
 
   /**
+   * Construct a quadrature formula from given vectors of quadrature points
+   * (which should really be in the unit cell) and the corresponding weights,
+   * moving the points and weights into the present object.
+   */
+  Quadrature(std::vector<Point<dim>> &&points, std::vector<double> &&weights);
+
+  /**
    * Construct a dummy quadrature formula from a list of points, with weights
    * set to infinity. The resulting object is therefore not meant to actually
    * perform integrations, but rather to be used with FEValues objects in
