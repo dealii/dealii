@@ -1,79 +1,79 @@
 
 DEAL:0::Testing for dim = 1
-DEAL:0::  Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.375000 p2 0.500000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.500000 p2 0.546875 rank owner: 0
-DEAL:0::  Bounding box: p1 0.546875 p2 0.671875 rank owner: 1
-DEAL:0::  Bounding box: p1 0.671875 p2 0.796875 rank owner: 1
-DEAL:0::  Bounding box: p1 0.796875 p2 0.921875 rank owner: 1
-DEAL:0::  Bounding box: p1 0.921875 p2 1.00000 rank owner: 1
+DEAL:0::  Bounding box: p1 -3.00000 p2 -2.87500 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.87500 p2 -2.75000 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.75000 p2 -2.62500 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.62500 p2 -2.50000 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.50000 p2 -2.45312 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.45312 p2 -2.32812 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.32812 p2 -2.20312 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.20312 p2 -2.07812 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.07812 p2 -2.00000 rank owner: 1
 DEAL:0::Testing for dim = 2
-DEAL:0::  Bounding box: p1 0.406250 0.656250 p2 0.562500 1.00000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.00000 0.218750 p2 0.281250 0.468750 rank owner: 0
-DEAL:0::  Bounding box: p1 0.265625 0.00000 p2 0.546875 0.234375 rank owner: 0
-DEAL:0::  Bounding box: p1 0.265625 0.234375 p2 0.546875 0.468750 rank owner: 0
-DEAL:0::  Bounding box: p1 0.00000 0.453125 p2 0.234375 0.734375 rank owner: 0
-DEAL:0::  Bounding box: p1 0.00000 0.718750 p2 0.234375 1.00000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.234375 0.453125 p2 0.562500 0.671875 rank owner: 0
-DEAL:0::  Bounding box: p1 0.218750 0.656250 p2 0.421875 1.00000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.00000 0.00000 p2 0.281250 0.234375 rank owner: 0
-DEAL:0::  Bounding box: p1 0.546875 0.531250 p2 0.781250 0.828125 rank owner: 1
-DEAL:0::  Bounding box: p1 0.531250 0.00000 p2 0.781250 0.281250 rank owner: 1
-DEAL:0::  Bounding box: p1 0.546875 0.265625 p2 0.781250 0.546875 rank owner: 1
-DEAL:0::  Bounding box: p1 0.562500 0.828125 p2 0.921875 1.00000 rank owner: 1
-DEAL:0::  Bounding box: p1 0.765625 0.00000 p2 1.00000 0.281250 rank owner: 1
-DEAL:0::  Bounding box: p1 0.765625 0.531250 p2 1.00000 0.828125 rank owner: 1
-DEAL:0::  Bounding box: p1 0.765625 0.265625 p2 1.00000 0.546875 rank owner: 1
-DEAL:0::  Bounding box: p1 0.906250 0.828125 p2 1.00000 1.00000 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.59375 -2.34375 p2 -2.43750 -2.00000 rank owner: 0
+DEAL:0::  Bounding box: p1 -3.00000 -2.78125 p2 -2.71875 -2.53125 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.73438 -3.00000 p2 -2.45312 -2.76562 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.73438 -2.76562 p2 -2.45312 -2.53125 rank owner: 0
+DEAL:0::  Bounding box: p1 -3.00000 -2.54688 p2 -2.76562 -2.26562 rank owner: 0
+DEAL:0::  Bounding box: p1 -3.00000 -2.28125 p2 -2.76562 -2.00000 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.76562 -2.54688 p2 -2.43750 -2.32812 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.78125 -2.34375 p2 -2.57812 -2.00000 rank owner: 0
+DEAL:0::  Bounding box: p1 -3.00000 -3.00000 p2 -2.71875 -2.76562 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.45312 -2.46875 p2 -2.21875 -2.17188 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.46875 -3.00000 p2 -2.21875 -2.71875 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.45312 -2.73438 p2 -2.21875 -2.45312 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.43750 -2.17188 p2 -2.07812 -2.00000 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.23438 -3.00000 p2 -2.00000 -2.71875 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.23438 -2.46875 p2 -2.00000 -2.17188 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.23438 -2.73438 p2 -2.00000 -2.45312 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.09375 -2.17188 p2 -2.00000 -2.00000 rank owner: 1
 DEAL:0::Testing for dim = 3
-DEAL:0::  Bounding box: p1 0.00000 0.00000 0.00000 p2 0.531250 0.500000 0.500000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.00000 0.00000 0.468750 p2 0.531250 0.500000 1.00000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.00000 0.468750 0.00000 p2 0.531250 1.00000 0.468750 rank owner: 0
-DEAL:0::  Bounding box: p1 0.00000 0.468750 0.437500 p2 0.437500 1.00000 1.00000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.406250 0.468750 0.437500 p2 0.531250 1.00000 1.00000 rank owner: 0
-DEAL:0::  Bounding box: p1 0.531250 0.00000 0.00000 p2 1.00000 0.562500 0.531250 rank owner: 1
-DEAL:0::  Bounding box: p1 0.531250 0.00000 0.500000 p2 1.00000 0.562500 1.00000 rank owner: 1
-DEAL:0::  Bounding box: p1 0.531250 0.531250 0.00000 p2 1.00000 1.00000 0.593750 rank owner: 1
-DEAL:0::  Bounding box: p1 0.531250 0.531250 0.562500 p2 1.00000 1.00000 1.00000 rank owner: 1
+DEAL:0::  Bounding box: p1 -3.00000 -3.00000 -3.00000 p2 -2.46875 -2.50000 -2.50000 rank owner: 0
+DEAL:0::  Bounding box: p1 -3.00000 -3.00000 -2.53125 p2 -2.46875 -2.50000 -2.00000 rank owner: 0
+DEAL:0::  Bounding box: p1 -3.00000 -2.53125 -3.00000 p2 -2.46875 -2.00000 -2.53125 rank owner: 0
+DEAL:0::  Bounding box: p1 -3.00000 -2.53125 -2.56250 p2 -2.56250 -2.00000 -2.00000 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.59375 -2.53125 -2.56250 p2 -2.46875 -2.00000 -2.00000 rank owner: 0
+DEAL:0::  Bounding box: p1 -2.46875 -3.00000 -3.00000 p2 -2.00000 -2.43750 -2.46875 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.46875 -3.00000 -2.50000 p2 -2.00000 -2.43750 -2.00000 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.46875 -2.46875 -3.00000 p2 -2.00000 -2.00000 -2.40625 rank owner: 1
+DEAL:0::  Bounding box: p1 -2.46875 -2.46875 -2.43750 p2 -2.00000 -2.00000 -2.00000 rank owner: 1
 
 DEAL:1::Testing for dim = 1
-DEAL:1::  Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.375000 p2 0.500000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.500000 p2 0.546875 rank owner: 0
-DEAL:1::  Bounding box: p1 0.546875 p2 0.671875 rank owner: 1
-DEAL:1::  Bounding box: p1 0.671875 p2 0.796875 rank owner: 1
-DEAL:1::  Bounding box: p1 0.796875 p2 0.921875 rank owner: 1
-DEAL:1::  Bounding box: p1 0.921875 p2 1.00000 rank owner: 1
+DEAL:1::  Bounding box: p1 -3.00000 p2 -2.87500 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.87500 p2 -2.75000 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.75000 p2 -2.62500 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.62500 p2 -2.50000 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.50000 p2 -2.45312 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.45312 p2 -2.32812 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.32812 p2 -2.20312 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.20312 p2 -2.07812 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.07812 p2 -2.00000 rank owner: 1
 DEAL:1::Testing for dim = 2
-DEAL:1::  Bounding box: p1 0.406250 0.656250 p2 0.562500 1.00000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.00000 0.218750 p2 0.281250 0.468750 rank owner: 0
-DEAL:1::  Bounding box: p1 0.265625 0.00000 p2 0.546875 0.234375 rank owner: 0
-DEAL:1::  Bounding box: p1 0.265625 0.234375 p2 0.546875 0.468750 rank owner: 0
-DEAL:1::  Bounding box: p1 0.00000 0.453125 p2 0.234375 0.734375 rank owner: 0
-DEAL:1::  Bounding box: p1 0.00000 0.718750 p2 0.234375 1.00000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.234375 0.453125 p2 0.562500 0.671875 rank owner: 0
-DEAL:1::  Bounding box: p1 0.218750 0.656250 p2 0.421875 1.00000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.00000 0.00000 p2 0.281250 0.234375 rank owner: 0
-DEAL:1::  Bounding box: p1 0.546875 0.531250 p2 0.781250 0.828125 rank owner: 1
-DEAL:1::  Bounding box: p1 0.531250 0.00000 p2 0.781250 0.281250 rank owner: 1
-DEAL:1::  Bounding box: p1 0.546875 0.265625 p2 0.781250 0.546875 rank owner: 1
-DEAL:1::  Bounding box: p1 0.562500 0.828125 p2 0.921875 1.00000 rank owner: 1
-DEAL:1::  Bounding box: p1 0.765625 0.00000 p2 1.00000 0.281250 rank owner: 1
-DEAL:1::  Bounding box: p1 0.765625 0.531250 p2 1.00000 0.828125 rank owner: 1
-DEAL:1::  Bounding box: p1 0.765625 0.265625 p2 1.00000 0.546875 rank owner: 1
-DEAL:1::  Bounding box: p1 0.906250 0.828125 p2 1.00000 1.00000 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.59375 -2.34375 p2 -2.43750 -2.00000 rank owner: 0
+DEAL:1::  Bounding box: p1 -3.00000 -2.78125 p2 -2.71875 -2.53125 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.73438 -3.00000 p2 -2.45312 -2.76562 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.73438 -2.76562 p2 -2.45312 -2.53125 rank owner: 0
+DEAL:1::  Bounding box: p1 -3.00000 -2.54688 p2 -2.76562 -2.26562 rank owner: 0
+DEAL:1::  Bounding box: p1 -3.00000 -2.28125 p2 -2.76562 -2.00000 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.76562 -2.54688 p2 -2.43750 -2.32812 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.78125 -2.34375 p2 -2.57812 -2.00000 rank owner: 0
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 p2 -2.71875 -2.76562 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.45312 -2.46875 p2 -2.21875 -2.17188 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.46875 -3.00000 p2 -2.21875 -2.71875 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.45312 -2.73438 p2 -2.21875 -2.45312 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.43750 -2.17188 p2 -2.07812 -2.00000 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.23438 -3.00000 p2 -2.00000 -2.71875 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.23438 -2.46875 p2 -2.00000 -2.17188 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.23438 -2.73438 p2 -2.00000 -2.45312 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.09375 -2.17188 p2 -2.00000 -2.00000 rank owner: 1
 DEAL:1::Testing for dim = 3
-DEAL:1::  Bounding box: p1 0.00000 0.00000 0.00000 p2 0.531250 0.500000 0.500000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.00000 0.00000 0.468750 p2 0.531250 0.500000 1.00000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.00000 0.468750 0.00000 p2 0.531250 1.00000 0.468750 rank owner: 0
-DEAL:1::  Bounding box: p1 0.00000 0.468750 0.437500 p2 0.437500 1.00000 1.00000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.406250 0.468750 0.437500 p2 0.531250 1.00000 1.00000 rank owner: 0
-DEAL:1::  Bounding box: p1 0.531250 0.00000 0.00000 p2 1.00000 0.562500 0.531250 rank owner: 1
-DEAL:1::  Bounding box: p1 0.531250 0.00000 0.500000 p2 1.00000 0.562500 1.00000 rank owner: 1
-DEAL:1::  Bounding box: p1 0.531250 0.531250 0.00000 p2 1.00000 1.00000 0.593750 rank owner: 1
-DEAL:1::  Bounding box: p1 0.531250 0.531250 0.562500 p2 1.00000 1.00000 1.00000 rank owner: 1
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -3.00000 p2 -2.46875 -2.50000 -2.50000 rank owner: 0
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.53125 p2 -2.46875 -2.50000 -2.00000 rank owner: 0
+DEAL:1::  Bounding box: p1 -3.00000 -2.53125 -3.00000 p2 -2.46875 -2.00000 -2.53125 rank owner: 0
+DEAL:1::  Bounding box: p1 -3.00000 -2.53125 -2.56250 p2 -2.56250 -2.00000 -2.00000 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.59375 -2.53125 -2.56250 p2 -2.46875 -2.00000 -2.00000 rank owner: 0
+DEAL:1::  Bounding box: p1 -2.46875 -3.00000 -3.00000 p2 -2.00000 -2.43750 -2.46875 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.46875 -3.00000 -2.50000 p2 -2.00000 -2.43750 -2.00000 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.46875 -2.46875 -3.00000 p2 -2.00000 -2.00000 -2.40625 rank owner: 1
+DEAL:1::  Bounding box: p1 -2.46875 -2.46875 -2.43750 p2 -2.00000 -2.00000 -2.00000 rank owner: 1
 

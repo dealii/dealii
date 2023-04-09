@@ -1,0 +1,819 @@
+
+DEAL:0::Testing for dim = 1
+DEAL:0::  Bounding box: p1 -2.25000 p2 -2.21875 owning cell: 5.24
+DEAL:0::  Bounding box: p1 -2.21875 p2 -2.18750 owning cell: 5.25
+DEAL:0::  Bounding box: p1 -2.18750 p2 -2.15625 owning cell: 5.26
+DEAL:0::  Bounding box: p1 -2.15625 p2 -2.12500 owning cell: 5.27
+DEAL:0::  Bounding box: p1 -2.12500 p2 -2.09375 owning cell: 5.28
+DEAL:0::  Bounding box: p1 -2.09375 p2 -2.06250 owning cell: 5.29
+DEAL:0::  Bounding box: p1 -2.06250 p2 -2.03125 owning cell: 5.30
+DEAL:0::  Bounding box: p1 -2.03125 p2 -2.00000 owning cell: 5.31
+DEAL:0::Testing for dim = 2
+DEAL:0::  Bounding box: p1 -2.93750 -2.93750 p2 -2.87500 -2.87500 owning cell: 4.3
+DEAL:0::  Bounding box: p1 -3.00000 -3.00000 p2 -2.93750 -2.93750 owning cell: 4.0
+DEAL:0::  Bounding box: p1 -2.81250 -3.00000 p2 -2.75000 -2.93750 owning cell: 4.5
+DEAL:0::  Bounding box: p1 -2.81250 -2.93750 p2 -2.75000 -2.87500 owning cell: 4.7
+DEAL:0::  Bounding box: p1 -2.87500 -2.93750 p2 -2.81250 -2.87500 owning cell: 4.6
+DEAL:0::  Bounding box: p1 -2.87500 -3.00000 p2 -2.81250 -2.93750 owning cell: 4.4
+DEAL:0::  Bounding box: p1 -2.93750 -3.00000 p2 -2.87500 -2.93750 owning cell: 4.1
+DEAL:0::  Bounding box: p1 -3.00000 -2.87500 p2 -2.93750 -2.81250 owning cell: 4.8
+DEAL:0::  Bounding box: p1 -2.93750 -2.87500 p2 -2.87500 -2.81250 owning cell: 4.9
+DEAL:0::  Bounding box: p1 -3.00000 -2.93750 p2 -2.93750 -2.87500 owning cell: 4.2
+DEAL:0::  Bounding box: p1 -2.87500 -2.87500 p2 -2.81250 -2.81250 owning cell: 4.12
+DEAL:0::  Bounding box: p1 -2.81250 -2.87500 p2 -2.75000 -2.81250 owning cell: 4.13
+DEAL:0::  Bounding box: p1 -2.87500 -2.81250 p2 -2.81250 -2.75000 owning cell: 4.14
+DEAL:0::  Bounding box: p1 -2.93750 -2.81250 p2 -2.87500 -2.75000 owning cell: 4.11
+DEAL:0::  Bounding box: p1 -3.00000 -2.81250 p2 -2.93750 -2.75000 owning cell: 4.10
+DEAL:0::  Bounding box: p1 -2.81250 -2.81250 p2 -2.75000 -2.75000 owning cell: 4.15
+DEAL:0::  Bounding box: p1 -2.93750 -2.75000 p2 -2.87500 -2.68750 owning cell: 4.33
+DEAL:0::  Bounding box: p1 -2.87500 -2.75000 p2 -2.81250 -2.68750 owning cell: 4.36
+DEAL:0::  Bounding box: p1 -3.00000 -2.75000 p2 -2.93750 -2.68750 owning cell: 4.32
+DEAL:0::  Bounding box: p1 -2.81250 -2.68750 p2 -2.75000 -2.62500 owning cell: 4.39
+DEAL:0::  Bounding box: p1 -2.81250 -2.75000 p2 -2.75000 -2.68750 owning cell: 4.37
+DEAL:0::  Bounding box: p1 -2.87500 -2.68750 p2 -2.81250 -2.62500 owning cell: 4.38
+DEAL:0::  Bounding box: p1 -2.93750 -2.68750 p2 -2.87500 -2.62500 owning cell: 4.35
+DEAL:0::  Bounding box: p1 -3.00000 -2.56250 p2 -2.93750 -2.50000 owning cell: 4.42
+DEAL:0::  Bounding box: p1 -2.93750 -2.62500 p2 -2.87500 -2.56250 owning cell: 4.41
+DEAL:0::  Bounding box: p1 -2.93750 -2.56250 p2 -2.87500 -2.50000 owning cell: 4.43
+DEAL:0::  Bounding box: p1 -2.81250 -2.56250 p2 -2.75000 -2.50000 owning cell: 4.47
+DEAL:0::  Bounding box: p1 -3.00000 -2.62500 p2 -2.93750 -2.56250 owning cell: 4.40
+DEAL:0::  Bounding box: p1 -2.87500 -2.62500 p2 -2.81250 -2.56250 owning cell: 4.44
+DEAL:0::  Bounding box: p1 -2.87500 -2.56250 p2 -2.81250 -2.50000 owning cell: 4.46
+DEAL:0::  Bounding box: p1 -3.00000 -2.68750 p2 -2.93750 -2.62500 owning cell: 4.34
+DEAL:0::  Bounding box: p1 -2.81250 -2.62500 p2 -2.75000 -2.56250 owning cell: 4.45
+DEAL:0::  Bounding box: p1 -2.75000 -3.00000 p2 -2.68750 -2.93750 owning cell: 4.16
+DEAL:0::  Bounding box: p1 -2.56250 -3.00000 p2 -2.50000 -2.93750 owning cell: 4.21
+DEAL:0::  Bounding box: p1 -2.62500 -3.00000 p2 -2.56250 -2.93750 owning cell: 4.20
+DEAL:0::  Bounding box: p1 -2.68750 -3.00000 p2 -2.62500 -2.93750 owning cell: 4.17
+DEAL:0::  Bounding box: p1 -2.75000 -2.81250 p2 -2.68750 -2.75000 owning cell: 4.26
+DEAL:0::  Bounding box: p1 -2.62500 -2.93750 p2 -2.56250 -2.87500 owning cell: 4.22
+DEAL:0::  Bounding box: p1 -2.75000 -2.93750 p2 -2.68750 -2.87500 owning cell: 4.18
+DEAL:0::  Bounding box: p1 -2.62500 -2.87500 p2 -2.56250 -2.81250 owning cell: 4.28
+DEAL:0::  Bounding box: p1 -2.56250 -2.87500 p2 -2.50000 -2.81250 owning cell: 4.29
+DEAL:0::  Bounding box: p1 -2.56250 -2.93750 p2 -2.50000 -2.87500 owning cell: 4.23
+DEAL:0::  Bounding box: p1 -2.68750 -2.93750 p2 -2.62500 -2.87500 owning cell: 4.19
+DEAL:0::  Bounding box: p1 -2.68750 -2.87500 p2 -2.62500 -2.81250 owning cell: 4.25
+DEAL:0::  Bounding box: p1 -2.75000 -2.87500 p2 -2.68750 -2.81250 owning cell: 4.24
+DEAL:0::  Bounding box: p1 -2.56250 -2.81250 p2 -2.50000 -2.75000 owning cell: 4.31
+DEAL:0::  Bounding box: p1 -2.68750 -2.81250 p2 -2.62500 -2.75000 owning cell: 4.27
+DEAL:0::  Bounding box: p1 -2.62500 -2.81250 p2 -2.56250 -2.75000 owning cell: 4.30
+DEAL:0::  Bounding box: p1 -2.56250 -2.75000 p2 -2.50000 -2.68750 owning cell: 4.53
+DEAL:0::  Bounding box: p1 -2.62500 -2.75000 p2 -2.56250 -2.68750 owning cell: 4.52
+DEAL:0::  Bounding box: p1 -2.75000 -2.75000 p2 -2.68750 -2.68750 owning cell: 4.48
+DEAL:0::  Bounding box: p1 -2.56250 -2.68750 p2 -2.50000 -2.62500 owning cell: 4.55
+DEAL:0::  Bounding box: p1 -2.68750 -2.75000 p2 -2.62500 -2.68750 owning cell: 4.49
+DEAL:0::  Bounding box: p1 -2.75000 -2.68750 p2 -2.68750 -2.62500 owning cell: 4.50
+DEAL:0::  Bounding box: p1 -2.62500 -2.68750 p2 -2.56250 -2.62500 owning cell: 4.54
+DEAL:0::  Bounding box: p1 -2.68750 -2.56250 p2 -2.62500 -2.50000 owning cell: 4.59
+DEAL:0::  Bounding box: p1 -2.75000 -2.56250 p2 -2.68750 -2.50000 owning cell: 4.58
+DEAL:0::  Bounding box: p1 -2.68750 -2.62500 p2 -2.62500 -2.56250 owning cell: 4.57
+DEAL:0::  Bounding box: p1 -2.75000 -2.62500 p2 -2.68750 -2.56250 owning cell: 4.56
+DEAL:0::  Bounding box: p1 -2.68750 -2.68750 p2 -2.62500 -2.62500 owning cell: 4.51
+DEAL:0::  Bounding box: p1 -2.62500 -2.62500 p2 -2.56250 -2.56250 owning cell: 4.60
+DEAL:0::  Bounding box: p1 -2.56250 -2.62500 p2 -2.50000 -2.56250 owning cell: 4.61
+DEAL:0::  Bounding box: p1 -2.62500 -2.56250 p2 -2.56250 -2.50000 owning cell: 4.62
+DEAL:0::  Bounding box: p1 -2.56250 -2.56250 p2 -2.50000 -2.50000 owning cell: 4.63
+DEAL:0::Testing for dim = 3
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -3.00000 p2 -2.75000 -2.25000 -2.87500 owning cell: 3.131
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -3.00000 p2 -2.87500 -2.25000 -2.87500 owning cell: 3.130
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -2.62500 p2 -2.87500 -2.25000 -2.50000 owning cell: 3.166
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -2.62500 p2 -2.87500 -2.37500 -2.50000 owning cell: 3.164
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -2.62500 p2 -2.75000 -2.25000 -2.50000 owning cell: 3.167
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -2.87500 p2 -2.87500 -2.37500 -2.75000 owning cell: 3.132
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -3.00000 p2 -2.87500 -2.37500 -2.87500 owning cell: 3.128
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -2.87500 p2 -2.75000 -2.37500 -2.75000 owning cell: 3.133
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -2.75000 p2 -2.87500 -2.37500 -2.62500 owning cell: 3.160
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -2.75000 p2 -2.87500 -2.25000 -2.62500 owning cell: 3.162
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -2.87500 p2 -2.87500 -2.25000 -2.75000 owning cell: 3.134
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -2.75000 p2 -2.75000 -2.25000 -2.62500 owning cell: 3.163
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -2.62500 p2 -2.75000 -2.37500 -2.50000 owning cell: 3.165
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -3.00000 p2 -2.75000 -2.37500 -2.87500 owning cell: 3.129
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -2.87500 p2 -2.75000 -2.25000 -2.75000 owning cell: 3.135
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -2.75000 p2 -2.75000 -2.37500 -2.62500 owning cell: 3.161
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -2.87500 p2 -2.62500 -2.25000 -2.75000 owning cell: 3.142
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -3.00000 p2 -2.62500 -2.37500 -2.87500 owning cell: 3.136
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -2.75000 p2 -2.62500 -2.25000 -2.62500 owning cell: 3.170
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -2.62500 p2 -2.50000 -2.37500 -2.50000 owning cell: 3.173
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -2.75000 p2 -2.50000 -2.25000 -2.62500 owning cell: 3.171
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -2.62500 p2 -2.50000 -2.25000 -2.50000 owning cell: 3.175
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -3.00000 p2 -2.50000 -2.37500 -2.87500 owning cell: 3.137
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -2.62500 p2 -2.62500 -2.25000 -2.50000 owning cell: 3.174
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -3.00000 p2 -2.62500 -2.25000 -2.87500 owning cell: 3.138
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -2.87500 p2 -2.62500 -2.37500 -2.75000 owning cell: 3.140
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -2.87500 p2 -2.50000 -2.37500 -2.75000 owning cell: 3.141
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -2.75000 p2 -2.62500 -2.37500 -2.62500 owning cell: 3.168
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -2.75000 p2 -2.50000 -2.37500 -2.62500 owning cell: 3.169
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -3.00000 p2 -2.50000 -2.25000 -2.87500 owning cell: 3.139
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -2.87500 p2 -2.50000 -2.25000 -2.75000 owning cell: 3.143
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -2.62500 p2 -2.62500 -2.37500 -2.50000 owning cell: 3.172
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -2.62500 p2 -2.75000 -2.00000 -2.50000 owning cell: 3.183
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -3.00000 p2 -2.75000 -2.00000 -2.87500 owning cell: 3.147
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -2.62500 p2 -2.75000 -2.12500 -2.50000 owning cell: 3.181
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -2.87500 p2 -2.87500 -2.12500 -2.75000 owning cell: 3.148
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -2.75000 p2 -2.87500 -2.12500 -2.62500 owning cell: 3.176
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -2.62500 p2 -2.87500 -2.12500 -2.50000 owning cell: 3.180
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -2.75000 p2 -2.75000 -2.00000 -2.62500 owning cell: 3.179
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -3.00000 p2 -2.87500 -2.00000 -2.87500 owning cell: 3.146
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -2.75000 p2 -2.87500 -2.00000 -2.62500 owning cell: 3.178
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -2.62500 p2 -2.87500 -2.00000 -2.50000 owning cell: 3.182
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -2.87500 p2 -2.87500 -2.00000 -2.75000 owning cell: 3.150
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -3.00000 p2 -2.87500 -2.12500 -2.87500 owning cell: 3.144
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -2.87500 p2 -2.75000 -2.00000 -2.75000 owning cell: 3.151
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -2.87500 p2 -2.75000 -2.12500 -2.75000 owning cell: 3.149
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -3.00000 p2 -2.75000 -2.12500 -2.87500 owning cell: 3.145
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -2.75000 p2 -2.75000 -2.12500 -2.62500 owning cell: 3.177
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -3.00000 p2 -2.62500 -2.00000 -2.87500 owning cell: 3.154
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -2.87500 p2 -2.62500 -2.12500 -2.75000 owning cell: 3.156
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -2.87500 p2 -2.62500 -2.00000 -2.75000 owning cell: 3.158
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -2.62500 p2 -2.62500 -2.00000 -2.50000 owning cell: 3.190
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -2.75000 p2 -2.62500 -2.00000 -2.62500 owning cell: 3.186
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -3.00000 p2 -2.50000 -2.12500 -2.87500 owning cell: 3.153
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -3.00000 p2 -2.62500 -2.12500 -2.87500 owning cell: 3.152
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -2.75000 p2 -2.50000 -2.00000 -2.62500 owning cell: 3.187
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -2.62500 p2 -2.50000 -2.12500 -2.50000 owning cell: 3.189
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -2.75000 p2 -2.50000 -2.12500 -2.62500 owning cell: 3.185
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -2.87500 p2 -2.50000 -2.12500 -2.75000 owning cell: 3.157
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -2.62500 p2 -2.50000 -2.00000 -2.50000 owning cell: 3.191
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -2.62500 p2 -2.62500 -2.12500 -2.50000 owning cell: 3.188
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -3.00000 p2 -2.50000 -2.00000 -2.87500 owning cell: 3.155
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -2.87500 p2 -2.50000 -2.00000 -2.75000 owning cell: 3.159
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -2.75000 p2 -2.62500 -2.12500 -2.62500 owning cell: 3.184
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -2.12500 p2 -2.75000 -2.37500 -2.00000 owning cell: 3.421
+DEAL:0::  Bounding box: p1 -3.00000 -2.62500 -2.12500 p2 -2.87500 -2.50000 -2.00000 owning cell: 3.310
+DEAL:0::  Bounding box: p1 -2.87500 -2.62500 -2.25000 p2 -2.75000 -2.50000 -2.12500 owning cell: 3.307
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -2.25000 p2 -2.87500 -2.25000 -2.12500 owning cell: 3.418
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -2.12500 p2 -2.87500 -2.37500 -2.00000 owning cell: 3.420
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -2.50000 p2 -2.75000 -2.37500 -2.37500 owning cell: 3.385
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -2.50000 p2 -2.75000 -2.25000 -2.37500 owning cell: 3.387
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -2.50000 p2 -2.87500 -2.25000 -2.37500 owning cell: 3.386
+DEAL:0::  Bounding box: p1 -3.00000 -2.62500 -2.25000 p2 -2.87500 -2.50000 -2.12500 owning cell: 3.306
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -2.25000 p2 -2.75000 -2.25000 -2.12500 owning cell: 3.419
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -2.37500 p2 -2.75000 -2.37500 -2.25000 owning cell: 3.389
+DEAL:0::  Bounding box: p1 -3.00000 -2.62500 -2.37500 p2 -2.87500 -2.50000 -2.25000 owning cell: 3.278
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -2.50000 p2 -2.87500 -2.37500 -2.37500 owning cell: 3.384
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -2.37500 p2 -2.87500 -2.37500 -2.25000 owning cell: 3.388
+DEAL:0::  Bounding box: p1 -2.87500 -2.50000 -2.25000 p2 -2.75000 -2.37500 -2.12500 owning cell: 3.417
+DEAL:0::  Bounding box: p1 -3.00000 -2.50000 -2.25000 p2 -2.87500 -2.37500 -2.12500 owning cell: 3.416
+DEAL:0::  Bounding box: p1 -2.87500 -2.62500 -2.12500 p2 -2.75000 -2.50000 -2.00000 owning cell: 3.311
+DEAL:0::  Bounding box: p1 -2.87500 -2.62500 -2.37500 p2 -2.75000 -2.50000 -2.25000 owning cell: 3.279
+DEAL:0::  Bounding box: p1 -2.75000 -2.62500 -2.12500 p2 -2.62500 -2.50000 -2.00000 owning cell: 3.318
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -2.25000 p2 -2.62500 -2.37500 -2.12500 owning cell: 3.424
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -2.37500 p2 -2.62500 -2.37500 -2.25000 owning cell: 3.396
+DEAL:0::  Bounding box: p1 -2.62500 -2.62500 -2.12500 p2 -2.50000 -2.50000 -2.00000 owning cell: 3.319
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -2.12500 p2 -2.62500 -2.37500 -2.00000 owning cell: 3.428
+DEAL:0::  Bounding box: p1 -2.75000 -2.62500 -2.25000 p2 -2.62500 -2.50000 -2.12500 owning cell: 3.314
+DEAL:0::  Bounding box: p1 -2.75000 -2.50000 -2.50000 p2 -2.62500 -2.37500 -2.37500 owning cell: 3.392
+DEAL:0::  Bounding box: p1 -2.75000 -2.62500 -2.37500 p2 -2.62500 -2.50000 -2.25000 owning cell: 3.286
+DEAL:0::  Bounding box: p1 -2.62500 -2.62500 -2.37500 p2 -2.50000 -2.50000 -2.25000 owning cell: 3.287
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -2.12500 p2 -2.50000 -2.37500 -2.00000 owning cell: 3.429
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -2.25000 p2 -2.50000 -2.37500 -2.12500 owning cell: 3.425
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -2.37500 p2 -2.50000 -2.37500 -2.25000 owning cell: 3.397
+DEAL:0::  Bounding box: p1 -2.62500 -2.62500 -2.25000 p2 -2.50000 -2.50000 -2.12500 owning cell: 3.315
+DEAL:0::  Bounding box: p1 -2.62500 -2.50000 -2.50000 p2 -2.50000 -2.37500 -2.37500 owning cell: 3.393
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -2.25000 p2 -2.75000 -2.12500 -2.12500 owning cell: 3.433
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -2.50000 p2 -2.87500 -2.12500 -2.37500 owning cell: 3.400
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -2.37500 p2 -2.75000 -2.25000 -2.25000 owning cell: 3.391
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -2.12500 p2 -2.87500 -2.25000 -2.00000 owning cell: 3.422
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -2.12500 p2 -2.75000 -2.00000 -2.00000 owning cell: 3.439
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -2.37500 p2 -2.87500 -2.00000 -2.25000 owning cell: 3.406
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -2.12500 p2 -2.87500 -2.00000 -2.00000 owning cell: 3.438
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -2.12500 p2 -2.75000 -2.12500 -2.00000 owning cell: 3.437
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -2.25000 p2 -2.87500 -2.00000 -2.12500 owning cell: 3.434
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -2.12500 p2 -2.87500 -2.12500 -2.00000 owning cell: 3.436
+DEAL:0::  Bounding box: p1 -3.00000 -2.12500 -2.50000 p2 -2.87500 -2.00000 -2.37500 owning cell: 3.402
+DEAL:0::  Bounding box: p1 -3.00000 -2.37500 -2.37500 p2 -2.87500 -2.25000 -2.25000 owning cell: 3.390
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -2.25000 p2 -2.87500 -2.12500 -2.12500 owning cell: 3.432
+DEAL:0::  Bounding box: p1 -3.00000 -2.25000 -2.37500 p2 -2.87500 -2.12500 -2.25000 owning cell: 3.404
+DEAL:0::  Bounding box: p1 -2.87500 -2.37500 -2.12500 p2 -2.75000 -2.25000 -2.00000 owning cell: 3.423
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -2.37500 p2 -2.75000 -2.00000 -2.25000 owning cell: 3.407
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -2.37500 p2 -2.75000 -2.12500 -2.25000 owning cell: 3.405
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -2.50000 p2 -2.75000 -2.00000 -2.37500 owning cell: 3.403
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -2.50000 p2 -2.50000 -2.25000 -2.37500 owning cell: 3.395
+DEAL:0::  Bounding box: p1 -2.87500 -2.25000 -2.50000 p2 -2.75000 -2.12500 -2.37500 owning cell: 3.401
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -2.37500 p2 -2.50000 -2.00000 -2.25000 owning cell: 3.415
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -2.37500 p2 -2.50000 -2.12500 -2.25000 owning cell: 3.413
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -2.37500 p2 -2.50000 -2.25000 -2.25000 owning cell: 3.399
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -2.50000 p2 -2.50000 -2.00000 -2.37500 owning cell: 3.411
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -2.50000 p2 -2.62500 -2.25000 -2.37500 owning cell: 3.394
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -2.50000 p2 -2.62500 -2.00000 -2.37500 owning cell: 3.410
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -2.50000 p2 -2.62500 -2.12500 -2.37500 owning cell: 3.408
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -2.50000 p2 -2.50000 -2.12500 -2.37500 owning cell: 3.409
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -2.25000 p2 -2.50000 -2.12500 -2.12500 owning cell: 3.441
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -2.37500 p2 -2.62500 -2.12500 -2.25000 owning cell: 3.412
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -2.37500 p2 -2.62500 -2.00000 -2.25000 owning cell: 3.414
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -2.37500 p2 -2.62500 -2.25000 -2.25000 owning cell: 3.398
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -2.25000 p2 -2.50000 -2.25000 -2.12500 owning cell: 3.427
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -2.25000 p2 -2.50000 -2.00000 -2.12500 owning cell: 3.443
+DEAL:0::  Bounding box: p1 -2.87500 -2.12500 -2.25000 p2 -2.75000 -2.00000 -2.12500 owning cell: 3.435
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -2.12500 p2 -2.62500 -2.25000 -2.00000 owning cell: 3.430
+DEAL:0::  Bounding box: p1 -2.75000 -2.37500 -2.25000 p2 -2.62500 -2.25000 -2.12500 owning cell: 3.426
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -2.12500 p2 -2.62500 -2.00000 -2.00000 owning cell: 3.446
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -2.25000 p2 -2.62500 -2.12500 -2.12500 owning cell: 3.440
+DEAL:0::  Bounding box: p1 -2.62500 -2.25000 -2.12500 p2 -2.50000 -2.12500 -2.00000 owning cell: 3.445
+DEAL:0::  Bounding box: p1 -2.75000 -2.12500 -2.25000 p2 -2.62500 -2.00000 -2.12500 owning cell: 3.442
+DEAL:0::  Bounding box: p1 -2.62500 -2.12500 -2.12500 p2 -2.50000 -2.00000 -2.00000 owning cell: 3.447
+DEAL:0::  Bounding box: p1 -2.62500 -2.37500 -2.12500 p2 -2.50000 -2.25000 -2.00000 owning cell: 3.431
+DEAL:0::  Bounding box: p1 -2.75000 -2.25000 -2.12500 p2 -2.62500 -2.12500 -2.00000 owning cell: 3.444
+
+DEAL:1::Testing for dim = 1
+DEAL:1::  Bounding box: p1 -2.53125 p2 -2.50000 owning cell: 5.15
+DEAL:1::  Bounding box: p1 -2.50000 p2 -2.46875 owning cell: 5.16
+DEAL:1::  Bounding box: p1 -2.46875 p2 -2.43750 owning cell: 5.17
+DEAL:1::  Bounding box: p1 -2.43750 p2 -2.40625 owning cell: 5.18
+DEAL:1::  Bounding box: p1 -2.40625 p2 -2.37500 owning cell: 5.19
+DEAL:1::  Bounding box: p1 -2.37500 p2 -2.34375 owning cell: 5.20
+DEAL:1::  Bounding box: p1 -2.34375 p2 -2.31250 owning cell: 5.21
+DEAL:1::  Bounding box: p1 -2.31250 p2 -2.28125 owning cell: 5.22
+DEAL:1::  Bounding box: p1 -2.28125 p2 -2.25000 owning cell: 5.23
+DEAL:1::Testing for dim = 2
+DEAL:1::  Bounding box: p1 -2.93750 -2.43750 p2 -2.87500 -2.37500 owning cell: 4.131
+DEAL:1::  Bounding box: p1 -3.00000 -2.50000 p2 -2.93750 -2.43750 owning cell: 4.128
+DEAL:1::  Bounding box: p1 -2.81250 -2.50000 p2 -2.75000 -2.43750 owning cell: 4.133
+DEAL:1::  Bounding box: p1 -2.81250 -2.43750 p2 -2.75000 -2.37500 owning cell: 4.135
+DEAL:1::  Bounding box: p1 -2.87500 -2.43750 p2 -2.81250 -2.37500 owning cell: 4.134
+DEAL:1::  Bounding box: p1 -2.87500 -2.50000 p2 -2.81250 -2.43750 owning cell: 4.132
+DEAL:1::  Bounding box: p1 -2.93750 -2.50000 p2 -2.87500 -2.43750 owning cell: 4.129
+DEAL:1::  Bounding box: p1 -3.00000 -2.37500 p2 -2.93750 -2.31250 owning cell: 4.136
+DEAL:1::  Bounding box: p1 -2.93750 -2.37500 p2 -2.87500 -2.31250 owning cell: 4.137
+DEAL:1::  Bounding box: p1 -3.00000 -2.43750 p2 -2.93750 -2.37500 owning cell: 4.130
+DEAL:1::  Bounding box: p1 -2.87500 -2.37500 p2 -2.81250 -2.31250 owning cell: 4.140
+DEAL:1::  Bounding box: p1 -2.81250 -2.37500 p2 -2.75000 -2.31250 owning cell: 4.141
+DEAL:1::  Bounding box: p1 -2.87500 -2.31250 p2 -2.81250 -2.25000 owning cell: 4.142
+DEAL:1::  Bounding box: p1 -2.93750 -2.31250 p2 -2.87500 -2.25000 owning cell: 4.139
+DEAL:1::  Bounding box: p1 -3.00000 -2.31250 p2 -2.93750 -2.25000 owning cell: 4.138
+DEAL:1::  Bounding box: p1 -2.81250 -2.31250 p2 -2.75000 -2.25000 owning cell: 4.143
+DEAL:1::  Bounding box: p1 -2.93750 -2.25000 p2 -2.87500 -2.18750 owning cell: 4.161
+DEAL:1::  Bounding box: p1 -2.87500 -2.25000 p2 -2.81250 -2.18750 owning cell: 4.164
+DEAL:1::  Bounding box: p1 -3.00000 -2.25000 p2 -2.93750 -2.18750 owning cell: 4.160
+DEAL:1::  Bounding box: p1 -2.81250 -2.18750 p2 -2.75000 -2.12500 owning cell: 4.167
+DEAL:1::  Bounding box: p1 -2.81250 -2.25000 p2 -2.75000 -2.18750 owning cell: 4.165
+DEAL:1::  Bounding box: p1 -2.87500 -2.18750 p2 -2.81250 -2.12500 owning cell: 4.166
+DEAL:1::  Bounding box: p1 -2.93750 -2.18750 p2 -2.87500 -2.12500 owning cell: 4.163
+DEAL:1::  Bounding box: p1 -3.00000 -2.06250 p2 -2.93750 -2.00000 owning cell: 4.170
+DEAL:1::  Bounding box: p1 -2.93750 -2.12500 p2 -2.87500 -2.06250 owning cell: 4.169
+DEAL:1::  Bounding box: p1 -2.93750 -2.06250 p2 -2.87500 -2.00000 owning cell: 4.171
+DEAL:1::  Bounding box: p1 -2.81250 -2.06250 p2 -2.75000 -2.00000 owning cell: 4.175
+DEAL:1::  Bounding box: p1 -3.00000 -2.12500 p2 -2.93750 -2.06250 owning cell: 4.168
+DEAL:1::  Bounding box: p1 -2.87500 -2.12500 p2 -2.81250 -2.06250 owning cell: 4.172
+DEAL:1::  Bounding box: p1 -2.87500 -2.06250 p2 -2.81250 -2.00000 owning cell: 4.174
+DEAL:1::  Bounding box: p1 -3.00000 -2.18750 p2 -2.93750 -2.12500 owning cell: 4.162
+DEAL:1::  Bounding box: p1 -2.81250 -2.12500 p2 -2.75000 -2.06250 owning cell: 4.173
+DEAL:1::  Bounding box: p1 -2.75000 -2.50000 p2 -2.68750 -2.43750 owning cell: 4.144
+DEAL:1::  Bounding box: p1 -2.56250 -2.50000 p2 -2.50000 -2.43750 owning cell: 4.149
+DEAL:1::  Bounding box: p1 -2.62500 -2.50000 p2 -2.56250 -2.43750 owning cell: 4.148
+DEAL:1::  Bounding box: p1 -2.68750 -2.50000 p2 -2.62500 -2.43750 owning cell: 4.145
+DEAL:1::  Bounding box: p1 -2.75000 -2.31250 p2 -2.68750 -2.25000 owning cell: 4.154
+DEAL:1::  Bounding box: p1 -2.62500 -2.43750 p2 -2.56250 -2.37500 owning cell: 4.150
+DEAL:1::  Bounding box: p1 -2.75000 -2.43750 p2 -2.68750 -2.37500 owning cell: 4.146
+DEAL:1::  Bounding box: p1 -2.62500 -2.37500 p2 -2.56250 -2.31250 owning cell: 4.156
+DEAL:1::  Bounding box: p1 -2.56250 -2.37500 p2 -2.50000 -2.31250 owning cell: 4.157
+DEAL:1::  Bounding box: p1 -2.56250 -2.43750 p2 -2.50000 -2.37500 owning cell: 4.151
+DEAL:1::  Bounding box: p1 -2.68750 -2.43750 p2 -2.62500 -2.37500 owning cell: 4.147
+DEAL:1::  Bounding box: p1 -2.68750 -2.37500 p2 -2.62500 -2.31250 owning cell: 4.153
+DEAL:1::  Bounding box: p1 -2.75000 -2.37500 p2 -2.68750 -2.31250 owning cell: 4.152
+DEAL:1::  Bounding box: p1 -2.56250 -2.31250 p2 -2.50000 -2.25000 owning cell: 4.159
+DEAL:1::  Bounding box: p1 -2.68750 -2.31250 p2 -2.62500 -2.25000 owning cell: 4.155
+DEAL:1::  Bounding box: p1 -2.62500 -2.31250 p2 -2.56250 -2.25000 owning cell: 4.158
+DEAL:1::  Bounding box: p1 -2.56250 -2.25000 p2 -2.50000 -2.18750 owning cell: 4.181
+DEAL:1::  Bounding box: p1 -2.62500 -2.25000 p2 -2.56250 -2.18750 owning cell: 4.180
+DEAL:1::  Bounding box: p1 -2.75000 -2.25000 p2 -2.68750 -2.18750 owning cell: 4.176
+DEAL:1::  Bounding box: p1 -2.56250 -2.18750 p2 -2.50000 -2.12500 owning cell: 4.183
+DEAL:1::  Bounding box: p1 -2.68750 -2.25000 p2 -2.62500 -2.18750 owning cell: 4.177
+DEAL:1::  Bounding box: p1 -2.75000 -2.18750 p2 -2.68750 -2.12500 owning cell: 4.178
+DEAL:1::  Bounding box: p1 -2.62500 -2.18750 p2 -2.56250 -2.12500 owning cell: 4.182
+DEAL:1::  Bounding box: p1 -2.68750 -2.06250 p2 -2.62500 -2.00000 owning cell: 4.187
+DEAL:1::  Bounding box: p1 -2.75000 -2.06250 p2 -2.68750 -2.00000 owning cell: 4.186
+DEAL:1::  Bounding box: p1 -2.68750 -2.12500 p2 -2.62500 -2.06250 owning cell: 4.185
+DEAL:1::  Bounding box: p1 -2.75000 -2.12500 p2 -2.68750 -2.06250 owning cell: 4.184
+DEAL:1::  Bounding box: p1 -2.68750 -2.18750 p2 -2.62500 -2.12500 owning cell: 4.179
+DEAL:1::  Bounding box: p1 -2.62500 -2.12500 p2 -2.56250 -2.06250 owning cell: 4.188
+DEAL:1::  Bounding box: p1 -2.56250 -2.12500 p2 -2.50000 -2.06250 owning cell: 4.189
+DEAL:1::  Bounding box: p1 -2.62500 -2.06250 p2 -2.56250 -2.00000 owning cell: 4.190
+DEAL:1::  Bounding box: p1 -2.56250 -2.06250 p2 -2.50000 -2.00000 owning cell: 4.191
+DEAL:1::Testing for dim = 3
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -2.62500 p2 -2.75000 -2.87500 -2.50000 owning cell: 3.37
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -2.87500 p2 -2.75000 -2.87500 -2.75000 owning cell: 3.5
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -3.00000 p2 -2.87500 -2.87500 -2.87500 owning cell: 3.0
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.75000 p2 -2.87500 -2.87500 -2.62500 owning cell: 3.32
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -2.75000 p2 -2.75000 -2.87500 -2.62500 owning cell: 3.33
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -2.87500 p2 -2.87500 -2.75000 -2.75000 owning cell: 3.6
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -3.00000 p2 -2.75000 -2.87500 -2.87500 owning cell: 3.1
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -3.00000 p2 -2.75000 -2.75000 -2.87500 owning cell: 3.3
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -2.87500 p2 -2.75000 -2.75000 -2.75000 owning cell: 3.7
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -3.00000 p2 -2.87500 -2.75000 -2.87500 owning cell: 3.2
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.62500 p2 -2.87500 -2.87500 -2.50000 owning cell: 3.36
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.87500 p2 -2.87500 -2.87500 -2.75000 owning cell: 3.4
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -2.75000 p2 -2.87500 -2.75000 -2.62500 owning cell: 3.34
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -2.62500 p2 -2.75000 -2.75000 -2.50000 owning cell: 3.39
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -2.75000 p2 -2.75000 -2.75000 -2.62500 owning cell: 3.35
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -2.62500 p2 -2.87500 -2.75000 -2.50000 owning cell: 3.38
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -3.00000 p2 -2.75000 -2.62500 -2.87500 owning cell: 3.17
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -2.87500 p2 -2.75000 -2.62500 -2.75000 owning cell: 3.21
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -2.62500 p2 -2.87500 -2.62500 -2.50000 owning cell: 3.52
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -2.62500 p2 -2.75000 -2.62500 -2.50000 owning cell: 3.53
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -2.87500 p2 -2.87500 -2.62500 -2.75000 owning cell: 3.20
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -2.75000 p2 -2.75000 -2.62500 -2.62500 owning cell: 3.49
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -2.75000 p2 -2.87500 -2.62500 -2.62500 owning cell: 3.48
+DEAL:1::  Bounding box: p1 -2.87500 -2.62500 -3.00000 p2 -2.75000 -2.50000 -2.87500 owning cell: 3.19
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -3.00000 p2 -2.87500 -2.62500 -2.87500 owning cell: 3.16
+DEAL:1::  Bounding box: p1 -2.87500 -2.62500 -2.87500 p2 -2.75000 -2.50000 -2.75000 owning cell: 3.23
+DEAL:1::  Bounding box: p1 -3.00000 -2.62500 -2.87500 p2 -2.87500 -2.50000 -2.75000 owning cell: 3.22
+DEAL:1::  Bounding box: p1 -2.87500 -2.62500 -2.75000 p2 -2.75000 -2.50000 -2.62500 owning cell: 3.51
+DEAL:1::  Bounding box: p1 -3.00000 -2.62500 -2.75000 p2 -2.87500 -2.50000 -2.62500 owning cell: 3.50
+DEAL:1::  Bounding box: p1 -3.00000 -2.62500 -3.00000 p2 -2.87500 -2.50000 -2.87500 owning cell: 3.18
+DEAL:1::  Bounding box: p1 -3.00000 -2.62500 -2.62500 p2 -2.87500 -2.50000 -2.50000 owning cell: 3.54
+DEAL:1::  Bounding box: p1 -2.87500 -2.62500 -2.62500 p2 -2.75000 -2.50000 -2.50000 owning cell: 3.55
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -2.62500 p2 -2.50000 -2.75000 -2.50000 owning cell: 3.47
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -3.00000 p2 -2.50000 -2.75000 -2.87500 owning cell: 3.11
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -2.87500 p2 -2.62500 -2.87500 -2.75000 owning cell: 3.12
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -2.75000 p2 -2.62500 -2.87500 -2.62500 owning cell: 3.40
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -2.87500 p2 -2.50000 -2.87500 -2.75000 owning cell: 3.13
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -2.87500 p2 -2.50000 -2.75000 -2.75000 owning cell: 3.15
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -2.75000 p2 -2.50000 -2.75000 -2.62500 owning cell: 3.43
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -2.62500 p2 -2.62500 -2.87500 -2.50000 owning cell: 3.44
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -3.00000 p2 -2.62500 -2.87500 -2.87500 owning cell: 3.8
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -3.00000 p2 -2.50000 -2.87500 -2.87500 owning cell: 3.9
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -2.75000 p2 -2.62500 -2.75000 -2.62500 owning cell: 3.42
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -2.62500 p2 -2.50000 -2.87500 -2.50000 owning cell: 3.45
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -2.75000 p2 -2.50000 -2.87500 -2.62500 owning cell: 3.41
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -3.00000 p2 -2.62500 -2.75000 -2.87500 owning cell: 3.10
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -2.87500 p2 -2.62500 -2.75000 -2.75000 owning cell: 3.14
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -2.62500 p2 -2.62500 -2.75000 -2.50000 owning cell: 3.46
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -2.87500 p2 -2.62500 -2.62500 -2.75000 owning cell: 3.28
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -3.00000 p2 -2.50000 -2.62500 -2.87500 owning cell: 3.25
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -3.00000 p2 -2.62500 -2.62500 -2.87500 owning cell: 3.24
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -2.87500 p2 -2.50000 -2.62500 -2.75000 owning cell: 3.29
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -2.75000 p2 -2.50000 -2.62500 -2.62500 owning cell: 3.57
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -2.75000 p2 -2.62500 -2.62500 -2.62500 owning cell: 3.56
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -2.62500 p2 -2.50000 -2.62500 -2.50000 owning cell: 3.61
+DEAL:1::  Bounding box: p1 -2.62500 -2.62500 -2.75000 p2 -2.50000 -2.50000 -2.62500 owning cell: 3.59
+DEAL:1::  Bounding box: p1 -2.62500 -2.62500 -2.87500 p2 -2.50000 -2.50000 -2.75000 owning cell: 3.31
+DEAL:1::  Bounding box: p1 -2.62500 -2.62500 -2.62500 p2 -2.50000 -2.50000 -2.50000 owning cell: 3.63
+DEAL:1::  Bounding box: p1 -2.75000 -2.62500 -2.87500 p2 -2.62500 -2.50000 -2.75000 owning cell: 3.30
+DEAL:1::  Bounding box: p1 -2.75000 -2.62500 -2.75000 p2 -2.62500 -2.50000 -2.62500 owning cell: 3.58
+DEAL:1::  Bounding box: p1 -2.75000 -2.62500 -3.00000 p2 -2.62500 -2.50000 -2.87500 owning cell: 3.26
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -2.62500 p2 -2.62500 -2.62500 -2.50000 owning cell: 3.60
+DEAL:1::  Bounding box: p1 -2.62500 -2.62500 -3.00000 p2 -2.50000 -2.50000 -2.87500 owning cell: 3.27
+DEAL:1::  Bounding box: p1 -2.75000 -2.62500 -2.62500 p2 -2.62500 -2.50000 -2.50000 owning cell: 3.62
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -2.12500 p2 -2.62500 -2.75000 -2.00000 owning cell: 3.302
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -2.25000 p2 -2.87500 -2.75000 -2.12500 owning cell: 3.290
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -2.12500 p2 -2.62500 -2.87500 -2.00000 owning cell: 3.300
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -2.25000 p2 -2.75000 -2.87500 -2.12500 owning cell: 3.289
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.25000 p2 -2.87500 -2.87500 -2.12500 owning cell: 3.288
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.37500 p2 -2.87500 -2.87500 -2.25000 owning cell: 3.260
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -2.37500 p2 -2.75000 -2.87500 -2.25000 owning cell: 3.261
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -2.37500 p2 -2.87500 -2.75000 -2.25000 owning cell: 3.262
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -2.37500 p2 -2.75000 -2.75000 -2.25000 owning cell: 3.263
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -2.25000 p2 -2.62500 -2.87500 -2.12500 owning cell: 3.296
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -2.25000 p2 -2.75000 -2.75000 -2.12500 owning cell: 3.291
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.12500 p2 -2.87500 -2.87500 -2.00000 owning cell: 3.292
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -2.12500 p2 -2.75000 -2.87500 -2.00000 owning cell: 3.293
+DEAL:1::  Bounding box: p1 -3.00000 -3.00000 -2.50000 p2 -2.87500 -2.87500 -2.37500 owning cell: 3.256
+DEAL:1::  Bounding box: p1 -2.87500 -3.00000 -2.50000 p2 -2.75000 -2.87500 -2.37500 owning cell: 3.257
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -2.50000 p2 -2.87500 -2.75000 -2.37500 owning cell: 3.258
+DEAL:1::  Bounding box: p1 -3.00000 -2.87500 -2.12500 p2 -2.87500 -2.75000 -2.00000 owning cell: 3.294
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -2.25000 p2 -2.62500 -2.75000 -2.12500 owning cell: 3.298
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -2.50000 p2 -2.75000 -2.75000 -2.37500 owning cell: 3.259
+DEAL:1::  Bounding box: p1 -2.87500 -2.87500 -2.12500 p2 -2.75000 -2.75000 -2.00000 owning cell: 3.295
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -2.37500 p2 -2.62500 -2.75000 -2.25000 owning cell: 3.270
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -2.12500 p2 -2.62500 -2.62500 -2.00000 owning cell: 3.316
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -2.25000 p2 -2.87500 -2.62500 -2.12500 owning cell: 3.304
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -2.37500 p2 -2.75000 -2.62500 -2.25000 owning cell: 3.277
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -2.50000 p2 -2.87500 -2.62500 -2.37500 owning cell: 3.272
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -2.50000 p2 -2.75000 -2.62500 -2.37500 owning cell: 3.273
+DEAL:1::  Bounding box: p1 -3.00000 -2.62500 -2.50000 p2 -2.87500 -2.50000 -2.37500 owning cell: 3.274
+DEAL:1::  Bounding box: p1 -2.87500 -2.62500 -2.50000 p2 -2.75000 -2.50000 -2.37500 owning cell: 3.275
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -2.25000 p2 -2.75000 -2.62500 -2.12500 owning cell: 3.305
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -2.37500 p2 -2.87500 -2.62500 -2.25000 owning cell: 3.276
+DEAL:1::  Bounding box: p1 -3.00000 -2.75000 -2.12500 p2 -2.87500 -2.62500 -2.00000 owning cell: 3.308
+DEAL:1::  Bounding box: p1 -2.87500 -2.75000 -2.12500 p2 -2.75000 -2.62500 -2.00000 owning cell: 3.309
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -2.50000 p2 -2.50000 -2.62500 -2.37500 owning cell: 3.281
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -2.37500 p2 -2.62500 -2.87500 -2.25000 owning cell: 3.268
+DEAL:1::  Bounding box: p1 -2.75000 -3.00000 -2.50000 p2 -2.62500 -2.87500 -2.37500 owning cell: 3.264
+DEAL:1::  Bounding box: p1 -2.75000 -2.87500 -2.50000 p2 -2.62500 -2.75000 -2.37500 owning cell: 3.266
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -2.50000 p2 -2.50000 -2.75000 -2.37500 owning cell: 3.267
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -2.50000 p2 -2.50000 -2.87500 -2.37500 owning cell: 3.265
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -2.37500 p2 -2.50000 -2.62500 -2.25000 owning cell: 3.285
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -2.12500 p2 -2.50000 -2.75000 -2.00000 owning cell: 3.303
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -2.37500 p2 -2.50000 -2.75000 -2.25000 owning cell: 3.271
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -2.37500 p2 -2.50000 -2.87500 -2.25000 owning cell: 3.269
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -2.12500 p2 -2.50000 -2.87500 -2.00000 owning cell: 3.301
+DEAL:1::  Bounding box: p1 -2.62500 -2.87500 -2.25000 p2 -2.50000 -2.75000 -2.12500 owning cell: 3.299
+DEAL:1::  Bounding box: p1 -2.62500 -3.00000 -2.25000 p2 -2.50000 -2.87500 -2.12500 owning cell: 3.297
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -2.37500 p2 -2.62500 -2.62500 -2.25000 owning cell: 3.284
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -2.50000 p2 -2.62500 -2.62500 -2.37500 owning cell: 3.280
+DEAL:1::  Bounding box: p1 -2.75000 -2.75000 -2.25000 p2 -2.62500 -2.62500 -2.12500 owning cell: 3.312
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -2.25000 p2 -2.50000 -2.62500 -2.12500 owning cell: 3.313
+DEAL:1::  Bounding box: p1 -2.62500 -2.75000 -2.12500 p2 -2.50000 -2.62500 -2.00000 owning cell: 3.317
+DEAL:1::  Bounding box: p1 -2.75000 -2.62500 -2.50000 p2 -2.62500 -2.50000 -2.37500 owning cell: 3.282
+DEAL:1::  Bounding box: p1 -2.62500 -2.62500 -2.50000 p2 -2.50000 -2.50000 -2.37500 owning cell: 3.283
+
+
+DEAL:2::Testing for dim = 1
+DEAL:2::  Bounding box: p1 -2.75000 p2 -2.71875 owning cell: 5.8
+DEAL:2::  Bounding box: p1 -2.71875 p2 -2.68750 owning cell: 5.9
+DEAL:2::  Bounding box: p1 -2.68750 p2 -2.65625 owning cell: 5.10
+DEAL:2::  Bounding box: p1 -2.65625 p2 -2.62500 owning cell: 5.11
+DEAL:2::  Bounding box: p1 -2.62500 p2 -2.59375 owning cell: 5.12
+DEAL:2::  Bounding box: p1 -2.59375 p2 -2.56250 owning cell: 5.13
+DEAL:2::  Bounding box: p1 -2.56250 p2 -2.53125 owning cell: 5.14
+DEAL:2::Testing for dim = 2
+DEAL:2::  Bounding box: p1 -2.43750 -2.93750 p2 -2.37500 -2.87500 owning cell: 4.67
+DEAL:2::  Bounding box: p1 -2.50000 -3.00000 p2 -2.43750 -2.93750 owning cell: 4.64
+DEAL:2::  Bounding box: p1 -2.31250 -3.00000 p2 -2.25000 -2.93750 owning cell: 4.69
+DEAL:2::  Bounding box: p1 -2.31250 -2.93750 p2 -2.25000 -2.87500 owning cell: 4.71
+DEAL:2::  Bounding box: p1 -2.37500 -2.93750 p2 -2.31250 -2.87500 owning cell: 4.70
+DEAL:2::  Bounding box: p1 -2.37500 -3.00000 p2 -2.31250 -2.93750 owning cell: 4.68
+DEAL:2::  Bounding box: p1 -2.43750 -3.00000 p2 -2.37500 -2.93750 owning cell: 4.65
+DEAL:2::  Bounding box: p1 -2.50000 -2.87500 p2 -2.43750 -2.81250 owning cell: 4.72
+DEAL:2::  Bounding box: p1 -2.43750 -2.87500 p2 -2.37500 -2.81250 owning cell: 4.73
+DEAL:2::  Bounding box: p1 -2.50000 -2.93750 p2 -2.43750 -2.87500 owning cell: 4.66
+DEAL:2::  Bounding box: p1 -2.37500 -2.87500 p2 -2.31250 -2.81250 owning cell: 4.76
+DEAL:2::  Bounding box: p1 -2.31250 -2.87500 p2 -2.25000 -2.81250 owning cell: 4.77
+DEAL:2::  Bounding box: p1 -2.37500 -2.81250 p2 -2.31250 -2.75000 owning cell: 4.78
+DEAL:2::  Bounding box: p1 -2.43750 -2.81250 p2 -2.37500 -2.75000 owning cell: 4.75
+DEAL:2::  Bounding box: p1 -2.50000 -2.81250 p2 -2.43750 -2.75000 owning cell: 4.74
+DEAL:2::  Bounding box: p1 -2.31250 -2.81250 p2 -2.25000 -2.75000 owning cell: 4.79
+DEAL:2::  Bounding box: p1 -2.43750 -2.75000 p2 -2.37500 -2.68750 owning cell: 4.97
+DEAL:2::  Bounding box: p1 -2.37500 -2.75000 p2 -2.31250 -2.68750 owning cell: 4.100
+DEAL:2::  Bounding box: p1 -2.50000 -2.75000 p2 -2.43750 -2.68750 owning cell: 4.96
+DEAL:2::  Bounding box: p1 -2.31250 -2.68750 p2 -2.25000 -2.62500 owning cell: 4.103
+DEAL:2::  Bounding box: p1 -2.31250 -2.75000 p2 -2.25000 -2.68750 owning cell: 4.101
+DEAL:2::  Bounding box: p1 -2.37500 -2.68750 p2 -2.31250 -2.62500 owning cell: 4.102
+DEAL:2::  Bounding box: p1 -2.43750 -2.68750 p2 -2.37500 -2.62500 owning cell: 4.99
+DEAL:2::  Bounding box: p1 -2.50000 -2.56250 p2 -2.43750 -2.50000 owning cell: 4.106
+DEAL:2::  Bounding box: p1 -2.43750 -2.62500 p2 -2.37500 -2.56250 owning cell: 4.105
+DEAL:2::  Bounding box: p1 -2.43750 -2.56250 p2 -2.37500 -2.50000 owning cell: 4.107
+DEAL:2::  Bounding box: p1 -2.31250 -2.56250 p2 -2.25000 -2.50000 owning cell: 4.111
+DEAL:2::  Bounding box: p1 -2.50000 -2.62500 p2 -2.43750 -2.56250 owning cell: 4.104
+DEAL:2::  Bounding box: p1 -2.37500 -2.62500 p2 -2.31250 -2.56250 owning cell: 4.108
+DEAL:2::  Bounding box: p1 -2.37500 -2.56250 p2 -2.31250 -2.50000 owning cell: 4.110
+DEAL:2::  Bounding box: p1 -2.50000 -2.68750 p2 -2.43750 -2.62500 owning cell: 4.98
+DEAL:2::  Bounding box: p1 -2.31250 -2.62500 p2 -2.25000 -2.56250 owning cell: 4.109
+DEAL:2::  Bounding box: p1 -2.25000 -3.00000 p2 -2.18750 -2.93750 owning cell: 4.80
+DEAL:2::  Bounding box: p1 -2.06250 -3.00000 p2 -2.00000 -2.93750 owning cell: 4.85
+DEAL:2::  Bounding box: p1 -2.12500 -3.00000 p2 -2.06250 -2.93750 owning cell: 4.84
+DEAL:2::  Bounding box: p1 -2.18750 -3.00000 p2 -2.12500 -2.93750 owning cell: 4.81
+DEAL:2::  Bounding box: p1 -2.25000 -2.81250 p2 -2.18750 -2.75000 owning cell: 4.90
+DEAL:2::  Bounding box: p1 -2.12500 -2.93750 p2 -2.06250 -2.87500 owning cell: 4.86
+DEAL:2::  Bounding box: p1 -2.25000 -2.93750 p2 -2.18750 -2.87500 owning cell: 4.82
+DEAL:2::  Bounding box: p1 -2.12500 -2.87500 p2 -2.06250 -2.81250 owning cell: 4.92
+DEAL:2::  Bounding box: p1 -2.06250 -2.87500 p2 -2.00000 -2.81250 owning cell: 4.93
+DEAL:2::  Bounding box: p1 -2.06250 -2.93750 p2 -2.00000 -2.87500 owning cell: 4.87
+DEAL:2::  Bounding box: p1 -2.18750 -2.93750 p2 -2.12500 -2.87500 owning cell: 4.83
+DEAL:2::  Bounding box: p1 -2.18750 -2.87500 p2 -2.12500 -2.81250 owning cell: 4.89
+DEAL:2::  Bounding box: p1 -2.25000 -2.87500 p2 -2.18750 -2.81250 owning cell: 4.88
+DEAL:2::  Bounding box: p1 -2.06250 -2.81250 p2 -2.00000 -2.75000 owning cell: 4.95
+DEAL:2::  Bounding box: p1 -2.18750 -2.81250 p2 -2.12500 -2.75000 owning cell: 4.91
+DEAL:2::  Bounding box: p1 -2.12500 -2.81250 p2 -2.06250 -2.75000 owning cell: 4.94
+DEAL:2::  Bounding box: p1 -2.06250 -2.75000 p2 -2.00000 -2.68750 owning cell: 4.117
+DEAL:2::  Bounding box: p1 -2.12500 -2.75000 p2 -2.06250 -2.68750 owning cell: 4.116
+DEAL:2::  Bounding box: p1 -2.25000 -2.75000 p2 -2.18750 -2.68750 owning cell: 4.112
+DEAL:2::  Bounding box: p1 -2.06250 -2.68750 p2 -2.00000 -2.62500 owning cell: 4.119
+DEAL:2::  Bounding box: p1 -2.18750 -2.75000 p2 -2.12500 -2.68750 owning cell: 4.113
+DEAL:2::  Bounding box: p1 -2.25000 -2.68750 p2 -2.18750 -2.62500 owning cell: 4.114
+DEAL:2::  Bounding box: p1 -2.12500 -2.68750 p2 -2.06250 -2.62500 owning cell: 4.118
+DEAL:2::  Bounding box: p1 -2.18750 -2.56250 p2 -2.12500 -2.50000 owning cell: 4.123
+DEAL:2::  Bounding box: p1 -2.25000 -2.56250 p2 -2.18750 -2.50000 owning cell: 4.122
+DEAL:2::  Bounding box: p1 -2.18750 -2.62500 p2 -2.12500 -2.56250 owning cell: 4.121
+DEAL:2::  Bounding box: p1 -2.25000 -2.62500 p2 -2.18750 -2.56250 owning cell: 4.120
+DEAL:2::  Bounding box: p1 -2.18750 -2.68750 p2 -2.12500 -2.62500 owning cell: 4.115
+DEAL:2::  Bounding box: p1 -2.12500 -2.62500 p2 -2.06250 -2.56250 owning cell: 4.124
+DEAL:2::  Bounding box: p1 -2.06250 -2.62500 p2 -2.00000 -2.56250 owning cell: 4.125
+DEAL:2::  Bounding box: p1 -2.12500 -2.56250 p2 -2.06250 -2.50000 owning cell: 4.126
+DEAL:2::  Bounding box: p1 -2.06250 -2.56250 p2 -2.00000 -2.50000 owning cell: 4.127
+DEAL:2::Testing for dim = 3
+DEAL:2::  Bounding box: p1 -2.37500 -3.00000 -2.37500 p2 -2.25000 -2.87500 -2.25000 owning cell: 3.325
+DEAL:2::  Bounding box: p1 -2.50000 -3.00000 -2.12500 p2 -2.37500 -2.87500 -2.00000 owning cell: 3.356
+DEAL:2::  Bounding box: p1 -2.37500 -3.00000 -2.12500 p2 -2.25000 -2.87500 -2.00000 owning cell: 3.357
+DEAL:2::  Bounding box: p1 -2.37500 -3.00000 -2.25000 p2 -2.25000 -2.87500 -2.12500 owning cell: 3.353
+DEAL:2::  Bounding box: p1 -2.50000 -3.00000 -2.25000 p2 -2.37500 -2.87500 -2.12500 owning cell: 3.352
+DEAL:2::  Bounding box: p1 -2.50000 -3.00000 -2.50000 p2 -2.37500 -2.87500 -2.37500 owning cell: 3.320
+DEAL:2::  Bounding box: p1 -2.37500 -3.00000 -2.50000 p2 -2.25000 -2.87500 -2.37500 owning cell: 3.321
+DEAL:2::  Bounding box: p1 -2.50000 -3.00000 -2.37500 p2 -2.37500 -2.87500 -2.25000 owning cell: 3.324
+DEAL:2::  Bounding box: p1 -2.50000 -2.87500 -2.50000 p2 -2.37500 -2.75000 -2.37500 owning cell: 3.322
+DEAL:2::  Bounding box: p1 -2.37500 -2.87500 -2.25000 p2 -2.25000 -2.75000 -2.12500 owning cell: 3.355
+DEAL:2::  Bounding box: p1 -2.37500 -2.87500 -2.12500 p2 -2.25000 -2.75000 -2.00000 owning cell: 3.359
+DEAL:2::  Bounding box: p1 -2.37500 -2.87500 -2.37500 p2 -2.25000 -2.75000 -2.25000 owning cell: 3.327
+DEAL:2::  Bounding box: p1 -2.37500 -2.87500 -2.50000 p2 -2.25000 -2.75000 -2.37500 owning cell: 3.323
+DEAL:2::  Bounding box: p1 -2.50000 -2.87500 -2.12500 p2 -2.37500 -2.75000 -2.00000 owning cell: 3.358
+DEAL:2::  Bounding box: p1 -2.50000 -2.87500 -2.25000 p2 -2.37500 -2.75000 -2.12500 owning cell: 3.354
+DEAL:2::  Bounding box: p1 -2.50000 -2.87500 -2.37500 p2 -2.37500 -2.75000 -2.25000 owning cell: 3.326
+DEAL:2::  Bounding box: p1 -2.37500 -2.75000 -2.50000 p2 -2.25000 -2.62500 -2.37500 owning cell: 3.337
+DEAL:2::  Bounding box: p1 -2.37500 -2.75000 -2.25000 p2 -2.25000 -2.62500 -2.12500 owning cell: 3.369
+DEAL:2::  Bounding box: p1 -2.50000 -2.75000 -2.37500 p2 -2.37500 -2.62500 -2.25000 owning cell: 3.340
+DEAL:2::  Bounding box: p1 -2.37500 -2.75000 -2.12500 p2 -2.25000 -2.62500 -2.00000 owning cell: 3.373
+DEAL:2::  Bounding box: p1 -2.50000 -2.75000 -2.12500 p2 -2.37500 -2.62500 -2.00000 owning cell: 3.372
+DEAL:2::  Bounding box: p1 -2.50000 -2.75000 -2.25000 p2 -2.37500 -2.62500 -2.12500 owning cell: 3.368
+DEAL:2::  Bounding box: p1 -2.37500 -2.75000 -2.37500 p2 -2.25000 -2.62500 -2.25000 owning cell: 3.341
+DEAL:2::  Bounding box: p1 -2.37500 -2.62500 -2.50000 p2 -2.25000 -2.50000 -2.37500 owning cell: 3.339
+DEAL:2::  Bounding box: p1 -2.50000 -2.75000 -2.50000 p2 -2.37500 -2.62500 -2.37500 owning cell: 3.336
+DEAL:2::  Bounding box: p1 -2.37500 -2.62500 -2.12500 p2 -2.25000 -2.50000 -2.00000 owning cell: 3.375
+DEAL:2::  Bounding box: p1 -2.37500 -2.62500 -2.25000 p2 -2.25000 -2.50000 -2.12500 owning cell: 3.371
+DEAL:2::  Bounding box: p1 -2.37500 -2.62500 -2.37500 p2 -2.25000 -2.50000 -2.25000 owning cell: 3.343
+DEAL:2::  Bounding box: p1 -2.50000 -2.62500 -2.12500 p2 -2.37500 -2.50000 -2.00000 owning cell: 3.374
+DEAL:2::  Bounding box: p1 -2.50000 -2.62500 -2.37500 p2 -2.37500 -2.50000 -2.25000 owning cell: 3.342
+DEAL:2::  Bounding box: p1 -2.50000 -2.62500 -2.25000 p2 -2.37500 -2.50000 -2.12500 owning cell: 3.370
+DEAL:2::  Bounding box: p1 -2.50000 -2.62500 -2.50000 p2 -2.37500 -2.50000 -2.37500 owning cell: 3.338
+DEAL:2::  Bounding box: p1 -2.25000 -3.00000 -2.50000 p2 -2.12500 -2.87500 -2.37500 owning cell: 3.328
+DEAL:2::  Bounding box: p1 -2.12500 -3.00000 -2.50000 p2 -2.00000 -2.87500 -2.37500 owning cell: 3.329
+DEAL:2::  Bounding box: p1 -2.12500 -3.00000 -2.37500 p2 -2.00000 -2.87500 -2.25000 owning cell: 3.333
+DEAL:2::  Bounding box: p1 -2.12500 -3.00000 -2.12500 p2 -2.00000 -2.87500 -2.00000 owning cell: 3.365
+DEAL:2::  Bounding box: p1 -2.25000 -3.00000 -2.12500 p2 -2.12500 -2.87500 -2.00000 owning cell: 3.364
+DEAL:2::  Bounding box: p1 -2.12500 -3.00000 -2.25000 p2 -2.00000 -2.87500 -2.12500 owning cell: 3.361
+DEAL:2::  Bounding box: p1 -2.25000 -2.87500 -2.37500 p2 -2.12500 -2.75000 -2.25000 owning cell: 3.334
+DEAL:2::  Bounding box: p1 -2.25000 -2.87500 -2.50000 p2 -2.12500 -2.75000 -2.37500 owning cell: 3.330
+DEAL:2::  Bounding box: p1 -2.25000 -3.00000 -2.37500 p2 -2.12500 -2.87500 -2.25000 owning cell: 3.332
+DEAL:2::  Bounding box: p1 -2.12500 -2.87500 -2.50000 p2 -2.00000 -2.75000 -2.37500 owning cell: 3.331
+DEAL:2::  Bounding box: p1 -2.12500 -2.87500 -2.12500 p2 -2.00000 -2.75000 -2.00000 owning cell: 3.367
+DEAL:2::  Bounding box: p1 -2.25000 -2.87500 -2.25000 p2 -2.12500 -2.75000 -2.12500 owning cell: 3.362
+DEAL:2::  Bounding box: p1 -2.12500 -2.87500 -2.25000 p2 -2.00000 -2.75000 -2.12500 owning cell: 3.363
+DEAL:2::  Bounding box: p1 -2.25000 -3.00000 -2.25000 p2 -2.12500 -2.87500 -2.12500 owning cell: 3.360
+DEAL:2::  Bounding box: p1 -2.12500 -2.87500 -2.37500 p2 -2.00000 -2.75000 -2.25000 owning cell: 3.335
+DEAL:2::  Bounding box: p1 -2.25000 -2.87500 -2.12500 p2 -2.12500 -2.75000 -2.00000 owning cell: 3.366
+DEAL:2::  Bounding box: p1 -2.12500 -2.75000 -2.50000 p2 -2.00000 -2.62500 -2.37500 owning cell: 3.345
+DEAL:2::  Bounding box: p1 -2.12500 -2.75000 -2.25000 p2 -2.00000 -2.62500 -2.12500 owning cell: 3.377
+DEAL:2::  Bounding box: p1 -2.25000 -2.75000 -2.25000 p2 -2.12500 -2.62500 -2.12500 owning cell: 3.376
+DEAL:2::  Bounding box: p1 -2.12500 -2.75000 -2.12500 p2 -2.00000 -2.62500 -2.00000 owning cell: 3.381
+DEAL:2::  Bounding box: p1 -2.12500 -2.75000 -2.37500 p2 -2.00000 -2.62500 -2.25000 owning cell: 3.349
+DEAL:2::  Bounding box: p1 -2.25000 -2.75000 -2.50000 p2 -2.12500 -2.62500 -2.37500 owning cell: 3.344
+DEAL:2::  Bounding box: p1 -2.12500 -2.62500 -2.50000 p2 -2.00000 -2.50000 -2.37500 owning cell: 3.347
+DEAL:2::  Bounding box: p1 -2.25000 -2.62500 -2.37500 p2 -2.12500 -2.50000 -2.25000 owning cell: 3.350
+DEAL:2::  Bounding box: p1 -2.25000 -2.62500 -2.50000 p2 -2.12500 -2.50000 -2.37500 owning cell: 3.346
+DEAL:2::  Bounding box: p1 -2.25000 -2.62500 -2.25000 p2 -2.12500 -2.50000 -2.12500 owning cell: 3.378
+DEAL:2::  Bounding box: p1 -2.12500 -2.62500 -2.25000 p2 -2.00000 -2.50000 -2.12500 owning cell: 3.379
+DEAL:2::  Bounding box: p1 -2.25000 -2.75000 -2.37500 p2 -2.12500 -2.62500 -2.25000 owning cell: 3.348
+DEAL:2::  Bounding box: p1 -2.25000 -2.62500 -2.12500 p2 -2.12500 -2.50000 -2.00000 owning cell: 3.382
+DEAL:2::  Bounding box: p1 -2.12500 -2.62500 -2.12500 p2 -2.00000 -2.50000 -2.00000 owning cell: 3.383
+DEAL:2::  Bounding box: p1 -2.12500 -2.62500 -2.37500 p2 -2.00000 -2.50000 -2.25000 owning cell: 3.351
+DEAL:2::  Bounding box: p1 -2.25000 -2.75000 -2.12500 p2 -2.12500 -2.62500 -2.00000 owning cell: 3.380
+DEAL:2::  Bounding box: p1 -2.50000 -2.37500 -2.12500 p2 -2.37500 -2.25000 -2.00000 owning cell: 3.486
+DEAL:2::  Bounding box: p1 -2.37500 -2.50000 -2.50000 p2 -2.25000 -2.37500 -2.37500 owning cell: 3.449
+DEAL:2::  Bounding box: p1 -2.50000 -2.50000 -2.25000 p2 -2.37500 -2.37500 -2.12500 owning cell: 3.480
+DEAL:2::  Bounding box: p1 -2.37500 -2.50000 -2.37500 p2 -2.25000 -2.37500 -2.25000 owning cell: 3.453
+DEAL:2::  Bounding box: p1 -2.50000 -2.37500 -2.50000 p2 -2.37500 -2.25000 -2.37500 owning cell: 3.450
+DEAL:2::  Bounding box: p1 -2.37500 -2.50000 -2.25000 p2 -2.25000 -2.37500 -2.12500 owning cell: 3.481
+DEAL:2::  Bounding box: p1 -2.37500 -2.37500 -2.50000 p2 -2.25000 -2.25000 -2.37500 owning cell: 3.451
+DEAL:2::  Bounding box: p1 -2.37500 -2.50000 -2.12500 p2 -2.25000 -2.37500 -2.00000 owning cell: 3.485
+DEAL:2::  Bounding box: p1 -2.50000 -2.50000 -2.12500 p2 -2.37500 -2.37500 -2.00000 owning cell: 3.484
+DEAL:2::  Bounding box: p1 -2.50000 -2.50000 -2.37500 p2 -2.37500 -2.37500 -2.25000 owning cell: 3.452
+DEAL:2::  Bounding box: p1 -2.50000 -2.50000 -2.50000 p2 -2.37500 -2.37500 -2.37500 owning cell: 3.448
+DEAL:2::  Bounding box: p1 -2.37500 -2.37500 -2.37500 p2 -2.25000 -2.25000 -2.25000 owning cell: 3.455
+DEAL:2::  Bounding box: p1 -2.50000 -2.37500 -2.37500 p2 -2.37500 -2.25000 -2.25000 owning cell: 3.454
+DEAL:2::  Bounding box: p1 -2.37500 -2.37500 -2.25000 p2 -2.25000 -2.25000 -2.12500 owning cell: 3.483
+DEAL:2::  Bounding box: p1 -2.50000 -2.37500 -2.25000 p2 -2.37500 -2.25000 -2.12500 owning cell: 3.482
+DEAL:2::  Bounding box: p1 -2.37500 -2.37500 -2.12500 p2 -2.25000 -2.25000 -2.00000 owning cell: 3.487
+DEAL:2::  Bounding box: p1 -2.50000 -2.25000 -2.25000 p2 -2.37500 -2.12500 -2.12500 owning cell: 3.496
+DEAL:2::  Bounding box: p1 -2.37500 -2.25000 -2.50000 p2 -2.25000 -2.12500 -2.37500 owning cell: 3.465
+DEAL:2::  Bounding box: p1 -2.37500 -2.25000 -2.12500 p2 -2.25000 -2.12500 -2.00000 owning cell: 3.501
+DEAL:2::  Bounding box: p1 -2.37500 -2.25000 -2.25000 p2 -2.25000 -2.12500 -2.12500 owning cell: 3.497
+DEAL:2::  Bounding box: p1 -2.37500 -2.25000 -2.37500 p2 -2.25000 -2.12500 -2.25000 owning cell: 3.469
+DEAL:2::  Bounding box: p1 -2.50000 -2.25000 -2.37500 p2 -2.37500 -2.12500 -2.25000 owning cell: 3.468
+DEAL:2::  Bounding box: p1 -2.50000 -2.12500 -2.37500 p2 -2.37500 -2.00000 -2.25000 owning cell: 3.470
+DEAL:2::  Bounding box: p1 -2.50000 -2.12500 -2.50000 p2 -2.37500 -2.00000 -2.37500 owning cell: 3.466
+DEAL:2::  Bounding box: p1 -2.50000 -2.25000 -2.50000 p2 -2.37500 -2.12500 -2.37500 owning cell: 3.464
+DEAL:2::  Bounding box: p1 -2.50000 -2.12500 -2.25000 p2 -2.37500 -2.00000 -2.12500 owning cell: 3.498
+DEAL:2::  Bounding box: p1 -2.37500 -2.12500 -2.12500 p2 -2.25000 -2.00000 -2.00000 owning cell: 3.503
+DEAL:2::  Bounding box: p1 -2.37500 -2.12500 -2.37500 p2 -2.25000 -2.00000 -2.25000 owning cell: 3.471
+DEAL:2::  Bounding box: p1 -2.37500 -2.12500 -2.25000 p2 -2.25000 -2.00000 -2.12500 owning cell: 3.499
+DEAL:2::  Bounding box: p1 -2.50000 -2.25000 -2.12500 p2 -2.37500 -2.12500 -2.00000 owning cell: 3.500
+DEAL:2::  Bounding box: p1 -2.50000 -2.12500 -2.12500 p2 -2.37500 -2.00000 -2.00000 owning cell: 3.502
+DEAL:2::  Bounding box: p1 -2.37500 -2.12500 -2.50000 p2 -2.25000 -2.00000 -2.37500 owning cell: 3.467
+DEAL:2::  Bounding box: p1 -2.12500 -2.50000 -2.25000 p2 -2.00000 -2.37500 -2.12500 owning cell: 3.489
+DEAL:2::  Bounding box: p1 -2.25000 -2.50000 -2.25000 p2 -2.12500 -2.37500 -2.12500 owning cell: 3.488
+DEAL:2::  Bounding box: p1 -2.12500 -2.50000 -2.50000 p2 -2.00000 -2.37500 -2.37500 owning cell: 3.457
+DEAL:2::  Bounding box: p1 -2.25000 -2.50000 -2.37500 p2 -2.12500 -2.37500 -2.25000 owning cell: 3.460
+DEAL:2::  Bounding box: p1 -2.12500 -2.50000 -2.12500 p2 -2.00000 -2.37500 -2.00000 owning cell: 3.493
+DEAL:2::  Bounding box: p1 -2.12500 -2.37500 -2.25000 p2 -2.00000 -2.25000 -2.12500 owning cell: 3.491
+DEAL:2::  Bounding box: p1 -2.12500 -2.37500 -2.37500 p2 -2.00000 -2.25000 -2.25000 owning cell: 3.463
+DEAL:2::  Bounding box: p1 -2.25000 -2.50000 -2.12500 p2 -2.12500 -2.37500 -2.00000 owning cell: 3.492
+DEAL:2::  Bounding box: p1 -2.12500 -2.37500 -2.12500 p2 -2.00000 -2.25000 -2.00000 owning cell: 3.495
+DEAL:2::  Bounding box: p1 -2.25000 -2.37500 -2.37500 p2 -2.12500 -2.25000 -2.25000 owning cell: 3.462
+DEAL:2::  Bounding box: p1 -2.12500 -2.50000 -2.37500 p2 -2.00000 -2.37500 -2.25000 owning cell: 3.461
+DEAL:2::  Bounding box: p1 -2.25000 -2.50000 -2.50000 p2 -2.12500 -2.37500 -2.37500 owning cell: 3.456
+DEAL:2::  Bounding box: p1 -2.12500 -2.37500 -2.50000 p2 -2.00000 -2.25000 -2.37500 owning cell: 3.459
+DEAL:2::  Bounding box: p1 -2.25000 -2.37500 -2.25000 p2 -2.12500 -2.25000 -2.12500 owning cell: 3.490
+DEAL:2::  Bounding box: p1 -2.25000 -2.37500 -2.12500 p2 -2.12500 -2.25000 -2.00000 owning cell: 3.494
+DEAL:2::  Bounding box: p1 -2.25000 -2.37500 -2.50000 p2 -2.12500 -2.25000 -2.37500 owning cell: 3.458
+DEAL:2::  Bounding box: p1 -2.12500 -2.25000 -2.25000 p2 -2.00000 -2.12500 -2.12500 owning cell: 3.505
+DEAL:2::  Bounding box: p1 -2.25000 -2.25000 -2.50000 p2 -2.12500 -2.12500 -2.37500 owning cell: 3.472
+DEAL:2::  Bounding box: p1 -2.12500 -2.25000 -2.50000 p2 -2.00000 -2.12500 -2.37500 owning cell: 3.473
+DEAL:2::  Bounding box: p1 -2.12500 -2.12500 -2.25000 p2 -2.00000 -2.00000 -2.12500 owning cell: 3.507
+DEAL:2::  Bounding box: p1 -2.25000 -2.25000 -2.37500 p2 -2.12500 -2.12500 -2.25000 owning cell: 3.476
+DEAL:2::  Bounding box: p1 -2.12500 -2.25000 -2.37500 p2 -2.00000 -2.12500 -2.25000 owning cell: 3.477
+DEAL:2::  Bounding box: p1 -2.12500 -2.25000 -2.12500 p2 -2.00000 -2.12500 -2.00000 owning cell: 3.509
+DEAL:2::  Bounding box: p1 -2.25000 -2.25000 -2.25000 p2 -2.12500 -2.12500 -2.12500 owning cell: 3.504
+DEAL:2::  Bounding box: p1 -2.25000 -2.25000 -2.12500 p2 -2.12500 -2.12500 -2.00000 owning cell: 3.508
+DEAL:2::  Bounding box: p1 -2.12500 -2.12500 -2.12500 p2 -2.00000 -2.00000 -2.00000 owning cell: 3.511
+DEAL:2::  Bounding box: p1 -2.25000 -2.12500 -2.50000 p2 -2.12500 -2.00000 -2.37500 owning cell: 3.474
+DEAL:2::  Bounding box: p1 -2.12500 -2.12500 -2.50000 p2 -2.00000 -2.00000 -2.37500 owning cell: 3.475
+DEAL:2::  Bounding box: p1 -2.25000 -2.12500 -2.37500 p2 -2.12500 -2.00000 -2.25000 owning cell: 3.478
+DEAL:2::  Bounding box: p1 -2.12500 -2.12500 -2.37500 p2 -2.00000 -2.00000 -2.25000 owning cell: 3.479
+DEAL:2::  Bounding box: p1 -2.25000 -2.12500 -2.12500 p2 -2.12500 -2.00000 -2.00000 owning cell: 3.510
+DEAL:2::  Bounding box: p1 -2.25000 -2.12500 -2.25000 p2 -2.12500 -2.00000 -2.12500 owning cell: 3.506
+
+
+DEAL:3::Testing for dim = 1
+DEAL:3::  Bounding box: p1 -3.00000 p2 -2.96875 owning cell: 5.0
+DEAL:3::  Bounding box: p1 -2.96875 p2 -2.93750 owning cell: 5.1
+DEAL:3::  Bounding box: p1 -2.93750 p2 -2.90625 owning cell: 5.2
+DEAL:3::  Bounding box: p1 -2.90625 p2 -2.87500 owning cell: 5.3
+DEAL:3::  Bounding box: p1 -2.87500 p2 -2.84375 owning cell: 5.4
+DEAL:3::  Bounding box: p1 -2.84375 p2 -2.81250 owning cell: 5.5
+DEAL:3::  Bounding box: p1 -2.81250 p2 -2.78125 owning cell: 5.6
+DEAL:3::  Bounding box: p1 -2.78125 p2 -2.75000 owning cell: 5.7
+DEAL:3::Testing for dim = 2
+DEAL:3::  Bounding box: p1 -2.43750 -2.43750 p2 -2.37500 -2.37500 owning cell: 4.195
+DEAL:3::  Bounding box: p1 -2.50000 -2.50000 p2 -2.43750 -2.43750 owning cell: 4.192
+DEAL:3::  Bounding box: p1 -2.31250 -2.50000 p2 -2.25000 -2.43750 owning cell: 4.197
+DEAL:3::  Bounding box: p1 -2.31250 -2.43750 p2 -2.25000 -2.37500 owning cell: 4.199
+DEAL:3::  Bounding box: p1 -2.37500 -2.43750 p2 -2.31250 -2.37500 owning cell: 4.198
+DEAL:3::  Bounding box: p1 -2.37500 -2.50000 p2 -2.31250 -2.43750 owning cell: 4.196
+DEAL:3::  Bounding box: p1 -2.43750 -2.50000 p2 -2.37500 -2.43750 owning cell: 4.193
+DEAL:3::  Bounding box: p1 -2.50000 -2.37500 p2 -2.43750 -2.31250 owning cell: 4.200
+DEAL:3::  Bounding box: p1 -2.43750 -2.37500 p2 -2.37500 -2.31250 owning cell: 4.201
+DEAL:3::  Bounding box: p1 -2.50000 -2.43750 p2 -2.43750 -2.37500 owning cell: 4.194
+DEAL:3::  Bounding box: p1 -2.37500 -2.37500 p2 -2.31250 -2.31250 owning cell: 4.204
+DEAL:3::  Bounding box: p1 -2.31250 -2.37500 p2 -2.25000 -2.31250 owning cell: 4.205
+DEAL:3::  Bounding box: p1 -2.37500 -2.31250 p2 -2.31250 -2.25000 owning cell: 4.206
+DEAL:3::  Bounding box: p1 -2.43750 -2.31250 p2 -2.37500 -2.25000 owning cell: 4.203
+DEAL:3::  Bounding box: p1 -2.50000 -2.31250 p2 -2.43750 -2.25000 owning cell: 4.202
+DEAL:3::  Bounding box: p1 -2.31250 -2.31250 p2 -2.25000 -2.25000 owning cell: 4.207
+DEAL:3::  Bounding box: p1 -2.43750 -2.25000 p2 -2.37500 -2.18750 owning cell: 4.225
+DEAL:3::  Bounding box: p1 -2.37500 -2.25000 p2 -2.31250 -2.18750 owning cell: 4.228
+DEAL:3::  Bounding box: p1 -2.50000 -2.25000 p2 -2.43750 -2.18750 owning cell: 4.224
+DEAL:3::  Bounding box: p1 -2.31250 -2.18750 p2 -2.25000 -2.12500 owning cell: 4.231
+DEAL:3::  Bounding box: p1 -2.31250 -2.25000 p2 -2.25000 -2.18750 owning cell: 4.229
+DEAL:3::  Bounding box: p1 -2.37500 -2.18750 p2 -2.31250 -2.12500 owning cell: 4.230
+DEAL:3::  Bounding box: p1 -2.43750 -2.18750 p2 -2.37500 -2.12500 owning cell: 4.227
+DEAL:3::  Bounding box: p1 -2.50000 -2.06250 p2 -2.43750 -2.00000 owning cell: 4.234
+DEAL:3::  Bounding box: p1 -2.43750 -2.12500 p2 -2.37500 -2.06250 owning cell: 4.233
+DEAL:3::  Bounding box: p1 -2.43750 -2.06250 p2 -2.37500 -2.00000 owning cell: 4.235
+DEAL:3::  Bounding box: p1 -2.31250 -2.06250 p2 -2.25000 -2.00000 owning cell: 4.239
+DEAL:3::  Bounding box: p1 -2.50000 -2.12500 p2 -2.43750 -2.06250 owning cell: 4.232
+DEAL:3::  Bounding box: p1 -2.37500 -2.12500 p2 -2.31250 -2.06250 owning cell: 4.236
+DEAL:3::  Bounding box: p1 -2.37500 -2.06250 p2 -2.31250 -2.00000 owning cell: 4.238
+DEAL:3::  Bounding box: p1 -2.50000 -2.18750 p2 -2.43750 -2.12500 owning cell: 4.226
+DEAL:3::  Bounding box: p1 -2.31250 -2.12500 p2 -2.25000 -2.06250 owning cell: 4.237
+DEAL:3::  Bounding box: p1 -2.25000 -2.50000 p2 -2.18750 -2.43750 owning cell: 4.208
+DEAL:3::  Bounding box: p1 -2.06250 -2.50000 p2 -2.00000 -2.43750 owning cell: 4.213
+DEAL:3::  Bounding box: p1 -2.12500 -2.50000 p2 -2.06250 -2.43750 owning cell: 4.212
+DEAL:3::  Bounding box: p1 -2.18750 -2.50000 p2 -2.12500 -2.43750 owning cell: 4.209
+DEAL:3::  Bounding box: p1 -2.25000 -2.31250 p2 -2.18750 -2.25000 owning cell: 4.218
+DEAL:3::  Bounding box: p1 -2.12500 -2.43750 p2 -2.06250 -2.37500 owning cell: 4.214
+DEAL:3::  Bounding box: p1 -2.25000 -2.43750 p2 -2.18750 -2.37500 owning cell: 4.210
+DEAL:3::  Bounding box: p1 -2.12500 -2.37500 p2 -2.06250 -2.31250 owning cell: 4.220
+DEAL:3::  Bounding box: p1 -2.06250 -2.37500 p2 -2.00000 -2.31250 owning cell: 4.221
+DEAL:3::  Bounding box: p1 -2.06250 -2.43750 p2 -2.00000 -2.37500 owning cell: 4.215
+DEAL:3::  Bounding box: p1 -2.18750 -2.43750 p2 -2.12500 -2.37500 owning cell: 4.211
+DEAL:3::  Bounding box: p1 -2.18750 -2.37500 p2 -2.12500 -2.31250 owning cell: 4.217
+DEAL:3::  Bounding box: p1 -2.25000 -2.37500 p2 -2.18750 -2.31250 owning cell: 4.216
+DEAL:3::  Bounding box: p1 -2.06250 -2.31250 p2 -2.00000 -2.25000 owning cell: 4.223
+DEAL:3::  Bounding box: p1 -2.18750 -2.31250 p2 -2.12500 -2.25000 owning cell: 4.219
+DEAL:3::  Bounding box: p1 -2.12500 -2.31250 p2 -2.06250 -2.25000 owning cell: 4.222
+DEAL:3::  Bounding box: p1 -2.06250 -2.25000 p2 -2.00000 -2.18750 owning cell: 4.245
+DEAL:3::  Bounding box: p1 -2.12500 -2.25000 p2 -2.06250 -2.18750 owning cell: 4.244
+DEAL:3::  Bounding box: p1 -2.25000 -2.25000 p2 -2.18750 -2.18750 owning cell: 4.240
+DEAL:3::  Bounding box: p1 -2.06250 -2.18750 p2 -2.00000 -2.12500 owning cell: 4.247
+DEAL:3::  Bounding box: p1 -2.18750 -2.25000 p2 -2.12500 -2.18750 owning cell: 4.241
+DEAL:3::  Bounding box: p1 -2.25000 -2.18750 p2 -2.18750 -2.12500 owning cell: 4.242
+DEAL:3::  Bounding box: p1 -2.12500 -2.18750 p2 -2.06250 -2.12500 owning cell: 4.246
+DEAL:3::  Bounding box: p1 -2.18750 -2.06250 p2 -2.12500 -2.00000 owning cell: 4.251
+DEAL:3::  Bounding box: p1 -2.25000 -2.06250 p2 -2.18750 -2.00000 owning cell: 4.250
+DEAL:3::  Bounding box: p1 -2.18750 -2.12500 p2 -2.12500 -2.06250 owning cell: 4.249
+DEAL:3::  Bounding box: p1 -2.25000 -2.12500 p2 -2.18750 -2.06250 owning cell: 4.248
+DEAL:3::  Bounding box: p1 -2.18750 -2.18750 p2 -2.12500 -2.12500 owning cell: 4.243
+DEAL:3::  Bounding box: p1 -2.12500 -2.12500 p2 -2.06250 -2.06250 owning cell: 4.252
+DEAL:3::  Bounding box: p1 -2.06250 -2.12500 p2 -2.00000 -2.06250 owning cell: 4.253
+DEAL:3::  Bounding box: p1 -2.12500 -2.06250 p2 -2.06250 -2.00000 owning cell: 4.254
+DEAL:3::  Bounding box: p1 -2.06250 -2.06250 p2 -2.00000 -2.00000 owning cell: 4.255
+DEAL:3::Testing for dim = 3
+DEAL:3::  Bounding box: p1 -2.37500 -3.00000 -2.87500 p2 -2.25000 -2.87500 -2.75000 owning cell: 3.69
+DEAL:3::  Bounding box: p1 -2.50000 -3.00000 -2.62500 p2 -2.37500 -2.87500 -2.50000 owning cell: 3.100
+DEAL:3::  Bounding box: p1 -2.37500 -3.00000 -2.62500 p2 -2.25000 -2.87500 -2.50000 owning cell: 3.101
+DEAL:3::  Bounding box: p1 -2.37500 -3.00000 -2.75000 p2 -2.25000 -2.87500 -2.62500 owning cell: 3.97
+DEAL:3::  Bounding box: p1 -2.50000 -3.00000 -2.75000 p2 -2.37500 -2.87500 -2.62500 owning cell: 3.96
+DEAL:3::  Bounding box: p1 -2.50000 -3.00000 -3.00000 p2 -2.37500 -2.87500 -2.87500 owning cell: 3.64
+DEAL:3::  Bounding box: p1 -2.37500 -3.00000 -3.00000 p2 -2.25000 -2.87500 -2.87500 owning cell: 3.65
+DEAL:3::  Bounding box: p1 -2.50000 -3.00000 -2.87500 p2 -2.37500 -2.87500 -2.75000 owning cell: 3.68
+DEAL:3::  Bounding box: p1 -2.50000 -2.87500 -3.00000 p2 -2.37500 -2.75000 -2.87500 owning cell: 3.66
+DEAL:3::  Bounding box: p1 -2.37500 -2.87500 -2.75000 p2 -2.25000 -2.75000 -2.62500 owning cell: 3.99
+DEAL:3::  Bounding box: p1 -2.37500 -2.87500 -2.62500 p2 -2.25000 -2.75000 -2.50000 owning cell: 3.103
+DEAL:3::  Bounding box: p1 -2.37500 -2.87500 -2.87500 p2 -2.25000 -2.75000 -2.75000 owning cell: 3.71
+DEAL:3::  Bounding box: p1 -2.37500 -2.87500 -3.00000 p2 -2.25000 -2.75000 -2.87500 owning cell: 3.67
+DEAL:3::  Bounding box: p1 -2.50000 -2.87500 -2.62500 p2 -2.37500 -2.75000 -2.50000 owning cell: 3.102
+DEAL:3::  Bounding box: p1 -2.50000 -2.87500 -2.75000 p2 -2.37500 -2.75000 -2.62500 owning cell: 3.98
+DEAL:3::  Bounding box: p1 -2.50000 -2.87500 -2.87500 p2 -2.37500 -2.75000 -2.75000 owning cell: 3.70
+DEAL:3::  Bounding box: p1 -2.37500 -2.75000 -3.00000 p2 -2.25000 -2.62500 -2.87500 owning cell: 3.81
+DEAL:3::  Bounding box: p1 -2.37500 -2.75000 -2.75000 p2 -2.25000 -2.62500 -2.62500 owning cell: 3.113
+DEAL:3::  Bounding box: p1 -2.50000 -2.75000 -2.87500 p2 -2.37500 -2.62500 -2.75000 owning cell: 3.84
+DEAL:3::  Bounding box: p1 -2.37500 -2.75000 -2.62500 p2 -2.25000 -2.62500 -2.50000 owning cell: 3.117
+DEAL:3::  Bounding box: p1 -2.50000 -2.75000 -2.62500 p2 -2.37500 -2.62500 -2.50000 owning cell: 3.116
+DEAL:3::  Bounding box: p1 -2.50000 -2.75000 -2.75000 p2 -2.37500 -2.62500 -2.62500 owning cell: 3.112
+DEAL:3::  Bounding box: p1 -2.37500 -2.75000 -2.87500 p2 -2.25000 -2.62500 -2.75000 owning cell: 3.85
+DEAL:3::  Bounding box: p1 -2.37500 -2.62500 -3.00000 p2 -2.25000 -2.50000 -2.87500 owning cell: 3.83
+DEAL:3::  Bounding box: p1 -2.50000 -2.75000 -3.00000 p2 -2.37500 -2.62500 -2.87500 owning cell: 3.80
+DEAL:3::  Bounding box: p1 -2.37500 -2.62500 -2.62500 p2 -2.25000 -2.50000 -2.50000 owning cell: 3.119
+DEAL:3::  Bounding box: p1 -2.37500 -2.62500 -2.75000 p2 -2.25000 -2.50000 -2.62500 owning cell: 3.115
+DEAL:3::  Bounding box: p1 -2.37500 -2.62500 -2.87500 p2 -2.25000 -2.50000 -2.75000 owning cell: 3.87
+DEAL:3::  Bounding box: p1 -2.50000 -2.62500 -2.62500 p2 -2.37500 -2.50000 -2.50000 owning cell: 3.118
+DEAL:3::  Bounding box: p1 -2.50000 -2.62500 -2.87500 p2 -2.37500 -2.50000 -2.75000 owning cell: 3.86
+DEAL:3::  Bounding box: p1 -2.50000 -2.62500 -2.75000 p2 -2.37500 -2.50000 -2.62500 owning cell: 3.114
+DEAL:3::  Bounding box: p1 -2.50000 -2.62500 -3.00000 p2 -2.37500 -2.50000 -2.87500 owning cell: 3.82
+DEAL:3::  Bounding box: p1 -2.25000 -3.00000 -3.00000 p2 -2.12500 -2.87500 -2.87500 owning cell: 3.72
+DEAL:3::  Bounding box: p1 -2.12500 -3.00000 -3.00000 p2 -2.00000 -2.87500 -2.87500 owning cell: 3.73
+DEAL:3::  Bounding box: p1 -2.12500 -3.00000 -2.87500 p2 -2.00000 -2.87500 -2.75000 owning cell: 3.77
+DEAL:3::  Bounding box: p1 -2.12500 -3.00000 -2.62500 p2 -2.00000 -2.87500 -2.50000 owning cell: 3.109
+DEAL:3::  Bounding box: p1 -2.25000 -3.00000 -2.62500 p2 -2.12500 -2.87500 -2.50000 owning cell: 3.108
+DEAL:3::  Bounding box: p1 -2.12500 -3.00000 -2.75000 p2 -2.00000 -2.87500 -2.62500 owning cell: 3.105
+DEAL:3::  Bounding box: p1 -2.25000 -2.87500 -2.87500 p2 -2.12500 -2.75000 -2.75000 owning cell: 3.78
+DEAL:3::  Bounding box: p1 -2.25000 -2.87500 -3.00000 p2 -2.12500 -2.75000 -2.87500 owning cell: 3.74
+DEAL:3::  Bounding box: p1 -2.25000 -3.00000 -2.87500 p2 -2.12500 -2.87500 -2.75000 owning cell: 3.76
+DEAL:3::  Bounding box: p1 -2.12500 -2.87500 -3.00000 p2 -2.00000 -2.75000 -2.87500 owning cell: 3.75
+DEAL:3::  Bounding box: p1 -2.12500 -2.87500 -2.62500 p2 -2.00000 -2.75000 -2.50000 owning cell: 3.111
+DEAL:3::  Bounding box: p1 -2.25000 -2.87500 -2.75000 p2 -2.12500 -2.75000 -2.62500 owning cell: 3.106
+DEAL:3::  Bounding box: p1 -2.12500 -2.87500 -2.75000 p2 -2.00000 -2.75000 -2.62500 owning cell: 3.107
+DEAL:3::  Bounding box: p1 -2.25000 -3.00000 -2.75000 p2 -2.12500 -2.87500 -2.62500 owning cell: 3.104
+DEAL:3::  Bounding box: p1 -2.12500 -2.87500 -2.87500 p2 -2.00000 -2.75000 -2.75000 owning cell: 3.79
+DEAL:3::  Bounding box: p1 -2.25000 -2.87500 -2.62500 p2 -2.12500 -2.75000 -2.50000 owning cell: 3.110
+DEAL:3::  Bounding box: p1 -2.12500 -2.75000 -3.00000 p2 -2.00000 -2.62500 -2.87500 owning cell: 3.89
+DEAL:3::  Bounding box: p1 -2.12500 -2.75000 -2.75000 p2 -2.00000 -2.62500 -2.62500 owning cell: 3.121
+DEAL:3::  Bounding box: p1 -2.25000 -2.75000 -2.75000 p2 -2.12500 -2.62500 -2.62500 owning cell: 3.120
+DEAL:3::  Bounding box: p1 -2.12500 -2.75000 -2.62500 p2 -2.00000 -2.62500 -2.50000 owning cell: 3.125
+DEAL:3::  Bounding box: p1 -2.12500 -2.75000 -2.87500 p2 -2.00000 -2.62500 -2.75000 owning cell: 3.93
+DEAL:3::  Bounding box: p1 -2.25000 -2.75000 -3.00000 p2 -2.12500 -2.62500 -2.87500 owning cell: 3.88
+DEAL:3::  Bounding box: p1 -2.12500 -2.62500 -3.00000 p2 -2.00000 -2.50000 -2.87500 owning cell: 3.91
+DEAL:3::  Bounding box: p1 -2.25000 -2.62500 -2.87500 p2 -2.12500 -2.50000 -2.75000 owning cell: 3.94
+DEAL:3::  Bounding box: p1 -2.25000 -2.62500 -3.00000 p2 -2.12500 -2.50000 -2.87500 owning cell: 3.90
+DEAL:3::  Bounding box: p1 -2.25000 -2.62500 -2.75000 p2 -2.12500 -2.50000 -2.62500 owning cell: 3.122
+DEAL:3::  Bounding box: p1 -2.12500 -2.62500 -2.75000 p2 -2.00000 -2.50000 -2.62500 owning cell: 3.123
+DEAL:3::  Bounding box: p1 -2.25000 -2.75000 -2.87500 p2 -2.12500 -2.62500 -2.75000 owning cell: 3.92
+DEAL:3::  Bounding box: p1 -2.25000 -2.62500 -2.62500 p2 -2.12500 -2.50000 -2.50000 owning cell: 3.126
+DEAL:3::  Bounding box: p1 -2.12500 -2.62500 -2.62500 p2 -2.00000 -2.50000 -2.50000 owning cell: 3.127
+DEAL:3::  Bounding box: p1 -2.12500 -2.62500 -2.87500 p2 -2.00000 -2.50000 -2.75000 owning cell: 3.95
+DEAL:3::  Bounding box: p1 -2.25000 -2.75000 -2.62500 p2 -2.12500 -2.62500 -2.50000 owning cell: 3.124
+DEAL:3::  Bounding box: p1 -2.50000 -2.37500 -2.62500 p2 -2.37500 -2.25000 -2.50000 owning cell: 3.230
+DEAL:3::  Bounding box: p1 -2.37500 -2.50000 -3.00000 p2 -2.25000 -2.37500 -2.87500 owning cell: 3.193
+DEAL:3::  Bounding box: p1 -2.50000 -2.50000 -2.75000 p2 -2.37500 -2.37500 -2.62500 owning cell: 3.224
+DEAL:3::  Bounding box: p1 -2.37500 -2.50000 -2.87500 p2 -2.25000 -2.37500 -2.75000 owning cell: 3.197
+DEAL:3::  Bounding box: p1 -2.50000 -2.37500 -3.00000 p2 -2.37500 -2.25000 -2.87500 owning cell: 3.194
+DEAL:3::  Bounding box: p1 -2.37500 -2.50000 -2.75000 p2 -2.25000 -2.37500 -2.62500 owning cell: 3.225
+DEAL:3::  Bounding box: p1 -2.37500 -2.37500 -3.00000 p2 -2.25000 -2.25000 -2.87500 owning cell: 3.195
+DEAL:3::  Bounding box: p1 -2.37500 -2.50000 -2.62500 p2 -2.25000 -2.37500 -2.50000 owning cell: 3.229
+DEAL:3::  Bounding box: p1 -2.50000 -2.50000 -2.62500 p2 -2.37500 -2.37500 -2.50000 owning cell: 3.228
+DEAL:3::  Bounding box: p1 -2.50000 -2.50000 -2.87500 p2 -2.37500 -2.37500 -2.75000 owning cell: 3.196
+DEAL:3::  Bounding box: p1 -2.50000 -2.50000 -3.00000 p2 -2.37500 -2.37500 -2.87500 owning cell: 3.192
+DEAL:3::  Bounding box: p1 -2.37500 -2.37500 -2.87500 p2 -2.25000 -2.25000 -2.75000 owning cell: 3.199
+DEAL:3::  Bounding box: p1 -2.50000 -2.37500 -2.87500 p2 -2.37500 -2.25000 -2.75000 owning cell: 3.198
+DEAL:3::  Bounding box: p1 -2.37500 -2.37500 -2.75000 p2 -2.25000 -2.25000 -2.62500 owning cell: 3.227
+DEAL:3::  Bounding box: p1 -2.50000 -2.37500 -2.75000 p2 -2.37500 -2.25000 -2.62500 owning cell: 3.226
+DEAL:3::  Bounding box: p1 -2.37500 -2.37500 -2.62500 p2 -2.25000 -2.25000 -2.50000 owning cell: 3.231
+DEAL:3::  Bounding box: p1 -2.50000 -2.25000 -2.75000 p2 -2.37500 -2.12500 -2.62500 owning cell: 3.240
+DEAL:3::  Bounding box: p1 -2.37500 -2.25000 -3.00000 p2 -2.25000 -2.12500 -2.87500 owning cell: 3.209
+DEAL:3::  Bounding box: p1 -2.37500 -2.25000 -2.62500 p2 -2.25000 -2.12500 -2.50000 owning cell: 3.245
+DEAL:3::  Bounding box: p1 -2.37500 -2.25000 -2.75000 p2 -2.25000 -2.12500 -2.62500 owning cell: 3.241
+DEAL:3::  Bounding box: p1 -2.37500 -2.25000 -2.87500 p2 -2.25000 -2.12500 -2.75000 owning cell: 3.213
+DEAL:3::  Bounding box: p1 -2.50000 -2.25000 -2.87500 p2 -2.37500 -2.12500 -2.75000 owning cell: 3.212
+DEAL:3::  Bounding box: p1 -2.50000 -2.12500 -2.87500 p2 -2.37500 -2.00000 -2.75000 owning cell: 3.214
+DEAL:3::  Bounding box: p1 -2.50000 -2.12500 -3.00000 p2 -2.37500 -2.00000 -2.87500 owning cell: 3.210
+DEAL:3::  Bounding box: p1 -2.50000 -2.25000 -3.00000 p2 -2.37500 -2.12500 -2.87500 owning cell: 3.208
+DEAL:3::  Bounding box: p1 -2.50000 -2.12500 -2.75000 p2 -2.37500 -2.00000 -2.62500 owning cell: 3.242
+DEAL:3::  Bounding box: p1 -2.37500 -2.12500 -2.62500 p2 -2.25000 -2.00000 -2.50000 owning cell: 3.247
+DEAL:3::  Bounding box: p1 -2.37500 -2.12500 -2.87500 p2 -2.25000 -2.00000 -2.75000 owning cell: 3.215
+DEAL:3::  Bounding box: p1 -2.37500 -2.12500 -2.75000 p2 -2.25000 -2.00000 -2.62500 owning cell: 3.243
+DEAL:3::  Bounding box: p1 -2.50000 -2.25000 -2.62500 p2 -2.37500 -2.12500 -2.50000 owning cell: 3.244
+DEAL:3::  Bounding box: p1 -2.50000 -2.12500 -2.62500 p2 -2.37500 -2.00000 -2.50000 owning cell: 3.246
+DEAL:3::  Bounding box: p1 -2.37500 -2.12500 -3.00000 p2 -2.25000 -2.00000 -2.87500 owning cell: 3.211
+DEAL:3::  Bounding box: p1 -2.12500 -2.50000 -2.75000 p2 -2.00000 -2.37500 -2.62500 owning cell: 3.233
+DEAL:3::  Bounding box: p1 -2.25000 -2.50000 -2.75000 p2 -2.12500 -2.37500 -2.62500 owning cell: 3.232
+DEAL:3::  Bounding box: p1 -2.12500 -2.50000 -3.00000 p2 -2.00000 -2.37500 -2.87500 owning cell: 3.201
+DEAL:3::  Bounding box: p1 -2.25000 -2.50000 -2.87500 p2 -2.12500 -2.37500 -2.75000 owning cell: 3.204
+DEAL:3::  Bounding box: p1 -2.12500 -2.50000 -2.62500 p2 -2.00000 -2.37500 -2.50000 owning cell: 3.237
+DEAL:3::  Bounding box: p1 -2.12500 -2.37500 -2.75000 p2 -2.00000 -2.25000 -2.62500 owning cell: 3.235
+DEAL:3::  Bounding box: p1 -2.12500 -2.37500 -2.87500 p2 -2.00000 -2.25000 -2.75000 owning cell: 3.207
+DEAL:3::  Bounding box: p1 -2.25000 -2.50000 -2.62500 p2 -2.12500 -2.37500 -2.50000 owning cell: 3.236
+DEAL:3::  Bounding box: p1 -2.12500 -2.37500 -2.62500 p2 -2.00000 -2.25000 -2.50000 owning cell: 3.239
+DEAL:3::  Bounding box: p1 -2.25000 -2.37500 -2.87500 p2 -2.12500 -2.25000 -2.75000 owning cell: 3.206
+DEAL:3::  Bounding box: p1 -2.12500 -2.50000 -2.87500 p2 -2.00000 -2.37500 -2.75000 owning cell: 3.205
+DEAL:3::  Bounding box: p1 -2.25000 -2.50000 -3.00000 p2 -2.12500 -2.37500 -2.87500 owning cell: 3.200
+DEAL:3::  Bounding box: p1 -2.12500 -2.37500 -3.00000 p2 -2.00000 -2.25000 -2.87500 owning cell: 3.203
+DEAL:3::  Bounding box: p1 -2.25000 -2.37500 -2.75000 p2 -2.12500 -2.25000 -2.62500 owning cell: 3.234
+DEAL:3::  Bounding box: p1 -2.25000 -2.37500 -2.62500 p2 -2.12500 -2.25000 -2.50000 owning cell: 3.238
+DEAL:3::  Bounding box: p1 -2.25000 -2.37500 -3.00000 p2 -2.12500 -2.25000 -2.87500 owning cell: 3.202
+DEAL:3::  Bounding box: p1 -2.12500 -2.25000 -2.75000 p2 -2.00000 -2.12500 -2.62500 owning cell: 3.249
+DEAL:3::  Bounding box: p1 -2.25000 -2.25000 -3.00000 p2 -2.12500 -2.12500 -2.87500 owning cell: 3.216
+DEAL:3::  Bounding box: p1 -2.12500 -2.25000 -3.00000 p2 -2.00000 -2.12500 -2.87500 owning cell: 3.217
+DEAL:3::  Bounding box: p1 -2.12500 -2.12500 -2.75000 p2 -2.00000 -2.00000 -2.62500 owning cell: 3.251
+DEAL:3::  Bounding box: p1 -2.25000 -2.25000 -2.87500 p2 -2.12500 -2.12500 -2.75000 owning cell: 3.220
+DEAL:3::  Bounding box: p1 -2.12500 -2.25000 -2.87500 p2 -2.00000 -2.12500 -2.75000 owning cell: 3.221
+DEAL:3::  Bounding box: p1 -2.12500 -2.25000 -2.62500 p2 -2.00000 -2.12500 -2.50000 owning cell: 3.253
+DEAL:3::  Bounding box: p1 -2.25000 -2.25000 -2.75000 p2 -2.12500 -2.12500 -2.62500 owning cell: 3.248
+DEAL:3::  Bounding box: p1 -2.25000 -2.25000 -2.62500 p2 -2.12500 -2.12500 -2.50000 owning cell: 3.252
+DEAL:3::  Bounding box: p1 -2.12500 -2.12500 -2.62500 p2 -2.00000 -2.00000 -2.50000 owning cell: 3.255
+DEAL:3::  Bounding box: p1 -2.25000 -2.12500 -3.00000 p2 -2.12500 -2.00000 -2.87500 owning cell: 3.218
+DEAL:3::  Bounding box: p1 -2.12500 -2.12500 -3.00000 p2 -2.00000 -2.00000 -2.87500 owning cell: 3.219
+DEAL:3::  Bounding box: p1 -2.25000 -2.12500 -2.87500 p2 -2.12500 -2.00000 -2.75000 owning cell: 3.222
+DEAL:3::  Bounding box: p1 -2.12500 -2.12500 -2.87500 p2 -2.00000 -2.00000 -2.75000 owning cell: 3.223
+DEAL:3::  Bounding box: p1 -2.25000 -2.12500 -2.62500 p2 -2.12500 -2.00000 -2.50000 owning cell: 3.254
+DEAL:3::  Bounding box: p1 -2.25000 -2.12500 -2.75000 p2 -2.12500 -2.00000 -2.62500 owning cell: 3.250
+

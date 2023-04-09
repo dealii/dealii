@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Validate grid_tools_cache for the creation of build global rtree
+// Check GridTools::Cache::get_locally_owned_cell_bounding_boxes_rtree()
 
 
 #include <deal.II/distributed/grid_refinement.h>
@@ -43,22 +43,24 @@ test()
 {
   deallog << "Testing for dim = " << dim << std::endl;
 
-  // Creating a grid in the square [0,1]x[0,1]
   parallel::shared::Triangulation<dim> tria(
     MPI_COMM_WORLD,
     Triangulation<dim>::none,
     false,
     parallel::shared::Triangulation<dim>::Settings::partition_zoltan);
   GridGenerator::hyper_cube(tria, -3, -2);
-  tria.refine_global(std::max(8 - dim, 3));
+  tria.refine_global(std::max(6 - dim, 3));
 
 
   GridTools::Cache<dim> cache(tria);
 
-  const auto &global_description = cache.get_covering_rtree();
+  const auto &global_description =
+    cache.get_locally_owned_cell_bounding_boxes_rtree();
 
   // Extract from the cache a list of all bounding boxes with process owners:
-  std::vector<std::pair<BoundingBox<dim>, unsigned int>> test_results;
+  std::vector<std::pair<BoundingBox<dim>,
+                        typename Triangulation<dim>::active_cell_iterator>>
+    test_results;
   global_description.query(bgi::satisfies([](const auto &) { return true; }),
                            std::back_inserter(test_results));
 
@@ -69,7 +71,7 @@ test()
     {
       const auto &bd_points = bb_and_owner.first.get_boundary_points();
       deallog << "  Bounding box: p1 " << bd_points.first << " p2 "
-              << bd_points.second << " rank owner: " << bb_and_owner.second
+              << bd_points.second << " owning cell: " << bb_and_owner.second
               << std::endl;
     }
 }
