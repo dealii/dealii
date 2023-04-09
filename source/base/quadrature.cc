@@ -74,6 +74,19 @@ Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points,
 
 
 template <int dim>
+Quadrature<dim>::Quadrature(std::vector<Point<dim>> &&points,
+                            std::vector<double> &&    weights)
+  : quadrature_points(std::move(points))
+  , weights(std::move(weights))
+  , is_tensor_product_flag(dim == 1)
+{
+  Assert(weights.size() == points.size(),
+         ExcDimensionMismatch(weights.size(), points.size()));
+}
+
+
+
+template <int dim>
 Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points)
   : quadrature_points(points)
   , weights(points.size(), std::numeric_limits<double>::infinity())
