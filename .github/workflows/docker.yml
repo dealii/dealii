@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build-master-docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.4
     steps:          
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,14 +34,3 @@ jobs:
           cache-to: type=inline
           push: ${{github.ref_name == 'master'}}
           tags: dealii/dealii:master-focal
-
-      - name: Build and push Docker image of master with root user
-        uses: docker/build-push-action@v4
-        with:
-          context: ./contrib/docker/
-          file: ./contrib/docker/Dockerfile.root
-          cache-from: type=registry,ref=dealii/dealii:master-focal
-          cache-to: type=inline
-          push: ${{github.ref_name == 'master'}}
-          tags: dealii/dealii:master-focal-root
-
