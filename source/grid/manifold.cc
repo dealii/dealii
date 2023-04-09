@@ -630,6 +630,35 @@ FlatManifold<dim, spacedim>::get_new_point(
 
 
 
+namespace
+{
+  template <int n_eval_points, int spacedim>
+  std::array<Point<spacedim>, n_eval_points>
+  interpolate_points(const unsigned int         n_points,
+                     const Point<spacedim> *    surrounding_points,
+                     const double *             weights,
+                     const Tensor<1, spacedim> &periodicity)
+  {
+    std::array<Point<spacedim>, n_eval_points> new_point;
+    for (unsigned int p = 0; p < n_points; ++p)
+      {
+        const Point<spacedim> surrounding_point = surrounding_points[p];
+        for (unsigned int i = 0; i < n_eval_points; ++i)
+          new_point[i] += surrounding_point * weights[p + i * n_points];
+      }
+
+    for (unsigned int d = 0; d < spacedim; ++d)
+      if (periodicity[d] > 0)
+        for (unsigned int i = 0; i < n_eval_points; ++i)
+          if (new_point[i][d] < 0)
+            new_point[i][d] += periodicity[d];
+
+    return new_point;
+  }
+} // namespace
+
+
+
 template <int dim, int spacedim>
 void
 FlatManifold<dim, spacedim>::get_new_points(
@@ -671,10 +700,9 @@ FlatManifold<dim, spacedim>::get_new_points(
           }
   if (adjust_periodicity == true)
     {
-      modified_points.resize(surrounding_points.size());
-      std::copy(surrounding_points.begin(),
-                surrounding_points.end(),
-                modified_points.begin());
+      modified_points.insert(modified_points.end(),
+                             surrounding_points.begin(),
+                             surrounding_points.end());
       for (unsigned int d = 0; d < spacedim; ++d)
         if (periodicity[d] > 0)
           for (unsigned int i = 0; i < n_points; ++i)
@@ -683,30 +711,38 @@ FlatManifold<dim, spacedim>::get_new_points(
       surrounding_points_start = modified_points.data();
     }
 
+  for (unsigned int r = 0; r < weights.size(0); ++r)
+    Assert(std::abs(
+             std::accumulate(&weights(r, 0), &weights(r, 0) + n_points, 0.0) -
+             1.0) < 1e-10,
+           ExcMessage("The weights each point should sum to 1!"));
+
   // Now perform the interpolation
-  for (unsigned int row = 0; row < weights.size(0); ++row)
+  for (unsigned int row = 0; row < weights.size(0);)
     {
-      Assert(
-        std::abs(
-          std::accumulate(&weights(row, 0), &weights(row, 0) + n_points, 0.0) -
-          1.0) < 1e-10,
-        ExcMessage("The weights for the individual points should sum to 1!"));
-      Point<spacedim> new_point;
-      for (unsigned int p = 0; p < n_points; ++p)
-        new_point += surrounding_points_start[p] * weights(row, p);
-
-      // if necessary, also adjust the weighted point by the periodicity
-      for (unsigned int d = 0; d < spacedim; ++d)
-        if (periodicity[d] > 0)
-          if (new_point[d] < 0)
-            new_point[d] += periodicity[d];
-
-      // TODO should this use surrounding_points_start or surrounding_points?
-      // The older version used surrounding_points
-      new_points[row] =
-        project_to_manifold(make_array_view(surrounding_points.begin(),
-                                            surrounding_points.end()),
-                            new_point);
+      // For performance reasons, try to compute three points at once
+      if (row + 3 <= weights.size(0))
+        {
+          const std::array<Point<spacedim>, 3> points = interpolate_points<3>(
+            n_points, surrounding_points_start, &weights(row, 0), periodicity);
+          for (unsigned int i = 0; i < 3; ++i)
+            new_points[row + i] =
+              project_to_manifold(make_array_view(surrounding_points.begin(),
+                                                  surrounding_points.end()),
+                                  points[i]);
+          row += 3;
+        }
+      else
+        {
+          new_points[row] =
+            project_to_manifold(make_array_view(surrounding_points.begin(),
+                                                surrounding_points.end()),
+                                interpolate_points<1>(n_points,
+                                                      surrounding_points_start,
+                                                      &weights(row, 0),
+                                                      periodicity)[0]);
+          ++row;
+        }
     }
 }
 
