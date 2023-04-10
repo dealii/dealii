@@ -160,20 +160,6 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const TecplotFlags &flags,
         std::ostream &      out);
 
-      template void
-      write_tecplot_binary(
-        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
-          &                             patches,
-        const std::vector<std::string> &data_names,
-        const std::vector<
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>>
-          &                 nonscalar_data_ranges,
-        const TecplotFlags &flags,
-        std::ostream &      out);
-
 #  if deal_II_space_dimension > 1
       template void
       write_svg(

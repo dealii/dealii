@@ -332,7 +332,7 @@ namespace Step13
     // formats. At the time of writing of this program, the supported graphics
     // formats are represented by the enum values <code>ucd</code>,
     // <code>gnuplot</code>, <code>povray</code>, <code>eps</code>,
-    // <code>gmv</code>, <code>tecplot</code>, <code>tecplot_binary</code>,
+    // <code>gmv</code>, <code>tecplot</code>,
     // <code>dx</code>, <code>vtk</code>, etc, but this list will certainly
     // grow over time. Now, within various functions of that base class, you
     // can use values of this type to get information about these graphics
