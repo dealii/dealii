@@ -23,12 +23,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 // Shorthand notation for PETSc error codes.
-#  define AssertPETSc(code)                              \
-    do                                                   \
-      {                                                  \
-        PetscErrorCode __ierr = (code);                  \
-        AssertThrow(__ierr == 0, ExcPETScError(__ierr)); \
-      }                                                  \
+#  define AssertPETSc(code)                          \
+    do                                               \
+      {                                              \
+        PetscErrorCode ierr = (code);                \
+        AssertThrow(ierr == 0, ExcPETScError(ierr)); \
+      }                                              \
     while (0)
 
 namespace PETScWrappers
