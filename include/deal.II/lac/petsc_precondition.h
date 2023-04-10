@@ -971,8 +971,8 @@ namespace PETScWrappers
    * PETSc (<a
    * href="https://petsc.org/release/docs/manualpages/PC/PCBDDC.html">PCBDDC</a>),
    * which is a two-level, substructuring, non-overlapping domain decomposition
-   * preconditioner. Details of the implementation can be found in "S Zampini,
-   * SISC (2016)". It mainly consists of two elements:
+   * preconditioner. Details of the implementation can be found in
+   * @cite zampini2016pcbddc. It mainly consists of two elements:
    *
    * <ul>
    *   <li> Local solvers: Solvers for each subdomain. These are performed concurrently by each processor
