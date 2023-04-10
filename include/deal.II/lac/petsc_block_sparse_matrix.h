@@ -112,6 +112,13 @@ namespace PETScWrappers
       explicit BlockSparseMatrix(const Mat &);
 
       /**
+       * Create a BlockSparseMatrix with an array of PETSc matrices.
+       */
+      template <size_t block_rows, size_t block_columns>
+      BlockSparseMatrix(
+        const std::array<std::array<Mat, block_columns>, block_rows> &);
+
+      /**
        * Destructor.
        */
       ~BlockSparseMatrix() override;
@@ -331,6 +338,23 @@ namespace PETScWrappers
       : BlockSparseMatrix()
     {
       this->reinit(A);
+    }
+
+    template <size_t block_rows, size_t block_columns>
+    inline BlockSparseMatrix::BlockSparseMatrix(
+      const std::array<std::array<Mat, block_columns>, block_rows> &arrayA)
+    {
+      this->reinit(block_rows, block_columns);
+      this->sub_objects.reinit(block_rows, block_columns);
+      for (auto r = 0; r < block_rows; ++r)
+        for (auto c = 0; c < block_columns; ++c)
+          {
+            if (arrayA[r][c])
+              this->sub_objects[r][c] = new BlockType(arrayA[r][c]);
+            else
+              this->sub_objects[r][c] = nullptr;
+          }
+      this->collect_sizes();
     }
 
     inline BlockSparseMatrix &
