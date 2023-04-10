@@ -32,20 +32,11 @@
 #include <boost/serialization/map.hpp>
 
 #include <limits>
+#include <ostream>
 #include <string>
 #include <tuple>
 #include <typeinfo>
 #include <vector>
-
-// Only include the Tecplot API header if the appropriate files
-// were detected by configure
-#ifdef DEAL_II_HAVE_TECPLOT
-#  include <string.h>
-
-#  include "TECIO.h"
-#endif
-
-#include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1668,14 +1659,6 @@ namespace DataOutBase
     tecplot,
 
     /**
-     * Output for Tecplot in binary format. Faster and smaller than text
-     * format.
-     *
-     * @deprecated Using Tecplot binary output is deprecated.
-     */
-    tecplot_binary,
-
-    /**
      * Output in VTK format.
      */
     vtk,
@@ -2499,7 +2482,6 @@ namespace DataOutBase
    * <li> <tt>eps</tt>: <tt>.eps</tt>
    * <li> <tt>gmv</tt>: <tt>.gmv</tt>
    * <li> <tt>tecplot</tt>: <tt>.dat</tt>
-   * <li> <tt>tecplot_binary</tt>: <tt>.plt</tt>
    * <li> <tt>vtk</tt>: <tt>.vtk</tt>
    * <li> <tt>vtu</tt>: <tt>.vtu</tt>
    * <li> <tt>svg</tt>: <tt>.svg</tt>
