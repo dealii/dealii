@@ -78,23 +78,29 @@ namespace NonMatching
    *
    * When dim = spacedim - 1, this class represents a (spacedim-2)-dimensional
    * integral. That is, if spacedim = 3 we have a line integral immersed in a
-   * face. Here, the transformation between the face, $F$, and reference face,
-   * $\hat{F}$, reads
+   * face. Let $\hat{r}(t)$, $t \in [0,T]$ be an arc-length parameterizations of
+   * $\hat{F}\cap \hat{S}$, i.e., the part of the surface that intersects the
+   * face in reference space. This means that $\bar{r}(t) = F_K(\hat{r}(t))$ is
+   * a parameterization of $S\cap F$. The transformation of the line integral
+   * now reads
    * @f[
-   * \int_{S\cap F} f dr =
-   * \int_{S\cap F} f |d\bar{r}| =
-   * \int_{\hat{S}\cap\hat{F}} f \circ F_{K} | J d\hat{r}|
-   * \approx \sum_{q} f \left(F_{K}(\hat{x}_{q}) \right) |J_q \hat{t}_q| w_q,
+   * \int_{S\cap F} f dr
+   * = \int_{0}^T f(\bar{r}(t)) \left \|\frac{d\bar{r}}{dt} \right \| dt
+   * = \int_{0}^T f(F_K(\hat{r}(t))) \left \| J \frac{d\hat{r}}{dt} \right \| dt
+   * \approx \sum_{q} f \left(F_{K}(\hat{x}_{q}) \right) \|J(\hat{x}_q)
+   * \hat{t}_q \| w_q,
    * @f]
-   * where $\hat{t}_q = \hat{n}_q \times \hat{n}_F$ is the tangent to the curve
-   * at $\hat{x}_q$ and $\hat{n}_F$ is the face normal. It would be possible to
-   * compute the tangent by only knowing the normal to the curve in the face
-   * plane (i.e. the dim-dimensional normal). However, when these quadratures
-   * are used, the weak form typically involves the so-called conormal, which
-   * can not be computed without knowing the surface normal in
+   * where $\hat{t}_q = \frac{d\hat{r}}{dt}(x_q) $ is the tangent to the curve
+   * at $\hat{x}_q$. This tangent can also be computed as
+   * $t_q = \hat{n}_q \times \hat{n}_F / \| \hat{n}_q \times \hat{n}_F \|$ where
+   * $\hat{n}_F$ is the face normal. It would be possible to compute the tangent
+   * by only knowing the normal to the curve in the face plane (i.e. the
+   * dim-dimensional normal). However, when these quadratures are used, the weak
+   * form typically involves the so-called conormal, which can not be computed
+   * without knowing the surface normal in
    * $\mathbb{R}^{\text{spacedim}}$. The conormal is the unit vector parallel to
-   * the projection of the face normal into the surface plane. This is
-   * essentially the same thing as the normalized
+   * the projection of the face normal into the surface plane. This is the same
+   * as the normalized
    * @ref GlossBoundaryForm "boundary form".
    */
   template <int dim, int spacedim = dim>
