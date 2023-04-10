@@ -46,6 +46,7 @@
 
 #include "../tests.h"
 
+#include "Kokkos_Core.hpp"
 #include "matrix_vector_mf.h"
 
 
@@ -194,6 +195,8 @@ main()
 
   deallog << std::setprecision(3);
 
+  Kokkos::initialize();
+
   init_cuda();
 
   {
@@ -222,6 +225,8 @@ main()
     deallog.pop();
     deallog.pop();
   }
+
+  Kokkos::finalize();
 
   return 0;
 }

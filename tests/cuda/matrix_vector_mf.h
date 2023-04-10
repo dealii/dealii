@@ -30,12 +30,12 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperatorQuad
 {
 public:
-  __device__
+  DEAL_II_HOST_DEVICE
   HelmholtzOperatorQuad(Number coef)
     : coef(coef)
   {}
 
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   operator()(
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
       *fe_eval) const;
@@ -47,7 +47,7 @@ private:
 
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
-__device__ void
+DEAL_II_HOST_DEVICE void
 HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::operator()(
   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval)
   const
@@ -66,7 +66,7 @@ public:
     : coef(coefficient)
   {}
 
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
@@ -86,7 +86,7 @@ public:
 
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
-__device__ void
+DEAL_II_HOST_DEVICE void
 HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const unsigned int                                          cell,
   const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
@@ -117,7 +117,7 @@ public:
     : coef(coefficient)
   {}
 
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data);
@@ -135,7 +135,7 @@ private:
 
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
-__device__ void
+DEAL_II_HOST_DEVICE void
 VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const unsigned int                                          cell,
   const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data)

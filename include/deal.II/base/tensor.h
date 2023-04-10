@@ -956,14 +956,15 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank, dim, T>>
   {
-    static constexpr DEAL_II_ALWAYS_INLINE const Tensor<rank, dim, T> &
-    value(const Tensor<rank, dim, T> &t)
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE const
+      Tensor<rank, dim, T> &
+      value(const Tensor<rank, dim, T> &t)
     {
       return t;
     }
 
-    static constexpr DEAL_II_ALWAYS_INLINE Tensor<rank, dim, T>
-                                           value(const T &t)
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE Tensor<rank, dim, T>
+                                                       value(const T &t)
     {
       Tensor<rank, dim, T> tmp;
       tmp = t;

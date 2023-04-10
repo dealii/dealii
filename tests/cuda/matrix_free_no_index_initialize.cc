@@ -24,6 +24,8 @@
 
 #include "../tests.h"
 
+#include "Kokkos_Core.hpp"
+
 template <int dim,
           int fe_degree,
           int n_q_points_1d = fe_degree + 1,
@@ -38,7 +40,7 @@ public:
   MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in)
     : data(data_in){};
 
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
@@ -51,7 +53,7 @@ public:
 
     // set to unit vector
     fe_eval.submit_dof_value(1.);
-    __syncthreads();
+    KOKKOS_IF_ON_DEVICE(__syncthreads();)
     fe_eval.evaluate(/*evaluate_values =*/true, /*evaluate_gradients=*/true);
 
 #ifndef __APPLE__
@@ -147,7 +149,12 @@ main()
 {
   initlog();
 
+  Kokkos::initialize();
   init_cuda();
 
   test<2, 1>();
+
+  Kokkos::finalize();
+
+  return 0;
 }

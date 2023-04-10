@@ -24,20 +24,18 @@
 
 #  include <deal.II/matrix_free/hanging_nodes_internal.h>
 
+#  include <Kokkos_Macros.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 namespace CUDAWrappers
 {
   namespace internal
   {
-    __constant__ double
-      constraint_weights[(CUDAWrappers::mf_max_elem_degree + 1) *
-                         (CUDAWrappers::mf_max_elem_degree + 1)];
-
     //------------------------------------------------------------------------//
     // Functions for resolving the hanging node constraints on the GPU        //
     //------------------------------------------------------------------------//
     template <unsigned int size>
-    __device__ inline unsigned int
+    DEAL_II_HOST_DEVICE inline unsigned int
     index2(unsigned int i, unsigned int j)
     {
       return i + size * j;
@@ -46,7 +44,7 @@ namespace CUDAWrappers
 
 
     template <unsigned int size>
-    __device__ inline unsigned int
+    DEAL_II_HOST_DEVICE inline unsigned int
     index3(unsigned int i, unsigned int j, unsigned int k)
     {
       return i + size * j + size * size * k;
@@ -58,11 +56,15 @@ namespace CUDAWrappers
               unsigned int direction,
               bool         transpose,
               typename Number>
-    __device__ inline void
+    DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_2d(
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-              constraint_mask,
-      Number *values)
+        constraint_mask,
+      Kokkos::Subview<
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+        Kokkos::pair<int, int>> values)
     {
       const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
       const unsigned int y_idx = threadIdx.y;
@@ -151,11 +153,11 @@ namespace CUDAWrappers
 
       // The synchronization is done for all the threads in one block with
       // each block being assigned to one element.
-      __syncthreads();
+      KOKKOS_IF_ON_DEVICE(__syncthreads();)
       if (constrained_face && constrained_dof)
         values[index2<fe_degree + 1>(x_idx, y_idx)] = t;
 
-      __syncthreads();
+      KOKKOS_IF_ON_DEVICE(__syncthreads();)
     }
 
 
@@ -164,11 +166,15 @@ namespace CUDAWrappers
               unsigned int direction,
               bool         transpose,
               typename Number>
-    __device__ inline void
+    DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_3d(
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-              constraint_mask,
-      Number *values)
+        constraint_mask,
+      Kokkos::Subview<
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+        Kokkos::pair<int, int>> values)
     {
       const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
       const unsigned int y_idx = threadIdx.y;
@@ -293,14 +299,14 @@ namespace CUDAWrappers
 
       // The synchronization is done for all the threads in one block with
       // each block being assigned to one element.
-      __syncthreads();
+      KOKKOS_IF_ON_DEVICE(__syncthreads();)
 
       if ((constrained_face != dealii::internal::MatrixFreeFunctions::
                                  ConstraintKinds::unconstrained) &&
           constrained_dof)
         values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = t;
 
-      __syncthreads();
+      KOKKOS_IF_ON_DEVICE(__syncthreads();)
     }
 
 
@@ -313,30 +319,39 @@ namespace CUDAWrappers
      * @cite kronbichler2019multigrid.
      */
     template <int dim, int fe_degree, bool transpose, typename Number>
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     resolve_hanging_nodes(
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-              constraint_mask,
-      Number *values)
+        constraint_mask,
+      Kokkos::Subview<
+        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
+        Kokkos::pair<int, int>> values)
     {
       if (dim == 2)
         {
-          interpolate_boundary_2d<fe_degree, 0, transpose>(constraint_mask,
+          interpolate_boundary_2d<fe_degree, 0, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
 
-          interpolate_boundary_2d<fe_degree, 1, transpose>(constraint_mask,
+          interpolate_boundary_2d<fe_degree, 1, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
         }
       else if (dim == 3)
         {
           // Interpolate y and z faces (x-direction)
-          interpolate_boundary_3d<fe_degree, 0, transpose>(constraint_mask,
+          interpolate_boundary_3d<fe_degree, 0, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
           // Interpolate x and z faces (y-direction)
-          interpolate_boundary_3d<fe_degree, 1, transpose>(constraint_mask,
+          interpolate_boundary_3d<fe_degree, 1, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
           // Interpolate x and y faces (z-direction)
-          interpolate_boundary_3d<fe_degree, 2, transpose>(constraint_mask,
+          interpolate_boundary_3d<fe_degree, 2, transpose>(constraint_weights,
+                                                           constraint_mask,
                                                            values);
         }
     }

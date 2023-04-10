@@ -819,7 +819,7 @@ public:
    * mapping from the symbolic flags defined in the RefinementPossibilities
    * base class to actual numerical values (the array indices).
    */
-  operator std::uint8_t() const;
+  DEAL_II_HOST_DEVICE operator std::uint8_t() const;
 
   /**
    * Return the union of the refinement flags represented by the current
@@ -2814,7 +2814,7 @@ inline RefinementCase<dim>::RefinementCase(const std::uint8_t refinement_case)
 
 
 template <int dim>
-inline RefinementCase<dim>::operator std::uint8_t() const
+inline DEAL_II_HOST_DEVICE RefinementCase<dim>::operator std::uint8_t() const
 {
   return value;
 }

@@ -28,6 +28,8 @@
 
 #include "../tests.h"
 
+#include "Kokkos_Core.hpp"
+
 
 template <int dim, int fe_degree>
 class DummyOperator
@@ -35,7 +37,7 @@ class DummyOperator
 public:
   DummyOperator() = default;
 
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
@@ -53,7 +55,7 @@ public:
 
 
 template <int dim, int fe_degree>
-__device__ void
+DEAL_II_HOST_DEVICE void
 DummyOperator<dim, fe_degree>::operator()(
   const unsigned int                                          cell,
   const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
@@ -172,11 +174,12 @@ int
 main()
 {
   initlog();
-  init_cuda();
+  Kokkos::initialize();
 
   test<2, 3>();
   test<3, 3>();
 
   deallog << "OK" << std::endl;
+  Kokkos::finalize();
   return 0;
 }
