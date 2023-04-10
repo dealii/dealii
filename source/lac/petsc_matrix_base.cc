@@ -307,9 +307,9 @@ namespace PETScWrappers
   MatrixBase::size_type
   MatrixBase::local_size() const
   {
-    PetscInt n_rows, n_cols;
+    PetscInt n_rows;
 
-    const PetscErrorCode ierr = MatGetLocalSize(matrix, &n_rows, &n_cols);
+    const PetscErrorCode ierr = MatGetLocalSize(matrix, &n_rows, nullptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return n_rows;
@@ -324,6 +324,35 @@ namespace PETScWrappers
 
     const PetscErrorCode ierr =
       MatGetOwnershipRange(static_cast<const Mat &>(matrix), &begin, &end);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return std::make_pair(begin, end);
+  }
+
+
+
+  MatrixBase::size_type
+  MatrixBase::local_domain_size() const
+  {
+    PetscInt n_cols;
+
+    const PetscErrorCode ierr = MatGetLocalSize(matrix, nullptr, &n_cols);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return n_cols;
+  }
+
+
+
+  std::pair<MatrixBase::size_type, MatrixBase::size_type>
+  MatrixBase::local_domain() const
+  {
+    PetscInt begin, end;
+
+    const PetscErrorCode ierr =
+      MatGetOwnershipRangeColumn(static_cast<const Mat &>(matrix),
+                                 &begin,
+                                 &end);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return std::make_pair(begin, end);

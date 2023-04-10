@@ -679,6 +679,24 @@ namespace PETScWrappers
     in_local_range(const size_type index) const;
 
     /**
+     * Return the local number of columns stored on the present MPI process.
+     *
+     * To figure out which elements exactly are stored locally, use
+     * local_domain().
+     */
+    size_type
+    local_domain_size() const;
+
+    /**
+     * Return a pair of indices indicating which columns of this matrix are
+     * stored locally. The first number is the index of the first column stored,
+     * the second the index of the one past the last one that is stored
+     * locally.
+     */
+    std::pair<size_type, size_type>
+    local_domain() const;
+
+    /**
      * Return a reference to the MPI communicator object in use with this
      * matrix.
      */
