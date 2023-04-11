@@ -217,7 +217,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
   internal::MGTransfer::reinit_vector(dof_handler, component_to_block_map, dst);
 #ifdef DEBUG_OUTPUT
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
-  int ierr = MPI_Barrier(MPI_COMM_WORLD);
+  int ierr = MPI_Barrier(dof_handler.get_communicator());
   AssertThrowMPI(ierr);
 #endif
 
@@ -237,7 +237,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
     {
       --level;
 #ifdef DEBUG_OUTPUT
-      ierr = MPI_Barrier(MPI_COMM_WORLD);
+      ierr = MPI_Barrier(dof_handler.get_communicator());
       AssertThrowMPI(ierr);
 #endif
 
@@ -258,7 +258,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
       dst_level.compress(VectorOperation::insert);
 
 #ifdef DEBUG_OUTPUT
-      ierr = MPI_Barrier(MPI_COMM_WORLD);
+      ierr = MPI_Barrier(dof_handler.get_communicator());
       AssertThrowMPI(ierr);
       std::cout << "copy_to_mg dst " << level << ' ' << dst_level.l2_norm()
                 << std::endl;
@@ -296,11 +296,11 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
 #ifdef DEBUG_OUTPUT
-      int ierr = MPI_Barrier(MPI_COMM_WORLD);
+      int ierr = MPI_Barrier(dof_handler.get_communicator());
       AssertThrowMPI(ierr);
       std::cout << "copy_from_mg src " << level << ' ' << src[level].l2_norm()
                 << std::endl;
-      ierr = MPI_Barrier(MPI_COMM_WORLD);
+      ierr = MPI_Barrier(dof_handler.get_communicator());
       AssertThrowMPI(ierr);
 #endif
 
@@ -321,7 +321,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
 #ifdef DEBUG_OUTPUT
       {
         dst.compress(VectorOperation::insert);
-        ierr = MPI_Barrier(MPI_COMM_WORLD);
+        ierr = MPI_Barrier(dof_handler.get_communicator());
         AssertThrowMPI(ierr);
         std::cout << "copy_from_mg level=" << level << ' ' << dst.l2_norm()
                   << std::endl;
@@ -330,7 +330,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
     }
   dst.compress(VectorOperation::insert);
 #ifdef DEBUG_OUTPUT
-  const int ierr = MPI_Barrier(MPI_COMM_WORLD);
+  const int ierr = MPI_Barrier(dof_handler.get_communicator());
   AssertThrowMPI(ierr);
   std::cout << "copy_from_mg " << dst.l2_norm() << std::endl;
 #endif
