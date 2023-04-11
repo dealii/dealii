@@ -46,21 +46,41 @@ namespace TrilinosWrappers
    * // set configuration
    * TrilinosWrappers::NOXSolver<VectorType>::AdditionalData additional_data;
    *
+   * // Define ParameterList object for more options
+   * // These specifications are the default but we include them for
+   * // clarification
+   * const Teuchos::RCP<Teuchos::ParameterList> parameters =
+   *   Teuchos::rcp(new Teuchos::ParameterList);
+   *
+   * // Specify nonlinear solver type
+   * parameters->set("Nonlinear Solver","Line Search Based");
+   *
+   * // Specify method of line search
+   * parameters->sublist("Line Search").set("Method","Full Step");
+   *
+   * // Specify direction
+   * parameters->sublist("Direction").set("Method","Newton")
+   *
    * // create nonlinear solver
-   * TrilinosWrappers::NOXSolver<VectorType> solver(additional_data);
+   * TrilinosWrappers::NOXSolver<VectorType> solver(additional_data,parameters);
    *
    * // Set user functions to compute residual, to set up the Jacobian, and to
    * // apply the inverse of the Jacobian.
    * // Note that there are more functions that can be set.
-   * solver.residual = [](const auto &src, auto &dst) {...};
-   * solver.setup_jacobian = [](const auto &src) {...};
+   * solver.residual = [](const auto &u, auto &F) {...};
+   * solver.setup_jacobian = [](const auto &u) {...};
    * solver.solve_with_jacobian =
-   *   [](const auto &src, auto &dst, const auto) {...};
+   *   [](const auto &u, auto &F, const auto) {...};
    *
    * // solver nonlinear system with solution containing the initial guess and
    * // the final solution
    * solver.solve(solution);
    * @endcode
+   *
+   * The functions used in NOX are nearly identical to the functions in KINSOL
+   * with a few exceptions (KINSOL requires a reinit() function where NOX does
+   * not). So check the KINSOL documentation for more precise details on how
+   * these functions are implemented.
    */
   template <typename VectorType>
   class NOXSolver
@@ -129,7 +149,10 @@ namespace TrilinosWrappers
     };
 
     /**
-     * Constructor.
+     * Constructor, with class parameters set by the AdditionalData object.
+     *
+     * @param additional_data NOX configuration data.
+     * @param parameters More specific NOX solver configuration.
      *
      * If @p parameters is not filled, a Newton solver with a full step is used.
      * An overview of possible parameters is given at
@@ -153,24 +176,24 @@ namespace TrilinosWrappers
     solve(VectorType &solution);
 
     /**
-     * A user function that computes the residual @p f based on the
-     * current solution @p x.
+     * A function object that users should supply and that is intended to
+     * compute the residual `u = F(u)`.
      *
      * @note This function should return 0 in the case of success.
      */
-    std::function<int(const VectorType &x, VectorType &f)> residual;
+    std::function<int(const VectorType &u, VectorType &F)> residual;
 
     /**
      * A user function that sets up the Jacobian, based on the
-     * current solution @p x.
+     * current solution @p current_u.
      *
      * @note This function should return 0 in the case of success.
      */
-    std::function<int(const VectorType &x)> setup_jacobian;
+    std::function<int(const VectorType &current_u)> setup_jacobian;
 
     /**
      * A user function that sets up the preconditioner for inverting
-     * the Jacobian, based on the current solution @p x.
+     * the Jacobian, based on the current solution @p current_u.
      *
      * @note This function is optional and is used when setup_jacobian is
      * called and the preconditioner needs to be updated (see
@@ -179,11 +202,11 @@ namespace TrilinosWrappers
      *
      * @note This function should return 0 in the case of success.
      */
-    std::function<int(const VectorType &x)> setup_preconditioner;
+    std::function<int(const VectorType &current_u)> setup_preconditioner;
 
     /**
-     * A user function that applies the Jacobian to @p x and writes
-     * the result in @p v.
+     * A user function that applies the Jacobian to @p u and writes
+     * the result in @p F.
      *
      * @note This function is optional and is used in the case of certain
      * configurations. For instance, this function is required if the
@@ -193,11 +216,11 @@ namespace TrilinosWrappers
      *
      * @note This function should return 0 in the case of success.
      */
-    std::function<int(const VectorType &x, VectorType &v)> apply_jacobian;
+    std::function<int(const VectorType &u, VectorType &F)> apply_jacobian;
 
     /**
      * A user function that applies the inverse of the Jacobian to
-     * @p x and writes the result in @p x. The parameter @p tolerance
+     * @p u and writes the result in @p F. The parameter @p tolerance
      * specifies the error reduction if an iterative solver is used.
      *
      * @note This function is optional and is used in the case of certain
@@ -206,12 +229,12 @@ namespace TrilinosWrappers
      * @note This function should return 0 in the case of success.
      */
     std::function<
-      int(const VectorType &f, VectorType &x, const double tolerance)>
+      int(const VectorType &F, VectorType &u, const double tolerance)>
       solve_with_jacobian;
 
     /**
      * A user function that applies the inverse of the Jacobian to
-     * @p x, writes the result in @p x and returns the numer of
+     * @p F, writes the result in @p u and returns the numer of
      * linear iterations the linear solver needed.
      * The parameter @p tolerance species the error reduction if a
      * interative solver is used.
@@ -220,7 +243,7 @@ namespace TrilinosWrappers
      * configurations.
      */
     std::function<
-      int(const VectorType &f, VectorType &x, const double tolerance)>
+      int(const VectorType &F, VectorType &u, const double tolerance)>
       solve_with_jacobian_and_track_n_linear_iterations;
 
     /**
@@ -229,14 +252,14 @@ namespace TrilinosWrappers
      * AdditionalData). It is run after each nonlinear iteration.
      *
      * The input are the current iteration number @p i, the l2-norm
-     * @p norm_f of the residual vector, the current solution @p x,
+     * @p norm_f of the residual vector, the current solution @p current_u,
      * and the current residual vector @p f.
      *
      * @note This function is optional.
      */
     std::function<SolverControl::State(const unsigned int i,
                                        const double       norm_f,
-                                       const VectorType & x,
+                                       const VectorType & current_u,
                                        const VectorType & f)>
       check_iteration_status;
 
