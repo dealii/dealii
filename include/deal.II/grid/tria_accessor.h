@@ -4289,6 +4289,6 @@ TriaAccessor<3, 3, 3>::set_all_manifold_ids(const types::manifold_id) const;
 DEAL_II_NAMESPACE_CLOSE
 
 // include more templates in debug and optimized mode
-#include "tria_accessor.templates.h"
+#include <deal.II/grid/tria_accessor.templates.h>
 
 #endif

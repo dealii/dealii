@@ -19,9 +19,6 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/memory_space.h"
-#include "deal.II/base/utilities.h"
-
 #ifdef DEAL_II_WITH_CUDA
 
 #  include <deal.II/base/cuda_size.h>
@@ -30,6 +27,7 @@
 #  include <deal.II/base/partitioner.h>
 #  include <deal.II/base/quadrature.h>
 #  include <deal.II/base/tensor.h>
+#  include <deal.II/base/utilities.h>
 
 #  include <deal.II/dofs/dof_handler.h>
 

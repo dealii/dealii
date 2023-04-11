@@ -19,17 +19,12 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/memory_space.h"
-
-#include <deal.II/matrix_free/cuda_matrix_free.h>
-
-#include <string>
-
 #ifdef DEAL_II_WITH_CUDA
 
 #  include <deal.II/base/cuda.h>
 #  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/graph_coloring.h>
+#  include <deal.II/base/memory_space.h>
 
 #  include <deal.II/dofs/dof_tools.h>
 
@@ -38,6 +33,7 @@
 #  include <deal.II/fe/mapping_q1.h>
 
 #  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
+#  include <deal.II/matrix_free/cuda_matrix_free.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
 #  include <Kokkos_Core.hpp>
@@ -45,6 +41,7 @@
 
 #  include <cmath>
 #  include <functional>
+#  include <string>
 
 
 DEAL_II_NAMESPACE_OPEN
