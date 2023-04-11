@@ -192,6 +192,24 @@ namespace PETScWrappers
             {
               if (!this->sub_objects[r][c])
                 {
+                  Assert(
+                    row_sizes[r] != size_type(-1),
+                    ExcMessage(
+                      "When passing empty sub-blocks of a block matrix, you need to make "
+                      "sure that at least one block in each block row and block column is "
+                      "non-empty. However, block row " +
+                      std::to_string(r) +
+                      " is completely empty "
+                      "and so it is not possible to determine how many rows it should have."));
+                  Assert(
+                    col_sizes[c] != size_type(-1),
+                    ExcMessage(
+                      "When passing empty sub-blocks of a block matrix, you need to make "
+                      "sure that at least one block in each block row and block column is "
+                      "non-empty. However, block column " +
+                      std::to_string(c) +
+                      " is completely empty "
+                      "and so it is not possible to determine how many columns it should have."));
                   Mat dummy = ::create_dummy_mat(
                     comm,
                     static_cast<PetscInt>(row_local_sizes[r]),
