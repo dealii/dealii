@@ -54,16 +54,16 @@ namespace Algorithms
    * Application class performing the theta timestepping scheme.
    *
    * The theta scheme is an abstraction of implicit and explicit Euler
-   * schemes, the Crank-Nicholson scheme and linear combinations of those. The
+   * schemes, the Crank-Nicolson scheme and linear combinations of those. The
    * choice of the actual scheme is controlled by the parameter #theta as
    * follows.
    * <ul>
    * <li> #theta=0: explicit Euler scheme
    * <li> #theta=1: implicit Euler scheme
-   * <li> #theta=½: Crank-Nicholson scheme
+   * <li> #theta=½: Crank-Nicolson scheme
    * </ul>
    *
-   * For fixed #theta, the Crank-Nicholson scheme is the only second order
+   * For fixed #theta, the Crank-Nicolson scheme is the only second order
    * scheme. Nevertheless, further stability may be achieved by choosing
    * #theta larger than ½, thereby introducing a first order error term. In
    * order to avoid a loss of convergence order, the adaptive theta scheme can

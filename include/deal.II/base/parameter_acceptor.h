@@ -177,7 +177,7 @@ DEAL_II_NAMESPACE_OPEN
  *   , my_subclass("Forcing term")
  * {}
  *
- * void MyClass::declare_parmeters(ParameterHandler &prm)
+ * void MyClass::declare_parameters(ParameterHandler &prm)
  * {
  *   // many add_parameter(...);
  * }

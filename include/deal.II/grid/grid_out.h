@@ -931,7 +931,7 @@ namespace GridOutFlags
  * if you know which format you want to have, or if you want the format to be
  * a runtime parameter, you can write
  * @code
- *   GridOut::OutputFormat grid_format =
+ *   GridOut::OutputFormat output_format =
  *     GridOut::parse_output_format(get_format_name_from_somewhere());
  *   std::ofstream output_file("some_filename"
  *                             + GridOut::default_suffix(output_format));
