@@ -166,10 +166,10 @@ namespace PETScWrappers
       // Create empty matrices if needed
       // This is neeeded by the base class
       // not by MATNEST
-      std::vector<size_type> row_sizes(m);
-      std::vector<size_type> col_sizes(n);
-      std::vector<size_type> row_local_sizes(m);
-      std::vector<size_type> col_local_sizes(n);
+      std::vector<size_type> row_sizes(m, size_type(-1));
+      std::vector<size_type> col_sizes(n, size_type(-1));
+      std::vector<size_type> row_local_sizes(m, size_type(-1));
+      std::vector<size_type> col_local_sizes(n, size_type(-1));
       MPI_Comm               comm = MPI_COMM_NULL;
       for (size_type r = 0; r < m; r++)
         {
