@@ -915,7 +915,7 @@ namespace internal
                       block(vv, b).local_element(j);
         }
 
-      Utilities::MPI::sum(h, MPI_COMM_WORLD, h);
+      Utilities::MPI::sum(h, block(vv, 0).get_mpi_communicator(), h);
     }
 
 
@@ -1025,7 +1025,8 @@ namespace internal
             }
         }
 
-      return std::sqrt(Utilities::MPI::sum(norm_vv_temp, MPI_COMM_WORLD));
+      return std::sqrt(
+        Utilities::MPI::sum(norm_vv_temp, block(vv, 0).get_mpi_communicator()));
     }
 
 
@@ -1067,7 +1068,8 @@ namespace internal
             norm += temp * temp;
           }
 
-      return std::sqrt(Utilities::MPI::sum(norm, MPI_COMM_WORLD));
+      return std::sqrt(
+        Utilities::MPI::sum(norm, block(v, 0).get_mpi_communicator()));
     }
 
 
