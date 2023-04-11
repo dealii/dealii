@@ -326,7 +326,7 @@ namespace PETScWrappers
       MatGetOwnershipRange(static_cast<const Mat &>(matrix), &begin, &end);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return std::make_pair(begin, end);
+    return {begin, end};
   }
 
 
@@ -355,7 +355,7 @@ namespace PETScWrappers
                                  &end);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return std::make_pair(begin, end);
+    return {begin, end};
   }
 
 

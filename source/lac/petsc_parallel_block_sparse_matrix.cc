@@ -18,37 +18,41 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-// A dummy utility routine to create an empty matrix in case we import
-// a MATNEST with NULL blocks
-static void
-createDummyMat(MPI_Comm comm,
-               PetscInt lr,
-               PetscInt gr,
-               PetscInt lc,
-               PetscInt gc,
-               Mat *    dummy)
+namespace
 {
-  PetscErrorCode ierr;
+  // A dummy utility routine to create an empty matrix in case we import
+  // a MATNEST with NULL blocks
+  static Mat
+  create_dummy_mat(MPI_Comm comm,
+                   PetscInt lr,
+                   PetscInt gr,
+                   PetscInt lc,
+                   PetscInt gc)
+  {
+    Mat            dummy;
+    PetscErrorCode ierr;
 
-  ierr = MatCreate(comm, dummy);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatSetSizes(*dummy, lr, lc, gr, gc);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatSetType(*dummy, MATAIJ);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatSeqAIJSetPreallocation(*dummy, 0, nullptr);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatMPIAIJSetPreallocation(*dummy, 0, nullptr, 0, nullptr);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatSetUp(*dummy);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatSetOption(*dummy, MAT_NO_OFF_PROC_ENTRIES, PETSC_TRUE);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatAssemblyBegin(*dummy, MAT_FINAL_ASSEMBLY);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-  ierr = MatAssemblyEnd(*dummy, MAT_FINAL_ASSEMBLY);
-  AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
-}
+    ierr = MatCreate(comm, &dummy);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetSizes(dummy, lr, lc, gr, gc);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetType(dummy, MATAIJ);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSeqAIJSetPreallocation(dummy, 0, nullptr);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatMPIAIJSetPreallocation(dummy, 0, nullptr, 0, nullptr);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetUp(dummy);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetOption(dummy, MAT_NO_OFF_PROC_ENTRIES, PETSC_TRUE);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatAssemblyBegin(dummy, MAT_FINAL_ASSEMBLY);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatAssemblyEnd(dummy, MAT_FINAL_ASSEMBLY);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    return dummy;
+  }
+} // namespace
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -188,15 +192,17 @@ namespace PETScWrappers
             {
               if (!this->sub_objects[r][c])
                 {
-                  Mat dummy;
-                  createDummyMat(comm,
-                                 static_cast<PetscInt>(row_local_sizes[r]),
-                                 static_cast<PetscInt>(row_sizes[r]),
-                                 static_cast<PetscInt>(col_local_sizes[c]),
-                                 static_cast<PetscInt>(col_sizes[c]),
-                                 &dummy);
+                  Mat dummy = ::create_dummy_mat(
+                    comm,
+                    static_cast<PetscInt>(row_local_sizes[r]),
+                    static_cast<PetscInt>(row_sizes[r]),
+                    static_cast<PetscInt>(col_local_sizes[c]),
+                    static_cast<PetscInt>(col_sizes[c]));
                   this->sub_objects[r][c] = new BlockType(dummy);
-                  ierr                    = MatDestroy(&dummy);
+
+                  // the new object got a reference on dummy, we can safely
+                  // call destroy here
+                  ierr = MatDestroy(&dummy);
                   AssertThrow(ierr == 0, ExcPETScError(ierr));
                 }
             }
