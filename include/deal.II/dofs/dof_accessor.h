@@ -2141,7 +2141,7 @@ DoFInvalidAccessor<structdim, dim, spacedim>::DoFInvalidAccessor(
 DEAL_II_NAMESPACE_CLOSE
 
 // include more templates
-#include "dof_accessor.templates.h"
+#include <deal.II/dofs/dof_accessor.templates.h>
 
 
 #endif
