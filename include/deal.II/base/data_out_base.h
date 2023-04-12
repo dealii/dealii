@@ -215,8 +215,7 @@ namespace DataOutBase
      */
     best_speed,
     /**
-     * Use the algorithm which results in the smallest compressed
-     * files. This is the default flag.
+     * Use the algorithm which results in the smallest compressed files.
      */
     best_compression,
     /**
