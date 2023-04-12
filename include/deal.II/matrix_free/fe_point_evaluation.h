@@ -1122,7 +1122,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
             make_array_view(shapes.begin() + qb * n_shapes,
                             shapes.begin() + (qb * n_shapes + n_shapes));
 
-          internal::compute_values_of_array(view, poly, vectorized_points);
+          internal::compute_values_of_array<dim>(view, poly, vectorized_points);
         }
     }
 

@@ -105,7 +105,21 @@ namespace internal
  * `std::array` classes.
  */
 template <typename T, std::size_t... Ns>
-using ndarray = typename internal::ndarray::HelperArray<T, Ns...>::type;
+struct ndarray : internal::ndarray::HelperArray<T, Ns...>::type
+{
+  using Base          = typename internal::ndarray::HelperArray<T, Ns...>::type;
+  constexpr ndarray() = default;
+  constexpr ndarray(const Base &rhs)
+    : Base(rhs)
+  {}
+  constexpr ndarray(const std::initializer_list<typename Base::value_type> &l)
+    : Base{}
+  {
+    std::size_t i = 0;
+    for (auto first = l.begin(); first != l.end(); ++first, ++i)
+      (*this)[i] = *first;
+  }
+};
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -3257,7 +3257,7 @@ namespace internal
 
         auto view = make_array_view(shapes);
 
-        compute_values_of_array(view, poly, p);
+        compute_values_of_array<dim>(view, poly, p);
 
         return evaluate_tensor_product_value_and_gradient_shapes<dim,
                                                                  Number,
