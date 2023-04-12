@@ -77,10 +77,11 @@ namespace TrilinosWrappers
    * solver.solve(solution);
    * @endcode
    *
-   * The functions used in NOX are nearly identical to the functions in KINSOL
-   * with a few exceptions (KINSOL requires a reinit() function where NOX does
-   * not). So check the KINSOL documentation for more precise details on how
-   * these functions are implemented.
+   * The functions used in NOX are nearly identical to the functions in
+   * SUNDIALS::KINSOL with a few exceptions (for example,
+   * SUNDIALS::KINSOL requires a reinit() function where NOX does
+   * not). So check the SUNDIALS::KINSOL documentation for more precise details
+   * on how these functions are implemented.
    */
   template <typename VectorType>
   class NOXSolver
@@ -177,7 +178,7 @@ namespace TrilinosWrappers
 
     /**
      * A function object that users should supply and that is intended to
-     * compute the residual `u = F(u)`.
+     * compute the residual $F(u)$.
      *
      * @note This function should return 0 in the case of success.
      */
@@ -205,8 +206,10 @@ namespace TrilinosWrappers
     std::function<int(const VectorType &current_u)> setup_preconditioner;
 
     /**
-     * A user function that applies the Jacobian to @p u and writes
-     * the result in @p F.
+     * A user function that applies the Jacobian $\nabla_u F(u)$ to
+     * @p x and writes the result in @p y. The Jacobian to be used
+     * (i.e., more precisely: the linearization point $u$ above) is
+     * the one computed when the `setup_jacobian` function was last called.
      *
      * @note This function is optional and is used in the case of certain
      * configurations. For instance, this function is required if the
@@ -216,12 +219,16 @@ namespace TrilinosWrappers
      *
      * @note This function should return 0 in the case of success.
      */
-    std::function<int(const VectorType &u, VectorType &F)> apply_jacobian;
+    std::function<int(const VectorType &x, VectorType &y)> apply_jacobian;
 
     /**
-     * A user function that applies the inverse of the Jacobian to
-     * @p u and writes the result in @p F. The parameter @p tolerance
-     * specifies the error reduction if an iterative solver is used.
+     * A user function that applies the inverse of the Jacobian
+     * $[\nabla_u F(u)]^{-1}$ to
+     * @p y and writes the result in @p x. The parameter @p tolerance
+     * specifies the error reduction if an iterative solver is used
+     * in applying the inverse matrix. The Jacobian to be used
+     * (i.e., more precisely: the linearization point $u$ above) is
+     * the one computed when the `setup_jacobian` function was last called.
      *
      * @note This function is optional and is used in the case of certain
      * configurations.
@@ -229,21 +236,24 @@ namespace TrilinosWrappers
      * @note This function should return 0 in the case of success.
      */
     std::function<
-      int(const VectorType &F, VectorType &u, const double tolerance)>
+      int(const VectorType &y, VectorType &x, const double tolerance)>
       solve_with_jacobian;
 
     /**
-     * A user function that applies the inverse of the Jacobian to
-     * @p F, writes the result in @p u and returns the numer of
+     * A user function that applies the inverse of the Jacobian
+     * $[\nabla_u F(u)]^{-1}$ to
+     * @p y, writes the result in @p x and returns the number of
      * linear iterations the linear solver needed.
      * The parameter @p tolerance species the error reduction if a
-     * interative solver is used.
+     * interative solver is used. The Jacobian to be used
+     * (i.e., more precisely: the linearization point $u$ above) is
+     * the one computed when the `setup_jacobian` function was last called.
      *
      * @note This function is optional and is used in the case of certain
      * configurations.
      */
     std::function<
-      int(const VectorType &F, VectorType &u, const double tolerance)>
+      int(const VectorType &y, VectorType &x, const double tolerance)>
       solve_with_jacobian_and_track_n_linear_iterations;
 
     /**
