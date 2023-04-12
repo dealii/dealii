@@ -130,7 +130,7 @@ namespace
     return vector;
   }
 
-
+#ifdef DEAL_II_WITH_TRILINOS
   template <>
   TrilinosWrappers::MPI::Vector
   create_test_vector(const double value)
@@ -156,7 +156,9 @@ namespace
     vector = value;
     return vector;
   }
+#endif
 
+#ifdef DEAL_II_WITH_PETSC
   template <>
   PETScWrappers::MPI::Vector
   create_test_vector(const double value)
@@ -182,6 +184,7 @@ namespace
     vector = value;
     return vector;
   }
+#endif
 
   template <typename VectorType>
   bool
@@ -1008,18 +1011,21 @@ main(int argc, char **argv)
     "LinearAlgebra::distributed::Vector<double>");
   run_all_tests<LinearAlgebra::distributed::BlockVector<double>>(
     "LinearAlgebra::distributed::BlockVector<double>");
+#ifdef DEAL_II_WITH_TRILINOS
   run_all_tests<TrilinosWrappers::MPI::Vector>("TrilinosWrappers::MPI::Vector");
   run_all_tests<TrilinosWrappers::MPI::BlockVector>(
     "TrilinosWrappers::MPI::BlockVector");
+#endif
+#ifdef DEAL_II_WITH_PETSC
   run_all_tests<PETScWrappers::MPI::Vector>("PETScWrappers::MPI::Vector");
   run_all_tests<PETScWrappers::MPI::BlockVector>(
     "PETScWrappers::MPI::BlockVector");
-
   // although the memory would be cleared in ~MPI_InitFinalize it needs to be
   // done manually to satisfy the PETSc memory check inside ~MPILogInitAll,
   // which is invoked first
   GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
   GrowingVectorMemory<PETScWrappers::MPI::BlockVector>::release_unused_memory();
+#endif
 
 #if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   SUNContext_Free(&global_nvector_context);

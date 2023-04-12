@@ -1265,10 +1265,9 @@ namespace TrilinosWrappers
       memory_consumption() const;
 
       /**
-       * Return a reference to the MPI communicator object in use with this
-       * object.
+       * Return the underlying MPI communicator.
        */
-      const MPI_Comm &
+      MPI_Comm
       get_mpi_communicator() const;
       /** @} */
 
@@ -2175,17 +2174,15 @@ namespace TrilinosWrappers
 
 
 
-    inline const MPI_Comm &
+    inline MPI_Comm
     Vector::get_mpi_communicator() const
     {
-      static MPI_Comm comm;
-
       const Epetra_MpiComm *mpi_comm =
         dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
-      comm = mpi_comm->Comm();
-
-      return comm;
+      return mpi_comm->Comm();
     }
+
+
 
     template <typename number>
     Vector::Vector(const IndexSet &              parallel_partitioner,

@@ -189,9 +189,9 @@ namespace Utilities
       memory_consumption();
 
       /**
-       * Return the underlying communicator.
+       * Return the underlying MPI communicator.
        */
-      const MPI_Comm &
+      MPI_Comm
       get_mpi_communicator() const override;
 
       void

@@ -281,7 +281,7 @@ namespace internal
         virtual types::global_dof_index
         size() const override;
 
-        const MPI_Comm &
+        MPI_Comm
         get_sm_mpi_communicator() const;
 
         void

@@ -347,7 +347,7 @@ namespace LinearAlgebra
       locally_owned_size() const;
 
       /**
-       * Return the MPI communicator object in use with this object.
+       * Return the underlying MPI communicator.
        */
       MPI_Comm
       get_mpi_communicator() const;

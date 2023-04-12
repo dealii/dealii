@@ -90,14 +90,10 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
-  const MPI_Comm &
+  MPI_Comm
   PreconditionBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm  = PETSC_COMM_SELF;
-    MPI_Comm        pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(pc));
-    if (pcomm != MPI_COMM_NULL)
-      comm = pcomm;
-    return comm;
+    return PetscObjectComm(reinterpret_cast<PetscObject>(pc));
   }
 
   void

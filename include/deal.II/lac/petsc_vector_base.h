@@ -803,10 +803,9 @@ namespace PETScWrappers
     memory_consumption() const;
 
     /**
-     * Return a reference to the MPI communicator object in use with this
-     * object.
+     * Return the underlying MPI communicator.
      */
-    const MPI_Comm &
+    MPI_Comm
     get_mpi_communicator() const;
 
   protected:
@@ -1178,14 +1177,10 @@ namespace PETScWrappers
     return operator()(index);
   }
 
-  inline const MPI_Comm &
+  inline MPI_Comm
   VectorBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm = PETSC_COMM_SELF;
-    MPI_Comm pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(vector));
-    if (pcomm != MPI_COMM_NULL)
-      comm = pcomm;
-    return comm;
+    return PetscObjectComm(reinterpret_cast<PetscObject>(vector));
   }
 
   inline void

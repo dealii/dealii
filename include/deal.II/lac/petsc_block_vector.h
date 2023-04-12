@@ -265,10 +265,9 @@ namespace PETScWrappers
       has_ghost_elements() const;
 
       /**
-       * Return a reference to the MPI communicator object in use with this
-       * vector.
+       * Return the underlying MPI communicator.
        */
-      const MPI_Comm &
+      MPI_Comm
       get_mpi_communicator() const;
 
       /**
@@ -516,15 +515,10 @@ namespace PETScWrappers
 
 
 
-    inline const MPI_Comm &
+    inline MPI_Comm
     BlockVector::get_mpi_communicator() const
     {
-      static MPI_Comm comm = PETSC_COMM_SELF;
-      MPI_Comm        pcomm =
-        PetscObjectComm(reinterpret_cast<PetscObject>(petsc_nest_vector));
-      if (pcomm != MPI_COMM_NULL)
-        comm = pcomm;
-      return comm;
+      return PetscObjectComm(reinterpret_cast<PetscObject>(petsc_nest_vector));
     }
 
     inline bool

@@ -71,7 +71,7 @@ namespace LinearAlgebra
 
 
 
-    const MPI_Comm &
+    MPI_Comm
     CommunicationPattern::get_mpi_communicator() const
     {
       return *comm;

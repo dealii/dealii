@@ -812,10 +812,11 @@ namespace TrilinosWrappers
     range_partitioner() const;
 
     /**
-     * Return the MPI communicator object in use with this matrix.
+     * Return the underlying MPI communicator.
      */
     MPI_Comm
     get_mpi_communicator() const;
+
     /** @} */
 
     /**

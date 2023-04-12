@@ -80,7 +80,7 @@ namespace Utilities
 
 
 
-    const MPI_Comm &
+    MPI_Comm
     NoncontiguousPartitioner::get_mpi_communicator() const
     {
       return communicator;

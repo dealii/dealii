@@ -1368,7 +1368,7 @@ namespace internal
 
 
 
-      const MPI_Comm &
+      MPI_Comm
       Full::get_sm_mpi_communicator() const
       {
         return this->comm_sm;
