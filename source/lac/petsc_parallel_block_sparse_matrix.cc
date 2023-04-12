@@ -18,6 +18,42 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+namespace
+{
+  // A dummy utility routine to create an empty matrix in case we import
+  // a MATNEST with NULL blocks
+  static Mat
+  create_dummy_mat(MPI_Comm comm,
+                   PetscInt lr,
+                   PetscInt gr,
+                   PetscInt lc,
+                   PetscInt gc)
+  {
+    Mat            dummy;
+    PetscErrorCode ierr;
+
+    ierr = MatCreate(comm, &dummy);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetSizes(dummy, lr, lc, gr, gc);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetType(dummy, MATAIJ);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSeqAIJSetPreallocation(dummy, 0, nullptr);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatMPIAIJSetPreallocation(dummy, 0, nullptr, 0, nullptr);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetUp(dummy);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatSetOption(dummy, MAT_NO_OFF_PROC_ENTRIES, PETSC_TRUE);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatAssemblyBegin(dummy, MAT_FINAL_ASSEMBLY);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    ierr = MatAssemblyEnd(dummy, MAT_FINAL_ASSEMBLY);
+    AssertThrow(ierr == 0, dealii::ExcPETScError(ierr));
+    return dummy;
+  }
+} // namespace
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
@@ -107,7 +143,7 @@ namespace PETScWrappers
             this->sub_objects[r][c] = p;
           }
 
-      collect_sizes();
+      this->collect_sizes();
     }
 
     void
@@ -123,24 +159,83 @@ namespace PETScWrappers
     void
     BlockSparseMatrix::collect_sizes()
     {
+      auto           m = this->n_block_rows();
+      auto           n = this->n_block_cols();
+      PetscErrorCode ierr;
+
+      // Create empty matrices if needed
+      // This is neeeded by the base class
+      // not by MATNEST
+      std::vector<size_type> row_sizes(m, size_type(-1));
+      std::vector<size_type> col_sizes(n, size_type(-1));
+      std::vector<size_type> row_local_sizes(m, size_type(-1));
+      std::vector<size_type> col_local_sizes(n, size_type(-1));
+      MPI_Comm               comm = MPI_COMM_NULL;
+      for (size_type r = 0; r < m; r++)
+        {
+          for (size_type c = 0; c < n; c++)
+            {
+              if (this->sub_objects[r][c])
+                {
+                  comm = this->sub_objects[r][c]->get_mpi_communicator();
+                  row_sizes[r]       = this->sub_objects[r][c]->m();
+                  col_sizes[c]       = this->sub_objects[r][c]->n();
+                  row_local_sizes[r] = this->sub_objects[r][c]->local_size();
+                  col_local_sizes[c] =
+                    this->sub_objects[r][c]->local_domain_size();
+                }
+            }
+        }
+      for (size_type r = 0; r < m; r++)
+        {
+          for (size_type c = 0; c < n; c++)
+            {
+              if (!this->sub_objects[r][c])
+                {
+                  Assert(
+                    row_sizes[r] != size_type(-1),
+                    ExcMessage(
+                      "When passing empty sub-blocks of a block matrix, you need to make "
+                      "sure that at least one block in each block row and block column is "
+                      "non-empty. However, block row " +
+                      std::to_string(r) +
+                      " is completely empty "
+                      "and so it is not possible to determine how many rows it should have."));
+                  Assert(
+                    col_sizes[c] != size_type(-1),
+                    ExcMessage(
+                      "When passing empty sub-blocks of a block matrix, you need to make "
+                      "sure that at least one block in each block row and block column is "
+                      "non-empty. However, block column " +
+                      std::to_string(c) +
+                      " is completely empty "
+                      "and so it is not possible to determine how many columns it should have."));
+                  Mat dummy = ::create_dummy_mat(
+                    comm,
+                    static_cast<PetscInt>(row_local_sizes[r]),
+                    static_cast<PetscInt>(row_sizes[r]),
+                    static_cast<PetscInt>(col_local_sizes[c]),
+                    static_cast<PetscInt>(col_sizes[c]));
+                  this->sub_objects[r][c] = new BlockType(dummy);
+
+                  // the new object got a reference on dummy, we can safely
+                  // call destroy here
+                  ierr = MatDestroy(&dummy);
+                  AssertThrow(ierr == 0, ExcPETScError(ierr));
+                }
+            }
+        }
+
       BaseClass::collect_sizes();
 
-      auto m = this->n_block_cols();
-      auto n = this->n_block_cols();
-
-      PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
+      ierr = destroy_matrix(petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       std::vector<Mat> psub_objects(m * n);
       for (unsigned int r = 0; r < m; r++)
         for (unsigned int c = 0; c < n; c++)
           psub_objects[r * n + c] = this->sub_objects[r][c]->petsc_matrix();
-      ierr = MatCreateNest(get_mpi_communicator(),
-                           m,
-                           nullptr,
-                           n,
-                           nullptr,
-                           psub_objects.data(),
-                           &petsc_nest_matrix);
+      ierr = MatCreateNest(
+        comm, m, nullptr, n, nullptr, psub_objects.data(), &petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
@@ -251,12 +346,14 @@ namespace PETScWrappers
         {
           for (PetscInt j = 0; j < nc; ++j)
             {
-              // TODO: MATNEST supports NULL blocks
-              this->sub_objects[i][j] = new BlockType(mats[i * nc + j]);
+              if (mats[i * nc + j])
+                this->sub_objects[i][j] = new BlockType(mats[i * nc + j]);
+              else
+                this->sub_objects[i][j] = nullptr;
             }
         }
 
-      collect_sizes();
+      this->collect_sizes();
     }
 
   } // namespace MPI
