@@ -3357,53 +3357,16 @@ namespace internal
     template <typename Number>
     void
     set_initial_guess(
-      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
-        &vector)
-    {
-      // Choose a high-frequency mode consisting of numbers between 0 and 1
-      // that is cheap to compute (cheaper than random numbers) but avoids
-      // obviously re-occurring numbers in multi-component systems by choosing
-      // a period of 11.
-      // Make initial guess robust with respect to number of processors
-      // by operating on the global index.
-      types::global_dof_index first_local_range = 0;
-      if (!vector.locally_owned_elements().is_empty())
-        first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
-      for (unsigned int i = 0; i < vector.locally_owned_size(); ++i)
-        vector.local_element(i) = (i + first_local_range) % 11;
-
-      const Number mean_value = vector.mean_value();
-      vector.add(-mean_value);
-    }
-
-    template <typename Number>
-    void
-    set_initial_guess(
       ::dealii::LinearAlgebra::distributed::BlockVector<Number> &vector)
     {
       for (unsigned int block = 0; block < vector.n_blocks(); ++block)
         set_initial_guess(vector.block(block));
     }
 
-
-#  ifdef DEAL_II_WITH_CUDA
-    template <typename Number>
-    __global__ void
-    set_initial_guess_kernel(const types::global_dof_index offset,
-                             const unsigned int            locally_owned_size,
-                             Number *                      values)
-
-    {
-      const unsigned int index = threadIdx.x + blockDim.x * blockIdx.x;
-      if (index < locally_owned_size)
-        values[index] = (index + offset) % 11;
-    }
-
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
     set_initial_guess(
-      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-        &vector)
+      ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace> &vector)
     {
       // Choose a high-frequency mode consisting of numbers between 0 and 1
       // that is cheap to compute (cheaper than random numbers) but avoids
@@ -3416,16 +3379,19 @@ namespace internal
         first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
 
       const auto n_local_elements = vector.locally_owned_size();
-      const int  n_blocks =
-        1 + (n_local_elements - 1) / CUDAWrappers::block_size;
-      set_initial_guess_kernel<<<n_blocks, CUDAWrappers::block_size>>>(
-        first_local_range, n_local_elements, vector.get_values());
-      AssertCudaKernel();
-
+      Number *   values_ptr       = vector.get_values();
+      Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space,
+                          Kokkos::IndexType<types::global_dof_index>>
+        policy(0, n_local_elements);
+      Kokkos::parallel_for(
+        "PreconditionChebyshev::set_initial_guess",
+        policy,
+        KOKKOS_LAMBDA(types::global_dof_index i) {
+          values_ptr[i] = (i + first_local_range) % 11;
+        });
       const Number mean_value = vector.mean_value();
       vector.add(-mean_value);
     }
-#  endif // DEAL_II_WITH_CUDA
 
     struct EigenvalueTracker
     {
