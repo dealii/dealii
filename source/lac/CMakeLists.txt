@@ -98,6 +98,7 @@ set(_inst
 if(DEAL_II_WITH_PETSC)
   set(_unity_include_src
     ${_unity_include_src}
+    petsc_communication_pattern.cc
     petsc_full_matrix.cc
     petsc_matrix_base.cc
     petsc_matrix_free.cc
@@ -107,7 +108,7 @@ if(DEAL_II_WITH_PETSC)
     petsc_parallel_vector.cc
     petsc_precondition.cc
     petsc_solver.cc
-    petsc_communication_pattern.cc
+    petsc_ts.cc
     petsc_sparse_matrix.cc
     petsc_vector_base.cc
   )

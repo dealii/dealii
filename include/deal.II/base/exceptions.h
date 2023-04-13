@@ -861,6 +861,14 @@ namespace StandardExceptions
                  << arg1 << "\"");
 
   /**
+   * This exception is used if some user function returns nonzero exit codes.
+   */
+  DeclException2(ExcFunctionNonzeroReturn,
+                 std::string,
+                 int,
+                 << "Function \"" << arg1 << "\" returned " << arg2);
+
+  /**
    * This exception is used if some object is found uninitialized.
    */
   DeclException0(ExcNotInitialized);
