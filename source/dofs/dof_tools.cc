@@ -1381,13 +1381,13 @@ namespace DoFTools
       c0_to_c1;
 
     // map volume mesh face -> codimension 1 dof cell
-    for (auto c1_cell : c1_dh.active_cell_iterators())
+    for (const auto &c1_cell : c1_dh.active_cell_iterators())
       if (c1_to_c0.find(c1_cell) != c1_to_c0.end())
         c0_to_c1[c1_to_c0.at(c1_cell)] = c1_cell;
 
     // generate a mapping that maps codimension-1 cells
     // to codimension-0 cells and faces
-    for (auto cell :
+    for (const auto &cell :
          c0_dh.active_cell_iterators()) // disp_dof.active_cell_iterators())
       for (const auto f : cell->face_indices())
         if (cell->face(f)->at_boundary() &&
