@@ -863,10 +863,17 @@ namespace StandardExceptions
   /**
    * This exception is used if some user function returns nonzero exit codes.
    */
-  DeclException2(ExcFunctionNonzeroReturn,
-                 std::string,
-                 int,
-                 << "Function \"" << arg1 << "\" returned " << arg2);
+  DeclException2(
+    ExcFunctionNonzeroReturn,
+    std::string,
+    int,
+    << "The function \"" << arg1 << "\" returned the nonzero value " << arg2
+    << ", but the calling site expected the return value to be zero. "
+       "This error often happens when the function in question is a 'callback', "
+       "that is a user-provided function called from somewhere within deal.II "
+       "or within an external library such as PETSc, Trilinos, SUNDIALS, etc., "
+       "that expect these callbacks to indicate errors via nonzero return "
+       "codes.");
 
   /**
    * This exception is used if some object is found uninitialized.
