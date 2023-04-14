@@ -1577,16 +1577,12 @@ public:
    * @param[in] cell An iterator to the first cell adjacent to the interface.
    * @param[in] face_no An integer identifying which face of the first cell the
    *   interface is on.
-   * @param[in] q_index If left at its default, use the quadrature formula
-   * within the hp::QCollection passed to the constructor as given by the
-   * dominating finite element across the interface (only used if the
-   * FEInterface object is initialized with an hp::FECollection, an
-   * hp::QCollection, and possibly an hp::MappingCollection).
-   * @param[in] mapping_index If left at its default, use the mapping within the
-   * hp::MappingCollection passed to the constructor as given by the dominating
-   * finite element across the interface (only used if the FEInterface object
-   * is initialized with an hp::FECollection, an hp::QCollection, and possibly
-   * an hp::MappingCollection).
+   * @param[in] q_index This argument selects which quadrature formula to use
+   *   See the discussion in the documentation of the other reinit() function
+   *   for what happens when this argument is left at its default value.
+   * @param[in] mapping_index This argument selects which mapping to use
+   *   See the discussion in the documentation of the other reinit() function
+   *   for what happens when this argument is left at its default value.
    * @param[in] fe_index If left at its default, use the finite element within
    * the hp::FECollection passed to the constructor as given by the dominating
    * finite element across the interface (only used if the FEInterface object
