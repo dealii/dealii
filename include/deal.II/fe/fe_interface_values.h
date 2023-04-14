@@ -2547,6 +2547,24 @@ FEInterfaceValues<dim, spacedim>::reinit(
         internal_hp_fe_face_values->get_fe_collection().find_dominated_fe(
           {cell->active_fe_index(), cell_neighbor->active_fe_index()});
 
+      if (q_index == numbers::invalid_unsigned_int)
+        Assert(dominated_fe_index != numbers::invalid_fe_index,
+               ExcMessage("You called this function with 'q_index' left at its "
+                          "default value, but this can only work if one of "
+                          "the two finite elements adjacent to this face "
+                          "dominates the other. See the documentation "
+                          "of this function for more information of how "
+                          "to deal with this situation."));
+      if (mapping_index == numbers::invalid_unsigned_int)
+        Assert(dominated_fe_index != numbers::invalid_fe_index,
+               ExcMessage("You called this function with 'mapping_index' left "
+                          "at its default value, but this can only work if one "
+                          "of the two finite elements adjacent to this face "
+                          "dominates the other. See the documentation "
+                          "of this function for more information of how "
+                          "to deal with this situation."));
+
+
       const unsigned int used_q_index =
         (q_index == numbers::invalid_unsigned_int ? dominated_fe_index :
                                                     q_index);
