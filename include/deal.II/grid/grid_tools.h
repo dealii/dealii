@@ -1108,6 +1108,16 @@ namespace GridTools
    *   of the cells adjacent to a vertex or an edge/face this function returns.
    *   Consequently, algorithms that call this function need to take into
    *   account that the returned cell will only contain the point approximately.
+   * @param[in] enforce_unique_mapping Enforce a one to one mapping between
+   points
+   *   in real and reference space.
+   * @param[in] marked_vertices An array of bools indicating which
+   * vertices of @p mesh will be considered within the search
+   * as the potentially closest vertex. On receiving a non-empty
+   * @p marked_vertices, the function will
+   * only search among @p marked_vertices for the closest vertex,
+   * otherwise on all vertices in the mesh.
+
    * @return A tuple containing the quadrature information
    *
    * The elements of the output tuple are:
@@ -1164,7 +1174,9 @@ namespace GridTools
     const GridTools::Cache<dim, spacedim> &                cache,
     const std::vector<Point<spacedim>> &                   local_points,
     const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
-    const double                                           tolerance = 1e-10);
+    const double                                           tolerance = 1e-10,
+    const std::vector<bool> &                              marked_vertices = {},
+    const bool enforce_unique_mapping = true);
 
   namespace internal
   {

@@ -5924,12 +5924,20 @@ namespace GridTools
     const GridTools::Cache<dim, spacedim> &                cache,
     const std::vector<Point<spacedim>> &                   points,
     const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
-    const double                                           tolerance)
+    const double                                           tolerance,
+    const std::vector<bool> &                              marked_vertices,
+    const bool enforce_unique_mapping)
   {
     // run internal function ...
-    const auto all = internal::distributed_compute_point_locations(
-                       cache, points, global_bboxes, {}, tolerance, false, true)
-                       .send_components;
+    const auto all =
+      internal::distributed_compute_point_locations(cache,
+                                                    points,
+                                                    global_bboxes,
+                                                    marked_vertices,
+                                                    tolerance,
+                                                    false,
+                                                    enforce_unique_mapping)
+        .send_components;
 
     // ... and reshuffle the data
     std::tuple<
