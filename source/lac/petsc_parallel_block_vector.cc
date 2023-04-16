@@ -17,8 +17,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-// For PetscObjectStateIncrease
-#  include <petsc/private/petscimpl.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -122,9 +121,7 @@ namespace PETScWrappers
     BlockVector::compress(VectorOperation::values operation)
     {
       BlockVectorBase::compress(operation);
-      PetscErrorCode ierr = PetscObjectStateIncrease(
-        reinterpret_cast<PetscObject>(petsc_nest_vector));
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      petsc_increment_state_counter(petsc_nest_vector);
     }
 
     void

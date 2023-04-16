@@ -18,9 +18,6 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-// For PetscObjectStateIncrease
-#  include <petsc/private/petscimpl.h>
-
 namespace
 {
   // A dummy utility routine to create an empty matrix in case we import
@@ -271,9 +268,7 @@ namespace PETScWrappers
     BlockSparseMatrix::compress(VectorOperation::values operation)
     {
       BaseClass::compress(operation);
-      PetscErrorCode ierr = PetscObjectStateIncrease(
-        reinterpret_cast<PetscObject>(petsc_nest_matrix));
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      petsc_increment_state_counter(petsc_nest_matrix);
     }
 
 
