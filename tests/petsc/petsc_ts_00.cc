@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2022 by the deal.II authors
+//    Copyright (C) 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -12,8 +12,6 @@
 //    the top level directory of deal.II.
 //
 //-----------------------------------------------------------
-//
-// Author: Stefano Zampini, King Abdullah University of Science and Technology.
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -136,8 +134,8 @@ public:
 
             // In the solve phase we se the stored shift to solve
             // for the implicit Jacobian system
-            time_stepper.solve_for_jacobian_system =
-              [&](const VectorType &src, VectorType &dst) -> int {
+            time_stepper.solve_with_jacobian = [&](const VectorType &src,
+                                                   VectorType &dst) -> int {
               auto sf = 1. / (kappa * kappa + myshift * myshift);
               dst(0)  = sf * (myshift * src(0) + src(1));
               dst(1)  = sf * (-kappa * kappa * src(0) + myshift * src(1));
@@ -207,7 +205,8 @@ public:
     y.compress(VectorOperation::insert);
 
     // Integrate the ODE.
-    time_stepper.solve(y);
+    auto nt = time_stepper.solve(y);
+    out << "# Number of steps taken: " << nt << std::endl;
   }
 
 private:

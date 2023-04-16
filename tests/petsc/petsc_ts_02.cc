@@ -12,8 +12,6 @@
 //    the top level directory of deal.II.
 //
 //-----------------------------------------------------------
-//
-// Author: Stefano Zampini, King Abdullah University of Science and Technology.
 
 //#include <deal.II/base/parameter_handler.h>
 
@@ -37,7 +35,7 @@ public:
   {
     // Customize solver: use BDF and basic adaptive time stepping
     PETScWrappers::TimeStepperData data;
-    data.tstype      = "bdf";
+    data.ts_type     = "bdf";
     data.final_time  = 1.0;
     data.tsadapttype = "basic";
     reinit(data);

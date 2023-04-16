@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2022 by the deal.II authors
+//    Copyright (C) 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -12,8 +12,6 @@
 //    the top level directory of deal.II.
 //
 //---------------------------------------------------------------
-//
-// Author: Stefano Zampini, King Abdullah University of Science and Technology.
 
 #ifndef dealii_petsc_ts_h
 #define dealii_petsc_ts_h
@@ -53,8 +51,8 @@ namespace PETScWrappers
      *
      * Running parameters:
      *
-     * @param opts_prefix The string indicating the options prefix for command line customization.
-     * @param tstype The string indicating the PETSc solver type.
+     * @param options_prefix The string indicating the options prefix for command line customization.
+     * @param ts_type The string indicating the PETSc solver type.
      * @param initial_time Initial simulation time.
      * @param final_time Final simulation time.
      * @param initial_step_size Initial step size.
@@ -76,13 +74,15 @@ namespace PETScWrappers
      * Adaptive time stepping is disabled by default.
      * Negative values indicate using PETSc's default.
      *
-     * Note that all parameters values specified here can be overriden by
+     * @note All parameters values specified here can be overriden by
      * command line choices.
+     *
+     * @ingroup PETScWrappers
      */
     TimeStepperData(
       // Running parameters
-      const std::string &opts_prefix       = "",
-      const std::string &tstype            = "",
+      const std::string &options_prefix    = "",
+      const std::string &ts_type           = "",
       const real_type    initial_time      = 0.0,
       const real_type    final_time        = 0.0,
       const real_type    initial_step_size = 0.0,
@@ -95,8 +95,8 @@ namespace PETScWrappers
       const real_type    absolute_tolerance   = -1.0,
       const real_type    relative_tolerance   = -1.0,
       const bool         ignore_algebraic_lte = true)
-      : opts_prefix(opts_prefix)
-      , tstype(tstype)
+      : options_prefix(options_prefix)
+      , ts_type(ts_type)
       , initial_time(initial_time)
       , final_time(final_time)
       , initial_step_size(initial_step_size)
@@ -110,68 +110,21 @@ namespace PETScWrappers
       , ignore_algebraic_lte(ignore_algebraic_lte)
     {}
 
+    /**
+     * Import parameter values.
+     */
     void
-    add_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Running parameters");
-      prm.add_parameter(
-        "options prefix",
-        opts_prefix,
-        "The string indicating the options prefix for command line customization.");
-      prm.add_parameter("solver type",
-                        tstype,
-                        "The string indicating the PETSc TS type.");
-      prm.add_parameter("initial time",
-                        initial_time,
-                        "The value for the initial time.");
-      prm.add_parameter("final time",
-                        final_time,
-                        "The value for the final time.");
-      prm.add_parameter("initial step size",
-                        initial_step_size,
-                        "The value for the initial time step.");
-      prm.add_parameter("maximum number of steps",
-                        max_steps,
-                        "Maximum number of time steps allowed.");
-      prm.add_parameter(
-        "match final time",
-        match_step,
-        "Whether or not to exactly stop at final time or step over it.");
-      prm.leave_subsection();
-
-      prm.enter_subsection("Error control");
-      prm.add_parameter("adaptor type",
-                        tsadapttype,
-                        "The string for the TSAdapt type.");
-      prm.add_parameter("minimum step size",
-                        minimum_step_size,
-                        "Minimum time step size allowed.");
-      prm.add_parameter("maximum step size",
-                        maximum_step_size,
-                        "Maximum time step size allowed.");
-      prm.add_parameter("absolute error tolerance",
-                        absolute_tolerance,
-                        "Absolute error tolerance.");
-      prm.add_parameter("relative error tolerance",
-                        relative_tolerance,
-                        "Absolute error tolerance.");
-      prm.add_parameter(
-        "ignore algebraic lte",
-        ignore_algebraic_lte,
-        "Indicate whether or not to suppress algebraic variables "
-        "in the local truncation error test.");
-      prm.leave_subsection();
-    }
+    add_parameters(ParameterHandler &prm);
 
     /**
      * Options database prefix.
      */
-    std::string opts_prefix;
+    std::string options_prefix;
 
     /**
      * PETSc solver type.
      */
-    std::string tstype;
+    std::string ts_type;
 
     /**
      * Initial time for the DAE.
@@ -185,18 +138,20 @@ namespace PETScWrappers
 
     /**
      * Initial step size.
-     * Non-positive values are ignored.
+     *
+     * @note Non-positive values are ignored.
      */
     real_type initial_step_size;
 
     /**
      * Maximum number of steps to be taken.
-     * Negative values are ignored.
+     *
+     * @note Negative values are ignored.
      */
     int max_steps;
 
     /**
-     * Match final time requested?
+     * Flag to indicate to stop exactly at the requested final time.
      */
     bool match_step;
 
@@ -207,25 +162,29 @@ namespace PETScWrappers
 
     /**
      * Minimum allowed step size for adaptive time stepping.
-     * Non-positive values indicate to use PETSc's default.
+     *
+     * @note Non-positive values indicate to use PETSc's default.
      */
     real_type minimum_step_size;
 
     /**
      * Maximum allowed step size for adaptive time stepping.
-     * Non-positive values indicate to use PETSc's default.
+     *
+     * @note Non-positive values indicate to use PETSc's default.
      */
     real_type maximum_step_size;
 
     /**
      * Absolute error tolerance for adaptive time stepping.
-     * Negative values indicate to use PETSc's default.
+     *
+     * @note Negative values indicate to use PETSc's default.
      */
     real_type absolute_tolerance;
 
     /**
      * Relative error tolerance for adaptive time stepping.
-     * Negative values indicate to use PETSc's default.
+     *
+     * @note Negative values indicate to use PETSc's default.
      */
     real_type relative_tolerance;
 
@@ -300,10 +259,10 @@ namespace PETScWrappers
    *
    * In alternative, users can also provide the implementations of the
    * *Jacobians*. This can be accomplished in two ways:
-   *  - a-la-PETSc style using TimeStepper::implicit_jacobian
+   *  - PETSc style using TimeStepper::implicit_jacobian
    *    and TimeStepper::explicit_jacobian.
-   *  - a-la-Deal.II style using TimeStepper::setup_jacobian and
-   * TimeStepper::solve_for_jacobian_system
+   *  - deal.II style using TimeStepper::setup_jacobian and
+   * TimeStepper::solve_with_jacobian
    *
    * In case both approaches are coded, the deal.II style
    * will be used.
@@ -315,7 +274,7 @@ namespace PETScWrappers
    * @endcode
    * in case the user wants to change the default nonlinear solver to
    * a trust region solver and iterate on the tangent system with CG,
-   * still using TimeStepper::solve_for_jacobian_system as a preconditioner.
+   * still using TimeStepper::solve_with_jacobian as a preconditioner.
    *
    * The first approach has instead the advantage that only the matrix assembly
    * procedure has to be coded, thus allowing quicker implementations and
@@ -324,6 +283,8 @@ namespace PETScWrappers
    * @code
    * ./myApp -ksp_type cg -pc_type gamg
    * @endcode
+   *
+   * @ingroup PETScWrappers
    */
   template <typename VectorType  = PETScWrappers::VectorBase,
             typename PMatrixType = PETScWrappers::MatrixBase,
@@ -350,6 +311,13 @@ namespace PETScWrappers
     ~TimeStepper();
 
     /**
+     * Conversion operator to gain access to the underlying PETSc type. If you
+     * do this, you cut this class off some information it may need, so this
+     * conversion operator should only be used if you know what you do.
+     */
+    operator TS() const;
+
+    /**
      * Return the PETSc TS object.
      */
     TS
@@ -369,7 +337,7 @@ namespace PETScWrappers
 
     /**
      * Reset solver.
-     * Change customization according to `data`.
+     * Change customization according to @p data.
      */
     void
     reinit(const TimeStepperData &data);
@@ -378,7 +346,7 @@ namespace PETScWrappers
      * Set the preconditioning matrix only.
      *
      * When used with TimeStepper::setup_jacobian and
-     * TimeStepper::solve_for_jacobian_system, PETSc will approximate the linear
+     * TimeStepper::solve_with_jacobian, PETSc will approximate the linear
      * system matrix-vector product using an internal matrix-free
      * representation.
      *
@@ -387,14 +355,14 @@ namespace PETScWrappers
      * preconditioning and matrix-vector products.
      */
     void
-    reinit_matrix(PMatrixType &P);
+    set_matrix(PMatrixType &P);
 
     /**
      * Set both the linear system matrix and the preconditioning matrix
      * that PETSc will use.
      */
     void
-    reinit_matrices(AMatrixType &A, PMatrixType &P);
+    set_matrices(AMatrixType &A, PMatrixType &P);
 
     /**
      * Return current time.
@@ -425,7 +393,7 @@ namespace PETScWrappers
      * Upon returning, the @p y vector contains the solution of the DAE at
      * the end time.
      *
-     * Here we also pass the matrix to handle the Jacobian.
+     * Here we also set the matrix to precondition the tangent system.
      */
     unsigned int
     solve(VectorType &y, PMatrixType &P);
@@ -437,7 +405,8 @@ namespace PETScWrappers
      * Upon returning, the @p y vector contains the solution of the DAE at
      * the end time.
      *
-     * Here we also pass the matrices to handle Jacobians.
+     * Here we also set the matrices to describe and precondition
+     * the tangent system.
      */
     unsigned int
     solve(VectorType &y, AMatrixType &A, PMatrixType &P);
@@ -454,7 +423,7 @@ namespace PETScWrappers
     /**
      * Callback for the computation of the implicit Jacobian
      * $\dfrac{\partial F}{\partial y} + \alpha \dfrac{\partial F}{\partial \dot
-     * y}$
+     * y}$.
      *
      * All implicit solvers implementations are recast to use the above
      * linearization. The $\alpha$ parameter is time-step and solver-type
@@ -496,7 +465,7 @@ namespace PETScWrappers
       monitor;
 
     /**
-     * Set up Jacobian callback without matrices.
+     * Callback for the set up of the Jacobian system.
      *
      * This callback gives full control to users to set up the linearized
      * equations
@@ -507,7 +476,7 @@ namespace PETScWrappers
      * linearization. The $\alpha$ parameter is time-step and solver-type
      * specific.
      *
-     * Solvers must be provided via TimeStepper::solve_for_jacobian_system.
+     * Solvers must be provided via TimeStepper::solve_with_jacobian.
      */
     std::function<int(const real_type   t,
                       const VectorType &y,
@@ -516,15 +485,16 @@ namespace PETScWrappers
       setup_jacobian;
 
     /**
-     * Solution of the Jacobian system set up with TimeStepper::setup_jacobian.
+     * Callback for the solution of the tangent system set up with
+     * TimeStepper::setup_jacobian.
      *
      * This is used as a preconditioner inside the Krylov process.
      */
     std::function<int(const VectorType &src, VectorType &dst)>
-      solve_for_jacobian_system;
+      solve_with_jacobian;
 
     /**
-     * Return an index set containing the algebraic components.
+     * Callback to return an index set containing the algebraic components.
      *
      * Implementation of this function is optional. If your equation is also
      * algebraic (i.e., it contains algebraic constraints, or Lagrange
@@ -533,55 +503,25 @@ namespace PETScWrappers
      */
     std::function<IndexSet()> algebraic_components;
 
-  protected:
+  private:
     /**
-     * The PETSc object
+     * The PETSc object.
      */
     TS ts;
 
     SmartPointer<AMatrixType, TimeStepper> A;
     SmartPointer<PMatrixType, TimeStepper> P;
-    bool                                   need_dae_tolerances;
+
+    /**
+     * This flag is set when changing the customization and used within solve.
+     */
+    bool need_dae_tolerances;
+
+    /**
+     * This flag is used to support versions of PETSc older than 3.13.
+     */
+    bool need_dummy_assemble;
   };
-
-#  ifndef DOXYGEN
-  /* Inline functions */
-
-  template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  inline TS
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::petsc_ts()
-  {
-    return ts;
-  }
-
-  template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  inline MPI_Comm
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_mpi_communicator()
-    const
-  {
-    return PetscObjectComm(reinterpret_cast<PetscObject>(ts));
-  }
-
-  template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  inline typename TimeStepper<VectorType, PMatrixType, AMatrixType>::real_type
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time()
-  {
-    PetscReal      t;
-    PetscErrorCode ierr = TSGetTime(ts, &t);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-    return t;
-  }
-
-  template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  inline typename TimeStepper<VectorType, PMatrixType, AMatrixType>::real_type
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time_step()
-  {
-    PetscReal      dt;
-    PetscErrorCode ierr = TSGetTimeStep(ts, &dt);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-    return dt;
-  }
-#  endif
 
 } // namespace PETScWrappers
 
