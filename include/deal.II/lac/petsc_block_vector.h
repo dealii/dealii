@@ -250,6 +250,20 @@ namespace PETScWrappers
       collect_sizes();
 
       /**
+       * Call the compress() function on all the subblocks of the vector
+       * and update the internal state of the nested PETSc vector.
+       *
+       * This functionality is needed because PETSc may cache vector norms for
+       * performance reasons.
+       *
+       * See
+       * @ref GlossCompress "Compressing distributed objects"
+       * for more information.
+       */
+      void
+      compress(VectorOperation::values operation);
+
+      /**
        * Change the number of blocks to <tt>num_blocks</tt>. The individual
        * blocks will get initialized with zero size, so it is assumed that the
        * user resizes the individual blocks by herself in an appropriate way,
@@ -327,10 +341,19 @@ namespace PETScWrappers
       DeclException0(ExcNonMatchingBlockVectors);
 
     private:
+      /**
+       * A PETSc Vec object that describes the entire block vector.
+       * Internally, this is done by creating
+       * a "nested" vector using PETSc's VECNEST object whose individual
+       * blocks are the blocks of this vector.
+       */
+      Vec petsc_nest_vector;
+
+      /**
+       * Utility to setup the VECNEST object
+       */
       void
       setup_nest_vec();
-
-      Vec petsc_nest_vector;
     };
 
     /** @} */

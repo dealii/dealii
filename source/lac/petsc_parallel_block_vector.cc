@@ -17,6 +17,9 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+// For PetscObjectStateIncrease
+#  include <petsc/private/petscimpl.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
@@ -84,7 +87,17 @@ namespace PETScWrappers
           this->components[i].reinit(sv[i]);
         }
 
-      this->collect_sizes();
+      BlockVectorBase::collect_sizes();
+      if (!isnest)
+        setup_nest_vec();
+      else
+        {
+          ierr = PetscObjectReference(reinterpret_cast<PetscObject>(v));
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          PetscErrorCode ierr = VecDestroy(&petsc_nest_vector);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          petsc_nest_vector = v;
+        }
     }
 
     Vec &
@@ -103,6 +116,15 @@ namespace PETScWrappers
     {
       BlockVectorBase::collect_sizes();
       setup_nest_vec();
+    }
+
+    void
+    BlockVector::compress(VectorOperation::values operation)
+    {
+      BlockVectorBase::compress(operation);
+      PetscErrorCode ierr = PetscObjectStateIncrease(
+        reinterpret_cast<PetscObject>(petsc_nest_vector));
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
     void

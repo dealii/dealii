@@ -18,6 +18,9 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+// For PetscObjectStateIncrease
+#  include <petsc/private/petscimpl.h>
+
 namespace
 {
   // A dummy utility routine to create an empty matrix in case we import
@@ -157,7 +160,7 @@ namespace PETScWrappers
 
 
     void
-    BlockSparseMatrix::collect_sizes()
+    BlockSparseMatrix::create_empty_matrices_if_needed()
     {
       auto           m = this->n_block_rows();
       auto           n = this->n_block_cols();
@@ -225,17 +228,48 @@ namespace PETScWrappers
                 }
             }
         }
+    }
 
+
+    void
+    BlockSparseMatrix::collect_sizes()
+    {
+      this->create_empty_matrices_if_needed();
       BaseClass::collect_sizes();
+      this->setup_nest_mat();
+    }
+
+    void
+    BlockSparseMatrix::setup_nest_mat()
+    {
+      auto           m = this->n_block_rows();
+      auto           n = this->n_block_cols();
+      PetscErrorCode ierr;
+
+      MPI_Comm comm = PETSC_COMM_SELF;
 
       ierr = destroy_matrix(petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       std::vector<Mat> psub_objects(m * n);
       for (unsigned int r = 0; r < m; r++)
         for (unsigned int c = 0; c < n; c++)
-          psub_objects[r * n + c] = this->sub_objects[r][c]->petsc_matrix();
+          {
+            comm = this->sub_objects[r][c]->get_mpi_communicator();
+            psub_objects[r * n + c] = this->sub_objects[r][c]->petsc_matrix();
+          }
       ierr = MatCreateNest(
         comm, m, nullptr, n, nullptr, psub_objects.data(), &petsc_nest_matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+    }
+
+
+
+    void
+    BlockSparseMatrix::compress(VectorOperation::values operation)
+    {
+      BaseClass::compress(operation);
+      PetscErrorCode ierr = PetscObjectStateIncrease(
+        reinterpret_cast<PetscObject>(petsc_nest_matrix));
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
@@ -318,6 +352,7 @@ namespace PETScWrappers
                                &isnest);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       std::vector<Mat> mats;
+      bool             need_empty_matrices = false;
       if (isnest)
         {
           ierr = MatNestGetSize(A, &nr, &nc);
@@ -329,6 +364,8 @@ namespace PETScWrappers
                   Mat sA;
                   ierr = MatNestGetSubMat(A, i, j, &sA);
                   mats.push_back(sA);
+                  if (!sA)
+                    need_empty_matrices = true;
                 }
             }
         }
@@ -352,8 +389,22 @@ namespace PETScWrappers
                 this->sub_objects[i][j] = nullptr;
             }
         }
+      if (need_empty_matrices)
+        this->create_empty_matrices_if_needed();
 
-      this->collect_sizes();
+      BaseClass::collect_sizes();
+      if (need_empty_matrices || !isnest)
+        {
+          setup_nest_mat();
+        }
+      else
+        {
+          ierr = PetscObjectReference(reinterpret_cast<PetscObject>(A));
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          PetscErrorCode ierr = MatDestroy(&petsc_nest_matrix);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          petsc_nest_matrix = A;
+        }
     }
 
   } // namespace MPI

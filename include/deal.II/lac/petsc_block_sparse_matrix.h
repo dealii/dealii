@@ -261,6 +261,20 @@ namespace PETScWrappers
       collect_sizes();
 
       /**
+       * Call the compress() function on all the subblocks of the matrix
+       * and update the internal state of the PETSc object.
+       *
+       * This functionality is needed because PETSc may use this information
+       * to decide whether or not to rebuild the preconditioner.
+       *
+       * See
+       * @ref GlossCompress "Compressing distributed objects"
+       * for more information.
+       */
+      void
+      compress(VectorOperation::values operation);
+
+      /**
        * Return the partitioning of the domain space of this matrix, i.e., the
        * partitioning of the vectors this matrix has to be multiplied with.
        */
@@ -326,6 +340,20 @@ namespace PETScWrappers
        * blocks are the blocks of this matrix.
        */
       Mat petsc_nest_matrix = nullptr;
+
+      /**
+       * Utility to setup the MATNEST object
+       */
+      void
+      setup_nest_mat();
+
+      /**
+       * An utility method to populate empty blocks with actual objects.
+       * This is needed because MATNEST supports nullptr as a block,
+       * while the BlockMatrixBase class does not.
+       */
+      void
+      create_empty_matrices_if_needed();
     };
 
 
