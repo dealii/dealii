@@ -242,6 +242,7 @@ namespace parallel
      * @ingroup distributed
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::DistributedTriangulationBase<dim, spacedim>
     {
@@ -852,6 +853,7 @@ namespace parallel
      * all this class does is throw an exception.
      */
     template <int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     class Triangulation<1, spacedim>
       : public dealii::parallel::DistributedTriangulationBase<1, spacedim>
     {
@@ -992,6 +994,7 @@ namespace parallel
      * p4est is not available.
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::DistributedTriangulationBase<dim, spacedim>
     {
