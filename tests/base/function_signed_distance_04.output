@@ -1,0 +1,85 @@
+
+DEAL::dim = 1
+DEAL::
+DEAL::test_zalesak_disk_level_set
+DEAL::center
+DEAL::point = 0.00000
+DEAL::value = 0.250000
+DEAL::inside
+DEAL::point = 0.100000
+DEAL::value = 0.150000
+DEAL::point = 0.300000
+DEAL::value = -0.0500000
+DEAL::notch
+DEAL::point = -0.100000
+DEAL::value = 0.150000
+DEAL::outside
+DEAL::point = -2.00000
+DEAL::value = 1.00000
+DEAL::point = -0.300000
+DEAL::value = -0.0500000
+DEAL::point = 0.00000
+DEAL::value = 0.250000
+DEAL::point = 2.00000
+DEAL::value = 1.00000
+DEAL::point = -2.00000
+DEAL::value = 1.00000
+DEAL::point = 2.00000
+DEAL::value = 1.00000
+DEAL::
+DEAL::dim = 2
+DEAL::
+DEAL::test_zalesak_disk_level_set
+DEAL::center
+DEAL::point = 0.00000 0.00000
+DEAL::value = -0.250000
+DEAL::inside
+DEAL::point = 0.100000 0.00000
+DEAL::value = -0.250000
+DEAL::point = 0.300000 0.00000
+DEAL::value = -0.254951
+DEAL::notch
+DEAL::point = -0.100000 -0.450000
+DEAL::value = 0.150000
+DEAL::outside
+DEAL::point = -0.100000 -2.00000
+DEAL::value = 1.00250
+DEAL::point = -0.300000 -1.20000
+DEAL::value = 0.236932
+DEAL::point = 0.00000 -2.00000
+DEAL::value = 1.00000
+DEAL::point = 0.00000 2.00000
+DEAL::value = 1.00000
+DEAL::point = -2.00000 2.00000
+DEAL::value = 1.82843
+DEAL::point = 2.00000 2.00000
+DEAL::value = 1.82843
+DEAL::
+DEAL::dim = 3
+DEAL::
+DEAL::test_zalesak_disk_level_set
+DEAL::center
+DEAL::point = 0.00000 0.00000 0.00000
+DEAL::value = -0.250000
+DEAL::inside
+DEAL::point = 0.100000 0.00000 0.00000
+DEAL::value = -0.250000
+DEAL::point = 0.300000 0.00000 0.00000
+DEAL::value = -0.254951
+DEAL::notch
+DEAL::point = 0.00000 -0.100000 -0.450000
+DEAL::value = 0.200000
+DEAL::outside
+DEAL::point = 0.00000 -0.100000 -2.00000
+DEAL::value = 1.00250
+DEAL::point = -0.300000 -0.300000 -1.20000
+DEAL::value = 0.272792
+DEAL::point = 0.00000 0.00000 -2.00000
+DEAL::value = 1.00000
+DEAL::point = 0.00000 0.00000 2.00000
+DEAL::value = 1.00000
+DEAL::point = -2.00000 0.00000 2.00000
+DEAL::value = 1.82843
+DEAL::point = 2.00000 0.00000 2.00000
+DEAL::value = 1.82843
+DEAL::
