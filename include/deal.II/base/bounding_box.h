@@ -257,6 +257,22 @@ public:
   create_extended(const Number amount) const;
 
   /**
+   * Increase (or decrease) each side of the bounding box by the given
+   * @p relative_amount.
+   *
+   * After calling this method, the lower left corner of the bounding box will
+   * have each coordinate decreased by @p relative_amount * side_length(direction),
+   * and the upper right corner of the bounding box will have each coordinate
+   * increased by @p relative_amount * side_length(direction).
+   *
+   * If you call this method with a negative number, and one of the axes of the
+   * original bounding box is smaller than relative_amount *
+   * side_length(direction) / 2, the method will trigger an assertion.
+   */
+  BoundingBox<spacedim, Number>
+  create_extended_relative(const Number relative_amount) const;
+
+  /**
    * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.
    */
   double
@@ -572,6 +588,29 @@ BoundingBox<spacedim, Number>::create_extended(const Number amount) const
 
   return bb;
 }
+
+
+
+template <int spacedim, typename Number>
+inline BoundingBox<spacedim, Number>
+BoundingBox<spacedim, Number>::create_extended_relative(
+  const Number relative_amount) const
+{
+  // create and modify copy
+  auto bb = *this;
+
+  for (unsigned int d = 0; d < spacedim; ++d)
+    {
+      bb.boundary_points.first[d] -= relative_amount * side_length(d);
+      bb.boundary_points.second[d] += relative_amount * side_length(d);
+      Assert(bb.boundary_points.first[d] <= bb.boundary_points.second[d],
+             ExcMessage("Bounding Box can't be shrunk this much: the points' "
+                        "order should remain bottom left, top right."));
+    }
+
+  return bb;
+}
+
 
 
 template <int spacedim, typename Number>

@@ -5829,7 +5829,9 @@ namespace GridTools
 
     // Check all points within a given pair of box and cell
     const auto check_all_points_within_box = [&](const auto &leaf) {
-      const auto &box       = leaf.first;
+      const double                relative_tolerance = 1e-12;
+      const BoundingBox<spacedim> box =
+        leaf.first.create_extended_relative(relative_tolerance);
       const auto &cell_hint = leaf.second;
 
       for (const auto &point_and_id :
