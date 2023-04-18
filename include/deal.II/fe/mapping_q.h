@@ -256,6 +256,37 @@ public:
       &output_data) const;
 
   /**
+   * As opposed to the fill_fe_face_values()
+   * function that relies on pre-computed information of InternalDataBase, this
+   * function chooses the flexible evaluation path on the cell and points
+   * passed in to the current function.
+   *
+   * @param[in] cell The cell where to evaluate the mapping.
+   *
+   * @param[in] face_number The face number where to evaluate the mapping.
+   *
+   * @param[in] face_quadrature The quadrature points where the
+   * transformation (Jacobians, positions) should be computed.
+   *
+   * @param[in] internal_data A reference to an object previously created
+   * that may be used to store information the mapping can compute once on the
+   * reference cell. See the documentation of the Mapping::InternalDataBase
+   * class for an extensive description of the purpose of these objects.
+   *
+   * @param[out] output_data A struct containing the evaluated quantities such
+   * as the Jacobian resulting from application of the mapping on the given
+   * cell with its underlying manifolds.
+   */
+  void
+  fill_mapping_data_for_face_quadrature(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_number,
+    const Quadrature<dim - 1> &                                 face_quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
+
+  /**
    * @name Interface with FEValues and friends
    * @{
    */
@@ -390,6 +421,13 @@ public:
      */
     virtual std::size_t
     memory_consumption() const override;
+
+    /**
+     * Location of quadrature points of faces or subfaces in 3d with all
+     * possible orientations. Can be accessed with the correct offset provided
+     * via QProjector::DataSetDescriptor. Not needed/used for cells.
+     */
+    AlignedVector<Point<dim>> quadrature_points;
 
     /**
      * Values of shape functions. Access by function @p shape.
