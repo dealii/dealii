@@ -191,7 +191,7 @@ denote $\bar u|_{\Gamma_1}=g_1$ and ${\mathbf n}\cdot \nabla\bar u|_{\Gamma_2}=g
   $f = -\Delta \bar u + \bar u$ is. Since the derivative of an exponential
   is relatively straightforward to compute, the choice above satisfies this
   requirement, whereas a function of the kind
-  $\bar u(\mathbf x) = \atan\left(\|\mathbf x\|^{\|\mathbf x\|}\right)$
+  $\bar u(\mathbf x) = \text{atan}\left(\|\mathbf x\|^{\|\mathbf x\|}\right)$
   would have presented greater difficulties.
   (ii) You *don't* want $\bar u$ be a polynomial of low degree. That is
   because if you choose the polynomial degree of your finite element
