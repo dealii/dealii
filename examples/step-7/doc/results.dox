@@ -187,7 +187,7 @@ here) that is written into a file in a way so that it could be
 copy-pasted into a LaTeX document.
 
 
-<h4> When is the error "small"? </h4>
+<h3> When is the error "small"? </h3>
 
 What we showed above is how to determine the size of the error
 $\|u-u_h\|$ in a number of different norms. We did this primarily
