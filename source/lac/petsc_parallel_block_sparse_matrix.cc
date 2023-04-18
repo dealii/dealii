@@ -260,6 +260,9 @@ namespace PETScWrappers
       ierr = MatCreateNest(
         comm, m, nullptr, n, nullptr, psub_objects.data(), &petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+      ierr = MatNestSetVecType(petsc_nest_matrix, VECNEST);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
 

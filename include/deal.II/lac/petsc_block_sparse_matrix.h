@@ -100,7 +100,7 @@ namespace PETScWrappers
        * reinit(BlockSparsityPattern). The number of blocks per row and column
        * are then determined by that function.
        */
-      BlockSparseMatrix() = default;
+      BlockSparseMatrix();
 
       /**
        * Create a BlockSparseMatrix with a PETSc Mat that describes the entire
@@ -339,7 +339,7 @@ namespace PETScWrappers
        * a "nested" matrix using PETSc's MATNEST object whose individual
        * blocks are the blocks of this matrix.
        */
-      Mat petsc_nest_matrix = nullptr;
+      Mat petsc_nest_matrix;
 
       /**
        * Utility to setup the MATNEST object
@@ -361,6 +361,12 @@ namespace PETScWrappers
     /** @} */
 
     // ------------- inline and template functions -----------------
+    inline BlockSparseMatrix::BlockSparseMatrix()
+      : BaseClass()
+      , petsc_nest_matrix(nullptr)
+    {}
+
+
 
     inline BlockSparseMatrix::BlockSparseMatrix(const Mat &A)
       : BlockSparseMatrix()
@@ -368,9 +374,12 @@ namespace PETScWrappers
       this->reinit(A);
     }
 
+
+
     template <size_t block_rows, size_t block_columns>
     inline BlockSparseMatrix::BlockSparseMatrix(
       const std::array<std::array<Mat, block_columns>, block_rows> &arrayA)
+      : BlockSparseMatrix()
     {
       this->reinit(block_rows, block_columns);
       this->sub_objects.reinit(block_rows, block_columns);
@@ -384,6 +393,8 @@ namespace PETScWrappers
           }
       this->collect_sizes();
     }
+
+
 
     inline BlockSparseMatrix &
     BlockSparseMatrix::operator=(const double d)
