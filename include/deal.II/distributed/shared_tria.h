@@ -103,6 +103,7 @@ namespace parallel
      * @ingroup distributed
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
@@ -402,10 +403,13 @@ namespace parallel
         true_level_subdomain_ids_of_cells;
     };
 
+
+
     template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     template <class Archive>
-    void
-    Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int version)
+    void Triangulation<dim, spacedim>::load(Archive &          ar,
+                                            const unsigned int version)
     {
       dealii::Triangulation<dim, spacedim>::load(ar, version);
       partition();
@@ -428,6 +432,7 @@ namespace parallel
      * MPI is not available.
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::TriangulationBase<dim, spacedim>
     {

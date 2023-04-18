@@ -107,6 +107,7 @@ namespace parallel
      *       GridTools::collect_periodic_faces()) are supported.
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public parallel::DistributedTriangulationBase<dim, spacedim>
     {
