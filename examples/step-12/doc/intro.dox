@@ -54,7 +54,7 @@ On each cell $T$, we multiply by a test function $v_h$ from the left and integra
 to get:
 @f[
   \left( v_h, \nabla \cdot (\beta u_h) \right)_T
-= -(\nabla v_h, \beta u_h) + \int_\Gamma v_h u_h \beta \cdot n
+= -(\nabla v_h, \beta u_h) + \int_{\partial T} v_h u_h \beta \cdot n
 @f]
 When summing this expression over all cells $T$, the boundary integral is done over
 all internal and external faces and as such there are three cases:

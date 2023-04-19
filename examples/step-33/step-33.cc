@@ -2368,7 +2368,6 @@ namespace Step33
       grid_in.read_ucd(input_file);
     }
 
-    dof_handler.clear();
     dof_handler.distribute_dofs(fe);
 
     // Size all of the fields.

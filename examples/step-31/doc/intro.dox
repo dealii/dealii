@@ -509,7 +509,7 @@ by using the approximation $\frac 12 T^{n-1}+\frac 12 T^{n-2}$, which means
 that we calculate the nonlinear viscosity as a function of this
 intermediate temperature, $\nu_\alpha =
 \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right)$. Note that this
-evaluation of the residual is nothing else than a Crank-Nicholson scheme,
+evaluation of the residual is nothing else than a Crank-Nicolson scheme,
 so we can be sure that now everything is alright. One might wonder whether
 it is a problem that the numerical viscosity now is not evaluated at
 time $n$ (as opposed to the rest of the equation). However, this offset

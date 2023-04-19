@@ -857,11 +857,11 @@ This functions obviates, by the way, also the call to the
 
 <h4>Performance optimizations</h4>
 
-The program developed below has seen a lot of TLC. We have run it over and
-over under profiling tools (mainly <a
+The program developed below has seen a lot of tender loving care.
+We have run it over and over under profiling tools (mainly <a
 href="http://www.valgrind.org/">valgrind</a>'s cachegrind and callgrind
 tools, as well as the KDE <a
-href="http://kcachegrind.sourceforge.net/">KCachegrind</a> program for
+href="http://kcachegrind.github.io/">KCachegrind</a> program for
 visualization) to see where the bottlenecks are. This has paid off: through
 this effort, the program has become about four times as fast when
 considering the runtime of the refinement cycles zero through three,
