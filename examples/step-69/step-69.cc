@@ -416,7 +416,7 @@ namespace Step69
 
   // @sect4{The <code>SchlierenPostprocessor</code> class}
   //
-  // At its core, the Schlieren class implements the class member
+  // At its core, the SchlierenPostprocessor class implements the class member
   // <code>compute_schlieren()</code>. The main purpose of this class member
   // is to compute an auxiliary finite element field
   // <code>schlieren</code>, that is defined at each node by
