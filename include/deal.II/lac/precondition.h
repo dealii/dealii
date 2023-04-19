@@ -3384,7 +3384,7 @@ namespace internal
                           Kokkos::IndexType<types::global_dof_index>>
         policy(0, n_local_elements);
       Kokkos::parallel_for(
-        "PreconditionChebyshev::set_initial_guess",
+        "dealii::PreconditionChebyshev::set_initial_guess",
         policy,
         KOKKOS_LAMBDA(types::global_dof_index i) {
           values_ptr[i] = (i + first_local_range) % 11;

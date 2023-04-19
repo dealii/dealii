@@ -130,7 +130,7 @@ namespace Utilities
               auto locally_owned_array_data = locally_owned_array.data();
               MemorySpace::Default::kokkos_space::execution_space exec;
               Kokkos::parallel_for(
-                "fill temp_array_ptr",
+                "dealii::fill temp_array_ptr",
                 Kokkos::RangePolicy<
                   MemorySpace::Default::kokkos_space::execution_space>(
                   exec, 0, chunk_size),
@@ -611,7 +611,7 @@ namespace Utilities
                       using IndexType = decltype(chunk_size);
                       MemorySpace::Default::kokkos_space::execution_space exec;
                       Kokkos::parallel_for(
-                        "fill locally_owned_array, add",
+                        "dealii::fill locally_owned_array, add",
                         Kokkos::RangePolicy<
                           MemorySpace::Default::kokkos_space::execution_space>(
                           exec, 0, chunk_size),
@@ -635,7 +635,7 @@ namespace Utilities
                       using IndexType = decltype(chunk_size);
                       MemorySpace::Default::kokkos_space::execution_space exec;
                       Kokkos::parallel_for(
-                        "fill locally_owned_array, min",
+                        "dealii::fill locally_owned_array, min",
                         Kokkos::RangePolicy<
                           MemorySpace::Default::kokkos_space::execution_space>(
                           exec, 0, chunk_size),
@@ -662,7 +662,7 @@ namespace Utilities
                       using IndexType = decltype(chunk_size);
                       MemorySpace::Default::kokkos_space::execution_space exec;
                       Kokkos::parallel_for(
-                        "fill locally_owned_array, max",
+                        "dealii::fill locally_owned_array, max",
                         Kokkos::RangePolicy<
                           MemorySpace::Default::kokkos_space::execution_space>(
                           exec, 0, chunk_size),

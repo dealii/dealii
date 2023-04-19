@@ -580,7 +580,7 @@ namespace CUDAWrappers
     const Number *     src_ptr = src.get_values();
     Number *           dst_ptr = dst.get_values();
     Kokkos::parallel_for(
-      "copy_constrained_values",
+      "dealii::copy_constrained_values",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
         0, n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
@@ -614,7 +614,7 @@ namespace CUDAWrappers
     const unsigned int size =
       partitioner ? dst.locally_owned_size() : dst.size();
     Kokkos::parallel_for(
-      "set_constrained_values",
+      "dealii::set_constrained_values",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
         0, n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {

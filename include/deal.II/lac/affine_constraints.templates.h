@@ -2272,7 +2272,7 @@ namespace internal
       ExecutionSpace exec;
       auto           local_values = vec.get_values();
       Kokkos::parallel_for(
-        "set_zero_parallel",
+        "dealii::set_zero_parallel",
         Kokkos::RangePolicy<ExecutionSpace>(exec, 0, n_constraints),
         KOKKOS_LAMBDA(int i) {
           local_values[constrained_local_dofs_device[i]] = 0;
