@@ -22,7 +22,6 @@ set(TARGET_SRC
 # Usually, you will not need to modify anything beyond this point...
 
 cmake_minimum_required(VERSION 3.13.4)
-project(${TARGET})
 
 find_package(deal.II 9.5.0
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
@@ -35,5 +34,6 @@ if(NOT ${deal.II_FOUND})
     )
 endif()
 
-add_executable(${TARGET} ${TARGET_SRC})
-target_link_libraries(${TARGET} dealii::dealii)
+deal_ii_initialize_cached_variables()
+project(${TARGET})
+deal_ii_invoke_autopilot()
