@@ -39,19 +39,13 @@ namespace PETScWrappers
 {
   /**
    * Set an option in the global PETSc database. This function just wraps
-   * PetscOptionsSetValue with a version check (the signature of this function
-   * changed in PETSc 3.7.0).
+   * PetscOptionsSetValue and checks the error return value.
    */
   inline void
   set_option_value(const std::string &name, const std::string &value)
   {
-#  if DEAL_II_PETSC_VERSION_LT(3, 7, 0)
-    const PetscErrorCode ierr =
-      PetscOptionsSetValue(name.c_str(), value.c_str());
-#  else
     const PetscErrorCode ierr =
       PetscOptionsSetValue(nullptr, name.c_str(), value.c_str());
-#  endif
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 

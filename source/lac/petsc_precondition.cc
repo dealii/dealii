@@ -114,11 +114,7 @@ namespace PETScWrappers
 
     create_pc_with_comm(comm);
 
-#  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-    ierr = PCSetOperators(pc, matrix, matrix, SAME_PRECONDITIONER);
-#  else
     ierr = PCSetOperators(pc, matrix, matrix);
-#  endif
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1098,11 +1094,7 @@ namespace PETScWrappers
   {
     initialize(matrix.get_mpi_communicator());
     PetscErrorCode ierr;
-#  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-    ierr = PCSetOperators(pc, matrix, matrix, DIFFERENT_NONZERO_PATTERN);
-#  else
     ierr = PCSetOperators(pc, matrix, matrix);
-#  endif
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
