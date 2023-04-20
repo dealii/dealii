@@ -40,7 +40,7 @@ namespace PETScWrappers
   {
     // get rid of old matrix and generate a
     // new one
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     do_reinit(m, n);

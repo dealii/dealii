@@ -48,7 +48,9 @@ namespace PETScWrappers
 
     SparseMatrix::~SparseMatrix()
     {
-      destroy_matrix(matrix);
+      PetscErrorCode ierr = MatDestroy(&matrix);
+      (void)ierr;
+      AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
 
 
@@ -78,7 +80,7 @@ namespace PETScWrappers
       if (&other == this)
         return;
 
-      PetscErrorCode ierr = destroy_matrix(matrix);
+      PetscErrorCode ierr = MatDestroy(&matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       ierr = MatDuplicate(other.matrix, MAT_DO_NOT_COPY_VALUES, &matrix);
@@ -95,7 +97,7 @@ namespace PETScWrappers
                          const MPI_Comm &           communicator)
     {
       // get rid of old matrix and generate a new one
-      const PetscErrorCode ierr = destroy_matrix(matrix);
+      const PetscErrorCode ierr = MatDestroy(&matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       do_reinit(communicator,
@@ -138,7 +140,7 @@ namespace PETScWrappers
       const bool                    preset_nonzero_locations)
     {
       // get rid of old matrix and generate a new one
-      const PetscErrorCode ierr = destroy_matrix(matrix);
+      const PetscErrorCode ierr = MatDestroy(&matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
 
@@ -169,7 +171,7 @@ namespace PETScWrappers
                          const MPI_Comm &           communicator)
     {
       // get rid of old matrix and generate a new one
-      const PetscErrorCode ierr = destroy_matrix(matrix);
+      const PetscErrorCode ierr = MatDestroy(&matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       do_reinit(communicator, local_rows, local_columns, sparsity_pattern);

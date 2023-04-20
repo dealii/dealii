@@ -54,24 +54,6 @@ namespace PETScWrappers
 
 
   /**
-   * Destroy a PETSc matrix. This function wraps MatDestroy with a version
-   * check (the signature of this function changed in PETSc 3.2.0).
-   *
-   * @warning Since the primary intent of this function is to enable RAII
-   * semantics in the PETSc wrappers, this function will not throw an
-   * exception if an error occurs, but instead just returns the error code
-   * given by MatDestroy.
-   */
-  inline PetscErrorCode
-  destroy_matrix(Mat &matrix)
-  {
-    // PETSc will check whether or not matrix is nullptr.
-    return MatDestroy(&matrix);
-  }
-
-
-
-  /**
    * Destroy a Krylov Subspace (KSP) PETSc solver. This function wraps
    * KSPDestroy with a version check (the signature of this function changed
    * in PETSc 3.2.0).

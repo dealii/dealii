@@ -72,7 +72,7 @@ namespace PETScWrappers
 
     BlockSparseMatrix::~BlockSparseMatrix()
     {
-      PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
+      PetscErrorCode ierr = MatDestroy(&petsc_nest_matrix);
       (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
@@ -245,7 +245,7 @@ namespace PETScWrappers
 
       MPI_Comm comm = PETSC_COMM_SELF;
 
-      ierr = destroy_matrix(petsc_nest_matrix);
+      ierr = MatDestroy(&petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       std::vector<Mat> psub_objects(m * n);
       for (unsigned int r = 0; r < m; r++)
