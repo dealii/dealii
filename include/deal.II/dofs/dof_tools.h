@@ -2248,10 +2248,10 @@ namespace DoFTools
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(
-    const dealii::hp::MappingCollection<dim, spacedim> &mapping,
-    const DoFHandler<dim, spacedim> &                   dof_handler,
-    std::vector<Point<spacedim>> &                      support_points,
-    const ComponentMask &                               mask = ComponentMask());
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof_handler,
+    std::vector<Point<spacedim>> &              support_points,
+    const ComponentMask &                       mask = ComponentMask());
 
   /**
    * This function is a version of the above map_dofs_to_support_points
@@ -2294,9 +2294,9 @@ namespace DoFTools
   template <int dim, int spacedim>
   std::map<types::global_dof_index, Point<spacedim>>
   map_dofs_to_support_points(
-    const dealii::hp::MappingCollection<dim, spacedim> &mapping,
-    const DoFHandler<dim, spacedim> &                   dof_handler,
-    const ComponentMask &                               mask = ComponentMask());
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof_handler,
+    const ComponentMask &                       mask = ComponentMask());
 
   /**
    * A version of the function of same name that returns the map via its third
@@ -2319,7 +2319,7 @@ namespace DoFTools
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
-    const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+    const hp::MappingCollection<dim, spacedim> &        mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
     const ComponentMask &                               mask = ComponentMask());
