@@ -115,7 +115,7 @@ namespace PETScWrappers
        * Create a BlockSparseMatrix with an array of PETSc matrices.
        */
       template <size_t block_rows, size_t block_columns>
-      BlockSparseMatrix(
+      explicit BlockSparseMatrix(
         const std::array<std::array<Mat, block_columns>, block_rows> &);
 
       /**

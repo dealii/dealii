@@ -142,7 +142,7 @@ namespace PETScWrappers
        * Create a BlockVector with an array of PETSc vectors.
        */
       template <size_t num_blocks>
-      BlockVector(const std::array<Vec, num_blocks> &);
+      explicit BlockVector(const std::array<Vec, num_blocks> &);
 
       /**
        * Destructor. Clears memory
