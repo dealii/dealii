@@ -555,7 +555,22 @@ namespace GridTools
    * predicate is either an object of a type that has an <tt>operator()</tt>,
    * or it is a pointer to a non-member function, or it is a lambda function
    * object. In either case, argument and return
-   * value have to be of type Point<spacedim>.
+   * value have to be of type Point<spacedim>. An example -- a simple
+   * transformation that moves the object two units to the
+   * right in the $x_1$ direction -- could look like as follows:
+   * @code
+   *   Triangulation<dim> triangulation;
+   *   ... // fill triangulation with something
+   *   GridTools::transform ([](const Point<dim> &p) -> Point<dim>
+   *                         {
+   *                           Point<dim> q = p;
+   *                           q[0] += 2;
+   *                           return q;
+   *                         },
+   *                         triangulation);
+   * @endcode
+   * Here, the transformation is provided by a lambda function that
+   * takes a `Point<dim>` as input and returns a `Point<dim>` as output.
    *
    * @note The transformations that make sense to use with this function
    *   should have a Jacobian with a positive determinant. For example,
