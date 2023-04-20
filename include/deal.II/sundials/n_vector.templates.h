@@ -76,7 +76,7 @@ namespace SUNDIALS
        *
        * @note This constructor is intended for the N_VClone() call of SUNDIALS.
        */
-      NVectorContent();
+      NVectorContent(const MPI_Comm comm);
 
       /**
        * Non-const access to the stored vector. Only allowed if a constructor
@@ -361,9 +361,9 @@ namespace SUNDIALS
 
 
     template <typename VectorType>
-    NVectorContent<VectorType>::NVectorContent()
+    NVectorContent<VectorType>::NVectorContent(const MPI_Comm comm)
       : vector(typename VectorMemory<VectorType>::Pointer(mem))
-      , comm(get_mpi_communicator_from_vector(*vector))
+      , comm(comm)
       , is_const(false)
     {}
 
@@ -565,14 +565,17 @@ namespace SUNDIALS
       {
         N_Vector v = clone_empty(w);
 
-        // the corresponding delete is called in destroy()
-        auto  cloned   = new NVectorContent<VectorType>();
         auto *w_dealii = unwrap_nvector_const<VectorType>(w);
 
-        // reinit the cloned vector based on the layout of the source vector
-        cloned->get()->reinit(*w_dealii);
-        v->content = cloned;
+        // Create the vector; the corresponding delete is called in destroy()
+        auto cloned = new NVectorContent<VectorType>(
+          get_mpi_communicator_from_vector(*w_dealii));
 
+        // Then also copy the structure and values:
+        *cloned->get() = *w_dealii;
+
+        // Finally set the cloned object in 'v':
+        v->content = cloned;
         return v;
       }
 
