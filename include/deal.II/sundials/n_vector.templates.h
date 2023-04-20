@@ -351,6 +351,9 @@ namespace SUNDIALS
         (void)v;
         return MPI_COMM_SELF;
 #  else
+        Assert(v.n_blocks() > 0,
+               ExcMessage("You cannot ask a block vector without blocks "
+                          "for its MPI communicator."));
         return v.block(0).get_mpi_communicator();
 #  endif
       }
