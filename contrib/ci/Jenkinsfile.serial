@@ -106,7 +106,6 @@ pipeline
                     -D CMAKE_BUILD_TYPE=Debug \
                     -D DEAL_II_WITH_MPI=OFF \
                     -D DEAL_II_UNITY_BUILD=ON \
-                    -D DEAL_II_COMPILER_HAS_FUSE_LD_GOLD=false \
                     $WORKSPACE/
                   time ninja -j 10 # 12 gives OOM
                   time ninja test # quicktests
