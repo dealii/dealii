@@ -264,9 +264,6 @@ namespace PETScWrappers
        * Call the compress() function on all the subblocks of the matrix
        * and update the internal state of the PETSc object.
        *
-       * This functionality is needed because PETSc may use this information
-       * to decide whether or not to rebuild the preconditioner.
-       *
        * See
        * @ref GlossCompress "Compressing distributed objects"
        * for more information.

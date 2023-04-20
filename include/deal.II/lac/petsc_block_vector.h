@@ -259,9 +259,6 @@ namespace PETScWrappers
        * Call the compress() function on all the subblocks of the vector
        * and update the internal state of the nested PETSc vector.
        *
-       * This functionality is needed because PETSc may cache vector norms for
-       * performance reasons.
-       *
        * See
        * @ref GlossCompress "Compressing distributed objects"
        * for more information.
