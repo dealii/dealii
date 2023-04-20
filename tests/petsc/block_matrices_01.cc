@@ -78,6 +78,7 @@ test()
   Assert(tmp2.n_block_cols() == pbsm.n_block_cols(), ExcInternalError());
   Assert(tmp2.m() == pbsm.m(), ExcInternalError());
   Assert(tmp2.n() == pbsm.n(), ExcInternalError());
+  Assert(tmp2.petsc_matrix() == pbsm.petsc_matrix(), ExcInternalError());
   for (unsigned int blr = 0; blr < 2; ++blr)
     {
       for (unsigned int blc = 0; blc < 2; ++blc)

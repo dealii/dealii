@@ -498,7 +498,7 @@ public:
   collect_sizes();
 
   /**
-   * Call the compress() function on all the subblocks of the matrix.
+   * Call the compress() function on all the subblocks of the vector.
    *
    * This functionality only needs to be called if using MPI based vectors and
    * exists in other objects for compatibility.

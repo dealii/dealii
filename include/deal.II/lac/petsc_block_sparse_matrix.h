@@ -100,7 +100,7 @@ namespace PETScWrappers
        * reinit(BlockSparsityPattern). The number of blocks per row and column
        * are then determined by that function.
        */
-      BlockSparseMatrix() = default;
+      BlockSparseMatrix();
 
       /**
        * Create a BlockSparseMatrix with a PETSc Mat that describes the entire
@@ -115,7 +115,7 @@ namespace PETScWrappers
        * Create a BlockSparseMatrix with an array of PETSc matrices.
        */
       template <size_t block_rows, size_t block_columns>
-      BlockSparseMatrix(
+      explicit BlockSparseMatrix(
         const std::array<std::array<Mat, block_columns>, block_rows> &);
 
       /**
@@ -261,6 +261,17 @@ namespace PETScWrappers
       collect_sizes();
 
       /**
+       * Call the compress() function on all the subblocks of the matrix
+       * and update the internal state of the PETSc object.
+       *
+       * See
+       * @ref GlossCompress "Compressing distributed objects"
+       * for more information.
+       */
+      void
+      compress(VectorOperation::values operation);
+
+      /**
        * Return the partitioning of the domain space of this matrix, i.e., the
        * partitioning of the vectors this matrix has to be multiplied with.
        */
@@ -325,7 +336,21 @@ namespace PETScWrappers
        * a "nested" matrix using PETSc's MATNEST object whose individual
        * blocks are the blocks of this matrix.
        */
-      Mat petsc_nest_matrix = nullptr;
+      Mat petsc_nest_matrix;
+
+      /**
+       * Utility to setup the MATNEST object
+       */
+      void
+      setup_nest_mat();
+
+      /**
+       * An utility method to populate empty blocks with actual objects.
+       * This is needed because MATNEST supports nullptr as a block,
+       * while the BlockMatrixBase class does not.
+       */
+      void
+      create_empty_matrices_if_needed();
     };
 
 
@@ -333,6 +358,12 @@ namespace PETScWrappers
     /** @} */
 
     // ------------- inline and template functions -----------------
+    inline BlockSparseMatrix::BlockSparseMatrix()
+      : BaseClass()
+      , petsc_nest_matrix(nullptr)
+    {}
+
+
 
     inline BlockSparseMatrix::BlockSparseMatrix(const Mat &A)
       : BlockSparseMatrix()
@@ -340,9 +371,12 @@ namespace PETScWrappers
       this->reinit(A);
     }
 
+
+
     template <size_t block_rows, size_t block_columns>
     inline BlockSparseMatrix::BlockSparseMatrix(
       const std::array<std::array<Mat, block_columns>, block_rows> &arrayA)
+      : BlockSparseMatrix()
     {
       this->reinit(block_rows, block_columns);
       this->sub_objects.reinit(block_rows, block_columns);
@@ -356,6 +390,8 @@ namespace PETScWrappers
           }
       this->collect_sizes();
     }
+
+
 
     inline BlockSparseMatrix &
     BlockSparseMatrix::operator=(const double d)

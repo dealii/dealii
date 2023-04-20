@@ -148,12 +148,27 @@ test()
   PETScWrappers::MPI::BlockVector vb2(v.petsc_vector());
   Assert(vb2.n_blocks() == v.n_blocks(), ExcInternalError());
   Assert(vb2.size() == v.size(), ExcInternalError());
+  Assert(vb2.petsc_vector() == v.petsc_vector(), ExcInternalError());
   for (unsigned int bl = 0; bl < 2; ++bl)
     {
       Assert(vb2.block(bl).size() == v.block(bl).size(), ExcInternalError());
       Assert(vb2.block(bl).petsc_vector() == v.block(bl).petsc_vector(),
              ExcInternalError());
     }
+
+  // Create new block vector from an array of PETSc vectors
+  std::array<Vec, 2> arrayVecs = {
+    {vb.block(0).petsc_vector(), vb.block(1).petsc_vector()}};
+  PETScWrappers::MPI::BlockVector vb3(arrayVecs);
+  Assert(vb3.n_blocks() == vb.n_blocks(), ExcInternalError());
+  Assert(vb3.size() == vb.size(), ExcInternalError());
+  for (unsigned int bl = 0; bl < 2; ++bl)
+    {
+      Assert(vb3.block(bl).size() == vb.block(bl).size(), ExcInternalError());
+      Assert(vb3.block(bl).petsc_vector() == vb.block(bl).petsc_vector(),
+             ExcInternalError());
+    }
+
 
   // Test swap
   auto old_v_vb2 = vb2.petsc_vector();
