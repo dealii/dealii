@@ -77,13 +77,13 @@ namespace
    */
   template <typename VectorType>
   VectorType
-  create_test_vector(double value = 0.0);
+  create_test_vector(const double value = 0.0);
 
 
 
   template <>
   Vector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     Vector<double> vector(3 /*size*/);
     vector = value;
@@ -94,7 +94,7 @@ namespace
 
   template <>
   BlockVector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const int           num_blocks = 2;
     const int           size_block = 3;
@@ -105,7 +105,7 @@ namespace
 
   template <>
   LinearAlgebra::distributed::Vector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     IndexSet local_dofs = create_parallel_index_set();
     LinearAlgebra::distributed::Vector<double> vector(local_dofs,
@@ -116,7 +116,7 @@ namespace
 
   template <>
   LinearAlgebra::distributed::BlockVector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const unsigned n_processes =
       Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -133,7 +133,7 @@ namespace
 
   template <>
   TrilinosWrappers::MPI::Vector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     IndexSet local_dofs = create_parallel_index_set();
 
@@ -144,7 +144,7 @@ namespace
 
   template <>
   TrilinosWrappers::MPI::BlockVector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const unsigned n_processes =
       Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -159,7 +159,7 @@ namespace
 
   template <>
   PETScWrappers::MPI::Vector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     IndexSet local_dofs = create_parallel_index_set();
 
@@ -170,7 +170,7 @@ namespace
 
   template <>
   PETScWrappers::MPI::BlockVector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const unsigned n_processes =
       Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
