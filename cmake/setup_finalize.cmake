@@ -55,12 +55,64 @@ endforeach()
 #
 
 foreach(build ${DEAL_II_BUILD_TYPES})
-  check_compiler_setup(
-    "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
-    "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
-    DEAL_II_HAVE_USABLE_FLAGS_${build}
-    ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
-    )
+  macro(_check_linker_flags)
+    check_compiler_setup(
+      "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
+      "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
+      DEAL_II_HAVE_USABLE_FLAGS_${build}
+      ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
+      )
+  endmacro()
+
+  macro(_drop_linker_flag _linker_flag _replacement_flag _variable)
+    message(STATUS
+      "Unable to compile a simple test program. "
+      "Trying to drop \"${_linker_flag}\" from the linker flags."
+      )
+    foreach(_flags
+        DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build}
+        BASE_LINKER_FLAGS BASE_LINKER_FLAGS_${build}
+        )
+      string(REPLACE "${_linker_flag}" "${_replacement_flag}"
+        ${_flags} "${${_flags}}"
+        )
+    endforeach()
+    set(${_variable} FALSE CACHE INTERNAL "" FORCE)
+    set(${_variable} FALSE)
+  endmacro()
+
+  _check_linker_flags()
+
+  if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+    set(_replacement "")
+    if(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+      set(_replacement "-fuse-ld=gold")
+    endif()
+    _drop_linker_flag(
+      "-fuse-ld=lld" ${_replacement}
+      DEAL_II_COMPILER_HAS_FUSE_LD_LLD
+      )
+    _check_linker_flags()
+  endif()
+
+  if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+    _drop_linker_flag(
+      "-fuse-ld=gold" ""
+      DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
+      )
+    _check_linker_flags()
+  endif()
+
+  if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build})
+    message(FATAL_ERROR "
+  Configuration error: Cannot compile a test program with the final set of
+  compiler and linker flags:
+    CXX flags (${build}): ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}
+    LD flags  (${build}): ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}
+    LIBRARIES (${build}): ${DEAL_II_LIBRARIES};${DEAL_II_LIBRARIES_${build}}
+  \n\n"
+      )
+  endif()
 endforeach()
 
 #
