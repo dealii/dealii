@@ -133,7 +133,7 @@ namespace PETScWrappers
 
     /**
      * Modify the vector @p locally_owned_array according to the precomputed communication
-     * pattern and the operation @ op with values from @p ghost_array.
+     * pattern and the operation @p op with values from @p ghost_array.
      */
     template <typename Number>
     void
@@ -144,7 +144,7 @@ namespace PETScWrappers
 
     /**
      * Start the communication round to modify the vector @p locally_owned_array according
-     * to the precomputed communication pattern and the operation @ op with
+     * to the precomputed communication pattern and the operation @p op with
      * values from
      * @p ghost_array. It can be overlapped with other communications.
      */
@@ -157,7 +157,7 @@ namespace PETScWrappers
 
     /**
      * Finish the communication round to modify the vector @p locally_owned_array according
-     * to the precomputed communication pattern and the operation @ op with
+     * to the precomputed communication pattern and the operation @p op with
      * values from
      * @p ghost_array. It can be overlapped with other communications.
      */
@@ -232,7 +232,7 @@ namespace PETScWrappers
 
     /**
      * Reinitialize the partitioner. As for the Utilities::MPI::Partitioner,
-     * any entry of @ ghost_indices that is also present in @
+     * any entry of @p ghost_indices that is also present in @
      * locally_owned_indices is discarded.
      */
     virtual void
@@ -242,10 +242,10 @@ namespace PETScWrappers
 
     /**
      * Reinitialize the partitioner. As for the Utilities::MPI::Partitioner,
-     * any entry of @ ghost_indices that is also present in @
+     * any entry of @p ghost_indices that is also present in @
      * locally_owned_indices is discarded. This reinitialization will allow to
      * perform communications either using a ghost data array of the size
-     * of @ ghost_indices or of @ larger_ghost_indices.
+     * of @p ghost_indices or of @p larger_ghost_indices.
      */
     void
     reinit(const IndexSet &locally_owned_indices,
@@ -310,7 +310,7 @@ namespace PETScWrappers
 
     /**
      * Modify the vector @p locally_owned_array according to the precomputed communication
-     * pattern and the operation @ op with values from @p ghost_array.
+     * pattern and the operation @p op with values from @p ghost_array.
      */
     template <typename Number>
     void
@@ -321,7 +321,7 @@ namespace PETScWrappers
 
     /**
      * Start the communication round to modify the vector @p locally_owned_array according
-     * to the precomputed communication pattern and the operation @ op with
+     * to the precomputed communication pattern and the operation @p op with
      * values from
      * @p ghost_array. It can be overlapped with other communications.
      * Differently from the Utilities::MPI::Partitioner implementation, here we
@@ -337,7 +337,7 @@ namespace PETScWrappers
 
     /**
      * Finish the communication round to modify the vector @p locally_owned_array according
-     * to the precomputed communication pattern and the operation @ op with
+     * to the precomputed communication pattern and the operation @p op with
      * values from
      * @p ghost_array. It can be overlapped with other communications.
      * Differently from the Utilities::MPI::Partitioner implementation, here we
