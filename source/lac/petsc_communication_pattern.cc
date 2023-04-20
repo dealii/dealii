@@ -249,11 +249,10 @@ namespace PETScWrappers
     AssertPETSc(PetscSFDestroy(&sf));
   }
 
-  const MPI_Comm &
+  MPI_Comm
   CommunicationPattern::get_mpi_communicator() const
   {
-    static MPI_Comm comm = PetscObjectComm(reinterpret_cast<PetscObject>(sf));
-    return comm;
+    return PetscObjectComm(reinterpret_cast<PetscObject>(sf));
   }
 
   template <typename Number>
@@ -392,7 +391,7 @@ namespace PETScWrappers
     n_ghost_indices_larger = larger_ghost_indices.n_elements();
   }
 
-  const MPI_Comm &
+  MPI_Comm
   Partitioner::get_mpi_communicator() const
   {
     return ghost.get_mpi_communicator();

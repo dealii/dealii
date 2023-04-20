@@ -109,9 +109,9 @@ namespace PETScWrappers
     get_pc() const;
 
     /**
-     * Return the MPI communicator object used by this preconditioner.
+     * Return the underlying MPI communicator.
      */
-    const MPI_Comm &
+    MPI_Comm
     get_mpi_communicator() const;
 
   protected:

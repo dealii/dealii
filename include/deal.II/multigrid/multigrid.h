@@ -578,7 +578,7 @@ public:
   locally_owned_domain_indices(const unsigned int block = 0) const;
 
   /**
-   * Return the MPI communicator object in use with this preconditioner.
+   * Return the underlying MPI communicator.
    */
   MPI_Comm
   get_mpi_communicator() const;

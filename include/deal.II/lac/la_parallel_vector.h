@@ -1158,10 +1158,9 @@ namespace LinearAlgebra
       /** @{ */
 
       /**
-       * Return a reference to the MPI communicator object in use with this
-       * vector.
+       * Return the underlying MPI communicator.
        */
-      const MPI_Comm &
+      MPI_Comm
       get_mpi_communicator() const;
 
       /**
@@ -1722,7 +1721,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline const MPI_Comm &
+    inline MPI_Comm
     Vector<Number, MemorySpace>::get_mpi_communicator() const
     {
       return partitioner->get_mpi_communicator();

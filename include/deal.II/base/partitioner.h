@@ -474,9 +474,9 @@ namespace Utilities
       n_mpi_processes() const;
 
       /**
-       * Return the MPI communicator underlying the partitioner object.
+       * Return the underlying MPI communicator.
        */
-      virtual const MPI_Comm &
+      virtual MPI_Comm
       get_mpi_communicator() const override;
 
       /**
@@ -985,7 +985,7 @@ namespace Utilities
 
 
 
-    inline const MPI_Comm &
+    inline MPI_Comm
     Partitioner::get_mpi_communicator() const
     {
       return communicator;

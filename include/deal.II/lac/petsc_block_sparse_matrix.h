@@ -295,10 +295,9 @@ namespace PETScWrappers
       n_nonzero_elements() const;
 
       /**
-       * Return a reference to the MPI communicator object in use with this
-       * matrix.
+       * Return the underlying MPI communicator.
        */
-      const MPI_Comm &
+      MPI_Comm
       get_mpi_communicator() const;
 
       /**

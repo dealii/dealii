@@ -973,7 +973,7 @@ namespace TrilinosWrappers
     memory_consumption() const;
 
     /**
-     * Return the MPI communicator object in use with this matrix.
+     * Return the underlying MPI communicator.
      */
     MPI_Comm
     get_mpi_communicator() const;

@@ -317,15 +317,10 @@ namespace PETScWrappers
 
 
 
-    const MPI_Comm &
+    MPI_Comm
     BlockSparseMatrix::get_mpi_communicator() const
     {
-      static MPI_Comm comm = PETSC_COMM_SELF;
-      MPI_Comm        pcomm =
-        PetscObjectComm(reinterpret_cast<PetscObject>(petsc_nest_matrix));
-      if (pcomm != MPI_COMM_NULL)
-        comm = pcomm;
-      return comm;
+      return PetscObjectComm(reinterpret_cast<PetscObject>(petsc_nest_matrix));
     }
 
     BlockSparseMatrix::operator const Mat &() const
