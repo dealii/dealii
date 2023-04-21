@@ -1465,6 +1465,15 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       std::string line;
       std::getline(in, line);
 
+      // We tend to get these sorts of files from folks who run on
+      // Windows and where line endings are \r\n instead of just
+      // \n. The \r is redundant unless you still use a line printer,
+      // so get rid of it in order to not confuse any of the functions
+      // below that try to interpret the entire content of a line
+      // as a string:
+      if ((line.size() > 0) && (line.back() == '\r'))
+        line.erase(line.size() - 1);
+
       // Strip trailing comments, then strip whatever spaces are at the end
       // of the line, and if anything is left, concatenate that to the previous
       // content of the file:
@@ -1549,7 +1558,8 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
     while (whole_file.peek() == '\n')
       whole_file.get();
     std::getline(whole_file, s);
-    AssertThrow(s == "4 Mesh", ExcNotImplemented());
+    AssertThrow(s == "4 Mesh",
+                ExcMessage("Expected '4 Mesh', but got '" + s + "'."));
   }
   {
     unsigned int version;
