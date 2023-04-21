@@ -444,6 +444,15 @@ namespace LinearAlgebra
       swap(Vector<Number, MemorySpace> &v);
 
       /**
+       * Move assignment operator.
+       *
+       * @note This method may throw an exception (should an MPI check fail) and
+       * is consequently not `noexcept`.
+       */
+      Vector<Number, MemorySpace> &
+      operator=(Vector<Number, MemorySpace> &&in_vector); // NOLINT
+
+      /**
        * Assigns the vector to the parallel partitioning of the input vector
        * @p in_vector, and copies all the data.
        *

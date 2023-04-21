@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// check parallel_vector::copy_from to update ghost values. Same vector layout
-// as in parallel_vector_07.cc
+// check parallel_vector assignment and ghost values. Same vector layout as in
+// parallel_vector_07.cc
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
@@ -58,10 +58,12 @@ test()
   IndexSet local_owned(global_size);
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
-  local_relevant                 = local_owned;
-  unsigned int ghost_indices[10] = {
+  local_relevant                            = local_owned;
+  const std::size_t n_ghosts                = 10;
+  unsigned int      ghost_indices[n_ghosts] = {
     1, 2, 13, set - 3, set - 2, set - 1, set, set + 1, set + 2, set + 3};
-  local_relevant.add_indices(&ghost_indices[0], &ghost_indices[0] + 10);
+  local_relevant.add_indices(std::begin(ghost_indices),
+                             std::end(ghost_indices));
 
   // v has ghosts, w has none. set some entries
   // on w, copy into v and check if they are
@@ -79,6 +81,29 @@ test()
 
   v = w;
   v.update_ghost_values();
+
+  // Check local and ghost values with move assignment:
+  {
+    decltype(v) v_move, v_copy = v;
+    v_move = std::move(v_copy);
+
+    LinearAlgebra::ReadWriteVector<double> v_rw(local_relevant);
+    v_rw.import(v, VectorOperation::insert);
+    LinearAlgebra::ReadWriteVector<double> v_move_rw(local_relevant);
+    v_move_rw.import(v_move, VectorOperation::insert);
+
+    for (unsigned int i = 0; i < v_rw.locally_owned_size(); ++i)
+      AssertThrow(v_move_rw.local_element(i) == v_rw.local_element(i),
+                  ExcInternalError());
+
+    // v_copy should now be empty
+    AssertThrow(v_copy.locally_owned_size() == 0, ExcInternalError());
+    AssertThrow(v_copy.get_partitioner()->size() == 0, ExcInternalError());
+    AssertThrow(v_copy.get_partitioner()->n_ghost_indices() == 0,
+                ExcInternalError());
+    AssertThrow(v_copy.get_mpi_communicator() == MPI_COMM_SELF,
+                ExcInternalError());
+  }
 
   // check local values for correctness
   rw_vector.import(v, VectorOperation::insert);
