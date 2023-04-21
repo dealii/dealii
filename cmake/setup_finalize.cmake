@@ -64,6 +64,11 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       )
   endmacro()
 
+  macro(_set_cache_variable _variable _value)
+    set(${_variable} ${_value} CACHE INTERNAL "" FORCE)
+    set(${_variable} ${_value})
+  endmacro()
+
   macro(_drop_linker_flag _linker_flag _replacement_flag _variable)
     message(STATUS
       "Unable to compile a simple test program. "
@@ -77,8 +82,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
         ${_flags} "${${_flags}}"
         )
     endforeach()
-    set(${_variable} FALSE CACHE INTERNAL "" FORCE)
-    set(${_variable} FALSE)
+    _set_cache_variable(_variable FALSE)
   endmacro()
 
   _check_linker_flags()
