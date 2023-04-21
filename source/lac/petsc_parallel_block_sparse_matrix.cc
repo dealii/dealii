@@ -18,9 +18,6 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-// For PetscObjectStateIncrease
-#  include <petsc/private/petscimpl.h>
-
 namespace
 {
   // A dummy utility routine to create an empty matrix in case we import
@@ -75,7 +72,7 @@ namespace PETScWrappers
 
     BlockSparseMatrix::~BlockSparseMatrix()
     {
-      PetscErrorCode ierr = destroy_matrix(petsc_nest_matrix);
+      PetscErrorCode ierr = MatDestroy(&petsc_nest_matrix);
       (void)ierr;
       AssertNothrow(ierr == 0, ExcPETScError(ierr));
     }
@@ -248,7 +245,7 @@ namespace PETScWrappers
 
       MPI_Comm comm = PETSC_COMM_SELF;
 
-      ierr = destroy_matrix(petsc_nest_matrix);
+      ierr = MatDestroy(&petsc_nest_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       std::vector<Mat> psub_objects(m * n);
       for (unsigned int r = 0; r < m; r++)
@@ -271,9 +268,7 @@ namespace PETScWrappers
     BlockSparseMatrix::compress(VectorOperation::values operation)
     {
       BaseClass::compress(operation);
-      PetscErrorCode ierr = PetscObjectStateIncrease(
-        reinterpret_cast<PetscObject>(petsc_nest_matrix));
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      petsc_increment_state_counter(petsc_nest_matrix);
     }
 
 

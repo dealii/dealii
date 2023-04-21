@@ -99,6 +99,7 @@ if(DEAL_II_WITH_PETSC)
   set(_unity_include_src
     ${_unity_include_src}
     petsc_communication_pattern.cc
+    petsc_compatibility.cc
     petsc_full_matrix.cc
     petsc_matrix_base.cc
     petsc_matrix_free.cc

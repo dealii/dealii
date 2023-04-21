@@ -97,13 +97,16 @@ namespace PETScWrappers
     PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(A));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-    destroy_matrix(matrix);
+    ierr = MatDestroy(&matrix);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
     matrix = A;
   }
 
   MatrixBase::~MatrixBase()
   {
-    destroy_matrix(matrix);
+    PetscErrorCode ierr = MatDestroy(&matrix);
+    (void)ierr;
+    AssertNothrow(ierr == 0, ExcPETScError(ierr));
   }
 
   void
@@ -111,7 +114,7 @@ namespace PETScWrappers
   {
     // destroy the matrix...
     {
-      const PetscErrorCode ierr = destroy_matrix(matrix);
+      const PetscErrorCode ierr = MatDestroy(&matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
@@ -625,7 +628,7 @@ namespace PETScWrappers
                             PETSC_DEFAULT,
                             &result.petsc_matrix());
           AssertThrow(ierr == 0, ExcPETScError(ierr));
-          ierr = PETScWrappers::destroy_matrix(tmp);
+          ierr = MatDestroy(&tmp);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
     }
@@ -764,7 +767,7 @@ namespace PETScWrappers
       }
     if (vmatrix != matrix)
       {
-        ierr = PETScWrappers::destroy_matrix(vmatrix);
+        ierr = MatDestroy(&vmatrix);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
     AssertThrow(out.fail() == false, ExcIO());

@@ -105,7 +105,7 @@ namespace PETScWrappers
                      const unsigned int local_columns)
   {
     // destroy the matrix and generate a new one
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     do_reinit(communicator, m, n, local_rows, local_columns);
@@ -126,7 +126,7 @@ namespace PETScWrappers
                                 local_columns_per_process.size()));
     Assert(this_process < local_rows_per_process.size(), ExcInternalError());
 
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr != 0, ExcPETScError(ierr));
 
     do_reinit(communicator,
@@ -169,7 +169,7 @@ namespace PETScWrappers
   void
   MatrixFree::clear()
   {
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const int m = 0;
