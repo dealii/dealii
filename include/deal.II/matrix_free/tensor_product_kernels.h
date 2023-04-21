@@ -3268,6 +3268,166 @@ namespace internal
 
 
 
+  /**
+   * This function computes derivatives of arbitrary orders in 1d, returning a
+   * Tensor with the respective derivative
+   */
+  template <int derivative_order, typename Number, typename Number2>
+  inline Tensor<1, 1, typename ProductTypeNoPoint<Number, Number2>::type>
+  evaluate_tensor_product_higher_derivatives(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const std::vector<Number> &                         values,
+    const Point<1, Number2> &                           p,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
+
+    const int n_shapes = poly.size();
+    AssertDimension(n_shapes, values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    std::array<Number2, derivative_order + 1> shapes;
+    Tensor<1, 1, Number3>                     result;
+    if (renumber.empty())
+      for (int i = 0; i < n_shapes; ++i)
+        {
+          poly[i].value(p[0], derivative_order, shapes.data());
+          result[0] += shapes[derivative_order] * values[i];
+        }
+    else
+      for (int i = 0; i < n_shapes; ++i)
+        {
+          poly[i].value(p[0], derivative_order, shapes.data());
+          result[0] += shapes[derivative_order] * values[renumber[i]];
+        }
+    return result;
+  }
+
+
+
+  /**
+   * This function computes derivatives of arbitrary orders in 2d, returning a
+   * Tensor with the respective derivatives
+   */
+  template <int derivative_order, typename Number, typename Number2>
+  inline Tensor<1,
+                derivative_order + 1,
+                typename ProductTypeNoPoint<Number, Number2>::type>
+  evaluate_tensor_product_higher_derivatives(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const std::vector<Number> &                         values,
+    const Point<2, Number2> &                           p,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    using Number3     = typename ProductTypeNoPoint<Number, Number2>::type;
+    constexpr int dim = 2;
+
+    const int n_shapes = poly.size();
+    AssertDimension(Utilities::pow(n_shapes, 2), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    AssertIndexRange(n_shapes, 100);
+    dealii::ndarray<Number2, 100, derivative_order + 1, dim> shapes;
+    // Evaluate 1d polynomials and their derivatives
+    std::array<Number2, dim> point;
+    for (unsigned int d = 0; d < dim; ++d)
+      point[d] = p[d];
+    for (int i = 0; i < n_shapes; ++i)
+      poly[i].values_of_array(point, derivative_order, &shapes[i][0]);
+
+    Tensor<1, derivative_order + 1, Number3> result;
+    for (int i1 = 0, i = 0; i1 < n_shapes; ++i1)
+      {
+        Tensor<1, derivative_order + 1, Number3> result_x;
+        if (renumber.empty())
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            for (unsigned int d = 0; d <= derivative_order; ++d)
+              result_x[d] += shapes[i0][d][0] * values[i];
+        else
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            for (unsigned int d = 0; d <= derivative_order; ++d)
+              result_x[d] += shapes[i0][d][0] * values[renumber[i]];
+
+        for (unsigned int d = 0; d <= derivative_order; ++d)
+          result[d] += shapes[i1][d][1] * result_x[derivative_order - d];
+      }
+    return result;
+  }
+
+
+
+  /**
+   * This function computes derivatives of arbitrary orders in 3d, returning a
+   * Tensor with the respective derivatives
+   */
+  template <int derivative_order, typename Number, typename Number2>
+  inline Tensor<1,
+                ((derivative_order + 1) * (derivative_order + 2)) / 2,
+                typename ProductTypeNoPoint<Number, Number2>::type>
+  evaluate_tensor_product_higher_derivatives(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const std::vector<Number> &                         values,
+    const Point<3, Number2> &                           p,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    using Number3     = typename ProductTypeNoPoint<Number, Number2>::type;
+    constexpr int dim = 3;
+    constexpr int n_derivatives =
+      ((derivative_order + 1) * (derivative_order + 2)) / 2;
+
+    const int n_shapes = poly.size();
+    AssertDimension(Utilities::pow(n_shapes, 3), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    AssertIndexRange(n_shapes, 100);
+    dealii::ndarray<Number2, 100, derivative_order + 1, dim> shapes;
+    // Evaluate 1d polynomials and their derivatives
+    std::array<Number2, dim> point;
+    for (unsigned int d = 0; d < dim; ++d)
+      point[d] = p[d];
+    for (int i = 0; i < n_shapes; ++i)
+      poly[i].values_of_array(point, derivative_order, &shapes[i][0]);
+
+    Tensor<1, n_derivatives, Number3> result;
+    for (int i2 = 0, i = 0; i2 < n_shapes; ++i2)
+      {
+        Tensor<1, n_derivatives, Number3> result_xy;
+        for (int i1 = 0; i1 < n_shapes; ++i1)
+          {
+            // apply x derivatives
+            Tensor<1, derivative_order + 1, Number3> result_x;
+            if (renumber.empty())
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                for (unsigned int d = 0; d <= derivative_order; ++d)
+                  result_x[d] += shapes[i0][d][0] * values[i];
+            else
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                for (unsigned int d = 0; d <= derivative_order; ++d)
+                  result_x[d] += shapes[i0][d][0] * values[renumber[i]];
+
+            // multiply by y derivatives, sorting them in upper triangular
+            // matrix, starting with highest global derivative order,
+            // decreasing the combined order of xy derivatives by one in each
+            // row, to be combined with z derivatives in the next step
+            for (unsigned int d = 0, c = 0; d <= derivative_order; ++d)
+              for (unsigned int e = d; e <= derivative_order; ++e, ++c)
+                result_xy[c] +=
+                  shapes[i1][e - d][1] * result_x[derivative_order - e];
+          }
+
+        // multiply by z derivatives, starting with highest x derivative
+        for (unsigned int d = 0, c = 0; d <= derivative_order; ++d)
+          for (unsigned int e = d; e <= derivative_order; ++e, ++c)
+            result[c] += shapes[i2][d][2] * result_xy[c];
+      }
+    return result;
+  }
+
+
+
   template <int dim, typename Number, typename Number2>
   SymmetricTensor<2, dim, typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_hessian(
@@ -3278,89 +3438,25 @@ namespace internal
   {
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
+    const auto hessian =
+      evaluate_tensor_product_higher_derivatives<2>(poly, values, p, renumber);
+
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
-
-    // use `int` type for this variable and the loops below to inform the
-    // compiler that the loops below will never overflow, which allows it to
-    // generate more optimized code for the variable loop bounds in the
-    // present context
-    const int n_shapes = poly.size();
-    AssertDimension(Utilities::pow(n_shapes, dim), values.size());
-    Assert(renumber.empty() || renumber.size() == values.size(),
-           ExcDimensionMismatch(renumber.size(), values.size()));
-
-    AssertIndexRange(n_shapes, 200);
-    dealii::ndarray<Number2, 200, 3, dim> shapes;
-
-    // Evaluate 1d polynomials and their derivatives
-    std::array<Number2, dim> point;
-    for (unsigned int d = 0; d < dim; ++d)
-      point[d] = p[d];
-    for (int i = 0; i < n_shapes; ++i)
-      poly[i].values_of_array(point, 2, &shapes[i][0]);
-
-    // Go through the tensor product of shape functions and interpolate
-    // with optimal algorithm
     SymmetricTensor<2, dim, Number3> result;
-    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+    if (dim == 1)
+      result[0][0] = hessian[0];
+    else if (dim >= 2)
       {
-        Number3 value_y = {}, deriv_x = {}, deriv_y = {}, deriv_xx = {},
-                deriv_xy = {}, deriv_yy = {};
-        for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
-          {
-            // Interpolation + derivative x direction
-            Number3 value = {}, deriv_1 = {}, deriv_2 = {};
-
-            // Distinguish the inner loop based on whether we have a
-            // renumbering or not
-            if (renumber.empty())
-              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                {
-                  value += shapes[i0][0][0] * values[i];
-                  deriv_1 += shapes[i0][1][0] * values[i];
-                  deriv_2 += shapes[i0][2][0] * values[i];
-                }
-            else
-              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                {
-                  value += shapes[i0][0][0] * values[renumber[i]];
-                  deriv_1 += shapes[i0][1][0] * values[renumber[i]];
-                  deriv_2 += shapes[i0][2][0] * values[renumber[i]];
-                }
-
-            // Interpolation + derivative in y direction
-            if (dim > 1)
-              {
-                if (dim > 2)
-                  {
-                    value_y += value * shapes[i1][0][1];
-                    deriv_x += deriv_1 * shapes[i1][0][1];
-                    deriv_y += value * shapes[i1][1][1];
-                  }
-                deriv_xx += deriv_2 * shapes[i1][0][1];
-                deriv_xy += deriv_1 * shapes[i1][1][1];
-                deriv_yy += value * shapes[i1][2][1];
-              }
-            else
-              {
-                result[0][0] = deriv_2;
-              }
-          }
+        // derivatives in Hessian are xx, xy, yy, xz, yz, zz, so must re-order
+        // them for 3D
+        for (unsigned int d = 0, c = 0; d < 2; ++d)
+          for (unsigned int e = d; e < 2; ++e, ++c)
+            result[d][e] = hessian[c];
         if (dim == 3)
           {
-            // Interpolation + derivative in z direction
-            result[0][0] += deriv_xx * shapes[i2][0][2];
-            result[0][1] += deriv_xy * shapes[i2][0][2];
-            result[0][2] += deriv_x * shapes[i2][1][2];
-            result[1][1] += deriv_yy * shapes[i2][0][2];
-            result[1][2] += deriv_y * shapes[i2][1][2];
-            result[2][2] += value_y * shapes[i2][2][2];
-          }
-        else if (dim == 2)
-          {
-            result[0][0] = deriv_xx;
-            result[1][0] = deriv_xy;
-            result[1][1] = deriv_yy;
+            for (unsigned int d = 0; d < 2; ++d)
+              result[d][2] = hessian[3 + d];
+            result[2][2] = hessian[5];
           }
       }
 
