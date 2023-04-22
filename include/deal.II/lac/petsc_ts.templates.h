@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2022 by the deal.II authors
+//    Copyright (C) 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -12,8 +12,6 @@
 //    the top level directory of deal.II.
 //
 //---------------------------------------------------------------
-//
-// Author: Stefano Zampini, King Abdullah University of Science and Technology.
 
 #ifndef dealii_petsc_ts_templates_h
 #define dealii_petsc_ts_templates_h
@@ -32,7 +30,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for PETSc error codes.
-#  define AssertTS(code)                             \
+#  define AssertPETSc(code)                          \
     do                                               \
       {                                              \
         PetscErrorCode ierr = (code);                \
@@ -57,8 +55,8 @@ namespace PETScWrappers
     const TimeStepperData &data,
     const MPI_Comm &       mpi_comm)
   {
-    AssertTS(TSCreate(mpi_comm, &ts));
-    AssertTS(TSSetApplicationContext(ts, this));
+    AssertPETSc(TSCreate(mpi_comm, &ts));
+    AssertPETSc(TSSetApplicationContext(ts, this));
     reinit(data);
   }
 
@@ -67,7 +65,58 @@ namespace PETScWrappers
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
   TimeStepper<VectorType, PMatrixType, AMatrixType>::~TimeStepper()
   {
-    AssertTS(TSDestroy(&ts));
+    AssertPETSc(TSDestroy(&ts));
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  TimeStepper<VectorType, PMatrixType, AMatrixType>::operator TS() const
+  {
+    return ts;
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  TS
+  TimeStepper<VectorType, PMatrixType, AMatrixType>::petsc_ts()
+  {
+    return ts;
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  inline MPI_Comm
+  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_mpi_communicator()
+    const
+  {
+    return PetscObjectComm(reinterpret_cast<PetscObject>(ts));
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  typename TimeStepper<VectorType, PMatrixType, AMatrixType>::real_type
+  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time()
+  {
+    PetscReal      t;
+    PetscErrorCode ierr = TSGetTime(ts, &t);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    return t;
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  typename TimeStepper<VectorType, PMatrixType, AMatrixType>::real_type
+  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time_step()
+  {
+    PetscReal      dt;
+    PetscErrorCode ierr = TSGetTimeStep(ts, &dt);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    return dt;
   }
 
 
@@ -76,7 +125,7 @@ namespace PETScWrappers
   void
   TimeStepper<VectorType, PMatrixType, AMatrixType>::reinit()
   {
-    AssertTS(TSReset(ts));
+    AssertPETSc(TSReset(ts));
   }
 
 
@@ -89,27 +138,28 @@ namespace PETScWrappers
     reinit();
 
     // Solver type
-    if (data.tstype.size())
-      AssertTS(TSSetType(ts, data.tstype.c_str()));
+    if (data.ts_type.size())
+      AssertPETSc(TSSetType(ts, data.ts_type.c_str()));
 
     // Options prefix
-    if (data.opts_prefix.size())
-      AssertTS(TSSetOptionsPrefix(ts, data.opts_prefix.c_str()));
+    if (data.options_prefix.size())
+      AssertPETSc(TSSetOptionsPrefix(ts, data.options_prefix.c_str()));
 
     // Time and steps limits
-    AssertTS(TSSetTime(ts, data.initial_time));
+    AssertPETSc(TSSetTime(ts, data.initial_time));
     if (data.final_time > data.initial_time)
-      AssertTS(TSSetMaxTime(ts, data.final_time));
+      ts_set_max_time(ts, data.final_time);
     if (data.initial_step_size > 0.0)
-      AssertTS(TSSetTimeStep(ts, data.initial_step_size));
+      AssertPETSc(TSSetTimeStep(ts, data.initial_step_size));
     if (data.max_steps >= 0)
-      AssertTS(TSSetMaxSteps(ts, data.max_steps));
+      ts_set_max_steps(ts, data.max_steps);
 
     // Decide how to end the integration. Either stepover the final time or
     // match it.
-    AssertTS(TSSetExactFinalTime(ts,
-                                 data.match_step ? TS_EXACTFINALTIME_MATCHSTEP :
-                                                   TS_EXACTFINALTIME_STEPOVER));
+    AssertPETSc(TSSetExactFinalTime(ts,
+                                    data.match_step ?
+                                      TS_EXACTFINALTIME_MATCHSTEP :
+                                      TS_EXACTFINALTIME_STEPOVER));
 
     // Adaptive tolerances
     const PetscReal atol = data.absolute_tolerance > 0.0 ?
@@ -118,7 +168,7 @@ namespace PETScWrappers
     const PetscReal rtol = data.relative_tolerance > 0.0 ?
                              data.relative_tolerance :
                              static_cast<PetscReal>(PETSC_DEFAULT);
-    AssertTS(TSSetTolerances(ts, atol, nullptr, rtol, nullptr));
+    AssertPETSc(TSSetTolerances(ts, atol, nullptr, rtol, nullptr));
 
     // At this point we do not know the problem size so we cannot
     // set variable tolerances for differential and algebratic equations
@@ -127,13 +177,14 @@ namespace PETScWrappers
 
     // Adaptive time stepping
     TSAdapt tsadapt;
-    AssertTS(TSGetAdapt(ts, &tsadapt));
-    AssertTS(TSAdaptSetType(tsadapt, data.tsadapttype.c_str()));
+    AssertPETSc(TSGetAdapt(ts, &tsadapt));
+    AssertPETSc(TSAdaptSetType(tsadapt, data.tsadapttype.c_str()));
 
     // As of 3.19, PETSc does not propagate options prefixes to the
     // adaptors.
-    if (data.opts_prefix.size())
-      AssertTS(TSAdaptSetOptionsPrefix(tsadapt, data.opts_prefix.c_str()));
+    if (data.options_prefix.size())
+      AssertPETSc(
+        TSAdaptSetOptionsPrefix(tsadapt, data.options_prefix.c_str()));
 
     // Time step limits
     const PetscReal hmin = data.minimum_step_size > 0.0 ?
@@ -142,15 +193,14 @@ namespace PETScWrappers
     const PetscReal hmax = data.maximum_step_size > 0.0 ?
                              data.maximum_step_size :
                              static_cast<PetscReal>(PETSC_DEFAULT);
-    AssertTS(TSAdaptSetStepLimits(tsadapt, hmin, hmax));
+    AssertPETSc(TSAdaptSetStepLimits(tsadapt, hmin, hmax));
   }
 
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
   void
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::reinit_matrix(
-    PMatrixType &P)
+  TimeStepper<VectorType, PMatrixType, AMatrixType>::set_matrix(PMatrixType &P)
   {
     this->A = nullptr;
     this->P = &P;
@@ -160,7 +210,7 @@ namespace PETScWrappers
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
   void
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::reinit_matrices(
+  TimeStepper<VectorType, PMatrixType, AMatrixType>::set_matrices(
     AMatrixType &A,
     PMatrixType &P)
   {
@@ -174,11 +224,9 @@ namespace PETScWrappers
   unsigned int
   TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(VectorType &y)
   {
-    auto ts_ifunction_ =
-      [](TS ts, PetscReal t, Vec x, Vec xdot, Vec f, void *ctx)
-      -> PetscErrorCode {
+    const auto ts_ifunction =
+      [](TS, PetscReal t, Vec x, Vec xdot, Vec f, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
-      (void)ts;
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType xdealii(x);
@@ -186,19 +234,14 @@ namespace PETScWrappers
       VectorType fdealii(f);
       AssertUser(user->implicit_function(t, xdealii, xdotdealii, fdealii),
                  "implicit_function");
+      petsc_increment_state_counter(f);
       PetscFunctionReturn(0);
     };
 
-    auto ts_ijacobian_ = [](TS        ts,
-                            PetscReal t,
-                            Vec       x,
-                            Vec       xdot,
-                            PetscReal s,
-                            Mat       A,
-                            Mat       P,
-                            void *    ctx) -> PetscErrorCode {
+    const auto ts_ijacobian =
+      [](TS, PetscReal t, Vec x, Vec xdot, PetscReal s, Mat A, Mat P, void *ctx)
+      -> PetscErrorCode {
       PetscFunctionBeginUser;
-      (void)ts;
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType  xdealii(x);
@@ -209,30 +252,27 @@ namespace PETScWrappers
       AssertUser(
         user->implicit_jacobian(t, xdealii, xdotdealii, s, Adealii, Pdealii),
         "implicit_jacobian");
+      petsc_increment_state_counter(P);
 
       // Handle the Jacobian-free case
       // This call allow to resample the linearization point
       // of the MFFD tangent operator
       PetscBool flg;
-      AssertTS(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
+      AssertPETSc(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
       if (flg)
         {
-          AssertTS(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
-          AssertTS(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
         }
+      else
+        petsc_increment_state_counter(A);
       PetscFunctionReturn(0);
     };
 
-    auto ts_ijacobian_with_setup_ = [](TS        ts,
-                                       PetscReal t,
-                                       Vec       x,
-                                       Vec       xdot,
-                                       PetscReal s,
-                                       Mat       A,
-                                       Mat       P,
-                                       void *    ctx) -> PetscErrorCode {
+    const auto ts_ijacobian_with_setup =
+      [](TS, PetscReal t, Vec x, Vec xdot, PetscReal s, Mat A, Mat P, void *ctx)
+      -> PetscErrorCode {
       PetscFunctionBeginUser;
-      (void)ts;
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType  xdealii(x);
@@ -244,24 +284,38 @@ namespace PETScWrappers
       user->P = &Pdealii;
       AssertUser(user->setup_jacobian(t, xdealii, xdotdealii, s),
                  "setup_jacobian");
+      petsc_increment_state_counter(P);
+
+      // Handle older versions of PETSc for which we cannot pass a MATSHELL
+      // matrix to DMSetMatType. This has been fixed from 3.13 on.
+      // What we need to do for older version of PETSc is instead to have
+      // a zero matrix with all diagonal entries present.
+      if (user->need_dummy_assemble)
+        {
+          AssertPETSc(MatZeroEntries(P));
+          AssertPETSc(MatAssemblyBegin(P, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyEnd(P, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatShift(P, 0.0));
+        }
 
       // Handle the Jacobian-free case
       // This call allow to resample the linearization point
       // of the MFFD tangent operator
       PetscBool flg;
-      AssertTS(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
+      AssertPETSc(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
       if (flg)
         {
-          AssertTS(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
-          AssertTS(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
         }
+      else
+        petsc_increment_state_counter(A);
       PetscFunctionReturn(0);
     };
 
-    auto ts_rhsfunction_ =
-      [](TS ts, PetscReal t, Vec x, Vec f, void *ctx) -> PetscErrorCode {
+    const auto ts_rhsfunction =
+      [](TS, PetscReal t, Vec x, Vec f, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
-      (void)ts;
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType xdealii(x);
@@ -269,13 +323,13 @@ namespace PETScWrappers
 
       AssertUser(user->explicit_function(t, xdealii, fdealii),
                  "explicit_function");
+      petsc_increment_state_counter(f);
       PetscFunctionReturn(0);
     };
 
-    auto ts_rhsjacobian_ =
-      [](TS ts, PetscReal t, Vec x, Mat A, Mat P, void *ctx) -> PetscErrorCode {
+    const auto ts_rhsjacobian =
+      [](TS, PetscReal t, Vec x, Mat A, Mat P, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
-      (void)ts;
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType  xdealii(x);
@@ -284,24 +338,36 @@ namespace PETScWrappers
 
       AssertUser(user->explicit_jacobian(t, xdealii, Adealii, Pdealii),
                  "explicit_jacobian");
+      petsc_increment_state_counter(P);
+
+      // Handle older versions of PETSc for which we cannot pass a MATSHELL
+      // matrix to DMSetMatType
+      if (user->need_dummy_assemble)
+        {
+          AssertPETSc(MatZeroEntries(P));
+          AssertPETSc(MatAssemblyBegin(P, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyEnd(P, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatShift(P, 0.0));
+        }
 
       // Handle the Jacobian-free case
       // This call allow to resample the linearization point
       // of the MFFD tangent operator
       PetscBool flg;
-      AssertTS(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
+      AssertPETSc(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
       if (flg)
         {
-          AssertTS(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
-          AssertTS(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
+          AssertPETSc(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
         }
+      else
+        petsc_increment_state_counter(A);
       PetscFunctionReturn(0);
     };
 
-    auto ts_monitor_ =
-      [](TS ts, PetscInt it, PetscReal t, Vec x, void *ctx) -> PetscErrorCode {
+    const auto ts_monitor =
+      [](TS, PetscInt it, PetscReal t, Vec x, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
-      (void)ts;
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType xdealii(x);
@@ -313,56 +379,61 @@ namespace PETScWrappers
                 StandardExceptions::ExcFunctionNotProvided(
                   "explicit_function || implicit_function"));
 
-    AssertTS(TSSetSolution(ts, y.petsc_vector()));
+    AssertPETSc(TSSetSolution(ts, y.petsc_vector()));
 
     if (explicit_function)
-      AssertTS(TSSetRHSFunction(ts, nullptr, ts_rhsfunction_, this));
+      AssertPETSc(TSSetRHSFunction(ts, nullptr, ts_rhsfunction, this));
 
     if (implicit_function)
-      AssertTS(TSSetIFunction(ts, nullptr, ts_ifunction_, this));
+      AssertPETSc(TSSetIFunction(ts, nullptr, ts_ifunction, this));
 
     if (setup_jacobian)
       {
-        AssertTS(TSSetIJacobian(ts,
-                                A ? A->petsc_matrix() : nullptr,
-                                P ? P->petsc_matrix() : nullptr,
-                                ts_ijacobian_with_setup_,
-                                this));
+        AssertPETSc(TSSetIJacobian(ts,
+                                   A ? A->petsc_matrix() : nullptr,
+                                   P ? P->petsc_matrix() : nullptr,
+                                   ts_ijacobian_with_setup,
+                                   this));
 
         // Tell PETSc to setup a MFFD operator for the linear system matrix
-        SNES snes;
-        AssertTS(TSGetSNES(ts, &snes));
         if (!A)
-          AssertTS(SNESSetUseMatrixFree(snes, PETSC_TRUE, PETSC_FALSE));
+          set_use_matrix_free(ts, true, false);
 
         // Do not waste memory by creating a dummy AIJ matrix inside PETSc.
+        this->need_dummy_assemble = false;
         if (!P)
           {
-            DM dm;
-            AssertTS(SNESGetDM(snes, &dm));
-            AssertTS(DMSetMatType(dm, MATSHELL));
+#  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)
+            DM   dm;
+            SNES snes;
+            AssertPETSc(TSGetSNES(ts, &snes));
+            AssertPETSc(SNESGetDM(snes, &dm));
+            AssertPETSc(DMSetMatType(dm, MATSHELL));
+#  else
+            this->need_dummy_assemble = true;
+#  endif
           }
       }
     else
       {
         if (explicit_jacobian)
           {
-            AssertTS(TSSetRHSJacobian(ts,
-                                      A ? A->petsc_matrix() :
-                                          (P ? P->petsc_matrix() : nullptr),
-                                      P ? P->petsc_matrix() : nullptr,
-                                      ts_rhsjacobian_,
-                                      this));
+            AssertPETSc(TSSetRHSJacobian(ts,
+                                         A ? A->petsc_matrix() :
+                                             (P ? P->petsc_matrix() : nullptr),
+                                         P ? P->petsc_matrix() : nullptr,
+                                         ts_rhsjacobian,
+                                         this));
           }
 
         if (implicit_jacobian)
           {
-            AssertTS(TSSetIJacobian(ts,
-                                    A ? A->petsc_matrix() :
-                                        (P ? P->petsc_matrix() : nullptr),
-                                    P ? P->petsc_matrix() : nullptr,
-                                    ts_ijacobian_,
-                                    this));
+            AssertPETSc(TSSetIJacobian(ts,
+                                       A ? A->petsc_matrix() :
+                                           (P ? P->petsc_matrix() : nullptr),
+                                       P ? P->petsc_matrix() : nullptr,
+                                       ts_ijacobian,
+                                       this));
           }
 
         // The user did not set any Jacobian callback. PETSc default in this
@@ -372,55 +443,53 @@ namespace PETScWrappers
         // be overriden from command line.
         if (!explicit_jacobian && !implicit_jacobian)
           {
-            SNES snes;
-            AssertTS(TSGetSNES(ts, &snes));
-            AssertTS(SNESSetUseMatrixFree(snes, PETSC_FALSE, PETSC_TRUE));
+            set_use_matrix_free(ts, false, true);
           }
       }
 
-    // In case solve_for_jacobian_system is provided, create a shell
+    // In case solve_with_jacobian is provided, create a shell
     // preconditioner wrapping the user call. The default internal Krylov
     // solver only applies the preconditioner. This choice
     // can be overriden by command line and users can use any other
     // Krylov method if their solve is not accurate enough.
-    // Using solve_for_jacobian_system as a preconditioner allow users
+    // Using solve_with_jacobian as a preconditioner allow users
     // to provide approximate solvers and possibly iterate on a matrix-free
     // approximation of the tangent operator.
     PreconditionShell precond(
       PetscObjectComm(reinterpret_cast<PetscObject>(ts)));
-    if (solve_for_jacobian_system)
+    if (solve_with_jacobian)
       {
         precond.vmult = [&](VectorBase &indst, const VectorBase &insrc) -> int {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
-          return solve_for_jacobian_system(src, dst);
+          return solve_with_jacobian(src, dst);
         };
 
         // Default Krylov solver (preconditioner only)
         SNES snes;
         KSP  ksp;
-        AssertTS(TSGetSNES(ts, &snes));
-        AssertTS(SNESGetKSP(snes, &ksp));
-        AssertTS(KSPSetType(ksp, KSPPREONLY));
-        AssertTS(KSPSetPC(ksp, precond.get_pc()));
+        AssertPETSc(TSGetSNES(ts, &snes));
+        AssertPETSc(SNESGetKSP(snes, &ksp));
+        AssertPETSc(KSPSetType(ksp, KSPPREONLY));
+        AssertPETSc(KSPSetPC(ksp, precond.get_pc()));
       }
 
     // Attach user monitoring routine.
     if (monitor)
-      AssertTS(TSMonitorSet(ts, ts_monitor_, this, nullptr));
+      AssertPETSc(TSMonitorSet(ts, ts_monitor, this, nullptr));
 
     // Allow command line customization.
-    AssertTS(TSSetFromOptions(ts));
+    AssertPETSc(TSSetFromOptions(ts));
 
     // Handle algebraic components.
     if (algebraic_components && need_dae_tolerances)
       {
         PetscReal atol, rtol;
-        AssertTS(TSGetTolerances(ts, &atol, nullptr, &rtol, nullptr));
+        AssertPETSc(TSGetTolerances(ts, &atol, nullptr, &rtol, nullptr));
 
         Vec av, rv;
-        AssertTS(VecDuplicate(y.petsc_vector(), &av));
-        AssertTS(VecDuplicate(y.petsc_vector(), &rv));
+        AssertPETSc(VecDuplicate(y.petsc_vector(), &av));
+        AssertPETSc(VecDuplicate(y.petsc_vector(), &rv));
 
         VectorBase avdealii(av);
         VectorBase rvdealii(rv);
@@ -433,18 +502,27 @@ namespace PETScWrappers
           }
         avdealii.compress(VectorOperation::insert);
         rvdealii.compress(VectorOperation::insert);
-        AssertTS(TSSetTolerances(ts, atol, av, rtol, rv));
-        AssertTS(VecDestroy(&av));
-        AssertTS(VecDestroy(&rv));
+        AssertPETSc(TSSetTolerances(ts, atol, av, rtol, rv));
+        AssertPETSc(VecDestroy(&av));
+        AssertPETSc(VecDestroy(&rv));
       }
 
     // Having set everything up, now do the actual work
     // and let PETSc do the time stepping.
-    AssertTS(TSSolve(ts, nullptr));
+    AssertPETSc(TSSolve(ts, nullptr));
 
-    // Return the number of steps taken.
-    PetscInt nt;
-    AssertTS(TSGetStepNumber(ts, &nt));
+    // Get the number of steps taken.
+    auto nt = ts_get_step_number(ts);
+
+    // Raise an exception if the solver has not converged
+    TSConvergedReason reason;
+    AssertPETSc(TSGetConvergedReason(ts, &reason));
+    AssertThrow(reason > 0,
+                ExcMessage("TS solver did not converge after " +
+                           std::to_string(nt) + " iterations with reason " +
+                           TSConvergedReasons[reason]));
+
+    // Finally return
     return nt;
   }
 
@@ -455,7 +533,7 @@ namespace PETScWrappers
   TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(VectorType & y,
                                                            PMatrixType &P)
   {
-    reinit_matrix(P);
+    set_matrix(P);
     return solve(y);
   }
 
@@ -467,13 +545,13 @@ namespace PETScWrappers
                                                            AMatrixType &A,
                                                            PMatrixType &P)
   {
-    reinit_matrices(A, P);
+    set_matrices(A, P);
     return solve(y);
   }
 
 } // namespace PETScWrappers
 
-#  undef AssertTS
+#  undef AssertPETSc
 #  undef AssertUser
 
 DEAL_II_NAMESPACE_CLOSE

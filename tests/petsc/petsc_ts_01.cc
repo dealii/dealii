@@ -12,8 +12,6 @@
 //    the top level directory of deal.II.
 //
 //-----------------------------------------------------------
-//
-// Author: Stefano Zampini, King Abdullah University of Science and Technology.
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/petsc_ts.templates.h>
@@ -78,6 +76,7 @@ main(int argc, char **argv)
       auto ts = myode.petsc_ts();
       auto t0 = myode.get_time();
       auto dt = myode.get_time_step();
+      AssertThrow(ts == static_cast<TS>(myode), ExcInternalError());
       myode.solve(v, A);
     }
   catch (std::exception &exc)
