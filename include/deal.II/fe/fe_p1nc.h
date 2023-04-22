@@ -301,8 +301,8 @@ private:
    * Do the work which is needed before cellwise data computation.
    * Since the shape functions are constructed independently on each cell,
    * the data on the reference cell is not necessary.
-   * It returns an empty variable type of @ InternalDataBase and updates @
-   * update_flags, and computes trivially zero Hessian for each cell if it is
+   * It returns an empty variable of type @p InternalDataBase and stores
+   * @p update_flags, and computes trivially zero Hessian for each cell if it is
    * needed.
    */
   virtual std::unique_ptr<FiniteElement<2, 2>::InternalDataBase>

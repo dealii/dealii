@@ -232,8 +232,8 @@ namespace PETScWrappers
 
     /**
      * Reinitialize the partitioner. As for the Utilities::MPI::Partitioner,
-     * any entry of @p ghost_indices that is also present in @
-     * locally_owned_indices is discarded.
+     * any entry of @p ghost_indices that is also present in
+     * @p locally_owned_indices is discarded.
      */
     virtual void
     reinit(const IndexSet &locally_owned_indices,
@@ -242,9 +242,9 @@ namespace PETScWrappers
 
     /**
      * Reinitialize the partitioner. As for the Utilities::MPI::Partitioner,
-     * any entry of @p ghost_indices that is also present in @
-     * locally_owned_indices is discarded. This reinitialization will allow to
-     * perform communications either using a ghost data array of the size
+     * any entry of @p ghost_indices that is also present in
+     * @p locally_owned_indices is discarded. This reinitialization will allow
+     * to perform communications either using a ghost data array of the size
      * of @p ghost_indices or of @p larger_ghost_indices.
      */
     void

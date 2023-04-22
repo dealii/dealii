@@ -66,11 +66,11 @@ namespace GridRefinement
    * @param[in] max_n_cells The maximal number of cells. If current cell
    * number @p current_n_cells is already exceeded maximal cell number @p
    * max_n_cells, refinement fraction of cells will be set to zero and
-   * coarsening fraction of cells will be adjusted to reduce cell number to @
-   * max_n_cells. If cell number is going to be exceeded only upon refinement,
-   * then refinement and coarsening fractions are going to be adjusted with a
-   * same ratio in an attempt to reach the maximum number of cells. Be aware
-   * though that through proliferation of refinement due to
+   * coarsening fraction of cells will be adjusted to reduce cell number to
+   * @p max_n_cells. If cell number is going to be exceeded only upon
+   * refinement, then refinement and coarsening fractions are going to be
+   * adjusted with a same ratio in an attempt to reach the maximum number of
+   * cells. Be aware though that through proliferation of refinement due to
    * Triangulation::MeshSmoothing, this number is only an indicator. The
    * default value of this argument is to impose no limit on the number of
    * cells.
