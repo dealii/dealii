@@ -440,12 +440,13 @@ namespace Step57
                       {
                         local_matrix(i, j) +=
                           (viscosity *
-                             scalar_product(grad_phi_u[j], grad_phi_u[i]) +
-                           present_velocity_gradients[q] * phi_u[j] * phi_u[i] +
-                           grad_phi_u[j] * present_velocity_values[q] *
-                             phi_u[i] -
+                             scalar_product(grad_phi_u[i], grad_phi_u[j]) +
+                           phi_u[i] *
+                             (present_velocity_gradients[q] * phi_u[j]) +
+                           phi_u[i] *
+                             (grad_phi_u[j] * present_velocity_values[q]) -
                            div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
-                           gamma * div_phi_u[j] * div_phi_u[i] +
+                           gamma * div_phi_u[i] * div_phi_u[j] +
                            phi_p[i] * phi_p[j]) *
                           fe_values.JxW(q);
                       }
@@ -454,13 +455,13 @@ namespace Step57
                 double present_velocity_divergence =
                   trace(present_velocity_gradients[q]);
                 local_rhs(i) +=
-                  (-viscosity * scalar_product(present_velocity_gradients[q],
-                                               grad_phi_u[i]) -
-                   present_velocity_gradients[q] * present_velocity_values[q] *
-                     phi_u[i] +
-                   present_pressure_values[q] * div_phi_u[i] +
-                   present_velocity_divergence * phi_p[i] -
-                   gamma * present_velocity_divergence * div_phi_u[i]) *
+                  (-viscosity * scalar_product(grad_phi_u[i],
+                                               present_velocity_gradients[q]) -
+                   phi_u[i] * (present_velocity_values[q] *
+                               present_velocity_gradients[q]) +
+                   div_phi_u[i] * present_pressure_values[q] +
+                   phi_p[i] * present_velocity_divergence -
+                   gamma * div_phi_u[i] * present_velocity_divergence) *
                   fe_values.JxW(q);
               }
           }
@@ -486,18 +487,32 @@ namespace Step57
           }
       }
 
+    // If we were asked to assemble the Newton matrix, then we also built
+    // a pressure mass matrix in the bottom right block of the matrix.
+    // We only need this for the preconditioner, so we need to copy it
+    // in into a separate matrix object, followed by zeroing out this
+    // block in the Newton matrix.
+    //
+    // Note that settings this bottom right block to zero is not identical to
+    // not assembling anything in this block, because applying boundary values
+    // and hanging node constraints (in the
+    // `constraints_used.distribute_local_to_global()` call above) puts entries
+    // into this block. As a consequence, setting the $(1,1)$ block to zero
+    // below does not result in what would have happened if we had just not
+    // assembled a pressure mass matrix in that block to begin with.
+    //
+    // The difference is that if we had not assembled anything in this block,
+    // dealing with constraint degrees of freedom would have put entries on
+    // the diagonal of the $(1,1)$ block whereas the last operation below,
+    // zeroing out the entire block, results in a system matrix with
+    // rows and columns that are completely empty. In other words, the
+    // linear problem is singular. Luckily, however, the FGMRES solver we
+    // use appears to handle these rows and columns without any problem.
     if (assemble_matrix)
       {
-        // Finally we move pressure mass matrix into a separate matrix:
         pressure_mass_matrix.reinit(sparsity_pattern.block(1, 1));
         pressure_mass_matrix.copy_from(system_matrix.block(1, 1));
 
-        // Note that settings this pressure block to zero is not identical to
-        // not assembling anything in this block, because this operation here
-        // will (incorrectly) delete diagonal entries that come in from
-        // hanging node constraints for pressure DoFs. This means that our
-        // whole system matrix will have rows that are completely
-        // zero. Luckily, FGMRES handles these rows without any problem.
         system_matrix.block(1, 1) = 0;
       }
   }
