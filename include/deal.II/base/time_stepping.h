@@ -242,7 +242,7 @@ namespace TimeStepping
      * problems. The input parameters are the time, $ \tau $, and a vector.
      * The output is the value of function at this point. This function
      * returns the time at the end of the time step. When using Runge-Kutta
-     * methods, @p F and @ J_inverse can only contain one element.
+     * methods, @p F and @p J_inverse can only contain one element.
      */
     double
     evolve_one_time_step(
