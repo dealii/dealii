@@ -87,6 +87,20 @@ foreach(build ${DEAL_II_BUILD_TYPES})
 
   _check_linker_flags()
 
+  if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_MOLD)
+    set(_replacement "")
+    if(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+      set(_replacement "-fuse-ld=lld")
+    elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+      set(_replacement "-fuse-ld=gold")
+    endif()
+    _drop_linker_flag(
+      "-fuse-ld=mold" ${_replacement}
+      DEAL_II_COMPILER_HAS_FUSE_LD_MOLD
+      )
+    _check_linker_flags()
+  endif()
+
   if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     set(_replacement "")
     if(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
