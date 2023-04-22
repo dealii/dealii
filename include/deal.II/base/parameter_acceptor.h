@@ -25,9 +25,21 @@
 
 #include <boost/signals2/signal.hpp>
 
+#include <mutex>
 #include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
+
+class ParameterAcceptor;
+
+namespace internal
+{
+  /**
+   * Compare operator between two parameter acceptors. Same as std::less applied
+   * to the acceptor ids of each instance.
+   */
+  struct ParameterAcceptorCompare;
+} // namespace internal
 
 /**
  * A parameter acceptor base class. This class is used to define a public
@@ -357,6 +369,12 @@ public:
   ParameterAcceptor(const std::string &section_name = "");
 
   /**
+   * Get the acceptor id of this object.
+   */
+  unsigned int
+  get_acceptor_id() const;
+
+  /**
    * Destructor.
    */
   virtual ~ParameterAcceptor() override;
@@ -592,12 +610,24 @@ public:
 
 private:
   /**
-   * A list containing all constructed classes of type
+   * Get the next free id for this class.
+   */
+  static unsigned int
+  get_next_free_id();
+
+  /**
+   * A mutex to prevent writing on the class_list set from multiple threads.
+   */
+  static std::mutex class_list_mutex;
+
+  /**
+   * A set containing the address of all constructed classes of type
    * ParameterAcceptor.
    */
-  static std::vector<SmartPointer<ParameterAcceptor>> class_list;
+  static std::set<ParameterAcceptor *, internal::ParameterAcceptorCompare>
+    class_list;
 
-  /** The index of this specific class within the class list. */
+  /** The id of this specific class instance. */
   const unsigned int acceptor_id;
 
   /**
