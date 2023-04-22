@@ -61,7 +61,7 @@ namespace PETScWrappers
      *
      * Error parameters:
      *
-     * @param tsadapttype The string indicating the PETSc time step adaptor type.
+     * @param ts_adapt_type The string indicating the PETSc time step adaptor type.
      * @param minimum_step_size Minimum step size allowed.
      * @param maximum_step_size Maximum step size allowed.
      * @param absolute_tolerance Absolute error tolerance.
@@ -89,7 +89,7 @@ namespace PETScWrappers
       const int          max_steps         = -1,
       const bool         match_step        = false,
       // Error parameters
-      const std::string &tsadapttype          = "none",
+      const std::string &ts_adapt_type        = "none",
       const real_type    minimum_step_size    = -1.0,
       const real_type    maximum_step_size    = -1.0,
       const real_type    absolute_tolerance   = -1.0,
@@ -102,7 +102,7 @@ namespace PETScWrappers
       , initial_step_size(initial_step_size)
       , max_steps(max_steps)
       , match_step(match_step)
-      , tsadapttype(tsadapttype)
+      , ts_adapt_type(ts_adapt_type)
       , minimum_step_size(minimum_step_size)
       , maximum_step_size(maximum_step_size)
       , absolute_tolerance(absolute_tolerance)
@@ -158,7 +158,7 @@ namespace PETScWrappers
     /**
      * PETSc time step adaptor type.
      */
-    std::string tsadapttype;
+    std::string ts_adapt_type;
 
     /**
      * Minimum allowed step size for adaptive time stepping.
@@ -283,6 +283,8 @@ namespace PETScWrappers
    * @code
    * ./myApp -ksp_type cg -pc_type gamg
    * @endcode
+   * See TimeStepper::set_matrix and TimeStepper::set_matrices for
+   * additional details.
    *
    * @ingroup PETScWrappers
    */

@@ -203,8 +203,8 @@ namespace PETScWrappers
    * ./myApp -snes_type newtontr -ksp_type cg
    * @endcode
    * in case the user wants to change the default nonlinear solver to
-   * a trust region solver and iterate on the tangent system with CG,
-   * still using NonlinearSolver::solve_with_jacobian as a preconditioner.
+   * a trust region solver and iterate on the matrix-free tangent system with
+   * CG, still using NonlinearSolver::solve_with_jacobian as a preconditioner.
    *
    * The first approach has instead the advantage that only the matrix assembly
    * procedure has to be provided, thus allowing quicker implementations and
@@ -213,6 +213,8 @@ namespace PETScWrappers
    * @code
    * ./myApp -ksp_type cg -pc_type gamg
    * @endcode
+   * See NonlinearSolver::set_matrix and NonlinearSolver::set_matrices for
+   * additional details.
    *
    * In case the nonlinear equations are derived from energy minimization
    * arguments, it may be beneficial to perform linesearch or test trust-region
