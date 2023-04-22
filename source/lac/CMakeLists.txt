@@ -108,6 +108,7 @@ if(DEAL_II_WITH_PETSC)
     petsc_parallel_sparse_matrix.cc
     petsc_parallel_vector.cc
     petsc_precondition.cc
+    petsc_snes.cc
     petsc_solver.cc
     petsc_ts.cc
     petsc_sparse_matrix.cc
