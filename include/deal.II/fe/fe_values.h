@@ -3954,7 +3954,6 @@ protected:
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     mapping_output;
 
-
   /**
    * A pointer to the finite element object associated with this FEValues
    * object.
