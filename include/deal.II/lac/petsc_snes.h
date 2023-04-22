@@ -224,6 +224,7 @@ namespace PETScWrappers
   template <typename VectorType  = PETScWrappers::VectorBase,
             typename PMatrixType = PETScWrappers::MatrixBase,
             typename AMatrixType = PMatrixType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_petsc_vector_type<VectorType>)
   class NonlinearSolver
   {
   public:
