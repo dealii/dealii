@@ -2143,13 +2143,14 @@ namespace DoFTools
     namespace
     {
       template <int dim, int spacedim>
-      void
+      std::map<types::global_dof_index, Point<spacedim>>
       map_dofs_to_support_points(
-        const hp::MappingCollection<dim, spacedim> &        mapping,
-        const DoFHandler<dim, spacedim> &                   dof_handler,
-        std::map<types::global_dof_index, Point<spacedim>> &support_points,
-        const ComponentMask &                               in_mask)
+        const hp::MappingCollection<dim, spacedim> &mapping,
+        const DoFHandler<dim, spacedim> &           dof_handler,
+        const ComponentMask &                       in_mask)
       {
+        std::map<types::global_dof_index, Point<spacedim>> support_points;
+
         const hp::FECollection<dim, spacedim> &fe_collection =
           dof_handler.get_fe_collection();
         hp::QCollection<dim> q_coll_dummy;
@@ -2208,23 +2209,24 @@ namespace DoFTools
                     support_points[local_dof_indices[i]] = points[i];
                 }
             }
+
+        return support_points;
       }
 
 
       template <int dim, int spacedim>
-      void
-      map_dofs_to_support_points(
+      std::vector<Point<spacedim>>
+      map_dofs_to_support_points_vector(
         const hp::MappingCollection<dim, spacedim> &mapping,
         const DoFHandler<dim, spacedim> &           dof_handler,
-        std::vector<Point<spacedim>> &              support_points,
         const ComponentMask &                       mask)
       {
+        std::vector<Point<spacedim>> support_points(dof_handler.n_dofs());
+
         // get the data in the form of the map as above
-        std::map<types::global_dof_index, Point<spacedim>> x_support_points;
-        map_dofs_to_support_points(mapping,
-                                   dof_handler,
-                                   x_support_points,
-                                   mask);
+        const std::map<types::global_dof_index, Point<spacedim>>
+          x_support_points =
+            map_dofs_to_support_points(mapping, dof_handler, mask);
 
         // now convert from the map to the linear vector. make sure every
         // entry really appeared in the map
@@ -2233,11 +2235,14 @@ namespace DoFTools
             Assert(x_support_points.find(i) != x_support_points.end(),
                    ExcInternalError());
 
-            support_points[i] = x_support_points[i];
+            support_points[i] = x_support_points.find(i)->second;
           }
+
+        return support_points;
       }
     } // namespace
   }   // namespace internal
+
 
   template <int dim, int spacedim>
   void
@@ -2258,10 +2263,10 @@ namespace DoFTools
     // gets a MappingCollection
     const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    internal::map_dofs_to_support_points(mapping_collection,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points =
+      internal::map_dofs_to_support_points_vector(mapping_collection,
+                                                  dof_handler,
+                                                  mask);
   }
 
 
@@ -2283,15 +2288,14 @@ namespace DoFTools
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    internal::map_dofs_to_support_points(mapping,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points =
+      internal::map_dofs_to_support_points_vector(mapping, dof_handler, mask);
   }
 
 
+  // This functino is deprecated:
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2304,15 +2308,15 @@ namespace DoFTools
     // gets a MappingCollection
     const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    internal::map_dofs_to_support_points(mapping_collection,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points = internal::map_dofs_to_support_points(mapping_collection,
+                                                          dof_handler,
+                                                          mask);
   }
 
 
+  // This functino is deprecated:
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &        mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2323,11 +2327,37 @@ namespace DoFTools
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    internal::map_dofs_to_support_points(mapping,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points =
+      internal::map_dofs_to_support_points(mapping, dof_handler, mask);
   }
+
+
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask &            mask)
+  {
+    // Let the internal function do all the work, just make sure that it
+    // gets a MappingCollection
+    const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+
+    return internal::map_dofs_to_support_points(mapping_collection,
+                                                dof_handler,
+                                                mask);
+  }
+
+
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof_handler,
+    const ComponentMask &                       mask)
+  {
+    return internal::map_dofs_to_support_points(mapping, dof_handler, mask);
+  }
+
 
   template <int spacedim>
   void

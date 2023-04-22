@@ -120,8 +120,7 @@ void make_grid(Triangulation<2> &triangulation)
 // understand exactly what this function does, and you can skip over
 // it. But if you would like to know anyway: We want to call the
 // function DoFTools::map_dofs_to_support_points() that returns a list
-// of locations (in the form of Point objects that store
-// coordinates). It does so in the form of a map through which we can
+// of locations. It does so in the form of a map through which we can
 // query (in a statement such as `dof_location_map[42]`) where the DoF
 // is located (in the example, where the 42nd DoF is). It puts this
 // information into the `dof_location_map` object.
@@ -134,10 +133,8 @@ void make_grid(Triangulation<2> &triangulation)
 void write_dof_locations(const DoFHandler<2> &dof_handler,
                          const std::string &  filename)
 {
-  std::map<types::global_dof_index, Point<2>> dof_location_map;
-  DoFTools::map_dofs_to_support_points(MappingQ1<2>(),
-                                       dof_handler,
-                                       dof_location_map);
+  std::map<types::global_dof_index, Point<2>> dof_location_map =
+    DoFTools::map_dofs_to_support_points(MappingQ1<2>(), dof_handler);
 
   std::ofstream dof_location_file(filename);
   DoFTools::write_gnuplot_dof_support_point_info(dof_location_file,
