@@ -130,6 +130,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>
@@ -168,6 +171,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>
@@ -200,6 +206,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>
@@ -238,6 +247,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>

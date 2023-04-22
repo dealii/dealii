@@ -103,6 +103,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup geomprimitives
+ *
+ * @dealiiConceptRequires{dim >= 0}
  */
 template <int dim, typename Number = double>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
@@ -668,6 +670,8 @@ inline DEAL_II_HOST_DEVICE
  * Output operator for points. Print the elements consecutively, with a space
  * in between.
  * @relatesalso Point
+ *
+ * @dealiiConceptRequires{dim >= 0}
  */
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
@@ -686,6 +690,8 @@ operator<<(std::ostream &out, const Point<dim, Number> &p)
 /**
  * Input operator for points. Inputs the elements consecutively.
  * @relatesalso Point
+ *
+ * @dealiiConceptRequires{dim >= 0}
  */
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)

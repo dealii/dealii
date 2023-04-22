@@ -139,6 +139,8 @@ namespace VectorTools
    * is true.
    * @param[in] project_to_boundary_first If true, perform a projection on the
    * boundary before projecting the interior of the function.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -157,6 +159,8 @@ namespace VectorTools
   /**
    * Call the project() function above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -173,6 +177,8 @@ namespace VectorTools
 
   /**
    * Same as above, but with hp-capabilities.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -191,6 +197,8 @@ namespace VectorTools
   /**
    * Call the project() function above, with a collection of $Q_1$ mapping
    * objects, i.e., with hp::StaticMappingQ1::mapping_collection.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -228,6 +236,8 @@ namespace VectorTools
    * @endcode
    * where <code>qp_data</code> is a CellDataStorage object, which stores
    * quadrature point data.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -268,6 +278,8 @@ namespace VectorTools
    * to use in case it was constructed with an <code>std::vector<const
    * DoFHandler<dim>*></code>. It will be used internally in constructor of
    * FEEvaluation object.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -287,6 +299,8 @@ namespace VectorTools
   /**
    * Same as above but for <code>n_q_points_1d =
    * matrix_free.get_dof_handler().get_fe().degree+1</code>.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)

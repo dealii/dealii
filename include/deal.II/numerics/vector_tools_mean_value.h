@@ -96,6 +96,8 @@ namespace VectorTools
    *
    * @warning This function can only be used for distributed vector classes
    * provided the boolean mask is empty, i.e. selecting the whole vector.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -127,6 +129,8 @@ namespace VectorTools
    *
    * @note In contrast to subtract_mean_value(), this function can
    * adjust a single component of a distributed vector.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <class VectorType, int dim, int spacedim = dim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -157,6 +161,8 @@ namespace VectorTools
    * finite element function with mean value zero. In fact, it only works for
    * Lagrangian elements. For all other elements, you will need to compute the
    * mean value and subtract it right inside the evaluation routine.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -171,6 +177,8 @@ namespace VectorTools
    * Calls the other compute_mean_value() function, see above, for the non-hp
    * case. That means, it requires a single FiniteElement, a single Quadrature,
    * and a single Mapping object.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -184,6 +192,8 @@ namespace VectorTools
   /**
    * Call the other compute_mean_value() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)

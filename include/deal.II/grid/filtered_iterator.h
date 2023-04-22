@@ -641,6 +641,8 @@ public:
   /**
    * Constructor. Set the iterator to the default state and use the given
    * predicate for filtering subsequent assignment and iteration.
+   *
+   * @dealiiConceptRequires{(std::predicate<Predicate, BaseIterator>)}
    */
   template <typename Predicate>
   DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
@@ -662,6 +664,8 @@ public:
    * If the cell <code>triangulation.begin_active()</code> does not have a
    * subdomain_id equal to 13, then the iterator will automatically be
    * advanced to the first cell that has.
+   *
+   * @dealiiConceptRequires{(std::predicate<Predicate, BaseIterator>)}
    */
   template <typename Predicate>
   DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
@@ -893,6 +897,8 @@ private:
  * automatically here.
  *
  * @relatesalso FilteredIterator
+ *
+ * @dealiiConceptRequires{(std::predicate<Predicate, BaseIterator>)}
  */
 template <typename BaseIterator, typename Predicate>
 DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
@@ -984,6 +990,8 @@ namespace internal
  *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
+ *
+ * @dealiiConceptRequires{(std::predicate<Predicate, BaseIterator>)}
  */
 template <typename BaseIterator, typename Predicate>
 DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
@@ -1053,6 +1061,8 @@ inline IteratorRange<FilteredIterator<BaseIterator>> filter_iterators(
  *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
+ *
+ * @dealiiConceptRequires{(std::predicate<Predicate, BaseIterator>)}
  */
 template <typename BaseIterator, typename Predicate, typename... Targs>
 DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
@@ -1127,6 +1137,8 @@ IteratorRange<
  *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
+ *
+ * @dealiiConceptRequires{(std::predicate<Predicate, BaseIterator>)}
  */
 template <typename BaseIterator, typename Predicate>
 DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
