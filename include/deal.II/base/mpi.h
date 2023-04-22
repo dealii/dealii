@@ -1071,8 +1071,8 @@ namespace Utilities
      * processor. In most use cases, one will of course want to work
      * on all MPI processes using essentially the same program, and so
      * this is not an issue. But if you plan to run deal.II-based work
-     * on only a subset of MPI processes, using an @ ref
-     * GlossMPICommunicator "MPI communicator" that is a subset of
+     * on only a subset of MPI processes, using an
+     * @ref GlossMPICommunicator "MPI communicator" that is a subset of
      * `MPI_COMM_WORLD` (for example, in client-server settings where
      * only a subset of processes is responsible for the finite
      * element communications and the remaining processes do other
