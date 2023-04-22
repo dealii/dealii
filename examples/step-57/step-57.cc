@@ -440,12 +440,13 @@ namespace Step57
                       {
                         local_matrix(i, j) +=
                           (viscosity *
-                             scalar_product(grad_phi_u[j], grad_phi_u[i]) +
-                           present_velocity_gradients[q] * phi_u[j] * phi_u[i] +
-                           grad_phi_u[j] * present_velocity_values[q] *
-                             phi_u[i] -
+                             scalar_product(grad_phi_u[i], grad_phi_u[j]) +
+                           phi_u[i] *
+                             (present_velocity_gradients[q] * phi_u[j]) +
+                           phi_u[i] *
+                             (grad_phi_u[j] * present_velocity_values[q]) -
                            div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
-                           gamma * div_phi_u[j] * div_phi_u[i] +
+                           gamma * div_phi_u[i] * div_phi_u[j] +
                            phi_p[i] * phi_p[j]) *
                           fe_values.JxW(q);
                       }
@@ -454,13 +455,13 @@ namespace Step57
                 double present_velocity_divergence =
                   trace(present_velocity_gradients[q]);
                 local_rhs(i) +=
-                  (-viscosity * scalar_product(present_velocity_gradients[q],
-                                               grad_phi_u[i]) -
-                   present_velocity_gradients[q] * present_velocity_values[q] *
-                     phi_u[i] +
-                   present_pressure_values[q] * div_phi_u[i] +
-                   present_velocity_divergence * phi_p[i] -
-                   gamma * present_velocity_divergence * div_phi_u[i]) *
+                  (-viscosity * scalar_product(grad_phi_u[i],
+                                               present_velocity_gradients[q]) -
+                   phi_u[i] * (present_velocity_values[q] *
+                               present_velocity_gradients[q]) +
+                   div_phi_u[i] * present_pressure_values[q] +
+                   phi_p[i] * present_velocity_divergence -
+                   gamma * div_phi_u[i] * present_velocity_divergence) *
                   fe_values.JxW(q);
               }
           }
