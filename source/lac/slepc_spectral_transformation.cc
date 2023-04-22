@@ -55,7 +55,7 @@ namespace SLEPcWrappers
   void
   TransformationBase::set_solver(const PETScWrappers::SolverBase &solver)
   {
-    PetscErrorCode ierr = STSetKSP(st, solver.solver_data->ksp);
+    PetscErrorCode ierr = STSetKSP(st, solver);
     AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
 
