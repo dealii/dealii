@@ -178,7 +178,7 @@ namespace PETScWrappers
     // Adaptive time stepping
     TSAdapt tsadapt;
     AssertPETSc(TSGetAdapt(ts, &tsadapt));
-    AssertPETSc(TSAdaptSetType(tsadapt, data.tsadapttype.c_str()));
+    AssertPETSc(TSAdaptSetType(tsadapt, data.ts_adapt_type.c_str()));
 
     // As of 3.19, PETSc does not propagate options prefixes to the
     // adaptors.

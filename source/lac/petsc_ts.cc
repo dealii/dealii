@@ -57,7 +57,7 @@ namespace PETScWrappers
 
     prm.enter_subsection("Error control");
     prm.add_parameter("adaptor type",
-                      tsadapttype,
+                      ts_adapt_type,
                       "The string for the TSAdapt type.");
     prm.add_parameter("minimum step size",
                       minimum_step_size,
