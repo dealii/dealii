@@ -68,7 +68,9 @@ namespace internal
           /**
            * Compute a threshold value so that the error accumulated over all
            * criteria[i] so that
+           * @code
            *     criteria[i] > threshold
+           * @endcode
            * is larger than target_error.
            */
           template <typename number>

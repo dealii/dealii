@@ -35,9 +35,9 @@ public:
   {
     // Customize solver: use BDF and basic adaptive time stepping
     PETScWrappers::TimeStepperData data;
-    data.ts_type     = "bdf";
-    data.final_time  = 1.0;
-    data.tsadapttype = "basic";
+    data.ts_type       = "bdf";
+    data.final_time    = 1.0;
+    data.ts_adapt_type = "basic";
     reinit(data);
 
     // Here we solve the two variables system:
