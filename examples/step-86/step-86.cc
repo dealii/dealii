@@ -603,19 +603,19 @@ namespace Step86
 
               nonlinear_solver.jacobian =
                 [&](const VectorType &current_u, MatrixType &, MatrixType &P) {
-                  compute_jacobian(current_u);
                   Assert(P == jacobian_matrix, ExcInternalError());
+                  compute_jacobian(current_u);
+                  (void)P;
                   return 0;
                 };
             }
 
           // Solver diagnostics can be performed by using a monitoring routine
           // that will be called at each Newton step. Here PETSc will give us
-          // the current solution, the current step, and the value of the norm
-          // of the function
+          // the current solution (unused here), the current step, and the
+          // value of the norm of the function.
           nonlinear_solver.monitor =
-            [&](const VectorType &current_u, unsigned int step, double gnorm) {
-              (void)current_u;
+            [&](const VectorType &, unsigned int step, double gnorm) {
               pcout << step << " norm=" << gnorm << std::endl;
               return 0;
             };
