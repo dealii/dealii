@@ -83,7 +83,7 @@ namespace parallel
      * Constructor.
      */
     TriangulationBase(
-      const MPI_Comm &mpi_communicator,
+      const MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
@@ -441,7 +441,7 @@ namespace parallel
      * Constructor.
      */
     DistributedTriangulationBase(
-      const MPI_Comm &mpi_communicator,
+      const MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
@@ -776,7 +776,7 @@ namespace parallel
     class DataTransfer
     {
     public:
-      DataTransfer(const MPI_Comm &mpi_communicator);
+      DataTransfer(const MPI_Comm mpi_communicator);
 
       /**
        * Prepare data transfer by calling the pack callback functions on each

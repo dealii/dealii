@@ -367,7 +367,7 @@ namespace parallel
        * triangulation is partitioned.
        */
       explicit Triangulation(
-        const MPI_Comm &mpi_communicator,
+        const MPI_Comm mpi_communicator,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
           smooth_grid           = (dealii::Triangulation<dim, spacedim>::none),
         const Settings settings = default_setting);
@@ -879,7 +879,7 @@ namespace parallel
        * the triangulation.
        */
       Triangulation(
-        const MPI_Comm &mpi_communicator,
+        const MPI_Comm mpi_communicator,
         const typename dealii::Triangulation<1, spacedim>::MeshSmoothing
                        smooth_grid = (dealii::Triangulation<1, spacedim>::none),
         const Settings settings    = default_setting);
@@ -1022,7 +1022,7 @@ namespace parallel
        * constructed (see also the class documentation).
        */
       explicit Triangulation(
-        const MPI_Comm & /*mpi_communicator*/,
+        const MPI_Comm /*mpi_communicator*/,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
         /*smooth_grid*/
         = (dealii::Triangulation<dim, spacedim>::none),

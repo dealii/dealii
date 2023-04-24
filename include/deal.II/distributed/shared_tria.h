@@ -257,7 +257,7 @@ namespace parallel
        * consider enabling artificial cells.
        */
       Triangulation(
-        const MPI_Comm &mpi_communicator,
+        const MPI_Comm mpi_communicator,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing =
           (dealii::Triangulation<dim, spacedim>::none),
         const bool     allow_artificial_cells = false,

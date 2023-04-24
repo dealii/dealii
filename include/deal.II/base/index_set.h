@@ -252,7 +252,7 @@ public:
    * is complete.
    */
   bool
-  is_ascending_and_one_to_one(const MPI_Comm &communicator) const;
+  is_ascending_and_one_to_one(const MPI_Comm communicator) const;
 
   /**
    * Return the number of elements stored in this index set.
@@ -503,19 +503,19 @@ public:
    * vector, e.g. for extracting only certain solution components.
    */
   Epetra_Map
-  make_trilinos_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
-                    const bool      overlapping  = false) const;
+  make_trilinos_map(const MPI_Comm communicator = MPI_COMM_WORLD,
+                    const bool     overlapping  = false) const;
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   Tpetra::Map<int, types::signed_global_dof_index>
-  make_tpetra_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
-                  const bool      overlapping  = false) const;
+  make_tpetra_map(const MPI_Comm communicator = MPI_COMM_WORLD,
+                  const bool     overlapping  = false) const;
 #  endif
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
   IS
-  make_petsc_is(const MPI_Comm &communicator = MPI_COMM_WORLD) const;
+  make_petsc_is(const MPI_Comm communicator = MPI_COMM_WORLD) const;
 #endif
 
 

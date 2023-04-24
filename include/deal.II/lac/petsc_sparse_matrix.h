@@ -432,7 +432,7 @@ namespace PETScWrappers
        * efficient to get memory allocation right from the start.
        */
       template <typename SparsityPatternType>
-      SparseMatrix(const MPI_Comm &              communicator,
+      SparseMatrix(const MPI_Comm                communicator,
                    const SparsityPatternType &   sparsity_pattern,
                    const std::vector<size_type> &local_rows_per_process,
                    const std::vector<size_type> &local_columns_per_process,
@@ -480,7 +480,7 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      reinit(const MPI_Comm &              communicator,
+      reinit(const MPI_Comm                communicator,
              const SparsityPatternType &   sparsity_pattern,
              const std::vector<size_type> &local_rows_per_process,
              const std::vector<size_type> &local_columns_per_process,
@@ -497,7 +497,7 @@ namespace PETScWrappers
       void
       reinit(const IndexSet &           local_partitioning,
              const SparsityPatternType &sparsity_pattern,
-             const MPI_Comm &           communicator);
+             const MPI_Comm             communicator);
 
       /**
        * Create a matrix where the size() of the IndexSets determine the
@@ -510,7 +510,7 @@ namespace PETScWrappers
       reinit(const IndexSet &           local_rows,
              const IndexSet &           local_columns,
              const SparsityPatternType &sparsity_pattern,
-             const MPI_Comm &           communicator);
+             const MPI_Comm             communicator);
 
       /**
        * Initialize this matrix to have the same structure as @p other. This
@@ -536,7 +536,7 @@ namespace PETScWrappers
              const IndexSet &           local_columns,
              const IndexSet &           local_active_columns,
              const SparsityPatternType &sparsity_pattern,
-             const MPI_Comm &           communicator);
+             const MPI_Comm             communicator);
 
       /**
        * @addtogroup Exceptions
@@ -626,7 +626,7 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      do_reinit(const MPI_Comm &              comm,
+      do_reinit(const MPI_Comm                comm,
                 const SparsityPatternType &   sparsity_pattern,
                 const std::vector<size_type> &local_rows_per_process,
                 const std::vector<size_type> &local_columns_per_process,
@@ -638,7 +638,7 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      do_reinit(const MPI_Comm &           comm,
+      do_reinit(const MPI_Comm             comm,
                 const IndexSet &           local_rows,
                 const IndexSet &           local_columns,
                 const SparsityPatternType &sparsity_pattern);
@@ -649,7 +649,7 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      do_reinit(const MPI_Comm &           comm,
+      do_reinit(const MPI_Comm             comm,
                 const IndexSet &           local_rows,
                 const IndexSet &           local_active_rows,
                 const IndexSet &           local_columns,

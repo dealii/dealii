@@ -128,7 +128,7 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm &mpi_comm)
+  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm mpi_comm)
     : data(data)
     , ida_mem(nullptr)
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)

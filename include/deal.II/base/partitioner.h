@@ -224,7 +224,7 @@ namespace Utilities
        */
       Partitioner(const types::global_dof_index local_size,
                   const types::global_dof_index ghost_size,
-                  const MPI_Comm &              communicator);
+                  const MPI_Comm                communicator);
 
       /**
        * Constructor with index set arguments. This constructor creates a
@@ -235,7 +235,7 @@ namespace Utilities
        */
       Partitioner(const IndexSet &locally_owned_indices,
                   const IndexSet &ghost_indices_in,
-                  const MPI_Comm &communicator_in);
+                  const MPI_Comm  communicator_in);
 
       /**
        * Constructor with one index set argument. This constructor creates a
@@ -245,7 +245,7 @@ namespace Utilities
        * constructor with two index sets.
        */
       Partitioner(const IndexSet &locally_owned_indices,
-                  const MPI_Comm &communicator_in);
+                  const MPI_Comm  communicator_in);
 
       /**
        * Reinitialize the communication pattern. The first argument
@@ -257,7 +257,7 @@ namespace Utilities
       virtual void
       reinit(const IndexSet &vector_space_vector_index_set,
              const IndexSet &read_write_vector_index_set,
-             const MPI_Comm &communicator) override;
+             const MPI_Comm  communicator) override;
 
       /**
        * Set the locally owned indices. Used in the constructor.

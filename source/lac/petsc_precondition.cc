@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  PreconditionBase::PreconditionBase(const MPI_Comm &comm)
+  PreconditionBase::PreconditionBase(const MPI_Comm comm)
     : pc(nullptr)
   {
     create_pc_with_comm(comm);
@@ -115,7 +115,7 @@ namespace PETScWrappers
   }
 
   void
-  PreconditionBase::create_pc_with_comm(const MPI_Comm &comm)
+  PreconditionBase::create_pc_with_comm(const MPI_Comm comm)
   {
     clear();
     PetscErrorCode ierr = PCCreate(comm, &pc);
@@ -137,7 +137,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionJacobi::PreconditionJacobi(const MPI_Comm &      comm,
+  PreconditionJacobi::PreconditionJacobi(const MPI_Comm        comm,
                                          const AdditionalData &additional_data_)
     : PreconditionBase(comm)
   {
@@ -194,7 +194,7 @@ namespace PETScWrappers
   {}
 
   PreconditionBlockJacobi::PreconditionBlockJacobi(
-    const MPI_Comm &      comm,
+    const MPI_Comm        comm,
     const AdditionalData &additional_data_)
     : PreconditionBase(comm)
   {
@@ -540,7 +540,7 @@ namespace PETScWrappers
 
 
   PreconditionBoomerAMG::PreconditionBoomerAMG(
-    const MPI_Comm &      comm,
+    const MPI_Comm        comm,
     const AdditionalData &additional_data_)
     : PreconditionBase(comm)
   {
@@ -1057,13 +1057,13 @@ namespace PETScWrappers
     initialize(matrix);
   }
 
-  PreconditionShell::PreconditionShell(const MPI_Comm &comm)
+  PreconditionShell::PreconditionShell(const MPI_Comm comm)
   {
     initialize(comm);
   }
 
   void
-  PreconditionShell::initialize(const MPI_Comm &comm)
+  PreconditionShell::initialize(const MPI_Comm comm)
   {
     PetscErrorCode ierr;
     if (pc)

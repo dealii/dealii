@@ -45,7 +45,7 @@ namespace PETScWrappers
   void
   CommunicationPattern::reinit(const types::global_dof_index local_size,
                                const IndexSet &              ghost_indices,
-                               const MPI_Comm &              communicator)
+                               const MPI_Comm                communicator)
   {
     clear();
 
@@ -81,7 +81,7 @@ namespace PETScWrappers
   void
   CommunicationPattern::reinit(const IndexSet &locally_owned_indices,
                                const IndexSet &ghost_indices,
-                               const MPI_Comm &communicator)
+                               const MPI_Comm  communicator)
   {
     std::vector<types::global_dof_index> in_deal;
     locally_owned_indices.fill_index_vector(in_deal);
@@ -100,7 +100,7 @@ namespace PETScWrappers
   CommunicationPattern::reinit(
     const std::vector<types::global_dof_index> &indices_has,
     const std::vector<types::global_dof_index> &indices_want,
-    const MPI_Comm &                            communicator)
+    const MPI_Comm                              communicator)
   {
     // Clean vectors from numbers::invalid_dof_index (indicating padding)
     std::vector<PetscInt> indices_has_clean, indices_has_loc;
@@ -154,7 +154,7 @@ namespace PETScWrappers
                                   const std::vector<PetscInt> &inloc,
                                   const std::vector<PetscInt> &outidx,
                                   const std::vector<PetscInt> &outloc,
-                                  const MPI_Comm &             communicator)
+                                  const MPI_Comm               communicator)
   {
     clear();
 
@@ -348,7 +348,7 @@ namespace PETScWrappers
   void
   Partitioner::reinit(const IndexSet &locally_owned_indices,
                       const IndexSet &ghost_indices,
-                      const MPI_Comm &communicator)
+                      const MPI_Comm  communicator)
   {
     ghost_indices_data = ghost_indices;
     ghost_indices_data.subtract_set(locally_owned_indices);
@@ -365,7 +365,7 @@ namespace PETScWrappers
   Partitioner::reinit(const IndexSet &locally_owned_indices,
                       const IndexSet &ghost_indices,
                       const IndexSet &larger_ghost_indices,
-                      const MPI_Comm &communicator)
+                      const MPI_Comm  communicator)
   {
     std::vector<types::global_dof_index> local_indices;
     locally_owned_indices.fill_index_vector(local_indices);

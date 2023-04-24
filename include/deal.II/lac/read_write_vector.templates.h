@@ -582,7 +582,7 @@ namespace LinearAlgebra
     const Tpetra::Vector<Number, int, types::signed_global_dof_index> &vector,
     const IndexSet &        source_elements,
     VectorOperation::values operation,
-    const MPI_Comm &        mpi_comm,
+    const MPI_Comm          mpi_comm,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
@@ -699,7 +699,7 @@ namespace LinearAlgebra
     const Epetra_MultiVector &multivector,
     const IndexSet &          source_elements,
     VectorOperation::values   operation,
-    const MPI_Comm &          mpi_comm,
+    const MPI_Comm            mpi_comm,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
@@ -1046,7 +1046,7 @@ namespace LinearAlgebra
   TpetraWrappers::CommunicationPattern
   ReadWriteVector<Number>::create_tpetra_comm_pattern(
     const IndexSet &source_index_set,
-    const MPI_Comm &mpi_comm)
+    const MPI_Comm  mpi_comm)
   {
     source_stored_elements = source_index_set;
     TpetraWrappers::CommunicationPattern epetra_comm_pattern(
@@ -1064,7 +1064,7 @@ namespace LinearAlgebra
   EpetraWrappers::CommunicationPattern
   ReadWriteVector<Number>::create_epetra_comm_pattern(
     const IndexSet &source_index_set,
-    const MPI_Comm &mpi_comm)
+    const MPI_Comm  mpi_comm)
   {
     source_stored_elements = source_index_set;
     EpetraWrappers::CommunicationPattern epetra_comm_pattern(

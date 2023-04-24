@@ -55,7 +55,7 @@ namespace PETScWrappers
                           std::constructible_from<VectorType, Vec>))
   NonlinearSolver<VectorType, PMatrixType, AMatrixType>::NonlinearSolver(
     const NonlinearSolverData &data,
-    const MPI_Comm &           mpi_comm)
+    const MPI_Comm             mpi_comm)
   {
     AssertPETSc(SNESCreate(mpi_comm, &snes));
     AssertPETSc(SNESSetApplicationContext(snes, this));

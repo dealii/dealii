@@ -311,7 +311,7 @@ namespace PETScWrappers
      * Constructor.
      */
     TimeStepper(const TimeStepperData &data     = TimeStepperData(),
-                const MPI_Comm &       mpi_comm = PETSC_COMM_WORLD);
+                const MPI_Comm         mpi_comm = PETSC_COMM_WORLD);
 
     /**
      * Destructor.

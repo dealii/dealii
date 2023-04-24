@@ -116,7 +116,7 @@ class PETScInverse
 public:
   PETScInverse(const dealii::PETScWrappers::MatrixBase &A,
                dealii::SolverControl &                  cn,
-               const MPI_Comm &mpi_communicator = PETSC_COMM_SELF)
+               const MPI_Comm mpi_communicator = PETSC_COMM_SELF)
     : solver(cn)
     , matrix(A)
     , preconditioner(matrix)

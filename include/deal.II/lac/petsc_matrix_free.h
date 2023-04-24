@@ -78,7 +78,7 @@ namespace PETScWrappers
      * any estimation of non_zero entries and has no option
      * <tt>is_symmetric</tt>.
      */
-    MatrixFree(const MPI_Comm &   communicator,
+    MatrixFree(const MPI_Comm     communicator,
                const unsigned int m,
                const unsigned int n,
                const unsigned int local_rows,
@@ -95,7 +95,7 @@ namespace PETScWrappers
      * any estimation of non_zero entries and has no option
      * <tt>is_symmetric</tt>.
      */
-    MatrixFree(const MPI_Comm &                 communicator,
+    MatrixFree(const MPI_Comm                   communicator,
                const unsigned int               m,
                const unsigned int               n,
                const std::vector<unsigned int> &local_rows_per_process,
@@ -129,7 +129,7 @@ namespace PETScWrappers
      * the same argument list as the present function.
      */
     void
-    reinit(const MPI_Comm &   communicator,
+    reinit(const MPI_Comm     communicator,
            const unsigned int m,
            const unsigned int n,
            const unsigned int local_rows,
@@ -141,7 +141,7 @@ namespace PETScWrappers
      * the same argument list as the present function.
      */
     void
-    reinit(const MPI_Comm &                 communicator,
+    reinit(const MPI_Comm                   communicator,
            const unsigned int               m,
            const unsigned int               n,
            const std::vector<unsigned int> &local_rows_per_process,
@@ -266,7 +266,7 @@ namespace PETScWrappers
      * previous matrix is left to the caller.
      */
     void
-    do_reinit(const MPI_Comm &   comm,
+    do_reinit(const MPI_Comm     comm,
               const unsigned int m,
               const unsigned int n,
               const unsigned int local_rows,

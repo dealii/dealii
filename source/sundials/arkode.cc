@@ -258,7 +258,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data,
-                             const MPI_Comm &      mpi_comm)
+                             const MPI_Comm        mpi_comm)
     : data(data)
     , arkode_mem(nullptr)
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)

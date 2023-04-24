@@ -50,7 +50,7 @@ namespace Utilities
   {
     template <typename Number>
     void
-    sum(const SparseMatrix<Number> &, const MPI_Comm &, SparseMatrix<Number> &);
+    sum(const SparseMatrix<Number> &, const MPI_Comm, SparseMatrix<Number> &);
   }
 } // namespace Utilities
 #  endif
@@ -1784,7 +1784,7 @@ private:
   template <typename Number>
   friend void
   Utilities::MPI::sum(const SparseMatrix<Number> &,
-                      const MPI_Comm &,
+                      const MPI_Comm,
                       SparseMatrix<Number> &);
 #endif
 };

@@ -665,7 +665,7 @@ namespace LinearAlgebra
              &                     tpetra_vector,
            const IndexSet &        locally_owned_elements,
            VectorOperation::values operation,
-           const MPI_Comm &        mpi_comm,
+           const MPI_Comm          mpi_comm,
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
              &communication_pattern);
 #  endif
@@ -679,7 +679,7 @@ namespace LinearAlgebra
     import(const Epetra_MultiVector &multivector,
            const IndexSet &          locally_owned_elements,
            VectorOperation::values   operation,
-           const MPI_Comm &          mpi_comm,
+           const MPI_Comm            mpi_comm,
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
              &communication_pattern);
 #endif
@@ -704,7 +704,7 @@ namespace LinearAlgebra
      */
     TpetraWrappers::CommunicationPattern
     create_tpetra_comm_pattern(const IndexSet &source_index_set,
-                               const MPI_Comm &mpi_comm);
+                               const MPI_Comm  mpi_comm);
 #  endif
 
     /**
@@ -713,7 +713,7 @@ namespace LinearAlgebra
      */
     EpetraWrappers::CommunicationPattern
     create_epetra_comm_pattern(const IndexSet &source_index_set,
-                               const MPI_Comm &mpi_comm);
+                               const MPI_Comm  mpi_comm);
 #endif
 
     /**

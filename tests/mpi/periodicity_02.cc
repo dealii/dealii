@@ -189,7 +189,7 @@ namespace Step22
     InverseMatrix(const Matrix &        m,
                   const Preconditioner &preconditioner,
                   const IndexSet &      locally_owned,
-                  const MPI_Comm &      mpi_communicator);
+                  const MPI_Comm        mpi_communicator);
 
     void
     vmult(TrilinosWrappers::MPI::Vector &      dst,
@@ -209,7 +209,7 @@ namespace Step22
     const Matrix &        m,
     const Preconditioner &preconditioner,
     const IndexSet &      locally_owned,
-    const MPI_Comm &      mpi_communicator)
+    const MPI_Comm        mpi_communicator)
     : matrix(&m)
     , preconditioner(&preconditioner)
     , mpi_communicator(&mpi_communicator)
@@ -247,7 +247,7 @@ namespace Step22
                                         Preconditioner> &      A_inverse,
                     const IndexSet &                           owned_pres,
                     const IndexSet &                           relevant_pres,
-                    const MPI_Comm &mpi_communicator);
+                    const MPI_Comm mpi_communicator);
 
     void
     vmult(TrilinosWrappers::MPI::Vector &      dst,
@@ -270,7 +270,7 @@ namespace Step22
       &             A_inverse,
     const IndexSet &owned_vel,
     const IndexSet &relevant_vel,
-    const MPI_Comm &mpi_communicator)
+    const MPI_Comm  mpi_communicator)
     : system_matrix(&system_matrix)
     , A_inverse(&A_inverse)
     , tmp1(owned_vel, mpi_communicator)

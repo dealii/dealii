@@ -63,7 +63,7 @@ namespace PETScWrappers
     /**
      * Constructor.
      */
-    explicit PreconditionBase(const MPI_Comm &mpi_communicator);
+    explicit PreconditionBase(const MPI_Comm mpi_communicator);
 
     /**
      * Constructor.
@@ -131,7 +131,7 @@ namespace PETScWrappers
      * Internal function to create the PETSc preconditioner object.
      */
     void
-    create_pc_with_comm(const MPI_Comm &);
+    create_pc_with_comm(const MPI_Comm);
   };
 
 
@@ -175,7 +175,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionJacobi(
-      const MPI_Comm &      communicator,
+      const MPI_Comm        communicator,
       const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -257,7 +257,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBlockJacobi(
-      const MPI_Comm &      communicator,
+      const MPI_Comm        communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 
@@ -764,7 +764,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBoomerAMG(
-      const MPI_Comm &      communicator,
+      const MPI_Comm        communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 
@@ -1097,7 +1097,7 @@ namespace PETScWrappers
     /**
      * Same as above but without setting a matrix to form the preconditioner.
      */
-    PreconditionShell(const MPI_Comm &communicator);
+    PreconditionShell(const MPI_Comm communicator);
 
     /**
      * The callback for the application of the preconditioner.
@@ -1115,7 +1115,7 @@ namespace PETScWrappers
      * matrix. This function sets up the PCSHELL preconditioner
      */
     void
-    initialize(const MPI_Comm &comm);
+    initialize(const MPI_Comm comm);
 
     /**
      * Initialize the preconditioner object with a particular

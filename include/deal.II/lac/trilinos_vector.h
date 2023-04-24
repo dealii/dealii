@@ -445,7 +445,7 @@ namespace TrilinosWrappers
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       explicit Vector(const IndexSet &parallel_partitioning,
-                      const MPI_Comm &communicator = MPI_COMM_WORLD);
+                      const MPI_Comm  communicator = MPI_COMM_WORLD);
 
       /**
        * Creates a ghosted parallel vector.
@@ -460,7 +460,7 @@ namespace TrilinosWrappers
        */
       Vector(const IndexSet &local,
              const IndexSet &ghost,
-             const MPI_Comm &communicator = MPI_COMM_WORLD);
+             const MPI_Comm  communicator = MPI_COMM_WORLD);
 
       /**
        * Copy constructor from the TrilinosWrappers vector class. Since a
@@ -478,7 +478,7 @@ namespace TrilinosWrappers
        */
       Vector(const IndexSet &parallel_partitioning,
              const Vector &  v,
-             const MPI_Comm &communicator = MPI_COMM_WORLD);
+             const MPI_Comm  communicator = MPI_COMM_WORLD);
 
       /**
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
@@ -495,7 +495,7 @@ namespace TrilinosWrappers
       template <typename Number>
       Vector(const IndexSet &              parallel_partitioning,
              const dealii::Vector<Number> &v,
-             const MPI_Comm &              communicator = MPI_COMM_WORLD);
+             const MPI_Comm                communicator = MPI_COMM_WORLD);
 
       /**
        * Move constructor. Creates a new vector by stealing the internal data
@@ -571,7 +571,7 @@ namespace TrilinosWrappers
        */
       void
       reinit(const IndexSet &parallel_partitioning,
-             const MPI_Comm &communicator         = MPI_COMM_WORLD,
+             const MPI_Comm  communicator         = MPI_COMM_WORLD,
              const bool      omit_zeroing_entries = false);
 
       /**
@@ -611,7 +611,7 @@ namespace TrilinosWrappers
       void
       reinit(const IndexSet &locally_owned_entries,
              const IndexSet &locally_relevant_or_ghost_entries,
-             const MPI_Comm &communicator    = MPI_COMM_WORLD,
+             const MPI_Comm  communicator    = MPI_COMM_WORLD,
              const bool      vector_writable = false);
 
       /**
@@ -2196,7 +2196,7 @@ namespace TrilinosWrappers
     template <typename number>
     Vector::Vector(const IndexSet &              parallel_partitioner,
                    const dealii::Vector<number> &v,
-                   const MPI_Comm &              communicator)
+                   const MPI_Comm                communicator)
     {
       *this =
         Vector(parallel_partitioner.make_trilinos_map(communicator, true), v);

@@ -795,7 +795,7 @@ public:
    * AffineConstraints was created for the DG case.
    */
   bool
-  is_closed(const MPI_Comm &comm) const;
+  is_closed(const MPI_Comm comm) const;
 
   /**
    * Merge the constraints represented by the object given as argument into
@@ -1758,7 +1758,7 @@ public:
   bool
   is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
                             const IndexSet &             locally_active_dofs,
-                            const MPI_Comm &             mpi_communicator,
+                            const MPI_Comm               mpi_communicator,
                             const bool                   verbose = false) const;
 
   /**

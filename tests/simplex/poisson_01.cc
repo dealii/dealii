@@ -338,7 +338,7 @@ test(const Triangulation<dim, spacedim> &tria,
 
 template <int dim, int spacedim = dim>
 void
-test_tet(const MPI_Comm &comm, const Parameters<dim> &params)
+test_tet(const MPI_Comm comm, const Parameters<dim> &params)
 {
   const unsigned int tria_type = 2;
 
@@ -425,7 +425,7 @@ test_tet(const MPI_Comm &comm, const Parameters<dim> &params)
 
 template <int dim, int spacedim = dim>
 void
-test_hex(const MPI_Comm &comm, const Parameters<dim> &params)
+test_hex(const MPI_Comm comm, const Parameters<dim> &params)
 {
   // 1) Create triangulation...
   parallel::distributed::Triangulation<dim, spacedim> tria(comm);
@@ -467,7 +467,7 @@ test_hex(const MPI_Comm &comm, const Parameters<dim> &params)
 
 template <int dim, int spacedim = dim>
 void
-test_wedge(const MPI_Comm &comm, const Parameters<dim> &params)
+test_wedge(const MPI_Comm comm, const Parameters<dim> &params)
 {
   const unsigned int tria_type = 2;
 
@@ -558,7 +558,7 @@ test_wedge(const MPI_Comm &comm, const Parameters<dim> &params)
 
 template <int dim, int spacedim = dim>
 void
-test_pyramid(const MPI_Comm &comm, const Parameters<dim> &params)
+test_pyramid(const MPI_Comm comm, const Parameters<dim> &params)
 {
   const unsigned int tria_type = 2;
 

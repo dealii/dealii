@@ -32,7 +32,7 @@ namespace Utilities
     NoncontiguousPartitioner::NoncontiguousPartitioner(
       const IndexSet &indexset_has,
       const IndexSet &indexset_want,
-      const MPI_Comm &communicator)
+      const MPI_Comm  communicator)
     {
       this->reinit(indexset_has, indexset_want, communicator);
     }
@@ -42,7 +42,7 @@ namespace Utilities
     NoncontiguousPartitioner::NoncontiguousPartitioner(
       const std::vector<types::global_dof_index> &indices_has,
       const std::vector<types::global_dof_index> &indices_want,
-      const MPI_Comm &                            communicator)
+      const MPI_Comm                              communicator)
     {
       this->reinit(indices_has, indices_want, communicator);
     }
@@ -91,7 +91,7 @@ namespace Utilities
     void
     NoncontiguousPartitioner::reinit(const IndexSet &indexset_has,
                                      const IndexSet &indexset_want,
-                                     const MPI_Comm &communicator)
+                                     const MPI_Comm  communicator)
     {
       this->communicator = communicator;
 
@@ -169,7 +169,7 @@ namespace Utilities
     NoncontiguousPartitioner::reinit(
       const std::vector<types::global_dof_index> &indices_has,
       const std::vector<types::global_dof_index> &indices_want,
-      const MPI_Comm &                            communicator)
+      const MPI_Comm                              communicator)
     {
       // step 0) clean vectors from numbers::invalid_dof_index (indicating
       //         padding)

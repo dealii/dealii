@@ -55,7 +55,7 @@ namespace PETScWrappers
                           std::constructible_from<VectorType, Vec>))
   TimeStepper<VectorType, PMatrixType, AMatrixType>::TimeStepper(
     const TimeStepperData &data,
-    const MPI_Comm &       mpi_comm)
+    const MPI_Comm         mpi_comm)
   {
     AssertPETSc(TSCreate(mpi_comm, &ts));
     AssertPETSc(TSSetApplicationContext(ts, this));

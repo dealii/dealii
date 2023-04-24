@@ -153,7 +153,7 @@ namespace internal
 
     void
     DoFInfo::assign_ghosts(const std::vector<unsigned int> &boundary_cells,
-                           const MPI_Comm &                 communicator_sm,
+                           const MPI_Comm                   communicator_sm,
                            const bool use_vector_data_exchanger_full)
     {
       Assert(boundary_cells.size() < row_starts.size(), ExcInternalError());
@@ -892,7 +892,7 @@ namespace internal
       const std::vector<FaceToCellTopology<1>> &inner_faces,
       const std::vector<FaceToCellTopology<1>> &ghosted_faces,
       const bool                                fill_cell_centric,
-      const MPI_Comm &                          communicator_sm,
+      const MPI_Comm                            communicator_sm,
       const bool                                use_vector_data_exchanger_full)
     {
       const Utilities::MPI::Partitioner &part = *vector_partitioner;

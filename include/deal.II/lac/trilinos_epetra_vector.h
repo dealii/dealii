@@ -82,7 +82,7 @@ namespace LinearAlgebra
        * need to generate a %parallel vector.
        */
       explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm &communicator);
+                      const MPI_Comm  communicator);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -92,7 +92,7 @@ namespace LinearAlgebra
        */
       void
       reinit(const IndexSet &parallel_partitioner,
-             const MPI_Comm &communicator,
+             const MPI_Comm  communicator,
              const bool      omit_zeroing_entries = false);
 
       /**
@@ -370,7 +370,7 @@ namespace LinearAlgebra
        */
       void
       create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                 const MPI_Comm &mpi_comm);
+                                 const MPI_Comm  mpi_comm);
 
       /**
        * Pointer to the actual Epetra vector object.

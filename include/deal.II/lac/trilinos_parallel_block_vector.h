@@ -109,7 +109,7 @@ namespace TrilinosWrappers
        * the MPI processes.
        */
       explicit BlockVector(const std::vector<IndexSet> &parallel_partitioning,
-                           const MPI_Comm &communicator = MPI_COMM_WORLD);
+                           const MPI_Comm communicator = MPI_COMM_WORLD);
 
       /**
        * Creates a BlockVector with ghost elements. See the respective
@@ -118,7 +118,7 @@ namespace TrilinosWrappers
        */
       BlockVector(const std::vector<IndexSet> &parallel_partitioning,
                   const std::vector<IndexSet> &ghost_values,
-                  const MPI_Comm &             communicator,
+                  const MPI_Comm               communicator,
                   const bool                   vector_writable = false);
 
       /**
@@ -189,7 +189,7 @@ namespace TrilinosWrappers
        */
       void
       reinit(const std::vector<IndexSet> &parallel_partitioning,
-             const MPI_Comm &             communicator         = MPI_COMM_WORLD,
+             const MPI_Comm               communicator         = MPI_COMM_WORLD,
              const bool                   omit_zeroing_entries = false);
 
       /**
@@ -212,7 +212,7 @@ namespace TrilinosWrappers
       void
       reinit(const std::vector<IndexSet> &partitioning,
              const std::vector<IndexSet> &ghost_values,
-             const MPI_Comm &             communicator    = MPI_COMM_WORLD,
+             const MPI_Comm               communicator    = MPI_COMM_WORLD,
              const bool                   vector_writable = false);
 
 
@@ -317,7 +317,7 @@ namespace TrilinosWrappers
     /*-------------------------- Inline functions ---------------------------*/
     inline BlockVector::BlockVector(
       const std::vector<IndexSet> &parallel_partitioning,
-      const MPI_Comm &             communicator)
+      const MPI_Comm               communicator)
     {
       reinit(parallel_partitioning, communicator, false);
     }
@@ -327,7 +327,7 @@ namespace TrilinosWrappers
     inline BlockVector::BlockVector(
       const std::vector<IndexSet> &parallel_partitioning,
       const std::vector<IndexSet> &ghost_values,
-      const MPI_Comm &             communicator,
+      const MPI_Comm               communicator,
       const bool                   vector_writable)
     {
       reinit(parallel_partitioning,

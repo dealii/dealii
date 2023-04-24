@@ -145,7 +145,7 @@ namespace SparseMatrixTools
   {
     template <typename T>
     std::tuple<T, T>
-    compute_prefix_sum(const T &value, const MPI_Comm &comm)
+    compute_prefix_sum(const T &value, const MPI_Comm comm)
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
@@ -231,7 +231,7 @@ namespace SparseMatrixTools
     extract_remote_rows(const SparseMatrixType &   system_matrix,
                         const SparsityPatternType &sparsity_pattern,
                         const IndexSet &           locally_active_dofs,
-                        const MPI_Comm &           comm)
+                        const MPI_Comm             comm)
     {
       std::vector<unsigned int> dummy(locally_active_dofs.n_elements());
 

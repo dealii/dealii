@@ -49,7 +49,7 @@ namespace LinearAlgebra
        */
       CommunicationPattern(const IndexSet &vector_space_vector_index_set,
                            const IndexSet &read_write_vector_index_set,
-                           const MPI_Comm &communicator);
+                           const MPI_Comm  communicator);
 
       /**
        * Reinitialize the object.
@@ -57,7 +57,7 @@ namespace LinearAlgebra
       virtual void
       reinit(const IndexSet &vector_space_vector_index_set,
              const IndexSet &read_write_vector_index_set,
-             const MPI_Comm &communicator) override;
+             const MPI_Comm  communicator) override;
 
       /**
        * Return the underlying MPI communicator.

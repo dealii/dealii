@@ -179,7 +179,7 @@ namespace PETScWrappers
      * Utility to create the KSP object and attach convergence test.
      */
     void
-    initialize_ksp_with_comm(const MPI_Comm &comm);
+    initialize_ksp_with_comm(const MPI_Comm comm);
 
     /**
      * %Function that takes a Krylov Subspace Solver context object, and sets
@@ -272,7 +272,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverRichardson(SolverControl &       cn,
-                     const MPI_Comm &      mpi_communicator,
+                     const MPI_Comm        mpi_communicator,
                      const AdditionalData &data = AdditionalData());
 
   protected:
@@ -324,7 +324,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverChebychev(SolverControl &       cn,
-                    const MPI_Comm &      mpi_communicator,
+                    const MPI_Comm        mpi_communicator,
                     const AdditionalData &data = AdditionalData());
 
   protected:
@@ -374,7 +374,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverCG(SolverControl &       cn,
-             const MPI_Comm &      mpi_communicator,
+             const MPI_Comm        mpi_communicator,
              const AdditionalData &data = AdditionalData());
 
   protected:
@@ -425,7 +425,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverBiCG(SolverControl &       cn,
-               const MPI_Comm &      mpi_communicator,
+               const MPI_Comm        mpi_communicator,
                const AdditionalData &data = AdditionalData());
 
   protected:
@@ -493,7 +493,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverGMRES(SolverControl &       cn,
-                const MPI_Comm &      mpi_communicator,
+                const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
 
   protected:
@@ -545,7 +545,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverBicgstab(SolverControl &       cn,
-                   const MPI_Comm &      mpi_communicator,
+                   const MPI_Comm        mpi_communicator,
                    const AdditionalData &data = AdditionalData());
 
   protected:
@@ -596,7 +596,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverCGS(SolverControl &       cn,
-              const MPI_Comm &      mpi_communicator,
+              const MPI_Comm        mpi_communicator,
               const AdditionalData &data = AdditionalData());
 
   protected:
@@ -647,7 +647,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverTFQMR(SolverControl &       cn,
-                const MPI_Comm &      mpi_communicator,
+                const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
 
   protected:
@@ -703,7 +703,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverTCQMR(SolverControl &       cn,
-                const MPI_Comm &      mpi_communicator,
+                const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
 
   protected:
@@ -753,7 +753,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverCR(SolverControl &       cn,
-             const MPI_Comm &      mpi_communicator,
+             const MPI_Comm        mpi_communicator,
              const AdditionalData &data = AdditionalData());
 
   protected:
@@ -805,7 +805,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverLSQR(SolverControl &       cn,
-               const MPI_Comm &      mpi_communicator,
+               const MPI_Comm        mpi_communicator,
                const AdditionalData &data = AdditionalData());
 
   protected:
@@ -861,7 +861,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SolverPreOnly(SolverControl &       cn,
-                  const MPI_Comm &      mpi_communicator,
+                  const MPI_Comm        mpi_communicator,
                   const AdditionalData &data = AdditionalData());
 
   protected:
@@ -924,7 +924,7 @@ namespace PETScWrappers
      */
     DEAL_II_DEPRECATED_EARLY
     SparseDirectMUMPS(SolverControl &       cn,
-                      const MPI_Comm &      mpi_communicator,
+                      const MPI_Comm        mpi_communicator,
                       const AdditionalData &data = AdditionalData());
 
     /**

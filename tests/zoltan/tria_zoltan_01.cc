@@ -29,7 +29,7 @@
 
 template <int dim>
 void
-test(const MPI_Comm &mpi_communicator)
+test(const MPI_Comm mpi_communicator)
 {
   parallel::shared::Triangulation<dim> triangulation(
     mpi_communicator, Triangulation<dim>::limit_level_difference_at_vertices);

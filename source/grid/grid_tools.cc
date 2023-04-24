@@ -5997,7 +5997,7 @@ namespace GridTools
                std::vector<unsigned int>,
                std::vector<unsigned int>>
     guess_owners_of_entities(
-      const MPI_Comm &                                       comm,
+      const MPI_Comm                                         comm,
       const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
       const std::vector<T> &                                 entities,
       const double                                           tolerance)
@@ -6524,7 +6524,7 @@ namespace GridTools
   std::vector<std::vector<BoundingBox<spacedim>>>
   exchange_local_bounding_boxes(
     const std::vector<BoundingBox<spacedim>> &local_bboxes,
-    const MPI_Comm &                          mpi_communicator)
+    const MPI_Comm                            mpi_communicator)
   {
 #ifndef DEAL_II_WITH_MPI
     (void)local_bboxes;
@@ -6620,7 +6620,7 @@ namespace GridTools
   RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
   build_global_description_tree(
     const std::vector<BoundingBox<spacedim>> &local_description,
-    const MPI_Comm &                          mpi_communicator)
+    const MPI_Comm                            mpi_communicator)
   {
 #ifndef DEAL_II_WITH_MPI
     (void)mpi_communicator;

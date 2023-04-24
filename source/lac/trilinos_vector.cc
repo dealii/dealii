@@ -80,7 +80,7 @@ namespace TrilinosWrappers
 
 
     Vector::Vector(const IndexSet &parallel_partitioning,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Vector()
     {
       reinit(parallel_partitioning, communicator);
@@ -110,7 +110,7 @@ namespace TrilinosWrappers
 
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const Vector &  v,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Vector()
     {
       AssertThrow(parallel_partitioner.size() ==
@@ -129,7 +129,7 @@ namespace TrilinosWrappers
 
     Vector::Vector(const IndexSet &local,
                    const IndexSet &ghost,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Vector()
     {
       reinit(local, ghost, communicator, false);
@@ -153,7 +153,7 @@ namespace TrilinosWrappers
 
     void
     Vector::reinit(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator,
+                   const MPI_Comm  communicator,
                    const bool /*omit_zeroing_entries*/)
     {
       nonlocal_vector.reset();
@@ -353,7 +353,7 @@ namespace TrilinosWrappers
     void
     Vector::reinit(const IndexSet &locally_owned_entries,
                    const IndexSet &ghost_entries,
-                   const MPI_Comm &communicator,
+                   const MPI_Comm  communicator,
                    const bool      vector_writable)
     {
       nonlocal_vector.reset();

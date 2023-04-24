@@ -7410,7 +7410,7 @@ namespace DataOutBase
       &                              nonscalar_data_ranges,
     const Deal_II_IntermediateFlags &flags,
     const std::string &              filename,
-    const MPI_Comm &                 comm,
+    const MPI_Comm                   comm,
     const CompressionLevel           compression)
   {
 #ifndef DEAL_II_WITH_MPI
@@ -7716,7 +7716,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   const std::string &filename,
-  const MPI_Comm &   comm) const
+  const MPI_Comm     comm) const
 {
 #ifndef DEAL_II_WITH_MPI
   // without MPI fall back to the normal way to write a vtu file:
@@ -7857,7 +7857,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   const std::string &directory,
   const std::string &filename_without_extension,
   const unsigned int counter,
-  const MPI_Comm &   mpi_communicator,
+  const MPI_Comm     mpi_communicator,
   const unsigned int n_digits_for_counter,
   const unsigned int n_groups) const
 {
@@ -7950,7 +7950,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_deal_II_intermediate_in_parallel(
   const std::string &                 filename,
-  const MPI_Comm &                    comm,
+  const MPI_Comm                      comm,
   const DataOutBase::CompressionLevel compression) const
 {
   DataOutBase::write_deal_II_intermediate_in_parallel(
@@ -7971,7 +7971,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const DataOutBase::DataOutFilter &data_filter,
   const std::string &               h5_filename,
   const double                      cur_time,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
   return create_xdmf_entry(
     data_filter, h5_filename, h5_filename, cur_time, comm);
@@ -7986,7 +7986,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const std::string &               h5_mesh_filename,
   const std::string &               h5_solution_filename,
   const double                      cur_time,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
   AssertThrow(spacedim == 2 || spacedim == 3,
               ExcMessage("XDMF only supports 2 or 3 space dimensions."));
@@ -8123,7 +8123,7 @@ void
 DataOutInterface<dim, spacedim>::write_xdmf_file(
   const std::vector<XDMFEntry> &entries,
   const std::string &           filename,
-  const MPI_Comm &              comm) const
+  const MPI_Comm                comm) const
 {
 #ifdef DEAL_II_WITH_MPI
   const int myrank = Utilities::MPI::this_mpi_process(comm);
@@ -8189,7 +8189,7 @@ namespace
                 const bool                        write_mesh_file,
                 const std::string &               mesh_filename,
                 const std::string &               solution_filename,
-                const MPI_Comm &                  comm)
+                const MPI_Comm                    comm)
   {
     hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
     hid_t node_dataspace, node_dataset, node_file_dataspace,
@@ -8658,7 +8658,7 @@ void
 DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const DataOutBase::DataOutFilter &data_filter,
   const std::string &               filename,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
   DataOutBase::write_hdf5_parallel(
     get_patches(), data_filter, hdf5_flags, filename, comm);
@@ -8673,7 +8673,7 @@ DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const bool                        write_mesh_file,
   const std::string &               mesh_filename,
   const std::string &               solution_filename,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(),
                                    data_filter,
@@ -8693,7 +8693,7 @@ DataOutBase::write_hdf5_parallel(
   const DataOutBase::DataOutFilter &       data_filter,
   const DataOutBase::Hdf5Flags &           flags,
   const std::string &                      filename,
-  const MPI_Comm &                         comm)
+  const MPI_Comm                           comm)
 {
   write_hdf5_parallel(
     patches, data_filter, flags, true, filename, filename, comm);
@@ -8710,7 +8710,7 @@ DataOutBase::write_hdf5_parallel(
   const bool                               write_mesh_file,
   const std::string &                      mesh_filename,
   const std::string &                      solution_filename,
-  const MPI_Comm &                         comm)
+  const MPI_Comm                           comm)
 {
   AssertThrow(
     spacedim >= 2,

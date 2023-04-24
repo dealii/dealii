@@ -69,7 +69,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     Vector<Number>::Vector(const IndexSet &parallel_partitioner,
-                           const MPI_Comm &communicator)
+                           const MPI_Comm  communicator)
       : Subscriptor()
       , vector(new Tpetra::Vector<Number, int, types::signed_global_dof_index>(
           Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
@@ -81,7 +81,7 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Vector<Number>::reinit(const IndexSet &parallel_partitioner,
-                           const MPI_Comm &communicator,
+                           const MPI_Comm  communicator,
                            const bool      omit_zeroing_entries)
     {
       Tpetra::Map<int, types::signed_global_dof_index> input_map =
@@ -677,7 +677,7 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Vector<Number>::create_tpetra_comm_pattern(const IndexSet &source_index_set,
-                                               const MPI_Comm &mpi_comm)
+                                               const MPI_Comm  mpi_comm)
     {
       source_stored_elements = source_index_set;
       tpetra_comm_pattern =

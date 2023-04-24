@@ -267,7 +267,7 @@ namespace SparsityTools
   void
   distribute_sparsity_pattern(DynamicSparsityPattern &dsp,
                               const IndexSet &        locally_owned_rows,
-                              const MPI_Comm &        mpi_comm,
+                              const MPI_Comm          mpi_comm,
                               const IndexSet &        locally_relevant_rows);
 
   /**
@@ -284,7 +284,7 @@ namespace SparsityTools
   distribute_sparsity_pattern(
     DynamicSparsityPattern &                              dsp,
     const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
-    const MPI_Comm &                                      mpi_comm,
+    const MPI_Comm                                        mpi_comm,
     const IndexSet &                                      myrange);
 
   /**
@@ -304,7 +304,7 @@ namespace SparsityTools
   void
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
                               const IndexSet &             locally_owned_rows,
-                              const MPI_Comm &             mpi_comm,
+                              const MPI_Comm               mpi_comm,
                               const IndexSet &locally_relevant_rows);
 
   /**
@@ -314,7 +314,7 @@ namespace SparsityTools
   void
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
                               const std::vector<IndexSet> &owned_set_per_cpu,
-                              const MPI_Comm &             mpi_comm,
+                              const MPI_Comm               mpi_comm,
                               const IndexSet &             myrange);
 
   /**
@@ -343,7 +343,7 @@ namespace SparsityTools
   void
   gather_sparsity_pattern(DynamicSparsityPattern &dsp,
                           const IndexSet &        locally_owned_rows,
-                          const MPI_Comm &        mpi_comm,
+                          const MPI_Comm          mpi_comm,
                           const IndexSet &        locally_relevant_rows);
 
 #endif

@@ -165,7 +165,7 @@ namespace Utilities
 
 
         void
-        Dictionary::reinit(const IndexSet &owned_indices, const MPI_Comm &comm)
+        Dictionary::reinit(const IndexSet &owned_indices, const MPI_Comm comm)
         {
           // 1) set up the partition
           this->partition(owned_indices, comm);
@@ -430,7 +430,7 @@ namespace Utilities
 
         void
         Dictionary::partition(const IndexSet &owned_indices,
-                              const MPI_Comm &comm)
+                              const MPI_Comm  comm)
         {
 #ifdef DEAL_II_WITH_MPI
           const unsigned int n_procs = n_mpi_processes(comm);
@@ -462,7 +462,7 @@ namespace Utilities
         ConsensusAlgorithmsPayload::ConsensusAlgorithmsPayload(
           const IndexSet &           owned_indices,
           const IndexSet &           indices_to_look_up,
-          const MPI_Comm &           comm,
+          const MPI_Comm             comm,
           std::vector<unsigned int> &owning_ranks,
           const bool                 track_index_requests)
           : owned_indices(owned_indices)

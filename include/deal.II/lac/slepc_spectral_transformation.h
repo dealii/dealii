@@ -79,7 +79,7 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationBase(const MPI_Comm &mpi_communicator);
+    TransformationBase(const MPI_Comm mpi_communicator);
 
   public:
     /**
@@ -144,7 +144,7 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationShift(const MPI_Comm &      mpi_communicator,
+    TransformationShift(const MPI_Comm        mpi_communicator,
                         const AdditionalData &data = AdditionalData());
 
 
@@ -184,7 +184,7 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationShiftInvert(const MPI_Comm &      mpi_communicator,
+    TransformationShiftInvert(const MPI_Comm        mpi_communicator,
                               const AdditionalData &data = AdditionalData());
 
   protected:
@@ -233,7 +233,7 @@ namespace SLEPcWrappers
      * Constructor.
      */
     TransformationSpectrumFolding(
-      const MPI_Comm &      mpi_communicator,
+      const MPI_Comm        mpi_communicator,
       const AdditionalData &data = AdditionalData());
 
   protected:
@@ -277,7 +277,7 @@ namespace SLEPcWrappers
     /**
      * Constructor.
      */
-    TransformationCayley(const MPI_Comm &      mpi_communicator,
+    TransformationCayley(const MPI_Comm        mpi_communicator,
                          const AdditionalData &data = AdditionalData());
 
   protected:

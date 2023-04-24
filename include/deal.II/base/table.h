@@ -725,7 +725,7 @@ public:
    *   the destructor is called.
    */
   void
-  replicate_across_communicator(const MPI_Comm &   communicator,
+  replicate_across_communicator(const MPI_Comm     communicator,
                                 const unsigned int root_process);
 
   /**
@@ -2385,7 +2385,7 @@ TableBase<N, T>::fill(const T &value)
 
 template <int N, typename T>
 inline void
-TableBase<N, T>::replicate_across_communicator(const MPI_Comm &   communicator,
+TableBase<N, T>::replicate_across_communicator(const MPI_Comm     communicator,
                                                const unsigned int root_process)
 {
   // Replicate first the actual data, then also exchange the

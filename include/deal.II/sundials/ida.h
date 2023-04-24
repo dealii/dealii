@@ -605,7 +605,7 @@ namespace SUNDIALS
      * @param mpi_comm MPI Communicator over which logging operations are
      * computed. Only used in SUNDIALS 6 and newer.
      */
-    IDA(const AdditionalData &data, const MPI_Comm &mpi_comm);
+    IDA(const AdditionalData &data, const MPI_Comm mpi_comm);
 
     /**
      * Destructor.

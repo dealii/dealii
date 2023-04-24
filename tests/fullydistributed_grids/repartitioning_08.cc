@@ -44,7 +44,7 @@ template <int dim, int spacedim = dim>
 class MyPolicy : public RepartitioningPolicyTools::Base<dim, spacedim>
 {
 public:
-  MyPolicy(const MPI_Comm &comm, const unsigned int direction)
+  MyPolicy(const MPI_Comm comm, const unsigned int direction)
     : comm(comm)
     , direction(direction)
   {}
@@ -74,7 +74,7 @@ public:
   }
 
 private:
-  const MPI_Comm &   comm;
+  const MPI_Comm     comm;
   const unsigned int direction;
 };
 

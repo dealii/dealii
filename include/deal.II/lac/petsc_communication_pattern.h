@@ -62,7 +62,7 @@ namespace PETScWrappers
     virtual void
     reinit(const IndexSet &locally_owned_indices,
            const IndexSet &ghost_indices,
-           const MPI_Comm &communicator) override;
+           const MPI_Comm  communicator) override;
 
     /**
      * Reinitialize the communication pattern. The argument @p indices_locally_owned
@@ -80,7 +80,7 @@ namespace PETScWrappers
     void
     reinit(const std::vector<types::global_dof_index> &indices_locally_owned,
            const std::vector<types::global_dof_index> &indices_want,
-           const MPI_Comm &                            communicator);
+           const MPI_Comm                              communicator);
 
     /**
      * Reinitialization that takes the number of locally-owned degrees of
@@ -98,7 +98,7 @@ namespace PETScWrappers
     void
     reinit(const types::global_dof_index local_size,
            const IndexSet &              ghost_indices,
-           const MPI_Comm &              communicator);
+           const MPI_Comm                communicator);
 
     /**
      * Fill the vector @p ghost_array according to the precomputed communication
@@ -202,7 +202,7 @@ namespace PETScWrappers
               const std::vector<PetscInt> &inloc,
               const std::vector<PetscInt> &outidx,
               const std::vector<PetscInt> &outloc,
-              const MPI_Comm &             communicator);
+              const MPI_Comm               communicator);
   };
 
   /**
@@ -238,7 +238,7 @@ namespace PETScWrappers
     virtual void
     reinit(const IndexSet &locally_owned_indices,
            const IndexSet &ghost_indices,
-           const MPI_Comm &communicator) override;
+           const MPI_Comm  communicator) override;
 
     /**
      * Reinitialize the partitioner. As for the Utilities::MPI::Partitioner,
@@ -251,7 +251,7 @@ namespace PETScWrappers
     reinit(const IndexSet &locally_owned_indices,
            const IndexSet &ghost_indices,
            const IndexSet &larger_ghost_indices,
-           const MPI_Comm &communicator);
+           const MPI_Comm  communicator);
 
     /**
      * Return the actual number of ghost indices.

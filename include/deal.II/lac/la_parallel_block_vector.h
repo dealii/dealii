@@ -168,13 +168,13 @@ namespace LinearAlgebra
        */
       BlockVector(const std::vector<IndexSet> &local_ranges,
                   const std::vector<IndexSet> &ghost_indices,
-                  const MPI_Comm &             communicator);
+                  const MPI_Comm               communicator);
 
       /**
        * Same as above but the ghost indices are assumed to be empty.
        */
       BlockVector(const std::vector<IndexSet> &local_ranges,
-                  const MPI_Comm &             communicator);
+                  const MPI_Comm               communicator);
 
       /**
        * Destructor.
@@ -319,14 +319,14 @@ namespace LinearAlgebra
       void
       reinit(const std::vector<IndexSet> &local_ranges,
              const std::vector<IndexSet> &ghost_indices,
-             const MPI_Comm &             communicator);
+             const MPI_Comm               communicator);
 
       /**
        * Same as above, but without ghost entries.
        */
       void
       reinit(const std::vector<IndexSet> &local_ranges,
-             const MPI_Comm &             communicator);
+             const MPI_Comm               communicator);
 
       /**
        * This function copies the data that has accumulated in the data buffer

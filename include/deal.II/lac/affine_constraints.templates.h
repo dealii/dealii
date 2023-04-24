@@ -107,7 +107,7 @@ bool
 AffineConstraints<number>::is_consistent_in_parallel(
   const std::vector<IndexSet> &locally_owned_dofs,
   const IndexSet &             locally_active_dofs,
-  const MPI_Comm &             mpi_communicator,
+  const MPI_Comm               mpi_communicator,
   const bool                   verbose) const
 {
   // Helper to return a ConstraintLine object that belongs to row @p row.
@@ -939,7 +939,7 @@ AffineConstraints<number>::is_closed() const
 
 template <typename number>
 bool
-AffineConstraints<number>::is_closed(const MPI_Comm &comm) const
+AffineConstraints<number>::is_closed(const MPI_Comm comm) const
 {
   return Utilities::MPI::min(static_cast<unsigned int>(is_closed()), comm) == 1;
 }

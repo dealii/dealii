@@ -60,7 +60,7 @@ namespace LinearAlgebra
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
                                      const std::vector<IndexSet> &ghost_indices,
-                                     const MPI_Comm &             communicator)
+                                     const MPI_Comm               communicator)
     {
       reinit(local_ranges, ghost_indices, communicator);
     }
@@ -68,7 +68,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
-                                     const MPI_Comm &             communicator)
+                                     const MPI_Comm               communicator)
     {
       reinit(local_ranges, communicator);
     }
@@ -149,7 +149,7 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::reinit(const std::vector<IndexSet> &local_ranges,
                                 const std::vector<IndexSet> &ghost_indices,
-                                const MPI_Comm &             communicator)
+                                const MPI_Comm               communicator)
     {
       AssertDimension(local_ranges.size(), ghost_indices.size());
 
@@ -172,7 +172,7 @@ namespace LinearAlgebra
     template <typename Number>
     void
     BlockVector<Number>::reinit(const std::vector<IndexSet> &local_ranges,
-                                const MPI_Comm &             communicator)
+                                const MPI_Comm               communicator)
     {
       // update the number of blocks
       this->block_indices.reinit(local_ranges.size(), 0);
