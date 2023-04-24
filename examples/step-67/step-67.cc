@@ -15,7 +15,6 @@
 
  *
  * Author: Martin Kronbichler, 2020
- 2022
  */
 
 // The include files are similar to the previous matrix-free tutorial programs
