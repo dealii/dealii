@@ -1487,7 +1487,14 @@ public:
    *    quadrature or mapping collection we are considering has only one
    *    element, then that is clearly the one that should be used.
    * -# If the quadrature or mapping collection have multiple elements,
-   *    then we need to dig further. To this end, we try to find out
+   *    then we need to dig further. For quadrature objects, we can
+   *    compare whether the two quadrature objects that correspond to
+   *    the `active_fe_index` values of the two adjacent cells are
+   *    identical (i.e., have quadrature points at the same locations,
+   *    and have the same weights). If this is so, then it does not
+   *    matter which one of the two we take, and we choose one or the
+   *    other.
+   * -# If this has still not helped, we try to find out
    *    which of the two finite element spaces on the two adjacent cells
    *    is "larger" (say, if you had used $Q_2$
    *    and $Q_4$ elements on the two adjacent cells, then the $Q_4$
@@ -2561,7 +2568,18 @@ FEInterfaceValues<dim, spacedim>::reinit(
         if (internal_hp_fe_face_values->get_mapping_collection().size() == 1)
           used_mapping_index = 0;
 
-      // Second check, if the above did not already suffice. We see if we
+      // Second check: See if the two quadrature objects are the same, because
+      // in that case it does not matter which one we use. Unfortunately, we
+      // currently have no way of testing that two mapping objects are the
+      // same :-(
+      if (used_q_index == numbers::invalid_unsigned_int)
+        if (internal_hp_fe_face_values
+              ->get_quadrature_collection()[cell->active_fe_index()] ==
+            internal_hp_fe_face_values
+              ->get_quadrature_collection()[cell_neighbor->active_fe_index()])
+          used_q_index = cell->active_fe_index();
+
+      // Third check, if the above did not already suffice. We see if we
       // can get somewhere via the dominated's finite element index.
       const unsigned int dominated_fe_index =
         ((used_q_index == numbers::invalid_unsigned_int) ||
