@@ -2429,6 +2429,60 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
             Assert(false, ExcNotImplemented());
         }
 
+  // Automatically merge components which are located consequently and have the
+  // same name into a vector or a tensor.
+  if (patch_spacedim > 1)
+    {
+      const auto names = get_dataset_names();
+
+      for (unsigned int component_start = 0; component_start < names.size();)
+        {
+          DataComponentInterpretation::DataComponentInterpretation
+            component_interpretation =
+              DataComponentInterpretation::component_is_scalar;
+
+          unsigned int component_end = component_start + 1;
+          for (; component_end < names.size(); ++component_end)
+            if (names[component_end] != names[component_start])
+              break;
+
+          const unsigned int n_components = component_end - component_start;
+
+          if (n_components == patch_spacedim)
+            component_interpretation =
+              DataComponentInterpretation::component_is_part_of_vector;
+          else if (n_components == patch_spacedim * patch_spacedim)
+            component_interpretation =
+              DataComponentInterpretation::component_is_part_of_tensor;
+
+          if (component_interpretation !=
+              DataComponentInterpretation::component_is_scalar)
+            {
+              bool add_new_range = true;
+              for (const auto &range : ranges)
+                {
+                  // Check if the component is already in the ranges
+                  if (std::get<0>(range) == component_start)
+                    add_new_range = false;
+
+                  // Here we rely on the fact that the ranges are sorted in
+                  // accending order
+                  if (std::get<0>(range) > component_start)
+                    break;
+                }
+
+              if (add_new_range)
+                ranges.emplace_back(
+                  std::forward_as_tuple(component_start,
+                                        component_end - 1,
+                                        names[component_start],
+                                        component_interpretation));
+            }
+
+          component_start = component_end;
+        }
+    }
+
   // note that we do not have to traverse the list of cell data here because
   // cell data is one value per (logical) cell and therefore cannot be a
   // vector
