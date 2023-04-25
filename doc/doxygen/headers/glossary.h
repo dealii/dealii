@@ -354,6 +354,11 @@
  * has read in from the mesh file. This can be done by using the
  * DataPostprocessors::BoundaryIds class and the following small piece of code:
  * @code
+ *    #include <deal.II/numerics/data_out_faces.h>
+ *    #include <deal.II/numerics/data_postprocessor.h>
+ *
+ *    ...
+ *
  *    DataPostprocessors::BoundaryIds<dim> boundary_ids;
  *    DataOutFaces<dim> data_out_faces;
  *    FE_Q<dim>         dummy_fe(1);
