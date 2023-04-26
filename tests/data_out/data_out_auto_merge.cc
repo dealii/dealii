@@ -78,7 +78,7 @@ check_this(const DoFHandler<dim> &dof_handler,
     }
 
   // VTK writer does not support tensorial output
-  // For thise reason a separate data_out object is used
+  // For this reason a separate DataOut object is used
   DataOut<dim> data_out_vec_only;
   data_out_vec_only.attach_dof_handler(dof_handler);
 
