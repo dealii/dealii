@@ -579,19 +579,28 @@ namespace TrilinosWrappers
        * and generates a new one based on the input partitioning. In addition
        * to just specifying one index set as in all the other methods above,
        * this method allows to supply an additional set of ghost entries.
+       *
        * There are two different versions of a vector that can be created. If
        * the flag @p vector_writable is set to @p false, the vector only
        * allows read access to the joint set of @p parallel_partitioning and
-       * @p ghost_entries. The effect of the reinit method is then equivalent
-       * to calling the other reinit method with an index set containing both
-       * the locally owned entries and the ghost entries.
+       * @p locally_relevant_or_ghost_entries. The effect of the reinit method
+       * is then equivalent to calling the other reinit method with an index set
+       * containing the union of the two provided index sets. In this case,
+       * it does not matter whether the second argument contains all
+       * locally relevant DoF indices, or only the ones indicating ghost
+       * indices: The union between the two index sets is the same in either
+       * case.
        *
        * If the flag @p vector_writable is set to true, this creates an
        * alternative storage scheme for ghost elements that allows multiple
        * threads to write into the vector (for the other reinit methods, only
-       * one thread is allowed to write into the ghost entries at a time).
+       * one thread is allowed to write into the ghost entries at a time). In
+       * this case, the set of ghost elements of the resulting vector is the
+       * *set difference* between the second and first argument -- where again
+       * it does not matter whether the second argument does or does not
+       * contain the locally owned entries specified by the first argument.
        *
-       * Depending on whether the @p ghost_entries argument uniquely
+       * Depending on whether the @p locally_relevant_or_ghost_entries argument uniquely
        * subdivides elements among processors or not, the resulting vector may
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
@@ -601,7 +610,7 @@ namespace TrilinosWrappers
        */
       void
       reinit(const IndexSet &locally_owned_entries,
-             const IndexSet &ghost_entries,
+             const IndexSet &locally_relevant_or_ghost_entries,
              const MPI_Comm &communicator    = MPI_COMM_WORLD,
              const bool      vector_writable = false);
 
