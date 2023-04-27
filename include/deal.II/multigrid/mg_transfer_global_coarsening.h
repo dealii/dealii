@@ -153,7 +153,9 @@ namespace MGTransferGlobalCoarseningTools
 } // namespace MGTransferGlobalCoarseningTools
 
 
-
+/**
+ * Abstract base class for transfer operators between two multigrid levels.
+ */
 template <typename VectorType>
 class MGTwoLevelTransferBase : public Subscriptor
 {
@@ -198,7 +200,13 @@ public:
 };
 
 
-
+/**
+ * Base class for transfer operators between two multigrid levels.
+ * Specialization for LinearAlgebra::distributed::Vector. The implementation of
+ * restriction and prolongation between levels is delegated to derived classes,
+ * which implement prolongate_and_add_internal() and restrict_and_add_internal()
+ * accordingly.
+ */
 template <typename Number>
 class MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
   : public Subscriptor
@@ -220,9 +228,7 @@ public:
 
   /**
    * Perform interpolation of a solution vector from the fine level to the
-   * coarse level. This function is different from restriction, where a
-   * weighted residual is transferred to a coarser level (transposition of
-   * prolongation matrix).
+   * coarse level.
    */
   virtual void
   interpolate(VectorType &dst, const VectorType &src) const = 0;
@@ -246,7 +252,7 @@ public:
 
 protected:
   /**
-   * Perform prolongation.
+   * Perform prolongation on vectors with correct ghosting.
    */
   virtual void
   prolongate_and_add_internal(
@@ -254,21 +260,36 @@ protected:
     const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
 
   /**
-   * Perform restriction.
+   * Perform restriction on vectors with correct ghosting.
    */
   virtual void
   restrict_and_add_internal(
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
 
+  /**
+   * A wrapper around update_ghost_values() optimized in case the
+   * present vector has the same parallel layout of one of the external
+   * partitioners.
+   */
   void
   update_ghost_values(
     const LinearAlgebra::distributed::Vector<Number> &vec) const;
 
+  /**
+   * A wrapper around compress() optimized in case the
+   * present vector has the same parallel layout of one of the external
+   * partitioners.
+   */
   void
   compress(LinearAlgebra::distributed::Vector<Number> &vec,
            const VectorOperation::values               op) const;
 
+  /**
+   * A wrapper around zero_out_ghost_values() optimized in case the
+   * present vector has the same parallel layout of one of the external
+   * partitioners.
+   */
   void
   zero_out_ghost_values(
     const LinearAlgebra::distributed::Vector<Number> &vec) const;
@@ -277,13 +298,14 @@ protected:
    * Enable inplace vector operations if external and internal vectors
    * are compatible.
    */
-  template <typename ConstraintInfo>
+  template <int dim, std::size_t width>
   void
   internal_enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
-    ConstraintInfo &                                          constraint_info);
+    internal::MatrixFreeFunctions::
+      ConstraintInfo<dim, VectorizedArray<Number, width>> &constraint_info);
 
   /**
    * Flag if the finite elements on the fine cells are continuous. If yes,
@@ -373,9 +395,7 @@ public:
 
   /**
    * Perform interpolation of a solution vector from the fine level to the
-   * coarse level. This function is different from restriction, where a
-   * weighted residual is transferred to a coarser level (transposition of
-   * prolongation matrix).
+   * coarse level.
    */
   void
   interpolate(VectorType &dst, const VectorType &src) const override;
@@ -484,9 +504,7 @@ public:
 
   /**
    * Perform interpolation of a solution vector from the fine level to the
-   * coarse level. This function is different from restriction, where a
-   * weighted residual is transferred to a coarser level (transposition of
-   * prolongation matrix).
+   * coarse level.
    */
   void
   interpolate(

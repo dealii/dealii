@@ -3113,15 +3113,16 @@ namespace internal
 } // namespace internal
 
 template <typename Number>
-template <typename ConstraintInfo>
+template <int dim, std::size_t width>
 void
 MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
   internal_enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &external_partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &             external_partitioner_fine,
-    ConstraintInfo &constraint_info)
+      &external_partitioner_fine,
+    internal::MatrixFreeFunctions::
+      ConstraintInfo<dim, VectorizedArray<Number, width>> &constraint_info)
 {
   if (this->partitioner_coarse->is_globally_compatible(
         *external_partitioner_coarse))
