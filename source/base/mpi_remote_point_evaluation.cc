@@ -200,6 +200,16 @@ namespace Utilities
     }
 
 
+
+    template <int dim, int spacedim>
+    const typename RemotePointEvaluation<dim, spacedim>::CellData &
+    RemotePointEvaluation<dim, spacedim>::get_cell_data() const
+    {
+      return cell_data;
+    }
+
+
+
     template <int dim, int spacedim>
     const std::vector<unsigned int> &
     RemotePointEvaluation<dim, spacedim>::get_point_ptrs() const
