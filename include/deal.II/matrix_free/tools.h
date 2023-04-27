@@ -422,14 +422,13 @@ namespace MatrixFreeTools
     template <typename Number>
     struct LocalCSR
     {
-      LocalCSR()
-        : row{0}
-      {}
-
       std::vector<unsigned int> row_lid_to_gid;
       std::vector<unsigned int> row;
       std::vector<unsigned int> col;
       std::vector<Number>       val;
+
+      std::vector<unsigned int>                          inverse_lookup_rows;
+      std::vector<std::pair<unsigned int, unsigned int>> inverse_lookup_origins;
     };
 
     template <int dim,
@@ -472,42 +471,36 @@ namespace MatrixFreeTools
         const unsigned int n_lanes_filled =
           matrix_free.n_active_entries_per_cell_batch(cell);
 
-        std::array<const unsigned int *, n_lanes> dof_indices{};
-        {
-          for (unsigned int v = 0; v < n_lanes_filled; ++v)
-            dof_indices[v] =
-              dof_info.dof_indices.data() +
-              dof_info
-                .row_starts[(cell * n_lanes + v) * n_fe_components +
-                            first_selected_component]
-                .first;
-        }
-
         // STEP 2: setup CSR storage of transposed locally-relevant
         //   constraint matrix
-        c_pools = std::array<internal::LocalCSR<Number>, n_lanes>();
+
+        // (constrained local index, global index of dof
+        // constraints, weight)
+        std::vector<std::tuple<unsigned int, unsigned int, Number>>
+          locally_relevant_constraints, locally_relevant_constraints_hn,
+          locally_relevant_constraints_tmp;
+        locally_relevant_constraints.reserve(phi.dofs_per_cell);
+
+        AlignedVector<VectorizedArrayType> values_dofs;
 
         for (unsigned int v = 0; v < n_lanes_filled; ++v)
           {
-            unsigned int index_indicators, next_index_indicators;
+            const unsigned int *dof_indices;
+            unsigned int        index_indicators, next_index_indicators;
 
-            index_indicators =
-              dof_info
-                .row_starts[(cell * n_lanes + v) * n_fe_components +
-                            first_selected_component]
-                .second;
-            next_index_indicators =
-              dof_info
-                .row_starts[(cell * n_lanes + v) * n_fe_components +
-                            first_selected_component + 1]
-                .second;
+            {
+              const unsigned int start =
+                (cell * n_lanes + v) * n_fe_components +
+                first_selected_component;
+              dof_indices =
+                dof_info.dof_indices.data() + dof_info.row_starts[start].first;
+              index_indicators      = dof_info.row_starts[start].second;
+              next_index_indicators = dof_info.row_starts[start + 1].second;
+            }
 
             // STEP 2a: setup locally-relevant constraint matrix in a
             //   coordinate list (COO)
-            std::vector<std::tuple<unsigned int, unsigned int, Number>>
-              locally_relevant_constrains; // (constrained local index,
-                                           // global index of dof which
-                                           // constrains, weight)
+            locally_relevant_constraints.clear();
 
             if (n_components == 1 || n_fe_components == 1)
               {
@@ -520,29 +513,30 @@ namespace MatrixFreeTools
 
                     for (unsigned int j = 0; j < indicator.first;
                          ++j, ++ind_local)
-                      locally_relevant_constrains.emplace_back(
-                        ind_local, dof_indices[v][j], 1.0);
+                      locally_relevant_constraints.emplace_back(ind_local,
+                                                                dof_indices[j],
+                                                                1.0);
 
-                    dof_indices[v] += indicator.first;
+                    dof_indices += indicator.first;
 
                     const Number *data_val =
                       matrix_free.constraint_pool_begin(indicator.second);
                     const Number *end_pool =
                       matrix_free.constraint_pool_end(indicator.second);
 
-                    for (; data_val != end_pool; ++data_val, ++dof_indices[v])
-                      locally_relevant_constrains.emplace_back(ind_local,
-                                                               *dof_indices[v],
-                                                               *data_val);
+                    for (; data_val != end_pool; ++data_val, ++dof_indices)
+                      locally_relevant_constraints.emplace_back(ind_local,
+                                                                *dof_indices,
+                                                                *data_val);
                   }
 
                 AssertIndexRange(ind_local, dofs_per_component + 1);
 
                 for (; ind_local < dofs_per_component;
-                     ++dof_indices[v], ++ind_local)
-                  locally_relevant_constrains.emplace_back(ind_local,
-                                                           *dof_indices[v],
-                                                           1.0);
+                     ++dof_indices, ++ind_local)
+                  locally_relevant_constraints.emplace_back(ind_local,
+                                                            *dof_indices,
+                                                            1.0);
               }
             else
               {
@@ -567,22 +561,21 @@ namespace MatrixFreeTools
                         // run through values up to next constraint
                         for (unsigned int j = 0; j < indicator.first;
                              ++j, ++ind_local)
-                          locally_relevant_constrains.emplace_back(
+                          locally_relevant_constraints.emplace_back(
                             comp * dofs_per_component + ind_local,
-                            dof_indices[v][j],
+                            dof_indices[j],
                             1.0);
-                        dof_indices[v] += indicator.first;
+                        dof_indices += indicator.first;
 
                         const Number *data_val =
                           matrix_free.constraint_pool_begin(indicator.second);
                         const Number *end_pool =
                           matrix_free.constraint_pool_end(indicator.second);
 
-                        for (; data_val != end_pool;
-                             ++data_val, ++dof_indices[v])
-                          locally_relevant_constrains.emplace_back(
+                        for (; data_val != end_pool; ++data_val, ++dof_indices)
+                          locally_relevant_constraints.emplace_back(
                             comp * dofs_per_component + ind_local,
-                            *dof_indices[v],
+                            *dof_indices,
                             *data_val);
                       }
 
@@ -590,10 +583,10 @@ namespace MatrixFreeTools
 
                     // get the dof values past the last constraint
                     for (; ind_local < dofs_per_component;
-                         ++dof_indices[v], ++ind_local)
-                      locally_relevant_constrains.emplace_back(
+                         ++dof_indices, ++ind_local)
+                      locally_relevant_constraints.emplace_back(
                         comp * dofs_per_component + ind_local,
-                        *dof_indices[v],
+                        *dof_indices,
                         1.0);
 
                     if (comp + 1 < n_components)
@@ -609,8 +602,8 @@ namespace MatrixFreeTools
             // STEP 2b: sort and make unique
 
             // sort vector
-            std::sort(locally_relevant_constrains.begin(),
-                      locally_relevant_constrains.end(),
+            std::sort(locally_relevant_constraints.begin(),
+                      locally_relevant_constraints.end(),
                       [](const auto &a, const auto &b) {
                         if (std::get<0>(a) < std::get<0>(b))
                           return true;
@@ -619,14 +612,14 @@ namespace MatrixFreeTools
                       });
 
             // make sure that all entries are unique
-            locally_relevant_constrains.erase(
-              unique(locally_relevant_constrains.begin(),
-                     locally_relevant_constrains.end(),
+            locally_relevant_constraints.erase(
+              unique(locally_relevant_constraints.begin(),
+                     locally_relevant_constraints.end(),
                      [](const auto &a, const auto &b) {
                        return (std::get<1>(a) == std::get<1>(b)) &&
                               (std::get<0>(a) == std::get<0>(b));
                      }),
-              locally_relevant_constrains.end());
+              locally_relevant_constraints.end());
 
             // STEP 2c: apply hanging-node constraints
             if (dof_info.hanging_node_constraint_masks.size() > 0 &&
@@ -644,14 +637,12 @@ namespace MatrixFreeTools
                   {
                     // check if hanging node internpolation matrix has been set
                     // up
-                    if (locally_relevant_constrains_hn_map.find(mask) ==
-                        locally_relevant_constrains_hn_map.end())
+                    if (locally_relevant_constraints_hn_map.find(mask) ==
+                        locally_relevant_constraints_hn_map.end())
                       {
                         // 1) collect hanging-node constraints for cell assuming
                         // scalar finite element
-                        AlignedVector<VectorizedArrayType> values_dofs(
-                          dofs_per_component);
-
+                        values_dofs.resize(dofs_per_component);
                         std::array<dealii::internal::MatrixFreeFunctions::
                                      compressed_constraint_kind,
                                    VectorizedArrayType::size()>
@@ -661,10 +652,7 @@ namespace MatrixFreeTools
                             unconstrained_compressed_constraint_kind);
 
                         constraint_mask[0] = mask;
-
-                        std::vector<
-                          std::tuple<unsigned int, unsigned int, Number>>
-                          locally_relevant_constrains_hn;
+                        locally_relevant_constraints_hn.clear();
 
                         for (unsigned int i = 0; i < dofs_per_component; ++i)
                           {
@@ -689,13 +677,13 @@ namespace MatrixFreeTools
                               if (1e-10 < std::abs(values_dofs[j][0]) &&
                                   (j != i ||
                                    1e-10 < std::abs(values_dofs[j][0] - 1.0)))
-                                locally_relevant_constrains_hn.emplace_back(
+                                locally_relevant_constraints_hn.emplace_back(
                                   j, i, values_dofs[j][0]);
                           }
 
 
-                        std::sort(locally_relevant_constrains_hn.begin(),
-                                  locally_relevant_constrains_hn.end(),
+                        std::sort(locally_relevant_constraints_hn.begin(),
+                                  locally_relevant_constraints_hn.end(),
                                   [](const auto &a, const auto &b) {
                                     if (std::get<0>(a) < std::get<0>(b))
                                       return true;
@@ -705,34 +693,40 @@ namespace MatrixFreeTools
 
                         // 1b) extend for multiple components
                         const unsigned int n_hn_constraints =
-                          locally_relevant_constrains_hn.size();
-                        locally_relevant_constrains_hn.resize(n_hn_constraints *
-                                                              n_components);
+                          locally_relevant_constraints_hn.size();
+                        locally_relevant_constraints_hn.resize(
+                          n_hn_constraints * n_components);
 
                         for (unsigned int c = 0; c < n_components; ++c)
                           for (unsigned int i = 0; i < n_hn_constraints; ++i)
-                            locally_relevant_constrains_hn[c *
-                                                             n_hn_constraints +
-                                                           i] =
+                            locally_relevant_constraints_hn[c *
+                                                              n_hn_constraints +
+                                                            i] =
                               std::tuple<unsigned int, unsigned int, Number>{
-                                std::get<0>(locally_relevant_constrains_hn[i]) +
+                                std::get<0>(
+                                  locally_relevant_constraints_hn[i]) +
                                   c * dofs_per_component,
-                                std::get<1>(locally_relevant_constrains_hn[i]) +
+                                std::get<1>(
+                                  locally_relevant_constraints_hn[i]) +
                                   c * dofs_per_component,
-                                std::get<2>(locally_relevant_constrains_hn[i])};
+                                std::get<2>(
+                                  locally_relevant_constraints_hn[i])};
 
 
-                        locally_relevant_constrains_hn_map[mask] =
-                          locally_relevant_constrains_hn;
+                        locally_relevant_constraints_hn_map[mask] =
+                          locally_relevant_constraints_hn;
                       }
 
-                    const auto &locally_relevant_constrains_hn =
-                      locally_relevant_constrains_hn_map[mask];
+                    const auto &locally_relevant_constraints_hn =
+                      locally_relevant_constraints_hn_map[mask];
 
-                    // 2) perform vmult with other constraints
-                    std::vector<std::tuple<unsigned int, unsigned int, Number>>
-                      locally_relevant_constrains_temp;
+                    locally_relevant_constraints_tmp.clear();
+                    if (locally_relevant_constraints_tmp.capacity() <
+                        locally_relevant_constraints.size())
+                      locally_relevant_constraints_tmp.reserve(
+                        locally_relevant_constraints.size() * 2);
 
+                    // 2) combine with other constraints
                     for (unsigned int i = 0;
                          i < dofs_per_component * n_components;
                          ++i)
@@ -748,13 +742,13 @@ namespace MatrixFreeTools
                         };
 
                         const auto i_begin = std::lower_bound(
-                          locally_relevant_constrains_hn.begin(),
-                          locally_relevant_constrains_hn.end(),
+                          locally_relevant_constraints_hn.begin(),
+                          locally_relevant_constraints_hn.end(),
                           i,
                           lower_bound_fu);
                         const auto i_end = std::upper_bound(
-                          locally_relevant_constrains_hn.begin(),
-                          locally_relevant_constrains_hn.end(),
+                          locally_relevant_constraints_hn.begin(),
+                          locally_relevant_constraints_hn.end(),
                           i,
                           upper_bound_fu);
 
@@ -763,18 +757,18 @@ namespace MatrixFreeTools
                             // dof is not constrained by hanging-node constraint
                             // (identity matrix): simply copy constraints
                             const auto j_begin = std::lower_bound(
-                              locally_relevant_constrains.begin(),
-                              locally_relevant_constrains.end(),
+                              locally_relevant_constraints.begin(),
+                              locally_relevant_constraints.end(),
                               i,
                               lower_bound_fu);
                             const auto j_end = std::upper_bound(
-                              locally_relevant_constrains.begin(),
-                              locally_relevant_constrains.end(),
+                              locally_relevant_constraints.begin(),
+                              locally_relevant_constraints.end(),
                               i,
                               upper_bound_fu);
 
                             for (auto v = j_begin; v != j_end; ++v)
-                              locally_relevant_constrains_temp.emplace_back(*v);
+                              locally_relevant_constraints_tmp.emplace_back(*v);
                           }
                         else
                           {
@@ -782,18 +776,18 @@ namespace MatrixFreeTools
                             for (auto v0 = i_begin; v0 != i_end; ++v0)
                               {
                                 const auto j_begin = std::lower_bound(
-                                  locally_relevant_constrains.begin(),
-                                  locally_relevant_constrains.end(),
+                                  locally_relevant_constraints.begin(),
+                                  locally_relevant_constraints.end(),
                                   std::get<1>(*v0),
                                   lower_bound_fu);
                                 const auto j_end = std::upper_bound(
-                                  locally_relevant_constrains.begin(),
-                                  locally_relevant_constrains.end(),
+                                  locally_relevant_constraints.begin(),
+                                  locally_relevant_constraints.end(),
                                   std::get<1>(*v0),
                                   upper_bound_fu);
 
                                 for (auto v1 = j_begin; v1 != j_end; ++v1)
-                                  locally_relevant_constrains_temp.emplace_back(
+                                  locally_relevant_constraints_tmp.emplace_back(
                                     std::get<0>(*v0),
                                     std::get<1>(*v1),
                                     std::get<2>(*v0) * std::get<2>(*v1));
@@ -801,14 +795,14 @@ namespace MatrixFreeTools
                           }
                       }
 
-                    locally_relevant_constrains =
-                      locally_relevant_constrains_temp;
+                    std::swap(locally_relevant_constraints,
+                              locally_relevant_constraints_tmp);
                   }
               }
 
             // STEP 2d: transpose COO
-            std::sort(locally_relevant_constrains.begin(),
-                      locally_relevant_constrains.end(),
+            std::sort(locally_relevant_constraints.begin(),
+                      locally_relevant_constraints.end(),
                       [](const auto &a, const auto &b) {
                         if (std::get<1>(a) < std::get<1>(b))
                           return true;
@@ -819,10 +813,16 @@ namespace MatrixFreeTools
             // STEP 2e: translate COO to CRS
             auto &c_pool = c_pools[v];
             {
-              if (locally_relevant_constrains.size() > 0)
+              c_pool.row_lid_to_gid.clear();
+              c_pool.row.clear();
+              c_pool.row.push_back(0);
+              c_pool.col.clear();
+              c_pool.val.clear();
+
+              if (locally_relevant_constraints.size() > 0)
                 c_pool.row_lid_to_gid.emplace_back(
-                  std::get<1>(locally_relevant_constrains.front()));
-              for (const auto &j : locally_relevant_constrains)
+                  std::get<1>(locally_relevant_constraints.front()));
+              for (const auto &j : locally_relevant_constraints)
                 {
                   if (c_pool.row_lid_to_gid.back() != std::get<1>(j))
                     {
@@ -836,8 +836,34 @@ namespace MatrixFreeTools
 
               if (c_pool.val.size() > 0)
                 c_pool.row.push_back(c_pool.val.size());
+
+              c_pool.inverse_lookup_rows.clear();
+              c_pool.inverse_lookup_rows.resize(1 + phi.dofs_per_cell);
+              for (const unsigned int i : c_pool.col)
+                c_pool.inverse_lookup_rows[1 + i]++;
+              // transform to offsets
+              std::partial_sum(c_pool.inverse_lookup_rows.begin(),
+                               c_pool.inverse_lookup_rows.end(),
+                               c_pool.inverse_lookup_rows.begin());
+              AssertDimension(c_pool.inverse_lookup_rows.back(),
+                              c_pool.col.size());
+
+              c_pool.inverse_lookup_origins.resize(c_pool.col.size());
+              std::vector<unsigned int> inverse_lookup_count(phi.dofs_per_cell);
+              for (unsigned int row = 0; row < c_pool.row.size() - 1; ++row)
+                for (unsigned int col = c_pool.row[row];
+                     col < c_pool.row[row + 1];
+                     ++col)
+                  {
+                    const unsigned int index = c_pool.col[col];
+                    c_pool.inverse_lookup_origins
+                      [c_pool.inverse_lookup_rows[index] +
+                       inverse_lookup_count[index]] = std::make_pair(row, col);
+                    ++inverse_lookup_count[index];
+                  }
             }
           }
+
         // STEP 3: compute element matrix A_e, apply
         //   locally-relevant constraints C_e^T * A_e * C_e, and get the
         //   the diagonal entry
@@ -903,23 +929,11 @@ namespace MatrixFreeTools
           {
             const auto &c_pool = c_pools[v];
 
-            for (unsigned int j = 0; j < c_pool.row.size() - 1; ++j)
+            for (unsigned int jj = c_pool.inverse_lookup_rows[i_comp];
+                 jj < c_pool.inverse_lookup_rows[i_comp + 1];
+                 ++jj)
               {
-                // check if the result will be zero, so that we can skip
-                // the following computations -> binary search
-                const auto scale_iterator =
-                  std::lower_bound(c_pool.col.begin() + c_pool.row[j],
-                                   c_pool.col.begin() + c_pool.row[j + 1],
-                                   i_comp);
-
-                // explanation: j-th row of C_e^T is empty (see above)
-                if (scale_iterator == c_pool.col.begin() + c_pool.row[j + 1])
-                  continue;
-
-                // explanation: C_e^T(j,i) is zero (see above)
-                if (*scale_iterator != i_comp)
-                  continue;
-
+                const unsigned int j = c_pool.inverse_lookup_origins[jj].first;
                 // apply constraint matrix from the left
                 Number temp = 0.0;
                 for (unsigned int k = c_pool.row[j]; k < c_pool.row[j + 1]; ++k)
@@ -930,8 +944,7 @@ namespace MatrixFreeTools
                 // apply constraint matrix from the right
                 diagonals_local_constrained
                   [v][j + comp * c_pools[v].row_lid_to_gid.size()] +=
-                  temp *
-                  c_pool.val[std::distance(c_pool.col.begin(), scale_iterator)];
+                  temp * c_pool.val[c_pool.inverse_lookup_origins[jj].second];
               }
           }
       }
@@ -985,7 +998,7 @@ namespace MatrixFreeTools
       std::map<
         dealii::internal::MatrixFreeFunctions::compressed_constraint_kind,
         std::vector<std::tuple<unsigned int, unsigned int, Number>>>
-        locally_relevant_constrains_hn_map;
+        locally_relevant_constraints_hn_map;
     };
 
   } // namespace internal
