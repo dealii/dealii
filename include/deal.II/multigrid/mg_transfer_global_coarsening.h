@@ -17,6 +17,7 @@
 #define dealii_mg_transfer_global_coarsening_h
 
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/mpi_remote_point_evaluation.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -153,25 +154,68 @@ namespace MGTransferGlobalCoarseningTools
 
 
 
-/**
- * Class for transfer between two multigrid levels for p- or global coarsening.
- *
- * The implementation of this class is explained in detail in @cite munch2022gc.
- */
-template <int dim, typename VectorType>
-class MGTwoLevelTransfer
+template <typename VectorType>
+class MGTwoLevelTransferBase : public Subscriptor
 {
 public:
   /**
    * Perform prolongation.
    */
-  void
+  virtual void
+  prolongate_and_add(VectorType &dst, const VectorType &src) const = 0;
+
+  /**
+   * Perform restriction.
+   */
+  virtual void
+  restrict_and_add(VectorType &dst, const VectorType &src) const = 0;
+
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix).
+   */
+  virtual void
+  interpolate(VectorType &dst, const VectorType &src) const = 0;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  virtual void
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_fine) = 0;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  virtual std::size_t
+  memory_consumption() const = 0;
+};
+
+
+
+template <typename Number>
+class MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
+  : public Subscriptor
+{
+public:
+  using VectorType = LinearAlgebra::distributed::Vector<Number>;
+
+  /**
+   * Perform prolongation.
+   */
+  virtual void
   prolongate_and_add(VectorType &dst, const VectorType &src) const;
 
   /**
    * Perform restriction.
    */
-  void
+  virtual void
   restrict_and_add(VectorType &dst, const VectorType &src) const;
 
   /**
@@ -180,8 +224,161 @@ public:
    * weighted residual is transferred to a coarser level (transposition of
    * prolongation matrix).
    */
+  virtual void
+  interpolate(VectorType &dst, const VectorType &src) const = 0;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  virtual void
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_fine) = 0;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  virtual std::size_t
+  memory_consumption() const = 0;
+
+protected:
+  /**
+   * Perform prolongation.
+   */
+  virtual void
+  prolongate_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
+
+  /**
+   * Perform restriction.
+   */
+  virtual void
+  restrict_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
+
   void
-  interpolate(VectorType &dst, const VectorType &src) const;
+  update_ghost_values(
+    const LinearAlgebra::distributed::Vector<Number> &vec) const;
+
+  void
+  compress(LinearAlgebra::distributed::Vector<Number> &vec,
+           const VectorOperation::values               op) const;
+
+  void
+  zero_out_ghost_values(
+    const LinearAlgebra::distributed::Vector<Number> &vec) const;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  template <typename ConstraintInfo>
+  void
+  internal_enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
+    ConstraintInfo &                                          constraint_info);
+
+  /**
+   * Flag if the finite elements on the fine cells are continuous. If yes,
+   * the multiplicity of DoF sharing a vertex/line as well as constraints have
+   * to be taken into account via weights.
+   */
+  bool fine_element_is_continuous;
+
+  /**
+   * Partitioner needed by the intermediate vector.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
+
+  /**
+   * Partitioner needed by the intermediate vector.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine;
+
+  /**
+   * Internal vector needed for collecting all degrees of freedom of the fine
+   * cells. It is only initialized if the fine-level DoF indices touch DoFs
+   * other than the locally active ones (which we always assume can be
+   * accessed by the given vectors in the prolongate/restrict functions),
+   * otherwise it is left at size zero.
+   */
+  mutable LinearAlgebra::distributed::Vector<Number> vec_fine;
+
+  /**
+   * Internal vector on that the actual prolongation/restriction is performed.
+   */
+  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
+
+  /**
+   * Embedded partitioner for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner>
+    partitioner_coarse_embedded;
+
+  /**
+   * Embedded partitioner for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine_embedded;
+
+  /**
+   * Buffer for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  mutable AlignedVector<Number> buffer_coarse_embedded;
+
+  /**
+   * Buffer for efficient communication if locally relevant DoFs
+   * are a subset of an external Partitioner object.
+   */
+  mutable AlignedVector<Number> buffer_fine_embedded;
+
+  /**
+   * DoF indices of the fine cells, expressed in indices local to the MPI
+   * rank.
+   */
+  std::vector<unsigned int> level_dof_indices_fine;
+};
+
+
+
+/**
+ * Class for transfer between two multigrid levels for p- or global coarsening.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
+ */
+template <int dim, typename VectorType>
+class MGTwoLevelTransfer : public MGTwoLevelTransferBase<VectorType>
+{
+public:
+  /**
+   * Perform prolongation.
+   */
+  void
+  prolongate_and_add(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * Perform restriction.
+   */
+  void
+  restrict_and_add(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * Perform interpolation of a solution vector from the fine level to the
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix).
+   */
+  void
+  interpolate(VectorType &dst, const VectorType &src) const override;
 
   /**
    * Enable inplace vector operations if external and internal vectors
@@ -191,13 +388,14 @@ public:
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine);
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+    override;
 
   /**
    * Return the memory consumption of the allocated memory in this class.
    */
   std::size_t
-  memory_consumption() const;
+  memory_consumption() const override;
 };
 
 
@@ -210,6 +408,7 @@ public:
  */
 template <int dim, typename Number>
 class MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
+  : public MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
 {
 public:
   /**
@@ -284,29 +483,15 @@ public:
                                      const unsigned int fe_degree_coarse);
 
   /**
-   * Perform prolongation.
-   */
-  void
-  prolongate_and_add(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const;
-
-  /**
-   * Perform restriction.
-   */
-  void
-  restrict_and_add(LinearAlgebra::distributed::Vector<Number> &      dst,
-                   const LinearAlgebra::distributed::Vector<Number> &src) const;
-
-  /**
    * Perform interpolation of a solution vector from the fine level to the
    * coarse level. This function is different from restriction, where a
    * weighted residual is transferred to a coarser level (transposition of
    * prolongation matrix).
    */
   void
-  interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
-              const LinearAlgebra::distributed::Vector<Number> &src) const;
+  interpolate(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
    * Enable inplace vector operations if external and internal vectors
@@ -316,26 +501,27 @@ public:
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine);
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+    override;
 
   /**
    * Return the memory consumption of the allocated memory in this class.
    */
   std::size_t
-  memory_consumption() const;
+  memory_consumption() const override;
+
+protected:
+  void
+  prolongate_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+
+  void
+  restrict_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
 private:
-  void
-  update_ghost_values(const LinearAlgebra::distributed::Vector<Number> &) const;
-
-  void
-  compress(LinearAlgebra::distributed::Vector<Number> &,
-           const VectorOperation::values) const;
-
-  void
-  zero_out_ghost_values(
-    const LinearAlgebra::distributed::Vector<Number> &) const;
-
   /**
    * A multigrid transfer scheme. A multrigrid transfer class can have different
    * transfer schemes to enable p-adaptivity (one transfer scheme per
@@ -412,62 +598,6 @@ private:
   std::vector<MGTransferScheme> schemes;
 
   /**
-   * Flag if the finite elements on the fine cells are continuous. If yes,
-   * the multiplicity of DoF sharing a vertex/line as well as constraints have
-   * to be taken into account via weights.
-   */
-  bool fine_element_is_continuous;
-
-  /**
-   * Partitioner needed by the intermediate vector.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine;
-
-  /**
-   * Embedded partitioner for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_fine_embedded;
-
-  /**
-   * Buffer for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  mutable AlignedVector<Number> buffer_fine_embedded;
-
-  /**
-   * Partitioner needed by the intermediate vector.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner> partitioner_coarse;
-
-  /**
-   * Embedded partitioner for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  std::shared_ptr<const Utilities::MPI::Partitioner>
-    partitioner_coarse_embedded;
-
-  /**
-   * Buffer for efficient communication if locally relevant DoFs
-   * are a subset of an external Partitioner object.
-   */
-  mutable AlignedVector<Number> buffer_coarse_embedded;
-
-  /**
-   * Internal vector needed for collecting all degrees of freedom of the fine
-   * cells. It is only initialized if the fine-level DoF indices touch DoFs
-   * other than the locally active ones (which we always assume can be
-   * accessed by the given vectors in the prolongate/restrict functions),
-   * otherwise it is left at size zero.
-   */
-  mutable LinearAlgebra::distributed::Vector<Number> vec_fine;
-
-  /**
-   * Internal vector on that the actual prolongation/restriction is performed.
-   */
-  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
-
-  /**
    * Helper class for reading from and writing to global vectors and for
    * applying constraints.
    */
@@ -484,12 +614,6 @@ private:
    * cell if possible.
    */
   AlignedVector<VectorizedArray<Number>> weights_compressed;
-
-  /**
-   * DoF indices of the fine cells, expressed in indices local to the MPI
-   * rank.
-   */
-  std::vector<unsigned int> level_dof_indices_fine;
 
   /**
    * Number of components.
@@ -529,8 +653,9 @@ public:
    * internal level vectors within the function call copy_to_mg() if used in the
    * context of PreconditionMG.
    */
+  template <typename T>
   MGTransferGlobalCoarsening(
-    const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer,
+    const MGLevelObject<T> &transfer,
     const std::function<void(const unsigned int, VectorType &)>
       &initialize_dof_vector = {});
 
@@ -661,7 +786,7 @@ private:
   /**
    * Collection of the two-level transfer operators.
    */
-  MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> transfer;
+  MGLevelObject<SmartPointer<MGTwoLevelTransferBase<VectorType>>> transfer;
 
   /**
    * External partitioners used during initialize_dof_vector().
@@ -711,12 +836,22 @@ private:
 
 
 template <int dim, typename VectorType>
+template <typename T>
 MGTransferGlobalCoarsening<dim, VectorType>::MGTransferGlobalCoarsening(
-  const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer,
+  const MGLevelObject<T> &transfer,
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
-  : transfer(transfer)
 {
+  const unsigned int min_level = transfer.min_level();
+  const unsigned int max_level = transfer.max_level();
+
+  this->transfer.resize(min_level, max_level);
+
+  for (unsigned int l = min_level; l <= max_level; ++l)
+    this->transfer[l] = &const_cast<MGTwoLevelTransferBase<VectorType> &>(
+      static_cast<const MGTwoLevelTransferBase<VectorType> &>(
+        Utilities::get_underlying_value(transfer[l])));
+
   this->build(initialize_dof_vector);
 }
 
@@ -738,7 +873,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::build(
       AssertDimension(this->external_partitioners.size(), transfer.n_levels());
 
       for (unsigned int l = min_level + 1; l <= max_level; ++l)
-        transfer[l].enable_inplace_operations_if_possible(
+        transfer[l]->enable_inplace_operations_if_possible(
           this->external_partitioners[l - 1 - min_level],
           this->external_partitioners[l - min_level]);
     }
@@ -817,7 +952,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::prolongate_and_add(
   VectorType &       dst,
   const VectorType & src) const
 {
-  this->transfer[to_level].prolongate_and_add(dst, src);
+  this->transfer[to_level]->prolongate_and_add(dst, src);
 }
 
 
@@ -829,7 +964,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::restrict_and_add(
   VectorType &       dst,
   const VectorType & src) const
 {
-  this->transfer[from_level].restrict_and_add(dst, src);
+  this->transfer[from_level]->restrict_and_add(dst, src);
 }
 
 
@@ -891,7 +1026,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
   dst[transfer.max_level()].copy_locally_owned_data_from(src);
 
   for (unsigned int l = max_level; l > min_level; --l)
-    this->transfer[l].interpolate(dst[l - 1], dst[l]);
+    this->transfer[l]->interpolate(dst[l - 1], dst[l]);
 }
 
 
@@ -921,7 +1056,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::memory_consumption() const
   const unsigned int max_level = transfer.max_level();
 
   for (unsigned int l = min_level + 1; l <= max_level; ++l)
-    size += this->transfer[l].memory_consumption();
+    size += this->transfer[l]->memory_consumption();
 
   return size;
 }
