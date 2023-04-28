@@ -3613,8 +3613,8 @@ namespace internal
       {
         const auto x0 = 1. - p[0], x1 = p[0];
 
-        values[0] = value * x0 - gradient[0];
-        values[1] = value * x1 + gradient[0];
+        values[0] += value * x0 - gradient[0];
+        values[1] += value * x1 + gradient[0];
       }
     else if (dim == 2)
       {
