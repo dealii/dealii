@@ -296,11 +296,25 @@ namespace NonMatching
       const unsigned int n_unfiltered_cells = numbers::invalid_unsigned_int);
 
     /**
+     * Return if this MappingInfo object is reinitialized for faces (by
+     * reinit_faces()) or not.
+     */
+    bool
+    is_face_state() const;
+
+    /**
      * Getter function for unit points. The offset can be obtained with
      * compute_unit_point_index_offset().
      */
     const Point<dim, VectorizedArrayType> *
     get_unit_point(const unsigned int offset) const;
+
+    /**
+     * Getter function for unit points on faces. The offset can be obtained with
+     * compute_unit_point_index_offset().
+     */
+    const Point<dim - 1, VectorizedArrayType> *
+    get_unit_point_faces(const unsigned int offset) const;
 
     /**
      * Getter function for Jacobians. The offset can be obtained with
@@ -401,6 +415,12 @@ namespace NonMatching
     resize_unit_points(const unsigned int n_unit_point_batches);
 
     /**
+     * Resize the unit_point_faces data field.
+     */
+    void
+    resize_unit_points_faces(const unsigned int n_unit_point_batches);
+
+    /**
      * Resize the mapping data fields.
      */
     void
@@ -414,6 +434,15 @@ namespace NonMatching
                       const unsigned int             n_q_points,
                       const unsigned int             n_q_points_unvectorized,
                       const std::vector<Point<dim>> &points);
+
+    /**
+     * Store the unit points on faces.
+     */
+    void
+    store_unit_points_faces(const unsigned int unit_points_index_offset,
+                            const unsigned int n_q_points,
+                            const unsigned int n_q_points_unvectorized,
+                            const std::vector<Point<dim - 1>> &points);
 
     /**
      * Store the requested mapping data.
@@ -460,6 +489,13 @@ namespace NonMatching
      * Indexed by @p unit_points_index.
      */
     AlignedVector<Point<dim, VectorizedArrayType>> unit_points;
+
+    /**
+     * The reference points on faces specified at reinit().
+     *
+     * Indexed by @p unit_points_index.
+     */
+    AlignedVector<Point<dim - 1, VectorizedArrayType>> unit_points_faces;
 
     /**
      * Offset to point to the first unit point of a cell/face.
@@ -960,6 +996,7 @@ namespace NonMatching
 
     // fill unit points and mapping data for every face of all cells
     // resize data vectors
+    resize_unit_points_faces(n_unit_points);
     resize_unit_points(n_unit_points);
     resize_data_fields(n_data_points);
 
@@ -983,8 +1020,6 @@ namespace NonMatching
                                           quadrature_on_face,
                                           f);
 
-            const auto &unit_points_on_cell = quadrature_on_cell.get_points();
-
             const unsigned int current_face_index =
               cell_index_offset[cell_index] + f;
 
@@ -996,6 +1031,11 @@ namespace NonMatching
                               n_q_points,
                               n_q_points_unvectorized[current_face_index],
                               quadrature_on_cell.get_points());
+
+            store_unit_points_faces(unit_points_index[current_face_index],
+                                    n_q_points,
+                                    n_q_points_unvectorized[current_face_index],
+                                    quadrature_on_face.get_points());
 
             internal::ComputeMappingDataHelper<dim, spacedim>::
               compute_mapping_data_for_face_quadrature(mapping,
@@ -1022,6 +1062,15 @@ namespace NonMatching
 
     state = State::faces_on_cells_in_vector;
     is_reinitialized();
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  bool
+  MappingInfo<dim, spacedim, Number>::is_face_state() const
+  {
+    return state == State::faces_on_cells_in_vector;
   }
 
 
@@ -1141,6 +1190,31 @@ namespace NonMatching
 
   template <int dim, int spacedim, typename Number>
   void
+  MappingInfo<dim, spacedim, Number>::store_unit_points_faces(
+    const unsigned int                 unit_points_index_offset,
+    const unsigned int                 n_q_points,
+    const unsigned int                 n_q_points_unvectorized,
+    const std::vector<Point<dim - 1>> &points)
+  {
+    const unsigned int n_lanes =
+      dealii::internal::VectorizedArrayTrait<VectorizedArrayType>::width();
+
+    for (unsigned int q = 0; q < n_q_points; ++q)
+      {
+        const unsigned int offset = unit_points_index_offset + q;
+        for (unsigned int v = 0;
+             v < n_lanes && q * n_lanes + v < n_q_points_unvectorized;
+             ++v)
+          for (unsigned int d = 0; d < dim - 1; ++d)
+            dealii::internal::VectorizedArrayTrait<VectorizedArrayType>::get(
+              unit_points_faces[offset][d], v) = points[q * n_lanes + v][d];
+      }
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  void
   MappingInfo<dim, spacedim, Number>::store_mapping_data(
     const unsigned int              unit_points_index_offset,
     const unsigned int              n_q_points,
@@ -1201,6 +1275,16 @@ namespace NonMatching
 
   template <int dim, int spacedim, typename Number>
   void
+  MappingInfo<dim, spacedim, Number>::resize_unit_points_faces(
+    const unsigned int n_unit_point_batches)
+  {
+    unit_points_faces.resize(n_unit_point_batches);
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  void
   MappingInfo<dim, spacedim, Number>::resize_data_fields(
     const unsigned int n_data_point_batches)
   {
@@ -1226,6 +1310,18 @@ namespace NonMatching
     const unsigned int offset) const
   {
     return &unit_points[offset];
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  inline const Point<
+    dim - 1,
+    typename MappingInfo<dim, spacedim, Number>::VectorizedArrayType> *
+  MappingInfo<dim, spacedim, Number>::get_unit_point_faces(
+    const unsigned int offset) const
+  {
+    return &unit_points_faces[offset];
   }
 
 
