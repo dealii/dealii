@@ -164,6 +164,7 @@ main()
   initlog();
   deallog << std::setprecision(10);
 
+  test<1>(1);
   test<1>(3);
   test<2>(1);
   test<2>(2);
