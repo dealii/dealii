@@ -17,7 +17,6 @@
 #define dealii_mg_transfer_global_coarsening_h
 
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/mpi_remote_point_evaluation.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -666,14 +665,16 @@ public:
 
   /**
    * Constructor taking a collection of transfer operators (with the coarsest
-   * level kept
-   * empty in @p transfer) and an optional function that initializes the
+   * level kept empty in @p transfer) and an optional function that initializes the
    * internal level vectors within the function call copy_to_mg() if used in the
-   * context of PreconditionMG.
+   * context of PreconditionMG. The template parameter @p MGTwoLevelTransferObject should derive from
+   * MGTwoLevelTransferBase and implement the transfer operation (see for
+   * instance MGTwoLevelTransfer). It can also be a std::shared_ptr or
+   * std::unique_ptr to the actual transfer operator.
    */
-  template <typename T>
+  template <typename MGTwoLevelTransferObject>
   MGTransferGlobalCoarsening(
-    const MGLevelObject<T> &transfer,
+    const MGLevelObject<MGTwoLevelTransferObject> &transfer,
     const std::function<void(const unsigned int, VectorType &)>
       &initialize_dof_vector = {});
 
@@ -854,9 +855,9 @@ private:
 
 
 template <int dim, typename VectorType>
-template <typename T>
+template <typename MGTwoLevelTransferObject>
 MGTransferGlobalCoarsening<dim, VectorType>::MGTransferGlobalCoarsening(
-  const MGLevelObject<T> &transfer,
+  const MGLevelObject<MGTwoLevelTransferObject> &transfer,
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
 {
