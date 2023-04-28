@@ -1301,6 +1301,15 @@ namespace internal
       if (update_flags & update_covariant_transformation)
         inverse_jacobians.resize(n_points);
 
+      const bool is_translation =
+        cell_similarity == CellSimilarity::translation;
+
+      const bool needs_gradient =
+        !is_translation &&
+        (update_flags &
+         (update_covariant_transformation |
+          update_contravariant_transformation | update_volume_elements));
+
       // Use the more heavy VectorizedArray code path if there is more than
       // one point left to compute
       for (unsigned int i = 0; i < n_points; i += n_lanes)
@@ -1315,25 +1324,39 @@ namespace internal
                 for (unsigned int d = 0; d < dim; ++d)
                   p_vec[d][j] = unit_points[i][d];
 
-            const auto result =
-              internal::evaluate_tensor_product_value_and_gradient(
+            Tensor<1, spacedim, VectorizedArray<double>> value;
+            DerivativeForm<1, dim, spacedim, VectorizedArray<double>>
+              derivative;
+            if (needs_gradient)
+              {
+                const auto result =
+                  internal::evaluate_tensor_product_value_and_gradient(
+                    polynomials_1d,
+                    support_points,
+                    p_vec,
+                    polynomials_1d.size() == 2,
+                    renumber_lexicographic_to_hierarchic);
+
+                value = result.first;
+
+                for (unsigned int d = 0; d < spacedim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    derivative[d][e] = result.second[e][d];
+              }
+            else
+              value = internal::evaluate_tensor_product_value(
                 polynomials_1d,
                 support_points,
                 p_vec,
                 polynomials_1d.size() == 2,
                 renumber_lexicographic_to_hierarchic);
-            DerivativeForm<1, dim, spacedim, VectorizedArray<double>>
-              derivative;
-            for (unsigned int d = 0; d < spacedim; ++d)
-              for (unsigned int e = 0; e < dim; ++e)
-                derivative[d][e] = result.second[e][d];
 
             if (update_flags & update_quadrature_points)
               for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
                 for (unsigned int d = 0; d < spacedim; ++d)
-                  quadrature_points[i + j][d] = result.first[d][j];
+                  quadrature_points[i + j][d] = value[d][j];
 
-            if (cell_similarity == CellSimilarity::translation)
+            if (is_translation)
               continue;
 
             if (update_flags & update_contravariant_transformation)
@@ -1357,8 +1380,26 @@ namespace internal
           }
         else
           {
-            const auto result =
-              internal::evaluate_tensor_product_value_and_gradient(
+            Tensor<1, spacedim, double>              value;
+            DerivativeForm<1, dim, spacedim, double> derivative;
+            if (needs_gradient)
+              {
+                const auto result =
+                  internal::evaluate_tensor_product_value_and_gradient(
+                    polynomials_1d,
+                    support_points,
+                    unit_points[i],
+                    polynomials_1d.size() == 2,
+                    renumber_lexicographic_to_hierarchic);
+
+                value = result.first;
+
+                for (unsigned int d = 0; d < spacedim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    derivative[d][e] = result.second[e][d];
+              }
+            else
+              value = internal::evaluate_tensor_product_value(
                 polynomials_1d,
                 support_points,
                 unit_points[i],
@@ -1366,18 +1407,16 @@ namespace internal
                 renumber_lexicographic_to_hierarchic);
 
             if (update_flags & update_quadrature_points)
-              quadrature_points[i] = result.first;
+              quadrature_points[i] = value;
 
-            if (cell_similarity == CellSimilarity::translation)
+            if (is_translation)
               continue;
 
             if (dim == spacedim && update_flags & update_volume_elements)
-              data.volume_elements[i] =
-                DerivativeForm<1, spacedim, dim>(result.second).determinant();
+              data.volume_elements[i] = derivative.determinant();
 
             if (update_flags & update_contravariant_transformation)
-              jacobians[i] =
-                DerivativeForm<1, spacedim, dim>(result.second).transpose();
+              jacobians[i] = derivative;
 
             if (update_flags & update_covariant_transformation)
               inverse_jacobians[i] = jacobians[i].covariant_form().transpose();
