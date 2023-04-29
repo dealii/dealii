@@ -2150,6 +2150,90 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossUserProvidedCallBack <b>User provided callbacks</b></dt>
+ * <dd>
+ *   Much functionality in deal.II under the hood uses external libraries that
+ *   operate by calling back into user-provided functions. Examples are
+ *   ODE solvers that solve differential equations of the form
+ *   @f[
+ *     \mathbf x'(t) = \mathbf f(t,\mathbf x(t)),
+ *   @f]
+ *   where users need to provide a function that, for a given time $t$ and vector
+ *   $\mathbf x$ returns the value of the right hand side $\mathbf f(t,\mathbf x)$.
+ *   Other examples are solvers for nonlinear systems
+ *   @f[
+ *     \mathbf F(\mathbf U) = 0,
+ *   @f]
+ *   where users need to provide functions that for a given vector $\mathbf U$ returns
+ *   the vector $\mathbf F(\mathbf U)$ and, in many cases, also the Jacobian
+ *   $\nabla \mathbf F(\mathbf U)$ as well as possibly other information about
+ *   the problem such as the relative scaling of solution variables within the
+ *   vector $\mathbf U$ that can be used to make the problem better conditioned.
+ *
+ *   These functions are often called "callbacks" because the ODE or nonlinear
+ *   solver libraries "call back" into user code. In code written in the C programming
+ *   language, these callbacks would often be described by pointers to user
+ *   functions handed to the solver library. Since deal.II is written in C++, we
+ *   typically instead use
+ *   [`std::function`](https://en.cppreference.com/w/cpp/utility/functional/function)
+ *   objects. Examples of classes that use this approach are SUNDIALS::KINSOL,
+ *   TrilinosWrappers::NOXSolver, PETScWrapper::NonlinearSolver, and
+ *   PETScWrappers::TimeStepper. step-77 illustrates how this can be used with
+ *   SUNDIALS::KINSOL.
+ *
+ *   Many of these libraries use a convention that comes from their origin in the
+ *   C programming language: User callbacks for the purposes of these libraries
+ *   return the data they are asked through one of their arguments, and indicate
+ *   success or failure by returning an `int` that needs to be zero if the function
+ *   returned successfully, and a nonzero value if the function failed for whatever
+ *   reason. (Examples of failures could include if the right hand side function
+ *   $\mathbf f(t,\mathbf x)$ contains a square root of one of the $x_i$, but that
+ *   $x_i$ is negative; or perhaps if a function requires table lookup for values
+ *   that are outside the range that is tabulated.)
+ *
+ *   The approach to return integer values is decidedly not in the spirit
+ *   of C++: If a function cannot complete the work it is asked to do, the C++ way
+ *   to deal with this is to throw an exception. As a consequence, for all of the
+ *   places where deal.II wraps external libraries and where user codes need to
+ *   provide callbacks, we adopt the following conventions that user callbacks
+ *   should follow:
+ *   - If a function successfully completes its operations, then it simply
+ *     returns as expected. If it is supposed to provide specific information,
+ *     then it should do so either via a regular return value, or via a non-`const`
+ *     argument, as appropriate for the specific callback.
+ *   - If a function cannot successfully complete its operation, it should
+ *     throw an exception as appropriate. If possible the classes wrapping
+ *     the external library (such as the KINSOL, NOX, or PETSc libraries mentioned
+ *     above) will then capture the exception, propagate an appropriate failure
+ *     code to the underlying library (say, a nonzero error code), which will
+ *     typically lead to some clean-up operations inside that external library,
+ *     and a return to the wrapper code. There, the originally thrown exception
+ *     will then be re-thrown and become visible again in the place where the
+ *     wrappers were thrown. In other words, for all practical purposes, it
+ *     looks like the exception thrown in the callback had simply propagated
+ *     all the way back to user code.
+ *   - There are some libraries that allow callbacks to indicate "recoverable
+ *     errors". For example, KINSOL can solve nonlinear systems
+ *     $\mathbf F(\mathbf U)=0$ and deal with situations where a function
+ *     evaluation for $\mathbf F$ is not possible -- for example the case above
+ *     one tries to take the square root of a negative value -- but where it
+ *     could then try again for a modified $\mathbf U$ for which evaluation
+ *     of the square root is possible. (This is often possible in
+ *     [line search algorithms](https://en.wikipedia.org/wiki/Line_search)
+ *     where using a shorter step length might actually succeed.) In such
+ *     cases, a user-provided callback function should throw an exception
+ *     of type RecoverableCallBackError, which will then internally be translated
+ *     into an appropriate code understandable by the underlying library.
+ *
+ *   The purpose of these conventions is to provide a unified approach to user
+ *   callbacks that is independent of how the underlying library likes to
+ *   have errors reported. (That is, independent of whether the underlying
+ *   library uses nonzero return values, exceptions, or any other mechanism.)
+ *   As a consequence, all deal.II classes that require user callbacks try
+ *   to follow the convention above.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor workstream_paper <b>%WorkStream paper</b></dt>
  * <dd>The "WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
  *   that discusses the design and implementation of WorkStream. WorkStream is, at its
