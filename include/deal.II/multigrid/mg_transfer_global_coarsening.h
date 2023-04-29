@@ -303,8 +303,10 @@ protected:
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
-    internal::MatrixFreeFunctions::
-      ConstraintInfo<dim, VectorizedArray<Number, width>> &constraint_info);
+    internal::MatrixFreeFunctions::ConstraintInfo<
+      dim,
+      VectorizedArray<Number, width>> &constraint_info_coarse,
+    std::vector<unsigned int> &        dof_indices_fine);
 
   /**
    * Flag if the finite elements on the fine cells are continuous. If yes,
@@ -361,12 +363,6 @@ protected:
    * are a subset of an external Partitioner object.
    */
   mutable AlignedVector<Number> buffer_fine_embedded;
-
-  /**
-   * DoF indices of the fine cells, expressed in indices local to the MPI
-   * rank.
-   */
-  std::vector<unsigned int> level_dof_indices_fine;
 };
 
 
@@ -429,6 +425,8 @@ template <int dim, typename Number>
 class MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
   : public MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
 {
+  using VectorizedArrayType = VectorizedArray<Number>;
+
 public:
   /**
    * Set up global coarsening between the given DoFHandler objects (
@@ -584,28 +582,28 @@ private:
     /**
      * Prolongation matrix for non-tensor-product elements.
      */
-    AlignedVector<VectorizedArray<Number>> prolongation_matrix;
+    AlignedVector<VectorizedArrayType> prolongation_matrix;
 
     /**
      * 1d prolongation matrix for tensor-product elements.
      */
-    AlignedVector<VectorizedArray<Number>> prolongation_matrix_1d;
+    AlignedVector<VectorizedArrayType> prolongation_matrix_1d;
 
     /**
      * Restriction matrix for non-tensor-product elements.
      */
-    AlignedVector<VectorizedArray<Number>> restriction_matrix;
+    AlignedVector<VectorizedArrayType> restriction_matrix;
 
     /**
      * 1d restriction matrix for tensor-product elements.
      */
-    AlignedVector<VectorizedArray<Number>> restriction_matrix_1d;
+    AlignedVector<VectorizedArrayType> restriction_matrix_1d;
 
     /**
      * ShapeInfo description of the coarse cell. Needed during the
      * fast application of hanging-node constraints.
      */
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>>
+    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
       shape_info_coarse;
   };
 
@@ -615,22 +613,28 @@ private:
   std::vector<MGTransferScheme> schemes;
 
   /**
-   * Helper class for reading from and writing to global vectors and for
+   * Helper class for reading from and writing to global coarse vectors and for
    * applying constraints.
    */
-  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArray<Number>>
-    constraint_info;
+  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArrayType>
+    constraint_info_coarse;
+
+  /**
+   * Helper class for reading from and writing to global fine vectors.
+   */
+  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArrayType>
+    constraint_info_fine;
 
   /**
    * Weights for continuous elements.
    */
-  std::vector<Number> weights;
+  std::vector<Number> weights; // TODO: vectorize
 
   /**
    * Weights for continuous elements, compressed into 3^dim doubles per
    * cell if possible.
    */
-  AlignedVector<VectorizedArray<Number>> weights_compressed;
+  AlignedVector<VectorizedArrayType> weights_compressed;
 
   /**
    * Number of components.
