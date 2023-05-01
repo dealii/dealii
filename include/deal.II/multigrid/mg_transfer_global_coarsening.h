@@ -259,9 +259,10 @@ public:
 
   /**
    * Enable inplace vector operations if external and internal vectors
-   * are compatible.
+   * are compatible. The returned pair indicates if the operation
+   * was successful on the coarse and the fine level.
    */
-  virtual void
+  virtual std::pair<bool, bool>
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
@@ -320,7 +321,7 @@ protected:
    * are compatible.
    */
   template <int dim, std::size_t width, typename IndexType>
-  void
+  std::pair<bool, bool>
   internal_enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
@@ -505,7 +506,7 @@ public:
    * Enable inplace vector operations if external and internal vectors
    * are compatible.
    */
-  void
+  std::pair<bool, bool>
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
@@ -750,7 +751,7 @@ public:
    * Enable inplace vector operations if external and internal vectors
    * are compatible.
    */
-  void
+  std::pair<bool, bool>
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
@@ -834,6 +835,16 @@ private:
    * the other mesh.
    */
   Utilities::MPI::RemotePointEvaluation<dim> rpe;
+
+  /**
+   * Vectors for input/output for rpe.
+   */
+  mutable std::vector<Number> rpe_input_output;
+
+  /**
+   * Buffers to be reused by rpe.
+   */
+  mutable std::vector<Number> rpe_buffer;
 
   /**
    * MappingInfo object needed as Mapping argument by FEPointEvaluation.
