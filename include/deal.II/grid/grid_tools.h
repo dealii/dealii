@@ -1305,6 +1305,107 @@ namespace GridTools
       const bool                                             perform_handshake,
       const bool enforce_unique_mapping = false);
 
+
+    /**
+     * Data structure returned by
+     * GridTools::internal::distributed_compute_intersection_locations(). It can
+     * be converted to
+     * GridTools::internal::DistributedComputePointLocationsInternal, which can
+     * be used to reinit Utilities::MPI::RemotePointEvaluation.
+     */
+    template <int structdim, int spacedim>
+    struct DistributedComputeIntersectionLocationsInternal
+    {
+      /**
+       * Intersections are assumed to be simplices (as, e.g., provided by CGAL)
+       */
+      using IntersectionType =
+        std::array<dealii::Point<spacedim>, structdim + 1>;
+
+      /**
+       * Information of each intersection on sending/evaluation side. The
+       * elements of the tuple are as follows: 0) cell level and index, 1) rank
+       * of the owning process, 2) local index of the owning process, 3)
+       * found intersection.
+       *
+       * @note The vector is sorted according to 1), 2).
+       */
+      std::vector<std::tuple<std::pair<int, int>,
+                             unsigned int,
+                             unsigned int,
+                             IntersectionType>>
+        send_components;
+
+      /**
+       * Information of each received data value. The elements of the tuple are
+       * as follows: 0) rank of sender, 1) local index, 2) found intersections.
+       *
+       * @note The vector is sorted according to 1), 0), 2).
+       *
+       * @note Multiple intersections between cells can be found
+       */
+      std::vector<std::tuple<unsigned int, unsigned int, IntersectionType>>
+        recv_components;
+
+      /**
+       * Pointers of ranges to found intersections for requested intersection.
+       */
+      std::vector<unsigned int> recv_ptrs;
+
+      /**
+       * Distribute quadrature points on found intersections and construct
+       * GridTools::internal::DistributedComputePointLocationsInternal from
+       * class members. This can be done without searching for points again
+       * since all information is locally known.
+       *
+       * The parameter @p consistent_numbering_of_sender_and_receiver can be used to ensure
+       * points on sender and receiver side are numbered consistently.
+       * This parameter is optional if DistributedComputePointLocationsInternal
+       * is used to setup RemotePointEvaluation, but might be helpful for
+       * debugging or other usage of DistributedComputePointLocationsInternal.
+       * Note that setting this parameter true requires an additional
+       * communication step during the setup phase.
+       */
+      template <int dim>
+      GridTools::internal::DistributedComputePointLocationsInternal<dim,
+                                                                    spacedim>
+      convert_to_distributed_compute_point_locations_internal(
+        const unsigned int                  n_quadrature_points,
+        const Triangulation<dim, spacedim> &tria,
+        const Mapping<dim, spacedim> &      mapping,
+        const bool consistent_numbering_of_sender_and_receiver = false) const;
+
+    private:
+      /**
+       * Helper function for
+       * convert_to_distributed_compute_point_locations_internal(). It sends the
+       * indices associated to quadrature points at the receiver side to the
+       * sender side, where the information is needed to build
+       * GridTools::internal::DistributedComputePointLocationsInternal::send_components
+       */
+      std::map<unsigned int, std::vector<unsigned int>>
+      communicate_indices(
+        const std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>
+          &            point_recv_components,
+        const MPI_Comm comm) const;
+    };
+
+    /**
+     * A function that fills DistributedComputeIntersectionLocationsInternal.
+     * @p intersection_requests are vertices of cells which describe the
+     * entities we want to search intersections for.
+     * The template parameter @p structdim provides the dimension of the
+     * resulting intersection.
+     */
+    template <int structdim, int dim, int spacedim>
+    DistributedComputeIntersectionLocationsInternal<structdim, spacedim>
+    distributed_compute_intersection_locations(
+      const Cache<dim, spacedim> &                     cache,
+      const std::vector<std::vector<Point<spacedim>>> &intersection_requests,
+      const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+      const std::vector<bool> &                              marked_vertices,
+      const double                                           tolerance);
+
   } // namespace internal
 
   /**

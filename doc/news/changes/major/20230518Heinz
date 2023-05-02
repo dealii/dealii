@@ -1,0 +1,11 @@
+New: The new function distributed_compute_intersection_locations() computes
+intersections on parallel::distributed::Triangulations using CGAL. It
+returns a new class DistributedComputeIntersectionLocationsInternal which
+stores the found intersections and relevant information about communication.
+The class contains a helper function
+convert_to_distributed_compute_point_locations_internal() to produce
+DistributedComputePointLocationsInternal without an additional
+(possibly expensive) search of points and can therefore be used to
+initialize RemotePointEvaluation.
+<br>
+(Johannes Heinz, 2023/05/18)

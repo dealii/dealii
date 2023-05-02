@@ -156,11 +156,63 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const double,
         const bool,
         const bool);
+
     \}
 
 #endif
   }
 
+
+for (deal_II_struct_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_struct_dimension <= deal_II_dimension && \
+  deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
+
+      template struct internal::DistributedComputeIntersectionLocationsInternal<
+        deal_II_struct_dimension,
+        deal_II_space_dimension>;
+
+    \}
+#endif
+  }
+
+
+for (deal_II_struct_dimension : DIMENSIONS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_struct_dimension <= deal_II_dimension && \
+  deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
+
+      template GridTools::internal::DistributedComputePointLocationsInternal<
+        deal_II_dimension,
+        deal_II_space_dimension>
+      internal::DistributedComputeIntersectionLocationsInternal<
+        deal_II_struct_dimension,
+        deal_II_space_dimension>::
+        convert_to_distributed_compute_point_locations_internal(
+          const unsigned int,
+          const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+          const bool) const;
+
+      template internal::DistributedComputeIntersectionLocationsInternal<
+        deal_II_struct_dimension,
+        deal_II_space_dimension>
+      internal::distributed_compute_intersection_locations(
+        const Cache<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<std::vector<Point<deal_II_space_dimension>>> &,
+        const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
+        const std::vector<bool> &,
+        const double);
+
+    \}
+#endif
+  }
 
 
 for (deal_II_space_dimension : SPACE_DIMENSIONS)

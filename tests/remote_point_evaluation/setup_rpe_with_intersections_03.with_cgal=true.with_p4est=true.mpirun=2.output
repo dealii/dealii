@@ -1,0 +1,51 @@
+
+DEAL:0::Cell intersections 2D-2D with n_quadrature_points = 1
+DEAL:0::CellData().cells.size() OK
+DEAL:0::CellData().cells OK
+DEAL:0::CellData().reference_point_ptrs.size() OK
+DEAL:0::CellData().reference_point_ptrs OK
+DEAL:0::CellData().reference_point_values.size() OK
+DEAL:0::CellData().reference_point_values OK
+DEAL:0::CellData() OK
+DEAL:0::get_point_ptrs().size() OK
+DEAL:0::get_point_ptrs() OK
+DEAL:0::is_map_unique() OK
+DEAL:0::all_points_found() OK
+DEAL:0::Cell intersections 2D-2D with n_quadrature_points = 2
+DEAL:0::CellData().cells.size() OK
+DEAL:0::CellData().cells OK
+DEAL:0::CellData().reference_point_ptrs.size() OK
+DEAL:0::CellData().reference_point_ptrs OK
+DEAL:0::CellData().reference_point_values.size() OK
+DEAL:0::CellData().reference_point_values OK
+DEAL:0::CellData() OK
+DEAL:0::get_point_ptrs().size() OK
+DEAL:0::get_point_ptrs() OK
+DEAL:0::is_map_unique() OK
+DEAL:0::all_points_found() OK
+
+DEAL:1::Cell intersections 2D-2D with n_quadrature_points = 1
+DEAL:1::CellData().cells.size() OK
+DEAL:1::CellData().cells OK
+DEAL:1::CellData().reference_point_ptrs.size() OK
+DEAL:1::CellData().reference_point_ptrs OK
+DEAL:1::CellData().reference_point_values.size() OK
+DEAL:1::CellData().reference_point_values OK
+DEAL:1::CellData() OK
+DEAL:1::get_point_ptrs().size() OK
+DEAL:1::get_point_ptrs() OK
+DEAL:1::is_map_unique() OK
+DEAL:1::all_points_found() OK
+DEAL:1::Cell intersections 2D-2D with n_quadrature_points = 2
+DEAL:1::CellData().cells.size() OK
+DEAL:1::CellData().cells OK
+DEAL:1::CellData().reference_point_ptrs.size() OK
+DEAL:1::CellData().reference_point_ptrs OK
+DEAL:1::CellData().reference_point_values.size() OK
+DEAL:1::CellData().reference_point_values OK
+DEAL:1::CellData() OK
+DEAL:1::get_point_ptrs().size() OK
+DEAL:1::get_point_ptrs() OK
+DEAL:1::is_map_unique() OK
+DEAL:1::all_points_found() OK
+
