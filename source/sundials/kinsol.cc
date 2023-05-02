@@ -217,14 +217,10 @@ namespace SUNDIALS
 
       internal::copy(*src_yy, yy);
 
-      int err = 0;
-      if (solver.residual)
-        err = call_and_possibly_capture_exception(solver.residual,
-                                                  solver.pending_exception,
-                                                  *src_yy,
-                                                  *dst_FF);
-      else
-        Assert(false, ExcInternalError());
+      Assert(solver.residual, ExcInternalError());
+
+      const int err = call_and_possibly_capture_exception(
+        solver.residual, solver.pending_exception, *src_yy, *dst_FF);
 
       internal::copy(FF, *dst_FF);
 
@@ -249,14 +245,10 @@ namespace SUNDIALS
 
       internal::copy(*src_yy, yy);
 
-      int err = 0;
-      if (solver.iteration_function)
-        err = call_and_possibly_capture_exception(solver.iteration_function,
-                                                  solver.pending_exception,
-                                                  *src_yy,
-                                                  *dst_FF);
-      else
-        Assert(false, ExcInternalError());
+      Assert(solver.iteration_function, ExcInternalError());
+
+      const int err = call_and_possibly_capture_exception(
+        solver.iteration_function, solver.pending_exception, *src_yy, *dst_FF);
 
       internal::copy(FF, *dst_FF);
 
