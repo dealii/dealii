@@ -1285,6 +1285,269 @@ namespace GridTools
       const bool                                             perform_handshake,
       const bool enforce_unique_mapping = false);
 
+
+    /**
+     * A function that fills DistributedComputeIntersectionLocationsInternal.
+     * @p intersection_requests are vertices of cells which describe the
+     * entities we want to search intersections for.
+     * The template parameter @p request_dim provides the dimension of the
+     * requesting intersection, e.g., if the intersection request corresponds
+     * to faces request_dim = dim-1 and for cells request_dim = dim.
+     */
+    template <int request_dim,
+              int dim,
+              int spacedim,
+              typename IntersectionRequest>
+    DistributedComputeIntersectionLocationsInternal<dim,
+                                                    spacedim,
+                                                    IntersectionRequest>
+    distributed_compute_intersection_locations(
+      const GridTools::Cache<dim, spacedim> & cache,
+      const std::vector<IntersectionRequest> &intersection_requests,
+      const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+      const std::vector<bool> &                              marked_vertices,
+      const double                                           tolerance)
+    {
+      using IntersectionAnswer =
+        typename DistributedComputeIntersectionLocationsInternal<
+          dim,
+          spacedim,
+          IntersectionRequest>::IntersectionAnswer;
+      const auto comm = cache.get_triangulation().get_communicator();
+
+      DistributedComputeIntersectionLocationsInternal<dim,
+                                                      spacedim,
+                                                      IntersectionRequest>
+        result;
+
+      auto &send_components = result.send_components;
+      auto &recv_components = result.recv_components;
+      auto &recv_ptrs       = result.recv_ptrs;
+      auto &send_ranks      = result.send_ranks;
+      auto &recv_ranks      = result.recv_ranks;
+
+      // construct entities we use to search for potential owners
+      std::vector<dealii::BoundingBox<dim>> request_bboxes;
+      request_bboxes.reserve(intersection_requests.size());
+      for (const auto &intersection_request : intersection_requests)
+        request_bboxes.emplace_back(
+          dealii::BoundingBox<dim>(intersection_request));
+
+      const auto potential_owners = internal::guess_owners_of_entities(
+        comm, global_bboxes, request_bboxes, tolerance);
+
+      const auto &potential_owners_ranks   = std::get<0>(potential_owners);
+      const auto &potential_owners_ptrs    = std::get<1>(potential_owners);
+      const auto &potential_owners_indices = std::get<2>(potential_owners);
+
+      const auto translate = [&](const unsigned int other_rank) {
+        const auto ptr = std::find(potential_owners_ranks.begin(),
+                                   potential_owners_ranks.end(),
+                                   other_rank);
+
+        Assert(ptr != potential_owners_ranks.end(), ExcInternalError());
+
+        const auto other_rank_index =
+          std::distance(potential_owners_ranks.begin(), ptr);
+
+        return other_rank_index;
+      };
+
+      Assert(
+        (marked_vertices.size() == 0) ||
+          (marked_vertices.size() == cache.get_triangulation().n_vertices()),
+        ExcMessage(
+          "The marked_vertices vector has to be either empty or its size has "
+          "to equal the number of vertices of the triangulation."));
+
+      // In the case that a marked_vertices vector has been given and none
+      // of its entries is true, we know that this process does not own
+      // any of the incoming points (and it will not send any data) so
+      // that we can take a short cut.
+      const bool has_relevant_vertices =
+        (marked_vertices.size() == 0) ||
+        (std::find(marked_vertices.begin(), marked_vertices.end(), true) !=
+         marked_vertices.end());
+
+      // intersection between two cells:
+      // One rank requests all intersections of owning cell:
+      // owning cell index, cgal vertices of cell
+      using RequestType =
+        std::vector<std::pair<unsigned int, IntersectionRequest>>;
+      // Other ranks send back all found intersections for requesting cell:
+      // requesting cell index, cgal vertices of found intersections
+      using AnswerType =
+        std::vector<std::pair<unsigned int, IntersectionAnswer>>;
+
+      const auto create_request = [&](const unsigned int other_rank) {
+        const auto other_rank_index = translate(other_rank);
+
+        RequestType request;
+        request.reserve(potential_owners_ptrs[other_rank_index + 1] -
+                        potential_owners_ptrs[other_rank_index]);
+
+        for (unsigned int i = potential_owners_ptrs[other_rank_index];
+             i < potential_owners_ptrs[other_rank_index + 1];
+             ++i)
+          request.emplace_back(
+            potential_owners_indices[i],
+            intersection_requests[potential_owners_indices[i]]);
+
+        return request;
+      };
+
+      const auto answer_request =
+        [&](const unsigned int &other_rank,
+            const RequestType & request) -> AnswerType {
+        AnswerType answer;
+
+        if (has_relevant_vertices)
+          {
+            // construct rtree containing only cells with marked vertices
+            // TODO: this is potentially useful in many cases and it would be
+            // nice to have
+            // cache.get_locally_owned_cell_bounding_boxes_rtree(marked_vertices)
+            const auto cell_marked = [&](const auto &cell) {
+              for (const unsigned int v : cell->vertex_indices())
+                if (marked_vertices[cell->vertex_index(v)])
+                  return true;
+              return false;
+            };
+
+            const auto &boxes_and_cells =
+              cache.get_locally_owned_cell_bounding_boxes_rtree();
+
+            std::vector<
+              std::pair<BoundingBox<spacedim>,
+                        typename dealii::Triangulation<dim>::cell_iterator>>
+              potential_boxes_and_cells;
+
+            for (const auto &box_and_cell : boxes_and_cells)
+              if (cell_marked(box_and_cell.second))
+                potential_boxes_and_cells.emplace_back(box_and_cell);
+
+            const auto marked_cell_tree = pack_rtree(potential_boxes_and_cells);
+
+
+            // process requests
+            for (unsigned int i = 0; i < request.size(); ++i)
+              {
+                const auto &request_index          = request[i].first;
+                const auto &requested_intersection = request[i].second;
+
+                // create a bounding box with tolerance
+                const auto bb = BoundingBox<spacedim>(request[i].second)
+                                  .create_extended(tolerance);
+
+                for (const auto &[box, cell] :
+                     marked_cell_tree |
+                       boost::geometry::index::adaptors::queried(
+                         boost::geometry::index::intersects(bb)))
+                  {
+#ifdef DEAL_II_WITH_CGAL
+                    auto const &try_intersection =
+                      dealii::CGALWrappers::get_vertices_in_cgal_order(
+                        cell, cache.get_mapping());
+
+                    const auto &found_intersections = dealii::CGALWrappers::
+                      compute_intersection_of_cells<dim, request_dim, spacedim>(
+                        try_intersection, requested_intersection, tolerance);
+
+                    if (found_intersections.size() > 0)
+                      {
+                        for (const auto &found_intersection :
+                             found_intersections)
+                          {
+                            answer.emplace_back(request_index,
+                                                found_intersection);
+
+                            send_components.emplace_back(
+                              std::make_pair(cell->level(), cell->index()),
+                              other_rank,
+                              request_index,
+                              found_intersection,
+                              requested_intersection);
+                          }
+                      }
+#else
+                    Assert(false, ExcNeedsCGAL());
+#endif
+                  }
+              }
+          }
+
+        if (answer.size() > 0)
+          send_ranks.emplace_back(other_rank);
+
+        return answer;
+      };
+
+      const auto process_answer = [&](const unsigned int other_rank,
+                                      const AnswerType & answer) {
+        for (unsigned int i = 0; i < answer.size(); ++i)
+          recv_components.emplace_back(other_rank,
+                                       answer[i].first,
+                                       answer[i].second);
+
+        if (answer.size() > 0)
+          recv_ranks.emplace_back(other_rank);
+      };
+
+      Utilities::MPI::ConsensusAlgorithms::selector<RequestType, AnswerType>(
+        potential_owners_ranks,
+        create_request,
+        answer_request,
+        process_answer,
+        comm);
+
+      // sort according to 1) intersection index and 2) rank (keeping the order
+      // of recv components with same indices and ranks)
+      std::stable_sort(recv_components.begin(),
+                       recv_components.end(),
+                       [&](const auto &a, const auto &b) {
+                         // intersecton index
+                         if (std::get<1>(a) != std::get<1>(b))
+                           return std::get<1>(a) < std::get<1>(b);
+
+                         // rank
+                         return std::get<0>(a) < std::get<0>(b);
+                       });
+
+      // sort according to 1) rank and 2) intersection index (keeping the
+      // order of recv components with same indices and ranks)
+      std::stable_sort(send_components.begin(),
+                       send_components.end(),
+                       [&](const auto &a, const auto &b) {
+                         // rank
+                         if (std::get<1>(a) != std::get<1>(b))
+                           return std::get<1>(a) < std::get<1>(b);
+
+                         // intersection idx
+                         return std::get<2>(a) < std::get<2>(b);
+                       });
+
+      // construct recv_ptrs
+      std::vector<unsigned int> n_found_intersections(
+        intersection_requests.size(), 0);
+      for (const auto &rc : recv_components)
+        ++n_found_intersections[std::get<1>(rc)];
+
+      recv_ptrs.resize(intersection_requests.size() + 1);
+      recv_ptrs[0] = 0;
+      for (unsigned int i = 0; i < n_found_intersections.size(); ++i)
+        recv_ptrs[i + 1] = recv_ptrs[i] + n_found_intersections[i];
+
+
+      // sort send and recv ranks
+      std::sort(recv_ranks.begin(), recv_ranks.end());
+      std::sort(send_ranks.begin(), send_ranks.end());
+
+
+
+      return result;
+    }
+
+
   } // namespace internal
 
   /**
