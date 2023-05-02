@@ -38,6 +38,7 @@
 #  include <sundials/sundials_math.h>
 #  include <sundials/sundials_types.h>
 
+#  include <exception>
 #  include <memory>
 
 
@@ -430,7 +431,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &src, VectorType &dst)> residual;
+    std::function<void(const VectorType &src, VectorType &dst)> residual;
 
     /**
      * A function object that users should supply and that is intended to
@@ -445,7 +446,7 @@ namespace SUNDIALS
      * - <0: Unrecoverable error; the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &src, VectorType &dst)>
+    std::function<void(const VectorType &src, VectorType &dst)>
       iteration_function;
 
     /**
@@ -493,7 +494,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      */
-    std::function<int(const VectorType &current_u, const VectorType &current_f)>
+    std::function<void(const VectorType &current_u,
+                       const VectorType &current_f)>
       setup_jacobian;
 
     /**
@@ -555,10 +557,10 @@ namespace SUNDIALS
      *   that the Jacobian should be re-computed in every iteration.
      */
     DEAL_II_DEPRECATED
-    std::function<int(const VectorType &ycur,
-                      const VectorType &fcur,
-                      const VectorType &rhs,
-                      VectorType &      dst)>
+    std::function<void(const VectorType &ycur,
+                       const VectorType &fcur,
+                       const VectorType &rhs,
+                       VectorType &      dst)>
       solve_jacobian_system;
 
     /**
@@ -601,7 +603,7 @@ namespace SUNDIALS
      * assertion will be thrown.
      */
     std::function<
-      int(const VectorType &rhs, VectorType &dst, const double tolerance)>
+      void(const VectorType &rhs, VectorType &dst, const double tolerance)>
       solve_with_jacobian;
 
     /**
@@ -669,6 +671,13 @@ namespace SUNDIALS
                    << "returned a negative error code: " << arg1
                    << ". Please consult SUNDIALS manual.");
 
+
+    /**
+     * A pointer to any exception that may have been thrown in user-defined
+     * call-backs and that we have to deal after the KINSOL function we call
+     * has returned.
+     */
+    mutable std::exception_ptr pending_exception;
 
   private:
     /**
