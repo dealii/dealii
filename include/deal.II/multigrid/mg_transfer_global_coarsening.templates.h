@@ -1115,7 +1115,7 @@ namespace internal
     {
       touch_count.reinit(transfer.partitioner_fine);
 
-      for (const auto i : transfer.level_dof_indices_fine)
+      for (const auto i : transfer.constraint_info_fine.dof_indices)
         touch_count.local_element(i) += 1;
       touch_count.compress(VectorOperation::add);
 
@@ -1455,9 +1455,6 @@ namespace internal
 
       // indices
       {
-        transfer.level_dof_indices_fine.resize(n_dof_indices_fine.back(),
-                                               numbers::invalid_unsigned_int);
-
         std::vector<types::global_dof_index> local_dof_indices(
           transfer.schemes[0].n_dofs_per_cell_coarse);
 
@@ -1486,17 +1483,15 @@ namespace internal
           }
 
         // ------------------------------ indices ------------------------------
-        unsigned int *level_dof_indices_fine_0 =
-          transfer.level_dof_indices_fine.data();
-
-        unsigned int *level_dof_indices_fine_1 =
-          level_dof_indices_fine_0 + transfer.schemes[0].n_dofs_per_cell_fine *
-                                       transfer.schemes[0].n_coarse_cells;
+        std::vector<types::global_dof_index> level_dof_indices_fine_0(
+          transfer.schemes[0].n_dofs_per_cell_fine);
+        std::vector<types::global_dof_index> level_dof_indices_fine_1(
+          transfer.schemes[1].n_dofs_per_cell_fine);
 
         unsigned int cell_no_0 = 0;
         unsigned int cell_no_1 = transfer.schemes[0].n_coarse_cells;
 
-        transfer.constraint_info.reinit(
+        transfer.constraint_info_coarse.reinit(
           dof_handler_coarse,
           transfer.schemes[0].n_coarse_cells +
             transfer.schemes[1].n_coarse_cells,
@@ -1504,12 +1499,16 @@ namespace internal
             use_fast_hanging_node_algorithm(dof_handler_coarse,
                                             mg_level_coarse));
 
+        transfer.constraint_info_fine.reinit(
+          transfer.schemes[0].n_coarse_cells +
+          transfer.schemes[1].n_coarse_cells);
+
         process_cells(
           [&](const auto &cell_coarse, const auto &cell_fine) {
             // parent
             {
-              transfer.constraint_info.read_dof_indices(
-                cell_no_0++,
+              transfer.constraint_info_coarse.read_dof_indices(
+                cell_no_0,
                 mg_level_coarse,
                 cell_coarse,
                 constraints_coarse,
@@ -1523,26 +1522,30 @@ namespace internal
                    i < transfer.schemes[0].n_dofs_per_cell_coarse;
                    i++)
                 level_dof_indices_fine_0[i] =
-                  transfer.partitioner_fine->global_to_local(
-                    local_dof_indices[lexicographic_numbering_fine[i]]);
+                  local_dof_indices[lexicographic_numbering_fine[i]];
+
+              transfer.constraint_info_fine.read_dof_indices(
+                cell_no_0, level_dof_indices_fine_0, transfer.partitioner_fine);
             }
 
             // move pointers
             {
-              level_dof_indices_fine_0 +=
-                transfer.schemes[0].n_dofs_per_cell_fine;
+              cell_no_0++;
             }
           },
           [&](const auto &cell_coarse, const auto &cell_fine, const auto c) {
             // parent (only once at the beginning)
             if (c == 0)
               {
-                transfer.constraint_info.read_dof_indices(
-                  cell_no_1++,
+                transfer.constraint_info_coarse.read_dof_indices(
+                  cell_no_1,
                   mg_level_coarse,
                   cell_coarse,
                   constraints_coarse,
                   transfer.partitioner_coarse);
+
+                level_dof_indices_fine_1.assign(level_dof_indices_fine_1.size(),
+                                                numbers::invalid_dof_index);
               }
 
             // child
@@ -1552,12 +1555,12 @@ namespace internal
                    i < transfer.schemes[1].n_dofs_per_cell_coarse;
                    ++i)
                 {
-                  const auto index = transfer.partitioner_fine->global_to_local(
-                    local_dof_indices[lexicographic_numbering_fine[i]]);
+                  const auto index =
+                    local_dof_indices[lexicographic_numbering_fine[i]];
 
                   Assert(level_dof_indices_fine_1
                                [cell_local_children_indices[c][i]] ==
-                             numbers::invalid_unsigned_int ||
+                             numbers::invalid_dof_index ||
                            level_dof_indices_fine_1
                                [cell_local_children_indices[c][i]] == index,
                          ExcInternalError());
@@ -1570,12 +1573,17 @@ namespace internal
             // move pointers (only once at the end)
             if (c + 1 == GeometryInfo<dim>::max_children_per_cell)
               {
-                level_dof_indices_fine_1 +=
-                  transfer.schemes[1].n_dofs_per_cell_fine;
+                transfer.constraint_info_fine.read_dof_indices(
+                  cell_no_1,
+                  level_dof_indices_fine_1,
+                  transfer.partitioner_fine);
+
+                cell_no_1++;
               }
           });
 
-        transfer.constraint_info.finalize();
+        transfer.constraint_info_coarse.finalize();
+        transfer.constraint_info_fine.finalize();
       }
 
 
@@ -1706,9 +1714,11 @@ namespace internal
           Number *weights_0 = transfer.weights.data() + n_dof_indices_fine[0];
           Number *weights_1 = transfer.weights.data() + n_dof_indices_fine[1];
           unsigned int *dof_indices_fine_0 =
-            transfer.level_dof_indices_fine.data() + n_dof_indices_fine[0];
+            transfer.constraint_info_fine.dof_indices.data() +
+            n_dof_indices_fine[0];
           unsigned int *dof_indices_fine_1 =
-            transfer.level_dof_indices_fine.data() + n_dof_indices_fine[1];
+            transfer.constraint_info_fine.dof_indices.data() +
+            n_dof_indices_fine[1];
 
           process_cells(
             [&](const auto &, const auto &) {
@@ -1904,6 +1914,8 @@ namespace internal
           local_dof_indices_coarse_lex(fe_index_pairs.size());
         std::vector<std::vector<types::global_dof_index>>
           local_dof_indices_fine(fe_index_pairs.size());
+        std::vector<std::vector<types::global_dof_index>>
+          local_dof_indices_fine_lex(fe_index_pairs.size());
 
         for (const auto &fe_index_pair : fe_index_pairs)
           {
@@ -1912,6 +1924,8 @@ namespace internal
             local_dof_indices_coarse_lex[fe_index_pair.second].resize(
               transfer.schemes[fe_index_pair.second].n_dofs_per_cell_coarse);
             local_dof_indices_fine[fe_index_pair.second].resize(
+              transfer.schemes[fe_index_pair.second].n_dofs_per_cell_fine);
+            local_dof_indices_fine_lex[fe_index_pair.second].resize(
               transfer.schemes[fe_index_pair.second].n_dofs_per_cell_fine);
 
             n_dof_indices_fine[fe_index_pair.second + 1] =
@@ -1983,24 +1997,16 @@ namespace internal
             cell_no[i + 1] += cell_no[i];
           }
 
-        transfer.level_dof_indices_fine.resize(n_dof_indices_fine.back());
-
         // ------------------------------ indices  -----------------------------
-        std::vector<unsigned int *> level_dof_indices_fine(
-          fe_index_pairs.size());
 
-        for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
-          {
-            level_dof_indices_fine[i] =
-              transfer.level_dof_indices_fine.data() + n_dof_indices_fine[i];
-          }
-
-        transfer.constraint_info.reinit(
+        transfer.constraint_info_coarse.reinit(
           dof_handler_coarse,
           cell_no.back(),
           constraints_coarse.n_constraints() > 0 &&
             use_fast_hanging_node_algorithm(dof_handler_coarse,
                                             mg_level_coarse));
+
+        transfer.constraint_info_fine.reinit(cell_no.back());
 
         process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
           const auto fe_pair_no =
@@ -2009,8 +2015,8 @@ namespace internal
 
           // parent
           {
-            transfer.constraint_info.read_dof_indices(
-              cell_no[fe_pair_no]++,
+            transfer.constraint_info_coarse.read_dof_indices(
+              cell_no[fe_pair_no],
               mg_level_coarse,
               cell_coarse,
               constraints_coarse,
@@ -2020,23 +2026,27 @@ namespace internal
           // child
           {
             cell_fine->get_dof_indices(local_dof_indices_fine[fe_pair_no]);
+
             for (unsigned int i = 0;
                  i < transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
-                 i++)
-              level_dof_indices_fine[fe_pair_no][i] =
-                transfer.partitioner_fine->global_to_local(
-                  local_dof_indices_fine
-                    [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]]);
+                 ++i)
+              local_dof_indices_fine_lex[fe_pair_no][i] = local_dof_indices_fine
+                [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]];
+
+            transfer.constraint_info_fine.read_dof_indices(
+              cell_no[fe_pair_no],
+              local_dof_indices_fine_lex[fe_pair_no],
+              transfer.partitioner_fine);
           }
 
           // move pointers
           {
-            level_dof_indices_fine[fe_pair_no] +=
-              transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
+            cell_no[fe_pair_no]++;
           }
         });
 
-        transfer.constraint_info.finalize();
+        transfer.constraint_info_coarse.finalize();
+        transfer.constraint_info_fine.finalize();
       }
 
       // ------------------------- prolongation matrix -------------------------
@@ -2205,7 +2215,8 @@ namespace internal
           for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
             {
               level_dof_indices_fine_[i] =
-                transfer.level_dof_indices_fine.data() + n_dof_indices_fine[i];
+                transfer.constraint_info_fine.dof_indices.data() +
+                n_dof_indices_fine[i];
               weights_[i] = transfer.weights.data() + n_dof_indices_fine[i];
             }
 
@@ -2643,16 +2654,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  using VectorizedArrayType = VectorizedArray<Number>;
-
   const unsigned int n_lanes = VectorizedArrayType::size();
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
-  const unsigned int *indices_fine = this->level_dof_indices_fine.data();
-  const Number *      weights      = nullptr;
-  const VectorizedArray<Number> *weights_compressed = nullptr;
+  const Number *             weights            = nullptr;
+  const VectorizedArrayType *weights_compressed = nullptr;
 
   if (this->fine_element_is_continuous)
     {
@@ -2691,17 +2699,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
           // read from src vector (similar to FEEvaluation::read_dof_values())
           internal::VectorReader<Number, VectorizedArrayType> reader;
-          constraint_info.read_write_operation(reader,
-                                               src,
-                                               evaluation_data_coarse.data(),
-                                               cell_counter,
-                                               n_lanes_filled,
-                                               scheme.n_dofs_per_cell_coarse,
-                                               true);
-          constraint_info.apply_hanging_node_constraints(
+          constraint_info_coarse.read_write_operation(
+            reader,
+            src,
+            evaluation_data_coarse.data(),
+            cell_counter,
+            n_lanes_filled,
+            scheme.n_dofs_per_cell_coarse,
+            true);
+          constraint_info_coarse.apply_hanging_node_constraints(
             cell_counter, n_lanes_filled, false, evaluation_data_coarse);
-
-          cell_counter += n_lanes_filled;
 
           // ---------------------------- coarse -------------------------------
           if (needs_interpolation)
@@ -2723,36 +2730,40 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             evaluation_data_fine = evaluation_data_coarse; // TODO
           // ------------------------------ fine -------------------------------
 
-          // weight and write into dst vector
+          // weight
           if (this->fine_element_is_continuous &&
               this->weights_compressed.size() > 0)
             {
               internal::
-                weight_fe_q_dofs_by_entity<dim, -1, VectorizedArray<Number>>(
+                weight_fe_q_dofs_by_entity<dim, -1, VectorizedArrayType>(
                   weights_compressed,
                   n_components,
                   scheme.degree_fine + 1,
                   evaluation_data_fine.begin());
               weights_compressed += Utilities::pow(3, dim);
             }
-
-          for (unsigned int v = 0; v < n_lanes_filled; ++v)
+          else if (this->fine_element_is_continuous)
             {
-              if (this->fine_element_is_continuous &&
-                  this->weights_compressed.size() == 0)
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  dst.local_element(indices_fine[i]) +=
-                    evaluation_data_fine[i][v] * weights[i];
-              else
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  dst.local_element(indices_fine[i]) +=
-                    evaluation_data_fine[i][v];
-
-              indices_fine += scheme.n_dofs_per_cell_fine;
-
-              if (this->fine_element_is_continuous)
-                weights += scheme.n_dofs_per_cell_fine;
+              for (unsigned int v = 0; v < n_lanes_filled; ++v)
+                {
+                  for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
+                    evaluation_data_fine[i][v] *= weights[i];
+                  weights += scheme.n_dofs_per_cell_fine;
+                }
             }
+
+          // add into dst vector
+          internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>
+            writer;
+          constraint_info_fine.read_write_operation(writer,
+                                                    dst,
+                                                    evaluation_data_fine.data(),
+                                                    cell_counter,
+                                                    n_lanes_filled,
+                                                    scheme.n_dofs_per_cell_fine,
+                                                    false);
+
+          cell_counter += n_lanes_filled;
         }
     }
 }
@@ -2814,16 +2825,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  using VectorizedArrayType = VectorizedArray<Number>;
-
   const unsigned int n_lanes = VectorizedArrayType::size();
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
-  const unsigned int *indices_fine = this->level_dof_indices_fine.data();
-  const Number *      weights      = nullptr;
-  const VectorizedArray<Number> *weights_compressed = nullptr;
+  const Number *             weights            = nullptr;
+  const VectorizedArrayType *weights_compressed = nullptr;
 
   if (this->fine_element_is_continuous)
     {
@@ -2860,35 +2868,36 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               (scheme.n_coarse_cells - cell) :
               n_lanes;
 
-          // read from source vector and weight
-          for (unsigned int v = 0; v < n_lanes_filled; ++v)
-            {
-              if (this->fine_element_is_continuous &&
-                  this->weights_compressed.size() == 0)
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  evaluation_data_fine[i][v] =
-                    src.local_element(indices_fine[i]) * weights[i];
-              else
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  evaluation_data_fine[i][v] =
-                    src.local_element(indices_fine[i]);
+          // read from source vector
+          internal::VectorReader<Number, VectorizedArrayType> reader;
+          constraint_info_fine.read_write_operation(reader,
+                                                    src,
+                                                    evaluation_data_fine.data(),
+                                                    cell_counter,
+                                                    n_lanes_filled,
+                                                    scheme.n_dofs_per_cell_fine,
+                                                    false);
 
-              indices_fine += scheme.n_dofs_per_cell_fine;
-
-              if (this->fine_element_is_continuous)
-                weights += scheme.n_dofs_per_cell_fine;
-            }
-
+          // weight
           if (this->fine_element_is_continuous &&
               this->weights_compressed.size() > 0)
             {
               internal::
-                weight_fe_q_dofs_by_entity<dim, -1, VectorizedArray<Number>>(
+                weight_fe_q_dofs_by_entity<dim, -1, VectorizedArrayType>(
                   weights_compressed,
                   n_components,
                   scheme.degree_fine + 1,
                   evaluation_data_fine.begin());
               weights_compressed += Utilities::pow(3, dim);
+            }
+          else if (this->fine_element_is_continuous)
+            {
+              for (unsigned int v = 0; v < n_lanes_filled; ++v)
+                {
+                  for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
+                    evaluation_data_fine[i][v] *= weights[i];
+                  weights += scheme.n_dofs_per_cell_fine;
+                }
             }
 
           // ------------------------------ fine -------------------------------
@@ -2915,15 +2924,16 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           // FEEvaluation::distribute_global_to_local())
           internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>
             writer;
-          constraint_info.apply_hanging_node_constraints(
+          constraint_info_coarse.apply_hanging_node_constraints(
             cell_counter, n_lanes_filled, true, evaluation_data_coarse);
-          constraint_info.read_write_operation(writer,
-                                               dst,
-                                               evaluation_data_coarse.data(),
-                                               cell_counter,
-                                               n_lanes_filled,
-                                               scheme.n_dofs_per_cell_coarse,
-                                               true);
+          constraint_info_coarse.read_write_operation(
+            writer,
+            dst,
+            evaluation_data_coarse.data(),
+            cell_counter,
+            n_lanes_filled,
+            scheme.n_dofs_per_cell_coarse,
+            true);
 
           cell_counter += n_lanes_filled;
         }
@@ -2938,8 +2948,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
               const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  using VectorizedArrayType = VectorizedArray<Number>;
-
   const unsigned int n_lanes = VectorizedArrayType::size();
 
   const bool use_src_inplace = this->vec_fine.size() == 0;
@@ -2964,8 +2972,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
-  const unsigned int *indices_fine = this->level_dof_indices_fine.data();
-
   unsigned int cell_counter = 0;
 
   for (const auto &scheme : schemes)
@@ -2976,7 +2982,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
       if (scheme.n_dofs_per_cell_fine == 0 ||
           scheme.n_dofs_per_cell_coarse == 0)
         {
-          indices_fine += scheme.n_coarse_cells * scheme.n_dofs_per_cell_fine;
           cell_counter += scheme.n_coarse_cells;
 
           continue;
@@ -3005,15 +3010,15 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
               (scheme.n_coarse_cells - cell) :
               n_lanes;
 
-          // read from source vector and weight
-          for (unsigned int v = 0; v < n_lanes_filled; ++v)
-            {
-              for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                evaluation_data_fine[i][v] =
-                  vec_fine_ptr->local_element(indices_fine[i]);
-
-              indices_fine += scheme.n_dofs_per_cell_fine;
-            }
+          // read from source vector
+          internal::VectorReader<Number, VectorizedArrayType> reader;
+          constraint_info_fine.read_write_operation(reader,
+                                                    *vec_fine_ptr,
+                                                    evaluation_data_fine.data(),
+                                                    cell_counter,
+                                                    n_lanes_filled,
+                                                    scheme.n_dofs_per_cell_fine,
+                                                    false);
 
           // ------------------------------ fine -------------------------------
           if (needs_interpolation)
@@ -3038,13 +3043,14 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           // write into dst vector (similar to
           // FEEvaluation::set_dof_values_plain())
           internal::VectorSetter<Number, VectorizedArrayType> writer;
-          constraint_info.read_write_operation(writer,
-                                               *vec_coarse_ptr,
-                                               evaluation_data_coarse.data(),
-                                               cell_counter,
-                                               n_lanes_filled,
-                                               scheme.n_dofs_per_cell_coarse,
-                                               false);
+          constraint_info_coarse.read_write_operation(
+            writer,
+            *vec_coarse_ptr,
+            evaluation_data_coarse.data(),
+            cell_counter,
+            n_lanes_filled,
+            scheme.n_dofs_per_cell_coarse,
+            false);
 
           cell_counter += n_lanes_filled;
         }
@@ -3121,8 +3127,10 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
       &external_partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &external_partitioner_fine,
-    internal::MatrixFreeFunctions::
-      ConstraintInfo<dim, VectorizedArray<Number, width>> &constraint_info)
+    internal::MatrixFreeFunctions::ConstraintInfo<
+      dim,
+      VectorizedArray<Number, width>> &constraint_info_coarse,
+    std::vector<unsigned int> &        dof_indices_fine)
 {
   if (this->partitioner_coarse->is_globally_compatible(
         *external_partitioner_coarse))
@@ -3135,11 +3143,11 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     {
       this->vec_coarse.reinit(0);
 
-      for (auto &i : constraint_info.dof_indices)
+      for (auto &i : constraint_info_coarse.dof_indices)
         i = external_partitioner_coarse->global_to_local(
           this->partitioner_coarse->local_to_global(i));
 
-      for (auto &i : constraint_info.plain_dof_indices)
+      for (auto &i : constraint_info_coarse.plain_dof_indices)
         i = external_partitioner_coarse->global_to_local(
           this->partitioner_coarse->local_to_global(i));
 
@@ -3161,7 +3169,7 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     {
       this->vec_fine.reinit(0);
 
-      for (auto &i : this->level_dof_indices_fine)
+      for (auto &i : dof_indices_fine)
         i = external_partitioner_fine->global_to_local(
           this->partitioner_fine->local_to_global(i));
 
@@ -3185,7 +3193,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
       &external_partitioner_fine)
 {
   this->internal_enable_inplace_operations_if_possible(
-    external_partitioner_coarse, external_partitioner_fine, constraint_info);
+    external_partitioner_coarse,
+    external_partitioner_fine,
+    constraint_info_coarse,
+    constraint_info_fine.dof_indices);
 }
 
 
@@ -3362,8 +3373,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   size += this->vec_fine.memory_consumption();
   size += this->vec_coarse.memory_consumption();
   size += MemoryConsumption::memory_consumption(weights);
-  size += MemoryConsumption::memory_consumption(this->level_dof_indices_fine);
-  size += constraint_info.memory_consumption();
+  size += constraint_info_coarse.memory_consumption();
+  size += constraint_info_fine.memory_consumption();
 
   return size;
 }

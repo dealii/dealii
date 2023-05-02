@@ -582,7 +582,8 @@ namespace internal
       const unsigned int n_dofs_per_cell,
       const bool         apply_constraints) const
     {
-      if (apply_constraints == false)
+      if ((row_starts_plain_indices.empty() == false) &&
+          (apply_constraints == false))
         {
           for (unsigned int v = 0; v < n_cells; ++v)
             {
