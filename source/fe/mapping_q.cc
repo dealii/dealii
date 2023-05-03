@@ -186,8 +186,10 @@ MappingQ<dim, spacedim>::InternalData::initialize_face(
       if (this->update_each &
           (update_boundary_forms | update_normal_vectors | update_JxW_values))
         {
-          aux.resize(dim - 1,
-                     AlignedVector<Tensor<1, spacedim>>(n_original_q_points));
+          aux.resize(dim - 1);
+          aux[0].resize(n_original_q_points);
+          if (dim > 2)
+            aux[1].resize(n_original_q_points);
 
           // Compute tangentials to the unit cell.
           for (const unsigned int i : GeometryInfo<dim>::face_indices())

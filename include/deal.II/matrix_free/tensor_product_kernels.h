@@ -2989,7 +2989,7 @@ namespace internal
   template <int dim, typename Number>
   inline void
   compute_values_of_array(
-    ArrayView<dealii::ndarray<Number, 2, dim>> &        shapes,
+    ArrayView<dealii::ndarray<Number, 2, dim>>          shapes,
     const std::vector<Polynomials::Polynomial<double>> &poly,
     const Point<dim, Number> &                          p)
   {

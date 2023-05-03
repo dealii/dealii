@@ -107,6 +107,13 @@ public:
   operator=(const Tensor<1, dim, Number> &);
 
   /**
+   * Number conversion operator.
+   */
+  template <typename OtherNumber>
+  DerivativeForm &
+  operator=(const DerivativeForm<order, dim, spacedim, OtherNumber> &df);
+
+  /**
    * Converts a DerivativeForm <order, dim, dim, Number> to Tensor<order+1, dim,
    * Number>. In particular, if order == 1 and the derivative is the Jacobian of
    * $\mathbf F(\mathbf x)$, then Tensor[i] = $\nabla F_i(\mathbf x)$.
@@ -247,6 +254,19 @@ DerivativeForm<order, dim, spacedim, Number>::operator=(
 
   (*this)[0] = T;
 
+  return *this;
+}
+
+
+
+template <int order, int dim, int spacedim, typename Number>
+template <typename OtherNumber>
+inline DerivativeForm<order, dim, spacedim, Number> &
+DerivativeForm<order, dim, spacedim, Number>::operator=(
+  const DerivativeForm<order, dim, spacedim, OtherNumber> &df)
+{
+  for (unsigned int j = 0; j < spacedim; ++j)
+    (*this)[j] = df[j];
   return *this;
 }
 

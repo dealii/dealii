@@ -5478,48 +5478,149 @@ namespace internal
   template <typename T>
   struct VectorizedArrayTrait
   {
-    using value_type                   = T;
+    /**
+     * Define scalar value type.
+     */
+    using value_type = T;
+
+    /**
+     * Define width of template type.
+     */
     static constexpr std::size_t width = 1;
 
-    static T &
-    get(T &value, unsigned int c)
+    /**
+     * Define vectorized value type for internal vectorization.
+     */
+    using vectorized_value_type = VectorizedArray<T>;
+
+    /**
+     * Define a stride which defines how often the template type T fits into the
+     * vectorized_value_type. This is useful to write vectorized templated code
+     * where the internal computation is vectorized and the user interface is
+     * optionally scalar or also vectorized.
+     */
+    static constexpr std::size_t stride = vectorized_value_type::size();
+
+    /**
+     * Get a reference to scalar value (on lane 0).
+     */
+    static value_type &
+    get(value_type &value, unsigned int c)
     {
-      AssertDimension(c, 0);
+      AssertIndexRange(c, 1);
       (void)c;
 
       return value;
     }
 
-    static const T &
-    get(const T &value, unsigned int c)
+    /**
+     * Get a read-only reference to scalar value (on lane 0).
+     */
+    static const value_type &
+    get(const value_type &value, unsigned int c)
     {
-      AssertDimension(c, 0);
+      AssertIndexRange(c, 1);
       (void)c;
 
       return value;
+    }
+
+    /**
+     * Get a reference to scalar value on lane c from a vectorized values field.
+     */
+    static value_type &
+    get_from_vectorized(vectorized_value_type &values, unsigned int c)
+    {
+      AssertIndexRange(c, stride);
+
+      return values[c];
+    }
+
+    /**
+     * Get a read-only reference to scalar value on lane c from a vectorized
+     * values field.
+     */
+    static const value_type &
+    get_from_vectorized(const vectorized_value_type &values, unsigned int c)
+    {
+      AssertIndexRange(c, stride);
+
+      return values[c];
     }
   };
 
   template <typename T, std::size_t width_>
   struct VectorizedArrayTrait<VectorizedArray<T, width_>>
   {
-    using value_type                   = T;
+    /**
+     * Define scalar value type.
+     */
+    using value_type = T;
+
+    /**
+     * Define width of template type.
+     */
     static constexpr std::size_t width = width_;
 
-    static T &
-    get(VectorizedArray<T, width_> &values, unsigned int c)
+    /**
+     * Define vectorized value type for internal vectorization.
+     */
+    using vectorized_value_type = VectorizedArray<T, width_>;
+
+    /**
+     * Define a stride which defines how often the template type
+     * VectorizedArray<T, width_> fits into the vectorized value type. This is
+     * useful to write vectorized templated code where the internal computation
+     * is vectorized and the user interface is optionally scalar or also
+     * vectorized.
+     */
+    static constexpr std::size_t stride = 1;
+
+    /**
+     * Get a reference to scalar value on lane c.
+     */
+    static value_type &
+    get(vectorized_value_type &values, unsigned int c)
     {
       AssertIndexRange(c, width_);
 
       return values[c];
     }
 
-    static const T &
-    get(const VectorizedArray<T, width_> &values, unsigned int c)
+    /**
+     * Get a read-only reference to scalar value on lane c.
+     */
+    static const value_type &
+    get(const vectorized_value_type &values, unsigned int c)
     {
       AssertIndexRange(c, width_);
 
       return values[c];
+    }
+
+    /**
+     * Get a reference to vectorized values from a vectorized values field.
+     */
+    static vectorized_value_type &
+    get_from_vectorized(vectorized_value_type &values, unsigned int c)
+    {
+      (void)c;
+      AssertIndexRange(c, stride);
+
+      return values;
+    }
+
+    /**
+     * Get a read-only reference to vectorized values from a vectorized values
+     * field.
+     */
+    static const vectorized_value_type &
+    get_from_vectorized(const vectorized_value_type &values, unsigned int c)
+    {
+      (void)c;
+      AssertIndexRange(c, stride);
+
+      return values;
     }
   };
 } // namespace internal

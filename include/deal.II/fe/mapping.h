@@ -55,8 +55,11 @@ namespace NonMatching
 {
   template <int dim>
   class FEImmersedSurfaceValues;
-  template <int dim, int spacedim>
-  class MappingInfo;
+  namespace internal
+  {
+    template <int dim, int spacedim>
+    class ComputeMappingDataHelper;
+  }
 } // namespace NonMatching
 
 
@@ -1320,7 +1323,7 @@ public:
   friend class FEFaceValues<dim, spacedim>;
   friend class FESubfaceValues<dim, spacedim>;
   friend class NonMatching::FEImmersedSurfaceValues<dim>;
-  friend class NonMatching::MappingInfo<dim, spacedim>;
+  friend class NonMatching::internal::ComputeMappingDataHelper<dim, spacedim>;
 };
 
 
