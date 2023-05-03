@@ -592,7 +592,7 @@ namespace Step77
           //
           // At the very end of the code block we then tell KINSOL to go to work
           // and solve our problem. The member functions called from the
-          // 'residual', 'setup_jacobian', and 'solve_jacobian_system' functions
+          // 'residual', 'setup_jacobian', and 'solve_with_jacobian' functions
           // will then print output to screen that allows us to follow along
           // with the progress of the program.
           nonlinear_solver.reinit_vector = [&](Vector<double> &x) {
