@@ -113,7 +113,7 @@ namespace SUNDIALS
    * automatically incorporated into the calculation of the perturbations used
    * for the default difference quotient approximations for Jacobian
    * information if the user does not supply a Jacobian solver through the
-   * solve_jacobian_system() function.
+   * solve_with_jacobian() function.
    *
    * Two methods of applying a computed step $\delta_n$ to the previously
    * computed solution vector are implemented. The first and simplest is the
@@ -353,7 +353,7 @@ namespace SUNDIALS
       /**
        * The relative error in computing $F(u)$, which is used in the
        * difference quotient approximation to the Jacobian matrix when the user
-       * does not supply a solve_jacobian_system_matrix() function.
+       * does not supply a solve_with_jacobian() function.
        *
        * If set to zero, default values provided by KINSOL will be used.
        */
@@ -451,10 +451,10 @@ namespace SUNDIALS
     /**
      * A function object that users may supply and that is intended to
      * prepare the linear solver for subsequent calls to
-     * solve_jacobian_system().
+     * solve_with_jacobian().
      *
      * The job of setup_jacobian() is to prepare the linear solver for
-     * subsequent calls to solve_jacobian_system(), in the solution of linear
+     * subsequent calls to solve_with_jacobian(), in the solution of linear
      * systems $Ax = b$. The exact nature of this system depends on the
      * SolutionStrategy that has been selected.
      *
@@ -468,7 +468,7 @@ namespace SUNDIALS
      * The setup_jacobian() function may call a user-supplied function, or a
      * function within the linear solver module, to compute Jacobian-related
      * data that is required by the linear solver. It may also preprocess that
-     * data as needed for solve_jacobian_system(), which may involve calling a
+     * data as needed for solve_with_jacobian(), which may involve calling a
      * generic function (such as for LU factorization) or, more generally,
      * build preconditioners from the assembled Jacobian. In any case, the
      * data so generated may then be used whenever a linear system is solved.
@@ -509,7 +509,7 @@ namespace SUNDIALS
      * the Jacobian, then KINSOL does not call setup_jacobian() again. If, on
      * the contrary, internal KINSOL convergence tests fail, then KINSOL calls
      * setup_jacobian() again with updated vectors and coefficients so that
-     * successive calls to solve_jacobian_systems() lead to better convergence
+     * successive calls to solve_jacobian_system() lead to better convergence
      * in the Newton process.
      *
      * If you do not specify a `solve_jacobian_system` or `solve_with_jacobian`
@@ -542,7 +542,8 @@ namespace SUNDIALS
      * @warning Starting with SUNDIALS 4.1, SUNDIALS no longer provides the
      *   `ycur` and `fcur` variables -- only `rhs` is provided and `dst`
      *   needs to be returned. The first two arguments will therefore be
-     *   empty vectors in that case. In practice, that means that one
+     *   empty vectors if you use a SUNDIALS version newer than 4.1.
+     *   In practice, that means that one
      *   can no longer compute a Jacobian matrix for the current iterate
      *   within this function. Rather, this has to happen inside the
      *   `setup_jacobian` function above that receives this information.
@@ -569,7 +570,7 @@ namespace SUNDIALS
      * the Jacobian, then KINSOL does not call setup_jacobian() again. If, on
      * the contrary, internal KINSOL convergence tests fail, then KINSOL calls
      * setup_jacobian() again with updated vectors and coefficients so that
-     * successive calls to solve_jacobian_system() lead to better convergence
+     * successive calls to solve_with_jacobian() lead to better convergence
      * in the Newton process.
      *
      * If you do not specify a `solve_with_jacobian` function, then only a

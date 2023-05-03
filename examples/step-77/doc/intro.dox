@@ -196,7 +196,7 @@ access are the
 SUNDIALS::KINSOL::reinit_vector,
 SUNDIALS::KINSOL::residual,
 SUNDIALS::KINSOL::setup_jacobian, and
-SUNDIALS::KINSOL::solve_jacobian_system
+SUNDIALS::KINSOL::solve_with_jacobian
 member variables. (See the documentation of these variables for their
 details.) In our implementation, we will use
 [lambda functions](https://en.cppreference.com/w/cpp/language/lambda)
