@@ -402,7 +402,7 @@ namespace NonMatching
     std::vector<Quadrature<dim>> quadrature_vector(n_cells);
     for (unsigned int cell_index = 0; cell_index < n_cells; ++cell_index)
       quadrature_vector[cell_index] =
-        Quadrature<dim>(quadrature_vector[cell_index].get_points());
+        Quadrature<dim>(unit_points_vector[cell_index]);
 
     reinit_cells(cell_iterator_range, quadrature_vector, n_unfiltered_cells);
   }
