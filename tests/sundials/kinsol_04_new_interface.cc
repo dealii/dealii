@@ -71,7 +71,7 @@ main()
   prm.parse_input(ifile);
 
   // Size of the problem
-  unsigned int N = 2;
+  const unsigned int N = 2;
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 

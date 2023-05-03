@@ -42,7 +42,7 @@ main()
   using VectorType = Vector<double>;
 
   // Size of the problem
-  unsigned int N = 2;
+  const unsigned int N = 2;
 
   FullMatrix<double> L(N, N);
   L(0, 0) = 1;
