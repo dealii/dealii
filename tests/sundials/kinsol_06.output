@@ -1,0 +1,70 @@
+
+DEAL::Computing residual at 10.0000
+DEAL::Setting up Jacobian system at u=10.0000
+DEAL::Computing residual at 10.0000
+DEAL::Computing residual at -88.0839
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual at -39.0419
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual at -14.5210
+DEAL::Reporting recoverable failure.
+DEAL::Computing residual at -2.26049
+DEAL::Setting up Jacobian system at u=-2.26049
+DEAL::Computing residual at -2.26049
+DEAL::Computing residual at 7.84693
+DEAL::Computing residual at 7.84693
+DEAL::Computing residual at 2.07902
+DEAL::Setting up Jacobian system at u=2.07902
+DEAL::Computing residual at 2.07902
+DEAL::Computing residual at -1.23396
+DEAL::Computing residual at -1.23396
+DEAL::Computing residual at 6.16274
+DEAL::Computing residual at 6.16274
+DEAL::Computing residual at 1.31977
+DEAL::Setting up Jacobian system at u=1.31977
+DEAL::Computing residual at 1.31977
+DEAL::Computing residual at 0.161688
+DEAL::Computing residual at 0.161688
+DEAL::Computing residual at 1.09307
+DEAL::Computing residual at 1.09307
+DEAL::Computing residual at 0.188729
+DEAL::Computing residual at 0.188729
+DEAL::Computing residual at 1.04819
+DEAL::Computing residual at 1.04819
+DEAL::Computing residual at 0.201190
+DEAL::Computing residual at 0.201190
+DEAL::Computing residual at 1.02773
+DEAL::Computing residual at 1.02773
+DEAL::Computing residual at 0.207732
+DEAL::Computing residual at 0.207732
+DEAL::Computing residual at 1.01706
+DEAL::Computing residual at 1.01706
+DEAL::Computing residual at 0.211367
+DEAL::Computing residual at 0.211368
+DEAL::Computing residual at 1.01115
+DEAL::Setting up Jacobian system at u=1.01115
+DEAL::Computing residual at 1.01115
+DEAL::Computing residual at 0.422744
+DEAL::Computing residual at 0.422744
+DEAL::Computing residual at 0.625070
+DEAL::Computing residual at 0.625070
+DEAL::Computing residual at 0.506456
+DEAL::Computing residual at 0.506456
+DEAL::Computing residual at 0.569557
+DEAL::Computing residual at 0.569557
+DEAL::Computing residual at 0.533691
+DEAL::Computing residual at 0.533691
+DEAL::Computing residual at 0.553438
+DEAL::Computing residual at 0.553438
+DEAL::Computing residual at 0.542357
+DEAL::Computing residual at 0.542357
+DEAL::Computing residual at 0.548512
+DEAL::Computing residual at 0.548512
+DEAL::Computing residual at 0.545073
+DEAL::Computing residual at 0.545074
+DEAL::Computing residual at 0.546989
+DEAL::Setting up Jacobian system at u=0.546989
+DEAL::Computing residual at 0.546989
+DEAL::Computing residual at 0.546302
+DEAL::Found solution at 5.463e-01 
+Converged in 27 iterations.
