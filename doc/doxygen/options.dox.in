@@ -93,6 +93,8 @@ ALIASES += dealiiWriggersA{2}="@note For a discussion of the background of this 
 
 ALIASES += dealiiHolzapfelA{2}="@note For a discussion of the background of this function, see G. A. Holzapfel: \"Nonlinear solid mechanics. A Continuum Approach for Engineering\" (2007), and in particular formula (\2) on p. \1 (or thereabouts). "
 
+ALIASES += dealiiConceptRequires{1}="@note This class, function, or variable is a template, and it can only be instantiated if the following condition is true: @code \1 @endcode If your compiler supports the C++20 standard, then this constraint will be enforced by a [C++20 requires clause](https://en.cppreference.com/w/cpp/language/constraints)."
+
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------

@@ -101,6 +101,8 @@ namespace parallel
      * mesh.
      *
      * @ingroup distributed
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -430,6 +432,8 @@ namespace parallel
      * Since the constructor of this class is deleted, no such objects
      * can actually be created as this would be pointless given that
      * MPI is not available.
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))

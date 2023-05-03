@@ -131,6 +131,12 @@ namespace parallel
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function,
+   *    decltype(*std::declval<InputIterator>())> &&
+   *    std::assignable_from<decltype(*std::declval<OutputIterator>()),
+   *    std::invoke_result_t<Function,
+   * decltype(*std::declval<InputIterator>())>>)}
    */
   template <typename InputIterator, typename OutputIterator, typename Function>
   DEAL_II_CXX20_REQUIRES(
@@ -192,6 +198,14 @@ namespace parallel
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function,
+   *    decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>())> &&
+   *    std::assignable_from<decltype(*std::declval<OutputIterator>()),
+   *    std::invoke_result_t<Function,
+   * decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>())>>)}
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -261,6 +275,16 @@ namespace parallel
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function,
+   *    decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>()),
+   *    decltype(*std::declval<InputIterator3>())> &&
+   *    std::assignable_from<decltype(*std::declval<OutputIterator>()),
+   *    std::invoke_result_t<Function,
+   * decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>()),
+   *    decltype(*std::declval<InputIterator3>())>>)}
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -321,6 +345,8 @@ namespace parallel
     /**
      * Take a range argument and call the given function with its begin and
      * end.
+     *
+     * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator>)}
      */
     template <typename Iterator, typename Function>
     DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
@@ -401,6 +427,8 @@ namespace parallel
    * applicable, see also the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator>)}
    */
   template <typename Iterator, typename Function>
   DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
@@ -547,6 +575,10 @@ namespace parallel
    * applicable, see also the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator> &&
+   *    std::convertible_to<std::invoke_result_t<Function, Iterator, Iterator>,
+   *    ResultType>)}
    */
   template <typename ResultType, typename Iterator, typename Function>
   DEAL_II_CXX20_REQUIRES(

@@ -428,6 +428,8 @@ namespace parallel
    *       return false;
    *   }
    * @endcode
+   *
+   * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
    */
   template <int dim, int spacedim = dim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))

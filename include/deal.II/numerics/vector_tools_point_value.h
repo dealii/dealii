@@ -235,6 +235,8 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -256,6 +258,8 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -302,6 +306,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -326,6 +332,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -372,6 +380,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -396,6 +406,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -437,6 +449,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -462,6 +476,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -503,6 +519,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
@@ -528,6 +546,8 @@ namespace VectorTools
    *   is <i>not</i> continuous, then you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)

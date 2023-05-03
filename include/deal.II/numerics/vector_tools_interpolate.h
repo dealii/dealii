@@ -66,6 +66,8 @@ namespace VectorTools
    * continuous again.
    *
    * See the general documentation of this namespace for further information.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -78,6 +80,8 @@ namespace VectorTools
 
   /**
    * Same as above but in an hp-context.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -92,6 +96,8 @@ namespace VectorTools
   /**
    * Call the @p interpolate() function above with
    * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -118,6 +124,9 @@ namespace VectorTools
    * (see the general documentation of the namespace), but only the same
    * vector for InVector and OutVector. Other combinations must be
    * instantiated by hand.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<InVector>
+   *   &&concepts::is_writable_dealii_vector_type<OutVector>}
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
@@ -173,6 +182,8 @@ namespace VectorTools
    * these objects separately (the order depends on what you want to get
    * between cells), then each subsequent call will rewrite the intercell @p
    * dofs of the previous one.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -208,6 +219,8 @@ namespace VectorTools
    * only if the parallel partitioning is the same for both meshes (see the
    * parallel::distributed::Triangulation<dim>::no_automatic_repartitioning
    * flag).
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -228,6 +241,8 @@ namespace VectorTools
    * continuous elements on grids with hanging nodes (locally refined grids):
    * Without it - due to cellwise interpolation - the resulting output vector
    * does not necessarily respect continuity requirements at hanging nodes.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -244,6 +259,8 @@ namespace VectorTools
    *
    * @p intergridmap has to be initialized via InterGridMap::make_mapping
    * pointing from a source DoFHandler to a destination DoFHandler.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -283,6 +300,8 @@ namespace VectorTools
    *
    * This function is only implemented for FiniteElements where the specified
    * components are primitive.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -297,6 +316,8 @@ namespace VectorTools
    * degree of the finite element in the DoFHandler @p dh, but more
    * importantly it allows to fill location vectors for mappings that do not
    * preserve vertex locations (like Eulerian mappings).
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)

@@ -406,6 +406,8 @@ namespace VectorTools
      * Helper interface for the matrix-free implementation of project(): avoid
      * instantiating the other helper functions for more than one VectorType
      * by copying from a LinearAlgebra::distributed::Vector.
+     *
+     * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
      */
     template <int dim, typename VectorType, int spacedim>
     DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -470,6 +472,8 @@ namespace VectorTools
 
     /**
      * Generic implementation of the project() function
+     *
+     * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
      */
     template <int dim,
               int spacedim,
@@ -765,6 +769,8 @@ namespace VectorTools
      * number types for MatrixFree support. Check if we actually can use the
      * MatrixFree implementation or need to use the matrix based one nonetheless
      * based on the number of components.
+     *
+     * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
      */
     template <typename VectorType, int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -829,6 +835,8 @@ namespace VectorTools
     /**
      * Specialization of project() for complex numbers or `dim < spacedim`,
      * for which we are sure that we cannot use the MatrixFree implementation.
+     *
+     * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
      */
     template <typename VectorType, int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)

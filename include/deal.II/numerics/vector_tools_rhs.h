@@ -56,6 +56,8 @@ namespace VectorTools
    * vector is deleted.
    *
    * See the general documentation of this namespace for further information.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -71,6 +73,8 @@ namespace VectorTools
   /**
    * Call the create_right_hand_side() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -84,6 +88,8 @@ namespace VectorTools
 
   /**
    * Like the previous set of functions, but for hp-objects.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -98,6 +104,8 @@ namespace VectorTools
 
   /**
    * Like the previous set of functions, but for hp-objects.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -117,6 +125,8 @@ namespace VectorTools
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -135,6 +145,8 @@ namespace VectorTools
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -151,6 +163,8 @@ namespace VectorTools
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
@@ -170,6 +184,8 @@ namespace VectorTools
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)

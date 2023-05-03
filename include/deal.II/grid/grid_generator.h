@@ -2657,6 +2657,9 @@ namespace GridGenerator
    * dimensions no manifold objects are copied by this function: you must
    * attach new manifold objects to @p surface_mesh.
    *
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <template <int, int> class MeshType, int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES(

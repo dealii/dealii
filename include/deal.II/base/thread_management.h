@@ -790,6 +790,8 @@ namespace Threads
    * @deprecated Use std::thread or std::jthread instead.
    *
    * @ingroup CPP11
+   *
+   * @dealiiConceptRequires{(std::invocable<FunctionObjectType>)}
    */
   template <typename FunctionObjectType>
   DEAL_II_CXX20_REQUIRES((std::invocable<FunctionObjectType>))
@@ -916,6 +918,9 @@ namespace Threads
   {
     /**
      * Set the value of a std::promise object by evaluating the action.
+     *
+     * @dealiiConceptRequires{(std::invocable<Function> &&
+     *    std::convertible_to<std::invoke_result_t<Function>, RT>)}
      */
     template <typename RT, typename Function>
     DEAL_II_CXX20_REQUIRES(
@@ -933,6 +938,8 @@ namespace Threads
      * for the case where the return type is `void`. Consequently, we
      * can't set a value. But we do evaluate the function object and
      * call `std::promise::set_value()` without argument.
+     *
+     * @dealiiConceptRequires{(std::invocable<Function>)}
      */
     template <typename Function>
     DEAL_II_CXX20_REQUIRES((std::invocable<Function>))
@@ -1566,6 +1573,8 @@ namespace Threads
    *   for more information.
    *
    * @ingroup CPP11
+   *
+   * @dealiiConceptRequires{(std::invocable<FunctionObjectType>)}
    */
   template <typename FunctionObjectType>
   DEAL_II_CXX20_REQUIRES((std::invocable<FunctionObjectType>))

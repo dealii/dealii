@@ -240,6 +240,8 @@ namespace parallel
      *
      *
      * @ingroup distributed
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -851,6 +853,8 @@ namespace parallel
      * Specialization of the general template for the 1d case. There is
      * currently no support for distributing 1d triangulations. Consequently,
      * all this class does is throw an exception.
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<1, spacedim>)}
      */
     template <int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
@@ -992,6 +996,8 @@ namespace parallel
      * Since the constructor of this class is deleted, no such objects
      * can actually be created as this would be pointless given that
      * p4est is not available.
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))

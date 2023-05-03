@@ -622,6 +622,10 @@ namespace GridTools
    *
    * This function is used in the "Possibilities for extensions" section of
    * step-38. It is also used in step-49 and step-53.
+   *
+   * @dealiiConceptRequires{(std::invocable<Transformation, Point<spacedim>> &&
+   *    std::assignable_from<Point<spacedim> &,
+   *    std::invoke_result_t<Transformation, Point<spacedim>>>)}
    */
   template <int dim, typename Transformation, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1372,6 +1376,9 @@ namespace GridTools
    * Triangulation::n_vertices() for the triangulation underlying the given mesh
    * (as opposed to the value returned by Triangulation::n_used_vertices()).
    * @return The index of the closest vertex found.
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1403,6 +1410,9 @@ namespace GridTools
    * Triangulation::n_vertices() for the triangulation underlying the given mesh
    * (as opposed to the value returned by Triangulation::n_used_vertices()).
    * @return The index of the closest vertex found.
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1432,6 +1442,9 @@ namespace GridTools
    * @note It isn't entirely clear at this time whether the function does the
    * right thing with anisotropically refined meshes. It needs to be checked
    * for this case.
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1507,6 +1520,9 @@ namespace GridTools
    * cell contains a point. For example, if two processors come together
    * at one vertex and the function is called with this vertex, then one
    * processor will return a locally owned cell and the other one a ghost cell.
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1530,6 +1546,9 @@ namespace GridTools
    * the mapping argument.
    *
    * @return An iterator into the mesh that points to the surrounding cell.
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1634,6 +1653,9 @@ namespace GridTools
    * GridTools::Cache object. Note, however, that in this case MeshType
    * has to be Triangulation, so that it might be more appropriate to directly
    * call the function above with argument `cache` in this case.
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1685,6 +1707,9 @@ namespace GridTools
    *   auto all_cells  = GridTools::find_all_active_cells_around_point(
    *   			   mapping, mesh, p, tolerance, first_pair);
    * @endcode
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1711,6 +1736,9 @@ namespace GridTools
    * functions find_active_cell_around_point() to obtain a first cell, and
    * subsequently adds all other active non-artificial cells by calling the
    * function find_all_active_cells_around_point() above.
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
   DEAL_II_CXX20_REQUIRES(
@@ -1751,6 +1779,8 @@ namespace GridTools
    * @code
    *   GridTools::get_active_child_cells<DoFHandler<dim> > (cell)
    * @endcode
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -1780,6 +1810,8 @@ namespace GridTools
    * @code
    *   GridTools::get_active_neighbors<DoFHandler<dim>>(cell, active_neighbors)
    * @endcode
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -1835,6 +1867,8 @@ namespace GridTools
    * is a function that takes in an active cell and returns a boolean.
    * @return A list of active cells sharing at least one common vertex with
    * the predicated subdomain.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -1851,6 +1885,8 @@ namespace GridTools
    * that level that share a common set of vertices with the subdomain
    * but are not a part of it). Here, the "subdomain" consists of exactly
    * all of those cells for which the @p predicate returns @p true.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -1873,6 +1909,8 @@ namespace GridTools
    * @ref ConceptMeshType "MeshType concept".
    * @param[in] mesh A mesh (i.e. objects of type Triangulation or DoFHandler).
    * @return A list of ghost cells
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -1927,6 +1965,8 @@ namespace GridTools
    * returns @p true.
    *
    * See compute_active_cell_halo_layer().
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -1958,6 +1998,8 @@ namespace GridTools
    *
    * Also see compute_ghost_cell_halo_layer() and
    * compute_active_cell_layer_within_distance().
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -1980,6 +2022,8 @@ namespace GridTools
    * object as one may expect. However, BoundingBox has a conversion constructor
    * from pairs of points, so the result of this function can still be assigned
    * to a BoundingBox object.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -2061,6 +2105,8 @@ namespace GridTools
    * This function does not take into account the curvature of cells and thus it
    * is not suited for handling curved geometry: the mapping is assumed to be
    * linear.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -2566,6 +2612,8 @@ namespace GridTools
    * parallel::distributed::Triangulation when both meshes use the same
    * Triangulation since, with a distributed Triangulation, not all cells are
    * stored locally, so the resulting list may not cover the entire domain.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -2598,6 +2646,8 @@ namespace GridTools
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -2679,6 +2729,8 @@ namespace GridTools
    * ghost cells. For both, we know that these are in fact the real cells of
    * the complete, parallel triangulation. We can also query the degrees of
    * freedom on these.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <class MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -3026,6 +3078,8 @@ namespace GridTools
    * boundary indicators set. In general, this means that one must first set
    * all boundary indicators on the coarse grid before performing any global
    * or local grid refinement.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -3062,6 +3116,8 @@ namespace GridTools
    * @note This version of collect_periodic_faces() will not work on
    * meshes with cells not in
    * @ref GlossFaceOrientation "standard orientation".
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -3291,6 +3347,8 @@ namespace GridTools
    * you get the idea -- the code could, just as well, have exchanged
    * material ids, user indices, boundary indicators, or any kind of other
    * data with similar calls as the ones above.)
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <typename DataType, typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
@@ -3313,6 +3371,8 @@ namespace GridTools
    * function allows to provide a @p cell_filter function, which can be used to only
    * communicate marked cells. In the default case, all relevant cells are
    * communicated.
+   *
+   * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <typename DataType, typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
