@@ -30,12 +30,18 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
-#include "../tests.h"
+#include <NOX_Epetra_Group.H>
+#include <NOX_Epetra_Interface_Jacobian.H>
+#include <NOX_Epetra_Interface_Required.H>
+#include <NOX_Epetra_LinearSystem_AztecOO.H>
+#include <NOX_Solver_Factory.H>
+#include <NOX_Solver_Generic.H>
+#include <NOX_StatusTest_Combo.H>
+#include <NOX_StatusTest_MaxIters.H>
+#include <NOX_StatusTest_NormF.H>
+#include <NOX_StatusTest_RelativeNormF.H>
 
-#include "NOX_Epetra_Group.H"
-#include "NOX_Epetra_Interface_Jacobian.H"
-#include "NOX_Epetra_Interface_Required.H"
-#include "NOX_Epetra_LinearSystem_AztecOO.H"
+#include "../tests.h"
 
 
 class NoxInterface : public NOX::Epetra::Interface::Required,
