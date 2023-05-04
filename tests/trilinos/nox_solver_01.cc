@@ -15,8 +15,12 @@
 
 
 
-// Check TrilinosWrappers::NOXSolver by solving f(x) = x^2 with initial
+// Check TrilinosWrappers::NOXSolver by solving f(x) = x^2 = 0 with initial
 // condition x=2.
+//
+// This test runs the same solver twice: Once via the deal.II interface to NOX
+// in the TrilinosWrappers::NOXSolver class and once using the native,
+// Epetra-based interface to NOX. The output should of course be the same.
 
 #include <deal.II/base/mpi.h>
 
@@ -107,6 +111,9 @@ main(int argc, char **argv)
     .set("Tolerance", lin_rel_tolerance);
   non_linear_parameters->sublist("Line Search").set("Method", "Polynomial");
 
+  /*
+   * First check: Use the deal.II-based wrappers for the test.
+   */
   if (true)
     {
       // set up solver
@@ -150,6 +157,9 @@ main(int argc, char **argv)
       deallog << "The solution is: " << solution[0] << std::endl;
     }
 
+  /*
+   * Second check: Run the same test through the native NOX interfaces.
+   */
   if (true)
     {
       // convert data structures to Epetra structures
