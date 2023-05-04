@@ -2989,7 +2989,7 @@ namespace internal
   template <int dim, typename Number>
   inline void
   compute_values_of_array(
-    ArrayView<dealii::ndarray<Number, 2, dim>>          shapes,
+    dealii::ndarray<Number, 2, dim> *                   shapes,
     const std::vector<Polynomials::Polynomial<double>> &poly,
     const Point<dim, Number> &                          p)
   {
@@ -3000,7 +3000,7 @@ namespace internal
     for (unsigned int d = 0; d < dim; ++d)
       point[d] = p[d];
     for (int i = 0; i < n_shapes; ++i)
-      poly[i].values_of_array(point, 1, &shapes[i][0]);
+      poly[i].values_of_array(point, 1, shapes[i].data());
   }
 
 
@@ -3009,12 +3009,16 @@ namespace internal
    * Interpolate inner dimensions of tensor product shape functions.
    */
   template <int dim, int length, typename Number2, typename Number>
-  inline std::array<typename ProductTypeNoPoint<Number, Number2>::type, 3>
-  do_interpolate_xy(const std::vector<Number> &                        values,
-                    const std::vector<unsigned int> &                  renumber,
-                    const ArrayView<dealii::ndarray<Number2, 2, dim>> &shapes,
-                    const int n_shapes_runtime,
-                    int &     i)
+  inline
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      std::array<typename ProductTypeNoPoint<Number, Number2>::type, 3>
+      do_interpolate_xy(const std::vector<Number> &             values,
+                        const std::vector<unsigned int> &       renumber,
+                        const dealii::ndarray<Number2, 2, dim> *shapes,
+                        const int n_shapes_runtime,
+                        int &     i)
   {
     const int n_shapes = length > 0 ? length : n_shapes_runtime;
     using Number3      = typename ProductTypeNoPoint<Number, Number2>::type;
@@ -3066,10 +3070,10 @@ namespace internal
     typename ProductTypeNoPoint<Number, Number2>::type,
     Tensor<1, dim, typename ProductTypeNoPoint<Number, Number2>::type>>
   evaluate_tensor_product_value_and_gradient_shapes(
-    const ArrayView<dealii::ndarray<Number2, 2, dim>> &shapes,
-    const int                                          n_shapes,
-    const std::vector<Number> &                        values,
-    const std::vector<unsigned int> &                  renumber = {})
+    const dealii::ndarray<Number2, 2, dim> *shapes,
+    const int                               n_shapes,
+    const std::vector<Number> &             values,
+    const std::vector<unsigned int> &       renumber = {})
   {
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
@@ -3253,16 +3257,15 @@ namespace internal
       }
     else
       {
+        AssertIndexRange(poly.size(), 200);
         std::array<dealii::ndarray<Number2, 2, dim>, 200> shapes;
 
-        auto view = make_array_view(shapes);
-
-        compute_values_of_array(view, poly, p);
+        compute_values_of_array(shapes.data(), poly, p);
 
         return evaluate_tensor_product_value_and_gradient_shapes<dim,
                                                                  Number,
                                                                  Number2>(
-          view, poly.size(), values, renumber);
+          shapes.data(), poly.size(), values, renumber);
       }
   }
 
@@ -3469,13 +3472,17 @@ namespace internal
    * Test inner dimensions of tensor product shape functions and accumulate.
    */
   template <int dim, int length, typename Number2, typename Number>
-  inline void
-  do_apply_test_functions_xy(
-    AlignedVector<Number2> &                          values,
-    const ArrayView<dealii::ndarray<Number, 2, dim>> &shapes,
-    const std::array<Number2, 3> &                    test_grads_value,
-    const int                                         n_shapes_runtime,
-    int &                                             i)
+  inline
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+    void
+    do_apply_test_functions_xy(
+      AlignedVector<Number2> &                          values,
+      const ArrayView<dealii::ndarray<Number, 2, dim>> &shapes,
+      const std::array<Number2, 3> &                    test_grads_value,
+      const int                                         n_shapes_runtime,
+      int &                                             i)
   {
     if (length > 0)
       {

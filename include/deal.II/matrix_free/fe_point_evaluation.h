@@ -1534,14 +1534,11 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
   if (fast_path && !polynomials_are_hat_functions)
     {
       const std::size_t n_batches =
-        n_q_points_scalar / n_lanes_internal +
-        (n_q_points_scalar % n_lanes_internal > 0 ? 1 : 0);
+        (n_q_points_scalar + n_lanes_internal - 1) / n_lanes_internal;
       const std::size_t n_shapes = poly.size();
       shapes.resize_fast(n_batches * n_shapes);
       for (unsigned int qb = 0; qb < n_batches; ++qb)
-        internal::compute_values_of_array(make_array_view(shapes,
-                                                          qb * n_shapes,
-                                                          n_shapes),
+        internal::compute_values_of_array(shapes.data() + qb * n_shapes,
                                           poly,
                                           unit_point_ptr[qb]);
     }
@@ -1561,13 +1558,15 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_fast(
   if (solution_renumbered.size() != dofs_per_component)
     solution_renumbered.resize(dofs_per_component);
   for (unsigned int comp = 0; comp < n_components; ++comp)
-    for (unsigned int i = 0; i < dofs_per_component; ++i)
-      ETT::read_value(
-        solution_values[renumber[(component_in_base_element + comp) *
-                                   dofs_per_component +
-                                 i]],
-        comp,
-        solution_renumbered[i]);
+    {
+      const unsigned int *renumber_ptr =
+        renumber.data() +
+        (component_in_base_element + comp) * dofs_per_component;
+      for (unsigned int i = 0; i < dofs_per_component; ++i)
+        ETT::read_value(solution_values[renumber_ptr[i]],
+                        comp,
+                        solution_renumbered[i]);
+    }
 
   // unit gradients are currently only implemented with the fast tensor
   // path
@@ -1586,15 +1585,15 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_fast(
           internal::evaluate_tensor_product_value_and_gradient_shapes<
             dim,
             scalar_value_type,
-            VectorizedArrayType>(make_array_view(shapes,
-                                                 qb * n_shapes,
-                                                 n_shapes),
+            VectorizedArrayType>(shapes.data() + qb * n_shapes,
                                  n_shapes,
                                  solution_renumbered);
 
       if (evaluation_flags & EvaluationFlags::values)
         {
-          for (unsigned int v = 0; v < stride && q + v < n_q_points_scalar; ++v)
+          for (unsigned int v = 0;
+               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               ++v)
             ETT::set_value(val_and_grad.first, v, values[qb * stride + v]);
         }
       if (evaluation_flags & EvaluationFlags::gradients)
@@ -1603,7 +1602,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_fast(
                    update_flags & update_inverse_jacobians,
                  ExcNotInitialized());
 
-          for (unsigned int v = 0; v < stride && q + v < n_q_points_scalar; ++v)
+          for (unsigned int v = 0;
+               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               ++v)
             {
               const unsigned int offset = qb * stride + v;
               ETT::set_gradient(val_and_grad.second, v, unit_gradients[offset]);
@@ -1762,7 +1763,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_fast(
                 ETT::set_zero_value(values[qb], v);
             }
 
-          for (unsigned int v = 0; v < stride && q + v < n_q_points_scalar; ++v)
+          for (unsigned int v = 0;
+               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               ++v)
             ETT::get_value(value, v, values[qb * stride + v]);
         }
       if (integration_flags & EvaluationFlags::gradients)
@@ -1778,7 +1781,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_fast(
                 ETT::set_zero_gradient(gradients[qb], v);
             }
 
-          for (unsigned int v = 0; v < stride && q + v < n_q_points_scalar; ++v)
+          for (unsigned int v = 0;
+               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               ++v)
             {
               const unsigned int offset = qb * stride + v;
               ETT::get_gradient(
