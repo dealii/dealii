@@ -699,14 +699,6 @@ namespace SUNDIALS
                    << "returned a negative error code: " << arg1
                    << ". Please consult SUNDIALS manual.");
 
-
-    /**
-     * A pointer to any exception that may have been thrown in user-defined
-     * call-backs and that we have to deal after the KINSOL function we call
-     * has returned.
-     */
-    mutable std::exception_ptr pending_exception;
-
   private:
     /**
      * Throw an exception when a function with the given name is not
@@ -766,6 +758,13 @@ namespace SUNDIALS
      * Memory pool of vectors.
      */
     GrowingVectorMemory<VectorType> mem;
+
+    /**
+     * A pointer to any exception that may have been thrown in user-defined
+     * call-backs and that we have to deal after the KINSOL function we call
+     * has returned.
+     */
+    mutable std::exception_ptr pending_exception;
   };
 
 } // namespace SUNDIALS
