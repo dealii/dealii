@@ -2222,8 +2222,15 @@
  *     [line search algorithms](https://en.wikipedia.org/wiki/Line_search)
  *     where using a shorter step length might actually succeed.) In such
  *     cases, a user-provided callback function should throw an exception
- *     of type RecoverableCallBackError, which will then internally be translated
- *     into an appropriate code understandable by the underlying library.
+ *     of type RecoverableUserCallbackError, which will then internally be
+ *     translated into an appropriate code understandable by the underlying
+ *     library. It is worthwhile pointing out that a user callback throwing
+ *     a "recoverable" exception does not actually guarantee that the
+ *     underlying library can actually recover: For example, KINSOL will
+ *     eventually give up if for several shorter and shorter step lengths
+ *     the residual computation throws a "recoverable" exception, and
+ *     the nonlinear solver will then return to user space with an error
+ *     that the deal.II wrappers translate into an exception.
  *
  *   The purpose of these conventions is to provide a unified approach to user
  *   callbacks that is independent of how the underlying library likes to
