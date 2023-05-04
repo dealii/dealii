@@ -1495,8 +1495,18 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
                                               current_face_number);
 
   const_cast<unsigned int &>(n_q_points) =
-    n_q_points_scalar / n_lanes_user_interface +
-    (n_q_points_scalar % n_lanes_user_interface > 0 ? 1 : 0);
+    (n_q_points_scalar + n_lanes_user_interface - 1) / n_lanes_user_interface;
+
+  if (update_flags & update_values)
+    values.resize(n_q_points, numbers::signaling_nan<value_type>());
+  if (update_flags & update_gradients)
+    gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
+
+  if (n_q_points == 0)
+    {
+      is_reinitialized = true;
+      return;
+    }
 
   // set unit point pointer
   const unsigned int unit_point_offset =
@@ -1520,11 +1530,6 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
     normal_ptr = mapping_info->get_normal_vector(data_offset);
   if (update_flags_mapping & UpdateFlags::update_JxW_values)
     JxW_ptr = mapping_info->get_JxW(data_offset);
-
-  if (update_flags & update_values)
-    values.resize(n_q_points, numbers::signaling_nan<value_type>());
-  if (update_flags & update_gradients)
-    gradients.resize(n_q_points, numbers::signaling_nan<gradient_type>());
 
   if (fast_path && !polynomials_are_hat_functions)
     {
