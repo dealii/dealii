@@ -415,6 +415,13 @@ namespace SUNDIALS
      * block vectors are used), and MPI communicator (if the vector is
      * distributed across multiple processors using MPI), along with any
      * other properties necessary.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<void(VectorType &)> reinit_vector;
 
@@ -424,12 +431,12 @@ namespace SUNDIALS
      * SolutionStrategy::newton, SolutionStrategy::linesearch, or
      * SolutionStrategy::picard strategies were selected.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<void(const VectorType &src, VectorType &dst)> residual;
 
@@ -439,12 +446,12 @@ namespace SUNDIALS
      * iteration. This function is only used if the
      * SolutionStrategy::fixed_point strategy is selected.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error; the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<void(const VectorType &src, VectorType &dst)>
       iteration_function;
@@ -487,12 +494,12 @@ namespace SUNDIALS
      * @param current_u Current value of $u$
      * @param current_f Current value of $F(u)$ or $G(u)$
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<void(const VectorType &current_u,
                        const VectorType &current_f)>
@@ -555,6 +562,13 @@ namespace SUNDIALS
      *   to a *previous* iterate), then you will also have to set the
      *   AdditionalData::maximum_newton_step variable to one, indicating
      *   that the Jacobian should be re-computed in every iteration.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     DEAL_II_DEPRECATED
     std::function<void(const VectorType &ycur,
@@ -595,12 +609,12 @@ namespace SUNDIALS
      * @param[in] tolerance The tolerance with which to solve the linear system
      *   of equations.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (KINSOL will try to change its internal
-     * parameters and attempt a new solution step)
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<
       void(const VectorType &rhs, VectorType &dst, const double tolerance)>
@@ -643,6 +657,13 @@ namespace SUNDIALS
      * If no function is provided to a KINSOL object, then this is interpreted
      * as implicitly saying that all of these scaling factors should be
      * considered as one.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<VectorType &()> get_solution_scaling;
 
@@ -659,6 +680,13 @@ namespace SUNDIALS
      * than the components of $U$, when computing norms. As above, if no
      * function is provided, then this is equivalent to using a scaling vector
      * whose components are all equal to one.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, KINSOL can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<VectorType &()> get_function_scaling;
 
