@@ -3474,8 +3474,8 @@ namespace internal
 {
   namespace
   {
-    template <int dim>
-    std::shared_ptr<NonMatching::MappingInfo<dim>>
+    template <int dim, typename Number>
+    std::shared_ptr<NonMatching::MappingInfo<dim, dim, Number>>
     fill_mapping_info(const Utilities::MPI::RemotePointEvaluation<dim> &rpe)
     {
       const auto &cell_data = rpe.get_cell_data();
@@ -3486,10 +3486,10 @@ namespace internal
 
       for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
         {
-          typename Triangulation<dim>::active_cell_iterator cell = {
+          typename Triangulation<dim>::active_cell_iterator cell(
             &rpe.get_triangulation(),
             cell_data.cells[i].first,
-            cell_data.cells[i].second};
+            cell_data.cells[i].second);
 
           const ArrayView<const Point<dim>> unit_points(
             cell_data.reference_point_values.data() +
@@ -3497,19 +3497,14 @@ namespace internal
             cell_data.reference_point_ptrs[i + 1] -
               cell_data.reference_point_ptrs[i]);
 
-          std::vector<Point<dim>> unit_points_vector_cell;
-
-          unit_points_vector_cell.insert(unit_points_vector_cell.begin(),
-                                         unit_points.begin(),
-                                         unit_points.end());
-
           cell_iterators.emplace_back(cell);
-          unit_points_vector.emplace_back(unit_points_vector_cell);
+          unit_points_vector.emplace_back(unit_points.begin(),
+                                          unit_points.end());
         }
 
       auto mapping_info =
-        std::make_shared<NonMatching::MappingInfo<dim>>(rpe.get_mapping(),
-                                                        update_values);
+        std::make_shared<NonMatching::MappingInfo<dim, dim, Number>>(
+          rpe.get_mapping(), update_values);
       mapping_info->reinit_cells(cell_iterators, unit_points_vector);
 
       return mapping_info;
@@ -3541,12 +3536,11 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   // create partitioners and internal vectors
   {
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
-                                            locally_relevant_dofs);
+    IndexSet locally_active_dofs =
+      DoFTools::extract_locally_active_dofs(dof_handler_coarse);
     this->partitioner_coarse.reset(
       new Utilities::MPI::Partitioner(dof_handler_coarse.locally_owned_dofs(),
-                                      locally_relevant_dofs,
+                                      locally_active_dofs,
                                       dof_handler_coarse.get_communicator()));
 
     this->vec_coarse.reinit(this->partitioner_coarse);
@@ -3610,7 +3604,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   rpe.reinit(points, dof_handler_coarse.get_triangulation(), mapping_coarse);
 
   // set up MappingInfo for easier data access
-  mapping_info = internal::fill_mapping_info(rpe);
+  mapping_info = internal::fill_mapping_info<dim, Number>(rpe);
 
   // set up constraints
   const auto &cell_data = rpe.get_cell_data();
@@ -3621,11 +3615,11 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
     {
-      typename DoFHandler<dim>::active_cell_iterator cell = {
+      typename DoFHandler<dim>::active_cell_iterator cell(
         &rpe.get_triangulation(),
         cell_data.cells[i].first,
         cell_data.cells[i].second,
-        &dof_handler_coarse};
+        &dof_handler_coarse);
 
       constraint_info.read_dof_indices(i,
                                        numbers::invalid_unsigned_int,
@@ -3697,23 +3691,24 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   if (rpe.is_map_unique() == false)
     {
       const auto evaluation_point_results_temp = evaluation_point_results;
-      evaluation_point_results.assign(rpe.get_point_ptrs().size() - 1, 0);
+      evaluation_point_results.clear();
+      evaluation_point_results.reserve(rpe.get_point_ptrs().size() - 1);
 
       const auto &ptr = rpe.get_point_ptrs();
 
       for (unsigned int i = 0; i < ptr.size() - 1; ++i)
         {
           const auto n_entries = ptr[i + 1] - ptr[i];
-          if (n_entries == 0)
-            continue;
 
           Number result = 0.0;
 
-          for (unsigned int j = 0; j < n_entries; ++j)
-            result += evaluation_point_results_temp[ptr[i] + j];
-          result /= n_entries;
-
-          evaluation_point_results[i] = result;
+          if (n_entries > 0)
+            {
+              for (unsigned int j = 0; j < n_entries; ++j)
+                result += evaluation_point_results_temp[ptr[i] + j];
+              result /= n_entries;
+            }
+          evaluation_point_results.push_back(result);
         }
     }
 
@@ -3817,7 +3812,10 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
       &external_partitioner_fine)
 {
   this->internal_enable_inplace_operations_if_possible(
-    external_partitioner_coarse, external_partitioner_fine, constraint_info);
+    external_partitioner_coarse,
+    external_partitioner_fine,
+    constraint_info,
+    this->level_dof_indices_fine);
 }
 
 

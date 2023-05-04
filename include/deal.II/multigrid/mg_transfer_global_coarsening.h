@@ -31,6 +31,8 @@
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 
+#include <deal.II/non_matching/mapping_info.h>
+
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -771,7 +773,7 @@ private:
   /**
    * MappingInfo object needed as Mapping argument by FEPointEvaluation.
    */
-  std::shared_ptr<NonMatching::MappingInfo<dim, dim>> mapping_info;
+  std::shared_ptr<NonMatching::MappingInfo<dim, dim, Number>> mapping_info;
 
   /**
    * Helper class for reading from and writing to global vectors and for
@@ -784,6 +786,12 @@ private:
    * Finite element of the coarse DoFHandler passed to reinit().
    */
   std::unique_ptr<FiniteElement<dim>> fe_coarse;
+
+  /**
+   * DoF indices of the fine cells, expressed in indices local to the MPI
+   * rank.
+   */
+  std::vector<unsigned int> level_dof_indices_fine;
 };
 
 

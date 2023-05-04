@@ -208,29 +208,6 @@ test_non_nested_transfer(
     // via constraint matrix
     constraint_fine.distribute(dst);
 
-    // Visualize the result
-    {
-      DataOut<2> data_out;
-      data_out.attach_dof_handler(dof_handler_coarse);
-      data_out.add_data_vector(
-        src,
-        "coarse_solution",
-        DataOut_DoFData<dim, dim>::DataVectorType::type_dof_data);
-      data_out.build_patches();
-      std::ofstream output_coarse("coarse_sol.vtk");
-      data_out.write_vtk(output_coarse);
-      data_out.clear();
-      std::ofstream output_fine("prolonged_sol.vtk");
-      data_out.attach_dof_handler(dof_handler_fine);
-      data_out.add_data_vector(
-        dst,
-        "prolonged_solution",
-        DataOut_DoFData<dim, dim>::DataVectorType::type_dof_data);
-
-      data_out.build_patches();
-      data_out.write_vtk(output_fine);
-    }
-
     // print norms
     if (true)
       {

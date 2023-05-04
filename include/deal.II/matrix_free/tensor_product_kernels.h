@@ -3488,10 +3488,10 @@ namespace internal
         constexpr unsigned int         array_size = length > 0 ? length : 1;
         std::array<Number, array_size> shape_values_x;
         std::array<Number, array_size> shape_derivs_x;
-        for (unsigned int i = 0; i < array_size; ++i)
+        for (unsigned int j = 0; j < array_size; ++j)
           {
-            shape_values_x[i] = shapes[i][0][0];
-            shape_derivs_x[i] = shapes[i][1][0];
+            shape_values_x[j] = shapes[j][0][0];
+            shape_derivs_x[j] = shapes[j][1][0];
           }
         for (unsigned int i1 = 0; i1 < (dim > 1 ? length : 1); ++i1)
           {
