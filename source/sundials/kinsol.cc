@@ -115,7 +115,7 @@ namespace SUNDIALS
         }
       // For any other exception, capture the exception and
       // return -1:
-      catch (const std::exception &)
+      catch (...)
         {
           eptr = std::current_exception();
           return -1;
