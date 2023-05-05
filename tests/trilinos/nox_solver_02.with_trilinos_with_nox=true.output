@@ -1,0 +1,24 @@
+
+DEAL::Evaluating residual at u=10.0000
+DEAL::Setting up Jacobian at u=10.0000
+DEAL::Evaluating residual at u=-88.0839
+DEAL::Evaluating residual at u=-7.84235
+DEAL::Evaluating residual at u=8.21577
+DEAL::Setting up Jacobian at u=8.21577
+DEAL::Evaluating residual at u=-56.8358
+DEAL::Evaluating residual at u=-3.24854
+DEAL::Evaluating residual at u=7.06933
+DEAL::Setting up Jacobian at u=7.06933
+DEAL::Evaluating residual at u=-40.3518
+DEAL::Evaluating residual at u=-1.05454
+DEAL::Evaluating residual at u=6.16035
+DEAL::Setting up Jacobian at u=6.16035
+DEAL::Evaluating residual at u=-29.2791
+DEAL::Evaluating residual at u=0.264030
+DEAL::Setting up Jacobian at u=0.264030
+DEAL::Evaluating residual at u=0.522751
+DEAL::Setting up Jacobian at u=0.522751
+DEAL::Evaluating residual at u=0.546074
+DEAL::Setting up Jacobian at u=0.546074
+DEAL::Evaluating residual at u=0.546302
+DEAL::The solution is: 0.546302
