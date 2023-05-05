@@ -46,7 +46,7 @@ struct FloatingPointComparator
   using ScalarNumber =
     typename dealii::internal::VectorizedArrayTrait<Number>::value_type;
   static constexpr std::size_t width =
-    dealii::internal::VectorizedArrayTrait<Number>::width;
+    dealii::internal::VectorizedArrayTrait<Number>::width();
 
   /**
    * An enum to decode whether a particular comparison returns less, larger,

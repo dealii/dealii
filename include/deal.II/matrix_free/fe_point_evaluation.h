@@ -984,11 +984,11 @@ public:
 
 private:
   static constexpr std::size_t n_lanes_user_interface =
-    internal::VectorizedArrayTrait<Number>::width;
+    internal::VectorizedArrayTrait<Number>::width();
   static constexpr std::size_t n_lanes_internal =
-    internal::VectorizedArrayTrait<VectorizedArrayType>::width;
+    internal::VectorizedArrayTrait<VectorizedArrayType>::width();
   static constexpr std::size_t stride =
-    internal::VectorizedArrayTrait<Number>::stride;
+    internal::VectorizedArrayTrait<Number>::stride();
 
   /**
    * Common setup function for both constructors. Does the setup for both fast

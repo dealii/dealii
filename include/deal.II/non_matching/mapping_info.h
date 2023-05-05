@@ -1056,7 +1056,7 @@ namespace NonMatching
     const unsigned int n_q_points_unvectorized)
   {
     const unsigned int n_lanes =
-      dealii::internal::VectorizedArrayTrait<NumberType>::width;
+      dealii::internal::VectorizedArrayTrait<NumberType>::width();
     const unsigned int n_filled_lanes_last_batch =
       n_q_points_unvectorized % n_lanes;
     unsigned int n_q_points = n_q_points_unvectorized / n_lanes;
@@ -1123,7 +1123,7 @@ namespace NonMatching
     const std::vector<Point<dim>> &points)
   {
     const unsigned int n_lanes =
-      dealii::internal::VectorizedArrayTrait<VectorizedArrayType>::width;
+      dealii::internal::VectorizedArrayTrait<VectorizedArrayType>::width();
 
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
@@ -1148,7 +1148,7 @@ namespace NonMatching
     const MappingInfo::MappingData &mapping_data)
   {
     const unsigned int n_lanes =
-      dealii::internal::VectorizedArrayTrait<Number>::width;
+      dealii::internal::VectorizedArrayTrait<Number>::width();
 
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
