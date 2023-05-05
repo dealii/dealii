@@ -1494,6 +1494,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
     mapping_info->get_n_q_points_unvectorized(current_cell_index,
                                               current_face_number);
 
+  // round up n_points_scalar / n_lanes_user_interface
   const_cast<unsigned int &>(n_q_points) =
     (n_q_points_scalar + n_lanes_user_interface - 1) / n_lanes_user_interface;
 
@@ -1533,6 +1534,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
 
   if (fast_path && !polynomials_are_hat_functions)
     {
+      // round up n_q_points_scalar / n_lanes_internal
       const std::size_t n_batches =
         (n_q_points_scalar + n_lanes_internal - 1) / n_lanes_internal;
       const std::size_t n_shapes = poly.size();
@@ -1592,7 +1594,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_fast(
       if (evaluation_flags & EvaluationFlags::values)
         {
           for (unsigned int v = 0;
-               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               v < stride && (stride == 1 || q + v < n_q_points_scalar);
                ++v)
             ETT::set_value(val_and_grad.first, v, values[qb * stride + v]);
         }
@@ -1603,7 +1605,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_fast(
                  ExcNotInitialized());
 
           for (unsigned int v = 0;
-               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               v < stride && (stride == 1 || q + v < n_q_points_scalar);
                ++v)
             {
               const unsigned int offset = qb * stride + v;
@@ -1764,7 +1766,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_fast(
             }
 
           for (unsigned int v = 0;
-               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               v < stride && (stride == 1 || q + v < n_q_points_scalar);
                ++v)
             ETT::get_value(value, v, values[qb * stride + v]);
         }
@@ -1782,7 +1784,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_fast(
             }
 
           for (unsigned int v = 0;
-               v < stride && (stride > 1 ? q + v < n_q_points_scalar : true);
+               v < stride && (stride == 1 || q + v < n_q_points_scalar);
                ++v)
             {
               const unsigned int offset = qb * stride + v;
@@ -1806,9 +1808,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_fast(
         internal::integrate_add_tensor_product_value_and_gradient_shapes<
           dim,
           VectorizedArrayType,
-          vectorized_value_type>(make_array_view(shapes,
-                                                 qb * n_shapes,
-                                                 n_shapes),
+          vectorized_value_type>(shapes.data() + qb * n_shapes,
                                  n_shapes,
                                  value,
                                  gradient,

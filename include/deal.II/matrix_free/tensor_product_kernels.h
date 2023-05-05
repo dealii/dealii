@@ -3477,12 +3477,11 @@ namespace internal
     DEAL_II_ALWAYS_INLINE
 #endif
     void
-    do_apply_test_functions_xy(
-      AlignedVector<Number2> &                          values,
-      const ArrayView<dealii::ndarray<Number, 2, dim>> &shapes,
-      const std::array<Number2, 3> &                    test_grads_value,
-      const int                                         n_shapes_runtime,
-      int &                                             i)
+    do_apply_test_functions_xy(AlignedVector<Number2> &               values,
+                               const dealii::ndarray<Number, 2, dim> *shapes,
+                               const std::array<Number2, 3> &test_grads_value,
+                               const int                     n_shapes_runtime,
+                               int &                         i)
   {
     if (length > 0)
       {
@@ -3544,11 +3543,11 @@ namespace internal
   template <int dim, typename Number, typename Number2>
   inline void
   integrate_add_tensor_product_value_and_gradient_shapes(
-    const ArrayView<dealii::ndarray<Number, 2, dim>> &shapes,
-    const int                                         n_shapes,
-    const Number2 &                                   value,
-    const Tensor<1, dim, Number2> &                   gradient,
-    AlignedVector<Number2> &                          values)
+    const dealii::ndarray<Number, 2, dim> *shapes,
+    const int                              n_shapes,
+    const Number2 &                        value,
+    const Tensor<1, dim, Number2> &        gradient,
+    AlignedVector<Number2> &               values)
   {
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
