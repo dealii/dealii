@@ -26,6 +26,7 @@
 
 #  include <Teuchos_ParameterList.hpp>
 
+#  include <exception>
 #  include <functional>
 
 DEAL_II_NAMESPACE_OPEN
@@ -180,17 +181,29 @@ namespace TrilinosWrappers
      * A function object that users should supply and that is intended to
      * compute the residual $F(u)$.
      *
-     * @note This function should return 0 in the case of success.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &u, VectorType &F)> residual;
+    std::function<void(const VectorType &u, VectorType &F)> residual;
 
     /**
      * A user function that sets up the Jacobian, based on the
      * current solution @p current_u.
      *
-     * @note This function should return 0 in the case of success.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &current_u)> setup_jacobian;
+    std::function<void(const VectorType &current_u)> setup_jacobian;
 
     /**
      * A user function that sets up the preconditioner for inverting
@@ -201,9 +214,15 @@ namespace TrilinosWrappers
      * update_preconditioner_predicate and
      * AdditionalData::threshold_nonlinear_iterations).
      *
-     * @note This function should return 0 in the case of success.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &current_u)> setup_preconditioner;
+    std::function<void(const VectorType &current_u)> setup_preconditioner;
 
     /**
      * A user function that applies the Jacobian $\nabla_u F(u)$ to
@@ -217,9 +236,15 @@ namespace TrilinosWrappers
      * chosen, whereas for the full step case (`NOX::LineSearch::FullStep`)
      * it won't be called.
      *
-     * @note This function should return 0 in the case of success.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &x, VectorType &y)> apply_jacobian;
+    std::function<void(const VectorType &x, VectorType &y)> apply_jacobian;
 
     /**
      * A user function that applies the inverse of the Jacobian
@@ -233,10 +258,16 @@ namespace TrilinosWrappers
      * @note This function is optional and is used in the case of certain
      * configurations.
      *
-     * @note This function should return 0 in the case of success.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
     std::function<
-      int(const VectorType &y, VectorType &x, const double tolerance)>
+      void(const VectorType &y, VectorType &x, const double tolerance)>
       solve_with_jacobian;
 
     /**
@@ -251,6 +282,14 @@ namespace TrilinosWrappers
      *
      * @note This function is optional and is used in the case of certain
      * configurations.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
     std::function<
       int(const VectorType &y, VectorType &x, const double tolerance)>
@@ -266,6 +305,14 @@ namespace TrilinosWrappers
      * and the current residual vector @p f.
      *
      * @note This function is optional.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
     std::function<SolverControl::State(const unsigned int i,
                                        const double       norm_f,
@@ -282,6 +329,14 @@ namespace TrilinosWrappers
      *
      * @note This function is optional. If no function is attached, this
      * means implicitly a return value of `false`.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. NOX can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
     std::function<bool()> update_preconditioner_predicate;
 
@@ -317,6 +372,13 @@ namespace TrilinosWrappers
      * The number of linear iterations of the last Jacobian solve.
      */
     unsigned int n_last_linear_iterations;
+
+    /**
+     * A pointer to any exception that may have been thrown in user-defined
+     * call-backs and that we have to deal after the KINSOL function we call
+     * has returned.
+     */
+    mutable std::exception_ptr pending_exception;
   };
 } // namespace TrilinosWrappers
 

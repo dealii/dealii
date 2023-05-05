@@ -43,6 +43,46 @@ namespace TrilinosWrappers
   {
     namespace NOXWrappers
     {
+      namespace
+      {
+        /**
+         * A function that calls the function object given by its first argument
+         * with the set of arguments following at the end. If the call returns
+         * regularly, the current function returns zero to indicate success. If
+         * the call fails with an, then the current function returns with an
+         * error code of -1. In that case, the exception thrown by `f` is
+         * captured and `eptr` is set to the exception. In case of success,
+         * `eptr` is set to `nullptr`.
+         */
+        template <typename F, typename... Args>
+        int
+        call_and_possibly_capture_exception(const F &           f,
+                                            std::exception_ptr &eptr,
+                                            Args &&...args)
+        {
+          // See whether there is already something in the exception pointer
+          // variable. There is no reason why this should be so, and
+          // we should probably bail out:
+          AssertThrow(eptr == nullptr, ExcInternalError());
+
+          // Call the function and if that succeeds, return zero:
+          try
+            {
+              f(std::forward<Args>(args)...);
+              eptr = nullptr;
+              return 0;
+            }
+          // In case of an exception, capture the exception and
+          // return -1:
+          catch (...)
+            {
+              eptr = std::current_exception();
+              return -1;
+            }
+        }
+      } // namespace
+
+
       template <typename VectorType>
       class Group;
 
@@ -937,7 +977,8 @@ namespace TrilinosWrappers
         n_residual_evaluations++;
 
         // evalute residual
-        return residual(x, f);
+        return internal::NOXWrappers::call_and_possibly_capture_exception(
+          residual, pending_exception, x, f);
       },
       [&](const VectorType &x) -> int {
         Assert(
@@ -946,7 +987,8 @@ namespace TrilinosWrappers
             "No setup_jacobian function has been attached to the NOXSolver object."));
 
         // setup Jacobian
-        int flag = setup_jacobian(x);
+        int flag = internal::NOXWrappers::call_and_possibly_capture_exception(
+          setup_jacobian, pending_exception, x);
 
         if (flag != 0)
           return flag;
@@ -967,7 +1009,8 @@ namespace TrilinosWrappers
               update_preconditioner = update_preconditioner_predicate();
 
             if (update_preconditioner)
-              flag = setup_preconditioner(x);
+              flag = internal::NOXWrappers::call_and_possibly_capture_exception(
+                setup_preconditioner, pending_exception, x);
           }
 
         return flag;
@@ -981,7 +1024,8 @@ namespace TrilinosWrappers
         n_jacobian_applications++;
 
         // apply Jacobian
-        return apply_jacobian(x, v);
+        return internal::NOXWrappers::call_and_possibly_capture_exception(
+          apply_jacobian, pending_exception, x, v);
       },
       [&](const VectorType &f, VectorType &x, const double tolerance) -> int {
         n_nonlinear_iterations++;
@@ -996,7 +1040,8 @@ namespace TrilinosWrappers
                 "solve_with_jacobian_and_track_n_linear_iterations!"));
 
             // without tracking of linear iterations
-            return solve_with_jacobian(f, x, tolerance);
+            return internal::NOXWrappers::call_and_possibly_capture_exception(
+              solve_with_jacobian, pending_exception, f, x, tolerance);
           }
         else if (solve_with_jacobian_and_track_n_linear_iterations)
           {
@@ -1063,8 +1108,18 @@ namespace TrilinosWrappers
     // create non-linear solver
     const auto solver = NOX::Solver::buildSolver(group, check, parameters);
 
-    // solve
+    // Solve, then check whether an exception was thrown by one of the user
+    // callback functions. If so, exit by rethrowing the exception that
+    // we had previously saved. This also calls the destructors of all of
+    // the member variables above, so we do not have to clean things up by hand.
     const auto status = solver->solve();
+    if (pending_exception)
+      {
+        std::exception_ptr this_exception = pending_exception;
+        pending_exception                 = nullptr;
+
+        std::rethrow_exception(this_exception);
+      }
 
     AssertThrow(status == NOX::StatusTest::Converged, ExcNOXNoConvergence());
 
