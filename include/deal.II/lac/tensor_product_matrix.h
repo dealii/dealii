@@ -285,7 +285,7 @@ namespace internal
       using VectorizedArrayTrait =
         dealii::internal::VectorizedArrayTrait<Number>;
       using ScalarNumber = typename VectorizedArrayTrait::value_type;
-      static constexpr std::size_t width = VectorizedArrayTrait::width;
+      static constexpr std::size_t width = VectorizedArrayTrait::width();
 
       MatrixPairComparator()
         : eps(std::sqrt(std::numeric_limits<ScalarNumber>::epsilon()))

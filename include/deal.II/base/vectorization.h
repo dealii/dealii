@@ -5484,9 +5484,13 @@ namespace internal
     using value_type = T;
 
     /**
-     * Define width of template type.
+     * Return the width of template type.
      */
-    static constexpr std::size_t width = 1;
+    static constexpr std::size_t
+    width()
+    {
+      return 1;
+    }
 
     /**
      * Define vectorized value type for internal vectorization.
@@ -5494,12 +5498,16 @@ namespace internal
     using vectorized_value_type = VectorizedArray<T>;
 
     /**
-     * Define a stride which defines how often the template type T fits into the
-     * vectorized_value_type. This is useful to write vectorized templated code
-     * where the internal computation is vectorized and the user interface is
-     * optionally scalar or also vectorized.
+     * Return a stride which defines how often the template type T fits into
+     * the vectorized_value_type. This is useful to write vectorized templated
+     * code where the internal computation is vectorized and the user
+     * interface is optionally scalar or also vectorized.
      */
-    static constexpr std::size_t stride = vectorized_value_type::size();
+    static constexpr std::size_t
+    stride()
+    {
+      return vectorized_value_type::size();
+    }
 
     /**
      * Get a reference to scalar value (on lane 0).
@@ -5531,7 +5539,7 @@ namespace internal
     static value_type &
     get_from_vectorized(vectorized_value_type &values, unsigned int c)
     {
-      AssertIndexRange(c, stride);
+      AssertIndexRange(c, stride());
 
       return values[c];
     }
@@ -5543,7 +5551,7 @@ namespace internal
     static const value_type &
     get_from_vectorized(const vectorized_value_type &values, unsigned int c)
     {
-      AssertIndexRange(c, stride);
+      AssertIndexRange(c, stride());
 
       return values[c];
     }
@@ -5558,9 +5566,13 @@ namespace internal
     using value_type = T;
 
     /**
-     * Define width of template type.
+     * Return the width of template type.
      */
-    static constexpr std::size_t width = width_;
+    static constexpr std::size_t
+    width()
+    {
+      return width_;
+    }
 
     /**
      * Define vectorized value type for internal vectorization.
@@ -5568,13 +5580,17 @@ namespace internal
     using vectorized_value_type = VectorizedArray<T, width_>;
 
     /**
-     * Define a stride which defines how often the template type
+     * Return a stride which defines how often the template type
      * VectorizedArray<T, width_> fits into the vectorized value type. This is
      * useful to write vectorized templated code where the internal computation
      * is vectorized and the user interface is optionally scalar or also
      * vectorized.
      */
-    static constexpr std::size_t stride = 1;
+    static constexpr std::size_t
+    stride()
+    {
+      return 1;
+    }
 
     /**
      * Get a reference to scalar value on lane c.
@@ -5605,7 +5621,7 @@ namespace internal
     get_from_vectorized(vectorized_value_type &values, unsigned int c)
     {
       (void)c;
-      AssertIndexRange(c, stride);
+      AssertIndexRange(c, stride());
 
       return values;
     }
@@ -5618,7 +5634,7 @@ namespace internal
     get_from_vectorized(const vectorized_value_type &values, unsigned int c)
     {
       (void)c;
-      AssertIndexRange(c, stride);
+      AssertIndexRange(c, stride());
 
       return values;
     }
