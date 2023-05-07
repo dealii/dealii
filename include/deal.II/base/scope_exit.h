@@ -141,9 +141,22 @@ public:
   ScopeExit(const std::function<void()> &exit_function);
 
   /**
+   * Copy constructor. These kinds of objects cannot be copied, so the
+   * constructor is deleted.
+   */
+  ScopeExit(const ScopeExit &) = delete;
+
+  /**
    * Destructor. Execute the stored action.
    */
   ~ScopeExit();
+
+  /**
+   * Copy operator. These kinds of objects cannot be copied, so the
+   * operator is deleted.
+   */
+  ScopeExit &
+  operator=(const ScopeExit &) = delete;
 
 private:
   /**
