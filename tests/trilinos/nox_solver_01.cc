@@ -15,8 +15,12 @@
 
 
 
-// Check TrilinosWrappers::NOXSolver by solving f(x) = x^2 with initial
+// Check TrilinosWrappers::NOXSolver by solving f(x) = x^2 = 0 with initial
 // condition x=2.
+//
+// This test runs the same solver twice: Once via the deal.II interface to NOX
+// in the TrilinosWrappers::NOXSolver class and once using the native,
+// Epetra-based interface to NOX. The output should of course be the same.
 
 #include <deal.II/base/mpi.h>
 
@@ -30,43 +34,18 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
+#include <NOX_Epetra_Group.H>
+#include <NOX_Epetra_Interface_Jacobian.H>
+#include <NOX_Epetra_Interface_Required.H>
+#include <NOX_Epetra_LinearSystem_AztecOO.H>
+#include <NOX_Solver_Factory.H>
+#include <NOX_Solver_Generic.H>
+#include <NOX_StatusTest_Combo.H>
+#include <NOX_StatusTest_MaxIters.H>
+#include <NOX_StatusTest_NormF.H>
+#include <NOX_StatusTest_RelativeNormF.H>
+
 #include "../tests.h"
-
-#include "NOX_Epetra_Group.H"
-#include "NOX_Epetra_Interface_Jacobian.H"
-#include "NOX_Epetra_Interface_Required.H"
-#include "NOX_Epetra_LinearSystem_AztecOO.H"
-
-
-class NoxInterface : public NOX::Epetra::Interface::Required,
-                     public NOX::Epetra::Interface::Jacobian
-{
-public:
-  bool
-  computeF(const Epetra_Vector &                      x,
-           Epetra_Vector &                            f,
-           NOX::Epetra::Interface::Required::FillType F) override
-  {
-    (void)F;
-
-    f[0] = x[0] * x[0];
-
-    return true;
-  }
-
-  bool
-  computeJacobian(const Epetra_Vector &x, Epetra_Operator &Jac) override
-  {
-    auto jac = dynamic_cast<Epetra_CrsMatrix *>(&Jac);
-
-    AssertThrow(jac, ExcNotImplemented());
-
-    jac->PutScalar(2.0 * x[0]);
-
-    return true;
-  }
-};
-
 
 
 int
@@ -101,122 +80,156 @@ main(int argc, char **argv)
     .set("Tolerance", lin_rel_tolerance);
   non_linear_parameters->sublist("Line Search").set("Method", "Polynomial");
 
-  if (true)
+  /*
+   * First check: Use the deal.II-based wrappers for the test.
+   */
+  {
+    // set up solver
+    TrilinosWrappers::NOXSolver<VectorType> solver(additional_data,
+                                                   non_linear_parameters);
+
+    // ... helper functions
+    double J = 0.0;
+
+    solver.residual = [](const auto &src, auto &dst) {
+      // compute residual
+      dst[0] = src[0] * src[0];
+      return 0;
+    };
+
+    solver.setup_jacobian = [&](const auto &src) {
+      // compute Jacobian
+      J = 2.0 * src[0];
+      return 0;
+    };
+
+    solver.apply_jacobian = [&](const auto &src, auto &dst) {
+      // solve with Jacobian
+      dst[0] = src[0] * J;
+      return 0;
+    };
+
+    solver.solve_with_jacobian = [&](const auto &src, auto &dst, const auto) {
+      // solve with Jacobian
+      dst[0] = src[0] / J;
+      return 0;
+    };
+
+    // initial guess
+    VectorType solution(1);
+    solution[0] = 2.0;
+
+    // solve with the given initial guess
+    solver.solve(solution);
+
+    deallog << "The solution is: " << solution[0] << std::endl;
+  }
+
+  /*
+   * Second check: Run the same test through the native NOX interfaces.
+   */
+  {
+    class NoxInterface : public NOX::Epetra::Interface::Required,
+                         public NOX::Epetra::Interface::Jacobian
     {
-      // set up solver
-      TrilinosWrappers::NOXSolver<VectorType> solver(additional_data,
-                                                     non_linear_parameters);
+    public:
+      bool
+      computeF(const Epetra_Vector &                      x,
+               Epetra_Vector &                            f,
+               NOX::Epetra::Interface::Required::FillType F) override
+      {
+        (void)F;
 
-      // ... helper functions
-      double J = 0.0;
+        f[0] = x[0] * x[0];
 
-      solver.residual = [](const auto &src, auto &dst) {
-        // compute residual
-        dst[0] = src[0] * src[0];
-        return 0;
-      };
+        return true;
+      }
 
-      solver.setup_jacobian = [&](const auto &src) {
-        // compute Jacobian
-        J = 2.0 * src[0];
-        return 0;
-      };
+      bool
+      computeJacobian(const Epetra_Vector &x, Epetra_Operator &Jac) override
+      {
+        auto jac = dynamic_cast<Epetra_CrsMatrix *>(&Jac);
 
-      solver.apply_jacobian = [&](const auto &src, auto &dst) {
-        // solve with Jacobian
-        dst[0] = src[0] * J;
-        return 0;
-      };
+        AssertThrow(jac, ExcNotImplemented());
 
-      solver.solve_with_jacobian = [&](const auto &src, auto &dst, const auto) {
-        // solve with Jacobian
-        dst[0] = src[0] / J;
-        return 0;
-      };
+        jac->PutScalar(2.0 * x[0]);
 
-      // initial guess
-      VectorType solution(1);
-      solution[0] = 2.0;
-
-      // solve with the given initial guess
-      solver.solve(solution);
-
-      deallog << "The solution is: " << solution[0] << std::endl;
-    }
-
-  if (true)
-    {
-      // convert data structures to Epetra structures
-      IndexSet is(1);
-      is.add_index(0);
-
-      TrilinosWrappers::MPI::Vector solution(is, MPI_COMM_WORLD);
-      solution[0] = 2.0;
-
-      TrilinosWrappers::SparsityPattern dsp(is, MPI_COMM_WORLD);
-      dsp.add(0, 0);
-      dsp.compress();
-
-      TrilinosWrappers::SparseMatrix system_matrix;
-      system_matrix.reinit(dsp);
+        return true;
+      }
+    };
 
 
-      // setup linear system and group
+    // convert data structures to Epetra structures
+    IndexSet is(1);
+    is.add_index(0);
 
-      Epetra_Vector InitialGuess(Copy, solution.trilinos_vector(), 0);
+    TrilinosWrappers::MPI::Vector solution(is, MPI_COMM_WORLD);
+    solution[0] = 2.0;
 
-      auto A =
-        Teuchos::rcp(new Epetra_CrsMatrix(system_matrix.trilinos_matrix()));
+    TrilinosWrappers::SparsityPattern dsp(is, MPI_COMM_WORLD);
+    dsp.add(0, 0);
+    dsp.compress();
 
-      Teuchos::ParameterList &printParams =
-        non_linear_parameters->sublist("Printing");
-      Teuchos::ParameterList &lsParams =
-        non_linear_parameters->sublist("Newton").sublist("Linear Solver");
+    TrilinosWrappers::SparseMatrix system_matrix;
+    system_matrix.reinit(dsp);
 
-      Teuchos::RCP<NoxInterface> interface = Teuchos::rcp(new NoxInterface());
 
-      Teuchos::RCP<NOX::Epetra::Interface::Required> iReq = interface;
-      Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac = interface;
+    // setup linear system and group
 
-      Teuchos::RCP<NOX::Epetra::LinearSystemAztecOO> linSys =
-        Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(
-          printParams, lsParams, iReq, iJac, A, InitialGuess));
+    Epetra_Vector InitialGuess(Copy, solution.trilinos_vector(), 0);
 
-      NOX::Epetra::Vector noxInitGuess(InitialGuess, NOX::DeepCopy);
-      Teuchos::RCP<NOX::Epetra::Group> group = Teuchos::rcp(
-        new NOX::Epetra::Group(printParams, iReq, noxInitGuess, linSys));
+    auto A =
+      Teuchos::rcp(new Epetra_CrsMatrix(system_matrix.trilinos_matrix()));
 
-      // setup solver control
-      auto check =
-        Teuchos::rcp(new NOX::StatusTest::Combo(NOX::StatusTest::Combo::OR));
+    Teuchos::ParameterList &printParams =
+      non_linear_parameters->sublist("Printing");
+    Teuchos::ParameterList &lsParams =
+      non_linear_parameters->sublist("Newton").sublist("Linear Solver");
 
-      if (additional_data.abs_tol > 0.0)
-        {
-          const auto additional_data_norm_f_abs =
-            Teuchos::rcp(new NOX::StatusTest::NormF(additional_data.abs_tol));
-          check->addStatusTest(additional_data_norm_f_abs);
-        }
+    Teuchos::RCP<NoxInterface> interface = Teuchos::rcp(new NoxInterface());
 
-      if (additional_data.rel_tol > 0.0)
-        {
-          const auto additional_data_norm_f_rel = Teuchos::rcp(
-            new NOX::StatusTest::RelativeNormF(additional_data.rel_tol));
-          check->addStatusTest(additional_data_norm_f_rel);
-        }
+    Teuchos::RCP<NOX::Epetra::Interface::Required> iReq = interface;
+    Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac = interface;
 
-      if (additional_data.max_iter > 0)
-        {
-          const auto additional_data_max_iterations = Teuchos::rcp(
-            new NOX::StatusTest::MaxIters(additional_data.max_iter));
-          check->addStatusTest(additional_data_max_iterations);
-        }
+    Teuchos::RCP<NOX::Epetra::LinearSystemAztecOO> linSys =
+      Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(
+        printParams, lsParams, iReq, iJac, A, InitialGuess));
 
-      Teuchos::RCP<NOX::Solver::Generic> solver =
-        NOX::Solver::buildSolver(group, check, non_linear_parameters);
-      auto status = solver->solve();
+    NOX::Epetra::Vector              noxInitGuess(InitialGuess, NOX::DeepCopy);
+    Teuchos::RCP<NOX::Epetra::Group> group = Teuchos::rcp(
+      new NOX::Epetra::Group(printParams, iReq, noxInitGuess, linSys));
 
-      AssertThrow(status == NOX::StatusTest::Converged, ExcInternalError());
+    // setup solver control
+    auto check =
+      Teuchos::rcp(new NOX::StatusTest::Combo(NOX::StatusTest::Combo::OR));
 
-      deallog << "The solution is: " << group->getX().norm() << std::endl;
-    }
+    if (additional_data.abs_tol > 0.0)
+      {
+        const auto additional_data_norm_f_abs =
+          Teuchos::rcp(new NOX::StatusTest::NormF(additional_data.abs_tol));
+        check->addStatusTest(additional_data_norm_f_abs);
+      }
+
+    if (additional_data.rel_tol > 0.0)
+      {
+        const auto additional_data_norm_f_rel = Teuchos::rcp(
+          new NOX::StatusTest::RelativeNormF(additional_data.rel_tol));
+        check->addStatusTest(additional_data_norm_f_rel);
+      }
+
+    if (additional_data.max_iter > 0)
+      {
+        const auto additional_data_max_iterations =
+          Teuchos::rcp(new NOX::StatusTest::MaxIters(additional_data.max_iter));
+        check->addStatusTest(additional_data_max_iterations);
+      }
+
+    Teuchos::RCP<NOX::Solver::Generic> solver =
+      NOX::Solver::buildSolver(group, check, non_linear_parameters);
+    auto status = solver->solve();
+
+    AssertThrow(status == NOX::StatusTest::Converged, ExcInternalError());
+
+    deallog << "The solution is: " << group->getX().norm() << std::endl;
+  }
 }
