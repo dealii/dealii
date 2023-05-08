@@ -1,0 +1,157 @@
+
+DEAL::Mesh refinement step 0
+DEAL::  Target_tolerance: 0.00100000
+DEAL::
+DEAL::  Computing residual vector 
+DEAL::0 norm=0.867975
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::1 norm=0.212073
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::2 norm=0.0189603
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::3 norm=0.000314854
+DEAL::
+DEAL::Mesh refinement step 1
+DEAL::  Target_tolerance: 0.000100000
+DEAL::
+DEAL::  Computing residual vector 
+DEAL::0 norm=0.246570
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::1 norm=0.0358579
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::2 norm=0.00208240
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::3 norm=8.20809e-06
+DEAL::
+DEAL::Mesh refinement step 2
+DEAL::  Target_tolerance: 1.00000e-05
+DEAL::
+DEAL::  Computing residual vector 
+DEAL::0 norm=0.504420
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::1 norm=0.171686
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::2 norm=0.0241205
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::3 norm=0.000550327
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::4 norm=5.73527e-07
+DEAL::
+DEAL::Mesh refinement step 3
+DEAL::  Target_tolerance: 1.00000e-06
+DEAL::
+DEAL::  Computing residual vector 
+DEAL::0 norm=0.194221
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::1 norm=0.112555
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::2 norm=0.0997270
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::3 norm=0.0855080
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::4 norm=0.0595086
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::5 norm=0.0254216
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::6 norm=0.00498811
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::7 norm=0.000282262
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::8 norm=1.01943e-06
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::9 norm=1.35132e-11
+DEAL::
+DEAL::Mesh refinement step 4
+DEAL::  Target_tolerance: 1.00000e-07
+DEAL::
+DEAL::  Computing residual vector 
+DEAL::0 norm=0.122598
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::1 norm=0.0494642
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::2 norm=0.00712958
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::3 norm=0.000683761
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::4 norm=8.10291e-06
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::5 norm=1.22189e-09
+DEAL::
+DEAL::Mesh refinement step 5
+DEAL::  Target_tolerance: 1.00000e-08
+DEAL::
+DEAL::  Computing residual vector 
+DEAL::0 norm=0.101164
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::1 norm=0.0107270
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::2 norm=0.000681226
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::3 norm=1.32342e-05
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::4 norm=2.93787e-08
+DEAL::  Computing Jacobian matrix
+DEAL::  Computing residual vector 
+DEAL::  Computing residual vector 
+DEAL::5 norm=3.23257e-13
+DEAL::
