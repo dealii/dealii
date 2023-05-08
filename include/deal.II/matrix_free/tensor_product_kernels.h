@@ -3693,8 +3693,9 @@ namespace internal
             data[0] *= weights[shift];
             // loop bound as int avoids compiler warnings in case n_points_1d
             // == 1 (polynomial degree 0)
+            const Number weight = weights[shift + 1];
             for (int i = 1; i < n_points_1d - 1; ++i)
-              data[i] *= weights[shift + 1];
+              data[i] *= weight;
             data[n_points_1d - 1] *= weights[shift + 2];
             data += n_points_1d;
           }
@@ -3735,12 +3736,14 @@ namespace internal
             const unsigned int shift =
               9 * compressed_index[k] + 3 * compressed_index[j];
 
-            unsigned int c = 0;
+            unsigned int c       = 0;
+            const Number weight1 = weights[shift];
             for (int i = 0; i < n_inside_1d; ++i)
-              data[c++] *= weights[shift];
+              data[c++] *= weight1;
             data[c++] *= weights[shift + 1];
+            const Number weight2 = weights[shift + 2];
             for (int i = 0; i < n_inside_1d; ++i)
-              data[c++] *= weights[shift + 2];
+              data[c++] *= weight2;
             data += n_points_1d;
           }
   }
