@@ -1,0 +1,7 @@
+
+DEAL::Adjacent finite elements: FESystem<2>[FE_Q<2>(1)-FE_Q<2>(2)] and FESystem<2>[FE_Q<2>(2)-FE_Q<2>(1)]
+DEAL::Chosen quadrature for the common face has 3 quadrature points. These points are located at:
+DEAL::  0.112702
+DEAL::  0.500000
+DEAL::  0.887298
+DEAL::OK
