@@ -51,6 +51,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace PETScWrappers
 {
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
   TimeStepper<VectorType, PMatrixType, AMatrixType>::TimeStepper(
     const TimeStepperData &data,
     const MPI_Comm &       mpi_comm)
@@ -63,6 +65,8 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
   TimeStepper<VectorType, PMatrixType, AMatrixType>::~TimeStepper()
   {
     AssertPETSc(TSDestroy(&ts));
@@ -71,6 +75,8 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
   TimeStepper<VectorType, PMatrixType, AMatrixType>::operator TS() const
   {
     return ts;
@@ -79,8 +85,9 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  TS
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::petsc_ts()
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  TS TimeStepper<VectorType, PMatrixType, AMatrixType>::petsc_ts()
   {
     return ts;
   }
@@ -88,9 +95,11 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
   inline MPI_Comm
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_mpi_communicator()
-    const
+    TimeStepper<VectorType, PMatrixType, AMatrixType>::get_mpi_communicator()
+      const
   {
     return PetscObjectComm(reinterpret_cast<PetscObject>(ts));
   }
@@ -98,8 +107,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
   typename TimeStepper<VectorType, PMatrixType, AMatrixType>::real_type
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time()
+    TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time()
   {
     PetscReal      t;
     PetscErrorCode ierr = TSGetTime(ts, &t);
@@ -110,8 +121,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
   typename TimeStepper<VectorType, PMatrixType, AMatrixType>::real_type
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time_step()
+    TimeStepper<VectorType, PMatrixType, AMatrixType>::get_time_step()
   {
     PetscReal      dt;
     PetscErrorCode ierr = TSGetTimeStep(ts, &dt);
@@ -122,8 +135,9 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  void
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::reinit()
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  void TimeStepper<VectorType, PMatrixType, AMatrixType>::reinit()
   {
     AssertPETSc(TSReset(ts));
   }
@@ -131,8 +145,9 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  void
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::reinit(
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  void TimeStepper<VectorType, PMatrixType, AMatrixType>::reinit(
     const TimeStepperData &data)
   {
     reinit();
@@ -199,8 +214,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  void
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::set_matrix(PMatrixType &P)
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  void TimeStepper<VectorType, PMatrixType, AMatrixType>::set_matrix(
+    PMatrixType &P)
   {
     this->A = nullptr;
     this->P = &P;
@@ -209,8 +226,9 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  void
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::set_matrices(
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  void TimeStepper<VectorType, PMatrixType, AMatrixType>::set_matrices(
     AMatrixType &A,
     PMatrixType &P)
   {
@@ -221,8 +239,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  unsigned int
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(VectorType &y)
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
+    VectorType &y)
   {
     const auto ts_ifunction =
       [](TS, PetscReal t, Vec x, Vec xdot, Vec f, void *ctx) -> PetscErrorCode {
@@ -529,9 +549,11 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  unsigned int
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(VectorType & y,
-                                                           PMatrixType &P)
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
+    VectorType & y,
+    PMatrixType &P)
   {
     set_matrix(P);
     return solve(y);
@@ -540,10 +562,12 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
-  unsigned int
-  TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(VectorType & y,
-                                                           AMatrixType &A,
-                                                           PMatrixType &P)
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
+  unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
+    VectorType & y,
+    AMatrixType &A,
+    PMatrixType &P)
   {
     set_matrices(A, P);
     return solve(y);

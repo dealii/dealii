@@ -656,6 +656,7 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
+  class VectorBase;
   class Vector;
   class BlockVector;
 
@@ -788,6 +789,40 @@ namespace concepts
       dealii::LinearAlgebra::TpetraWrappers::Vector<Number>> = true;
 #    endif
 #  endif
+
+
+    /**
+     * A template variable that returns whether the template argument is
+     * a valid deal.II vector type that is internally built on PETSc
+     * functionality. Its general definition is `false`, with
+     * specializations dealing with actual vector types for which the
+     * predicate is `true`.
+     */
+    template <typename T>
+    inline constexpr bool is_dealii_petsc_vector_type = false;
+
+#  ifdef DEAL_II_WITH_PETSC
+    template <>
+    inline constexpr bool
+      is_dealii_petsc_vector_type<dealii::PETScWrappers::VectorBase> = true;
+
+    template <>
+    inline constexpr bool
+      is_dealii_petsc_vector_type<dealii::PETScWrappers::Vector> = true;
+
+    template <>
+    inline constexpr bool
+      is_dealii_petsc_vector_type<dealii::PETScWrappers::BlockVector> = true;
+
+    template <>
+    inline constexpr bool
+      is_dealii_petsc_vector_type<dealii::PETScWrappers::MPI::Vector> = true;
+
+    template <>
+    inline constexpr bool
+      is_dealii_petsc_vector_type<dealii::PETScWrappers::MPI::BlockVector> =
+        true;
+#  endif
   } // namespace internal
 
 
@@ -819,6 +854,18 @@ namespace concepts
   concept is_writable_dealii_vector_type = is_dealii_vector_type<VectorType> &&
                                            (std::is_const_v<VectorType> ==
                                             false);
+
+  /**
+   * A concept that tests whether a given template argument is a deal.II
+   * vector type that internally builds on PETSc functionality. This
+   * concept is used to constrain some classes that implement advanced
+   * functionality based on PETSc and that requires that the vector
+   * it works on are PETSc vectors. This includes, for example, the
+   * time stepping and nonlinear solver classes in namespace PETScWrappers.
+   */
+  template <typename VectorType>
+  concept is_dealii_petsc_vector_type =
+    internal::is_dealii_petsc_vector_type<VectorType>;
 
 #endif
 } // namespace concepts

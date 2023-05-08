@@ -29,6 +29,11 @@
 
 #  include <petscsnes.h>
 
+#  if defined(DEAL_II_HAVE_CXX20)
+#    include <concepts>
+#  endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
@@ -226,6 +231,8 @@ namespace PETScWrappers
   template <typename VectorType  = PETScWrappers::VectorBase,
             typename PMatrixType = PETScWrappers::MatrixBase,
             typename AMatrixType = PMatrixType>
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>))
   class NonlinearSolver
   {
   public:
