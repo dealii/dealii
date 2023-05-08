@@ -1,0 +1,6 @@
+
+DEAL::Exiting function regularly.
+DEAL::Exiting function via throw.
+DEAL::Caught int=123
+DEAL::Caught exception. Making it go away.
+DEAL::Exiting function regularly.
