@@ -688,13 +688,7 @@ namespace LinearAlgebra
      * Return the local position of @p global_index.
      */
     unsigned int
-    global_to_local(const types::global_dof_index global_index) const
-    {
-      // the following will throw an exception if the global_index is not
-      // in the remaining_elements
-      return static_cast<unsigned int>(
-        stored_elements.index_within_set(global_index));
-    }
+    global_to_local(const types::global_dof_index global_index) const;
 
     /**
      * A helper function that is used to resize the val array.
@@ -795,6 +789,7 @@ namespace LinearAlgebra
   /*---------------------------- Inline functions ---------------------------*/
 
 #ifndef DOXYGEN
+
 
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector()
@@ -1054,6 +1049,19 @@ namespace LinearAlgebra
             "The given value is not finite but either infinite or Not A Number (NaN)"));
         this->operator()(indices[i]) += values_to_add[i];
       }
+  }
+
+
+
+  template <typename Number>
+  inline unsigned int
+  ReadWriteVector<Number>::global_to_local(
+    const types::global_dof_index global_index) const
+  {
+    // the following will throw an exception if the global_index is not
+    // in the remaining_elements
+    return static_cast<unsigned int>(
+      stored_elements.index_within_set(global_index));
   }
 
 
