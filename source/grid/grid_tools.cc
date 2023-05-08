@@ -6168,6 +6168,127 @@ namespace GridTools
         return locally_owned_active_cells_around_point;
     }
 
+    template <int dim, int spacedim>
+    DistributedComputePointLocationsInternal<dim, spacedim>::
+      DistributedComputePointLocationsInternal()
+      : n_searched_points(numbers::invalid_unsigned_int)
+    {}
+
+    template <int dim, int spacedim>
+    void
+    DistributedComputePointLocationsInternal<dim, spacedim>::finalize_setup()
+    {
+      // before reshuffeling the data check if data.recv_components and
+      // n_searched_points are in a valid state.
+      Assert(n_searched_points != numbers::invalid_unsigned_int,
+             ExcInternalError());
+      Assert(recv_components.empty() ||
+               std::get<1>(*std::max_element(recv_components.begin(),
+                                             recv_components.end(),
+                                             [](const auto &a, const auto &b) {
+                                               return std::get<1>(a) <
+                                                      std::get<1>(b);
+                                             })) < n_searched_points,
+             ExcInternalError());
+
+      send_ranks.clear();
+      recv_ranks.clear();
+      send_ptrs.clear();
+      recv_ptrs.clear();
+
+      if (true)
+        {
+          // sort according to rank (and point index and cell) -> make
+          // deterministic
+          std::sort(send_components.begin(),
+                    send_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<1>(a) != std::get<1>(b)) // rank
+                        return std::get<1>(a) < std::get<1>(b);
+
+                      if (std::get<2>(a) != std::get<2>(b)) // point index
+                        return std::get<2>(a) < std::get<2>(b);
+
+                      return std::get<0>(a) < std::get<0>(b); // cell
+                    });
+
+          // perform enumeration and extract rank information
+          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
+               i < send_components.size();
+               ++i)
+            {
+              std::get<5>(send_components[i]) = i;
+
+              if (dummy != std::get<1>(send_components[i]))
+                {
+                  dummy = std::get<1>(send_components[i]);
+                  send_ranks.push_back(dummy);
+                  send_ptrs.push_back(i);
+                }
+            }
+          send_ptrs.push_back(send_components.size());
+
+          // sort according to cell, rank, point index (while keeping
+          // partial ordering)
+          std::sort(send_components.begin(),
+                    send_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<0>(a) != std::get<0>(b))
+                        return std::get<0>(a) < std::get<0>(b); // cell
+
+                      if (std::get<1>(a) != std::get<1>(b))
+                        return std::get<1>(a) < std::get<1>(b); // rank
+
+                      if (std::get<2>(a) != std::get<2>(b))
+                        return std::get<2>(a) < std::get<2>(b); // point index
+
+                      return std::get<5>(a) < std::get<5>(b); // enumeration
+                    });
+        }
+
+      if (recv_components.size() > 0)
+        {
+          // sort according to rank (and point index) -> make deterministic
+          std::sort(recv_components.begin(),
+                    recv_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<0>(a) != std::get<0>(b))
+                        return std::get<0>(a) < std::get<0>(b); // rank
+
+                      return std::get<1>(a) < std::get<1>(b); // point index
+                    });
+
+          // perform enumeration and extract rank information
+          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
+               i < recv_components.size();
+               ++i)
+            {
+              std::get<2>(recv_components[i]) = i;
+
+              if (dummy != std::get<0>(recv_components[i]))
+                {
+                  dummy = std::get<0>(recv_components[i]);
+                  recv_ranks.push_back(dummy);
+                  recv_ptrs.push_back(i);
+                }
+            }
+          recv_ptrs.push_back(recv_components.size());
+
+          // sort according to point index and rank (while keeping partial
+          // ordering)
+          std::sort(recv_components.begin(),
+                    recv_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<1>(a) != std::get<1>(b))
+                        return std::get<1>(a) < std::get<1>(b); // point index
+
+                      if (std::get<0>(a) != std::get<0>(b))
+                        return std::get<0>(a) < std::get<0>(b); // rank
+
+                      return std::get<2>(a) < std::get<2>(b); // enumeration
+                    });
+        }
+    }
 
 
     template <int dim, int spacedim>
@@ -6182,13 +6303,10 @@ namespace GridTools
       const bool enforce_unique_mapping)
     {
       DistributedComputePointLocationsInternal<dim, spacedim> result;
+      result.n_searched_points = points.size();
 
       auto &send_components = result.send_components;
-      auto &send_ranks      = result.send_ranks;
-      auto &send_ptrs       = result.send_ptrs;
       auto &recv_components = result.recv_components;
-      auto &recv_ranks      = result.recv_ranks;
-      auto &recv_ptrs       = result.recv_ptrs;
 
       const auto comm = cache.get_triangulation().get_communicator();
 
@@ -6330,98 +6448,7 @@ namespace GridTools
         process_answer,
         comm);
 
-      if (true)
-        {
-          // sort according to rank (and point index and cell) -> make
-          // deterministic
-          std::sort(send_components.begin(),
-                    send_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<1>(a) != std::get<1>(b)) // rank
-                        return std::get<1>(a) < std::get<1>(b);
-
-                      if (std::get<2>(a) != std::get<2>(b)) // point index
-                        return std::get<2>(a) < std::get<2>(b);
-
-                      return std::get<0>(a) < std::get<0>(b); // cell
-                    });
-
-          // perform enumeration and extract rank information
-          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
-               i < send_components.size();
-               ++i)
-            {
-              std::get<5>(send_components[i]) = i;
-
-              if (dummy != std::get<1>(send_components[i]))
-                {
-                  dummy = std::get<1>(send_components[i]);
-                  send_ranks.push_back(dummy);
-                  send_ptrs.push_back(i);
-                }
-            }
-          send_ptrs.push_back(send_components.size());
-
-          // sort according to cell, rank, point index (while keeping
-          // partial ordering)
-          std::sort(send_components.begin(),
-                    send_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<0>(a) != std::get<0>(b))
-                        return std::get<0>(a) < std::get<0>(b); // cell
-
-                      if (std::get<1>(a) != std::get<1>(b))
-                        return std::get<1>(a) < std::get<1>(b); // rank
-
-                      if (std::get<2>(a) != std::get<2>(b))
-                        return std::get<2>(a) < std::get<2>(b); // point index
-
-                      return std::get<5>(a) < std::get<5>(b); // enumeration
-                    });
-        }
-
-      if (perform_handshake)
-        {
-          // sort according to rank (and point index) -> make deterministic
-          std::sort(recv_components.begin(),
-                    recv_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<0>(a) != std::get<0>(b))
-                        return std::get<0>(a) < std::get<0>(b); // rank
-
-                      return std::get<1>(a) < std::get<1>(b); // point index
-                    });
-
-          // perform enumeration and extract rank information
-          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
-               i < recv_components.size();
-               ++i)
-            {
-              std::get<2>(recv_components[i]) = i;
-
-              if (dummy != std::get<0>(recv_components[i]))
-                {
-                  dummy = std::get<0>(recv_components[i]);
-                  recv_ranks.push_back(dummy);
-                  recv_ptrs.push_back(i);
-                }
-            }
-          recv_ptrs.push_back(recv_components.size());
-
-          // sort according to point index and rank (while keeping partial
-          // ordering)
-          std::sort(recv_components.begin(),
-                    recv_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<1>(a) != std::get<1>(b))
-                        return std::get<1>(a) < std::get<1>(b); // point index
-
-                      if (std::get<0>(a) != std::get<0>(b))
-                        return std::get<0>(a) < std::get<0>(b); // rank
-
-                      return std::get<2>(a) < std::get<2>(b); // enumeration
-                    });
-        }
+      result.finalize_setup();
 
       return result;
     }

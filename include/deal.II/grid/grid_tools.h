@@ -1217,6 +1217,22 @@ namespace GridTools
     template <int dim, int spacedim>
     struct DistributedComputePointLocationsInternal
     {
+      DistributedComputePointLocationsInternal();
+
+      /**
+       * Function which sets up @p send_ranks, @p send_ptrs, @p recv_ranks,
+       * and @p recv_ptrs from @p send_components, @p recv_components,
+       * and @p n_searched_points. Internally @p send_components and @p recv_components
+       * are sorted and enumerated.
+       */
+      void
+      finalize_setup();
+
+      /**
+       * Number of searched point locations.
+       */
+      unsigned int n_searched_points;
+
       /**
        * Information of each point on sending/evaluation side. The elements of
        * the tuple are as follows: 0) cell level and index, 1) rank of the

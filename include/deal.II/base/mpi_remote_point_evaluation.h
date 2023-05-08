@@ -25,6 +25,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+namespace GridTools
+{
+  namespace internal
+  {
+    template <int dim, int spacedim>
+    struct DistributedComputePointLocationsInternal;
+  }
+} // namespace GridTools
 
 namespace Utilities
 {
@@ -85,6 +94,21 @@ namespace Utilities
       reinit(const std::vector<Point<spacedim>> &points,
              const Triangulation<dim, spacedim> &tria,
              const Mapping<dim, spacedim> &      mapping);
+
+      /**
+       * Set up internal data structures and communication pattern based on
+       * GridTools::internal::DistributedComputePointLocationsInternal.
+       *
+       * This function is called internally by the reinit() function above.
+       * Having it as a seperate function makes it possible to setup the class
+       * if it is known in which cells corresponding reference points are
+       * located (e.g. if intersections of cells are known).
+       */
+      void
+      reinit(const GridTools::internal::
+               DistributedComputePointLocationsInternal<dim, spacedim> &data,
+             const Triangulation<dim, spacedim> &                       tria,
+             const Mapping<dim, spacedim> &mapping);
 
       /**
        * Data of points positioned in a cell.
