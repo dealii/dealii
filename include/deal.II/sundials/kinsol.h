@@ -123,9 +123,8 @@ namespace SUNDIALS
    * way for furthering convergence of the nonlinear problem. This technique is
    * implemented in the second strategy, called Linesearch. This option employs
    * both the $\alpha$ and $\beta$ conditions of the Goldstein-Armijo
-   * linesearch algorithm given in *J. E. Dennis and R. B. Schnabel. "Numerical
-   * Methods for Unconstrained Optimization and Nonlinear Equations." SIAM,
-   * Philadelphia, 1996.*, where $\lambda$ is chosen to guarantee a sufficient
+   * linesearch algorithm given in @cite DennisSchnabel96 ,
+   * where $\lambda$ is chosen to guarantee a sufficient
    * decrease in $F$ relative to the step length as well as a minimum step
    * length relative to the initial rate of decrease of $F$. One property of the
    * algorithm is that the full Newton step tends to be taken close to the
@@ -150,9 +149,10 @@ namespace SUNDIALS
    * produce the new iterate. Next, the nonlinear residual function is
    * evaluated at the new iterate, and convergence is checked. The Picard and
    * fixed point methods can be significantly accelerated using Anderson's
-   * method.
+   * acceleration method.
    *
-   * The user has to provide the implementation of the following std::functions:
+   * The user has to provide the implementation of the following
+   * `std::function`s:
    *  - reinit_vector;
    * and only one of
    *  - residual;
@@ -177,7 +177,7 @@ namespace SUNDIALS
    * scaling factors for both the solution and the residual evaluation during
    * convergence checks:
    *  - get_solution_scaling;
-   *  - get_function_scaling;
+   *  - get_function_scaling.
    */
   template <typename VectorType = Vector<double>>
   class KINSOL
