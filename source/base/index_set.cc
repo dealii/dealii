@@ -717,8 +717,8 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 Tpetra::Map<int, types::signed_global_dof_index>
-IndexSet::make_tpetra_map(const MPI_Comm &communicator,
-                          const bool      overlapping) const
+IndexSet::make_tpetra_map(const MPI_Comm communicator,
+                          const bool     overlapping) const
 {
   compress();
   (void)communicator;
@@ -786,8 +786,8 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
 
 
 Epetra_Map
-IndexSet::make_trilinos_map(const MPI_Comm &communicator,
-                            const bool      overlapping) const
+IndexSet::make_trilinos_map(const MPI_Comm communicator,
+                            const bool     overlapping) const
 {
   compress();
   (void)communicator;
@@ -855,7 +855,7 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
 
 #ifdef DEAL_II_WITH_PETSC
 IS
-IndexSet::make_petsc_is(const MPI_Comm &communicator) const
+IndexSet::make_petsc_is(const MPI_Comm communicator) const
 {
   std::vector<size_type> indices;
   fill_index_vector(indices);
@@ -875,7 +875,7 @@ IndexSet::make_petsc_is(const MPI_Comm &communicator) const
 
 
 bool
-IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
+IndexSet::is_ascending_and_one_to_one(const MPI_Comm communicator) const
 {
   // If the sum of local elements does not add up to the total size,
   // the IndexSet can't be complete.

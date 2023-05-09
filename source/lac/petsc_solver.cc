@@ -204,7 +204,7 @@ namespace PETScWrappers
 
 
   void
-  SolverBase::initialize_ksp_with_comm(const MPI_Comm &comm)
+  SolverBase::initialize_ksp_with_comm(const MPI_Comm comm)
   {
     // Create the PETSc KSP object
     AssertPETSc(KSPCreate(comm, &ksp));
@@ -263,7 +263,7 @@ namespace PETScWrappers
 
 
   SolverRichardson::SolverRichardson(SolverControl &cn,
-                                     const MPI_Comm &,
+                                     const MPI_Comm,
                                      const AdditionalData &data)
     : SolverRichardson(cn, data)
   {}
@@ -313,7 +313,7 @@ namespace PETScWrappers
 
 
   SolverChebychev::SolverChebychev(SolverControl &cn,
-                                   const MPI_Comm &,
+                                   const MPI_Comm,
                                    const AdditionalData &data)
     : SolverChebychev(cn, data)
   {}
@@ -340,7 +340,7 @@ namespace PETScWrappers
 
 
   SolverCG::SolverCG(SolverControl &cn,
-                     const MPI_Comm &,
+                     const MPI_Comm,
                      const AdditionalData &data)
     : SolverCG(cn, data)
   {}
@@ -367,7 +367,7 @@ namespace PETScWrappers
 
 
   SolverBiCG::SolverBiCG(SolverControl &cn,
-                         const MPI_Comm &,
+                         const MPI_Comm,
                          const AdditionalData &data)
     : SolverBiCG(cn, data)
   {}
@@ -403,7 +403,7 @@ namespace PETScWrappers
 
 
   SolverGMRES::SolverGMRES(SolverControl &cn,
-                           const MPI_Comm &,
+                           const MPI_Comm,
                            const AdditionalData &data)
     : SolverGMRES(cn, data)
   {}
@@ -438,7 +438,7 @@ namespace PETScWrappers
 
 
   SolverBicgstab::SolverBicgstab(SolverControl &cn,
-                                 const MPI_Comm &,
+                                 const MPI_Comm,
                                  const AdditionalData &data)
     : SolverBicgstab(cn, data)
   {}
@@ -465,7 +465,7 @@ namespace PETScWrappers
 
 
   SolverCGS::SolverCGS(SolverControl &cn,
-                       const MPI_Comm &,
+                       const MPI_Comm,
                        const AdditionalData &data)
     : SolverCGS(cn, data)
   {}
@@ -492,7 +492,7 @@ namespace PETScWrappers
 
 
   SolverTFQMR::SolverTFQMR(SolverControl &cn,
-                           const MPI_Comm &,
+                           const MPI_Comm,
                            const AdditionalData &data)
     : SolverTFQMR(cn, data)
   {}
@@ -519,7 +519,7 @@ namespace PETScWrappers
 
 
   SolverTCQMR::SolverTCQMR(SolverControl &cn,
-                           const MPI_Comm &,
+                           const MPI_Comm,
                            const AdditionalData &data)
     : SolverTCQMR(cn, data)
   {}
@@ -546,7 +546,7 @@ namespace PETScWrappers
 
 
   SolverCR::SolverCR(SolverControl &cn,
-                     const MPI_Comm &,
+                     const MPI_Comm,
                      const AdditionalData &data)
     : SolverCR(cn, data)
   {}
@@ -574,7 +574,7 @@ namespace PETScWrappers
 
 
   SolverLSQR::SolverLSQR(SolverControl &cn,
-                         const MPI_Comm &,
+                         const MPI_Comm,
                          const AdditionalData &data)
     : SolverLSQR(cn, data)
   {}
@@ -609,7 +609,7 @@ namespace PETScWrappers
 
 
   SolverPreOnly::SolverPreOnly(SolverControl &cn,
-                               const MPI_Comm &,
+                               const MPI_Comm,
                                const AdditionalData &data)
     : SolverPreOnly(cn, data)
   {}
@@ -649,7 +649,7 @@ namespace PETScWrappers
 
 
   SparseDirectMUMPS::SparseDirectMUMPS(SolverControl &cn,
-                                       const MPI_Comm &,
+                                       const MPI_Comm,
                                        const AdditionalData &data)
     : SparseDirectMUMPS(cn, data)
   {}

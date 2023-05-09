@@ -696,7 +696,7 @@ namespace TrilinosWrappers
      * to be saved in each block.
      */
     BlockSparsityPattern(const std::vector<IndexSet> &parallel_partitioning,
-                         const MPI_Comm &communicator = MPI_COMM_WORLD);
+                         const MPI_Comm communicator = MPI_COMM_WORLD);
 
     /**
      * Initialize the pattern with two arrays of index sets that specify rows
@@ -713,7 +713,7 @@ namespace TrilinosWrappers
       const std::vector<IndexSet> &row_parallel_partitioning,
       const std::vector<IndexSet> &column_parallel_partitioning,
       const std::vector<IndexSet> &writeable_rows,
-      const MPI_Comm &             communicator = MPI_COMM_WORLD);
+      const MPI_Comm               communicator = MPI_COMM_WORLD);
 
     /**
      * Resize the matrix to a tensor product of matrices with dimensions
@@ -734,7 +734,7 @@ namespace TrilinosWrappers
      */
     void
     reinit(const std::vector<IndexSet> &parallel_partitioning,
-           const MPI_Comm &             communicator = MPI_COMM_WORLD);
+           const MPI_Comm               communicator = MPI_COMM_WORLD);
 
     /**
      * Resize the matrix to a rectangular block matrices. This method allows
@@ -744,7 +744,7 @@ namespace TrilinosWrappers
     void
     reinit(const std::vector<IndexSet> &row_parallel_partitioning,
            const std::vector<IndexSet> &column_parallel_partitioning,
-           const MPI_Comm &             communicator = MPI_COMM_WORLD);
+           const MPI_Comm               communicator = MPI_COMM_WORLD);
 
     /**
      * Resize the matrix to a rectangular block matrices that furthermore
@@ -758,7 +758,7 @@ namespace TrilinosWrappers
     reinit(const std::vector<IndexSet> &row_parallel_partitioning,
            const std::vector<IndexSet> &column_parallel_partitioning,
            const std::vector<IndexSet> &writeable_rows,
-           const MPI_Comm &             communicator = MPI_COMM_WORLD);
+           const MPI_Comm               communicator = MPI_COMM_WORLD);
 
     /**
      * Allow the use of the reinit functions of the base class as well.

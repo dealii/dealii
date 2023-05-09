@@ -19,74 +19,74 @@
 for (S : REAL_SCALARS)
   {
     template void sum<S>(const SparseMatrix<S> &,
-                         const MPI_Comm &,
+                         const MPI_Comm,
                          SparseMatrix<S> &);
   }
 
 for (S : MPI_SCALARS)
   {
     template void sum<LAPACKFullMatrix<S>>(const LAPACKFullMatrix<S> &,
-                                           const MPI_Comm &,
+                                           const MPI_Comm,
                                            LAPACKFullMatrix<S> &);
 
     template void sum<Vector<S>>(const Vector<S> &,
-                                 const MPI_Comm &,
+                                 const MPI_Comm,
                                  Vector<S> &);
 
     template void sum<FullMatrix<S>>(const FullMatrix<S> &,
-                                     const MPI_Comm &,
+                                     const MPI_Comm,
                                      FullMatrix<S> &);
 
     template void sum<S>(const ArrayView<const S> &,
-                         const MPI_Comm &,
+                         const MPI_Comm,
                          const ArrayView<S> &);
 
-    template S sum<S>(const S &, const MPI_Comm &);
+    template S sum<S>(const S &, const MPI_Comm);
 
     template void sum<std::vector<S>>(const std::vector<S> &,
-                                      const MPI_Comm &,
+                                      const MPI_Comm,
                                       std::vector<S> &);
 
-    template S max<S>(const S &, const MPI_Comm &);
+    template S max<S>(const S &, const MPI_Comm);
 
     template void max<std::vector<S>>(const std::vector<S> &,
-                                      const MPI_Comm &,
+                                      const MPI_Comm,
                                       std::vector<S> &);
 
     template void max<S>(const ArrayView<const S> &,
-                         const MPI_Comm &,
+                         const MPI_Comm,
                          const ArrayView<S> &);
 
-    template S min<S>(const S &, const MPI_Comm &);
+    template S min<S>(const S &, const MPI_Comm);
 
     template void min<std::vector<S>>(const std::vector<S> &,
-                                      const MPI_Comm &,
+                                      const MPI_Comm,
                                       std::vector<S> &);
 
     template void min<S>(const ArrayView<const S> &,
-                         const MPI_Comm &,
+                         const MPI_Comm,
                          const ArrayView<S> &);
 
     template S reduce(const S &                                     vec,
-                      const MPI_Comm &                              comm,
+                      const MPI_Comm                                comm,
                       const std::function<S(const S &, const S &)> &process,
                       const unsigned int root_process);
 
     template std::vector<S> reduce(
       const std::vector<S> &                                       vec,
-      const MPI_Comm &                                             comm,
+      const MPI_Comm                                               comm,
       const std::function<std::vector<S>(const std::vector<S> &,
                                          const std::vector<S> &)> &process,
       const unsigned int root_process);
 
     template S all_reduce(
       const S &                                     vec,
-      const MPI_Comm &                              comm,
+      const MPI_Comm                                comm,
       const std::function<S(const S &, const S &)> &process);
 
     template std::vector<S> all_reduce(
       const std::vector<S> &                                       vec,
-      const MPI_Comm &                                             comm,
+      const MPI_Comm                                               comm,
       const std::function<std::vector<S>(const std::vector<S> &,
                                          const std::vector<S> &)> &process);
 
@@ -107,7 +107,7 @@ for (S : MPI_SCALARS)
     template void Utilities::MPI::internal::all_reduce<S>(
       const MPI_Op &,
       const ArrayView<const S> &,
-      const MPI_Comm &,
+      const MPI_Comm,
       const ArrayView<S> &);
   }
 
@@ -115,7 +115,7 @@ for (S : MPI_SCALARS)
 for (S : REAL_SCALARS; rank : RANKS; dim : SPACE_DIMENSIONS)
   {
     template Tensor<rank, dim, S> sum<rank, dim, S>(
-      const Tensor<rank, dim, S> &, const MPI_Comm &);
+      const Tensor<rank, dim, S> &, const MPI_Comm);
   }
 
 
@@ -123,10 +123,10 @@ for (S : REAL_SCALARS; rank : RANKS; dim : SPACE_DIMENSIONS)
 for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
   {
     template SymmetricTensor<2, dim, S> sum<2, dim, S>(
-      const SymmetricTensor<2, dim, S> &, const MPI_Comm &);
+      const SymmetricTensor<2, dim, S> &, const MPI_Comm);
 
     template SymmetricTensor<4, dim, S> sum<4, dim, S>(
-      const SymmetricTensor<4, dim, S> &, const MPI_Comm &);
+      const SymmetricTensor<4, dim, S> &, const MPI_Comm);
   }
 
 

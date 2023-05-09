@@ -38,7 +38,7 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const MPI_Comm &communicator,
+    Vector::Vector(const MPI_Comm  communicator,
                    const size_type n,
                    const size_type locally_owned_size)
     {
@@ -49,7 +49,7 @@ namespace PETScWrappers
 
     Vector::Vector(const IndexSet &local,
                    const IndexSet &ghost,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
     {
       Assert(local.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
@@ -83,7 +83,7 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const IndexSet &local, const MPI_Comm &communicator)
+    Vector::Vector(const IndexSet &local, const MPI_Comm communicator)
     {
       Assert(local.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
@@ -145,7 +145,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::reinit(const MPI_Comm &communicator,
+    Vector::reinit(const MPI_Comm  communicator,
                    const size_type n,
                    const size_type local_sz,
                    const bool      omit_zeroing_entries)
@@ -211,7 +211,7 @@ namespace PETScWrappers
     void
     Vector::reinit(const IndexSet &local,
                    const IndexSet &ghost,
-                   const MPI_Comm &comm)
+                   const MPI_Comm  comm)
     {
       const PetscErrorCode ierr = VecDestroy(&vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -225,7 +225,7 @@ namespace PETScWrappers
     }
 
     void
-    Vector::reinit(const IndexSet &local, const MPI_Comm &comm)
+    Vector::reinit(const IndexSet &local, const MPI_Comm comm)
     {
       const PetscErrorCode ierr = VecDestroy(&vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -246,7 +246,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::create_vector(const MPI_Comm &communicator,
+    Vector::create_vector(const MPI_Comm  communicator,
                           const size_type n,
                           const size_type locally_owned_size)
     {
@@ -266,7 +266,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::create_vector(const MPI_Comm &communicator,
+    Vector::create_vector(const MPI_Comm  communicator,
                           const size_type n,
                           const size_type locally_owned_size,
                           const IndexSet &ghostnodes)

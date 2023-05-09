@@ -61,7 +61,7 @@ namespace Utilities
        */
       NoncontiguousPartitioner(const IndexSet &indexset_locally_owned,
                                const IndexSet &indexset_ghost,
-                               const MPI_Comm &communicator);
+                               const MPI_Comm  communicator);
 
       /**
        * Constructor. Same as above but for vectors of indices @p indices_locally_owned
@@ -75,7 +75,7 @@ namespace Utilities
       NoncontiguousPartitioner(
         const std::vector<types::global_dof_index> &indices_locally_owned,
         const std::vector<types::global_dof_index> &indices_ghost,
-        const MPI_Comm &                            communicator);
+        const MPI_Comm                              communicator);
 
       /**
        * Fill the vector @p ghost_array according to the precomputed communication
@@ -197,7 +197,7 @@ namespace Utilities
       void
       reinit(const IndexSet &locally_owned_indices,
              const IndexSet &ghost_indices,
-             const MPI_Comm &communicator) override;
+             const MPI_Comm  communicator) override;
 
       /**
        * Initialize the inner data structures using explicit sets of
@@ -207,7 +207,7 @@ namespace Utilities
       void
       reinit(const std::vector<types::global_dof_index> &locally_owned_indices,
              const std::vector<types::global_dof_index> &ghost_indices,
-             const MPI_Comm &                            communicator);
+             const MPI_Comm                              communicator);
 
     private:
       /**

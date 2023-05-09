@@ -172,7 +172,7 @@ namespace PETScWrappers
       reinit(const std::vector<IndexSet> &      rows,
              const std::vector<IndexSet> &      cols,
              const BlockDynamicSparsityPattern &bdsp,
-             const MPI_Comm &                   com);
+             const MPI_Comm                     com);
 
 
       /**
@@ -181,7 +181,7 @@ namespace PETScWrappers
       void
       reinit(const std::vector<IndexSet> &      sizes,
              const BlockDynamicSparsityPattern &bdsp,
-             const MPI_Comm &                   com);
+             const MPI_Comm                     com);
 
 
       /**

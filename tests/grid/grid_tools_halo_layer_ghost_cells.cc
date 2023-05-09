@@ -30,7 +30,7 @@ template <int dim>
 void
 test()
 {
-  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
+  const MPI_Comm mpi_communicator = MPI_COMM_WORLD;
   deallog << "dim = " << dim << std::endl;
 
   parallel::distributed::Triangulation<dim> tria(mpi_communicator);

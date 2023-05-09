@@ -3417,7 +3417,7 @@ namespace GridTools
   std::vector<std::vector<BoundingBox<spacedim>>>
   exchange_local_bounding_boxes(
     const std::vector<BoundingBox<spacedim>> &local_bboxes,
-    const MPI_Comm &                          mpi_communicator);
+    const MPI_Comm                            mpi_communicator);
 
   /**
    * In this collective operation each process provides a vector
@@ -3455,7 +3455,7 @@ namespace GridTools
   RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
   build_global_description_tree(
     const std::vector<BoundingBox<spacedim>> &local_description,
-    const MPI_Comm &                          mpi_communicator);
+    const MPI_Comm                            mpi_communicator);
 
   /**
    * Collect for a given triangulation all locally relevant vertices that

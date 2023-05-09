@@ -264,7 +264,7 @@ namespace internal
       public:
         Full(
           const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-          const MPI_Comm &communicator_sm);
+          const MPI_Comm communicator_sm);
 
         unsigned int
         locally_owned_size() const override;

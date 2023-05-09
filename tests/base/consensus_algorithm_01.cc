@@ -22,7 +22,7 @@
 
 
 void
-test(const MPI_Comm &comm)
+test(const MPI_Comm comm)
 {
   const unsigned int my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
   const unsigned int n_rank  = dealii::Utilities::MPI::n_mpi_processes(comm);

@@ -193,7 +193,7 @@ namespace Step45
     InverseMatrix(const MatrixType &        m,
                   const PreconditionerType &preconditioner,
                   const IndexSet &          locally_owned,
-                  const MPI_Comm &          mpi_communicator);
+                  const MPI_Comm            mpi_communicator);
 
     void vmult(TrilinosWrappers::MPI::Vector &      dst,
                const TrilinosWrappers::MPI::Vector &src) const;
@@ -213,7 +213,7 @@ namespace Step45
     const MatrixType &        m,
     const PreconditionerType &preconditioner,
     const IndexSet &          locally_owned,
-    const MPI_Comm &          mpi_communicator)
+    const MPI_Comm            mpi_communicator)
     : matrix(&m)
     , preconditioner(&preconditioner)
     , mpi_communicator(&mpi_communicator)
@@ -246,7 +246,7 @@ namespace Step45
                     const InverseMatrix<TrilinosWrappers::SparseMatrix,
                                         PreconditionerType> &  A_inverse,
                     const IndexSet &                           owned_pres,
-                    const MPI_Comm &mpi_communicator);
+                    const MPI_Comm mpi_communicator);
 
     void vmult(TrilinosWrappers::MPI::Vector &      dst,
                const TrilinosWrappers::MPI::Vector &src) const;
@@ -267,7 +267,7 @@ namespace Step45
     const InverseMatrix<TrilinosWrappers::SparseMatrix, PreconditionerType>
       &             A_inverse,
     const IndexSet &owned_vel,
-    const MPI_Comm &mpi_communicator)
+    const MPI_Comm  mpi_communicator)
     : system_matrix(&system_matrix)
     , A_inverse(&A_inverse)
     , tmp1(owned_vel, mpi_communicator)

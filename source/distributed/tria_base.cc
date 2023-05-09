@@ -46,7 +46,7 @@ namespace parallel
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   TriangulationBase<dim, spacedim>::TriangulationBase(
-    const MPI_Comm &mpi_communicator,
+    const MPI_Comm mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                smooth_grid,
     const bool check_for_distorted_cells)
@@ -671,7 +671,7 @@ namespace parallel
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   DistributedTriangulationBase<dim, spacedim>::DistributedTriangulationBase(
-    const MPI_Comm &mpi_communicator,
+    const MPI_Comm mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                smooth_grid,
     const bool check_for_distorted_cells)
@@ -877,7 +877,7 @@ namespace parallel
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   DistributedTriangulationBase<dim, spacedim>::DataTransfer::DataTransfer(
-    const MPI_Comm &mpi_communicator)
+    const MPI_Comm mpi_communicator)
     : variable_size_data_stored(false)
     , mpi_communicator(mpi_communicator)
   {}

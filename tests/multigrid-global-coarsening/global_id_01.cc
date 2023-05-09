@@ -37,7 +37,7 @@
 
 template <int dim, int spacedim>
 void
-test(const MPI_Comm &comm)
+test(const MPI_Comm comm)
 {
   Triangulation<dim> basetria;
   GridGenerator::subdivided_hyper_cube(basetria, 4);

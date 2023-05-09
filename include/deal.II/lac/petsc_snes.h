@@ -247,7 +247,7 @@ namespace PETScWrappers
      * Constructor.
      */
     NonlinearSolver(const NonlinearSolverData &data     = NonlinearSolverData(),
-                    const MPI_Comm &           mpi_comm = PETSC_COMM_WORLD);
+                    const MPI_Comm             mpi_comm = PETSC_COMM_WORLD);
 
     /**
      * Destructor.

@@ -303,7 +303,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   KINSOL<VectorType>::KINSOL(const AdditionalData &data,
-                             const MPI_Comm &      mpi_comm)
+                             const MPI_Comm        mpi_comm)
     : data(data)
     , mpi_communicator(mpi_comm)
     , kinsol_mem(nullptr)

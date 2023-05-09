@@ -295,7 +295,7 @@ public:
    * Constructor.
    */
   PArpackSolver(SolverControl &       control,
-                const MPI_Comm &      mpi_communicator,
+                const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
 
   /**
@@ -638,7 +638,7 @@ PArpackSolver<VectorType>::AdditionalData::AdditionalData(
 
 template <typename VectorType>
 PArpackSolver<VectorType>::PArpackSolver(SolverControl &       control,
-                                         const MPI_Comm &      mpi_communicator,
+                                         const MPI_Comm        mpi_communicator,
                                          const AdditionalData &data)
   : solver_control(control)
   , additional_data(data)

@@ -202,7 +202,7 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
           &                              nonscalar_data_ranges,
         const Deal_II_IntermediateFlags &flags,
         const std::string &              filename,
-        const MPI_Comm &                 comm,
+        const MPI_Comm                   comm,
         const CompressionLevel           compression);
 
       template void
@@ -212,7 +212,7 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const DataOutFilter &         data_filter,
         const DataOutBase::Hdf5Flags &flags,
         const std::string &           filename,
-        const MPI_Comm &              comm);
+        const MPI_Comm                comm);
 
       template void
       write_filtered_data(

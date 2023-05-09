@@ -400,7 +400,7 @@ namespace internal
       std::vector<types::global_dof_index> &ghosted_level_dofs,
       const std::shared_ptr<const Utilities::MPI::Partitioner>
         &                                                 external_partitioner,
-      const MPI_Comm &                                    communicator,
+      const MPI_Comm                                      communicator,
       std::shared_ptr<const Utilities::MPI::Partitioner> &target_partitioner,
       Table<2, unsigned int> &copy_indices_global_mine)
     {

@@ -54,7 +54,7 @@ namespace LinearAlgebra
 
 
     Vector::Vector(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Subscriptor()
       , vector(new Epetra_FEVector(
           parallel_partitioner.make_trilinos_map(communicator, false)))
@@ -64,7 +64,7 @@ namespace LinearAlgebra
 
     void
     Vector::reinit(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator,
+                   const MPI_Comm  communicator,
                    const bool      omit_zeroing_entries)
     {
       Epetra_Map input_map =
@@ -661,7 +661,7 @@ namespace LinearAlgebra
 
     void
     Vector::create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                       const MPI_Comm &mpi_comm)
+                                       const MPI_Comm  mpi_comm)
     {
       source_stored_elements = source_index_set;
       epetra_comm_pattern =

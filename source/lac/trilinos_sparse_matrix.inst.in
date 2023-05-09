@@ -28,7 +28,7 @@ for (S : REAL_SCALARS)
       SparseMatrix::reinit(const IndexSet &,
                            const IndexSet &,
                            const dealii::SparseMatrix<S> &,
-                           const MPI_Comm &,
+                           const MPI_Comm,
                            const double,
                            const bool,
                            const dealii::SparsityPattern *);

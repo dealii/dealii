@@ -371,7 +371,7 @@ namespace internal
 
       Full::Full(
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-        const MPI_Comm &communicator_sm)
+        const MPI_Comm communicator_sm)
         : comm(partitioner->get_mpi_communicator())
         , comm_sm(communicator_sm)
         , n_local_elements(partitioner->locally_owned_range().n_elements())

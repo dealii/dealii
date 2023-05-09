@@ -111,7 +111,7 @@ namespace TriangulationDescription
         collect(
           const std::vector<unsigned int> &                  relevant_processes,
           const std::vector<DescriptionTemp<dim, spacedim>> &description_temp,
-          const MPI_Comm &                                   comm,
+          const MPI_Comm                                     comm,
           const bool vertices_have_unique_ids)
         {
           const auto create_request = [&](const unsigned int other_rank) {
@@ -404,7 +404,7 @@ namespace TriangulationDescription
           const std::function<types::subdomain_id(
             const typename dealii::Triangulation<dim, spacedim>::cell_iterator
               &)> &                                level_subdomain_id_function,
-          const MPI_Comm &                         comm,
+          const MPI_Comm                           comm,
           const TriangulationDescription::Settings settings)
           : tria(tria)
           , subdomain_id_function(subdomain_id_function)
@@ -709,7 +709,7 @@ namespace TriangulationDescription
           const typename dealii::Triangulation<dim, spacedim>::cell_iterator &)>
           level_subdomain_id_function;
 
-        const MPI_Comm &                         comm;
+        const MPI_Comm                           comm;
         const TriangulationDescription::Settings settings;
         const bool                               construct_multigrid;
 
@@ -725,7 +725,7 @@ namespace TriangulationDescription
     Description<dim, spacedim>
     create_description_from_triangulation(
       const dealii::Triangulation<dim, spacedim> &tria,
-      const MPI_Comm &                            comm,
+      const MPI_Comm                              comm,
       const TriangulationDescription::Settings    settings,
       const unsigned int                          my_rank_in)
     {
@@ -791,9 +791,9 @@ namespace TriangulationDescription
       const std::function<void(dealii::Triangulation<dim, spacedim> &)>
         &                                            serial_grid_generator,
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
-                               const MPI_Comm &,
+                               const MPI_Comm,
                                const unsigned int)> &serial_grid_partitioner,
-      const MPI_Comm &                               comm,
+      const MPI_Comm                                 comm,
       const int                                      group_size,
       const typename Triangulation<dim, spacedim>::MeshSmoothing smoothing,
       const TriangulationDescription::Settings                   settings)

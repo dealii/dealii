@@ -46,7 +46,7 @@
 
 template <int dim>
 void
-transfer(const MPI_Comm &comm)
+transfer(const MPI_Comm comm)
 {
   AssertDimension(Utilities::MPI::n_mpi_processes(comm), 1);
 

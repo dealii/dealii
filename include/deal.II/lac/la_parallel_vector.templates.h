@@ -95,7 +95,7 @@ namespace LinearAlgebra
           types::global_dof_index & /*allocated_size*/,
           ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType>
             & /*data*/,
-          const MPI_Comm & /*comm_sm*/)
+          const MPI_Comm /*comm_sm*/)
         {}
 
         static void
@@ -130,7 +130,7 @@ namespace LinearAlgebra
                    types::global_dof_index &     allocated_size,
                    ::dealii::MemorySpace::
                      MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data,
-                   const MPI_Comm &comm_shared)
+                   const MPI_Comm comm_shared)
         {
           if (comm_shared == MPI_COMM_SELF)
             {
@@ -328,8 +328,8 @@ namespace LinearAlgebra
           types::global_dof_index &     allocated_size,
           ::dealii::MemorySpace::MemorySpaceData<Number,
                                                  ::dealii::MemorySpace::Default>
-            &             data,
-          const MPI_Comm &comm_sm)
+            &            data,
+          const MPI_Comm comm_sm)
         {
           (void)comm_sm;
 
@@ -521,7 +521,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size,
-                                                const MPI_Comm &comm_sm)
+                                                const MPI_Comm  comm_sm)
     {
       internal::la_parallel_vector_templates_functions<
         Number,
@@ -567,8 +567,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::reinit(
       const types::global_dof_index local_size,
       const types::global_dof_index ghost_size,
-      const MPI_Comm &              comm,
-      const MPI_Comm &              comm_sm)
+      const MPI_Comm                comm,
+      const MPI_Comm                comm_sm)
     {
       clear_mpi_requests();
 
@@ -637,7 +637,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::reinit(
       const IndexSet &locally_owned_indices,
       const IndexSet &ghost_indices,
-      const MPI_Comm &communicator)
+      const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
       reinit(std::make_shared<Utilities::MPI::Partitioner>(
@@ -650,7 +650,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::reinit(
       const IndexSet &locally_owned_indices,
-      const MPI_Comm &communicator)
+      const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
       reinit(
@@ -664,7 +664,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::reinit(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in,
-      const MPI_Comm &                                          comm_sm)
+      const MPI_Comm                                            comm_sm)
     {
       clear_mpi_requests();
 
@@ -737,7 +737,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
                                             const IndexSet &ghost_indices,
-                                            const MPI_Comm &communicator)
+                                            const MPI_Comm  communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
       , comm_sm(MPI_COMM_SELF)
@@ -749,7 +749,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
-                                            const MPI_Comm &communicator)
+                                            const MPI_Comm  communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
       , comm_sm(MPI_COMM_SELF)

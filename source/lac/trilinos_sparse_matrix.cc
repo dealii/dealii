@@ -269,7 +269,7 @@ namespace TrilinosWrappers
 
 
   SparseMatrix::SparseMatrix(const IndexSet &   parallel_partitioning,
-                             const MPI_Comm &   communicator,
+                             const MPI_Comm     communicator,
                              const unsigned int n_max_entries_per_row)
     : column_space_map(new Epetra_Map(
         parallel_partitioning.make_trilinos_map(communicator, false)))
@@ -284,7 +284,7 @@ namespace TrilinosWrappers
 
 
   SparseMatrix::SparseMatrix(const IndexSet &parallel_partitioning,
-                             const MPI_Comm &communicator,
+                             const MPI_Comm  communicator,
                              const std::vector<unsigned int> &n_entries_per_row)
     : column_space_map(new Epetra_Map(
         parallel_partitioning.make_trilinos_map(communicator, false)))
@@ -302,7 +302,7 @@ namespace TrilinosWrappers
 
   SparseMatrix::SparseMatrix(const IndexSet &row_parallel_partitioning,
                              const IndexSet &col_parallel_partitioning,
-                             const MPI_Comm &communicator,
+                             const MPI_Comm  communicator,
                              const size_type n_max_entries_per_row)
     : column_space_map(new Epetra_Map(
         col_parallel_partitioning.make_trilinos_map(communicator, false)))
@@ -319,7 +319,7 @@ namespace TrilinosWrappers
 
   SparseMatrix::SparseMatrix(const IndexSet &row_parallel_partitioning,
                              const IndexSet &col_parallel_partitioning,
-                             const MPI_Comm &communicator,
+                             const MPI_Comm  communicator,
                              const std::vector<unsigned int> &n_entries_per_row)
     : column_space_map(new Epetra_Map(
         col_parallel_partitioning.make_trilinos_map(communicator, false)))
@@ -452,7 +452,7 @@ namespace TrilinosWrappers
                   const IndexSet &             column_parallel_partitioning,
                   const SparsityPatternType &  sparsity_pattern,
                   const bool                   exchange_data,
-                  const MPI_Comm &             communicator,
+                  const MPI_Comm               communicator,
                   std::unique_ptr<Epetra_Map> &column_space_map,
                   std::unique_ptr<Epetra_FECrsMatrix> &matrix,
                   std::unique_ptr<Epetra_CrsMatrix> &  nonlocal_matrix,
@@ -605,7 +605,7 @@ namespace TrilinosWrappers
                   const IndexSet &              column_parallel_partitioning,
                   const DynamicSparsityPattern &sparsity_pattern,
                   const bool                    exchange_data,
-                  const MPI_Comm &              communicator,
+                  const MPI_Comm                communicator,
                   std::unique_ptr<Epetra_Map> & column_space_map,
                   std::unique_ptr<Epetra_FECrsMatrix> &matrix,
                   std::unique_ptr<Epetra_CrsMatrix> &  nonlocal_matrix,
@@ -800,7 +800,7 @@ namespace TrilinosWrappers
   SparseMatrix::reinit(const IndexSet &           row_parallel_partitioning,
                        const IndexSet &           col_parallel_partitioning,
                        const SparsityPatternType &sparsity_pattern,
-                       const MPI_Comm &           communicator,
+                       const MPI_Comm             communicator,
                        const bool                 exchange_data)
   {
     reinit_matrix(row_parallel_partitioning,
@@ -877,7 +877,7 @@ namespace TrilinosWrappers
     const IndexSet &                      row_parallel_partitioning,
     const IndexSet &                      col_parallel_partitioning,
     const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-    const MPI_Comm &                      communicator,
+    const MPI_Comm                        communicator,
     const double                          drop_tolerance,
     const bool                            copy_values,
     const ::dealii::SparsityPattern *     use_this_sparsity)
@@ -3021,14 +3021,14 @@ namespace TrilinosWrappers
   SparseMatrix::reinit(const IndexSet &,
                        const IndexSet &,
                        const dealii::SparsityPattern &,
-                       const MPI_Comm &,
+                       const MPI_Comm,
                        const bool);
 
   template void
   SparseMatrix::reinit(const IndexSet &,
                        const IndexSet &,
                        const DynamicSparsityPattern &,
-                       const MPI_Comm &,
+                       const MPI_Comm,
                        const bool);
 
   template void

@@ -47,7 +47,7 @@ template <int dim, int spacedim = dim>
 void
 test_hypercube(unsigned int ref, unsigned int max_bbox)
 {
-  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
+  const MPI_Comm mpi_communicator = MPI_COMM_WORLD;
   deallog << "Testing hypercube for spacedim = " << spacedim
           << " refinement: " << ref << " max number of boxes: " << max_bbox
           << std::endl;

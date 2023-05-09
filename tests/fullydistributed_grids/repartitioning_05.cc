@@ -39,7 +39,7 @@
 using namespace dealii;
 
 MPI_Comm
-create_sub_comm(const MPI_Comm &comm, const unsigned int size)
+create_sub_comm(const MPI_Comm comm, const unsigned int size)
 {
   const auto rank = Utilities::MPI::this_mpi_process(comm);
 
@@ -64,7 +64,7 @@ create_sub_comm(const MPI_Comm &comm, const unsigned int size)
 template <int dim, int spacedim>
 LinearAlgebra::distributed::Vector<double>
 partition_distributed_triangulation(const Triangulation<dim, spacedim> &tria_in,
-                                    const MPI_Comm &                    comm)
+                                    const MPI_Comm                      comm)
 {
   const auto comm_tria = tria_in.get_communicator();
 

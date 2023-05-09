@@ -316,12 +316,12 @@ namespace LinearAlgebra
        */
       Vector(const IndexSet &local_range,
              const IndexSet &ghost_indices,
-             const MPI_Comm &communicator);
+             const MPI_Comm  communicator);
 
       /**
        * Same constructor as above but without any ghost indices.
        */
-      Vector(const IndexSet &local_range, const MPI_Comm &communicator);
+      Vector(const IndexSet &local_range, const MPI_Comm communicator);
 
       /**
        * Create the vector based on the parallel partitioning described in @p
@@ -378,13 +378,13 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet &local_range,
              const IndexSet &ghost_indices,
-             const MPI_Comm &communicator);
+             const MPI_Comm  communicator);
 
       /**
        * Same as above, but without ghost entries.
        */
       void
-      reinit(const IndexSet &local_range, const MPI_Comm &communicator);
+      reinit(const IndexSet &local_range, const MPI_Comm communicator);
 
       /**
        * Initialize the vector given to the parallel partitioning described in
@@ -401,7 +401,7 @@ namespace LinearAlgebra
       void
       reinit(
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-        const MPI_Comm &comm_sm = MPI_COMM_SELF);
+        const MPI_Comm comm_sm = MPI_COMM_SELF);
 
       /**
        * Initialize vector with @p local_size locally-owned and @p ghost_size
@@ -425,8 +425,8 @@ namespace LinearAlgebra
       void
       reinit(const types::global_dof_index local_size,
              const types::global_dof_index ghost_size,
-             const MPI_Comm &              comm,
-             const MPI_Comm &              comm_sm = MPI_COMM_SELF);
+             const MPI_Comm                comm,
+             const MPI_Comm                comm_sm = MPI_COMM_SELF);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could
@@ -1419,7 +1419,7 @@ namespace LinearAlgebra
        */
       void
       resize_val(const size_type new_allocated_size,
-                 const MPI_Comm &comm_sm = MPI_COMM_SELF);
+                 const MPI_Comm  comm_sm = MPI_COMM_SELF);
 
       // Make all other vector types friends.
       template <typename Number2, typename MemorySpace2>

@@ -32,7 +32,7 @@ namespace LinearAlgebra
     CommunicationPattern::CommunicationPattern(
       const IndexSet &vector_space_vector_index_set,
       const IndexSet &read_write_vector_index_set,
-      const MPI_Comm &communicator)
+      const MPI_Comm  communicator)
     {
       // virtual functions called in constructors and destructors never use the
       // override in a derived class
@@ -47,7 +47,7 @@ namespace LinearAlgebra
     void
     CommunicationPattern::reinit(const IndexSet &vector_space_vector_index_set,
                                  const IndexSet &read_write_vector_index_set,
-                                 const MPI_Comm &communicator)
+                                 const MPI_Comm  communicator)
     {
       comm = std::make_shared<const MPI_Comm>(communicator);
 

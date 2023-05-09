@@ -69,7 +69,7 @@ namespace TrilinosWrappers
 
     void
     BlockVector::reinit(const std::vector<IndexSet> &parallel_partitioning,
-                        const MPI_Comm &             communicator,
+                        const MPI_Comm               communicator,
                         const bool                   omit_zeroing_entries)
     {
       // update the number of blocks
@@ -91,7 +91,7 @@ namespace TrilinosWrappers
     void
     BlockVector::reinit(const std::vector<IndexSet> &parallel_partitioning,
                         const std::vector<IndexSet> &ghost_values,
-                        const MPI_Comm &             communicator,
+                        const MPI_Comm               communicator,
                         const bool                   vector_writable)
     {
       AssertDimension(parallel_partitioning.size(), ghost_values.size());

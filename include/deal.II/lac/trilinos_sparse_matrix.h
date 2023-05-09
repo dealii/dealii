@@ -748,7 +748,7 @@ namespace TrilinosWrappers
      * use (in the compress() step).
      */
     SparseMatrix(const IndexSet &   parallel_partitioning,
-                 const MPI_Comm &   communicator          = MPI_COMM_WORLD,
+                 const MPI_Comm     communicator          = MPI_COMM_WORLD,
                  const unsigned int n_max_entries_per_row = 0);
 
     /**
@@ -759,7 +759,7 @@ namespace TrilinosWrappers
      * by the respective SparseMatrix::reinit call considerably faster.
      */
     SparseMatrix(const IndexSet &                 parallel_partitioning,
-                 const MPI_Comm &                 communicator,
+                 const MPI_Comm                   communicator,
                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
@@ -778,7 +778,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix(const IndexSet &row_parallel_partitioning,
                  const IndexSet &col_parallel_partitioning,
-                 const MPI_Comm &communicator          = MPI_COMM_WORLD,
+                 const MPI_Comm  communicator          = MPI_COMM_WORLD,
                  const size_type n_max_entries_per_row = 0);
 
     /**
@@ -797,7 +797,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix(const IndexSet &                 row_parallel_partitioning,
                  const IndexSet &                 col_parallel_partitioning,
-                 const MPI_Comm &                 communicator,
+                 const MPI_Comm                   communicator,
                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
@@ -824,7 +824,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &           parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
-           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const MPI_Comm             communicator  = MPI_COMM_WORLD,
            const bool                 exchange_data = false);
 
     /**
@@ -845,7 +845,7 @@ namespace TrilinosWrappers
     reinit(const IndexSet &           row_parallel_partitioning,
            const IndexSet &           col_parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
-           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const MPI_Comm             communicator  = MPI_COMM_WORLD,
            const bool                 exchange_data = false);
 
     /**
@@ -868,7 +868,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &                      parallel_partitioning,
            const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const MPI_Comm &                      communicator = MPI_COMM_WORLD,
+           const MPI_Comm                        communicator = MPI_COMM_WORLD,
            const double                          drop_tolerance    = 1e-13,
            const bool                            copy_values       = true,
            const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
@@ -891,7 +891,7 @@ namespace TrilinosWrappers
     reinit(const IndexSet &                      row_parallel_partitioning,
            const IndexSet &                      col_parallel_partitioning,
            const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const MPI_Comm &                      communicator = MPI_COMM_WORLD,
+           const MPI_Comm                        communicator = MPI_COMM_WORLD,
            const double                          drop_tolerance    = 1e-13,
            const bool                            copy_values       = true,
            const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
@@ -2419,7 +2419,7 @@ namespace TrilinosWrappers
         TrilinosPayload(EpetraOpType &  op,
                         const bool      supports_inverse_operations,
                         const bool      use_transpose,
-                        const MPI_Comm &mpi_communicator,
+                        const MPI_Comm  mpi_communicator,
                         const IndexSet &locally_owned_domain_indices,
                         const IndexSet &locally_owned_range_indices);
 
@@ -3026,7 +3026,7 @@ namespace TrilinosWrappers
   inline void
   SparseMatrix::reinit(const IndexSet &           parallel_partitioning,
                        const SparsityPatternType &sparsity_pattern,
-                       const MPI_Comm &           communicator,
+                       const MPI_Comm             communicator,
                        const bool                 exchange_data)
   {
     reinit(parallel_partitioning,
@@ -3042,7 +3042,7 @@ namespace TrilinosWrappers
   inline void
   SparseMatrix::reinit(const IndexSet &parallel_partitioning,
                        const ::dealii::SparseMatrix<number> &sparse_matrix,
-                       const MPI_Comm &                      communicator,
+                       const MPI_Comm                        communicator,
                        const double                          drop_tolerance,
                        const bool                            copy_values,
                        const ::dealii::SparsityPattern *     use_this_sparsity)
@@ -3115,7 +3115,7 @@ namespace TrilinosWrappers
         EpetraOpType &  op,
         const bool      supports_inverse_operations,
         const bool      use_transpose,
-        const MPI_Comm &mpi_communicator,
+        const MPI_Comm  mpi_communicator,
         const IndexSet &locally_owned_domain_indices,
         const IndexSet &locally_owned_range_indices)
         : use_transpose(use_transpose)

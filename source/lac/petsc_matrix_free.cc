@@ -33,7 +33,7 @@ namespace PETScWrappers
 
 
 
-  MatrixFree::MatrixFree(const MPI_Comm &   communicator,
+  MatrixFree::MatrixFree(const MPI_Comm     communicator,
                          const unsigned int m,
                          const unsigned int n,
                          const unsigned int local_rows,
@@ -45,7 +45,7 @@ namespace PETScWrappers
 
 
   MatrixFree::MatrixFree(
-    const MPI_Comm &                 communicator,
+    const MPI_Comm                   communicator,
     const unsigned int               m,
     const unsigned int               n,
     const std::vector<unsigned int> &local_rows_per_process,
@@ -98,7 +98,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixFree::reinit(const MPI_Comm &   communicator,
+  MatrixFree::reinit(const MPI_Comm     communicator,
                      const unsigned int m,
                      const unsigned int n,
                      const unsigned int local_rows,
@@ -114,7 +114,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixFree::reinit(const MPI_Comm &                 communicator,
+  MatrixFree::reinit(const MPI_Comm                   communicator,
                      const unsigned int               m,
                      const unsigned int               n,
                      const std::vector<unsigned int> &local_rows_per_process,
@@ -211,7 +211,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixFree::do_reinit(const MPI_Comm &   communicator,
+  MatrixFree::do_reinit(const MPI_Comm     communicator,
                         const unsigned int m,
                         const unsigned int n,
                         const unsigned int local_rows,

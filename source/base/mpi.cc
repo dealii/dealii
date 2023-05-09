@@ -121,7 +121,7 @@ namespace Utilities
 
 
     MinMaxAvg
-    min_max_avg(const double my_value, const MPI_Comm &mpi_communicator)
+    min_max_avg(const double my_value, const MPI_Comm mpi_communicator)
     {
       MinMaxAvg result;
       min_max_avg(ArrayView<const double>(my_value),
@@ -135,7 +135,7 @@ namespace Utilities
 
     std::vector<MinMaxAvg>
     min_max_avg(const std::vector<double> &my_values,
-                const MPI_Comm &           mpi_communicator)
+                const MPI_Comm             mpi_communicator)
     {
       std::vector<MinMaxAvg> results(my_values.size());
       min_max_avg(my_values, results, mpi_communicator);
@@ -147,7 +147,7 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
     unsigned int
-    n_mpi_processes(const MPI_Comm &mpi_communicator)
+    n_mpi_processes(const MPI_Comm mpi_communicator)
     {
       int       n_jobs = 1;
       const int ierr   = MPI_Comm_size(mpi_communicator, &n_jobs);
@@ -158,7 +158,7 @@ namespace Utilities
 
 
     unsigned int
-    this_mpi_process(const MPI_Comm &mpi_communicator)
+    this_mpi_process(const MPI_Comm mpi_communicator)
     {
       int       rank = 0;
       const int ierr = MPI_Comm_rank(mpi_communicator, &rank);
@@ -170,8 +170,8 @@ namespace Utilities
 
 
     const std::vector<unsigned int>
-    mpi_processes_within_communicator(const MPI_Comm &comm_large,
-                                      const MPI_Comm &comm_small)
+    mpi_processes_within_communicator(const MPI_Comm comm_large,
+                                      const MPI_Comm comm_small)
     {
       if (Utilities::MPI::job_supports_mpi() == false)
         return std::vector<unsigned int>{0};
@@ -190,7 +190,7 @@ namespace Utilities
 
 
     MPI_Comm
-    duplicate_communicator(const MPI_Comm &mpi_communicator)
+    duplicate_communicator(const MPI_Comm mpi_communicator)
     {
       MPI_Comm  new_communicator;
       const int ierr = MPI_Comm_dup(mpi_communicator, &new_communicator);
@@ -201,7 +201,7 @@ namespace Utilities
 
 
     void
-    free_communicator(MPI_Comm &mpi_communicator)
+    free_communicator(MPI_Comm mpi_communicator)
     {
       // MPI_Comm_free will set the argument to MPI_COMM_NULL automatically.
       const int ierr = MPI_Comm_free(&mpi_communicator);
@@ -211,7 +211,7 @@ namespace Utilities
 
 
     int
-    create_group(const MPI_Comm & comm,
+    create_group(const MPI_Comm   comm,
                  const MPI_Group &group,
                  const int        tag,
                  MPI_Comm *       new_comm)
@@ -225,7 +225,7 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(
-      const MPI_Comm &              comm,
+      const MPI_Comm                comm,
       const types::global_dof_index locally_owned_size)
     {
       static_assert(
@@ -254,7 +254,7 @@ namespace Utilities
 
     IndexSet
     create_evenly_distributed_partitioning(
-      const MPI_Comm &              comm,
+      const MPI_Comm                comm,
       const types::global_dof_index total_size)
     {
       const unsigned int this_proc = this_mpi_process(comm);
@@ -312,7 +312,7 @@ namespace Utilities
 
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern(
-      const MPI_Comm &                 mpi_comm,
+      const MPI_Comm                   mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
@@ -427,7 +427,7 @@ namespace Utilities
 
     unsigned int
     compute_n_point_to_point_communications(
-      const MPI_Comm &                 mpi_comm,
+      const MPI_Comm                   mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
       // Have a little function that checks if destinations provided
@@ -537,7 +537,7 @@ namespace Utilities
     void
     min_max_avg(const ArrayView<const double> &my_values,
                 const ArrayView<MinMaxAvg> &   result,
-                const MPI_Comm &               mpi_communicator)
+                const MPI_Comm                 mpi_communicator)
     {
       // If MPI was not started, we have a serial computation and cannot run
       // the other MPI commands
@@ -655,7 +655,7 @@ namespace Utilities
 #else
 
     unsigned int
-    n_mpi_processes(const MPI_Comm &)
+    n_mpi_processes(const MPI_Comm)
     {
       return 1;
     }
@@ -663,7 +663,7 @@ namespace Utilities
 
 
     unsigned int
-    this_mpi_process(const MPI_Comm &)
+    this_mpi_process(const MPI_Comm)
     {
       return 0;
     }
@@ -671,7 +671,7 @@ namespace Utilities
 
 
     const std::vector<unsigned int>
-    mpi_processes_within_communicator(const MPI_Comm &, const MPI_Comm &)
+    mpi_processes_within_communicator(const MPI_Comm, const MPI_Comm)
     {
       return std::vector<unsigned int>{0};
     }
@@ -680,7 +680,7 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(
-      const MPI_Comm & /*comm*/,
+      const MPI_Comm /*comm*/,
       const types::global_dof_index locally_owned_size)
     {
       return std::vector<IndexSet>(1, complete_index_set(locally_owned_size));
@@ -688,7 +688,7 @@ namespace Utilities
 
     IndexSet
     create_evenly_distributed_partitioning(
-      const MPI_Comm & /*comm*/,
+      const MPI_Comm /*comm*/,
       const types::global_dof_index total_size)
     {
       return complete_index_set(total_size);
@@ -697,15 +697,14 @@ namespace Utilities
 
 
     MPI_Comm
-    duplicate_communicator(const MPI_Comm &mpi_communicator)
+    duplicate_communicator(const MPI_Comm mpi_communicator)
     {
       return mpi_communicator;
     }
 
 
 
-    void
-    free_communicator(MPI_Comm & /*mpi_communicator*/)
+    void free_communicator(MPI_Comm /*mpi_communicator*/)
     {}
 
 
@@ -713,7 +712,7 @@ namespace Utilities
     void
     min_max_avg(const ArrayView<const double> &my_values,
                 const ArrayView<MinMaxAvg> &   result,
-                const MPI_Comm &)
+                const MPI_Comm)
     {
       AssertDimension(my_values.size(), result.size());
 
@@ -1064,7 +1063,7 @@ namespace Utilities
     std::vector<unsigned int>
     compute_index_owner(const IndexSet &owned_indices,
                         const IndexSet &indices_to_look_up,
-                        const MPI_Comm &comm)
+                        const MPI_Comm  comm)
     {
       Assert(owned_indices.size() == indices_to_look_up.size(),
              ExcMessage("IndexSets have to have the same sizes."));
@@ -1165,7 +1164,7 @@ namespace Utilities
 
 
     void
-    CollectiveMutex::lock(const MPI_Comm &comm)
+    CollectiveMutex::lock(const MPI_Comm comm)
     {
       (void)comm;
 
@@ -1199,7 +1198,7 @@ namespace Utilities
 
 
     void
-    CollectiveMutex::unlock(const MPI_Comm &comm)
+    CollectiveMutex::unlock(const MPI_Comm comm)
     {
       (void)comm;
 
@@ -1236,26 +1235,26 @@ namespace Utilities
     // booleans aren't in MPI_SCALARS
     template bool
     reduce(const bool &,
-           const MPI_Comm &,
+           const MPI_Comm,
            const std::function<bool(const bool &, const bool &)> &,
            const unsigned int);
 
     template std::vector<bool>
     reduce(const std::vector<bool> &,
-           const MPI_Comm &,
+           const MPI_Comm,
            const std::function<std::vector<bool>(const std::vector<bool> &,
                                                  const std::vector<bool> &)> &,
            const unsigned int);
 
     template bool
     all_reduce(const bool &,
-               const MPI_Comm &,
+               const MPI_Comm,
                const std::function<bool(const bool &, const bool &)> &);
 
     template std::vector<bool>
     all_reduce(
       const std::vector<bool> &,
-      const MPI_Comm &,
+      const MPI_Comm,
       const std::function<std::vector<bool>(const std::vector<bool> &,
                                             const std::vector<bool> &)> &);
 
@@ -1264,27 +1263,27 @@ namespace Utilities
     template void
     internal::all_reduce<bool>(const MPI_Op &,
                                const ArrayView<const bool> &,
-                               const MPI_Comm &,
+                               const MPI_Comm,
                                const ArrayView<bool> &);
 
 
     template bool
-    logical_or<bool>(const bool &, const MPI_Comm &);
+    logical_or<bool>(const bool &, const MPI_Comm);
 
 
     template void
     logical_or<bool>(const ArrayView<const bool> &,
-                     const MPI_Comm &,
+                     const MPI_Comm,
                      const ArrayView<bool> &);
 
 
     template std::vector<unsigned int>
     compute_set_union(const std::vector<unsigned int> &vec,
-                      const MPI_Comm &                 comm);
+                      const MPI_Comm                   comm);
 
 
     template std::set<unsigned int>
-    compute_set_union(const std::set<unsigned int> &set, const MPI_Comm &comm);
+    compute_set_union(const std::set<unsigned int> &set, const MPI_Comm comm);
 #endif
 
 #include "mpi.inst"
