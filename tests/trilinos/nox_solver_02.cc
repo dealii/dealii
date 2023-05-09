@@ -77,26 +77,22 @@ main(int argc, char **argv)
     // compute residual
     deallog << "Evaluating residual at u=" << src[0] << std::endl;
     dst[0] = std::atan(src[0]) - 0.5;
-    return 0;
   };
 
   solver.setup_jacobian = [&](const auto &src) {
     // compute Jacobian
     deallog << "Setting up Jacobian at u=" << src[0] << std::endl;
     J = 1. / (1 + src[0] * src[0]);
-    return 0;
   };
 
   solver.apply_jacobian = [&](const auto &src, auto &dst) {
     // solve with Jacobian
     dst[0] = src[0] * J;
-    return 0;
   };
 
   solver.solve_with_jacobian = [&](const auto &src, auto &dst, const auto) {
     // solve with Jacobian
     dst[0] = src[0] / J;
-    return 0;
   };
 
   // initial guess

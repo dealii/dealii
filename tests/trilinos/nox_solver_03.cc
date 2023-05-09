@@ -87,19 +87,18 @@ main(int argc, char **argv)
                                                  non_linear_parameters);
 
   // ... helper functions
-  solver.residual = [](const VectorType &u, VectorType &F) -> int {
+  solver.residual = [](const VectorType &u, VectorType &F) {
     deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ')'
             << std::endl;
 
     F(0) = std::cos(u[0] + u[1]) - 1 + 2 * u[0];
     F(1) = std::sin(u[0] - u[1]) + 2 * u[1];
-    return 0;
   };
 
   FullMatrix<double> J(2, 2);
   FullMatrix<double> J_inverse(2, 2);
 
-  solver.setup_jacobian = [&J, &J_inverse](const VectorType &u) -> int {
+  solver.setup_jacobian = [&J, &J_inverse](const VectorType &u) {
     // We don't do any kind of set-up in this program, but we can at least
     // say that we're here
     deallog << "Setting up Jacobian system at u=(" << u[0] << ',' << u[1] << ')'
@@ -111,24 +110,19 @@ main(int argc, char **argv)
     J(1, 1) = -std::cos(u[0] - u[1]) + 2;
 
     J_inverse.invert(J);
-
-    return 0;
   };
 
   solver.apply_jacobian = [&](const VectorType &src, VectorType &dst) {
     J.vmult(dst, src);
-    return -0;
   };
 
   solver.solve_with_jacobian = [&J_inverse](const VectorType &rhs,
                                             VectorType &      dst,
-                                            const double /*tolerance*/) -> int {
+                                            const double /*tolerance*/) {
     deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
             << ')' << std::endl;
 
     J_inverse.vmult(dst, rhs);
-
-    return 0;
   };
 
   // initial guess
