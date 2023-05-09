@@ -1,0 +1,24 @@
+
+DEAL::Evaluating the solution at u=(0.500000,1.23400)
+DEAL::Caught an irrecoverable exception in a callback:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    NOX aborted with an error text of <NOX Error> after a user callback
+    function had thrown an exception with the following message:
+    
+    --------------------------------------------------------
+    An error occurred in line <0> of file <> in function
+    
+    The violated condition was:
+    
+    Additional information:
+    Irrecoverable failure.
+    --------------------------------------------------------
+    
+--------------------------------------------------------
+
