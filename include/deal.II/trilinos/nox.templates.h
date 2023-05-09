@@ -967,7 +967,10 @@ namespace TrilinosWrappers
     // create group
     const auto group = Teuchos::rcp(new internal::NOXWrappers::Group<
                                     VectorType>(
+      /* Starting vector */
       solution,
+
+      /* Residual function */
       [&](const VectorType &x, VectorType &f) -> int {
         Assert(
           residual,
@@ -980,6 +983,8 @@ namespace TrilinosWrappers
         return internal::NOXWrappers::call_and_possibly_capture_exception(
           residual, pending_exception, x, f);
       },
+
+      /* setup_jacobian function */
       [&](const VectorType &x) -> int {
         Assert(
           setup_jacobian,
@@ -1015,6 +1020,8 @@ namespace TrilinosWrappers
 
         return flag;
       },
+
+      /* apply_jacobian function */
       [&](const VectorType &x, VectorType &v) -> int {
         Assert(
           apply_jacobian,
@@ -1027,6 +1034,8 @@ namespace TrilinosWrappers
         return internal::NOXWrappers::call_and_possibly_capture_exception(
           apply_jacobian, pending_exception, x, v);
       },
+
+      /* solve_with_jacobian function */
       [&](const VectorType &f, VectorType &x, const double tolerance) -> int {
         n_nonlinear_iterations++;
 
