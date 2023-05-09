@@ -1,0 +1,13 @@
+
+DEAL:can_set_single_value:OK
+DEAL:can_set_full_matrix:OK
+DEAL:can_set_full_matrix_elide:OK
+DEAL:can_set_full_matrix_different_row_col_idxs:OK
+DEAL:can_set_row:OK
+DEAL:can_set_row_raw:OK
+DEAL:can_add_single_value:OK
+DEAL:can_add_full_matrix:OK
+DEAL:can_add_full_matrix_elide:OK
+DEAL:can_add_full_matrix_different_row_col_idxs:OK
+DEAL:can_add_row:OK
+DEAL:can_add_row_raw:OK

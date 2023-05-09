@@ -1,0 +1,8 @@
+
+DEAL:can_create_with_size:OK
+DEAL:can_create_from_ginkgo_object:OK
+DEAL:can_create_from_dealii_object:OK
+DEAL:can_vmult:OK
+DEAL:can_vmult_add:OK
+DEAL:can_tvmult:OK
+DEAL:can_tvmult_add:OK
