@@ -1121,18 +1121,78 @@ namespace TrilinosWrappers
     // callback functions. If so, exit by rethrowing the exception that
     // we had previously saved. This also calls the destructors of all of
     // the member variables above, so we do not have to clean things up by hand.
-    const auto status = solver->solve();
-    if (pending_exception)
+    //
+    // NOX has the annoying habit of reporting success through a return code,
+    // but if a user callback function throws an exception (which we translate
+    // into a return code of -1), then it throws its own exception. So we
+    // have to check both the return code and also catch exceptions :-(
+    try
       {
-        std::exception_ptr this_exception = pending_exception;
-        pending_exception                 = nullptr;
+        const auto status = solver->solve();
 
-        std::rethrow_exception(this_exception);
+        if (status == NOX::StatusTest::Converged)
+          return solver->getNumIterations();
+        else
+          {
+            // See if NOX aborted because we had thrown an exception in a user
+            // callback:
+            if (pending_exception)
+              {
+                std::exception_ptr this_exception = pending_exception;
+                pending_exception                 = nullptr;
+
+                std::rethrow_exception(this_exception);
+              }
+
+            // If that was not the case, NOX just didn't converge:
+            AssertThrow(status == NOX::StatusTest::Converged,
+                        ExcNOXNoConvergence());
+          }
+      }
+    // See if NOX returned by triggering an exception. In a sign of generally
+    // poor software design, NOX throws an exception that is not of a class
+    // derived from std::exception, but just a char*. That's a nuisance -- you
+    // just have to know :-(
+    catch (const char *s)
+      {
+        // Like above, see if NOX aborted because there was an exception
+        // in a user callback. In that case, collate the errors if we can
+        // (namely, if the user exception was derived from std::exception),
+        // and otherwise just let the user exception propagate (then swallowing
+        // the NOX exception):
+        if (pending_exception)
+          {
+            std::exception_ptr this_exception = pending_exception;
+            pending_exception                 = nullptr;
+
+            try
+              {
+                std::rethrow_exception(this_exception);
+              }
+            catch (const std::exception &e)
+              {
+                // Collate the exception texts:
+                throw ExcMessage(
+                  "NOX aborted with an error text of <" + std::string(s) +
+                  "> after a user callback function had thrown an exception " +
+                  "with the following message:\n" + e.what());
+              }
+            catch (...)
+              {
+                // Let user exception propagate if of a different type:
+                throw;
+              }
+          }
+
+        // NOX just happened to throw an exception, but it wasn't because there
+        // was a user callback exception before. Convert the char* to something
+        // more readable:
+        AssertThrow(false,
+                    ExcMessage("NOX aborted with an error text of <" +
+                               std::string(s) + ">."));
       }
 
-    AssertThrow(status == NOX::StatusTest::Converged, ExcNOXNoConvergence());
-
-    return solver->getNumIterations();
+    return 0; // unreachable
   }
 
 } // namespace TrilinosWrappers
