@@ -128,6 +128,7 @@ if(DEAL_II_WITH_GINKGO)
       ${_unity_include_src}
       ginkgo_solver.cc
       ginkgo_vector.cc
+      ginkgo_sparse_matrix.cc
       )
 endif()
 
