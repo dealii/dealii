@@ -1272,6 +1272,19 @@ namespace StandardExceptions
     const int error_code;
   };
 #endif // DEAL_II_TRILINOS_WITH_SEACAS
+
+  /**
+   * An exception to be thrown in user call-backs. See the glossary entry
+   * on user call-back functions for more information.
+   */
+  DeclExceptionMsg(
+    RecoverableUserCallbackError,
+    "A user call-back function encountered a recoverable error, "
+    "but the underlying library that called the call-back did not "
+    "manage to recover from the error and aborted its operation."
+    "\n\n"
+    "See the glossary entry on user call-back functions for more "
+    "information.");
 } /*namespace StandardExceptions*/
 
 

@@ -60,40 +60,34 @@ main()
 
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
-  kinsol.residual = [&](const VectorType &u, VectorType &F) -> int {
+  kinsol.residual = [&](const VectorType &u, VectorType &F) {
     deallog << "Computing residual at " << u[0] << std::endl;
 
     if ((u[0] < -10) || (u[0] > 20))
       {
         deallog << "Reporting recoverable failure." << std::endl;
-        return 1;
+        throw RecoverableUserCallbackError();
       }
 
 
     F.reinit(u);
     F[0] = std::atan(u[0]) - 0.5;
-
-    return 0;
   };
 
   double J_inverse;
 
   kinsol.setup_jacobian = [&J_inverse](const VectorType &u,
-                                       const VectorType &F) -> int {
+                                       const VectorType &F) {
     deallog << "Setting up Jacobian system at u=" << u[0] << std::endl;
 
     const double J = 1. / (1 + u[0] * u[0]);
     J_inverse      = 1. / J;
-
-    return 0;
   };
 
 
-  kinsol.solve_with_jacobian =
-    [&](const VectorType &rhs, VectorType &dst, double) -> int {
-    dst[0] = J_inverse * rhs[0];
-    return 0;
-  };
+  kinsol.solve_with_jacobian = [&](const VectorType &rhs,
+                                   VectorType &      dst,
+                                   double) { dst[0] = J_inverse * rhs[0]; };
 
   VectorType v(N);
   v[0] = 10;

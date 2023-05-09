@@ -63,27 +63,20 @@ main()
 
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
-  kinsol.residual = [&](const VectorType &u, VectorType &F) -> int {
+  kinsol.residual = [&](const VectorType &u, VectorType &F) {
     F = u;
 
     F[0] += .1 * u[0] * u[0] - 1;
     F[1] += .1 * u[1] * u[1] - 2;
-    return 0;
   };
 
   kinsol.solve_with_jacobian =
-    [&](const VectorType &rhs, VectorType &dst, double) -> int {
-    dst = rhs;
-    return 0;
-  };
+    [&](const VectorType &rhs, VectorType &dst, double) { dst = rhs; };
 
   kinsol.solve_jacobian_system = [&](const VectorType &,
                                      const VectorType &,
                                      const VectorType &rhs,
-                                     VectorType &      dst) -> int {
-    dst = rhs;
-    return 0;
-  };
+                                     VectorType &      dst) { dst = rhs; };
 
   VectorType v(N);
 

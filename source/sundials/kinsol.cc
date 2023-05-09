@@ -52,6 +52,77 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
+  namespace
+  {
+    /**
+     * A function that calls the function object given by its first argument
+     * with the set of arguments following at the end. If the call returns
+     * regularly, the current function returns zero to indicate success. If the
+     * call fails with an exception of type RecoverableUserCallbackError, then
+     * the current function returns 1 to indicate that the called function
+     * object thought the error it encountered is recoverable. If the call fails
+     * with any other exception, then the current function returns with an error
+     * code of -1. In each of the last two cases, the exception thrown by `f`
+     * is captured and `eptr` is set to the exception. In case of success,
+     * `eptr` is set to `nullptr`.
+     */
+    template <typename F, typename... Args>
+    int
+    call_and_possibly_capture_exception(const F &           f,
+                                        std::exception_ptr &eptr,
+                                        Args &&...args)
+    {
+      // See whether there is already something in the exception pointer
+      // variable. This can only happen if we had previously had
+      // a recoverable exception, and the underlying library actually
+      // did recover successfully. In that case, we can abandon the
+      // exception previously thrown. If eptr contains anything other,
+      // then we really don't know how that could have happened, and
+      // should probably bail out:
+      if (eptr)
+        {
+          try
+            {
+              std::rethrow_exception(eptr);
+            }
+          catch (const RecoverableUserCallbackError &)
+            {
+              // ok, ignore, but reset the pointer
+              eptr = nullptr;
+            }
+          catch (...)
+            {
+              // uh oh:
+              AssertThrow(false, ExcInternalError());
+            }
+        }
+
+      // Call the function and if that succeeds, return zero:
+      try
+        {
+          f(std::forward<Args>(args)...);
+          eptr = nullptr;
+          return 0;
+        }
+      // If the call failed with a recoverable error, then
+      // ignore the exception for now (but store a pointer to it)
+      // and return a positive return value (+1). If the underlying
+      // implementation manages to recover
+      catch (const RecoverableUserCallbackError &)
+        {
+          eptr = std::current_exception();
+          return 1;
+        }
+      // For any other exception, capture the exception and
+      // return -1:
+      catch (const std::exception &)
+        {
+          eptr = std::current_exception();
+          return -1;
+        }
+    }
+  } // namespace
+
   template <typename VectorType>
   KINSOL<VectorType>::AdditionalData::AdditionalData(
     const SolutionStrategy &strategy,
@@ -128,171 +199,6 @@ namespace SUNDIALS
   }
 
 
-  namespace
-  {
-    template <typename VectorType>
-    int
-    residual_callback(N_Vector yy, N_Vector FF, void *user_data)
-    {
-      KINSOL<VectorType> &solver =
-        *static_cast<KINSOL<VectorType> *>(user_data);
-      GrowingVectorMemory<VectorType> mem;
-
-      typename VectorMemory<VectorType>::Pointer src_yy(mem);
-      solver.reinit_vector(*src_yy);
-
-      typename VectorMemory<VectorType>::Pointer dst_FF(mem);
-      solver.reinit_vector(*dst_FF);
-
-      internal::copy(*src_yy, yy);
-
-      int err = 0;
-      if (solver.residual)
-        err = solver.residual(*src_yy, *dst_FF);
-      else
-        Assert(false, ExcInternalError());
-
-      internal::copy(FF, *dst_FF);
-
-      return err;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    iteration_callback(N_Vector yy, N_Vector FF, void *user_data)
-    {
-      KINSOL<VectorType> &solver =
-        *static_cast<KINSOL<VectorType> *>(user_data);
-      GrowingVectorMemory<VectorType> mem;
-
-      typename VectorMemory<VectorType>::Pointer src_yy(mem);
-      solver.reinit_vector(*src_yy);
-
-      typename VectorMemory<VectorType>::Pointer dst_FF(mem);
-      solver.reinit_vector(*dst_FF);
-
-      internal::copy(*src_yy, yy);
-
-      int err = 0;
-      if (solver.iteration_function)
-        err = solver.iteration_function(*src_yy, *dst_FF);
-      else
-        Assert(false, ExcInternalError());
-
-      internal::copy(FF, *dst_FF);
-
-      return err;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    setup_jacobian_callback(N_Vector u,
-                            N_Vector f,
-                            SUNMatrix /* ignored */,
-                            void *user_data,
-                            N_Vector /* tmp1 */,
-                            N_Vector /* tmp2 */)
-    {
-      // Receive the object that describes the linear solver and
-      // unpack the pointer to the KINSOL object from which we can then
-      // get the 'setup' function.
-      const KINSOL<VectorType> &solver =
-        *static_cast<const KINSOL<VectorType> *>(user_data);
-
-      // Allocate temporary (deal.II-type) vectors into which to copy the
-      // N_vectors
-      GrowingVectorMemory<VectorType>            mem;
-      typename VectorMemory<VectorType>::Pointer ycur(mem);
-      typename VectorMemory<VectorType>::Pointer fcur(mem);
-      solver.reinit_vector(*ycur);
-      solver.reinit_vector(*fcur);
-
-      internal::copy(*ycur, u);
-      internal::copy(*fcur, f);
-
-      // Call the user-provided setup function with these arguments:
-      solver.setup_jacobian(*ycur, *fcur);
-
-      return 0;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    solve_with_jacobian_callback(SUNLinearSolver LS,
-                                 SUNMatrix /*ignored*/,
-                                 N_Vector x,
-                                 N_Vector b,
-                                 realtype tol)
-    {
-      // Receive the object that describes the linear solver and
-      // unpack the pointer to the KINSOL object from which we can then
-      // get the 'reinit' and 'solve' functions.
-      const KINSOL<VectorType> &solver =
-        *static_cast<const KINSOL<VectorType> *>(LS->content);
-
-      // This is where we have to make a decision about which of the two
-      // signals to call. Let's first check the more modern one:
-      if (solver.solve_with_jacobian)
-        {
-          // Allocate temporary (deal.II-type) vectors into which to copy the
-          // N_vectors
-          GrowingVectorMemory<VectorType>            mem;
-          typename VectorMemory<VectorType>::Pointer src_b(mem);
-          typename VectorMemory<VectorType>::Pointer dst_x(mem);
-
-          solver.reinit_vector(*src_b);
-          solver.reinit_vector(*dst_x);
-
-          internal::copy(*src_b, b);
-
-          const int err = solver.solve_with_jacobian(*src_b, *dst_x, tol);
-
-          internal::copy(x, *dst_x);
-
-          return err;
-        }
-      else
-        {
-          // User has not provided the modern callback, so the fact that we are
-          // here means that they must have given us something for the old
-          // signal. Check this.
-          Assert(solver.solve_jacobian_system, ExcInternalError());
-
-          // Allocate temporary (deal.II-type) vectors into which to copy the
-          // N_vectors
-          GrowingVectorMemory<VectorType>            mem;
-          typename VectorMemory<VectorType>::Pointer src_ycur(mem);
-          typename VectorMemory<VectorType>::Pointer src_fcur(mem);
-          typename VectorMemory<VectorType>::Pointer src_b(mem);
-          typename VectorMemory<VectorType>::Pointer dst_x(mem);
-
-          solver.reinit_vector(*src_b);
-          solver.reinit_vector(*dst_x);
-
-          internal::copy(*src_b, b);
-
-          // Call the user-provided setup function with these arguments. Note
-          // that Sundials 4.x and later no longer provide values for
-          // src_ycur and src_fcur, and so we simply pass dummy vector in.
-          // These vectors will have zero lengths because we don't reinit them
-          // above.
-          const int err =
-            solver.solve_jacobian_system(*src_ycur, *src_fcur, *src_b, *dst_x);
-
-          internal::copy(x, *dst_x);
-
-          return err;
-        }
-    }
-  } // namespace
-
-
 
   template <typename VectorType>
   KINSOL<VectorType>::KINSOL(const AdditionalData &data)
@@ -313,6 +219,7 @@ namespace SUNDIALS
     , solution(nullptr)
     , u_scale(nullptr)
     , f_scale(nullptr)
+    , pending_exception(nullptr)
   {
     set_functions_to_trigger_an_assert();
 
@@ -342,6 +249,8 @@ namespace SUNDIALS
     (void)status;
     AssertKINSOL(status);
 #  endif
+
+    Assert(pending_exception == nullptr, ExcInternalError());
   }
 
 
@@ -472,9 +381,62 @@ namespace SUNDIALS
     AssertKINSOL(status);
 
     if (data.strategy == AdditionalData::fixed_point)
-      status = KINInit(kinsol_mem, iteration_callback<VectorType>, solution);
+      status = KINInit(
+        kinsol_mem,
+        /* wrap up the iteration_function() callback: */
+        [](N_Vector yy, N_Vector FF, void *user_data) -> int {
+          KINSOL<VectorType> &solver =
+            *static_cast<KINSOL<VectorType> *>(user_data);
+          GrowingVectorMemory<VectorType> mem;
+
+          typename VectorMemory<VectorType>::Pointer src_yy(mem);
+          solver.reinit_vector(*src_yy);
+
+          typename VectorMemory<VectorType>::Pointer dst_FF(mem);
+          solver.reinit_vector(*dst_FF);
+
+          internal::copy(*src_yy, yy);
+
+          Assert(solver.iteration_function, ExcInternalError());
+
+          const int err =
+            call_and_possibly_capture_exception(solver.iteration_function,
+                                                solver.pending_exception,
+                                                *src_yy,
+                                                *dst_FF);
+
+          internal::copy(FF, *dst_FF);
+
+          return err;
+        },
+        solution);
     else
-      status = KINInit(kinsol_mem, residual_callback<VectorType>, solution);
+      status = KINInit(
+        kinsol_mem,
+        /* wrap up the residual() callback: */
+        [](N_Vector yy, N_Vector FF, void *user_data) -> int {
+          KINSOL<VectorType> &solver =
+            *static_cast<KINSOL<VectorType> *>(user_data);
+          GrowingVectorMemory<VectorType> mem;
+
+          typename VectorMemory<VectorType>::Pointer src_yy(mem);
+          solver.reinit_vector(*src_yy);
+
+          typename VectorMemory<VectorType>::Pointer dst_FF(mem);
+          solver.reinit_vector(*dst_FF);
+
+          internal::copy(*src_yy, yy);
+
+          Assert(solver.residual, ExcInternalError());
+
+          const int err = call_and_possibly_capture_exception(
+            solver.residual, solver.pending_exception, *src_yy, *dst_FF);
+
+          internal::copy(FF, *dst_FF);
+
+          return err;
+        },
+        solution);
     AssertKINSOL(status);
 
     status = KINSetFuncNormTol(kinsol_mem, data.function_tolerance);
@@ -537,7 +499,81 @@ namespace SUNDIALS
           return 0;
         };
 
-        LS->ops->solve = solve_with_jacobian_callback<VectorType>;
+        LS->ops->solve = [](SUNLinearSolver LS,
+                            SUNMatrix /*ignored*/,
+                            N_Vector x,
+                            N_Vector b,
+                            realtype tol) -> int {
+          // Receive the object that describes the linear solver and
+          // unpack the pointer to the KINSOL object from which we can then
+          // get the 'reinit' and 'solve' functions.
+          const KINSOL<VectorType> &solver =
+            *static_cast<const KINSOL<VectorType> *>(LS->content);
+
+          // This is where we have to make a decision about which of the two
+          // signals to call. Let's first check the more modern one:
+          if (solver.solve_with_jacobian)
+            {
+              // Allocate temporary (deal.II-type) vectors into which to copy
+              // the N_vectors
+              GrowingVectorMemory<VectorType>            mem;
+              typename VectorMemory<VectorType>::Pointer src_b(mem);
+              typename VectorMemory<VectorType>::Pointer dst_x(mem);
+
+              solver.reinit_vector(*src_b);
+              solver.reinit_vector(*dst_x);
+
+              internal::copy(*src_b, b);
+
+              const int err =
+                call_and_possibly_capture_exception(solver.solve_with_jacobian,
+                                                    solver.pending_exception,
+                                                    *src_b,
+                                                    *dst_x,
+                                                    tol);
+
+              internal::copy(x, *dst_x);
+
+              return err;
+            }
+          else
+            {
+              // User has not provided the modern callback, so the fact that
+              // we are here means that they must have given us something for
+              // the old signal. Check this.
+              Assert(solver.solve_jacobian_system, ExcInternalError());
+
+              // Allocate temporary (deal.II-type) vectors into which to copy
+              // the N_vectors
+              GrowingVectorMemory<VectorType>            mem;
+              typename VectorMemory<VectorType>::Pointer src_ycur(mem);
+              typename VectorMemory<VectorType>::Pointer src_fcur(mem);
+              typename VectorMemory<VectorType>::Pointer src_b(mem);
+              typename VectorMemory<VectorType>::Pointer dst_x(mem);
+
+              solver.reinit_vector(*src_b);
+              solver.reinit_vector(*dst_x);
+
+              internal::copy(*src_b, b);
+
+              // Call the user-provided setup function with these arguments.
+              // Note that Sundials 4.x and later no longer provide values for
+              // src_ycur and src_fcur, and so we simply pass dummy vector in.
+              // These vectors will have zero lengths because we don't reinit
+              // them above.
+              const int err = call_and_possibly_capture_exception(
+                solver.solve_jacobian_system,
+                solver.pending_exception,
+                *src_ycur,
+                *src_fcur,
+                *src_b,
+                *dst_x);
+
+              internal::copy(x, *dst_x);
+
+              return err;
+            }
+        };
 
         // Even though we don't use it, KINSOL still wants us to set some
         // kind of matrix object for the nonlinear solver. This is because
@@ -580,12 +616,70 @@ namespace SUNDIALS
           setup_jacobian = [](const VectorType &, const VectorType &) {
             return 0;
           };
-        status = KINSetJacFn(kinsol_mem, &setup_jacobian_callback<VectorType>);
+        status = KINSetJacFn(
+          kinsol_mem,
+          [](N_Vector u,
+             N_Vector f,
+             SUNMatrix /* ignored */,
+             void *user_data,
+             N_Vector /* tmp1 */,
+             N_Vector /* tmp2 */) {
+            // Receive the object that describes the linear solver and
+            // unpack the pointer to the KINSOL object from which we can then
+            // get the 'setup' function.
+            const KINSOL<VectorType> &solver =
+              *static_cast<const KINSOL<VectorType> *>(user_data);
+
+            // Allocate temporary (deal.II-type) vectors into which to copy the
+            // N_vectors
+            GrowingVectorMemory<VectorType>            mem;
+            typename VectorMemory<VectorType>::Pointer ycur(mem);
+            typename VectorMemory<VectorType>::Pointer fcur(mem);
+            solver.reinit_vector(*ycur);
+            solver.reinit_vector(*fcur);
+
+            internal::copy(*ycur, u);
+            internal::copy(*fcur, f);
+
+            // Call the user-provided setup function with these arguments:
+            return call_and_possibly_capture_exception(solver.setup_jacobian,
+                                                       solver.pending_exception,
+                                                       *ycur,
+                                                       *fcur);
+          });
         AssertKINSOL(status);
       }
 
-    // call to KINSol
+    // Having set up all of the ancillary things, finally call the main KINSol
+    // function. One we return, check that what happened:
+    // - If we have a pending recoverable exception, ignore it if SUNDIAL's
+    //   return code was zero -- in that case, SUNDIALS managed to indeed
+    //   recover and we no longer need the exception
+    // - If we have any other exception, rethrow it
+    // - If no exception, test that SUNDIALS really did successfully return
+    Assert(pending_exception == nullptr, ExcInternalError());
     status = KINSol(kinsol_mem, solution, data.strategy, u_scale, f_scale);
+
+    if (pending_exception)
+      {
+        try
+          {
+            std::rethrow_exception(pending_exception);
+          }
+        catch (const RecoverableUserCallbackError &exc)
+          {
+            pending_exception = nullptr;
+            if (status == 0)
+              /* just eat the exception */;
+            else
+              throw;
+          }
+        catch (...)
+          {
+            pending_exception = nullptr;
+            throw;
+          }
+      }
     AssertKINSOL(status);
 
     internal::copy(initial_guess_and_solution, solution);
