@@ -178,21 +178,21 @@ namespace LinearAlgebra
               "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }
 
-      Epetra_Import import(epetra_comm_pattern->get_epetra_import());
+      Epetra_Import import_map(epetra_comm_pattern->get_epetra_import());
 
       // The TargetMap and the SourceMap have their roles inverted.
-      Epetra_FEVector source_vector(import.TargetMap());
+      Epetra_FEVector source_vector(import_map.TargetMap());
       double *        values = source_vector.Values();
       std::copy(V.begin(), V.end(), values);
 
       if (operation == VectorOperation::insert)
-        vector->Export(source_vector, import, Insert);
+        vector->Export(source_vector, import_map, Insert);
       else if (operation == VectorOperation::add)
-        vector->Export(source_vector, import, Add);
+        vector->Export(source_vector, import_map, Add);
       else if (operation == VectorOperation::max)
-        vector->Export(source_vector, import, Epetra_Max);
+        vector->Export(source_vector, import_map, Epetra_Max);
       else if (operation == VectorOperation::min)
-        vector->Export(source_vector, import, Epetra_Min);
+        vector->Export(source_vector, import_map, Epetra_Min);
       else
         AssertThrow(false, ExcNotImplemented());
     }
