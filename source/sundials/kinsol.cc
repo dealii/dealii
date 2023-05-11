@@ -21,6 +21,7 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
+#  include <deal.II/base/scope_exit.h>
 #  include <deal.II/base/utilities.h>
 
 #  include <deal.II/lac/block_vector.h>
@@ -657,8 +658,39 @@ namespace SUNDIALS
     //   recover and we no longer need the exception
     // - If we have any other exception, rethrow it
     // - If no exception, test that SUNDIALS really did successfully return
+    //
+    // This all creates difficult exit paths from this function. We have to
+    // do some manual clean ups to get rid of the explicitly created
+    // temporary objects of this class. To avoid having to repeat the clean-up
+    // code on each exit path, we package it up and put the code into a
+    // ScopeExit object that is executed automatically on each such path
+    // out of this function.
     Assert(pending_exception == nullptr, ExcInternalError());
     status = KINSol(kinsol_mem, solution, data.strategy, u_scale, f_scale);
+
+    ScopeExit upon_exit([this, &J, &LS]() mutable {
+    // Free the vectors which are no longer used.
+#  ifdef DEAL_II_WITH_MPI
+      if (is_serial_vector<VectorType>::value == false)
+        {
+          N_VDestroy_Parallel(solution);
+          N_VDestroy_Parallel(u_scale);
+          N_VDestroy_Parallel(f_scale);
+        }
+      else
+#  endif
+        {
+          N_VDestroy_Serial(solution);
+          N_VDestroy_Serial(u_scale);
+          N_VDestroy_Serial(f_scale);
+        }
+
+      if (J != nullptr)
+        SUNMatDestroy(J);
+      if (LS != nullptr)
+        SUNLinSolFree(LS);
+      KINFree(&kinsol_mem);
+    });
 
     if (pending_exception)
       {
@@ -684,34 +716,14 @@ namespace SUNDIALS
 
     internal::copy(initial_guess_and_solution, solution);
 
-    // Free the vectors which are no longer used.
-#  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
-      {
-        N_VDestroy_Parallel(solution);
-        N_VDestroy_Parallel(u_scale);
-        N_VDestroy_Parallel(f_scale);
-      }
-    else
-#  endif
-      {
-        N_VDestroy_Serial(solution);
-        N_VDestroy_Serial(u_scale);
-        N_VDestroy_Serial(f_scale);
-      }
-
     long nniters;
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
     AssertKINSOL(status);
 
-    if (J != nullptr)
-      SUNMatDestroy(J);
-    if (LS != nullptr)
-      SUNLinSolFree(LS);
-    KINFree(&kinsol_mem);
-
     return static_cast<unsigned int>(nniters);
   }
+
+
 
   template <typename VectorType>
   void
