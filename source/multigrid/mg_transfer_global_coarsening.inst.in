@@ -19,6 +19,9 @@ for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
   {
     template class MGTwoLevelTransfer<deal_II_dimension,
                                       LinearAlgebra::distributed::Vector<S1>>;
+    template class MGTwoLevelTransferNonNested<
+      deal_II_dimension,
+      LinearAlgebra::distributed::Vector<S1>>;
     template class MGTransferBlockMatrixFreeBase<
       deal_II_dimension,
       S1,
