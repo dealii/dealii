@@ -739,20 +739,6 @@ namespace SUNDIALS
     SUNContext kinsol_ctx;
 #  endif
 
-    /**
-     * KINSOL solution vector.
-     */
-    N_Vector solution;
-
-    /**
-     * KINSOL solution scale.
-     */
-    N_Vector u_scale;
-
-    /**
-     * KINSOL f scale.
-     */
-    N_Vector f_scale;
 
     /**
      * Memory pool of vectors.
