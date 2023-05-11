@@ -71,20 +71,20 @@ test()
       w_rw.local_element(i) = 1000 + 2 * (my_start + i);
       x_rw.local_element(i) = 10000;
     }
-  v.import(v_rw, VectorOperation::insert);
-  w.import(w_rw, VectorOperation::insert);
-  x.import(x_rw, VectorOperation::insert);
+  v.import_elements(v_rw, VectorOperation::insert);
+  w.import_elements(w_rw, VectorOperation::insert);
+  x.import_elements(x_rw, VectorOperation::insert);
 
   y = v;
   LinearAlgebra::ReadWriteVector<double> y_rw(local_owned);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == i + my_start, ExcInternalError());
 
   if (myid == 0)
     deallog << "Check add (scalar): ";
   y.add(42);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == i + my_start + 42, ExcInternalError());
   if (myid == 0)
@@ -93,7 +93,7 @@ test()
   if (myid == 0)
     deallog << "Check add (vector): ";
   y.add(1., w);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 3 * (i + my_start) + 1042,
                 ExcInternalError());
@@ -103,7 +103,7 @@ test()
   if (myid == 0)
     deallog << "Check add (factor, vector): ";
   y.add(-1., w);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == i + my_start + 42, ExcInternalError());
   if (myid == 0)
@@ -112,7 +112,7 @@ test()
   if (myid == 0)
     deallog << "Check add (factor, vector, factor, vector): ";
   y.add(2., w, -0.5, x);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 5 * (i + my_start) + 2042 - 5000,
                 ExcInternalError());
@@ -123,7 +123,7 @@ test()
     deallog << "Check sadd (factor, factor, vector): ";
   y = v;
   y.sadd(-3., 2., v);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == (-i - my_start), ExcInternalError());
   if (myid == 0)
@@ -133,7 +133,7 @@ test()
     deallog << "Check sadd (factor, factor, vector, factor, vector): ";
   y.sadd(2., 3., v);
   y.add(2., w);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     {
       AssertThrow(y_rw.local_element(i) == 5 * (i + my_start) + 2000,
@@ -148,7 +148,7 @@ test()
   y.sadd(-1., 1., v);
   y.add(2., w);
   y.add(2., x);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 20000, ExcInternalError());
   if (myid == 0)
@@ -158,7 +158,7 @@ test()
     deallog << "Check add (factor, vector_1, factor, vector_1): ";
   y = 0;
   y.add(1., v, 3., v);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 4 * (i + my_start),
                 ExcInternalError());
@@ -168,7 +168,7 @@ test()
   if (myid == 0)
     deallog << "Check operator * (scalar): ";
   x *= 2.;
-  x_rw.import(x, VectorOperation::insert);
+  x_rw.import_elements(x, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(x_rw.local_element(i) == 20000., ExcInternalError());
   if (myid == 0)
@@ -177,7 +177,7 @@ test()
   if (myid == 0)
     deallog << "Check operator / (scalar): ";
   x /= 2.;
-  x_rw.import(x, VectorOperation::insert);
+  x_rw.import_elements(x, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(x_rw.local_element(i) == 10000., ExcInternalError());
   if (myid == 0)
@@ -186,7 +186,7 @@ test()
   if (myid == 0)
     deallog << "Check scale (vector): ";
   y.scale(x);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 40000. * (i + my_start),
                 ExcInternalError());
@@ -196,7 +196,7 @@ test()
   if (myid == 0)
     deallog << "Check equ (factor, vector): ";
   y.equ(10., x);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 100000., ExcInternalError());
   if (myid == 0)
@@ -206,7 +206,7 @@ test()
     deallog << "Check equ (factor, vector, factor, vector): ";
   y.equ(10., v);
   y.add(-2., w);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 6. * (i + my_start) - 2000,
                 ExcInternalError());
@@ -218,7 +218,7 @@ test()
   y.equ(10., v);
   y.add(-2., w);
   y.add(3., x);
-  y_rw.import(y, VectorOperation::insert);
+  y_rw.import_elements(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     AssertThrow(y_rw.local_element(i) == 6. * (i + my_start) + 28000,
                 ExcInternalError());

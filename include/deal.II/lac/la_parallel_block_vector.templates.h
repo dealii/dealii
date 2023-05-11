@@ -355,8 +355,9 @@ namespace LinearAlgebra
           IndexSet    combined_set = partitioner->locally_owned_range();
           combined_set.add_indices(partitioner->ghost_indices());
           ReadWriteVector<Number> rw_vector(combined_set);
-          rw_vector.import(trilinos_vec.block(i), VectorOperation::insert);
-          this->block(i).import(rw_vector, VectorOperation::insert);
+          rw_vector.import_elements(trilinos_vec.block(i),
+                                    VectorOperation::insert);
+          this->block(i).import_elements(rw_vector, VectorOperation::insert);
 
           if (this->block(i).has_ghost_elements() ||
               trilinos_vec.block(i).has_ghost_elements())
@@ -895,7 +896,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline void
-    BlockVector<Number>::import(
+    BlockVector<Number>::import_elements(
       const LinearAlgebra::ReadWriteVector<Number> &,
       VectorOperation::values,
       std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)

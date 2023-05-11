@@ -23,7 +23,7 @@ for (SCALAR : REAL_AND_COMPLEX_SCALARS)
       \{
         template class Vector<SCALAR, ::dealii::MemorySpace::Host>;
         template void
-        Vector<SCALAR, ::dealii::MemorySpace::Host>::import<
+        Vector<SCALAR, ::dealii::MemorySpace::Host>::import_elements<
           ::dealii::MemorySpace::Host>(
           const Vector<SCALAR, ::dealii::MemorySpace::Host> &,
           VectorOperation::values);

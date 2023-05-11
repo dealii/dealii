@@ -46,13 +46,13 @@ test(LinearAlgebra::EpetraWrappers::Vector &v,
     read_write_v(i) = i;
 
   m.compress(VectorOperation::insert);
-  v.import(read_write_v, VectorOperation::insert);
+  v.import_elements(read_write_v, VectorOperation::insert);
 
   // w:=Mv
   m.vmult(w, v);
 
   // make sure we get the expected result
-  read_write_w.import(w, VectorOperation::insert);
+  read_write_w.import_elements(w, VectorOperation::insert);
   for (unsigned int i = 0; i < m.m(); ++i)
     {
       double result = 0;
@@ -64,7 +64,7 @@ test(LinearAlgebra::EpetraWrappers::Vector &v,
   m.vmult_add(w, v);
 
   // make sure we get the expected result
-  read_write_w.import(w, VectorOperation::insert);
+  read_write_w.import_elements(w, VectorOperation::insert);
   for (unsigned int i = 0; i < m.m(); ++i)
     {
       double result = 0;

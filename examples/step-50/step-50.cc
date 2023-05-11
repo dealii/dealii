@@ -105,13 +105,13 @@ namespace ChangeVectorTypes
             const LinearAlgebra::distributed::Vector<number> &in)
   {
     LinearAlgebra::ReadWriteVector<double> rwv(out.locally_owned_elements());
-    rwv.import(in, VectorOperation::insert);
+    rwv.import_elements(in, VectorOperation::insert);
 #ifdef USE_PETSC_LA
     AssertThrow(false,
                 ExcMessage("CopyVectorTypes::copy() not implemented for "
                            "PETSc vector types."));
 #else
-    out.import(rwv, VectorOperation::insert);
+    out.import_elements(rwv, VectorOperation::insert);
 #endif
   }
 
@@ -130,7 +130,7 @@ namespace ChangeVectorTypes
 #else
     rwv.reinit(in);
 #endif
-    out.import(rwv, VectorOperation::insert);
+    out.import_elements(rwv, VectorOperation::insert);
   }
 } // namespace ChangeVectorTypes
 

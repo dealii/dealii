@@ -64,7 +64,7 @@ test()
   LinearAlgebra::ReadWriteVector<double> rw_vector(workaround_set);
   rw_vector(0) += 1.;
   rw_vector(2) += 1.;
-  v2.import(rw_vector, VectorOperation::add);
+  v2.import_elements(rw_vector, VectorOperation::add);
 
   // now we should have the correct data, not some uninitialized trash that
   // resided in the ghost range

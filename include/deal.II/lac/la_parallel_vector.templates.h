@@ -898,7 +898,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     template <typename MemorySpaceType2>
     void
-    Vector<Number, MemorySpaceType>::import(
+    Vector<Number, MemorySpaceType>::import_elements(
       const Vector<Number, MemorySpaceType2> &src,
       VectorOperation::values                 operation)
     {
@@ -1240,7 +1240,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::import(
+    Vector<Number, MemorySpaceType>::import_elements(
       const ReadWriteVector<Number> &V,
       VectorOperation::values        operation,
       std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>

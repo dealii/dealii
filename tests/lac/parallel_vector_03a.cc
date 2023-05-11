@@ -95,7 +95,7 @@ test()
 
   // set value from processor which does not own it:
   rw_vector(5) = 55.;
-  v.import(rw_vector, VectorOperation::insert);
+  v.import_elements(rw_vector, VectorOperation::insert);
 
   // add to value from processor which has it as a ghost
   // Because of limitation in import, the ReadWriteVector needs to have locally
@@ -112,7 +112,7 @@ test()
     {
       rw_add.reinit(indexset_2);
     }
-  v.import(rw_add, VectorOperation::add); // 60 + 6
+  v.import_elements(rw_add, VectorOperation::add); // 60 + 6
   // compress(insert) used to leave ghosts un-touched which resulted in
   // the wrong 55+55 for this compress(add) operation.
 
@@ -136,7 +136,7 @@ test()
     }
 
   rw_vector.reinit(indexset_3);
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
 
   check(myid, rw_vector);
 

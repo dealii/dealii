@@ -718,8 +718,8 @@ namespace TrilinosWrappers
        * current elements.
        */
       void
-      import(const LinearAlgebra::ReadWriteVector<double> &rwv,
-             const VectorOperation::values                 operation);
+      import_elements(const LinearAlgebra::ReadWriteVector<double> &rwv,
+                      const VectorOperation::values                 operation);
 
 
       /**

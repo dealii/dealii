@@ -492,8 +492,8 @@ namespace Step64
     system_rhs_host.compress(VectorOperation::add);
 
     LinearAlgebra::ReadWriteVector<double> rw_vector(locally_owned_dofs);
-    rw_vector.import(system_rhs_host, VectorOperation::insert);
-    system_rhs_dev.import(rw_vector, VectorOperation::insert);
+    rw_vector.import_elements(system_rhs_host, VectorOperation::insert);
+    system_rhs_dev.import_elements(rw_vector, VectorOperation::insert);
   }
 
 
@@ -525,8 +525,8 @@ namespace Step64
           << std::endl;
 
     LinearAlgebra::ReadWriteVector<double> rw_vector(locally_owned_dofs);
-    rw_vector.import(solution_dev, VectorOperation::insert);
-    ghost_solution_host.import(rw_vector, VectorOperation::insert);
+    rw_vector.import_elements(solution_dev, VectorOperation::insert);
+    ghost_solution_host.import_elements(rw_vector, VectorOperation::insert);
 
     constraints.distribute(ghost_solution_host);
 

@@ -45,46 +45,46 @@ test()
       read_write_2[i] = 5. + i;
     }
 
-  a.import(read_write_1, VectorOperation::insert);
-  b.import(read_write_2, VectorOperation::insert);
-  c.import(read_write_2, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
+  b.import_elements(read_write_2, VectorOperation::insert);
+  c.import_elements(read_write_2, VectorOperation::insert);
 
   a.add(1.);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(1. + read_write_1[i] == read_write_3[i],
                 ExcMessage("Problem in add(scalar)."));
 
   a.add(2., b);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(1. + read_write_1[i] + 2. * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in add(scalar,Vector)."));
 
   LinearAlgebra::CUDAWrappers::Vector<double> d(a);
   a.add(2., b, 3., d);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(4. + 4. * read_write_1[i] + 10. * read_write_2[i] ==
                   read_write_3[i],
                 ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
 
-  a.import(read_write_1, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
   a.sadd(3., 2., c);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(3. * read_write_1[i] + 2. * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in sadd(scalar,scalar,Vector)."));
 
-  a.import(read_write_1, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
   a.scale(b);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_1[i] * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in scale."));
 
   a.equ(2., c);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(2. * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in equ."));
@@ -99,7 +99,7 @@ test()
 
   AssertThrow(b.linfty_norm() == 104., ExcMessage("Problem in linfty_norm."));
 
-  a.import(read_write_1, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
   const double val = a.add_and_dot(2., a, b);
   AssertThrow(val == 1059300., ExcMessage("Problem in add_and_dot"));
 }

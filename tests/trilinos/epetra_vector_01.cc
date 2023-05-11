@@ -89,11 +89,11 @@ test()
         }
     }
 
-  a.import(read_write_2, VectorOperation::insert);
-  b.import(read_write_1, VectorOperation::insert);
-  c.import(read_write_2, VectorOperation::insert);
+  a.import_elements(read_write_2, VectorOperation::insert);
+  b.import_elements(read_write_1, VectorOperation::insert);
+  c.import_elements(read_write_2, VectorOperation::insert);
 
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -109,7 +109,7 @@ test()
                     ExcMessage("Vector a has been modified."));
     }
 
-  read_write_3.import(b, VectorOperation::insert);
+  read_write_3.import_elements(b, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -123,7 +123,7 @@ test()
                     ExcMessage("Vector b has been modified."));
     }
 
-  read_write_3.import(c, VectorOperation::insert);
+  read_write_3.import_elements(c, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -139,7 +139,7 @@ test()
 
 
   a *= 2;
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -154,7 +154,7 @@ test()
     }
 
   c /= 2.;
-  read_write_3.import(c, VectorOperation::insert);
+  read_write_3.import_elements(c, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -169,7 +169,7 @@ test()
     }
 
   b += a;
-  read_write_3.import(b, VectorOperation::insert);
+  read_write_3.import_elements(b, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -184,7 +184,7 @@ test()
     }
 
   b -= c;
-  read_write_3.import(b, VectorOperation::insert);
+  read_write_3.import_elements(b, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -198,8 +198,8 @@ test()
                     ExcMessage("Problem in operator -=."));
     }
 
-  b.import(read_write_1, VectorOperation::insert);
-  c.import(read_write_1, VectorOperation::insert);
+  b.import_elements(read_write_1, VectorOperation::insert);
+  c.import_elements(read_write_1, VectorOperation::insert);
   const double val = b * c;
   AssertThrow(val == 285., ExcMessage("Problem in operator *."));
 }

@@ -57,11 +57,11 @@ test()
   rw_vector(myid * 2)     = myid * 2.0;
   rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
 
-  v.import(rw_vector, VectorOperation::insert);
+  v.import_elements(rw_vector, VectorOperation::insert);
   v *= 2.0;
   v.add(1.0);
 
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(rw_vector(myid * 2) == myid * 4.0 + 1, ExcInternalError());
   AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 3.0, ExcInternalError());
 
@@ -71,26 +71,26 @@ test()
   index.add_index(1);
   LinearAlgebra::ReadWriteVector<double> local_rw_vector(index);
   local_rw_vector(1) = 7;
-  v.import(local_rw_vector, VectorOperation::insert);
+  v.import_elements(local_rw_vector, VectorOperation::insert);
 
   {
-    rw_vector.import(v, VectorOperation::insert);
+    rw_vector.import_elements(v, VectorOperation::insert);
     deallog << myid * 2 << ":" << rw_vector(myid * 2) << std::endl;
     deallog << myid * 2 + 1 << ":" << rw_vector(myid * 2 + 1) << std::endl;
   }
 
   local_rw_vector(1) = -7;
-  v.import(local_rw_vector, VectorOperation::insert);
+  v.import_elements(local_rw_vector, VectorOperation::insert);
 
   {
-    rw_vector.import(v, VectorOperation::insert);
+    rw_vector.import_elements(v, VectorOperation::insert);
     deallog << myid * 2 << ":" << rw_vector(myid * 2) << std::endl;
     deallog << myid * 2 + 1 << ":" << rw_vector(myid * 2 + 1) << std::endl;
   }
 
   // import ghosts onto all procs
   v.update_ghost_values();
-  local_rw_vector.import(v, VectorOperation::insert);
+  local_rw_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(local_rw_vector(1) == -7.0, ExcInternalError());
 
   // check l2 norm

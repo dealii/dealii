@@ -116,15 +116,15 @@ main(int argc, char *argv[])
                                                dof_handler.get_communicator());
       LinearAlgebra::ReadWriteVector<Number> x_temp(
         dof_handler.locally_owned_dofs());
-      x_temp.import(x, VectorOperation::insert);
-      x_.import(x_temp, VectorOperation::insert);
+      x_temp.import_elements(x, VectorOperation::insert);
+      x_.import_elements(x_temp, VectorOperation::insert);
 
       LinearAlgebra::EpetraWrappers::Vector r_(dof_handler.locally_owned_dofs(),
                                                dof_handler.get_communicator());
       LinearAlgebra::ReadWriteVector<Number> r_temp(
         dof_handler.locally_owned_dofs());
-      r_temp.import(r, VectorOperation::insert);
-      r_.import(r_temp, VectorOperation::insert);
+      r_temp.import_elements(r, VectorOperation::insert);
+      r_.import_elements(r_temp, VectorOperation::insert);
 
       X = Teuchos::rcp<Epetra_MultiVector>(&x_.trilinos_vector(), false);
       B = Teuchos::rcp<Epetra_MultiVector>(&r_.trilinos_vector(), false);

@@ -55,7 +55,7 @@ test()
   LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
   rw_vector(myid * 2)     = myid * 2.0;
   rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
-  v.import(rw_vector, VectorOperation::insert);
+  v.import_elements(rw_vector, VectorOperation::insert);
 
   v.update_ghost_values();
 
@@ -63,7 +63,7 @@ test()
   IndexSet ghost_set(numproc * 2);
   ghost_set.add_index(1);
   LinearAlgebra::ReadWriteVector<double> ghost_vector(ghost_set);
-  ghost_vector.import(v, VectorOperation::insert);
+  ghost_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(ghost_vector(1) == 1., ExcInternalError());
 
   // copy vector
@@ -72,9 +72,9 @@ test()
 
   v.update_ghost_values();
   w.update_ghost_values();
-  ghost_vector.import(v, VectorOperation::insert);
+  ghost_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(ghost_vector(1) == 2., ExcInternalError());
-  ghost_vector.import(w, VectorOperation::insert);
+  ghost_vector.import_elements(w, VectorOperation::insert);
   AssertThrow(ghost_vector(1) == 1., ExcInternalError());
 
   if (myid == 0)

@@ -44,7 +44,7 @@ test()
   LinearAlgebra::ReadWriteVector<double> read_write(parallel_partitioner);
   if (rank == 0)
     read_write[0] = 1.;
-  a.import(read_write, VectorOperation::insert);
+  a.import_elements(read_write, VectorOperation::insert);
   AssertThrow(a.all_zero() == false, ExcInternalError());
 }
 

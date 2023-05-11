@@ -59,10 +59,10 @@ test()
     partitioner);
 
   // Assignment from Host to Default
-  vec_dev.import(vec_ref, VectorOperation::insert);
+  vec_dev.import_elements(vec_ref, VectorOperation::insert);
 
   // Assignment from Default to Host
-  vec_host.import(vec_dev, VectorOperation::insert);
+  vec_host.import_elements(vec_dev, VectorOperation::insert);
 
   for (unsigned int i = 0; i < ghost_size; ++i)
     {

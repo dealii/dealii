@@ -132,7 +132,6 @@ test()
   Kokkos::deep_copy(x_dev, x_host);
   Kokkos::deep_copy(y_dev, y_host);
 
-
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values(
     Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
     size_shape_values);

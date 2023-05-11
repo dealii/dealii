@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// test: RWV::import() from TrilinosWrappers::MPI::Vector
+// test: RWV::import_elements() from TrilinosWrappers::MPI::Vector
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
@@ -52,17 +52,17 @@ test()
   readwrite.print(deallog.get_file_stream());
 
   // import RWV->Trilinos
-  tril_vector.import(readwrite, VectorOperation::insert);
+  tril_vector.import_elements(readwrite, VectorOperation::insert);
   deallog << "trilinos vec:" << std::endl;
   tril_vector.print(deallog.get_file_stream());
 
   // test that ::add also works
-  tril_vector.import(readwrite, VectorOperation::add);
+  tril_vector.import_elements(readwrite, VectorOperation::add);
   deallog << "trilinos vec (2x):" << std::endl;
   tril_vector.print(deallog.get_file_stream());
 
   // import again overwriting the contents
-  tril_vector.import(readwrite, VectorOperation::insert);
+  tril_vector.import_elements(readwrite, VectorOperation::insert);
   deallog << "trilinos vec (1x):" << std::endl;
   tril_vector.print(deallog.get_file_stream());
 

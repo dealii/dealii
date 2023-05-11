@@ -119,27 +119,27 @@ test(Utilities::CUDA::Handle &cuda_handle)
   LinearAlgebra::ReadWriteVector<double>      read_write(vector_size);
   for (unsigned int i = 0; i < vector_size; ++i)
     read_write[i] = i;
-  src_dev.import(read_write, VectorOperation::insert);
+  src_dev.import_elements(read_write, VectorOperation::insert);
   A_dev.vmult(dst_dev, src_dev);
-  read_write.import(dst_dev, VectorOperation::insert);
+  read_write.import_elements(dst_dev, VectorOperation::insert);
   check_vector(dst, read_write);
 
   // Transpose matrix-vector multiplication
   A.Tvmult(dst, src);
   A_dev.Tvmult(dst_dev, src_dev);
-  read_write.import(dst_dev, VectorOperation::insert);
+  read_write.import_elements(dst_dev, VectorOperation::insert);
   check_vector(dst, read_write);
 
   // Matrix-vector multiplication and add
   A.vmult_add(dst, src);
   A_dev.vmult_add(dst_dev, src_dev);
-  read_write.import(dst_dev, VectorOperation::insert);
+  read_write.import_elements(dst_dev, VectorOperation::insert);
   check_vector(dst, read_write);
 
   // Transpose matrix-vector multiplication and add
   A.Tvmult_add(dst, src);
   A_dev.Tvmult_add(dst_dev, src_dev);
-  read_write.import(dst_dev, VectorOperation::insert);
+  read_write.import_elements(dst_dev, VectorOperation::insert);
   check_vector(dst, read_write);
 
   // Matrix norm square
@@ -161,12 +161,12 @@ test(Utilities::CUDA::Handle &cuda_handle)
       read_write[i] = i;
     }
   LinearAlgebra::CUDAWrappers::Vector<double> b_dev(vector_size);
-  b_dev.import(read_write, VectorOperation::insert);
-  src_dev.import(read_write, VectorOperation::insert);
+  b_dev.import_elements(read_write, VectorOperation::insert);
+  src_dev.import_elements(read_write, VectorOperation::insert);
   value      = A.residual(dst, src, b);
   value_host = A_dev.residual(dst_dev, src_dev, b_dev);
   AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
-  read_write.import(dst_dev, VectorOperation::insert);
+  read_write.import_elements(dst_dev, VectorOperation::insert);
   check_vector(dst, read_write);
 
   // Compute L1 norm

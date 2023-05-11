@@ -298,10 +298,11 @@ namespace LinearAlgebra
      *   dealing with a serial vector here.
      */
     void
-    import(const dealii::Vector<Number> &vec,
-           VectorOperation::values       operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const dealii::Vector<Number> &vec,
+      VectorOperation::values       operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 
     /**
      * Imports all the elements present in the vector's IndexSet from the
@@ -313,10 +314,11 @@ namespace LinearAlgebra
      *   dealing with a serial vector here.
      */
     void
-    import(const LinearAlgebra::Vector<Number> &vec,
-           VectorOperation::values              operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const LinearAlgebra::Vector<Number> &vec,
+      VectorOperation::values              operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 
     /**
      * Imports all the elements present in the vector's IndexSet from the
@@ -328,10 +330,11 @@ namespace LinearAlgebra
      */
     template <typename MemorySpace>
     void
-    import(const distributed::Vector<Number, MemorySpace> &vec,
-           VectorOperation::values                         operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const distributed::Vector<Number, MemorySpace> &vec,
+      VectorOperation::values                         operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 
 #ifdef DEAL_II_WITH_PETSC
     /**
@@ -343,10 +346,11 @@ namespace LinearAlgebra
      * performance.
      */
     void
-    import(const PETScWrappers::MPI::Vector &petsc_vec,
-           VectorOperation::values           operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const PETScWrappers::MPI::Vector &petsc_vec,
+      VectorOperation::values           operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -361,10 +365,11 @@ namespace LinearAlgebra
      * @note The @p trilinos_vec is not allowed to have ghost entries.
      */
     void
-    import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
-           VectorOperation::values              operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const TrilinosWrappers::MPI::Vector &trilinos_vec,
+      VectorOperation::values              operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
@@ -378,10 +383,11 @@ namespace LinearAlgebra
     template <typename Dummy = Number>
     std::enable_if_t<std::is_same<Dummy, Number>::value &&
                      dealii::is_tpetra_type<Number>::value>
-    import(const TpetraWrappers::Vector<Number> &tpetra_vec,
-           VectorOperation::values               operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const TpetraWrappers::Vector<Number> &tpetra_vec,
+      VectorOperation::values               operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 #  endif
 
     /**
@@ -393,10 +399,11 @@ namespace LinearAlgebra
      * performance.
      */
     void
-    import(const EpetraWrappers::Vector &epetra_vec,
-           VectorOperation::values       operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const EpetraWrappers::Vector &epetra_vec,
+      VectorOperation::values       operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 #endif
 
 #ifdef DEAL_II_WITH_CUDA
@@ -407,10 +414,11 @@ namespace LinearAlgebra
      * replace the current elements. The last parameter is not used.
      */
     void
-    import(const CUDAWrappers::Vector<Number> &cuda_vec,
-           VectorOperation::values             operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {});
+    import_elements(
+      const CUDAWrappers::Vector<Number> &cuda_vec,
+      VectorOperation::values             operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern = {});
 #endif
 
     /**
@@ -661,13 +669,14 @@ namespace LinearAlgebra
     template <typename Dummy = Number>
     std::enable_if_t<std::is_same<Dummy, Number>::value &&
                      dealii::is_tpetra_type<Number>::value>
-    import(const Tpetra::Vector<Number, int, types::signed_global_dof_index>
-             &                     tpetra_vector,
-           const IndexSet &        locally_owned_elements,
-           VectorOperation::values operation,
-           const MPI_Comm          mpi_comm,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern);
+    import_elements(
+      const Tpetra::Vector<Number, int, types::signed_global_dof_index>
+        &                     tpetra_vector,
+      const IndexSet &        locally_owned_elements,
+      VectorOperation::values operation,
+      const MPI_Comm          mpi_comm,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern);
 #  endif
 
     /**
@@ -676,12 +685,13 @@ namespace LinearAlgebra
      * used directly.
      */
     void
-    import(const Epetra_MultiVector &multivector,
-           const IndexSet &          locally_owned_elements,
-           VectorOperation::values   operation,
-           const MPI_Comm            mpi_comm,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern);
+    import_elements(
+      const Epetra_MultiVector &multivector,
+      const IndexSet &          locally_owned_elements,
+      VectorOperation::values   operation,
+      const MPI_Comm            mpi_comm,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern);
 #endif
 
     /**

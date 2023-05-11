@@ -107,7 +107,7 @@ test()
     {
       rw_vector.reinit(ghost_set);
     }
-  v.import(rw_vector, VectorOperation::add); // 60 + 6
+  v.import_elements(rw_vector, VectorOperation::add); // 60 + 6
   // compress(insert) used to leave ghosts un-touched which resulted in
   // the wrong 55+55 for this compress(add) operation.
 

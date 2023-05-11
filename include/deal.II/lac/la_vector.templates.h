@@ -248,7 +248,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  Vector<Number>::import(
+  Vector<Number>::import_elements(
     const ReadWriteVector<Number> &,
     VectorOperation::values,
     std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)

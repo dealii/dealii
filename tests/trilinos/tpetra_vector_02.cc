@@ -79,12 +79,12 @@ test()
         }
     }
 
-  a.import(read_write_1, VectorOperation::insert);
-  b.import(read_write_2, VectorOperation::insert);
-  c.import(read_write_2, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
+  b.import_elements(read_write_2, VectorOperation::insert);
+  c.import_elements(read_write_2, VectorOperation::insert);
 
   a.add(1.);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -99,7 +99,7 @@ test()
     }
 
   a.add(2., b);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -120,7 +120,7 @@ test()
 
   LinearAlgebra::TpetraWrappers::Vector<Number> d(a);
   a.add(2., b, 3., d);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -139,9 +139,9 @@ test()
     }
 
 
-  a.import(read_write_1, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
   a.sadd(3., 2., c);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -160,9 +160,9 @@ test()
     }
 
 
-  a.import(read_write_1, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
   a.scale(b);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -178,7 +178,7 @@ test()
 
 
   a.equ(2., c);
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
@@ -201,7 +201,7 @@ test()
 
   AssertThrow(b.linfty_norm() == 14., ExcMessage("Problem in linfty_norm."));
 
-  a.import(read_write_1, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
   const Number val = a.add_and_dot(2., a, b);
   AssertThrow(val == Number(1530.), ExcMessage("Problem in add_and_dot"));
 }

@@ -108,10 +108,11 @@ namespace LinearAlgebra
      * performance.
      */
     virtual void
-    import(const ReadWriteVector<Number> &V,
-           VectorOperation::values        operation,
-           std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             communication_pattern = {}) = 0;
+    import_elements(
+      const ReadWriteVector<Number> &V,
+      VectorOperation::values        operation,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        communication_pattern = {}) = 0;
 
     /**
      * Return the scalar product of two vectors.

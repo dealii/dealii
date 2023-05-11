@@ -71,10 +71,10 @@ do_test(const DoFHandler<2> &            dof,
       in(i)              = entry;
     }
 
-  in_device.import(in, VectorOperation::insert);
+  in_device.import_elements(in, VectorOperation::insert);
   mf.vmult(out_device, in_device);
   cudaDeviceSynchronize();
-  out.import(out_device, VectorOperation::insert);
+  out.import_elements(out_device, VectorOperation::insert);
 
   // assemble sparse matrix with (\nabla v, \nabla u) + (v, 10 * u)
   SparsityPattern sparsity;

@@ -54,57 +54,57 @@ test()
       read_write_2[i] = 5. + i;
     }
 
-  a.import(read_write_2, VectorOperation::insert);
-  b.import(read_write_1, VectorOperation::insert);
-  c.import(read_write_2, VectorOperation::insert);
+  a.import_elements(read_write_2, VectorOperation::insert);
+  b.import_elements(read_write_1, VectorOperation::insert);
+  c.import_elements(read_write_2, VectorOperation::insert);
 
 
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_2[i] == read_write_3[i],
                 ExcMessage("Vector a has been modified."));
 
-  read_write_3.import(b, VectorOperation::insert);
+  read_write_3.import_elements(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_1[i] == read_write_3[i],
                 ExcMessage("Vector b has been modified."));
 
-  read_write_3.import(c, VectorOperation::insert);
+  read_write_3.import_elements(c, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_2[i] == read_write_3[i],
                 ExcMessage("Vector c has been modified."));
 
   a *= 2.;
-  read_write_3.import(a, VectorOperation::insert);
+  read_write_3.import_elements(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(2. * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in operator *=."));
 
   c /= 2.;
-  read_write_3.import(c, VectorOperation::insert);
+  read_write_3.import_elements(c, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(0.5 * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in operator /=."));
 
   b += a;
-  read_write_3.import(b, VectorOperation::insert);
+  read_write_3.import_elements(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(2. * read_write_2[i] + read_write_1[i] == read_write_3[i],
                 ExcMessage("Problem in operator +=."));
 
   b -= c;
-  read_write_3.import(b, VectorOperation::insert);
+  read_write_3.import_elements(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(1.5 * read_write_2[i] + read_write_1[i] == read_write_3[i],
                 ExcMessage("Problem in operator -=."));
 
-  b.import(read_write_1, VectorOperation::insert);
-  c.import(read_write_1, VectorOperation::insert);
+  b.import_elements(read_write_1, VectorOperation::insert);
+  c.import_elements(read_write_1, VectorOperation::insert);
   const double val = b * c;
   AssertThrow(val == 328350., ExcMessage("Problem in operator *."));
 
   b = 0.;
-  read_write_3.import(b, VectorOperation::insert);
+  read_write_3.import_elements(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_3[i] == 0., ExcMessage("Problem in operator =."));
 }
