@@ -231,6 +231,22 @@ namespace internal
       (void)dummy2;
     }
 
+    /**
+     * Constructor, taking the data from ShapeInfo via raw pointers
+     */
+    EvaluatorTensorProduct(const Number2 *    shape_values,
+                           const Number2 *    shape_gradients,
+                           const Number2 *    shape_hessians,
+                           const unsigned int dummy1 = 0,
+                           const unsigned int dummy2 = 0)
+      : shape_values(shape_values)
+      , shape_gradients(shape_gradients)
+      , shape_hessians(shape_hessians)
+    {
+      (void)dummy1;
+      (void)dummy2;
+    }
+
     template <int direction, bool contract_over_rows, bool add>
     void
     values(const Number in[], Number out[]) const

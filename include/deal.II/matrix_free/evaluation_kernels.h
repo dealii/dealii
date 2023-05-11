@@ -3552,9 +3552,9 @@ namespace internal
                                  fe_degree + 1,
                                  0,
                                  Number>
-            evalf(shape_data[face_no % 2],
-                  AlignedVector<Number>(),
-                  AlignedVector<Number>(),
+            evalf(shape_data[face_no % 2].begin(),
+                  nullptr,
+                  nullptr,
                   n_points_1d,
                   0);
 
