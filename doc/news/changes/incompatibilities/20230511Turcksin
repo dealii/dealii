@@ -1,0 +1,3 @@
+Extensive rework of CUDAWrappers::MatrixFree and CUDAWrappers::FEEvalution.
+<br>
+(Bruno Turcksin, 2023/05/11)
