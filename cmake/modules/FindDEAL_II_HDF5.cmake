@@ -35,7 +35,27 @@ set(HDF5_PREFER_PARALLEL TRUE)
 find_package(HDF5)
 
 set(_include_dirs "${HDF5_INCLUDE_DIRS}")
-set(_libraries "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
+set(_libraries_tmp "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
+
+# HDF5_LIBRARIES and HDF5_HL_LIBRARIES might contain targets or full paths to libraries
+# try to find full paths in the former case
+set(_libraries)
+foreach(_library ${_libraries_tmp})
+  if(TARGET ${_library})
+    get_target_property(_configurations ${_library} IMPORTED_CONFIGURATIONS)
+    if(_configurations)
+      foreach(_configuration ${_configurations})
+        get_target_property(_imported_location ${_library} IMPORTED_LOCATION_${_configuration})
+        list(APPEND _libraries ${_imported_location})
+      endforeach()
+    else()
+      get_target_property(_imported_location ${_library} IMPORTED_LOCATION)
+      list(APPEND _libraries ${_imported_location})
+    endif()
+  else()
+    list(APPEND _libraries ${_library})
+  endif()
+endforeach()
 
 process_feature(HDF5
   LIBRARIES
