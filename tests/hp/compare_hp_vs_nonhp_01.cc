@@ -78,7 +78,7 @@ namespace with_hp
   class LaplaceProblem
   {
   public:
-    LaplaceProblem<dim>();
+    LaplaceProblem();
 
     void
     run(Vector<double> &sol);
@@ -239,7 +239,7 @@ namespace without_hp
   class LaplaceProblem
   {
   public:
-    LaplaceProblem<dim>();
+    LaplaceProblem();
 
     void
     run(Vector<double> &sol);
