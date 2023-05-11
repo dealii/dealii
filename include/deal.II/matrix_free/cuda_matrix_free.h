@@ -235,6 +235,30 @@ namespace CUDAWrappers
        * the destingation vector. Otherwise, use atomic operations.
        */
       bool use_coloring;
+
+      /**
+       * Return the quadrature point index local. The index is
+       * only unique for a given MPI process.
+       */
+      DEAL_II_HOST_DEVICE unsigned int
+      local_q_point_id(const unsigned int cell,
+                       const unsigned int n_q_points,
+                       const unsigned int q_point) const
+      {
+        return (row_start / padding_length + cell) * n_q_points + q_point;
+      }
+
+
+      /**
+       * Return the quadrature point.
+       */
+      DEAL_II_HOST_DEVICE
+      typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
+      get_quadrature_point(const unsigned int cell,
+                           const unsigned int q_point) const
+      {
+        return q_points(cell, q_point);
+      }
     };
 
     /**
@@ -585,22 +609,6 @@ namespace CUDAWrappers
      */
     std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
-    /**
-     * Cells per block (determined by the function cells_per_block_shmem() ).
-     */
-    unsigned int cells_per_block;
-
-    /**
-     * Grid dimensions used to launch the CUDA kernels
-     * in *_constrained_values-operations.
-     */
-    dim3 constraint_grid_dim;
-
-    /**
-     * Block dimensions used to launch the CUDA kernels
-     * in *_constrained_values-operations.
-     */
-    dim3 constraint_block_dim;
 
     /**
      * Length of the padding (closest power of two larger than or equal to
@@ -628,113 +636,47 @@ namespace CUDAWrappers
 
 
 
-  // TODO We should rework this to use scratch memory
-  /**
-   * Structure to pass the shared memory into a general user function.
-   */
   template <int dim, typename Number>
   struct SharedData
   {
+    using TeamHandle = Kokkos::TeamPolicy<
+      MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
+    using SharedView1D = Kokkos::View<
+      Number *,
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    using SharedView2D = Kokkos::View<
+      Number *[dim],
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
+    DEAL_II_HOST_DEVICE
+    SharedData(const TeamHandle &team_member,
+               SharedView1D      values,
+               SharedView2D      gradients)
+      : team_member(team_member)
+      , values(values)
+      , gradients(gradients)
+    {}
+
+    /**
+     * TeamPolicy handle.
+     */
+    TeamHandle team_member;
+
     /**
      * Memory for dof and quad values.
      */
-    Kokkos::Subview<Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
-                    Kokkos::pair<int, int>>
-      values;
+    SharedView1D values;
 
     /**
      * Memory for computed gradients in reference coordinate system.
      */
-    Kokkos::Subview<
-      Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>,
-      Kokkos::pair<int, int>,
-      Kokkos::pair<int, int>>
-      gradients;
+    SharedView2D gradients;
   };
 
 
-
-  // This function determines the number of cells per block, possibly at compile
-  // time (by virtue of being 'constexpr')
-  // TODO this function should be rewritten using meta-programming
-  DEAL_II_HOST_DEVICE constexpr unsigned int
-  cells_per_block_shmem(int dim, int fe_degree)
-  {
-    /* clang-format off */
-    // We are limiting the number of threads according to the
-    // following formulas:
-    //  - in 2d: `threads = cells * (k+1)^d <= 4*CUDAWrappers::warp_size`
-    //  - in 3d: `threads = cells * (k+1)^d <= 2*CUDAWrappers::warp_size`
-    return dim==2 ? (fe_degree==1 ? CUDAWrappers::warp_size :    // 128
-                     fe_degree==2 ? CUDAWrappers::warp_size/4 :  //  72
-                     fe_degree==3 ? CUDAWrappers::warp_size/8 :  //  64
-                     fe_degree==4 ? CUDAWrappers::warp_size/8 :  // 100
-                     1) :
-           dim==3 ? (fe_degree==1 ? CUDAWrappers::warp_size/4 :  //  64
-                     fe_degree==2 ? CUDAWrappers::warp_size/16 : //  54
-                     1) : 1;
-    /* clang-format on */
-  }
-
-
-  /*----------------------- Helper functions ---------------------------------*/
-  /**
-   * Compute the quadrature point index in the local cell of a given thread.
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim>
-  DEAL_II_HOST_DEVICE inline unsigned int
-  q_point_id_in_cell(const unsigned int n_q_points_1d)
-  {
-    KOKKOS_IF_ON_DEVICE(
-      return (dim == 1 ?
-                threadIdx.x % n_q_points_1d :
-              dim == 2 ?
-                threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
-                threadIdx.x % n_q_points_1d +
-                  n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));)
-
-    KOKKOS_IF_ON_HOST(AssertThrow(false, ExcInternalError()); return 0;)
-  }
-
-
-
-  /**
-   * Return the quadrature point index local of a given thread. The index is
-   * only unique for a given MPI process.
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  DEAL_II_HOST_DEVICE inline unsigned int
-  local_q_point_id(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
-    const unsigned int                                          n_q_points_1d,
-    const unsigned int                                          n_q_points)
-  {
-    return (data->row_start / data->padding_length + cell) * n_q_points +
-           q_point_id_in_cell<dim>(n_q_points_1d);
-  }
-
-
-
-  /**
-   * Return the quadrature point associated with a given thread.
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  DEAL_II_HOST_DEVICE inline
-    typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
-    get_quadrature_point(
-      const unsigned int                                          cell,
-      const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
-      const unsigned int                                          n_q_points_1d)
-  {
-    return data->q_points(cell, q_point_id_in_cell<dim>(n_q_points_1d));
-  }
 
   /**
    * Structure which is passed to the kernel. It is used to pass all the
@@ -798,6 +740,31 @@ namespace CUDAWrappers
      * the destingation vector. Otherwise, use atomic operations.
      */
     bool use_coloring;
+
+
+
+    /**
+     * This function is the host version of local_q_point_id().
+     */
+    unsigned int
+    local_q_point_id(const unsigned int cell,
+                     const unsigned int n_q_points,
+                     const unsigned int q_point) const
+    {
+      return (row_start / padding_length + cell) * n_q_points + q_point;
+    }
+
+
+
+    /**
+     * This function is the host version of get_quadrature_point().
+     */
+    Point<dim, Number>
+    get_quadrature_point(const unsigned int cell,
+                         const unsigned int q_point) const
+    {
+      return q_points(cell, q_point);
+    }
   };
 
 
@@ -848,41 +815,6 @@ namespace CUDAWrappers
     Kokkos::deep_copy(data_host.constraint_mask, data.constraint_mask);
 
     return data_host;
-  }
-
-
-
-  /**
-   * This function is the host version of local_q_point_id().
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  inline unsigned int
-  local_q_point_id_host(const unsigned int           cell,
-                        const DataHost<dim, Number> &data,
-                        const unsigned int           n_q_points,
-                        const unsigned int           i)
-  {
-    return (data.row_start / data.padding_length + cell) * n_q_points + i;
-  }
-
-
-
-  /**
-   * This function is the host version of get_quadrature_point(). It assumes
-   * that the data in MatrixFree<dim, Number>::Data has been copied to the host
-   * using copy_mf_data_to_host().
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  inline Point<dim, Number>
-  get_quadrature_point_host(const unsigned int           cell,
-                            const DataHost<dim, Number> &data,
-                            const unsigned int           i)
-  {
-    return data.q_points(cell, i);
   }
 
 

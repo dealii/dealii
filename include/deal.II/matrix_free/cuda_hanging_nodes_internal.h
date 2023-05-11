@@ -52,31 +52,96 @@ namespace CUDAWrappers
 
 
 
+    template <unsigned int fe_degree, unsigned int direction>
+    DEAL_II_HOST_DEVICE inline bool
+    is_constrained_dof(
+      const dealii::internal::MatrixFreeFunctions::ConstraintKinds
+        &                constraint_mask,
+      const unsigned int x_idx,
+      const unsigned int y_idx)
+    {
+      return ((direction == 0) &&
+              (((constraint_mask & dealii::internal::MatrixFreeFunctions::
+                                     ConstraintKinds::subcell_y) !=
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                  unconstrained) ?
+                 (y_idx == 0) :
+                 (y_idx == fe_degree))) ||
+             ((direction == 1) &&
+              (((constraint_mask & dealii::internal::MatrixFreeFunctions::
+                                     ConstraintKinds::subcell_x) !=
+                dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                  unconstrained) ?
+                 (x_idx == 0) :
+                 (x_idx == fe_degree)));
+    }
+
+    template <unsigned int fe_degree, unsigned int direction>
+    DEAL_II_HOST_DEVICE inline bool
+    is_constrained_dof(
+      const dealii::internal::MatrixFreeFunctions::ConstraintKinds
+        &                constraint_mask,
+      const unsigned int x_idx,
+      const unsigned int y_idx,
+      const unsigned int z_idx,
+      const dealii::internal::MatrixFreeFunctions::ConstraintKinds face1_type,
+      const dealii::internal::MatrixFreeFunctions::ConstraintKinds face2_type,
+      const dealii::internal::MatrixFreeFunctions::ConstraintKinds face1,
+      const dealii::internal::MatrixFreeFunctions::ConstraintKinds face2,
+      const dealii::internal::MatrixFreeFunctions::ConstraintKinds edge)
+    {
+      const unsigned int face1_idx = (direction == 0) ? y_idx :
+                                     (direction == 1) ? z_idx :
+                                                        x_idx;
+      const unsigned int face2_idx = (direction == 0) ? z_idx :
+                                     (direction == 1) ? x_idx :
+                                                        y_idx;
+
+      const bool on_face1 = ((constraint_mask & face1_type) !=
+                             dealii::internal::MatrixFreeFunctions::
+                               ConstraintKinds::unconstrained) ?
+                              (face1_idx == 0) :
+                              (face1_idx == fe_degree);
+      const bool on_face2 = ((constraint_mask & face2_type) !=
+                             dealii::internal::MatrixFreeFunctions::
+                               ConstraintKinds::unconstrained) ?
+                              (face2_idx == 0) :
+                              (face2_idx == fe_degree);
+      return (
+        (((constraint_mask & face1) != dealii::internal::MatrixFreeFunctions::
+                                         ConstraintKinds::unconstrained) &&
+         on_face1) ||
+        (((constraint_mask & face2) != dealii::internal::MatrixFreeFunctions::
+                                         ConstraintKinds::unconstrained) &&
+         on_face2) ||
+        (((constraint_mask & edge) != dealii::internal::MatrixFreeFunctions::
+                                        ConstraintKinds::unconstrained) &&
+         on_face1 && on_face2));
+    }
+
+
+
     template <unsigned int fe_degree,
               unsigned int direction,
               bool         transpose,
               typename Number>
     DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_2d(
+      const Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type
+        &team_member,
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-        constraint_mask,
-      Kokkos::Subview<
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
-        Kokkos::pair<int, int>> values)
+        &                                                   constraint_mask,
+      Kokkos::View<Number *,
+                   MemorySpace::Default::kokkos_space::execution_space::
+                     scratch_memory_space,
+                   Kokkos::MemoryTraits<Kokkos::Unmanaged>> values)
     {
-      const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
-      const unsigned int y_idx = threadIdx.y;
+      constexpr unsigned int n_q_points_1d = fe_degree + 1;
+      constexpr unsigned int n_q_points    = Utilities::pow(n_q_points_1d, 2);
 
-      const auto this_type =
-        (direction == 0) ?
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_x :
-          dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y;
-
-      const unsigned int interp_idx = (direction == 0) ? x_idx : y_idx;
-
-      Number t = 0;
       // Flag is true if dof is constrained for the given direction and the
       // given face.
       const bool constrained_face =
@@ -91,73 +156,88 @@ namespace CUDAWrappers
                unconstrained))) !=
         dealii::internal::MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
-      // Flag is true if for the given direction, the dof is constrained with
-      // the right type and is on the correct side (left (= 0) or right (=
-      // fe_degree))
-      const bool constrained_dof =
-        ((direction == 0) &&
-         (((constraint_mask & dealii::internal::MatrixFreeFunctions::
-                                ConstraintKinds::subcell_y) !=
-           dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-             unconstrained) ?
-            (y_idx == 0) :
-            (y_idx == fe_degree))) ||
-        ((direction == 1) &&
-         (((constraint_mask & dealii::internal::MatrixFreeFunctions::
-                                ConstraintKinds::subcell_x) !=
-           dealii::internal::MatrixFreeFunctions::ConstraintKinds::
-             unconstrained) ?
-            (x_idx == 0) :
-            (x_idx == fe_degree)));
+      Number t[n_q_points];
+      Kokkos::parallel_for(
+        Kokkos::TeamThreadRange(team_member, n_q_points),
+        [&](const int &q_point) {
+          const unsigned int x_idx = q_point % n_q_points_1d;
+          const unsigned int y_idx = q_point / n_q_points_1d;
 
-      if (constrained_face && constrained_dof)
-        {
-          const bool type = (constraint_mask & this_type) !=
-                            dealii::internal::MatrixFreeFunctions::
-                              ConstraintKinds::unconstrained;
+          const auto this_type =
+            (direction == 0) ?
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+                subcell_x :
+              dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y;
 
-          if (type)
+          const unsigned int interp_idx = (direction == 0) ? x_idx : y_idx;
+          t[q_point]                    = 0;
+
+          // Flag is true if for the given direction, the dof is constrained
+          // with the right type and is on the correct side (left (= 0) or right
+          // (= fe_degree))
+          const bool constrained_dof =
+            is_constrained_dof<fe_degree, direction>(constraint_mask,
+                                                     x_idx,
+                                                     y_idx);
+
+          if (constrained_face && constrained_dof)
             {
-              for (unsigned int i = 0; i <= fe_degree; ++i)
-                {
-                  const unsigned int real_idx =
-                    (direction == 0) ? index2<fe_degree + 1>(i, y_idx) :
-                                       index2<fe_degree + 1>(x_idx, i);
+              const bool type = (constraint_mask & this_type) !=
+                                dealii::internal::MatrixFreeFunctions::
+                                  ConstraintKinds::unconstrained;
 
-                  const Number w =
-                    transpose ?
-                      constraint_weights[i * (fe_degree + 1) + interp_idx] :
-                      constraint_weights[interp_idx * (fe_degree + 1) + i];
-                  t += w * values[real_idx];
+              if (type)
+                {
+                  for (unsigned int i = 0; i <= fe_degree; ++i)
+                    {
+                      const unsigned int real_idx =
+                        (direction == 0) ? index2<n_q_points_1d>(i, y_idx) :
+                                           index2<n_q_points_1d>(x_idx, i);
+
+                      const Number w =
+                        transpose ?
+                          constraint_weights[i * n_q_points_1d + interp_idx] :
+                          constraint_weights[interp_idx * n_q_points_1d + i];
+                      t[q_point] += w * values[real_idx];
+                    }
+                }
+              else
+                {
+                  for (unsigned int i = 0; i <= fe_degree; ++i)
+                    {
+                      const unsigned int real_idx =
+                        (direction == 0) ? index2<n_q_points_1d>(i, y_idx) :
+                                           index2<n_q_points_1d>(x_idx, i);
+
+                      const Number w =
+                        transpose ?
+                          constraint_weights[(fe_degree - i) * n_q_points_1d +
+                                             fe_degree - interp_idx] :
+                          constraint_weights[(fe_degree - interp_idx) *
+                                               n_q_points_1d +
+                                             fe_degree - i];
+                      t[q_point] += w * values[real_idx];
+                    }
                 }
             }
-          else
-            {
-              for (unsigned int i = 0; i <= fe_degree; ++i)
-                {
-                  const unsigned int real_idx =
-                    (direction == 0) ? index2<fe_degree + 1>(i, y_idx) :
-                                       index2<fe_degree + 1>(x_idx, i);
-
-                  const Number w =
-                    transpose ?
-                      constraint_weights[(fe_degree - i) * (fe_degree + 1) +
-                                         fe_degree - interp_idx] :
-                      constraint_weights[(fe_degree - interp_idx) *
-                                           (fe_degree + 1) +
-                                         fe_degree - i];
-                  t += w * values[real_idx];
-                }
-            }
-        }
+        });
 
       // The synchronization is done for all the threads in one block with
       // each block being assigned to one element.
-      KOKKOS_IF_ON_DEVICE(__syncthreads();)
-      if (constrained_face && constrained_dof)
-        values[index2<fe_degree + 1>(x_idx, y_idx)] = t;
+      team_member.team_barrier();
+      Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_q_points),
+                           [&](const int &q_point) {
+                             const unsigned int x_idx = q_point % n_q_points_1d;
+                             const unsigned int y_idx = q_point / n_q_points_1d;
+                             const bool         constrained_dof =
+                               is_constrained_dof<fe_degree, direction>(
+                                 constraint_mask, x_idx, y_idx);
+                             if (constrained_face && constrained_dof)
+                               values[index2<fe_degree + 1>(x_idx, y_idx)] =
+                                 t[q_point];
+                           });
 
-      KOKKOS_IF_ON_DEVICE(__syncthreads();)
+      team_member.team_barrier();
     }
 
 
@@ -168,17 +248,20 @@ namespace CUDAWrappers
               typename Number>
     DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_3d(
+      const Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type
+        &team_member,
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-        constraint_mask,
-      Kokkos::Subview<
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
-        Kokkos::pair<int, int>> values)
+                                                            constraint_mask,
+      Kokkos::View<Number *,
+                   MemorySpace::Default::kokkos_space::execution_space::
+                     scratch_memory_space,
+                   Kokkos::MemoryTraits<Kokkos::Unmanaged>> values)
     {
-      const unsigned int x_idx = threadIdx.x % (fe_degree + 1);
-      const unsigned int y_idx = threadIdx.y;
-      const unsigned int z_idx = threadIdx.z;
+      constexpr unsigned int n_q_points_1d = fe_degree + 1;
+      constexpr unsigned int n_q_points    = Utilities::pow(n_q_points_1d, 3);
 
       const auto this_type =
         (direction == 0) ?
@@ -221,92 +304,104 @@ namespace CUDAWrappers
           dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z;
       const auto constrained_face = constraint_mask & (face1 | face2 | edge);
 
-      const unsigned int interp_idx = (direction == 0) ? x_idx :
-                                      (direction == 1) ? y_idx :
-                                                         z_idx;
-      const unsigned int face1_idx  = (direction == 0) ? y_idx :
-                                      (direction == 1) ? z_idx :
-                                                         x_idx;
-      const unsigned int face2_idx  = (direction == 0) ? z_idx :
-                                      (direction == 1) ? x_idx :
-                                                         y_idx;
+      Number t[n_q_points];
+      Kokkos::parallel_for(
+        Kokkos::TeamThreadRange(team_member, n_q_points),
+        [&](const int &q_point) {
+          const unsigned int x_idx = q_point % n_q_points_1d;
+          const unsigned int y_idx = (q_point / n_q_points_1d) % n_q_points_1d;
+          const unsigned int z_idx = q_point / (n_q_points_1d * n_q_points_1d);
 
-      Number     t        = 0;
-      const bool on_face1 = ((constraint_mask & face1_type) !=
-                             dealii::internal::MatrixFreeFunctions::
-                               ConstraintKinds::unconstrained) ?
-                              (face1_idx == 0) :
-                              (face1_idx == fe_degree);
-      const bool on_face2 = ((constraint_mask & face2_type) !=
-                             dealii::internal::MatrixFreeFunctions::
-                               ConstraintKinds::unconstrained) ?
-                              (face2_idx == 0) :
-                              (face2_idx == fe_degree);
-      const bool constrained_dof =
-        ((((constraint_mask & face1) != dealii::internal::MatrixFreeFunctions::
-                                          ConstraintKinds::unconstrained) &&
-          on_face1) ||
-         (((constraint_mask & face2) != dealii::internal::MatrixFreeFunctions::
-                                          ConstraintKinds::unconstrained) &&
-          on_face2) ||
-         (((constraint_mask & edge) != dealii::internal::MatrixFreeFunctions::
-                                         ConstraintKinds::unconstrained) &&
-          on_face1 && on_face2));
-
-      if ((constrained_face != dealii::internal::MatrixFreeFunctions::
-                                 ConstraintKinds::unconstrained) &&
-          constrained_dof)
-        {
-          const bool type = (constraint_mask & this_type) !=
-                            dealii::internal::MatrixFreeFunctions::
-                              ConstraintKinds::unconstrained;
-          if (type)
+          const unsigned int interp_idx = (direction == 0) ? x_idx :
+                                          (direction == 1) ? y_idx :
+                                                             z_idx;
+          const bool         constrained_dof =
+            is_constrained_dof<fe_degree, direction>(constraint_mask,
+                                                     x_idx,
+                                                     y_idx,
+                                                     z_idx,
+                                                     face1_type,
+                                                     face2_type,
+                                                     face1,
+                                                     face2,
+                                                     edge);
+          t[q_point] = 0;
+          if ((constrained_face != dealii::internal::MatrixFreeFunctions::
+                                     ConstraintKinds::unconstrained) &&
+              constrained_dof)
             {
-              for (unsigned int i = 0; i <= fe_degree; ++i)
+              const bool type = (constraint_mask & this_type) !=
+                                dealii::internal::MatrixFreeFunctions::
+                                  ConstraintKinds::unconstrained;
+              if (type)
                 {
-                  const unsigned int real_idx =
-                    (direction == 0) ? index3<fe_degree + 1>(i, y_idx, z_idx) :
-                    (direction == 1) ? index3<fe_degree + 1>(x_idx, i, z_idx) :
-                                       index3<fe_degree + 1>(x_idx, y_idx, i);
+                  for (unsigned int i = 0; i <= fe_degree; ++i)
+                    {
+                      const unsigned int real_idx =
+                        (direction == 0) ?
+                          index3<fe_degree + 1>(i, y_idx, z_idx) :
+                        (direction == 1) ?
+                          index3<fe_degree + 1>(x_idx, i, z_idx) :
+                          index3<fe_degree + 1>(x_idx, y_idx, i);
 
-                  const Number w =
-                    transpose ?
-                      constraint_weights[i * (fe_degree + 1) + interp_idx] :
-                      constraint_weights[interp_idx * (fe_degree + 1) + i];
-                  t += w * values[real_idx];
+                      const Number w =
+                        transpose ?
+                          constraint_weights[i * n_q_points_1d + interp_idx] :
+                          constraint_weights[interp_idx * n_q_points_1d + i];
+                      t[q_point] += w * values[real_idx];
+                    }
+                }
+              else
+                {
+                  for (unsigned int i = 0; i <= fe_degree; ++i)
+                    {
+                      const unsigned int real_idx =
+                        (direction == 0) ?
+                          index3<n_q_points_1d>(i, y_idx, z_idx) :
+                        (direction == 1) ?
+                          index3<n_q_points_1d>(x_idx, i, z_idx) :
+                          index3<n_q_points_1d>(x_idx, y_idx, i);
+
+                      const Number w =
+                        transpose ?
+                          constraint_weights[(fe_degree - i) * n_q_points_1d +
+                                             fe_degree - interp_idx] :
+                          constraint_weights[(fe_degree - interp_idx) *
+                                               n_q_points_1d +
+                                             fe_degree - i];
+                      t[q_point] += w * values[real_idx];
+                    }
                 }
             }
-          else
-            {
-              for (unsigned int i = 0; i <= fe_degree; ++i)
-                {
-                  const unsigned int real_idx =
-                    (direction == 0) ? index3<fe_degree + 1>(i, y_idx, z_idx) :
-                    (direction == 1) ? index3<fe_degree + 1>(x_idx, i, z_idx) :
-                                       index3<fe_degree + 1>(x_idx, y_idx, i);
-
-                  const Number w =
-                    transpose ?
-                      constraint_weights[(fe_degree - i) * (fe_degree + 1) +
-                                         fe_degree - interp_idx] :
-                      constraint_weights[(fe_degree - interp_idx) *
-                                           (fe_degree + 1) +
-                                         fe_degree - i];
-                  t += w * values[real_idx];
-                }
-            }
-        }
+        });
 
       // The synchronization is done for all the threads in one block with
       // each block being assigned to one element.
-      KOKKOS_IF_ON_DEVICE(__syncthreads();)
+      team_member.team_barrier();
 
-      if ((constrained_face != dealii::internal::MatrixFreeFunctions::
-                                 ConstraintKinds::unconstrained) &&
-          constrained_dof)
-        values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = t;
+      Kokkos::parallel_for(
+        Kokkos::TeamThreadRange(team_member, n_q_points),
+        [&](const int &q_point) {
+          const unsigned int x_idx = q_point % n_q_points_1d;
+          const unsigned int y_idx = (q_point / n_q_points_1d) % n_q_points_1d;
+          const unsigned int z_idx = q_point / (n_q_points_1d * n_q_points_1d);
+          const bool         constrained_dof =
+            is_constrained_dof<fe_degree, direction>(constraint_mask,
+                                                     x_idx,
+                                                     y_idx,
+                                                     z_idx,
+                                                     face1_type,
+                                                     face2_type,
+                                                     face1,
+                                                     face2,
+                                                     edge);
+          if ((constrained_face != dealii::internal::MatrixFreeFunctions::
+                                     ConstraintKinds::unconstrained) &&
+              constrained_dof)
+            values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = t[q_point];
+        });
 
-      KOKKOS_IF_ON_DEVICE(__syncthreads();)
+      team_member.team_barrier();
     }
 
 
@@ -321,36 +416,45 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, bool transpose, typename Number>
     DEAL_II_HOST_DEVICE void
     resolve_hanging_nodes(
+      const Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type
+        &team_member,
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-        constraint_mask,
-      Kokkos::Subview<
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
-        Kokkos::pair<int, int>> values)
+                                                            constraint_mask,
+      Kokkos::View<Number *,
+                   MemorySpace::Default::kokkos_space::execution_space::
+                     scratch_memory_space,
+                   Kokkos::MemoryTraits<Kokkos::Unmanaged>> values)
     {
       if (dim == 2)
         {
-          interpolate_boundary_2d<fe_degree, 0, transpose>(constraint_weights,
+          interpolate_boundary_2d<fe_degree, 0, transpose>(team_member,
+                                                           constraint_weights,
                                                            constraint_mask,
                                                            values);
 
-          interpolate_boundary_2d<fe_degree, 1, transpose>(constraint_weights,
+          interpolate_boundary_2d<fe_degree, 1, transpose>(team_member,
+                                                           constraint_weights,
                                                            constraint_mask,
                                                            values);
         }
       else if (dim == 3)
         {
           // Interpolate y and z faces (x-direction)
-          interpolate_boundary_3d<fe_degree, 0, transpose>(constraint_weights,
+          interpolate_boundary_3d<fe_degree, 0, transpose>(team_member,
+                                                           constraint_weights,
                                                            constraint_mask,
                                                            values);
           // Interpolate x and z faces (y-direction)
-          interpolate_boundary_3d<fe_degree, 1, transpose>(constraint_weights,
+          interpolate_boundary_3d<fe_degree, 1, transpose>(team_member,
+                                                           constraint_weights,
                                                            constraint_mask,
                                                            values);
           // Interpolate x and y faces (z-direction)
-          interpolate_boundary_3d<fe_degree, 2, transpose>(constraint_weights,
+          interpolate_boundary_3d<fe_degree, 2, transpose>(team_member,
+                                                           constraint_weights,
                                                            constraint_mask,
                                                            values);
         }

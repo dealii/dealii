@@ -49,22 +49,32 @@ public:
     Number *                                                    dst) const
   {
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
-      fe_eval(cell, gpu_data, shared_data);
+      fe_eval(gpu_data, shared_data);
 
     // set to unit vector
-    fe_eval.submit_dof_value(1.);
-    KOKKOS_IF_ON_DEVICE(__syncthreads();)
+    auto fe_eval_ptr = &fe_eval;
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                 n_local_dofs),
+                         [&](int i) { fe_eval_ptr->submit_dof_value(1., i); });
+    shared_data->team_member.team_barrier();
     fe_eval.evaluate(/*evaluate_values =*/true, /*evaluate_gradients=*/true);
 
 #ifndef __APPLE__
-    // values should evaluate to one, derivatives to zero
-    assert(fe_eval.get_value() == 1.);
-    for (unsigned int e = 0; e < dim; ++e)
-      assert(fe_eval.get_gradient()[e] == 0.);
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                 n_local_dofs),
+                         [&](int i) {
+                           // values should evaluate to one, derivatives to zero
+                           assert(fe_eval_ptr->get_value(i) == 1.);
+                           for (unsigned int e = 0; e < dim; ++e)
+                             assert(fe_eval_ptr->get_gradient(i)[e] == 0.);
+                         });
 
     fe_eval.integrate(/*integrate_values = */ true,
                       /*integrate_gradients=*/true);
-    assert(fe_eval.get_dof_value() == 1.);
+
+    Kokkos::parallel_for(
+      Kokkos::TeamThreadRange(shared_data->team_member, n_local_dofs),
+      KOKKOS_LAMBDA(int i) { assert(fe_eval_ptr->get_dof_value(i) == 1.); });
 #endif
   }
 

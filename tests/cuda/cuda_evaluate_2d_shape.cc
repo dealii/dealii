@@ -32,14 +32,18 @@
 
 namespace CUDA = LinearAlgebra::CUDAWrappers;
 
+using TeamHandle = Kokkos::TeamPolicy<
+  MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
 template <int M, int N, int type, bool add, bool dof_to_quad>
-__global__ void
+DEAL_II_HOST_DEVICE void
 evaluate_tensor_product(
+  const TeamHandle &                                         team_member,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients,
-  double *                                                   dst,
-  double *                                                   src)
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst,
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> src)
 {
   CUDAWrappers::internal::EvaluatorTensorProduct<
     CUDAWrappers::internal::evaluate_general,
@@ -47,18 +51,18 @@ evaluate_tensor_product(
     M - 1,
     N,
     double>
-    evaluator(shape_values, shape_gradients, co_shape_gradients);
+    evaluator(team_member, shape_values, shape_gradients, co_shape_gradients);
 
   if (type == 0)
     {
       evaluator.template values<0, dof_to_quad, false, false>(src, src);
-      __syncthreads();
+      team_member.team_barrier();
       evaluator.template values<1, dof_to_quad, add, false>(src, dst);
     }
   if (type == 1)
     {
       evaluator.template gradients<0, dof_to_quad, false, false>(src, src);
-      __syncthreads();
+      team_member.team_barrier();
       evaluator.template gradients<1, dof_to_quad, add, false>(src, dst);
     }
 }
@@ -91,10 +95,16 @@ test()
 
   constexpr int                          M_2d = M * M;
   constexpr int                          N_2d = N * N;
-  LinearAlgebra::ReadWriteVector<double> x_host(N_2d), x_ref(N_2d),
-    y_host(M_2d), y_ref(M_2d);
+  LinearAlgebra::ReadWriteVector<double> x_ref(N_2d), y_ref(M_2d);
+  Kokkos::View<double[N_2d], MemorySpace::Default::kokkos_space> x_dev(
+    Kokkos::view_alloc("x_dev", Kokkos::WithoutInitializing));
+  Kokkos::View<double[M_2d], MemorySpace::Default::kokkos_space> y_dev(
+    Kokkos::view_alloc("y_dev", Kokkos::WithoutInitializing));
+  auto x_host = Kokkos::create_mirror_view(x_dev);
+  auto y_host = Kokkos::create_mirror_view(y_dev);
+
   for (unsigned int i = 0; i < N_2d; ++i)
-    x_host[i] = static_cast<double>(Testing::rand()) / RAND_MAX;
+    x_host(i) = static_cast<double>(Testing::rand()) / RAND_MAX;
 
   FullMatrix<double> shape_2d(M_2d, N_2d);
   for (unsigned int i = 0; i < M; ++i)
@@ -112,16 +122,15 @@ test()
   // Compute reference
   for (unsigned int i = 0; i < M_2d; ++i)
     {
-      y_host[i] = 1.;
-      y_ref[i]  = add ? y_host[i] : 0.;
+      y_host(i) = 1.;
+      y_ref[i]  = add ? y_host(i) : 0.;
       for (unsigned int j = 0; j < N_2d; ++j)
-        y_ref[i] += shape_2d(i, j) * x_host[j];
+        y_ref[i] += shape_2d(i, j) * x_host(j);
     }
 
   // Copy data to the GPU.
-  CUDA::Vector<double> x_dev(N_2d), y_dev(M_2d);
-  x_dev.import(x_host, VectorOperation::insert);
-  y_dev.import(y_host, VectorOperation::insert);
+  Kokkos::deep_copy(x_dev, x_host);
+  Kokkos::deep_copy(y_dev, y_host);
 
 
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values(
@@ -144,53 +153,61 @@ test()
   Kokkos::deep_copy(co_shape_gradients, shape_host_view);
 
   // Launch the kernel
-  dim3 block_dim(M, N);
-  evaluate_tensor_product<M, N, type, add, false>
-    <<<1, block_dim>>>(shape_values,
-                       shape_gradients,
-                       co_shape_gradients,
-                       y_dev.get_values(),
-                       x_dev.get_values());
+  MemorySpace::Default::kokkos_space::execution_space exec;
+  Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>
+    team_policy(exec, 1, Kokkos::AUTO);
+  Kokkos::parallel_for(
+    team_policy, KOKKOS_LAMBDA(const TeamHandle &team_member) {
+      evaluate_tensor_product<M, N, type, add, false>(team_member,
+                                                      shape_values,
+                                                      shape_gradients,
+                                                      co_shape_gradients,
+                                                      y_dev,
+                                                      x_dev);
+    });
 
   // Check the results on the host
-  y_host.import(y_dev, VectorOperation::insert);
+  Kokkos::deep_copy(y_host, y_dev);
   deallog << "Errors no transpose: ";
 
   for (unsigned int i = 0; i < M_2d; ++i)
-    deallog << y_host[i] - y_ref[i] << " ";
+    deallog << y_host(i) - y_ref[i] << " ";
   deallog << std::endl;
 
   for (unsigned int i = 0; i < M_2d; ++i)
-    y_host[i] = static_cast<double>(Testing::rand()) / RAND_MAX;
+    y_host(i) = static_cast<double>(Testing::rand()) / RAND_MAX;
 
   // Copy y_host to the device
-  y_dev.import(y_host, VectorOperation::insert);
+  Kokkos::deep_copy(y_dev, y_host);
 
   // Compute reference
   for (unsigned int i = 0; i < N_2d; ++i)
     {
-      x_host[i] = 2.;
-      x_ref[i]  = add ? x_host[i] : 0.;
+      x_host(i) = 2.;
+      x_ref[i]  = add ? x_host(i) : 0.;
       for (unsigned int j = 0; j < M_2d; ++j)
-        x_ref[i] += shape_2d(j, i) * y_host[j];
+        x_ref[i] += shape_2d(j, i) * y_host(j);
     }
 
   // Copy x_host to the device
-  x_dev.import(x_host, VectorOperation::insert);
+  Kokkos::deep_copy(x_dev, x_host);
 
   // Launch the kernel
-  evaluate_tensor_product<M, N, type, add, true>
-    <<<1, block_dim>>>(shape_values,
-                       shape_gradients,
-                       co_shape_gradients,
-                       x_dev.get_values(),
-                       y_dev.get_values());
+  Kokkos::parallel_for(
+    team_policy, KOKKOS_LAMBDA(const TeamHandle &team_member) {
+      evaluate_tensor_product<M, N, type, add, true>(team_member,
+                                                     shape_values,
+                                                     shape_gradients,
+                                                     co_shape_gradients,
+                                                     x_dev,
+                                                     y_dev);
+    });
 
   // Check the results on the host
-  x_host.import(x_dev, VectorOperation::insert);
+  Kokkos::deep_copy(x_host, x_dev);
   deallog << "Errors transpose:    ";
   for (unsigned int i = 0; i < N_2d; ++i)
-    deallog << x_host[i] - x_ref[i] << " ";
+    deallog << x_host(i) - x_ref[i] << " ";
   deallog << std::endl;
 }
 

@@ -59,41 +59,70 @@ namespace CUDAWrappers
               typename ViewTypeIn,
               typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
-    apply(const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+    apply(const Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>::member_type
+            &team_member,
+          const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
                            shape_data,
           const ViewTypeIn in,
           ViewTypeOut      out)
     {
-      KOKKOS_IF_ON_DEVICE(
-        const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
-        const unsigned int j = (dim == 3) ? threadIdx.y : 0;
-        const unsigned int q = (dim == 1) ? (threadIdx.x % n_q_points_1d) :
-                               (dim == 2) ? threadIdx.y :
-                                            threadIdx.z;
+      constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
-        // This loop simply multiplies the shape function at the quadrature
-        // point by the value finite element coefficient.
-        Number t = 0;
-        for (int k = 0; k < n_q_points_1d; ++k) {
-          const unsigned int shape_idx =
-            dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
-          const unsigned int source_idx =
-            (direction == 0) ? (k + n_q_points_1d * (i + n_q_points_1d * j)) :
-            (direction == 1) ? (i + n_q_points_1d * (k + n_q_points_1d * j)) :
-                               (i + n_q_points_1d * (j + n_q_points_1d * k));
-          t += shape_data[shape_idx] *
-               (in_place ? out[source_idx] : in[source_idx]);
-        }
+      Number t[n_q_points];
+      Kokkos::parallel_for(
+        Kokkos::TeamThreadRange(team_member, n_q_points),
+        [&](const int &q_point) {
+          const unsigned int i = (dim == 1) ? 0 : q_point % n_q_points_1d;
+          const unsigned int j =
+            (dim == 3) ? (q_point / n_q_points_1d) % n_q_points_1d : 0;
+          const unsigned int q =
+            (dim == 1) ? q_point :
+            (dim == 2) ? (q_point / n_q_points_1d) % n_q_points_1d :
+                         q_point / (n_q_points_1d * n_q_points_1d);
 
-        if (in_place) __syncthreads();
+          // This loop simply multiplies the shape function at the quadrature
+          // point by the value finite element coefficient.
+          t[q_point] = 0;
+          for (int k = 0; k < n_q_points_1d; ++k)
+            {
+              const unsigned int shape_idx =
+                dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
+              const unsigned int source_idx =
+                (direction == 0) ?
+                  (k + n_q_points_1d * (i + n_q_points_1d * j)) :
+                (direction == 1) ?
+                  (i + n_q_points_1d * (k + n_q_points_1d * j)) :
+                  (i + n_q_points_1d * (j + n_q_points_1d * k));
+              t[q_point] += shape_data[shape_idx] *
+                            (in_place ? out(source_idx) : in(source_idx));
+            }
+        });
 
-        const unsigned int destination_idx =
-          (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
-          (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
-                             (i + n_q_points_1d * (j + n_q_points_1d * q));
+      if (in_place)
+        team_member.team_barrier();
 
-        if (add) Kokkos::atomic_add(&out[destination_idx], t);
-        else out[destination_idx] = t;)
+      Kokkos::parallel_for(
+        Kokkos::TeamThreadRange(team_member, n_q_points),
+        [&](const int &q_point) {
+          const unsigned int i = (dim == 1) ? 0 : q_point % n_q_points_1d;
+          const unsigned int j =
+            (dim == 3) ? (q_point / n_q_points_1d) % n_q_points_1d : 0;
+          const unsigned int q =
+            (dim == 1) ? q_point :
+            (dim == 2) ? (q_point / n_q_points_1d) % n_q_points_1d :
+                         q_point / (n_q_points_1d * n_q_points_1d);
+
+          const unsigned int destination_idx =
+            (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
+            (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
+                               (i + n_q_points_1d * (j + n_q_points_1d * q));
+
+          if (add)
+            Kokkos::atomic_add(&out(destination_idx), t[q_point]);
+          else
+            out(destination_idx) = t[q_point];
+        });
     }
 
 
@@ -125,8 +154,12 @@ namespace CUDAWrappers
                                   n_q_points_1d,
                                   Number>
     {
+      using TeamHandle = Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
       DEAL_II_HOST_DEVICE
       EvaluatorTensorProduct(
+        const TeamHandle &                                         team_member,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
           shape_gradients,
@@ -219,6 +252,11 @@ namespace CUDAWrappers
       integrate_value_and_gradient(ViewType1 u, ViewType2 grad_u);
 
       /**
+       * TeamPolicy handle.
+       */
+      const TeamHandle &team_member;
+
+      /**
        * Values of the shape functions.
        */
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
@@ -246,12 +284,14 @@ namespace CUDAWrappers
                            n_q_points_1d,
                            Number>::
       EvaluatorTensorProduct(
+        const TeamHandle &                                         team_member,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
           shape_gradients,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
           co_shape_gradients)
-      : shape_values(shape_values)
+      : team_member(team_member)
+      , shape_values(shape_values)
       , shape_gradients(shape_gradients)
       , co_shape_gradients(co_shape_gradients)
     {}
@@ -274,7 +314,7 @@ namespace CUDAWrappers
                                            ViewTypeOut      out) const
     {
       apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
-        shape_values, in, out);
+        team_member, shape_values, in, out);
     }
 
 
@@ -295,7 +335,7 @@ namespace CUDAWrappers
                                               ViewTypeOut      out) const
     {
       apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
-        shape_gradients, in, out);
+        team_member, shape_gradients, in, out);
     }
 
 
@@ -316,7 +356,7 @@ namespace CUDAWrappers
                                                  ViewTypeOut      out) const
     {
       apply<dim, n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
-        co_shape_gradients, in, out);
+        team_member, co_shape_gradients, in, out);
     }
 
 
@@ -341,7 +381,7 @@ namespace CUDAWrappers
           case 2:
             {
               values<0, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<1, true, false, true>(u, u);
 
               break;
@@ -349,9 +389,9 @@ namespace CUDAWrappers
           case 3:
             {
               values<0, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<1, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<2, true, false, true>(u, u);
 
               break;
@@ -386,7 +426,7 @@ namespace CUDAWrappers
           case 2:
             {
               values<0, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<1, false, false, true>(u, u);
 
               break;
@@ -394,9 +434,9 @@ namespace CUDAWrappers
           case 3:
             {
               values<0, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<1, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<2, false, false, true>(u, u);
 
               break;
@@ -437,7 +477,7 @@ namespace CUDAWrappers
               values<0, true, false, false>(
                 u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
 
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<1, true, false, true>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0),
@@ -457,7 +497,7 @@ namespace CUDAWrappers
               values<0, true, false, false>(
                 u, Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<1, true, false, true>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0),
@@ -469,7 +509,7 @@ namespace CUDAWrappers
                 Kokkos::subview(grad_u, Kokkos::ALL, 2),
                 Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<2, true, false, true>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0),
@@ -509,7 +549,7 @@ namespace CUDAWrappers
           case 1:
             {
               values<0, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               co_gradients<0, true, false, false>(
                 u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
@@ -519,9 +559,9 @@ namespace CUDAWrappers
           case 2:
             {
               values<0, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<1, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               co_gradients<0, true, false, false>(
                 u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
@@ -533,11 +573,11 @@ namespace CUDAWrappers
           case 3:
             {
               values<0, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<1, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<2, true, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               co_gradients<0, true, false, false>(
                 u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
@@ -586,11 +626,11 @@ namespace CUDAWrappers
                 Kokkos::subview(grad_u, Kokkos::ALL, 1),
                 Kokkos::subview(grad_u, Kokkos::ALL, 1));
 
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<1, false, add, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               gradients<1, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
 
@@ -608,7 +648,7 @@ namespace CUDAWrappers
                 Kokkos::subview(grad_u, Kokkos::ALL, 2),
                 Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<1, false, false, true>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0),
@@ -620,14 +660,14 @@ namespace CUDAWrappers
                 Kokkos::subview(grad_u, Kokkos::ALL, 2),
                 Kokkos::subview(grad_u, Kokkos::ALL, 2));
 
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<2, false, add, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<2, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               gradients<2, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
 
@@ -660,7 +700,7 @@ namespace CUDAWrappers
             {
               co_gradients<0, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<0, false, false, true>(u, u);
 
@@ -670,15 +710,15 @@ namespace CUDAWrappers
             {
               co_gradients<1, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               co_gradients<0, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<1, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<0, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               break;
             }
@@ -686,20 +726,20 @@ namespace CUDAWrappers
             {
               co_gradients<2, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               co_gradients<1, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               co_gradients<0, false, true, false>(
                 Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               values<2, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<1, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
               values<0, false, false, true>(u, u);
-              KOKKOS_IF_ON_DEVICE(__syncthreads();)
+              team_member.team_barrier();
 
               break;
             }
