@@ -3871,7 +3871,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                    VectorizedArrayType::size()>
           vector_ptrs = {};
 
-        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+        const auto upper_bound =
+          std::min<unsigned int>(n_filled_lanes, VectorizedArrayType::size());
+        for (unsigned int v = 0; v < upper_bound; ++v)
           {
             if (mask[v] == false)
               {
