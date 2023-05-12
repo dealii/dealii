@@ -46,14 +46,38 @@ macro(deal_ii_invoke_autopilot)
 
   set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-  # Define and setup a compilation target:
+  #
+  # Make sure that compile_commands.json is available in the source
+  # directory (to help IDEs like VSCode with clangd for code analysis):
+  #
+
+  # In order to check whether we have an "in source" build we have to make
+  # sure to remove all symlinks and resolve to absolute file paths. This is
+  # necessary because with symlinks CMAKE_SOURCE_DIR and CMAKE_BINARY dir
+  # might look different but are in fact the same (fully resolved)
+  # directory...
+  get_filename_component(_source "${CMAKE_SOURCE_DIR}" REALPATH)
+  get_filename_component(_build  "${CMAKE_BINARY_DIR}" REALPATH)
+  if(NOT "${_source}" STREQUAL "${_build}")
+    # Ensure that we do not override "compile_commands.json" in the source
+    # directory if already present and then create a symlink using the
+    # (unresolved) CMAKE_BINARY_DIR variable.
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/compile_commands.json")
+      file(CREATE_LINK
+        "${CMAKE_BINARY_DIR}/compile_commands.json"
+        "${CMAKE_SOURCE_DIR}/compile_commands.json"
+        SYMBOLIC
+        )
+    endif()
+  endif()
+
+  # Define and set up a compilation target:
   add_executable(${TARGET} ${TARGET_SRC})
   deal_ii_setup_target(${TARGET})
 
   message(STATUS "Autopilot invoked")
 
   # Define a custom target to easily run the program:
-
   if(NOT DEFINED TARGET_RUN)
     set(TARGET_RUN ${TARGET})
   endif()
