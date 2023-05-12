@@ -48,8 +48,7 @@ MGTransferBase<VectorType>::prolongate_and_add(const unsigned int to_level,
                                                VectorType &       dst,
                                                const VectorType & src) const
 {
-  VectorType temp;
-  temp.reinit(dst, true);
+  auto temp = VectorType::create_with_same_size(dst, true);
 
   this->prolongate(to_level, temp, src);
 

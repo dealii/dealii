@@ -288,10 +288,8 @@ namespace VectorTools
 
       // We will need two temporary global vectors that store the new values
       // and weights.
-      VectorType interpolation;
-      VectorType weights;
-      interpolation.reinit(vec);
-      weights.reinit(vec);
+      auto interpolation = VectorType::create_with_same_size(vec);
+      auto weights       = VectorType::create_with_same_size(vec);
 
       // Store locally owned dofs, so that we can skip all non-local dofs,
       // if they do not need to be interpolated.
@@ -555,8 +553,7 @@ namespace VectorTools
     data_2 = static_cast<number>(0);
 
     // Store how many cells share each dof (unghosted).
-    OutVector touch_count;
-    touch_count.reinit(data_2);
+    OutVector touch_count(data_2);
 
     std::vector<types::global_dof_index> local_dof_indices(
       dof_2.get_fe().n_dofs_per_cell());

@@ -704,8 +704,9 @@ namespace FETools
       // and we cannot use the sadd function directly, so we have to create
       // a completely distributed vector first and copy the local entries
       // from the vector with ghost entries
-      TrilinosWrappers::MPI::Vector u1_completely_distributed;
-      u1_completely_distributed.reinit(u1_difference, true);
+      auto u1_completely_distributed =
+        TrilinosWrappers::MPI::Vector::create_with_same_size(u1_difference,
+                                                             true);
       u1_completely_distributed = u1;
 
       u1_difference.sadd(-1, u1_completely_distributed);

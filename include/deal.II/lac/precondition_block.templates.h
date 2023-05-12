@@ -980,8 +980,7 @@ PreconditionBlockSSOR<MatrixType, inverse_type>::vmult(
   Vector<number2> &      dst,
   const Vector<number2> &src) const
 {
-  Vector<number2> help;
-  help.reinit(dst);
+  auto help = Vector<number2>::create_with_same_size(dst);
 
   this->forward(help, src, false, false);
 
@@ -1013,8 +1012,7 @@ PreconditionBlockSSOR<MatrixType, inverse_type>::Tvmult(
   Vector<number2> &      dst,
   const Vector<number2> &src) const
 {
-  Vector<number2> help;
-  help.reinit(dst);
+  auto help = Vector<number2>::create_with_same_size(dst);
 
   this->backward(help, src, true, false);
 
