@@ -6644,7 +6644,7 @@ namespace GridGenerator
           else if (structdim == 2)
             {
               // rotate the vertex numbers so that the lowest one is first
-              std::array<unsigned int, 4> renumbering;
+              std::array<unsigned int, 4> renumbering{};
               std::copy(std::begin(cell_data.vertices),
                         std::end(cell_data.vertices),
                         renumbering.begin());
