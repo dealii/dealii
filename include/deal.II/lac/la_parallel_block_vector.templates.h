@@ -101,6 +101,19 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    template <typename Number2>
+    BlockVector<Number>
+    BlockVector<Number>::create_with_same_size(const BlockVector<Number2> &V,
+                                               const bool omit_zeroing_entries)
+    {
+      BlockVector result;
+      result.reinit(V, omit_zeroing_entries);
+      return result;
+    }
+
+
+
+    template <typename Number>
     void
     BlockVector<Number>::reinit(const size_type n_bl,
                                 const size_type bl_sz,

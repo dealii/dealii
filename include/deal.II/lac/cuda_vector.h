@@ -87,6 +87,15 @@ namespace LinearAlgebra
       explicit Vector(const size_type n);
 
       /**
+       * Creates a new vector with the same size as the input vector @p V. If
+       * @p omit_zeroing_entries is false, the entries of the new vector will be
+       * initialized with zeros.
+       */
+      static Vector
+      create_with_same_size(const VectorSpaceVector &V,
+                            const bool omit_zeroing_entries = false);
+
+      /**
        * Copy assignment operator.
        */
       Vector &

@@ -783,6 +783,20 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
+    template <typename Number2>
+    inline Vector<Number, MemorySpaceType>
+    Vector<Number, MemorySpaceType>::create_with_same_size(
+      const Vector<Number2, MemorySpaceType> &V,
+      const bool                              omit_zeroing_entries)
+    {
+      Vector result;
+      result.reinit(V, omit_zeroing_entries);
+      return result;
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
     inline Vector<Number, MemorySpaceType>::~Vector()
     {
       try

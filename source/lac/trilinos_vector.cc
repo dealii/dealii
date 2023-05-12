@@ -137,6 +137,17 @@ namespace TrilinosWrappers
 
 
 
+    Vector
+    Vector::create_with_same_size(const Vector &v,
+                                  const bool    omit_zeroing_entries)
+    {
+      Vector result;
+      result.reinit(v, omit_zeroing_entries);
+      return result;
+    }
+
+
+
     void
     Vector::clear()
     {

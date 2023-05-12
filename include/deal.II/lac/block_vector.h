@@ -163,6 +163,17 @@ public:
               const InputIterator           first,
               const InputIterator           end);
 
+
+  /**
+   * Creates a new block vector with the same size as the input vector @p V. If
+   * @p omit_zeroing_entries is false, the entries of the new vector will be
+   * initialized with zeros.
+   */
+  template <typename Number2>
+  static BlockVector
+  create_with_same_size(const BlockVector<Number2> &V,
+                        const bool omit_zeroing_entries = false);
+
   /**
    * Destructor. Clears memory
    */
@@ -394,6 +405,19 @@ BlockVector<Number>::BlockVector(const std::vector<size_type> &block_sizes,
       start = end;
     };
   Assert(start == end, ExcIteratorRangeDoesNotMatchVectorSize());
+}
+
+
+
+template <typename Number>
+template <typename Number2>
+BlockVector<Number>
+BlockVector<Number>::create_with_same_size(const BlockVector<Number2> &V,
+                                           const bool omit_zeroing_entries)
+{
+  BlockVector result;
+  result.reinit(V, omit_zeroing_entries);
+  return result;
 }
 
 

@@ -333,6 +333,16 @@ namespace LinearAlgebra
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
+       * Creates a new vector with the same size as the input vector @p V. If
+       * @p omit_zeroing_entries is false, the entries of the new vector will be
+       * initialized with zeros.
+       */
+      template <typename Number2>
+      static Vector
+      create_with_same_size(const Vector<Number2, MemorySpace> &V,
+                            const bool omit_zeroing_entries = false);
+
+      /**
        * Destructor.
        */
       virtual ~Vector() override;

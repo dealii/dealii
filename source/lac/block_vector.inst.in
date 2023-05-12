@@ -24,12 +24,16 @@ for (S1, S2 : REAL_SCALARS)
   {
     template void BlockVector<S1>::reinit<S2>(const BlockVector<S2> &,
                                               const bool);
+    template BlockVector<S1> BlockVector<S1>::create_with_same_size<S2>(
+      const BlockVector<S2> &, const bool);
   }
 
 for (S1, S2 : COMPLEX_SCALARS)
   {
     template void BlockVector<S1>::reinit<S2>(const BlockVector<S2> &,
                                               const bool);
+    template BlockVector<S1> BlockVector<S1>::create_with_same_size<S2>(
+      const BlockVector<S2> &, const bool);
   }
 
 
@@ -37,4 +41,6 @@ for (S1 : COMPLEX_SCALARS; S2 : REAL_SCALARS)
   {
     template void BlockVector<S1>::reinit<S2>(const BlockVector<S2> &,
                                               const bool);
+    template BlockVector<S1> BlockVector<S1>::create_with_same_size<S2>(
+      const BlockVector<S2> &, const bool);
   }
