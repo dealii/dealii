@@ -2471,12 +2471,11 @@ namespace internal
   // this is an operation that is different for all vector types and so we
   // need a few overloads
 #ifdef DEAL_II_WITH_TRILINOS
-  inline void
+  inline TrilinosWrappers::MPI::Vector
   import_vector_with_ghost_elements(
     const TrilinosWrappers::MPI::Vector &vec,
     const IndexSet & /*locally_owned_elements*/,
-    const IndexSet &               needed_elements,
-    TrilinosWrappers::MPI::Vector &output,
+    const IndexSet &needed_elements,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
     Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
@@ -2485,16 +2484,18 @@ namespace internal
       dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
 
     Assert(mpi_comm != nullptr, ExcInternalError());
-    output.reinit(needed_elements, mpi_comm->GetMpiComm());
+    TrilinosWrappers::MPI::Vector output(needed_elements,
+                                         mpi_comm->GetMpiComm());
 #  else
-    output.reinit(needed_elements, MPI_COMM_SELF);
+    TrilinosWrappers::MPI::Vector outputneeded_elements, MPI_COMM_SELF);
 #  endif
     output = vec;
+    return output;
   }
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
-  inline void
+  inline PETScWrappers::MPI::Vector
   import_vector_with_ghost_elements(
     const PETScWrappers::MPI::Vector &vec,
     const IndexSet &                  locally_owned_elements,
@@ -2502,42 +2503,41 @@ namespace internal
     PETScWrappers::MPI::Vector &      output,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
-    output.reinit(locally_owned_elements,
-                  needed_elements,
-                  vec.get_mpi_communicator());
+    PETScWrappers::MPI::Vector output(locally_owned_elements,
+                                      needed_elements,
+                                      vec.get_mpi_communicator());
     output = vec;
+    return output;
   }
 #endif
 
   template <typename number>
-  void
+  LinearAlgebra::distributed::Vector<number>
   import_vector_with_ghost_elements(
     const LinearAlgebra::distributed::Vector<number> &vec,
     const IndexSet &                                  locally_owned_elements,
     const IndexSet &                                  needed_elements,
-    LinearAlgebra::distributed::Vector<number> &      output,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
     // TODO: the in vector might already have all elements. need to find a
     // way to efficiently avoid the copy then
     const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
       .zero_out_ghost_values();
-    output.reinit(locally_owned_elements,
-                  needed_elements,
-                  vec.get_mpi_communicator());
+    LinearAlgebra::distributed::Vector<number> output(
+      locally_owned_elements, needed_elements, vec.get_mpi_communicator());
     output = vec;
     output.update_ghost_values();
+    return output;
   }
 
   // all other vector non-block vector types are sequential and we should
   // not have this function called at all -- so throw an exception
   template <typename Vector>
-  void
+  Vector
   import_vector_with_ghost_elements(
     const Vector & /*vec*/,
     const IndexSet & /*locally_owned_elements*/,
     const IndexSet & /*needed_elements*/,
-    Vector & /*output*/,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
     Assert(false, ExcMessage("We shouldn't even get here!"));
@@ -2545,31 +2545,30 @@ namespace internal
 
   // for block vectors, simply dispatch to the individual blocks
   template <class VectorType>
-  void
+  VectorType
   import_vector_with_ghost_elements(
     const VectorType &vec,
     const IndexSet &  locally_owned_elements,
     const IndexSet &  needed_elements,
-    VectorType &      output,
     const std::integral_constant<bool, true> /*is_block_vector*/)
   {
-    output.reinit(vec.n_blocks());
+    VectorType output(vec.n_blocks());
 
     types::global_dof_index block_start = 0;
     for (unsigned int b = 0; b < vec.n_blocks(); ++b)
       {
-        import_vector_with_ghost_elements(
+        output.block(b) = import_vector_with_ghost_elements(
           vec.block(b),
           locally_owned_elements.get_view(block_start,
                                           block_start + vec.block(b).size()),
           needed_elements.get_view(block_start,
                                    block_start + vec.block(b).size()),
-          output.block(b),
           std::integral_constant<bool, false>());
         block_start += vec.block(b).size();
       }
 
     output.collect_sizes();
+    return output;
   }
 } // namespace internal
 
@@ -2616,12 +2615,10 @@ AffineConstraints<number>::distribute(VectorType &vec) const
             if (!vec_owned_elements.is_element(entry.first))
               needed_elements.add_index(entry.first);
 
-      VectorType ghosted_vector;
-      internal::import_vector_with_ghost_elements(
+      auto ghosted_vector = internal::import_vector_with_ghost_elements(
         vec,
         vec_owned_elements,
         needed_elements,
-        ghosted_vector,
         std::integral_constant<bool, IsBlockVector<VectorType>::value>());
 
       for (const ConstraintLine &line : lines)
