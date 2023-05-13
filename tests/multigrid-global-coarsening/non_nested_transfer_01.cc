@@ -124,14 +124,20 @@ test(int fe_degree, const Function<dim, Number> &function)
       deallog.pop();
     }
 
-  if (false)
+  if (fe_degree > 0)
     {
-      deallog.push("DG<2>(" + str_fine + ")<->DG<2>(" + str_coarse + ")");
+      deallog.push("DG<2>(" + str_fine + ")<->CG<2>(" + str_coarse + ")");
       do_test<dim, double>(FE_DGQ<dim>(fe_degree),
-                           FE_DGQ<dim>(fe_degree),
+                           FE_Q<dim>(fe_degree),
                            function);
       deallog.pop();
     }
+
+  deallog.push("DG<2>(" + str_fine + ")<->DG<2>(" + str_coarse + ")");
+  do_test<dim, double>(FE_DGQ<dim>(fe_degree),
+                       FE_DGQ<dim>(fe_degree),
+                       function);
+  deallog.pop();
 }
 
 int
