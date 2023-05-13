@@ -431,22 +431,19 @@ namespace VectorTools
 
 
 
-    template <int dim, int spacedim, class InVector, class OutVector>
-    DEAL_II_CXX20_REQUIRES(
-      concepts::is_dealii_vector_type<InVector>
-        &&concepts::is_writable_dealii_vector_type<OutVector>)
+    template <int dim, int spacedim, typename Number, class OutVector>
+    DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
     static void do_integrate_difference(
-      const dealii::hp::MappingCollection<dim, spacedim> &     mapping,
-      const DoFHandler<dim, spacedim> &                        dof,
-      const InVector &                                         fe_function,
-      const Function<spacedim, typename InVector::value_type> &exact_solution,
-      OutVector &                                              difference,
-      const dealii::hp::QCollection<dim> &                     q,
-      const NormType &                                         norm,
-      const Function<spacedim> *                               weight,
-      const double                                             exponent_1)
+      const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+      const DoFHandler<dim, spacedim> &                   dof,
+      const ReadVector<Number> &                          fe_function,
+      const Function<spacedim, Number> &                  exact_solution,
+      OutVector &                                         difference,
+      const dealii::hp::QCollection<dim> &                q,
+      const NormType &                                    norm,
+      const Function<spacedim> *                          weight,
+      const double                                        exponent_1)
     {
-      using Number = typename InVector::value_type;
       // we mark the "exponent" parameter to this function "const" since it is
       // strictly incoming, but we need to set it to something different later
       // on, if necessary, so have a read-write version of it:
@@ -553,19 +550,17 @@ namespace VectorTools
 
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
-                           concepts::is_writable_dealii_vector_type<OutVector>)
-  void integrate_difference(
-    const Mapping<dim, spacedim> &                           mapping,
-    const DoFHandler<dim, spacedim> &                        dof,
-    const InVector &                                         fe_function,
-    const Function<spacedim, typename InVector::value_type> &exact_solution,
-    OutVector &                                              difference,
-    const Quadrature<dim> &                                  q,
-    const NormType &                                         norm,
-    const Function<spacedim> *                               weight,
-    const double                                             exponent)
+  template <int dim, typename Number, class OutVector, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(const Mapping<dim, spacedim> &    mapping,
+                            const DoFHandler<dim, spacedim> & dof,
+                            const ReadVector<Number> &        fe_function,
+                            const Function<spacedim, Number> &exact_solution,
+                            OutVector &                       difference,
+                            const Quadrature<dim> &           q,
+                            const NormType &                  norm,
+                            const Function<spacedim> *        weight,
+                            const double                      exponent)
   {
     internal::do_integrate_difference(hp::MappingCollection<dim, spacedim>(
                                         mapping),
@@ -580,18 +575,16 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
-                           concepts::is_writable_dealii_vector_type<OutVector>)
-  void integrate_difference(
-    const DoFHandler<dim, spacedim> &                        dof,
-    const InVector &                                         fe_function,
-    const Function<spacedim, typename InVector::value_type> &exact_solution,
-    OutVector &                                              difference,
-    const Quadrature<dim> &                                  q,
-    const NormType &                                         norm,
-    const Function<spacedim> *                               weight,
-    const double                                             exponent)
+  template <int dim, typename Number, class OutVector, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(const DoFHandler<dim, spacedim> & dof,
+                            const ReadVector<Number> &        fe_function,
+                            const Function<spacedim, Number> &exact_solution,
+                            OutVector &                       difference,
+                            const Quadrature<dim> &           q,
+                            const NormType &                  norm,
+                            const Function<spacedim> *        weight,
+                            const double                      exponent)
   {
     internal::do_integrate_difference(
       hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
@@ -606,19 +599,18 @@ namespace VectorTools
   }
 
 
-  template <int dim, class InVector, class OutVector, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
-                           concepts::is_writable_dealii_vector_type<OutVector>)
+  template <int dim, typename Number, class OutVector, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
   void integrate_difference(
-    const dealii::hp::MappingCollection<dim, spacedim> &     mapping,
-    const DoFHandler<dim, spacedim> &                        dof,
-    const InVector &                                         fe_function,
-    const Function<spacedim, typename InVector::value_type> &exact_solution,
-    OutVector &                                              difference,
-    const dealii::hp::QCollection<dim> &                     q,
-    const NormType &                                         norm,
-    const Function<spacedim> *                               weight,
-    const double                                             exponent)
+    const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &                   dof,
+    const ReadVector<Number> &                          fe_function,
+    const Function<spacedim, Number> &                  exact_solution,
+    OutVector &                                         difference,
+    const dealii::hp::QCollection<dim> &                q,
+    const NormType &                                    norm,
+    const Function<spacedim> *                          weight,
+    const double                                        exponent)
   {
     internal::do_integrate_difference(mapping,
                                       dof,
@@ -631,18 +623,16 @@ namespace VectorTools
                                       exponent);
   }
 
-  template <int dim, class InVector, class OutVector, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
-                           concepts::is_writable_dealii_vector_type<OutVector>)
-  void integrate_difference(
-    const DoFHandler<dim, spacedim> &                        dof,
-    const InVector &                                         fe_function,
-    const Function<spacedim, typename InVector::value_type> &exact_solution,
-    OutVector &                                              difference,
-    const dealii::hp::QCollection<dim> &                     q,
-    const NormType &                                         norm,
-    const Function<spacedim> *                               weight,
-    const double                                             exponent)
+  template <int dim, typename Number, class OutVector, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(const DoFHandler<dim, spacedim> &   dof,
+                            const ReadVector<Number> &          fe_function,
+                            const Function<spacedim, Number> &  exact_solution,
+                            OutVector &                         difference,
+                            const dealii::hp::QCollection<dim> &q,
+                            const NormType &                    norm,
+                            const Function<spacedim> *          weight,
+                            const double                        exponent)
   {
     internal::do_integrate_difference(
       hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
