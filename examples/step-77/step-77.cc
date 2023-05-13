@@ -334,6 +334,8 @@ namespace Step77
 
     std::cout << "  Computing residual vector..." << std::flush;
 
+    residual = 0.0;
+
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
