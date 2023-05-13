@@ -243,6 +243,8 @@ namespace Step77
     const Vector<double> &evaluation_point,
     Vector<double> &      residual)
   {
+    residual = 0.0;
+
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
