@@ -652,14 +652,13 @@ namespace internal
    * boundary), or the other side's refinement level is the same as that of
    * this side, then handle the integration of these both cases together.
    */
-  template <typename InputVector, int dim, int spacedim>
+  template <typename Number, int dim, int spacedim>
   void
   integrate_over_regular_face(
-    const std::vector<const InputVector *> &solutions,
-    ParallelData<dim, spacedim, typename InputVector::value_type>
-      &                            parallel_data,
+    const std::vector<const ReadVector<Number> *> &solutions,
+    ParallelData<dim, spacedim, Number> &          parallel_data,
     std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>> &local_face_integrals,
+             std::vector<double>> &                local_face_integrals,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
     dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
@@ -746,14 +745,13 @@ namespace internal
    * over face @p face_no of @p cell, where the respective neighbor is
    * refined, so that the integration is a bit more complex.
    */
-  template <typename InputVector, int dim, int spacedim>
+  template <typename Number, int dim, int spacedim>
   void
   integrate_over_irregular_face(
-    const std::vector<const InputVector *> &solutions,
-    ParallelData<dim, spacedim, typename InputVector::value_type>
-      &                            parallel_data,
+    const std::vector<const ReadVector<Number> *> &solutions,
+    ParallelData<dim, spacedim, Number> &          parallel_data,
     std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>> &local_face_integrals,
+             std::vector<double>> &                local_face_integrals,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
     dealii::hp::FEFaceValues<dim, spacedim> &   fe_face_values,
@@ -861,15 +859,14 @@ namespace internal
    * This function is only needed in two or three dimensions.  The error
    * estimator in one dimension is implemented separately.
    */
-  template <typename InputVector, int dim, int spacedim>
+  template <typename Number, int dim, int spacedim>
   void
   estimate_one_cell(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-    ParallelData<dim, spacedim, typename InputVector::value_type>
-      &                                     parallel_data,
+    ParallelData<dim, spacedim, Number> &          parallel_data,
     std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>> &         local_face_integrals,
-    const std::vector<const InputVector *> &solutions,
+             std::vector<double>> &                local_face_integrals,
+    const std::vector<const ReadVector<Number> *> &solutions,
     const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
     const unsigned int n_solution_vectors = solutions.size();
@@ -1001,16 +998,15 @@ namespace internal
 // the following function is still independent of dimension, but it
 // calls dimension dependent functions
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const Mapping<dim, spacedim> &   mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
   const Quadrature<dim - 1> &      quadrature,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
     &                       neumann_bc,
-  const InputVector &       solution,
+  const ReadVector<Number> &solution,
   Vector<float> &           error,
   const ComponentMask &     component_mask,
   const Function<spacedim> *coefficients,
@@ -1020,8 +1016,8 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const Strategy            strategy)
 {
   // just pass on to the other function
-  const std::vector<const InputVector *> solutions(1, &solution);
-  std::vector<Vector<float> *>           errors(1, &error);
+  const std::vector<const ReadVector<Number> *> solutions(1, &solution);
+  std::vector<Vector<float> *>                  errors(1, &error);
   estimate(mapping,
            dof_handler,
            quadrature,
@@ -1038,15 +1034,14 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const DoFHandler<dim, spacedim> &dof_handler,
   const Quadrature<dim - 1> &      quadrature,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
     &                       neumann_bc,
-  const InputVector &       solution,
+  const ReadVector<Number> &solution,
   Vector<float> &           error,
   const ComponentMask &     component_mask,
   const Function<spacedim> *coefficients,
@@ -1071,16 +1066,15 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const Mapping<dim, spacedim> &   mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
   const hp::QCollection<dim - 1> & quadrature,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
     &                       neumann_bc,
-  const InputVector &       solution,
+  const ReadVector<Number> &solution,
   Vector<float> &           error,
   const ComponentMask &     component_mask,
   const Function<spacedim> *coefficients,
@@ -1090,8 +1084,8 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   const Strategy            strategy)
 {
   // just pass on to the other function
-  const std::vector<const InputVector *> solutions(1, &solution);
-  std::vector<Vector<float> *>           errors(1, &error);
+  const std::vector<const ReadVector<Number> *> solutions(1, &solution);
+  std::vector<Vector<float> *>                  errors(1, &error);
   estimate(mapping,
            dof_handler,
            quadrature,
@@ -1108,15 +1102,14 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const DoFHandler<dim, spacedim> &dof_handler,
   const hp::QCollection<dim - 1> & quadrature,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
     &                       neumann_bc,
-  const InputVector &       solution,
+  const ReadVector<Number> &solution,
   Vector<float> &           error,
   const ComponentMask &     component_mask,
   const Function<spacedim> *coefficients,
@@ -1142,19 +1135,18 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const Mapping<dim, spacedim> &   mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
   const hp::QCollection<dim - 1> & face_quadratures,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
-    &                                     neumann_bc,
-  const std::vector<const InputVector *> &solutions,
-  std::vector<Vector<float> *> &          errors,
-  const ComponentMask &                   component_mask,
-  const Function<spacedim> *              coefficients,
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+    &                                            neumann_bc,
+  const std::vector<const ReadVector<Number> *> &solutions,
+  std::vector<Vector<float> *> &                 errors,
+  const ComponentMask &                          component_mask,
+  const Function<spacedim> *                     coefficients,
   const unsigned int,
   const types::subdomain_id subdomain_id_,
   const types::material_id  material_id,
@@ -1222,17 +1214,17 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   // all the data needed in the error estimator by each of the threads is
   // gathered in the following structures
   const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
-  const internal::ParallelData<dim, spacedim, typename InputVector::value_type>
-    parallel_data(dof_handler.get_fe_collection(),
-                  face_quadratures,
-                  mapping_collection,
-                  (!neumann_bc.empty() || (coefficients != nullptr)),
-                  solutions.size(),
-                  subdomain_id,
-                  material_id,
-                  &neumann_bc,
-                  component_mask,
-                  coefficients);
+  const internal::ParallelData<dim, spacedim, Number> parallel_data(
+    dof_handler.get_fe_collection(),
+    face_quadratures,
+    mapping_collection,
+    (!neumann_bc.empty() || (coefficients != nullptr)),
+    solutions.size(),
+    subdomain_id,
+    material_id,
+    &neumann_bc,
+    component_mask,
+    coefficients);
   std::map<typename DoFHandler<dim, spacedim>::face_iterator,
            std::vector<double>>
     sample_local_face_integrals;
@@ -1244,10 +1236,9 @@ KellyErrorEstimator<dim, spacedim>::estimate(
       dof_handler.end()),
     [&solutions, strategy](
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-      internal::ParallelData<dim, spacedim, typename InputVector::value_type>
-        &                            parallel_data,
+      internal::ParallelData<dim, spacedim, Number> &parallel_data,
       std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-               std::vector<double>> &local_face_integrals) {
+               std::vector<double>> &                local_face_integrals) {
       internal::estimate_one_cell(
         cell, parallel_data, local_face_integrals, solutions, strategy);
     },
@@ -1311,23 +1302,22 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const Mapping<dim, spacedim> &   mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
   const Quadrature<dim - 1> &      quadrature,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
-    &                                     neumann_bc,
-  const std::vector<const InputVector *> &solutions,
-  std::vector<Vector<float> *> &          errors,
-  const ComponentMask &                   component_mask,
-  const Function<spacedim> *              coefficients,
-  const unsigned int                      n_threads,
-  const types::subdomain_id               subdomain_id,
-  const types::material_id                material_id,
-  const Strategy                          strategy)
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+    &                                            neumann_bc,
+  const std::vector<const ReadVector<Number> *> &solutions,
+  std::vector<Vector<float> *> &                 errors,
+  const ComponentMask &                          component_mask,
+  const Function<spacedim> *                     coefficients,
+  const unsigned int                             n_threads,
+  const types::subdomain_id                      subdomain_id,
+  const types::material_id                       material_id,
+  const Strategy                                 strategy)
 {
   // forward to the function with the QCollection
   estimate(mapping,
@@ -1346,22 +1336,21 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const DoFHandler<dim, spacedim> &dof_handler,
   const Quadrature<dim - 1> &      quadrature,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
-    &                                     neumann_bc,
-  const std::vector<const InputVector *> &solutions,
-  std::vector<Vector<float> *> &          errors,
-  const ComponentMask &                   component_mask,
-  const Function<spacedim> *              coefficients,
-  const unsigned int                      n_threads,
-  const types::subdomain_id               subdomain_id,
-  const types::material_id                material_id,
-  const Strategy                          strategy)
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+    &                                            neumann_bc,
+  const std::vector<const ReadVector<Number> *> &solutions,
+  std::vector<Vector<float> *> &                 errors,
+  const ComponentMask &                          component_mask,
+  const Function<spacedim> *                     coefficients,
+  const unsigned int                             n_threads,
+  const types::subdomain_id                      subdomain_id,
+  const types::material_id                       material_id,
+  const Strategy                                 strategy)
 {
   estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
@@ -1380,22 +1369,21 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 
 
 template <int dim, int spacedim>
-template <typename InputVector>
+template <typename Number>
 void
 KellyErrorEstimator<dim, spacedim>::estimate(
   const DoFHandler<dim, spacedim> &dof_handler,
   const hp::QCollection<dim - 1> & quadrature,
-  const std::map<types::boundary_id,
-                 const Function<spacedim, typename InputVector::value_type> *>
-    &                                     neumann_bc,
-  const std::vector<const InputVector *> &solutions,
-  std::vector<Vector<float> *> &          errors,
-  const ComponentMask &                   component_mask,
-  const Function<spacedim> *              coefficients,
-  const unsigned int                      n_threads,
-  const types::subdomain_id               subdomain_id,
-  const types::material_id                material_id,
-  const Strategy                          strategy)
+  const std::map<types::boundary_id, const Function<spacedim, Number> *>
+    &                                            neumann_bc,
+  const std::vector<const ReadVector<Number> *> &solutions,
+  std::vector<Vector<float> *> &                 errors,
+  const ComponentMask &                          component_mask,
+  const Function<spacedim> *                     coefficients,
+  const unsigned int                             n_threads,
+  const types::subdomain_id                      subdomain_id,
+  const types::material_id                       material_id,
+  const Strategy                                 strategy)
 {
   estimate(get_default_linear_mapping(dof_handler.get_triangulation()),
            dof_handler,
