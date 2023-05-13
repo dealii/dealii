@@ -1540,25 +1540,21 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_values(
-    const InputVector &fe_function,
-    std::vector<solution_value_type<typename InputVector::value_type>> &values)
-    const
+    const ReadVector<Number> &                fe_function,
+    std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
-    AssertDimension(fe_function.size(),
-                    fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell and call internal worker
     // function
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_values<dim, spacedim>(
@@ -1813,24 +1809,20 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_values(
-    const InputVector &fe_function,
-    std::vector<solution_value_type<typename InputVector::value_type>> &values)
-    const
+    const ReadVector<Number> &                fe_function,
+    std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
-    AssertDimension(fe_function.size(),
-                    fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_values<dim, spacedim>(
@@ -2258,24 +2250,20 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   SymmetricTensor<2, dim, spacedim>::get_function_values(
-    const InputVector &fe_function,
-    std::vector<solution_value_type<typename InputVector::value_type>> &values)
-    const
+    const ReadVector<Number> &                fe_function,
+    std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
-    AssertDimension(fe_function.size(),
-                    fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_values<dim, spacedim>(
@@ -2368,24 +2356,20 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Tensor<2, dim, spacedim>::get_function_values(
-    const InputVector &fe_function,
-    std::vector<solution_value_type<typename InputVector::value_type>> &values)
-    const
+    const ReadVector<Number> &                fe_function,
+    std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
-    AssertDimension(fe_function.size(),
-                    fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_values<dim, spacedim>(
@@ -2645,11 +2629,11 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::n_dofs_for_dof_handler()
 
 
 template <int dim, int spacedim>
-template <typename VectorType>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
-  const VectorType &                       in,
-  Vector<typename VectorType::value_type> &out) const
+  const ReadVector<Number> &in,
+  Vector<Number> &          out) const
 {
   Assert(is_initialized(), ExcNotReinited());
   Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
@@ -3265,13 +3249,12 @@ namespace internal
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                            fe_function,
-  std::vector<typename InputVector::value_type> &values) const
+  const ReadVector<Number> &fe_function,
+  std::vector<Number> &     values) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   AssertDimension(fe->n_components(), 1);
@@ -3290,24 +3273,22 @@ FEValuesBase<dim, spacedim>::get_function_values(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                             fe_function,
+  const ReadVector<Number> &                      fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<typename InputVector::value_type> & values) const
+  std::vector<Number> &                           values) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
   AssertDimension(fe->n_components(), 1);
   AssertDimension(indices.size(), dofs_per_cell);
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
-  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
-  internal::do_function_values(make_array_view(dof_values.begin(),
-                                               dof_values.end()),
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
+  internal::do_function_values(view,
                                this->finite_element_output.shape_values,
                                values);
 }
@@ -3315,13 +3296,12 @@ FEValuesBase<dim, spacedim>::get_function_values(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                                    fe_function,
-  std::vector<Vector<typename InputVector::value_type>> &values) const
+  const ReadVector<Number> &   fe_function,
+  std::vector<Vector<Number>> &values) const
 {
-  using Number = typename InputVector::value_type;
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
   Assert(this->update_flags & update_values,
@@ -3342,14 +3322,13 @@ FEValuesBase<dim, spacedim>::get_function_values(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                                    fe_function,
-  const ArrayView<const types::global_dof_index> &       indices,
-  std::vector<Vector<typename InputVector::value_type>> &values) const
+  const ReadVector<Number> &                      fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  std::vector<Vector<Number>> &                   values) const
 {
-  using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
@@ -3358,10 +3337,10 @@ FEValuesBase<dim, spacedim>::get_function_values(
          ExcAccessToUninitializedField("update_values"));
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
-  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_values(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_values,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -3373,15 +3352,14 @@ FEValuesBase<dim, spacedim>::get_function_values(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                                      fe_function,
-  const ArrayView<const types::global_dof_index> &         indices,
-  ArrayView<std::vector<typename InputVector::value_type>> values,
+  const ReadVector<Number> &                      fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  ArrayView<std::vector<Number>>                  values,
   const bool quadrature_points_fastest) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
 
@@ -3390,11 +3368,11 @@ FEValuesBase<dim, spacedim>::get_function_values(
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
 
-  boost::container::small_vector<Number, 200> dof_values(indices.size());
-  for (unsigned int i = 0; i < indices.size(); ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_values(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_values,
     *fe,
     this->finite_element_output.shape_function_to_row_table,

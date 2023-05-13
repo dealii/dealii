@@ -88,6 +88,65 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
                                       deal_II_space_dimension>> &);
 #  endif
   }
+for (S : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#  if deal_II_dimension <= deal_II_space_dimension
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(const dealii::ReadVector<S> &,
+                             std::vector<ProductType<S, value_type>::type> &)
+        const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<1, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void FEValuesViews::SymmetricTensor<2,
+                                                 deal_II_dimension,
+                                                 deal_II_space_dimension>::
+      get_function_values<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<ProductType<
+          S,
+          dealii::SymmetricTensor<2, deal_II_space_dimension>>::type> &) const;
+
+    template void
+    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<2, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(const ReadVector<S> &, std::vector<S> &) const;
+
+    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(const ReadVector<S> &,
+                             const ArrayView<const types::global_dof_index> &,
+                             std::vector<S> &) const;
+
+    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(const ReadVector<S> &, std::vector<Vector<S>> &)
+        const;
+
+    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(const ReadVector<S> &,
+                             const ArrayView<const types::global_dof_index> &,
+                             std::vector<Vector<S>> &) const;
+
+    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(const ReadVector<S> &,
+                             const ArrayView<const types::global_dof_index> &,
+                             ArrayView<std::vector<S>>,
+                             bool) const;
+#  endif
+  }
 
 
 
@@ -95,12 +154,6 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #  if deal_II_dimension <= deal_II_space_dimension
-    template void
-    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<dealii::VEC>(
-        const dealii::VEC &,
-        std::vector<ProductType<dealii::VEC::value_type, value_type>::type> &)
-        const;
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients<dealii::VEC>(
@@ -132,14 +185,6 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                       dealii::Tensor<3, deal_II_space_dimension>>::type> &)
         const;
 
-    template void
-    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<dealii::VEC>(
-        const dealii::VEC &,
-        std::vector<
-          ProductType<dealii::VEC::value_type,
-                      dealii::Tensor<1, deal_II_space_dimension>>::type> &)
-        const;
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients<dealii::VEC>(
@@ -192,14 +237,6 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                       dealii::Tensor<4, deal_II_space_dimension>>::type> &)
         const;
 
-    template void FEValuesViews::SymmetricTensor<2,
-                                                 deal_II_dimension,
-                                                 deal_II_space_dimension>::
-      get_function_values<dealii::VEC>(
-        const dealii::VEC &,
-        std::vector<ProductType<
-          dealii::VEC::value_type,
-          dealii::SymmetricTensor<2, deal_II_space_dimension>>::type> &) const;
     template void FEValuesViews::
       SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
         get_function_divergences<dealii::VEC>(
@@ -209,14 +246,6 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
                         dealii::Tensor<1, deal_II_space_dimension>>::type> &)
           const;
 
-    template void
-    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<dealii::VEC>(
-        const dealii::VEC &,
-        std::vector<
-          ProductType<dealii::VEC::value_type,
-                      dealii::Tensor<2, deal_II_space_dimension>>::type> &)
-        const;
     template void
     FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
       get_function_divergences<dealii::VEC>(
@@ -357,29 +386,6 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #  if deal_II_dimension <= deal_II_space_dimension
-
-    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<VEC>(const VEC &, std::vector<VEC::value_type> &)
-        const;
-    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<VEC>(const VEC &,
-                               const ArrayView<const types::global_dof_index> &,
-                               std::vector<VEC::value_type> &) const;
-
-    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<VEC>(const VEC &,
-                               std::vector<Vector<VEC::value_type>> &) const;
-
-    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<VEC>(const VEC &,
-                               const ArrayView<const types::global_dof_index> &,
-                               std::vector<Vector<VEC::value_type>> &) const;
-
-    template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      get_function_values<VEC>(const VEC &,
-                               const ArrayView<const types::global_dof_index> &,
-                               ArrayView<std::vector<VEC::value_type>>,
-                               bool) const;
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients<VEC>(

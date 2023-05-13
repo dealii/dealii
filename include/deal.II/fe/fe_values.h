@@ -41,6 +41,8 @@
 
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/read_vector.h>
+
 #include <algorithm>
 #include <memory>
 #include <type_traits>
@@ -419,12 +421,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -1108,12 +1108,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -1682,12 +1680,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -2058,12 +2054,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -2717,19 +2711,12 @@ public:
    * @post <code>values[q]</code> will contain the value of the field
    * described by fe_function at the $q$th quadrature point.
    *
-   * @note The actual data type of the input vector may be either a
-   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
-   * vector wrapper classes. It represents a global vector of DoF values
-   * associated with the DoFHandler object with which this FEValues object was
-   * last initialized.
-   *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                            fe_function,
-    std::vector<typename InputVector::value_type> &values) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      std::vector<Number> &     values) const;
 
   /**
    * This function does the same as the other get_function_values(), but
@@ -2744,11 +2731,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                                    fe_function,
-    std::vector<Vector<typename InputVector::value_type>> &values) const;
+  get_function_values(const ReadVector<Number> &   fe_function,
+                      std::vector<Vector<Number>> &values) const;
 
   /**
    * Generate function values from an arbitrary vector. This function
@@ -2806,12 +2792,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                             fe_function,
-    const ArrayView<const types::global_dof_index> &indices,
-    std::vector<typename InputVector::value_type> & values) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      const ArrayView<const types::global_dof_index> &indices,
+                      std::vector<Number> &values) const;
 
   /**
    * Generate vector function values from an arbitrary vector.
@@ -2821,12 +2806,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                                    fe_function,
-    const ArrayView<const types::global_dof_index> &       indices,
-    std::vector<Vector<typename InputVector::value_type>> &values) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      const ArrayView<const types::global_dof_index> &indices,
+                      std::vector<Vector<Number>> &values) const;
 
 
   /**
@@ -2850,13 +2834,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                                      fe_function,
-    const ArrayView<const types::global_dof_index> &         indices,
-    ArrayView<std::vector<typename InputVector::value_type>> values,
-    const bool quadrature_points_fastest) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      const ArrayView<const types::global_dof_index> &indices,
+                      ArrayView<std::vector<Number>>                  values,
+                      const bool quadrature_points_fastest) const;
 
   /** @} */
   /// @name Access to derivatives of global finite element fields
@@ -3882,11 +3865,10 @@ protected:
      * Call @p get_interpolated_dof_values of the iterator with the
      * given arguments.
      */
-    template <typename VectorType>
+    template <typename Number>
     void
-    get_interpolated_dof_values(
-      const VectorType &                       in,
-      Vector<typename VectorType::value_type> &out) const;
+    get_interpolated_dof_values(const ReadVector<Number> &in,
+                                Vector<Number> &          out) const;
 
     /**
      * Call @p get_interpolated_dof_values of the iterator with the
