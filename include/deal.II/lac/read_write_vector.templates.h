@@ -739,13 +739,13 @@ namespace LinearAlgebra
                       "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
       }
 
-    Epetra_Import import(epetra_comm_pattern->get_epetra_import());
+    Epetra_Import import_map(epetra_comm_pattern->get_epetra_import());
 
-    Epetra_FEVector target_vector(import.TargetMap());
+    Epetra_FEVector target_vector(import_map.TargetMap());
 
     if (operation == VectorOperation::insert)
       {
-        const int err = target_vector.Import(multivector, import, Insert);
+        const int err = target_vector.Import(multivector, import_map, Insert);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
@@ -760,7 +760,7 @@ namespace LinearAlgebra
       }
     else if (operation == VectorOperation::add)
       {
-        const int err = target_vector.Import(multivector, import, Add);
+        const int err = target_vector.Import(multivector, import_map, Add);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
@@ -775,7 +775,7 @@ namespace LinearAlgebra
       }
     else if (operation == VectorOperation::min)
       {
-        const int err = target_vector.Import(multivector, import, Add);
+        const int err = target_vector.Import(multivector, import_map, Add);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
@@ -805,7 +805,7 @@ namespace LinearAlgebra
       }
     else if (operation == VectorOperation::max)
       {
-        const int err = target_vector.Import(multivector, import, Add);
+        const int err = target_vector.Import(multivector, import_map, Add);
         AssertThrow(err == 0,
                     ExcMessage("Epetra Import() failed with error code: " +
                                std::to_string(err)));
