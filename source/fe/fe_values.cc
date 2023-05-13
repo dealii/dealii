@@ -1591,12 +1591,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_gradients(
-    const InputVector &fe_function,
-    std::vector<solution_gradient_type<typename InputVector::value_type>>
-      &gradients) const
+    const ReadVector<Number> &                   fe_function,
+    std::vector<solution_gradient_type<Number>> &gradients) const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -1607,8 +1606,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_derivatives<1, dim, spacedim>(
@@ -1621,7 +1619,7 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename InputVector>
   void
   Scalar<dim, spacedim>::get_function_gradients_from_local_dof_values(
     const InputVector &dof_values,
@@ -1859,12 +1857,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_gradients(
-    const InputVector &fe_function,
-    std::vector<solution_gradient_type<typename InputVector::value_type>>
-      &gradients) const
+    const ReadVector<Number> &                   fe_function,
+    std::vector<solution_gradient_type<Number>> &gradients) const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -1875,8 +1872,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_derivatives<1, dim, spacedim>(
@@ -1889,7 +1885,7 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename InputVector>
   void
   Vector<dim, spacedim>::get_function_gradients_from_local_dof_values(
     const InputVector &dof_values,
@@ -2461,12 +2457,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Tensor<2, dim, spacedim>::get_function_gradients(
-    const InputVector &fe_function,
-    std::vector<solution_gradient_type<typename InputVector::value_type>>
-      &gradients) const
+    const ReadVector<Number> &                   fe_function,
+    std::vector<solution_gradient_type<Number>> &gradients) const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -2478,8 +2473,7 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_gradients<dim, spacedim>(
@@ -3384,14 +3378,12 @@ FEValuesBase<dim, spacedim>::get_function_values(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const InputVector &fe_function,
-  std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
-  const
+  const ReadVector<Number> &                fe_function,
+  std::vector<Tensor<1, spacedim, Number>> &gradients) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension(fe->n_components(), 1);
@@ -3410,25 +3402,22 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const InputVector &                             fe_function,
+  const ReadVector<Number> &                      fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
-  const
+  std::vector<Tensor<1, spacedim, Number>> &      gradients) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension(fe->n_components(), 1);
   AssertDimension(indices.size(), dofs_per_cell);
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
-  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
-  internal::do_function_derivatives(make_array_view(dof_values.begin(),
-                                                    dof_values.end()),
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
+  internal::do_function_derivatives(view,
                                     this->finite_element_output.shape_gradients,
                                     gradients);
 }
@@ -3436,15 +3425,12 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const InputVector &fe_function,
-  std::vector<
-    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-    &gradients) const
+  const ReadVector<Number> &                             fe_function,
+  std::vector<std::vector<Tensor<1, spacedim, Number>>> &gradients) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -3464,16 +3450,14 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const InputVector &                             fe_function,
-  const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-             gradients,
+  const ReadVector<Number> &                          fe_function,
+  const ArrayView<const types::global_dof_index> &    indices,
+  ArrayView<std::vector<Tensor<1, spacedim, Number>>> gradients,
   const bool quadrature_points_fastest) const
 {
-  using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
@@ -3481,9 +3465,9 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
 
-  boost::container::small_vector<Number, 200> dof_values(indices.size());
-  for (unsigned int i = 0; i < indices.size(); ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_derivatives(
     make_array_view(dof_values.begin(), dof_values.end()),
     this->finite_element_output.shape_gradients,

@@ -484,12 +484,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
+      const ReadVector<Number> &                   fe_function,
+      std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
      * This function relates to get_function_gradients() in the same way
@@ -1171,12 +1170,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
+      const ReadVector<Number> &                   fe_function,
+      std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
      * This function relates to get_function_gradients() in the same way
@@ -2157,12 +2155,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
+      const ReadVector<Number> &                   fe_function,
+      std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
      * This function relates to get_function_gradients() in the same way
@@ -2887,12 +2884,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &fe_function,
-    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-      &gradients) const;
+    const ReadVector<Number> &                fe_function,
+    std::vector<Tensor<1, spacedim, Number>> &gradients) const;
 
   /**
    * This function does the same as the other get_function_gradients(), but
@@ -2910,13 +2906,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &fe_function,
-    std::vector<
-      std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-      &gradients) const;
+    const ReadVector<Number> &                             fe_function,
+    std::vector<std::vector<Tensor<1, spacedim, Number>>> &gradients) const;
 
   /**
    * This function relates to the first of the get_function_gradients() function
@@ -2926,13 +2920,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &                             fe_function,
+    const ReadVector<Number> &                      fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-      &gradients) const;
+    std::vector<Tensor<1, spacedim, Number>> &      gradients) const;
 
   /**
    * This function relates to the first of the get_function_gradients() function
@@ -2942,14 +2935,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &                             fe_function,
-    const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<
-      std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-               gradients,
+    const ReadVector<Number> &                          fe_function,
+    const ArrayView<const types::global_dof_index> &    indices,
+    ArrayView<std::vector<Tensor<1, spacedim, Number>>> gradients,
     const bool quadrature_points_fastest = false) const;
 
   /** @} */
