@@ -1220,8 +1220,8 @@ private:
 // ----------------------- template and inline function ----------------------
 
 
-template <int n_components, int dim, int spacedim, typename Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
+template <int n_components_, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   const Mapping<dim> &      mapping,
   const FiniteElement<dim> &fe,
   const UpdateFlags         update_flags,
@@ -1245,8 +1245,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
+template <int n_components_, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
   const FiniteElement<dim> &                       fe,
   const unsigned int                               first_selected_component)
@@ -1340,17 +1340,17 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::~FEPointEvaluation()
+template <int n_components_, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components_, dim, spacedim, Number>::~FEPointEvaluation()
 {
   connection_is_reinitialized.disconnect();
 }
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::setup(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::setup(
   const unsigned int first_selected_component)
 {
   AssertIndexRange(first_selected_component + n_components,
@@ -1420,9 +1420,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::setup(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points)
 {
@@ -1447,9 +1447,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::reinit()
+FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit()
 {
   current_cell_index  = numbers::invalid_unsigned_int;
   current_face_number = numbers::invalid_unsigned_int;
@@ -1459,9 +1459,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit()
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   const unsigned int cell_index)
 {
   current_cell_index  = cell_index;
@@ -1472,9 +1472,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   const unsigned int cell_index,
   const unsigned int face_number)
 {
@@ -1486,9 +1486,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
+FEPointEvaluation<n_components_, dim, spacedim, Number>::do_reinit()
 {
   const_cast<unsigned int &>(n_q_points_scalar) =
     mapping_info->get_n_q_points_unvectorized(current_cell_index,
@@ -1550,9 +1550,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::do_reinit()
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_fast(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_fast(
   const ArrayView<const ScalarNumber> &   solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flags)
 {
@@ -1620,9 +1620,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_fast(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_slow(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_slow(
   const ArrayView<const ScalarNumber> &   solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flags)
 {
@@ -1702,9 +1702,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate_slow(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const ArrayView<const ScalarNumber> &   solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flags)
 {
@@ -1729,9 +1729,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_fast(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
   const ArrayView<ScalarNumber> &         solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
@@ -1831,9 +1831,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_fast(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_slow(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
   const ArrayView<ScalarNumber> &         solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
@@ -1902,9 +1902,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate_slow(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 void
-FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
   const ArrayView<ScalarNumber> &         solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
@@ -1936,10 +1936,10 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
-inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
+template <int n_components_, int dim, int spacedim, typename Number>
+inline const typename FEPointEvaluation<n_components_, dim, spacedim, Number>::
   value_type &
-  FEPointEvaluation<n_components, dim, spacedim, Number>::get_value(
+  FEPointEvaluation<n_components_, dim, spacedim, Number>::get_value(
     const unsigned int point_index) const
 {
   AssertIndexRange(point_index, values.size());
@@ -1948,10 +1948,10 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
-inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
+template <int n_components_, int dim, int spacedim, typename Number>
+inline const typename FEPointEvaluation<n_components_, dim, spacedim, Number>::
   gradient_type &
-  FEPointEvaluation<n_components, dim, spacedim, Number>::get_gradient(
+  FEPointEvaluation<n_components_, dim, spacedim, Number>::get_gradient(
     const unsigned int point_index) const
 {
   AssertIndexRange(point_index, gradients.size());
@@ -1960,10 +1960,10 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
-inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
+template <int n_components_, int dim, int spacedim, typename Number>
+inline const typename FEPointEvaluation<n_components_, dim, spacedim, Number>::
   gradient_type &
-  FEPointEvaluation<n_components, dim, spacedim, Number>::get_unit_gradient(
+  FEPointEvaluation<n_components_, dim, spacedim, Number>::get_unit_gradient(
     const unsigned int point_index) const
 {
   Assert(fast_path,
@@ -1976,9 +1976,9 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim, Number>::submit_value(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::submit_value(
   const value_type & value,
   const unsigned int point_index)
 {
@@ -1988,9 +1988,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::submit_value(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components, dim, spacedim, Number>::submit_gradient(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::submit_gradient(
   const gradient_type &gradient,
   const unsigned int   point_index)
 {
@@ -2000,9 +2000,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::submit_gradient(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline DerivativeForm<1, dim, spacedim, Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::jacobian(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::jacobian(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, n_q_points);
@@ -2015,9 +2015,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::jacobian(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline DerivativeForm<1, spacedim, dim, Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::inverse_jacobian(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::inverse_jacobian(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, n_q_points);
@@ -2030,9 +2030,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::inverse_jacobian(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline Number
-FEPointEvaluation<n_components, dim, spacedim, Number>::JxW(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::JxW(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, n_q_points);
@@ -2045,9 +2045,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::JxW(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline Tensor<1, spacedim, Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::normal_vector(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::normal_vector(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, n_q_points);
@@ -2060,9 +2060,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::normal_vector(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline Point<spacedim, Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::real_point(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::real_point(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, n_q_points);
@@ -2075,9 +2075,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::real_point(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline Point<dim, Number>
-FEPointEvaluation<n_components, dim, spacedim, Number>::unit_point(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::unit_point(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, n_q_points);
@@ -2091,9 +2091,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::unit_point(
 
 
 
-template <int n_components, int dim, int spacedim, typename Number>
+template <int n_components_, int dim, int spacedim, typename Number>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-FEPointEvaluation<n_components, dim, spacedim, Number>::
+FEPointEvaluation<n_components_, dim, spacedim, Number>::
   quadrature_point_indices() const
 {
   return {0U, n_q_points};
