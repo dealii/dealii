@@ -85,7 +85,7 @@ namespace VectorTools
    * @param[out] difference The vector of values $d_K$ computed as above.
    * @param[in] q The quadrature formula used to approximate the integral
    * shown above. Note that some quadrature formulas are more useful than
-   * other in integrating $u-u_h$. For example, it is known that the $Q_1$
+   * others in integrating $u-u_h$. For example, it is known that the $Q_1$
    * approximation $u_h$ to the exact solution $u$ of a Laplace equation is
    * particularly accurate (in fact, superconvergent, i.e. accurate to higher
    * order) at the 4 Gauss points of a cell in 2d (or 8 points in 3d) that
