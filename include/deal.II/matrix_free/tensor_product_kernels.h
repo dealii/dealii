@@ -482,7 +482,7 @@ namespace internal
     AssertIndexRange(face_direction, dim);
     constexpr int in_stride  = Utilities::pow(n_rows, face_direction);
     constexpr int out_stride = Utilities::pow(n_rows, dim - 1);
-    const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
+    const Number2 *DEAL_II_RESTRICT shape_values = this->shape_values;
 
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
@@ -2815,7 +2815,7 @@ namespace internal
                                                           n_rows)));
     constexpr int out_stride = n_blocks1 * n_blocks2;
 
-    const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
+    const Number2 *DEAL_II_RESTRICT shape_values = this->shape_values;
 
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
