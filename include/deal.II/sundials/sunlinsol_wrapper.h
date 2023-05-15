@@ -171,7 +171,7 @@ namespace SUNDIALS
   };
 
   /**
-   * Type of function objects to interface with SUNDIALS linear solvers
+   * Type of function objects to interface with SUNDIALS' linear solvers
    *
    * This function type encapsulates the action of solving $P^{-1}Ax=P^{-1}b$.
    * The LinearOperator @p op encapsulates the matrix vector product $Ax$ and
@@ -188,20 +188,21 @@ namespace SUNDIALS
    * @param[in] b The right-hand side
    * @param[in] tol Tolerance for the iterative solver
    *
-   * This function should return:
-   * - 0: Success
-   * - >0: Recoverable error, ARKode will reattempt the solution and call this
-   *       function again.
-   * - <0: Unrecoverable error, the computation will be aborted and an
-   *       assertion will be thrown.
+   *
+   * @note This variable represents a
+   * @ref GlossUserProvidedCallBack "user provided callback".
+   * See there for a description of how to deal with errors and other
+   * requirements and conventions. In particular, ARKode can deal
+   * with "recoverable" errors in some circumstances, so callbacks
+   * can throw exceptions of type RecoverableUserCallbackError.
    */
   template <typename VectorType>
   using LinearSolveFunction =
-    std::function<int(SundialsOperator<VectorType> &      op,
-                      SundialsPreconditioner<VectorType> &prec,
-                      VectorType &                        x,
-                      const VectorType &                  b,
-                      double                              tol)>;
+    std::function<void(SundialsOperator<VectorType> &      op,
+                       SundialsPreconditioner<VectorType> &prec,
+                       VectorType &                        x,
+                       const VectorType &                  b,
+                       double                              tol)>;
 
   namespace internal
   {

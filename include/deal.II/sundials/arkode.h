@@ -51,6 +51,7 @@
 #  include <sundials/sundials_math.h>
 #  include <sundials/sundials_types.h>
 
+#  include <exception>
 #  include <memory>
 
 
@@ -579,15 +580,15 @@ namespace SUNDIALS
      * provided. According to which one is provided, explicit, implicit, or
      * mixed RK methods are used.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<
-      int(const double t, const VectorType &y, VectorType &explicit_f)>
+      void(const double t, const VectorType &y, VectorType &explicit_f)>
       explicit_function;
 
     /**
@@ -599,14 +600,14 @@ namespace SUNDIALS
      * provided. According to which one is provided, explicit, implicit, or
      * mixed RK methods are used.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(const double t, const VectorType &y, VectorType &res)>
+    std::function<void(const double t, const VectorType &y, VectorType &res)>
       implicit_function;
 
     /**
@@ -619,14 +620,14 @@ namespace SUNDIALS
      * A call to this function should store in `Mv` the result of $M$
      * applied to `v`.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(double t, const VectorType &v, VectorType &Mv)>
+    std::function<void(const double t, const VectorType &v, VectorType &Mv)>
       mass_times_vector;
 
     /**
@@ -656,14 +657,14 @@ namespace SUNDIALS
      *
      * @param t The current evaluation time
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(const double t)> mass_times_setup;
+    std::function<void(const double t)> mass_times_setup;
 
     /**
      * A function object that users may supply and that is intended to compute
@@ -684,18 +685,18 @@ namespace SUNDIALS
      * @param[in] fy  The current value of the implicit right-hand side at y,
      *   $f_I (t_n, y)$.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(const VectorType &v,
-                      VectorType &      Jv,
-                      double            t,
-                      const VectorType &y,
-                      const VectorType &fy)>
+    std::function<void(const VectorType &v,
+                       VectorType &      Jv,
+                       const double      t,
+                       const VectorType &y,
+                       const VectorType &fy)>
       jacobian_times_vector;
 
     /**
@@ -725,14 +726,15 @@ namespace SUNDIALS
      * @param fy  The implicit right-hand side function evaluated at the
      *   current time $t$ and state $y$, i.e., $f_I(y,t)$
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(realtype t, const VectorType &y, const VectorType &fy)>
+    std::function<
+      void(const double t, const VectorType &y, const VectorType &fy)>
       jacobian_times_setup;
 
     /**
@@ -753,6 +755,13 @@ namespace SUNDIALS
      * SUNDIALS packaged SPGMR solver with default settings is used.
      *
      * For more details on the function type refer to LinearSolveFunction.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     LinearSolveFunction<VectorType> solve_linearized_system;
 
@@ -770,6 +779,13 @@ namespace SUNDIALS
      * and applied in mass_times_vector().
      *
      * For more details on the function type refer to LinearSolveFunction.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     LinearSolveFunction<VectorType> solve_mass;
 
@@ -797,21 +813,21 @@ namespace SUNDIALS
      *   (lr = 2). Only relevant if used with a SUNDIALS packaged solver. If
      *   used with a custom solve_mass() function this will be set to zero.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(double            t,
-                      const VectorType &y,
-                      const VectorType &fy,
-                      const VectorType &r,
-                      VectorType &      z,
-                      double            gamma,
-                      double            tol,
-                      int               lr)>
+    std::function<void(const double      t,
+                       const VectorType &y,
+                       const VectorType &fy,
+                       const VectorType &r,
+                       VectorType &      z,
+                       const double      gamma,
+                       const double      tol,
+                       const int         lr)>
       jacobian_preconditioner_solve;
 
     /**
@@ -849,19 +865,19 @@ namespace SUNDIALS
      * @param[in] gamma The value $\gamma$ in $M-\gamma J$. The preconditioner
      *   should approximate the inverse of this matrix.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(double            t,
-                      const VectorType &y,
-                      const VectorType &fy,
-                      int               jok,
-                      int &             jcur,
-                      double            gamma)>
+    std::function<void(const double      t,
+                       const VectorType &y,
+                       const VectorType &fy,
+                       const int         jok,
+                       int &             jcur,
+                       const double      gamma)>
       jacobian_preconditioner_setup;
 
     /**
@@ -884,15 +900,18 @@ namespace SUNDIALS
      *   (lr = 2). Only relevant if used with a SUNDIALS packaged solver. If
      *   used with a custom solve_mass() function this will be set to zero.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<
-      int(double t, const VectorType &r, VectorType &z, double tol, int lr)>
+    std::function<void(const double      t,
+                       const VectorType &r,
+                       VectorType &      z,
+                       const double      tol,
+                       const int         lr)>
       mass_preconditioner_solve;
 
     /**
@@ -912,14 +931,14 @@ namespace SUNDIALS
      *
      * @param[in] t  The current time
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error, ARKode will reattempt the solution and call this
-     *       function again.
-     * - <0: Unrecoverable error, the computation will be aborted and an
-     *       assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(double t)> mass_preconditioner_setup;
+    std::function<void(const double t)> mass_preconditioner_setup;
 
     /**
      * A function object that users may supply and that is intended to
@@ -983,7 +1002,7 @@ namespace SUNDIALS
      * @endcode
      *
      * @note This function will be called at the end of all other set up right
-     *   before the actual time evloution is started or continued with
+     *   before the actual time evolution is started or continued with
      *   solve_ode(). This function is also called when the solver is restarted,
      *   see solver_should_restart(). Consult the SUNDIALS manual to see which
      *   options are still available at this point.
@@ -1067,6 +1086,14 @@ namespace SUNDIALS
 
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
+
+  public:
+    /**
+     * A pointer to any exception that may have been thrown in user-defined
+     * call-backs and that we have to deal after the KINSOL function we call
+     * has returned.
+     */
+    mutable std::exception_ptr pending_exception;
 
 #  ifdef DEAL_II_WITH_PETSC
 #    ifdef PETSC_USE_COMPLEX
