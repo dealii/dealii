@@ -29,6 +29,10 @@ for (deal_II_dimension : DIMENSIONS)
   {
     template Quadrature<deal_II_dimension>
     ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const;
+
     template const Quadrature<deal_II_dimension>
       &ReferenceCell::get_nodal_type_quadrature() const;
+
+    template Point<deal_II_dimension> ReferenceCell::closest_point(
+      const Point<deal_II_dimension> &) const;
   }

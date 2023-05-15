@@ -588,7 +588,15 @@ public:
   bool
   contains_point(const Point<dim> &p, const double tolerance = 0) const;
 
-  /*
+  /**
+   * Return the point on the surface of the reference cell closest (in the
+   * Euclidean norm) to @p p.
+   */
+  template <int dim>
+  Point<dim>
+  closest_point(const Point<dim> &p) const;
+
+  /**
    * Return $i$-th unit tangential vector of a face of the reference cell.
    * The vectors are arranged such that the
    * cross product between the two vectors returns the unit normal vector.
