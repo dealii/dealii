@@ -5708,6 +5708,8 @@ namespace internal
                   {
                     unsigned int k = 0;
 
+                    // avoid a compiler warning by fixing the max number of
+                    // loop iterations to 8
                     const unsigned int n_vertices = std::min(hex->n_vertices(), 8u);
                     for (unsigned int i = 0; i < n_vertices; ++i)
                       vertex_indices[k++] = hex->vertex_index(i);
