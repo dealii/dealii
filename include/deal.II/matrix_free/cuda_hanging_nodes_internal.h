@@ -54,7 +54,7 @@ namespace CUDAWrappers
 
     template <unsigned int fe_degree, unsigned int direction>
     DEAL_II_HOST_DEVICE inline bool
-    is_constrained_dof(
+    is_constrained_dof_2d(
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
         &                constraint_mask,
       const unsigned int x_idx,
@@ -78,7 +78,7 @@ namespace CUDAWrappers
 
     template <unsigned int fe_degree, unsigned int direction>
     DEAL_II_HOST_DEVICE inline bool
-    is_constrained_dof(
+    is_constrained_dof_3d(
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
         &                constraint_mask,
       const unsigned int x_idx,
@@ -156,7 +156,7 @@ namespace CUDAWrappers
                unconstrained))) !=
         dealii::internal::MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
-      Number t[n_q_points];
+      Number tmp[n_q_points];
       Kokkos::parallel_for(
         Kokkos::TeamThreadRange(team_member, n_q_points),
         [&](const int &q_point) {
@@ -170,15 +170,15 @@ namespace CUDAWrappers
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y;
 
           const unsigned int interp_idx = (direction == 0) ? x_idx : y_idx;
-          t[q_point]                    = 0;
+          tmp[q_point]                  = 0;
 
           // Flag is true if for the given direction, the dof is constrained
           // with the right type and is on the correct side (left (= 0) or right
           // (= fe_degree))
           const bool constrained_dof =
-            is_constrained_dof<fe_degree, direction>(constraint_mask,
-                                                     x_idx,
-                                                     y_idx);
+            is_constrained_dof_2d<fe_degree, direction>(constraint_mask,
+                                                        x_idx,
+                                                        y_idx);
 
           if (constrained_face && constrained_dof)
             {
@@ -198,7 +198,7 @@ namespace CUDAWrappers
                         transpose ?
                           constraint_weights[i * n_q_points_1d + interp_idx] :
                           constraint_weights[interp_idx * n_q_points_1d + i];
-                      t[q_point] += w * values[real_idx];
+                      tmp[q_point] += w * values[real_idx];
                     }
                 }
               else
@@ -216,25 +216,25 @@ namespace CUDAWrappers
                           constraint_weights[(fe_degree - interp_idx) *
                                                n_q_points_1d +
                                              fe_degree - i];
-                      t[q_point] += w * values[real_idx];
+                      tmp[q_point] += w * values[real_idx];
                     }
                 }
             }
         });
 
-      // The synchronization is done for all the threads in one block with
-      // each block being assigned to one element.
+      // The synchronization is done for all the threads in one team with
+      // each team being assigned to one element.
       team_member.team_barrier();
       Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_q_points),
                            [&](const int &q_point) {
                              const unsigned int x_idx = q_point % n_q_points_1d;
                              const unsigned int y_idx = q_point / n_q_points_1d;
                              const bool         constrained_dof =
-                               is_constrained_dof<fe_degree, direction>(
+                               is_constrained_dof_2d<fe_degree, direction>(
                                  constraint_mask, x_idx, y_idx);
                              if (constrained_face && constrained_dof)
                                values[index2<fe_degree + 1>(x_idx, y_idx)] =
-                                 t[q_point];
+                                 tmp[q_point];
                            });
 
       team_member.team_barrier();
@@ -304,7 +304,7 @@ namespace CUDAWrappers
           dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z;
       const auto constrained_face = constraint_mask & (face1 | face2 | edge);
 
-      Number t[n_q_points];
+      Number tmp[n_q_points];
       Kokkos::parallel_for(
         Kokkos::TeamThreadRange(team_member, n_q_points),
         [&](const int &q_point) {
@@ -316,16 +316,16 @@ namespace CUDAWrappers
                                           (direction == 1) ? y_idx :
                                                              z_idx;
           const bool         constrained_dof =
-            is_constrained_dof<fe_degree, direction>(constraint_mask,
-                                                     x_idx,
-                                                     y_idx,
-                                                     z_idx,
-                                                     face1_type,
-                                                     face2_type,
-                                                     face1,
-                                                     face2,
-                                                     edge);
-          t[q_point] = 0;
+            is_constrained_dof_3d<fe_degree, direction>(constraint_mask,
+                                                        x_idx,
+                                                        y_idx,
+                                                        z_idx,
+                                                        face1_type,
+                                                        face2_type,
+                                                        face1,
+                                                        face2,
+                                                        edge);
+          tmp[q_point] = 0;
           if ((constrained_face != dealii::internal::MatrixFreeFunctions::
                                      ConstraintKinds::unconstrained) &&
               constrained_dof)
@@ -348,7 +348,7 @@ namespace CUDAWrappers
                         transpose ?
                           constraint_weights[i * n_q_points_1d + interp_idx] :
                           constraint_weights[interp_idx * n_q_points_1d + i];
-                      t[q_point] += w * values[real_idx];
+                      tmp[q_point] += w * values[real_idx];
                     }
                 }
               else
@@ -369,14 +369,14 @@ namespace CUDAWrappers
                           constraint_weights[(fe_degree - interp_idx) *
                                                n_q_points_1d +
                                              fe_degree - i];
-                      t[q_point] += w * values[real_idx];
+                      tmp[q_point] += w * values[real_idx];
                     }
                 }
             }
         });
 
-      // The synchronization is done for all the threads in one block with
-      // each block being assigned to one element.
+      // The synchronization is done for all the threads in one team with
+      // each team being assigned to one element.
       team_member.team_barrier();
 
       Kokkos::parallel_for(
@@ -386,19 +386,19 @@ namespace CUDAWrappers
           const unsigned int y_idx = (q_point / n_q_points_1d) % n_q_points_1d;
           const unsigned int z_idx = q_point / (n_q_points_1d * n_q_points_1d);
           const bool         constrained_dof =
-            is_constrained_dof<fe_degree, direction>(constraint_mask,
-                                                     x_idx,
-                                                     y_idx,
-                                                     z_idx,
-                                                     face1_type,
-                                                     face2_type,
-                                                     face1,
-                                                     face2,
-                                                     edge);
+            is_constrained_dof_3d<fe_degree, direction>(constraint_mask,
+                                                        x_idx,
+                                                        y_idx,
+                                                        z_idx,
+                                                        face1_type,
+                                                        face2_type,
+                                                        face1,
+                                                        face2,
+                                                        edge);
           if ((constrained_face != dealii::internal::MatrixFreeFunctions::
                                      ConstraintKinds::unconstrained) &&
               constrained_dof)
-            values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = t[q_point];
+            values[index3<fe_degree + 1>(x_idx, y_idx, z_idx)] = tmp[q_point];
         });
 
       team_member.team_barrier();

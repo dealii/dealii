@@ -78,7 +78,7 @@ namespace Step64
 
     // Since CUDAWrappers::MatrixFree::Data doesn't know about the size of its
     // arrays, we need to store the number of quadrature points and the
-    // numbers of degrees of freedom in this class to do necessary index
+    // number of degrees of freedom in this class to do necessary index
     // conversions.
     static const unsigned int n_dofs_1d    = fe_degree + 1;
     static const unsigned int n_local_dofs = Utilities::pow(n_dofs_1d, dim);

@@ -652,9 +652,9 @@ namespace CUDAWrappers
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
     DEAL_II_HOST_DEVICE
-    SharedData(const TeamHandle &team_member,
-               SharedView1D      values,
-               SharedView2D      gradients)
+    SharedData(const TeamHandle &  team_member,
+               const SharedView1D &values,
+               const SharedView2D &gradients)
       : team_member(team_member)
       , values(values)
       , gradients(gradients)

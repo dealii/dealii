@@ -20,7 +20,7 @@
 // much easier to check their correctness directly rather than from the results
 // in dependent functions
 
-#include "deal.II/base/memory_space.h"
+#include <deal.II/base/memory_space.h>
 
 #include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/read_write_vector.h>
