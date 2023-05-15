@@ -5708,7 +5708,8 @@ namespace internal
                   {
                     unsigned int k = 0;
 
-                    for (const unsigned int i : hex->vertex_indices())
+                    const unsigned int n_vertices = std::min(hex->n_vertices(), 8u);
+                    for (unsigned int i = 0; i < n_vertices; ++i)
                       vertex_indices[k++] = hex->vertex_index(i);
 
                     const std::array<unsigned int, 12> line_indices =
@@ -14943,7 +14944,10 @@ void Triangulation<dim, spacedim>::execute_coarsening()
           {
             const auto line_indices = internal::TriaAccessorImplementation::
               Implementation::get_line_indices_of_cell(*cell);
-            for (unsigned int l = 0; l < cell->n_lines(); ++l)
+            // avoid a compiler warning by fixing the max number of
+            // loop iterations to 12
+            const unsigned int n_lines = std::min(cell->n_lines(), 12u);
+            for (unsigned int l = 0; l < n_lines; ++l)
               ++line_cell_count[line_indices[l]];
             for (unsigned int q : cell->face_indices())
               ++quad_cell_count[cell->face_index(q)];
