@@ -1,0 +1,17 @@
+
+DEAL::Computing residual at 10.0000
+DEAL::Setting up Jacobian system at u=10.0000
+DEAL::Computing residual at 10.0000
+DEAL::Computing residual at -88.0839
+DEAL::Reporting irrecoverable failure.
+DEAL::Caught an irrecoverable exception in a callback:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    Irrecoverable failure.
+--------------------------------------------------------
+
