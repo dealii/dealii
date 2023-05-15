@@ -41,20 +41,16 @@ create_solver()
   auto ode = std::make_unique<SUNDIALS::ARKode<VectorType>>(data);
 
   // will yield analytic solution y[0] = sin(kappa*t); y[1] = kappa*cos(kappa*t)
-  ode->explicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode->explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = y[1];
     ydot[1] = -kappa * kappa * y[0];
-    return 0;
   };
 
-  ode->output_step = [&](const double       t,
-                         const VectorType & sol,
-                         const unsigned int step_number) -> int {
-    deallog << std::setprecision(16) << t << ' ' << sol[0] << ' ' << sol[1]
-            << std::endl;
-    return 0;
-  };
+  ode->output_step =
+    [&](const double t, const VectorType &sol, const unsigned int step_number) {
+      deallog << std::setprecision(16) << t << ' ' << sol[0] << ' ' << sol[1]
+              << std::endl;
+    };
   return ode;
 }
 
@@ -122,6 +118,4 @@ main()
     ode->reset(0.0, 0.01, y0);
     ode->solve_ode_incrementally(y, 2.0);
   }
-
-  return 0;
 }

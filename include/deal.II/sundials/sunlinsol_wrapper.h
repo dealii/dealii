@@ -23,6 +23,7 @@
 
 #  include <sundials/sundials_linearsolver.h>
 
+#  include <exception>
 #  include <functional>
 #  include <memory>
 
@@ -216,10 +217,12 @@ namespace SUNDIALS
     class LinearSolverWrapper
     {
     public:
-      explicit LinearSolverWrapper(LinearSolveFunction<VectorType> lsolve
+      explicit LinearSolverWrapper(
+        const LinearSolveFunction<VectorType> &lsolve,
+        std::exception_ptr &                   pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                                   ,
-                                   SUNContext linsol_ctx
+        ,
+        SUNContext linsol_ctx
 #  endif
       );
 

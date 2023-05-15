@@ -81,60 +81,50 @@ main()
   // Explicit jacobian.
   FullMatrix<double> J(3, 3);
 
-  ode.implicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = 0;
     ydot[1] = 0;
     ydot[2] = -y[2] / eps;
-    return 0;
   };
 
 
-  ode.explicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
     ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
     ydot[2] = b / eps - y[2] * y[0];
-    return 0;
   };
 
 
   ode.jacobian_times_setup =
-    [&](realtype t, const VectorType &y, const VectorType &fy) -> int {
-    J       = 0;
-    J(2, 2) = -1.0 / eps;
-    return 0;
-  };
+    [&](realtype t, const VectorType &y, const VectorType &fy) {
+      J       = 0;
+      J(2, 2) = -1.0 / eps;
+    };
 
   ode.jacobian_times_vector = [&](const VectorType &v,
                                   VectorType &      Jv,
                                   double            t,
                                   const VectorType &y,
-                                  const VectorType &fy) -> int {
-    J.vmult(Jv, v);
-    return 0;
-  };
+                                  const VectorType &fy) { J.vmult(Jv, v); };
 
   ode.solve_linearized_system =
     [&](SUNDIALS::SundialsOperator<VectorType> &      op,
         SUNDIALS::SundialsPreconditioner<VectorType> &prec,
         VectorType &                                  x,
         const VectorType &                            b,
-        double                                        tol) -> int {
-    ReductionControl     control;
-    SolverCG<VectorType> solver_cg(control);
-    solver_cg.solve(op, x, b, prec);
-    return 0;
-  };
+        double                                        tol) {
+      ReductionControl     control;
+      SolverCG<VectorType> solver_cg(control);
+      solver_cg.solve(op, x, b, prec);
+    };
 
   ode.jacobian_preconditioner_setup = [&](double            t,
                                           const VectorType &y,
                                           const VectorType &fy,
                                           int               jok,
                                           int &             jcur,
-                                          double            gamma) -> int {
+                                          double            gamma) {
     deallog << "jacobian_preconditioner_setup called\n";
-    return 0;
   };
 
   ode.jacobian_preconditioner_solve = [&](double            t,
@@ -144,20 +134,17 @@ main()
                                           VectorType &      z,
                                           double            gamma,
                                           double            delta,
-                                          int               lr) -> int {
+                                          int               lr) {
     deallog << "jacobian_preconditioner_solve called\n";
     z = r;
-    return 0;
   };
 
 
-  ode.output_step = [&](const double       t,
-                        const VectorType & sol,
-                        const unsigned int step_number) -> int {
-    deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol[2]
-            << std::endl;
-    return 0;
-  };
+  ode.output_step =
+    [&](const double t, const VectorType &sol, const unsigned int step_number) {
+      deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol[2]
+              << std::endl;
+    };
 
   // after 5.2.0 a special interpolation mode should be used for stiff problems
 #if DEAL_II_SUNDIALS_VERSION_GTE(5, 2, 0)
@@ -171,5 +158,4 @@ main()
   y[1] = v0;
   y[2] = w0;
   ode.solve_ode(y);
-  return 0;
 }

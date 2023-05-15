@@ -52,6 +52,78 @@ namespace SUNDIALS
 #  define AssertSundialsSolver(code) \
     Assert(code >= 0, ExcSundialsSolverError(code))
 
+  namespace
+  {
+    /**
+     * A function that calls the function object given by its first argument
+     * with the set of arguments following at the end. If the call returns
+     * regularly, the current function returns zero to indicate success. If the
+     * call fails with an exception of type RecoverableUserCallbackError, then
+     * the current function returns 1 to indicate that the called function
+     * object thought the error it encountered is recoverable. If the call fails
+     * with any other exception, then the current function returns with an error
+     * code of -1. In each of the last two cases, the exception thrown by `f`
+     * is captured and `eptr` is set to the exception. In case of success,
+     * `eptr` is set to `nullptr`.
+     */
+    template <typename F, typename... Args>
+    int
+    call_and_possibly_capture_exception(const F &           f,
+                                        std::exception_ptr &eptr,
+                                        Args &&...args)
+    {
+      // See whether there is already something in the exception pointer
+      // variable. This can only happen if we had previously had
+      // a recoverable exception, and the underlying library actually
+      // did recover successfully. In that case, we can abandon the
+      // exception previously thrown. If eptr contains anything other,
+      // then we really don't know how that could have happened, and
+      // should probably bail out:
+      if (eptr)
+        {
+          try
+            {
+              std::rethrow_exception(eptr);
+            }
+          catch (const RecoverableUserCallbackError &)
+            {
+              // ok, ignore, but reset the pointer
+              eptr = nullptr;
+            }
+          catch (...)
+            {
+              // uh oh:
+              AssertThrow(false, ExcInternalError());
+            }
+        }
+
+      // Call the function and if that succeeds, return zero:
+      try
+        {
+          f(std::forward<Args>(args)...);
+          eptr = nullptr;
+          return 0;
+        }
+      // If the call failed with a recoverable error, then
+      // ignore the exception for now (but store a pointer to it)
+      // and return a positive return value (+1). If the underlying
+      // implementation manages to recover
+      catch (const RecoverableUserCallbackError &)
+        {
+          eptr = std::current_exception();
+          return 1;
+        }
+      // For any other exception, capture the exception and
+      // return -1:
+      catch (const std::exception &)
+        {
+          eptr = std::current_exception();
+          return -1;
+        }
+    }
+  } // namespace
+
+
   namespace internal
   {
     /**
@@ -60,7 +132,7 @@ namespace SUNDIALS
     template <typename VectorType>
     struct LinearSolverContent
     {
-      LinearSolverContent()
+      LinearSolverContent(std::exception_ptr &pending_exception)
         : a_times_fn(nullptr)
         , preconditioner_setup(nullptr)
         , preconditioner_solve(nullptr)
@@ -69,6 +141,7 @@ namespace SUNDIALS
 #  endif
         , P_data(nullptr)
         , A_data(nullptr)
+        , pending_exception(pending_exception)
       {}
 
       ATimesFn a_times_fn;
@@ -83,6 +156,12 @@ namespace SUNDIALS
 
       void *P_data;
       void *A_data;
+
+      /**
+       * A reference to a location where we can store exceptions, should they
+       * be thrown by a linear solver object.
+       */
+      std::exception_ptr &pending_exception;
     };
   } // namespace internal
 
@@ -119,7 +198,7 @@ namespace SUNDIALS
                         N_Vector b,
                         realtype tol)
     {
-      auto content = access_content<VectorType>(LS);
+      LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
 
       auto *src_b = unwrap_nvector_const<VectorType>(b);
       auto *dst_x = unwrap_nvector<VectorType>(x);
@@ -140,7 +219,13 @@ namespace SUNDIALS
 #  endif
         tol);
 
-      return content->lsolve(op, preconditioner, *dst_x, *src_b, tol);
+      return call_and_possibly_capture_exception(content->lsolve,
+                                                 content->pending_exception,
+                                                 op,
+                                                 preconditioner,
+                                                 *dst_x,
+                                                 *src_b,
+                                                 tol);
     }
 
 
@@ -149,7 +234,8 @@ namespace SUNDIALS
     int
     arkode_linsol_setup(SUNLinearSolver LS, SUNMatrix /*ignored*/)
     {
-      auto content = access_content<VectorType>(LS);
+      LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
+
       if (content->preconditioner_setup)
         return content->preconditioner_setup(content->P_data);
       return 0;
@@ -171,7 +257,8 @@ namespace SUNDIALS
     int
     arkode_linsol_set_a_times(SUNLinearSolver LS, void *A_data, ATimesFn ATimes)
     {
-      auto content        = access_content<VectorType>(LS);
+      LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
+
       content->A_data     = A_data;
       content->a_times_fn = ATimes;
       return 0;
@@ -186,7 +273,8 @@ namespace SUNDIALS
                                      PSetupFn        p_setup,
                                      PSolveFn        p_solve)
     {
-      auto content                  = access_content<VectorType>(LS);
+      LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
+
       content->P_data               = P_data;
       content->preconditioner_setup = p_setup;
       content->preconditioner_solve = p_solve;
@@ -198,13 +286,15 @@ namespace SUNDIALS
 
   template <typename VectorType>
   internal::LinearSolverWrapper<VectorType>::LinearSolverWrapper(
-    LinearSolveFunction<VectorType> lsolve
+    const LinearSolveFunction<VectorType> &lsolve,
+    std::exception_ptr &                   pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     ,
     SUNContext linsol_ctx
 #  endif
     )
-    : content(std::make_unique<LinearSolverContent<VectorType>>())
+    : content(
+        std::make_unique<LinearSolverContent<VectorType>>(pending_exception))
   {
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     sun_linear_solver = SUNLinSolNewEmpty(linsol_ctx);

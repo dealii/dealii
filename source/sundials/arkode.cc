@@ -383,6 +383,7 @@ namespace SUNDIALS
 #  endif
     , mpi_communicator(mpi_comm)
     , last_end_time(data.initial_time)
+    , pending_exception(nullptr)
   {
     set_functions_to_trigger_an_assert();
 
@@ -413,6 +414,8 @@ namespace SUNDIALS
     (void)status;
     AssertARKode(status);
 #  endif
+
+    Assert(pending_exception == nullptr, ExcInternalError());
   }
 
 
@@ -662,7 +665,8 @@ namespace SUNDIALS
                 ,
                 arkode_ctx
 #  endif
-              );
+                ,
+                pending_exception);
             sun_linear_solver = *linear_solver;
           }
         else
@@ -764,7 +768,8 @@ namespace SUNDIALS
                 ,
                 arkode_ctx
 #  endif
-              );
+                ,
+                pending_exception);
             sun_mass_linear_solver = *mass_solver;
           }
         else
