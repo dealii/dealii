@@ -68,34 +68,20 @@ namespace CUDAWrappers
         const UpdateFlags &    update_flags);
 
       void
-      setup_color_arrays(const unsigned int n_colors);
+      resize(const unsigned int n_colors);
 
       void
-      setup_cell_arrays(const unsigned int color);
+      setup(const unsigned int color);
 
       template <typename CellFilter>
       void
-      get_cell_data(
-        const CellFilter &                                        cell,
-        const unsigned int                                        cell_id,
+      fill_data(
+        const unsigned int                                        color,
+        const std::vector<CellFilter> &                           graph,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
-
-      void
-      alloc_and_copy_arrays(const unsigned int cell);
 
     private:
       MatrixFree<dim, Number> *data;
-      Kokkos::View<types::global_dof_index **,
-                   MemorySpace::Default::kokkos_space>
-        local_to_global;
-      Kokkos::View<Point<dim, Number> **, MemorySpace::Default::kokkos_space>
-                                                                  q_points;
-      Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
-      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>
-        inv_jacobian;
-      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
-                   MemorySpace::Default::kokkos_space>
-        constraint_mask;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
       FEValues<dim>                        fe_values;
@@ -144,7 +130,7 @@ namespace CUDAWrappers
 
     template <int dim, typename Number>
     void
-    ReinitHelper<dim, Number>::setup_color_arrays(const unsigned int n_colors)
+    ReinitHelper<dim, Number>::resize(const unsigned int n_colors)
     {
       // We need at least three colors when we are using CUDA-aware MPI and
       // overlapping the communication
@@ -170,34 +156,37 @@ namespace CUDAWrappers
 
     template <int dim, typename Number>
     void
-    ReinitHelper<dim, Number>::setup_cell_arrays(const unsigned int color)
+    ReinitHelper<dim, Number>::setup(const unsigned int color)
     {
       const unsigned int n_cells = data->n_cells[color];
 
-      local_to_global = Kokkos::View<types::global_dof_index **,
-                                     MemorySpace::Default::kokkos_space>(
-        Kokkos::view_alloc("local_to_global_" + std::to_string(color),
-                           Kokkos::WithoutInitializing),
-        n_cells,
-        dofs_per_cell);
-
-      if (update_flags & update_quadrature_points)
-        q_points = Kokkos::View<Point<dim, Number> **,
-                                MemorySpace::Default::kokkos_space>(
-          Kokkos::view_alloc("q_points_" + std::to_string(color),
-                             Kokkos::WithoutInitializing),
-          n_cells,
-          q_points_per_cell);
-
-      if (update_flags & update_JxW_values)
-        JxW = Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
-          Kokkos::view_alloc("JxW_" + std::to_string(color),
+      data->local_to_global[color] =
+        Kokkos::View<types::global_dof_index **,
+                     MemorySpace::Default::kokkos_space>(
+          Kokkos::view_alloc("local_to_global_" + std::to_string(color),
                              Kokkos::WithoutInitializing),
           n_cells,
           dofs_per_cell);
 
+      if (update_flags & update_quadrature_points)
+        data->q_points[color] =
+          Kokkos::View<Point<dim, Number> **,
+                       MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("q_points_" + std::to_string(color),
+                               Kokkos::WithoutInitializing),
+            n_cells,
+            q_points_per_cell);
+
+      if (update_flags & update_JxW_values)
+        data->JxW[color] =
+          Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("JxW_" + std::to_string(color),
+                               Kokkos::WithoutInitializing),
+            n_cells,
+            dofs_per_cell);
+
       if (update_flags & update_gradients)
-        inv_jacobian =
+        data->inv_jacobian[color] =
           Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
@@ -205,7 +194,7 @@ namespace CUDAWrappers
             dofs_per_cell);
 
       // Initialize to zero, i.e., unconstrained cell
-      constraint_mask =
+      data->constraint_mask[color] =
         Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
                      MemorySpace::Default::kokkos_space>(
           "constraint_mask_" + std::to_string(color), n_cells);
@@ -216,115 +205,92 @@ namespace CUDAWrappers
     template <int dim, typename Number>
     template <typename CellFilter>
     void
-    ReinitHelper<dim, Number>::get_cell_data(
-      const CellFilter &                                        cell,
-      const unsigned int                                        cell_id,
+    ReinitHelper<dim, Number>::fill_data(
+      const unsigned int                                        color,
+      const std::vector<CellFilter> &                           graph,
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
     {
-      cell->get_dof_indices(local_dof_indices);
-      // When using MPI, we need to transform the local_dof_indices, which
-      // contains global dof indices, to get local (to the current MPI process)
-      // dof indices.
-      if (partitioner)
-        for (auto &index : local_dof_indices)
-          index = partitioner->global_to_local(index);
-
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
-
-      // FIXME too many deep_copy
       auto constraint_mask_host =
         Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
-                                            constraint_mask);
-      const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-        cell_id_view(constraint_mask_host[cell_id]);
-
-      hanging_nodes.setup_constraints(cell,
-                                      partitioner,
-                                      {lexicographic_inv},
-                                      lexicographic_dof_indices,
-                                      cell_id_view);
-      Kokkos::deep_copy(constraint_mask, constraint_mask_host);
-
-      // FIXME too many deep_copy
+                                            data->constraint_mask[color]);
       auto local_to_global_host =
         Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
-                                            local_to_global);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        local_to_global_host(cell_id, i) = lexicographic_dof_indices[i];
-      Kokkos::deep_copy(local_to_global, local_to_global_host);
+                                            data->local_to_global[color]);
+      auto q_points_host =
+        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
+                                            data->q_points[color]);
+      auto JxW_host =
+        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
+                                            data->JxW[color]);
+      auto inv_jacobian_host =
+        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
+                                            data->inv_jacobian[color]);
 
-      fe_values.reinit(cell);
-
-      // Quadrature points
-      if (update_flags & update_quadrature_points)
+      auto cell = graph.cbegin(), end_cell = graph.cend();
+      for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
         {
-          // FIXME too many deep_copy
-          auto q_points_host = Kokkos::create_mirror_view_and_copy(
-            MemorySpace::Host::kokkos_space{}, q_points);
-          const std::vector<Point<dim>> &q_points_vec =
-            fe_values.get_quadrature_points();
-          for (unsigned int i = 0; i < q_points_per_cell; ++i)
-            q_points_host(cell_id, i) = q_points_vec[i];
-          Kokkos::deep_copy(q_points, q_points_host);
+          (*cell)->get_dof_indices(local_dof_indices);
+          // When using MPI, we need to transform the local_dof_indices, which
+          // contains global dof indices, to get local (to the current MPI
+          // process) dof indices.
+          if (partitioner)
+            for (auto &index : local_dof_indices)
+              index = partitioner->global_to_local(index);
+
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            lexicographic_dof_indices[i] =
+              local_dof_indices[lexicographic_inv[i]];
+
+          const ArrayView<
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+            cell_id_view(constraint_mask_host[cell_id]);
+
+          hanging_nodes.setup_constraints(*cell,
+                                          partitioner,
+                                          {lexicographic_inv},
+                                          lexicographic_dof_indices,
+                                          cell_id_view);
+
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            local_to_global_host(cell_id, i) = lexicographic_dof_indices[i];
+
+          fe_values.reinit(*cell);
+
+          // Quadrature points
+          if (update_flags & update_quadrature_points)
+            {
+              const std::vector<Point<dim>> &q_points_vec =
+                fe_values.get_quadrature_points();
+              for (unsigned int i = 0; i < q_points_per_cell; ++i)
+                q_points_host(cell_id, i) = q_points_vec[i];
+            }
+
+          if (update_flags & update_JxW_values)
+            {
+              std::vector<double> JxW_values_double =
+                fe_values.get_JxW_values();
+              for (unsigned int i = 0; i < q_points_per_cell; ++i)
+                JxW_host(cell_id, i) =
+                  static_cast<Number>(JxW_values_double[i]);
+            }
+
+          if (update_flags & update_gradients)
+            {
+              const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
+                fe_values.get_inverse_jacobians();
+              for (unsigned int i = 0; i < q_points_per_cell; ++i)
+                for (unsigned int j = 0; j < dim; ++j)
+                  for (unsigned int k = 0; k < dim; ++k)
+                    inv_jacobian_host(cell_id, i, j, k) =
+                      inv_jacobians[i][j][k];
+            }
         }
 
-      if (update_flags & update_JxW_values)
-        {
-          // FIXME too many deep_copy
-          auto JxW_host = Kokkos::create_mirror_view_and_copy(
-            MemorySpace::Host::kokkos_space{}, JxW);
-          std::vector<double> JxW_values_double = fe_values.get_JxW_values();
-          for (unsigned int i = 0; i < q_points_per_cell; ++i)
-            JxW_host(cell_id, i) = static_cast<Number>(JxW_values_double[i]);
-          Kokkos::deep_copy(JxW, JxW_host);
-        }
-
-      if (update_flags & update_gradients)
-        {
-          // FIXME too many deep_copy
-          auto inv_jacobian_host = Kokkos::create_mirror_view_and_copy(
-            MemorySpace::Host::kokkos_space{}, inv_jacobian);
-          const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
-            fe_values.get_inverse_jacobians();
-          for (unsigned int i = 0; i < q_points_per_cell; ++i)
-            for (unsigned int j = 0; j < dim; ++j)
-              for (unsigned int k = 0; k < dim; ++k)
-                inv_jacobian_host(cell_id, i, j, k) = inv_jacobians[i][j][k];
-          Kokkos::deep_copy(inv_jacobian, inv_jacobian_host);
-        }
-    }
-
-
-
-    template <int dim, typename Number>
-    void
-    ReinitHelper<dim, Number>::alloc_and_copy_arrays(const unsigned int color)
-    {
-      const unsigned int n_cells = data->n_cells[color];
-
-      // Local-to-global mapping
-      data->local_to_global[color] = local_to_global;
-
-      // Quadrature points
-      if (update_flags & update_quadrature_points)
-        {
-          data->q_points[color] = q_points;
-        }
-
-      // Jacobian determinants/quadrature weights
-      if (update_flags & update_JxW_values)
-        {
-          data->JxW[color] = JxW;
-        }
-
-      // Inverse jacobians
-      if (update_flags & update_gradients)
-        {
-          data->inv_jacobian[color] = inv_jacobian;
-        }
-
-      data->constraint_mask[color] = constraint_mask;
+      Kokkos::deep_copy(data->constraint_mask[color], constraint_mask_host);
+      Kokkos::deep_copy(data->local_to_global[color], local_to_global_host);
+      Kokkos::deep_copy(data->q_points[color], q_points_host);
+      Kokkos::deep_copy(data->JxW[color], JxW_host);
+      Kokkos::deep_copy(data->inv_jacobian[color], inv_jacobian_host);
     }
 
 
@@ -888,7 +854,7 @@ namespace CUDAWrappers
       }
     n_colors = graph.size();
 
-    helper.setup_color_arrays(n_colors);
+    helper.resize(n_colors);
 
     IndexSet locally_relevant_dofs;
     if (comm)
@@ -901,13 +867,8 @@ namespace CUDAWrappers
     for (unsigned int i = 0; i < n_colors; ++i)
       {
         n_cells[i] = graph[i].size();
-        helper.setup_cell_arrays(i);
-        typename std::vector<CellFilter>::iterator cell     = graph[i].begin(),
-                                                   end_cell = graph[i].end();
-        for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
-          helper.get_cell_data(*cell, cell_id, partitioner);
-
-        helper.alloc_and_copy_arrays(i);
+        helper.setup(i);
+        helper.fill_data(i, graph[i], partitioner);
       }
 
     // Setup row starts
