@@ -121,8 +121,8 @@ class FEEvaluationData
 public:
   static constexpr unsigned int dimension = dim;
 
-  using NumberType = Number;
-
+  using NumberType             = Number;
+  using shape_info_number_type = Number;
   using ScalarNumber =
     typename internal::VectorizedArrayTrait<Number>::value_type;
 
@@ -1502,7 +1502,7 @@ FEEvaluationData<dim, Number, is_face>::get_cell_type() const
 
 
 template <int dim, typename Number, bool is_face>
-inline const internal::MatrixFreeFunctions::ShapeInfo<Number> &
+inline const typename FEEvaluationData<dim, Number, is_face>::ShapeInfoType &
 FEEvaluationData<dim, Number, is_face>::get_shape_info() const
 {
   Assert(data != nullptr, ExcInternalError());

@@ -137,14 +137,12 @@ namespace
         internal::EvaluatorQuantity::value,
         dim,
         degree_coarse + 1,
-        degree_fine + 1,
-        Number,
-        Number>::do_forward(1,
-                            prolongation_matrix_1d,
-                            evaluation_data_coarse,
-                            evaluation_data_fine,
-                            degree_coarse_ + 1,
-                            degree_fine_ + 1);
+        degree_fine + 1>::do_forward(1,
+                                     prolongation_matrix_1d,
+                                     evaluation_data_coarse,
+                                     evaluation_data_fine,
+                                     degree_coarse_ + 1,
+                                     degree_fine_ + 1);
     }
 
     void
@@ -157,14 +155,12 @@ namespace
         internal::EvaluatorQuantity::value,
         1,
         0,
-        0,
-        Number,
-        Number>::do_forward(1,
-                            prolongation_matrix,
-                            evaluation_data_coarse,
-                            evaluation_data_fine,
-                            n_dofs_coarse,
-                            n_dofs_fine);
+        0>::do_forward(1,
+                       prolongation_matrix,
+                       evaluation_data_coarse,
+                       evaluation_data_fine,
+                       n_dofs_coarse,
+                       n_dofs_fine);
     }
 
   private:
@@ -203,15 +199,14 @@ namespace
         internal::EvaluatorQuantity::value,
         dim,
         degree_coarse == 0 ? -1 : (degree_coarse + 1),
-        degree_fine == 0 ? -1 : (degree_fine + 1),
-        Number,
-        Number>::do_backward(1,
-                             prolongation_matrix_1d,
-                             false,
-                             evaluation_data_fine,
-                             evaluation_data_coarse,
-                             degree_coarse_ + 1,
-                             degree_fine_ + 1);
+        degree_fine == 0 ? -1 : (degree_fine + 1)>::
+        do_backward(1,
+                    prolongation_matrix_1d,
+                    false,
+                    evaluation_data_fine,
+                    evaluation_data_coarse,
+                    degree_coarse_ + 1,
+                    degree_fine_ + 1);
     }
 
     void
@@ -224,15 +219,13 @@ namespace
         internal::EvaluatorQuantity::value,
         1,
         0,
-        0,
-        Number,
-        Number>::do_backward(1,
-                             prolongation_matrix,
-                             false,
-                             evaluation_data_fine,
-                             evaluation_data_coarse,
-                             n_dofs_coarse,
-                             n_dofs_fine);
+        0>::do_backward(1,
+                        prolongation_matrix,
+                        false,
+                        evaluation_data_fine,
+                        evaluation_data_coarse,
+                        n_dofs_coarse,
+                        n_dofs_fine);
     }
 
   private:

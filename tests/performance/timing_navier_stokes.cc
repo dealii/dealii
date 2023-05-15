@@ -1014,15 +1014,13 @@ namespace NavierStokes_DG
           internal::EvaluatorQuantity::hessian,
           dim,
           degree + 1,
-          n_points_1d,
-          VectorizedArrayType,
-          VectorizedArrayType>::do_backward(dim + 2,
-                                            data.get_shape_info()
-                                              .data[0]
-                                              .inverse_shape_values_eo,
-                                            false,
-                                            phi.begin_values(),
-                                            phi.begin_dof_values());
+          n_points_1d>::do_backward(dim + 2,
+                                    data.get_shape_info()
+                                      .data[0]
+                                      .inverse_shape_values_eo,
+                                    false,
+                                    phi.begin_values(),
+                                    phi.begin_dof_values());
 
         if (ai == Number())
           {
