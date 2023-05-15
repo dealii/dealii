@@ -45,7 +45,7 @@
 #include <fstream>
 
 // From the following include file we will import the declaration of
-// H1-conforming finite element shape functions. This family of finite
+// $H^1$-conforming finite element shape functions. This family of finite
 // elements is called <code>FE_Q</code>, and was used in all examples before
 // already to define the usual bi- or tri-linear elements, but we will now use
 // it for bi-quadratic elements:
