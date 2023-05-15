@@ -258,6 +258,7 @@ namespace nonlinear_solver_selector_test
     Vector<double> &      residual)
   {
     deallog << "  Computing residual vector..." << std::flush;
+    residual = 0.;
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,

@@ -16,7 +16,7 @@
 
 
 // Tests the class NonlinearSolverSelector using an example based on
-// the test nonlinear_solver_selector_01. Here we use the nonlinear
+// the test nonlinear_solver_selector_03. Here we use the nonlinear
 // solver NOX instead of KINSOL with MPI.
 
 #define SOLVER NonlinearSolverSelector<LA::MPI::Vector>::AdditionalData::nox

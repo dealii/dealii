@@ -17,6 +17,8 @@
 
 #include <deal.II/base/exceptions.h>
 
+#include <deal.II/lac/petsc_snes.h>
+
 #include <deal.II/sundials/kinsol.h>
 
 #include <deal.II/trilinos/nox.h>
@@ -25,15 +27,19 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Selects a nonlinear solver by choosing between KINSOL or NOX.
- * KINSOL and NOX are nonlinear solvers included in the SUNDIALS
- * package and the Trilinos package, respectively. If no solver type is
- * specified it will automaticlaly choose a solver based on what
- * deal.II was configured with, KINSOL having priority.
+ * This class offers a unified interface to several nonlinear solver
+ * implementations like KINSOL, NOX, and SNES.
  *
- * By calling the @p solve function of this @p NonlinearSolverSelector, it selects the
- * @p solve function of that @p Solver that was specified in the constructor
- * of this class, similar to the SolverSelector class.
+ * KINSOL nonlinear solvers are part of the SUNDIALS package, while
+ * NOX is part of Trilinos and SNES is part of PETSc, respectively.
+ * If no solver is manually specified, this class will automaticlaly
+ * choose one of the available solvers depending on the enabled
+ * dependencies.
+ *
+ * By calling the @p solve function of this @p
+ * NonlinearSolverSelector, it selects the @p solve function of that
+ * @p Solver that was specified in the constructor of this class,
+ * similar to the SolverSelector class.
  *
  * <h3>Usage</h3>
  * An example of code one would run with this class is the
@@ -48,20 +54,19 @@ DEAL_II_NAMESPACE_OPEN
  *
  * // Functions that are required for solving a nonlinear problem,
  * // which are utilized in both @p KINSOL and @p NOX.
- * nonlinear_solver.reinit_vector = [&](Vector<double> &x) {...}
+ * nonlinear_solver.reinit_vector = [&](Vector<double> &x) {...};
  *
  * nonlinear_solver.residual =
  *           [&](const Vector<double> &evaluation_point,
- *               Vector<double> &      residual) {...}
+ *               Vector<double> &      residual) {...};
  *
  * nonlinear_solver.setup_jacobian =
- *           [&](const Vector<double> &current_u,
- *               const Vector<double> &current_f) {...}
+ *           [&](const Vector<double> &current_u) {...};
  *
  * nonlinear_solver.solve_with_jacobian =
  *           [&](const Vector<double> &rhs,
  *               Vector<double> &      dst,
- *               const double tolerance) {...}
+ *               const double tolerance) {...};
  *
  * // Calling the @p solve function with an initial guess.
  * nonlinear_solver.solve(current_solution);
@@ -92,7 +97,7 @@ public:
        */
       newton,
       /**
-       * Newton iteration with linesearch.
+       * Newton iteration with line search.
        */
       linesearch,
       /**
@@ -116,20 +121,25 @@ public:
        * NOX nonlinear solver, part of the TRILINOS package.
        */
       nox,
+      /*
+       * Use the PETSc SNES solver.
+       */
+      petsc_snes
     };
 
     /**
      * Initialization parameters for NonlinearSolverSelector.
      *
-     * @param solver_type Nonlinear solver type, can be 'auto', 'kinsol', or 'nox'.
-     * @param strategy Method of solving nonlinear problem, can be 'newton',
-     * 'linesearch', or 'picard'.
+     * @param solver_type Nonlinear solver type.
+     * @param strategy Method of solving the nonlinear problem.
      * @param maximum_non_linear_iterations Maximum number of nonlinear
-     * iterations. This parameter is shared between KINSOL and NOX.
-     * @param function_tolerance Function norm stopping tolerance.
-     * @param relative_tolerance Relative function norm stopping tolerance.
-     * @param step_tolerance Step tolerance for solution update.
-     * @param anderson_subspace_size Anderson acceleration subspace size
+     *   iterations.
+     * @param function_tolerance Absolute stopping tolerance for the norm
+     *   of the residual $F(u)$.
+     * @param relative_tolerance Relative stopping tolerance.
+     * @param step_tolerance Tolerance for minimum scaled step length
+     * @param anderson_subspace_size Size of the Anderson acceleration
+     *   subspace, use 0 to disable.
      */
     AdditionalData(const SolverType &      solver_type = automatic,
                    const SolutionStrategy &strategy    = linesearch,
@@ -140,9 +150,9 @@ public:
                    const unsigned int      anderson_subspace_size        = 0);
 
     /**
-     * The type of nonlinear solver to use. The default value is set to 'auto',
-     * which will use either KINSOL or NOX depending on which package is
-     * installed, KINSOL having priority.
+     * The type of nonlinear solver to use. If the default 'automatic' is used,
+     * it will choose the first available package in the order KINSOL, NOX, or
+     * SNES.
      */
     SolverType solver_type;
 
@@ -163,29 +173,29 @@ public:
      * A scalar used as a stopping tolerance on the scaled
      * maximum norm of the system function $F(u)$ or $G(u)$.
      *
-     * If set to zero, default values provided by KINSOL will be used.
+     * If set to zero, default values will be used.
      */
     double function_tolerance;
+
+    /**
+     * Relative $l_2$ tolerance of the residual to be reached.
+     *
+     * @note Solver terminates successfully if either the function
+     * tolerance or the relative tolerance has been reached.
+     */
+    const double relative_tolerance;
 
     /**
      * A scalar used as a stopping tolerance on the minimum
      * scaled step length.
      *
-     * If set to zero, default values provided by KINSOL will be used.
+     * If set to zero, default values will be used.
      */
-    double step_tolerance = 0.0;
-
-    /**
-     * Relative $l_2$ tolerance of the residual to be reached.
-     *
-     * @note Solver terminates successfully if either the absolute or
-     * the relative tolerance has been reached.
-     */
-    const double relative_tolerance;
+    double step_tolerance;
 
     /**
      * The size of the subspace used with Anderson acceleration
-     * in conjunction with Picard or fixed-point iteration.
+     * in conjunction with Picard iteration.
      *
      * If you set this to 0, no acceleration is used.
      */
@@ -204,11 +214,10 @@ public:
   NonlinearSolverSelector(const AdditionalData &additional_data);
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param additional_data NonlinearSolverSelector configuration data
-   * @param mpi_communicator MPI communicator over which logging operations are
-   * computer.
+   * @param mpi_communicator MPI communicator used by the nonlinear solver.
    */
   NonlinearSolverSelector(const AdditionalData &additional_data,
                           const MPI_Comm &      mpi_communicator);
@@ -220,8 +229,15 @@ public:
   void
   select(const typename AdditionalData::SolverType &type);
 
+  /**
+   * Set the generic additional data for all nonlinear solvers.
+   */
+  void
+  set_data(const AdditionalData &additional_data);
+
 /**
- * Set the additional data. For more information see the @p Solver class.
+ * Set the additional data for NOX. See TrilinosWrappers::NOXSolver
+ * for more information.
  */
 #ifdef DEAL_II_WITH_TRILINOS
   void
@@ -233,7 +249,8 @@ public:
 #endif
 
 /**
- * Set the additional data. For more information see the @p Solver class.
+ * Set the additional data for KINSOL. See SUNDIALS::KINSOL for more
+ * information.
  */
 #ifdef DEAL_II_WITH_SUNDIALS
   void
@@ -241,13 +258,20 @@ public:
              &additional_data);
 #endif
 
+/**
+ * Set the additional data for SNES. See PETScWrappers::NonlinearSolverData
+ * for more information.
+ */
+#ifdef DEAL_II_WITH_PETSC
+  void
+  set_data(const typename PETScWrappers::NonlinearSolverData &additional_data);
+#endif
+
   /**
-   * Solve the nonlinear system. KINSOL uses the content of
-   * `initial_guess_and_solution` as an initial guess, and
-   * stores the final solution in the same vector.
+   * Solve the nonlinear system.
    *
-   * The functions herein are nearly identical in setup to what can be found
-   * in the KINSOL and NOX documentation.
+   * The content of `initial_guess_and_solution` is used as an initial guess
+   * and the final solution is stored in the same vector.
    */
   void
   solve(VectorType &initial_guess_and_solution);
@@ -283,14 +307,6 @@ public:
    * F/\partial u$. If strategy = SolutionStrategy::picard, $A$ is the
    * approximate Jacobian matrix $L$.
    *
-   * The setup_jacobian() function may call a user-supplied function, or a
-   * function within the linear solver module, to compute Jacobian-related
-   * data that is required by the linear solver. It may also preprocess that
-   * data as needed for solve_with_jacobian(), which may involve calling a
-   * generic function (such as for LU factorization) or, more generally,
-   * build preconditioners from the assembled Jacobian. In any case, the
-   * data so generated may then be used whenever a linear system is solved.
-   *
    * @param current_u Current value of $u$
    */
   std::function<int(const VectorType &current_u)> setup_jacobian;
@@ -299,12 +315,11 @@ public:
    * A function object that users may supply and that is intended to solve
    * a linear system with the Jacobian matrix.
    *
-   * Specific details on this function can be found in the KINSOL
-   *
-   * Arguments to the function are:
+   * @note PETSc SNES does not provide us with a linear tolerance to solve
+   *       linear system with. We will provide a value of 1e-6 in that case.
    *
    * @param[in] rhs The system right hand side to solve for.
-   * @param[out] dst The solution of $J^{-1} * src$.
+   * @param[out] dst The solution of $J^{-1} * \texttt{src}$.
    * @param[in] tolerance The tolerance with which to solve the linear system
    *   of equations.
    */
@@ -312,7 +327,7 @@ public:
     int(const VectorType &rhs, VectorType &dst, const double tolerance)>
     solve_with_jacobian;
 
-protected:
+private:
   /**
    * NonlinearSolverSelector configuration data.
    */
@@ -341,16 +356,28 @@ private:
     Teuchos::rcp(new Teuchos::ParameterList);
 #endif
 
+/**
+ * PETSc SNES configuration data
+ */
+#ifdef DEAL_II_WITH_PETSC
+  typename PETScWrappers::NonlinearSolverData additional_data_petsc_snes;
+#endif
+
   /**
-   * Data transfer function
+   * Solve with PETSc SNES. Internal functions specialized for PETSc
+   * Vectors. This is necessary to only instantiate the SNES solvers
+   * with PETSc Vectors, as this is the only vector type currently
+   * supported.
    */
   void
-  data_transfer(const AdditionalData &additional_data);
+  solve_with_petsc(VectorType &initial_guess_and_solution);
 };
+
+
 
 template <typename VectorType>
 void
-NonlinearSolverSelector<VectorType>::data_transfer(
+NonlinearSolverSelector<VectorType>::set_data(
   const AdditionalData &additional_data)
 {
 #ifdef DEAL_II_WITH_SUNDIALS
@@ -381,7 +408,6 @@ NonlinearSolverSelector<VectorType>::data_transfer(
 
 // Do the same thing we did above but with NOX
 #ifdef DEAL_II_WITH_TRILINOS
-  // Some default settings for parameters.
   parameters_nox->set("Nonlinear Solver", "Line Search Based");
   Teuchos::ParameterList &Line_Search = parameters_nox->sublist("Line Search");
   Line_Search.set("Method", "Full Step");
@@ -390,18 +416,61 @@ NonlinearSolverSelector<VectorType>::data_transfer(
   additional_data_nox.abs_tol  = additional_data.function_tolerance;
   additional_data_nox.rel_tol  = additional_data.relative_tolerance;
 #endif
+
+#ifdef DEAL_II_WITH_PETSC
+  additional_data_petsc_snes.options_prefix = "";
+
+  if (additional_data.anderson_subspace_size > 0 &&
+      additional_data.strategy ==
+        NonlinearSolverSelector<VectorType>::AdditionalData::picard)
+    {
+      additional_data_petsc_snes.snes_type = "anderson";
+      // TODO additional_data.anderson_subspace_size;
+    }
+  else if (additional_data.strategy ==
+           NonlinearSolverSelector<VectorType>::AdditionalData::linesearch)
+    {
+      additional_data_petsc_snes.snes_type            = "newtonls";
+      additional_data_petsc_snes.snes_linesearch_type = "bt";
+    }
+  else if (additional_data.strategy ==
+           NonlinearSolverSelector<VectorType>::AdditionalData::newton)
+    {
+      additional_data_petsc_snes.snes_linesearch_type = "newtonls";
+      additional_data_petsc_snes.snes_linesearch_type = "basic";
+    }
+  else if (additional_data.strategy ==
+           NonlinearSolverSelector<VectorType>::AdditionalData::picard)
+    additional_data_petsc_snes.snes_type = "nrichardson";
+
+  additional_data_petsc_snes.absolute_tolerance =
+    additional_data.function_tolerance;
+  additional_data_petsc_snes.relative_tolerance =
+    additional_data.relative_tolerance;
+  additional_data_petsc_snes.step_tolerance = additional_data.step_tolerance;
+  additional_data_petsc_snes.maximum_non_linear_iterations =
+    additional_data.maximum_non_linear_iterations;
+  additional_data_petsc_snes.max_n_function_evaluations = -1;
+
+#endif
 }
+
+
 
 template <typename VectorType>
 NonlinearSolverSelector<VectorType>::NonlinearSolverSelector() = default;
+
+
 
 template <typename VectorType>
 NonlinearSolverSelector<VectorType>::NonlinearSolverSelector(
   const AdditionalData &additional_data)
   : additional_data(additional_data)
 {
-  data_transfer(additional_data);
+  set_data(additional_data);
 }
+
+
 
 template <typename VectorType>
 NonlinearSolverSelector<VectorType>::NonlinearSolverSelector(
@@ -410,8 +479,9 @@ NonlinearSolverSelector<VectorType>::NonlinearSolverSelector(
   : additional_data(additional_data)
   , mpi_communicator(mpi_communicator)
 {
-  data_transfer(additional_data);
+  set_data(additional_data);
 }
+
 
 
 template <typename VectorType>
@@ -421,6 +491,8 @@ NonlinearSolverSelector<VectorType>::select(
 {
   additional_data.solver_type = type;
 }
+
+
 
 template <typename VectorType>
 NonlinearSolverSelector<VectorType>::AdditionalData::AdditionalData(
@@ -440,6 +512,8 @@ NonlinearSolverSelector<VectorType>::AdditionalData::AdditionalData(
   , anderson_subspace_size(anderson_subspace_size)
 {}
 
+
+
 #ifdef DEAL_II_WITH_TRILINOS
 template <typename VectorType>
 void
@@ -453,6 +527,8 @@ NonlinearSolverSelector<VectorType>::set_data(
 }
 #endif
 
+
+
 #ifdef DEAL_II_WITH_SUNDIALS
 template <typename VectorType>
 void
@@ -463,6 +539,47 @@ NonlinearSolverSelector<VectorType>::set_data(
 }
 #endif
 
+
+
+template <typename VectorType>
+void
+NonlinearSolverSelector<VectorType>::solve_with_petsc(
+  VectorType & /*initial_guess_and_solution*/)
+{
+  AssertThrow(false,
+              ExcMessage("PETSc SNES requires you to use PETSc vectors."));
+}
+
+
+
+#ifdef DEAL_II_WITH_PETSC
+template <>
+void
+NonlinearSolverSelector<PETScWrappers::MPI::Vector>::solve_with_petsc(
+  PETScWrappers::MPI::Vector &initial_guess_and_solution)
+{
+  PETScWrappers::NonlinearSolver<PETScWrappers::MPI::Vector> nonlinear_solver(
+    additional_data_petsc_snes, mpi_communicator);
+
+  nonlinear_solver.residual = residual;
+
+  nonlinear_solver.setup_jacobian = setup_jacobian;
+
+  nonlinear_solver.solve_with_jacobian =
+    [&](const PETScWrappers::MPI::Vector &src,
+        PETScWrappers::MPI::Vector &      dst) -> int {
+    // PETSc does not gives a tolerance, so we have to choose something
+    // reasonable to provide to the user:
+    const double tolerance = 1e-6;
+    return solve_with_jacobian(src, dst, tolerance);
+  };
+
+  nonlinear_solver.solve(initial_guess_and_solution);
+}
+#endif
+
+
+
 template <typename VectorType>
 void
 NonlinearSolverSelector<VectorType>::solve(
@@ -472,6 +589,9 @@ NonlinearSolverSelector<VectorType>::solve(
   // available then we will use NOX.
   if (additional_data.solver_type == AdditionalData::SolverType::automatic)
     {
+#ifdef DEAL_II_WITH_PETSC
+      additional_data.solver_type = AdditionalData::SolverType::petsc_snes;
+#endif
 #ifdef DEAL_II_WITH_TRILINOS
       additional_data.solver_type = AdditionalData::SolverType::nox;
 #endif
@@ -490,16 +610,13 @@ NonlinearSolverSelector<VectorType>::solve(
       SUNDIALS::KINSOL<VectorType> nonlinear_solver(additional_data_kinsol,
                                                     mpi_communicator);
 
-      // We set the KINSOL reinit vector equal to the same function
-      // defined for NonlinearSolverSelector.
       nonlinear_solver.reinit_vector = reinit_vector;
-
-      nonlinear_solver.residual = residual;
+      nonlinear_solver.residual      = residual;
 
       // We cannot simply set these two functions equal to each other
       // because they have a different number of inputs.
       nonlinear_solver.setup_jacobian = [&](const VectorType &current_u,
-                                            const VectorType /*&current_f*/) {
+                                            const VectorType & /*current_f*/) {
         return NonlinearSolverSelector<VectorType>::setup_jacobian(current_u);
       };
 
@@ -514,6 +631,7 @@ NonlinearSolverSelector<VectorType>::solve(
   else if (additional_data.solver_type == AdditionalData::SolverType::nox)
     {
 #ifdef DEAL_II_WITH_TRILINOS
+
       TrilinosWrappers::NOXSolver<VectorType> nonlinear_solver(
         additional_data_nox, parameters_nox);
 
@@ -532,27 +650,33 @@ NonlinearSolverSelector<VectorType>::solve(
         false, ExcMessage("You do not have Trilinos configured with deal.II"));
 #endif
     }
+  else if (additional_data.solver_type ==
+           AdditionalData::SolverType::petsc_snes)
+    {
+      // Forward to internal function specializations, which throws for
+      // non-supported vector types:
+      solve_with_petsc(initial_guess_and_solution);
+    }
   else
     {
-      std::string solver1;
-      std::string solver2;
-
+      const std::string solvers =
 #ifdef DEAL_II_WITH_SUNDIALS
-      solver1 = "kinsol \n";
+        "kinsol\n"
 #endif
 #ifdef DEAL_II_WITH_TRILINOS
-      solver2 = "nox \n";
+        "NOX\n"
 #endif
+#ifdef DEAL_II_WITH_PETSC
+        "SNES\n"
+#endif
+        ;
 
-      DeclException2(InvalidNonlinearSolver,
-                     std::string,
-                     std::string,
-                     "Invalid nonlinear solver specified, you may use:\n"
-                       << arg1 << arg2);
-
-      AssertThrow(false, InvalidNonlinearSolver(solver1, solver2));
+      AssertThrow(false,
+                  ExcMessage(
+                    "Invalid nonlinear solver specified. "
+                    "The solvers available in your installation are:\n" +
+                    solvers));
     }
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
