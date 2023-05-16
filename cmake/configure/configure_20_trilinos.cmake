@@ -257,7 +257,10 @@ macro(feature_trilinos_find_external var)
           using map_type = Tpetra::Map<LO, GO>;
           Teuchos::RCP<const map_type>   dummy_map = Teuchos::rcp(new map_type());
           Tpetra::Vector<double, LO, GO> dummy_vector(dummy_map);
-          (void)dummy_vector;
+
+          // Newer versions of Trilinos deprecate/remove this call
+          dummy_vector.template sync<Kokkos::HostSpace>();
+
           return 0;
         }
         "
