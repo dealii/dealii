@@ -791,8 +791,9 @@ namespace Patterns
             tmp_it = std::find_if(tmp_it + 1, description.end(), [](char c) {
               return (c == '>' || c == '<');
             });
-            Assert(tmp_it != description.end(),
-                   ExcMessage("Couldn't find a closing '>' in description!"));
+            AssertThrow(tmp_it != description.end(),
+                        ExcMessage(
+                          "Couldn't find a closing '>' in description!"));
             if (*tmp_it == '<')
               ++n_open_angular;
             else
