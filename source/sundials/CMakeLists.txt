@@ -16,7 +16,6 @@
 set(_src
   arkode.cc
   ida.cc
-  copy.cc
   kinsol.cc
   n_vector.cc
   sunlinsol_wrapper.cc
