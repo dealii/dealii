@@ -15,8 +15,11 @@
 
 
 
-// Check TrilinosWrappers::NOXSolver by solving f(x) = atan(x)-0.5 = 0, starting
-// at x=10. This corresponds also to what the sundials/kinsol_06 test checks.
+// Check TrilinosWrappers::NOXSolver. This test solves the same
+// problem as nox_solver_03, but it throws an exception in one of the
+// user functions. The test checks that we capture and rethrow the
+// exception, and that we can ultimately catch it.
+
 
 #include <deal.II/base/mpi.h>
 
@@ -41,7 +44,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
   using Number     = double;
-  using VectorType = LinearAlgebra::distributed::Vector<Number>;
+  using VectorType = Vector<Number>;
 
   // set up solver control
   const unsigned int n_max_iterations  = 100;
@@ -71,36 +74,67 @@ main(int argc, char **argv)
                                                  non_linear_parameters);
 
   // ... helper functions
-  double J = 0.0;
+  solver.residual = [](const VectorType &u, VectorType &F) {
+    deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ')'
+            << std::endl;
 
-  solver.residual = [](const auto &src, auto &dst) {
-    // compute residual
-    deallog << "Evaluating residual at u=" << src[0] << std::endl;
-    dst[0] = std::atan(src[0]) - 0.5;
+    F(0) = std::cos(u[0] + u[1]) - 1 + 2 * u[0];
+    F(1) = std::sin(u[0] - u[1]) + 2 * u[1];
+
+    throw ExcMessage("Irrecoverable failure.");
   };
 
-  solver.setup_jacobian = [&](const auto &src) {
-    // compute Jacobian
-    deallog << "Setting up Jacobian at u=" << src[0] << std::endl;
-    J = 1. / (1 + src[0] * src[0]);
+  FullMatrix<double> J(2, 2);
+  FullMatrix<double> J_inverse(2, 2);
+
+  solver.setup_jacobian = [&J, &J_inverse](const VectorType &u) {
+    // We don't do any kind of set-up in this program, but we can at least
+    // say that we're here
+    deallog << "Setting up Jacobian system at u=(" << u[0] << ',' << u[1] << ')'
+            << std::endl;
+
+    J(0, 0) = -std::sin(u[0] + u[1]) + 2;
+    J(0, 1) = -std::sin(u[0] + u[1]);
+    J(1, 0) = std::cos(u[0] - u[1]);
+    J(1, 1) = -std::cos(u[0] - u[1]) + 2;
+
+    J_inverse.invert(J);
   };
 
-  solver.apply_jacobian = [&](const auto &src, auto &dst) {
-    // solve with Jacobian
-    dst[0] = src[0] * J;
+  solver.apply_jacobian = [&](const VectorType &src, VectorType &dst) {
+    J.vmult(dst, src);
   };
 
-  solver.solve_with_jacobian = [&](const auto &src, auto &dst, const auto) {
-    // solve with Jacobian
-    dst[0] = src[0] / J;
+  solver.solve_with_jacobian = [&J_inverse](const VectorType &rhs,
+                                            VectorType &      dst,
+                                            const double /*tolerance*/) {
+    deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
+            << ')' << std::endl;
+
+    J_inverse.vmult(dst, rhs);
   };
 
   // initial guess
-  VectorType solution(1);
-  solution[0] = 10.0;
+  const unsigned int N = 2;
+  VectorType         solution(N);
+  solution[0] = 0.5;
+  solution[1] = 1.234;
 
   // solve with the given initial guess
-  solver.solve(solution);
-
-  deallog << "The solution is: " << solution[0] << std::endl;
+  try
+    {
+      auto niter = solver.solve(solution);
+      solution.print(deallog.get_file_stream());
+      deallog << "Converged in " << niter << " iterations." << std::endl;
+    }
+  catch (const std::exception &exc)
+    {
+      deallog << "Caught an irrecoverable exception in a callback:" << std::endl
+              << exc.what() << std::endl;
+    }
+  catch (const char *s)
+    {
+      deallog << "Trilinos threw its own exception of type char*:" << std::endl
+              << s << std::endl;
+    }
 }

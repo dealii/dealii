@@ -43,6 +43,46 @@ namespace TrilinosWrappers
   {
     namespace NOXWrappers
     {
+      namespace
+      {
+        /**
+         * A function that calls the function object given by its first argument
+         * with the set of arguments following at the end. If the call returns
+         * regularly, the current function returns zero to indicate success. If
+         * the call fails with an, then the current function returns with an
+         * error code of -1. In that case, the exception thrown by `f` is
+         * captured and `eptr` is set to the exception. In case of success,
+         * `eptr` is set to `nullptr`.
+         */
+        template <typename F, typename... Args>
+        int
+        call_and_possibly_capture_exception(const F &           f,
+                                            std::exception_ptr &eptr,
+                                            Args &&...args)
+        {
+          // See whether there is already something in the exception pointer
+          // variable. There is no reason why this should be so, and
+          // we should probably bail out:
+          AssertThrow(eptr == nullptr, ExcInternalError());
+
+          // Call the function and if that succeeds, return zero:
+          try
+            {
+              f(std::forward<Args>(args)...);
+              eptr = nullptr;
+              return 0;
+            }
+          // In case of an exception, capture the exception and
+          // return -1:
+          catch (...)
+            {
+              eptr = std::current_exception();
+              return -1;
+            }
+        }
+      } // namespace
+
+
       template <typename VectorType>
       class Group;
 
@@ -927,7 +967,10 @@ namespace TrilinosWrappers
     // create group
     const auto group = Teuchos::rcp(new internal::NOXWrappers::Group<
                                     VectorType>(
+      /* Starting vector */
       solution,
+
+      /* Residual function */
       [&](const VectorType &x, VectorType &f) -> int {
         Assert(
           residual,
@@ -937,8 +980,11 @@ namespace TrilinosWrappers
         n_residual_evaluations++;
 
         // evalute residual
-        return residual(x, f);
+        return internal::NOXWrappers::call_and_possibly_capture_exception(
+          residual, pending_exception, x, f);
       },
+
+      /* setup_jacobian function */
       [&](const VectorType &x) -> int {
         Assert(
           setup_jacobian,
@@ -946,7 +992,8 @@ namespace TrilinosWrappers
             "No setup_jacobian function has been attached to the NOXSolver object."));
 
         // setup Jacobian
-        int flag = setup_jacobian(x);
+        int flag = internal::NOXWrappers::call_and_possibly_capture_exception(
+          setup_jacobian, pending_exception, x);
 
         if (flag != 0)
           return flag;
@@ -967,11 +1014,14 @@ namespace TrilinosWrappers
               update_preconditioner = update_preconditioner_predicate();
 
             if (update_preconditioner)
-              flag = setup_preconditioner(x);
+              flag = internal::NOXWrappers::call_and_possibly_capture_exception(
+                setup_preconditioner, pending_exception, x);
           }
 
         return flag;
       },
+
+      /* apply_jacobian function */
       [&](const VectorType &x, VectorType &v) -> int {
         Assert(
           apply_jacobian,
@@ -981,8 +1031,11 @@ namespace TrilinosWrappers
         n_jacobian_applications++;
 
         // apply Jacobian
-        return apply_jacobian(x, v);
+        return internal::NOXWrappers::call_and_possibly_capture_exception(
+          apply_jacobian, pending_exception, x, v);
       },
+
+      /* solve_with_jacobian function */
       [&](const VectorType &f, VectorType &x, const double tolerance) -> int {
         n_nonlinear_iterations++;
 
@@ -996,7 +1049,8 @@ namespace TrilinosWrappers
                 "solve_with_jacobian_and_track_n_linear_iterations!"));
 
             // without tracking of linear iterations
-            return solve_with_jacobian(f, x, tolerance);
+            return internal::NOXWrappers::call_and_possibly_capture_exception(
+              solve_with_jacobian, pending_exception, f, x, tolerance);
           }
         else if (solve_with_jacobian_and_track_n_linear_iterations)
           {
@@ -1063,12 +1117,82 @@ namespace TrilinosWrappers
     // create non-linear solver
     const auto solver = NOX::Solver::buildSolver(group, check, parameters);
 
-    // solve
-    const auto status = solver->solve();
+    // Solve, then check whether an exception was thrown by one of the user
+    // callback functions. If so, exit by rethrowing the exception that
+    // we had previously saved. This also calls the destructors of all of
+    // the member variables above, so we do not have to clean things up by hand.
+    //
+    // NOX has the annoying habit of reporting success through a return code,
+    // but if a user callback function throws an exception (which we translate
+    // into a return code of -1), then it throws its own exception. So we
+    // have to check both the return code and also catch exceptions :-(
+    try
+      {
+        const auto status = solver->solve();
 
-    AssertThrow(status == NOX::StatusTest::Converged, ExcNOXNoConvergence());
+        if (status == NOX::StatusTest::Converged)
+          return solver->getNumIterations();
+        else
+          {
+            // See if NOX aborted because we had thrown an exception in a user
+            // callback:
+            if (pending_exception)
+              {
+                std::exception_ptr this_exception = pending_exception;
+                pending_exception                 = nullptr;
 
-    return solver->getNumIterations();
+                std::rethrow_exception(this_exception);
+              }
+
+            // If that was not the case, NOX just didn't converge:
+            AssertThrow(status == NOX::StatusTest::Converged,
+                        ExcNOXNoConvergence());
+          }
+      }
+    // See if NOX returned by triggering an exception. In a sign of generally
+    // poor software design, NOX throws an exception that is not of a class
+    // derived from std::exception, but just a char*. That's a nuisance -- you
+    // just have to know :-(
+    catch (const char *s)
+      {
+        // Like above, see if NOX aborted because there was an exception
+        // in a user callback. In that case, collate the errors if we can
+        // (namely, if the user exception was derived from std::exception),
+        // and otherwise just let the user exception propagate (then swallowing
+        // the NOX exception):
+        if (pending_exception)
+          {
+            std::exception_ptr this_exception = pending_exception;
+            pending_exception                 = nullptr;
+
+            try
+              {
+                std::rethrow_exception(this_exception);
+              }
+            catch (const std::exception &e)
+              {
+                // Collate the exception texts:
+                throw ExcMessage(
+                  "NOX aborted with an error text of <" + std::string(s) +
+                  "> after a user callback function had thrown an exception " +
+                  "with the following message:\n" + e.what());
+              }
+            catch (...)
+              {
+                // Let user exception propagate if of a different type:
+                throw;
+              }
+          }
+
+        // NOX just happened to throw an exception, but it wasn't because there
+        // was a user callback exception before. Convert the char* to something
+        // more readable:
+        AssertThrow(false,
+                    ExcMessage("NOX aborted with an error text of <" +
+                               std::string(s) + ">."));
+      }
+
+    return 0; // unreachable
   }
 
 } // namespace TrilinosWrappers
