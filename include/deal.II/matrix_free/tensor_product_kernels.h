@@ -3509,7 +3509,7 @@ namespace internal
             shape_values_x[j] = shapes[j][0][0];
             shape_derivs_x[j] = shapes[j][1][0];
           }
-        for (unsigned int i1 = 0; i1 < (dim > 1 ? length : 1); ++i1)
+        for (int i1 = 0; i1 < (dim > 1 ? length : 1); ++i1)
           {
             const Number2 test_value_y =
               dim > 1 ? (test_grads_value[2] * shapes[i1][0][1] +
@@ -3520,7 +3520,7 @@ namespace internal
                         test_grads_value[0];
 
             Number2 *values_ptr = values.data() + i + i1 * length;
-            for (unsigned int i0 = 0; i0 < length; ++i0)
+            for (int i0 = 0; i0 < length; ++i0)
               {
                 values_ptr[i0] += shape_values_x[i0] * test_value_y;
                 values_ptr[i0] += shape_derivs_x[i0] * test_grad_xy;
