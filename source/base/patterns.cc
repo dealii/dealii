@@ -780,15 +780,30 @@ namespace Patterns
       {
         unsigned int min_elements = 0, max_elements = 0;
 
-        std::istringstream is(description);
-        is.ignore(strlen(description_init) + strlen(" of <"));
+        std::string::const_iterator it =
+          description.begin() + strlen(description_init) + strlen(" of <");
 
-        std::string str;
-        std::getline(is, str, '>');
+        int  n_open_angular = 1;
+        auto tmp_it         = it - 1;
+        while (n_open_angular > 0)
+          {
+            tmp_it = std::find_if(tmp_it + 1, description.end(), [](char c) {
+              return (c == '>' || c == '<');
+            });
+            Assert(tmp_it != description.end(),
+                   ExcMessage("Couldn't find a closing '>' in description!"));
+            if (*tmp_it == '<')
+              ++n_open_angular;
+            else
+              --n_open_angular;
+          }
 
-        std::unique_ptr<PatternBase> base_pattern(pattern_factory(str));
+        std::string                  base_pattern_string(it, tmp_it);
+        std::unique_ptr<PatternBase> base_pattern(
+          pattern_factory(base_pattern_string));
 
-        is.ignore(strlen(" of length "));
+        std::istringstream is(
+          std::string(tmp_it + strlen(" of length "), description.end()));
         if (!(is >> min_elements))
           return std::make_unique<List>(*base_pattern);
 
