@@ -2067,11 +2067,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
               ETT::write_value(vectorized_input,
                                comp,
                                solution_renumbered_vectorized[i]);
-              for (unsigned int lane = n_lanes_internal / 2; lane > 0;
-                   lane /= 2)
-                for (unsigned int j = 0; j < lane; ++j)
-                  vectorized_input[j] += vectorized_input[lane + j];
-              input[i] = vectorized_input[0];
+              input[i] = vectorized_input.horizontal_add();
             }
 
           internal::FEFaceNormalEvaluationImpl<dim, -1, ScalarNumber>::
@@ -2092,12 +2088,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
             {
               VectorizedArrayType result;
               ETT::write_value(result, comp, solution_renumbered_vectorized[i]);
-              for (unsigned int lane = n_lanes_internal / 2; lane > 0;
-                   lane /= 2)
-                for (unsigned int j = 0; j < lane; ++j)
-                  result[j] += result[lane + j];
               solution_values[renumber[comp * dofs_per_component + i]] =
-                result[0];
+                result.horizontal_add();
             }
         }
     }

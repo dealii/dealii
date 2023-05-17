@@ -657,6 +657,16 @@ public:
   }
 
   /**
+   * Returns horizontal sum of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  Number
+  horizontal_add()
+  {
+    return data;
+  }
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -1217,6 +1227,12 @@ public:
   }
 
   /**
+   * Returns horizontal sum of data field.
+   */
+  double
+  horizontal_add();
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -1224,6 +1240,26 @@ public:
   __m512d data;
 
 private:
+  /**
+   * Extract lower half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m256d
+  get_low() const
+  {
+    return _mm512_castpd512_pd256(data);
+  }
+
+  /**
+   * Extract higher half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m256d
+  get_high() const
+  {
+    return _mm512_extractf64x4_pd(data, 1);
+  }
+
   /**
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
@@ -1790,6 +1826,12 @@ public:
   }
 
   /**
+   * Returns horizontal sum of data field.
+   */
+  float
+  horizontal_add();
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -1797,6 +1839,26 @@ public:
   __m512 data;
 
 private:
+  /**
+   * Extract lower half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m256
+  get_low() const
+  {
+    return _mm512_castps512_ps256(data);
+  }
+
+  /**
+   * Extract higher half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m256
+  get_high() const
+  {
+    return _mm256_castpd_ps(_mm512_extractf64x4_pd(_mm512_castps_pd(data), 1));
+  }
+
   /**
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
@@ -2253,6 +2315,14 @@ public:
   {}
 
   /**
+   * Construct an array with the data field.
+   */
+  VectorizedArray(__m256d const &x)
+  {
+    data = x;
+  }
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2468,6 +2538,12 @@ public:
   }
 
   /**
+   * Returns horizontal sum of data field.
+   */
+  double
+  horizontal_add();
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -2475,6 +2551,26 @@ public:
   __m256d data;
 
 private:
+  /**
+   * Extract lower half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m128d
+  get_low() const
+  {
+    return _mm256_castpd256_pd128(data);
+  }
+
+  /**
+   * Extract higher half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m128d
+  get_high() const
+  {
+    return _mm256_extractf128_pd(data, 1);
+  }
+
   /**
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
@@ -2799,6 +2895,14 @@ public:
   {}
 
   /**
+   * Construct an array with the data field.
+   */
+  VectorizedArray(__m256 const &x)
+  {
+    data = x;
+  }
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3000,6 +3104,12 @@ public:
   }
 
   /**
+   * Returns horizontal sum of data field.
+   */
+  float
+  horizontal_add();
+
+  /**
    * Actual data field. To be consistent with the standard layout type and to
    * enable interaction with external SIMD functionality, this member is
    * declared public.
@@ -3007,6 +3117,26 @@ public:
   __m256 data;
 
 private:
+  /**
+   * Extract lower half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m128
+  get_low() const
+  {
+    return _mm256_castps256_ps128(data);
+  }
+
+  /**
+   * Extract higher half of data field.
+   */
+  DEAL_II_ALWAYS_INLINE
+  __m128
+  get_high() const
+  {
+    return _mm256_extractf128_ps(data, 1);
+  }
+
   /**
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
@@ -3365,6 +3495,14 @@ public:
   {}
 
   /**
+   * Construct an array with the data field.
+   */
+  VectorizedArray(__m128d const &x)
+  {
+    data = x;
+  }
+
+  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3560,6 +3698,12 @@ public:
     for (unsigned int i = 0; i < 2; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
+
+  /**
+   * Returns horizontal sum of data field.
+   */
+  double
+  horizontal_add();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -3850,6 +3994,14 @@ public:
   }
 
   /**
+   * Construct an array with the data field.
+   */
+  VectorizedArray(__m128 const &x)
+  {
+    data = x;
+  }
+
+  /**
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
@@ -4016,6 +4168,12 @@ public:
     for (unsigned int i = 0; i < 4; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
+
+  /**
+   * Returns horizontal sum of data field.
+   */
+  float
+  horizontal_add();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -4811,6 +4969,74 @@ private:
 
 
 #endif // DOXYGEN
+
+/**
+ * horizontal_add() functions.
+ */
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
+inline double
+VectorizedArray<double, 2>::horizontal_add()
+{
+  __m128d t1 = _mm_unpackhi_pd(data, data);
+  __m128d t2 = _mm_add_pd(data, t1);
+  return _mm_cvtsd_f64(t2);
+}
+
+
+
+inline float
+VectorizedArray<float, 4>::horizontal_add()
+{
+  __m128 t1 = _mm_movehl_ps(data, data);
+  __m128 t2 = _mm_add_ps(data, t1);
+  __m128 t3 = _mm_shuffle_ps(t2, t2, 1);
+  __m128 t4 = _mm_add_ss(t2, t3);
+  return _mm_cvtss_f32(t4);
+}
+#endif
+
+
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
+inline double
+VectorizedArray<double, 4>::horizontal_add()
+{
+  VectorizedArray<double, 2> t1(this->get_low() + this->get_high());
+  return t1.horizontal_add();
+}
+
+
+
+inline float
+VectorizedArray<float, 8>::horizontal_add()
+{
+  VectorizedArray<float, 4> t1(this->get_low() + this->get_high());
+  return t1.horizontal_add();
+}
+#endif
+
+
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
+inline double
+VectorizedArray<double, 8>::horizontal_add()
+{
+  VectorizedArray<double, 4> t1(this->get_low() + this->get_high());
+  return t1.horizontal_add();
+}
+
+
+
+inline float
+VectorizedArray<float, 16>::horizontal_add()
+{
+  VectorizedArray<float, 8> t1(this->get_low() + this->get_high());
+  return t1.horizontal_add();
+}
+#endif
+
+
 
 /**
  * @name Arithmetic operations with VectorizedArray
