@@ -102,12 +102,19 @@ namespace PETScWrappers
     std::string options_prefix;
 
     /**
-     * PETSc solver type.
+     * PETSc nonlinear solver type. Valid options include "newtonls"
+     * (Newton with line search), "newtontr" (Newton with Trust
+     * Region), "nrichardson" (Picard), and many more. See
+     * https://petsc.org/release/manualpages/SNES/SNESType/ for more
+     * information.
      */
     std::string snes_type;
 
     /**
-     * Linesearch type.
+     * Linesearch type. Valid options include "bt" (backtracking) and
+     * "basic" (no line search). See
+     * https://petsc.org/release/manualpages/SNES/SNESLineSearchType/
+     * for more information.
      */
     std::string snes_linesearch_type;
 
