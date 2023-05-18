@@ -1009,9 +1009,8 @@ namespace TrilinosWrappers
                (n_last_linear_iterations >
                 additional_data.threshold_n_linear_iterations));
 
-            if ((update_preconditioner == false) &&
-                (update_preconditioner_predicate != nullptr))
-              update_preconditioner = update_preconditioner_predicate();
+            if (update_preconditioner_predicate)
+              update_preconditioner |= update_preconditioner_predicate();
 
             if (update_preconditioner)
               flag = internal::NOXWrappers::call_and_possibly_capture_exception(
@@ -1028,7 +1027,7 @@ namespace TrilinosWrappers
           ExcMessage(
             "No apply_jacobian function has been attached to the NOXSolver object."));
 
-        n_jacobian_applications++;
+        ++n_jacobian_applications;
 
         // apply Jacobian
         return internal::NOXWrappers::call_and_possibly_capture_exception(
@@ -1037,7 +1036,7 @@ namespace TrilinosWrappers
 
       /* solve_with_jacobian function */
       [&](const VectorType &f, VectorType &x, const double tolerance) -> int {
-        n_nonlinear_iterations++;
+        ++n_nonlinear_iterations;
 
         // invert Jacobian
         if (solve_with_jacobian)

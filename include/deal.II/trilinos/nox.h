@@ -134,10 +134,18 @@ namespace TrilinosWrappers
       unsigned int threshold_nonlinear_iterations;
 
       /**
-       * Max number of linear iterations after which the preconditioner
-       * should be updated. This is only used if
-       * solve_with_jacobian_and_track_n_linear_iterations has been given
-       * a target (i.e., it is not empty).
+       * A number that indicates how many iterations a linear solver
+       * should at most perform before the preconditioner should
+       * be updated. The use of this variable is predicated on the
+       * idea that one can keep using a preconditioner built earlier
+       * as long as it is a good preconditioner for the matrix currently
+       * in use -- where "good" is defined as leading to a number of
+       * iterations to solve linear systems less than the threshold
+       * given by the current variable.
+       *
+       * This variable is only used if the
+       * NOXSolver::solve_with_jacobian_and_track_n_linear_iterations
+       * function object has been given a target (i.e., it is not empty).
        */
       unsigned int threshold_n_linear_iterations;
 
@@ -280,8 +288,16 @@ namespace TrilinosWrappers
      * (i.e., more precisely: the linearization point $u$ above) is
      * the one computed when the `setup_jacobian` function was last called.
      *
-     * @note This function is optional and is used in the case of certain
-     * configurations.
+     * @note This function is used if `solve_with_jacobian` is not
+     *   provided. Its return value is compared again
+     *   AdditionalFlags::threshold_n_linear_iterations; if it is
+     *   larger, the preconditioner will be built before the next
+     *   linear system is solved. The use of this approach is predicated on the
+     * idea that one can keep using a preconditioner built earlier
+     * as long as it is a good preconditioner for the matrix currently
+     * in use -- where "good" is defined as leading to a number of
+     * iterations to solve linear systems less than the threshold
+     * given by the current variable.
      *
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
