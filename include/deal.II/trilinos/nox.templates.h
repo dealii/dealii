@@ -1054,18 +1054,23 @@ namespace TrilinosWrappers
           }
         else if (solve_with_jacobian_and_track_n_linear_iterations)
           {
-            // with tracking of linear iterations
-            const int n_linear_iterations =
-              solve_with_jacobian_and_track_n_linear_iterations(f,
-                                                                x,
-                                                                tolerance);
-
-            if (n_linear_iterations == -1)
-              return 1;
-
-            this->n_last_linear_iterations = n_linear_iterations;
-
-            return 0;
+            // With tracking of linear iterations. The callback function we
+            // have here is using an integer return type, which is not
+            // what internal::NOXWrappers::call_and_possibly_capture_exception
+            // knows how to deal with. As a consequence, package the call
+            // and assignment of the return value into a lambda function;
+            // if the call to the user-defined callback fails, this will
+            // trigger an exception that will propagate through the lambda
+            // function and be treated correctly by the logic in
+            // internal::NOXWrappers::call_and_possibly_capture_exception.
+            return internal::NOXWrappers::call_and_possibly_capture_exception(
+              [&]() {
+                this->n_last_linear_iterations =
+                  solve_with_jacobian_and_track_n_linear_iterations(f,
+                                                                    x,
+                                                                    tolerance);
+              },
+              pending_exception);
           }
         else
           {
