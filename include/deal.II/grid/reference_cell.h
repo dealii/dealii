@@ -1200,7 +1200,7 @@ ReferenceCell::n_lines() const
       case ReferenceCells::Tetrahedron:
         return 6;
       case ReferenceCells::Pyramid:
-        return 7;
+        return 8;
       case ReferenceCells::Wedge:
         return 9;
       case ReferenceCells::Hexahedron:
@@ -1821,7 +1821,7 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
              {{0, 6, 4, X}},
              {{1, 5, 7, X}},
              {{2, 4, 5, X}},
-             {{3, 7, 6, 2}}}};
+             {{3, 7, 6, X}}}};
 
           return table[face][standard_to_real_face_line(
             line, face, face_orientation)];
