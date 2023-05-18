@@ -198,17 +198,16 @@ namespace SUNDIALS
    * time_stepper.residual = [&](const double t,
    *                             const VectorType &y,
    *                             const VectorType &y_dot,
-   *                             VectorType &res) ->int
+   *                             VectorType &res)
    * {
    *   res = y_dot;
    *   A.vmult_add(res, y);
-   *   return 0;
    * };
    *
    * time_stepper.setup_jacobian = [&](const double ,
    *                                   const VectorType &,
    *                                   const VectorType &,
-   *                                   const double alpha) ->int
+   *                                   const double alpha)
    * {
    *   J = A;
    *
@@ -216,14 +215,12 @@ namespace SUNDIALS
    *   J(1,1) = alpha;
    *
    *   Jinv.invert(J);
-   *   return 0;
    * };
    *
    * time_stepper.solve_jacobian_system = [&](const VectorType &src,
-   *                                          VectorType &dst) ->int
+   *                                          VectorType &dst)
    * {
    *   Jinv.vmult(dst,src);
-   *   return 0;
    * };
    *
    * y[1] = kappa;
@@ -651,17 +648,17 @@ namespace SUNDIALS
     /**
      * Compute residual. Return $F(t, y, \dot y)$.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (IDAReinit will be called if this happens, and
-     *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, IDA can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(const double      t,
-                      const VectorType &y,
-                      const VectorType &y_dot,
-                      VectorType &      res)>
+    std::function<void(const double      t,
+                       const VectorType &y,
+                       const VectorType &y_dot,
+                       VectorType &      res)>
       residual;
 
     /**
@@ -677,7 +674,7 @@ namespace SUNDIALS
      *  \alpha \dfrac{\partial F}{\partial \dot y}.
      * \f]
      *
-     * If the user uses a matrix based computation of the Jacobian, than this
+     * If the user uses a matrix based computation of the Jacobian, then this
      * is the right place where an assembly routine should be called to
      * assemble both a matrix and a preconditioner for the Jacobian system.
      * Subsequent calls (possibly more than one) to solve_jacobian_system() or
@@ -690,17 +687,17 @@ namespace SUNDIALS
      * solve_with_jacobian() to obtain a solution $x$ to the
      * system $J x = b$.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (IDAReinit will be called if this happens, and
-     *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, IDA can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<int(const double      t,
-                      const VectorType &y,
-                      const VectorType &y_dot,
-                      const double      alpha)>
+    std::function<void(const double      t,
+                       const VectorType &y,
+                       const VectorType &y_dot,
+                       const double      alpha)>
       setup_jacobian;
 
     /**
@@ -724,18 +721,18 @@ namespace SUNDIALS
      * applied to `src`, i.e., `J*dst = src`. It is the users responsibility
      * to set up proper solvers and preconditioners inside this function.
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (IDAReinit will be called if this happens, and
-     *       then last function will be attempted again
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, IDA can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      *
      * @deprecated Use solve_with_jacobian() instead which also uses a numerical
      * tolerance.
      */
     DEAL_II_DEPRECATED
-    std::function<int(const VectorType &rhs, VectorType &dst)>
+    std::function<void(const VectorType &rhs, VectorType &dst)>
       solve_jacobian_system;
 
     /**
@@ -772,15 +769,15 @@ namespace SUNDIALS
      * `setup_jacobian()`, given that that function is called far less often
      * than the current one.)
      *
-     * This function should return:
-     * - 0: Success
-     * - >0: Recoverable error (IDAReinit will be called if this happens, and
-     *       then the last function will be attempted again).
-     * - <0: Unrecoverable error the computation will be aborted and an
-     * assertion will be thrown.
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, IDA can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<
-      int(const VectorType &rhs, VectorType &dst, const double tolerance)>
+      void(const VectorType &rhs, VectorType &dst, const double tolerance)>
       solve_with_jacobian;
 
     /**
@@ -818,6 +815,13 @@ namespace SUNDIALS
      *
      * The default implementation simply returns `false`, i.e., no restart is
      * performed during the evolution.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, IDA can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<bool(const double t, VectorType &sol, VectorType &sol_dot)>
       solver_should_restart;
@@ -901,6 +905,14 @@ namespace SUNDIALS
      * Memory pool of vectors.
      */
     GrowingVectorMemory<VectorType> mem;
+
+  public:
+    /**
+     * A pointer to any exception that may have been thrown in user-defined
+     * call-backs and that we have to deal after the KINSOL function we call
+     * has returned.
+     */
+    mutable std::exception_ptr pending_exception;
 
 #  ifdef DEAL_II_WITH_PETSC
 #    ifdef PETSC_USE_COMPLEX

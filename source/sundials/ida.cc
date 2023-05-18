@@ -46,6 +46,78 @@ namespace SUNDIALS
 {
   namespace
   {
+    /**
+     * A function that calls the function object given by its first argument
+     * with the set of arguments following at the end. If the call returns
+     * regularly, the current function returns zero to indicate success. If the
+     * call fails with an exception of type RecoverableUserCallbackError, then
+     * the current function returns 1 to indicate that the called function
+     * object thought the error it encountered is recoverable. If the call fails
+     * with any other exception, then the current function returns with an error
+     * code of -1. In each of the last two cases, the exception thrown by `f`
+     * is captured and `eptr` is set to the exception. In case of success,
+     * `eptr` is set to `nullptr`.
+     */
+    template <typename F, typename... Args>
+    int
+    call_and_possibly_capture_exception(const F &           f,
+                                        std::exception_ptr &eptr,
+                                        Args &&...args)
+    {
+      // See whether there is already something in the exception pointer
+      // variable. This can only happen if we had previously had
+      // a recoverable exception, and the underlying library actually
+      // did recover successfully. In that case, we can abandon the
+      // exception previously thrown. If eptr contains anything other,
+      // then we really don't know how that could have happened, and
+      // should probably bail out:
+      if (eptr)
+        {
+          try
+            {
+              std::rethrow_exception(eptr);
+            }
+          catch (const RecoverableUserCallbackError &)
+            {
+              // ok, ignore, but reset the pointer
+              eptr = nullptr;
+            }
+          catch (...)
+            {
+              // uh oh:
+              AssertThrow(false, ExcInternalError());
+            }
+        }
+
+      // Call the function and if that succeeds, return zero:
+      try
+        {
+          f(std::forward<Args>(args)...);
+          eptr = nullptr;
+          return 0;
+        }
+      // If the call failed with a recoverable error, then
+      // ignore the exception for now (but store a pointer to it)
+      // and return a positive return value (+1). If the underlying
+      // implementation manages to recover
+      catch (const RecoverableUserCallbackError &)
+        {
+          eptr = std::current_exception();
+          return 1;
+        }
+      // For any other exception, capture the exception and
+      // return -1:
+      catch (const std::exception &)
+        {
+          eptr = std::current_exception();
+          return -1;
+        }
+    }
+  } // namespace
+
+
+  namespace
+  {
     template <typename VectorType>
     int
     residual_callback(realtype tt,
@@ -60,9 +132,12 @@ namespace SUNDIALS
       auto *src_yp   = internal::unwrap_nvector_const<VectorType>(yp);
       auto *residual = internal::unwrap_nvector<VectorType>(rr);
 
-      int err = solver.residual(tt, *src_yy, *src_yp, *residual);
-
-      return err;
+      return call_and_possibly_capture_exception(solver.residual,
+                                                 solver.pending_exception,
+                                                 tt,
+                                                 *src_yy,
+                                                 *src_yp,
+                                                 *residual);
     }
 
 
@@ -86,9 +161,12 @@ namespace SUNDIALS
       auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
       auto *src_yp = internal::unwrap_nvector_const<VectorType>(yp);
 
-      int err = solver.setup_jacobian(tt, *src_yy, *src_yp, cj);
-
-      return err;
+      return call_and_possibly_capture_exception(solver.setup_jacobian,
+                                                 solver.pending_exception,
+                                                 tt,
+                                                 *src_yy,
+                                                 *src_yp,
+                                                 cj);
     }
 
 
@@ -105,16 +183,23 @@ namespace SUNDIALS
 
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
       auto *dst_x = internal::unwrap_nvector<VectorType>(x);
-      int   err   = 0;
       if (solver.solve_with_jacobian)
-        err = solver.solve_with_jacobian(*src_b, *dst_x, tol);
+        return call_and_possibly_capture_exception(solver.solve_with_jacobian,
+                                                   solver.pending_exception,
+                                                   *src_b,
+                                                   *dst_x,
+                                                   tol);
       else if (solver.solve_jacobian_system)
-        err = solver.solve_jacobian_system(*src_b, *dst_x);
+        return call_and_possibly_capture_exception(solver.solve_jacobian_system,
+                                                   solver.pending_exception,
+                                                   *src_b,
+                                                   *dst_x);
       else
-        // We have already checked this outside, so we should never get here.
-        Assert(false, ExcInternalError());
-
-      return err;
+        {
+          // We have already checked this outside, so we should never get here.
+          Assert(false, ExcInternalError());
+          return -1;
+        }
     }
   } // namespace
 
@@ -135,6 +220,7 @@ namespace SUNDIALS
     , ida_ctx(nullptr)
 #  endif
     , mpi_communicator(mpi_comm)
+    , pending_exception(nullptr)
   {
     // SUNDIALS will always duplicate communicators if we provide them. This
     // can cause problems if SUNDIALS is configured with MPI and we pass along
@@ -163,6 +249,8 @@ namespace SUNDIALS
     (void)status;
     AssertIDA(status);
 #  endif
+
+    Assert(pending_exception == nullptr, ExcInternalError());
   }
 
 
@@ -205,7 +293,31 @@ namespace SUNDIALS
 #  endif
         );
 
+        // Execute time steps. If we ended up with a pending exception,
+        // see if it was recoverable; if it was, and if IDA recovered,
+        // just continue on. If IDA did not recover, rethrow the exception.
+        // Do the same if the exception was not recoverable.
         status = IDASolve(ida_mem, next_time, &t, yy, yp, IDA_NORMAL);
+        if (pending_exception)
+          {
+            try
+              {
+                std::rethrow_exception(pending_exception);
+              }
+            catch (const RecoverableUserCallbackError &exc)
+              {
+                pending_exception = nullptr;
+                if (status == 0)
+                  /* just eat the exception and continue */;
+                else
+                  throw;
+              }
+            catch (...)
+              {
+                pending_exception = nullptr;
+                throw;
+              }
+          }
         AssertIDA(status);
 
         status = IDAGetLastStep(ida_mem, &h);
