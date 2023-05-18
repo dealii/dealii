@@ -712,24 +712,22 @@ namespace CUDAWrappers
     dofs_per_cell     = fe.n_dofs_per_cell();
     q_points_per_cell = Utilities::fixed_power<dim>(n_q_points_1d);
 
-    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
-      quad, fe);
+    ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quad,
+                                                                          fe);
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
-    FE_DGQArbitraryNodes<1> fe_quad_co(quad);
-    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-      shape_info_co(quad, fe_quad_co);
+    FE_DGQArbitraryNodes<1>                                    fe_quad_co(quad);
+    ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info_co(
+      quad, fe_quad_co);
 
     shape_values = Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
       Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
       size_shape_values);
-    auto shape_values_host = Kokkos::create_mirror_view(shape_values);
-    for (unsigned int i = 0; i < size_shape_values; ++i)
-      {
-        shape_values_host[i] = shape_info.data.front().shape_values[i];
-      }
-    Kokkos::deep_copy(shape_values, shape_values_host);
+    Kokkos::deep_copy(shape_values,
+                      Kokkos::View<Number *, Kokkos::HostSpace>(
+                        shape_info.data.front().shape_values.data(),
+                        size_shape_values));
 
     if (update_flags & update_gradients)
       {
@@ -737,13 +735,10 @@ namespace CUDAWrappers
           Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("shape_gradients", Kokkos::WithoutInitializing),
             size_shape_values);
-        auto shape_gradients_host = Kokkos::create_mirror_view(shape_gradients);
-        for (unsigned int i = 0; i < size_shape_values; ++i)
-          {
-            shape_gradients_host[i] =
-              shape_info.data.front().shape_gradients[i];
-          }
-        Kokkos::deep_copy(shape_gradients, shape_gradients_host);
+        Kokkos::deep_copy(shape_gradients,
+                          Kokkos::View<Number *, Kokkos::HostSpace>(
+                            shape_info.data.front().shape_gradients.data(),
+                            size_shape_values));
 
 
         co_shape_gradients =
@@ -751,14 +746,10 @@ namespace CUDAWrappers
             Kokkos::view_alloc("co_shape_gradients",
                                Kokkos::WithoutInitializing),
             size_shape_values);
-        auto co_shape_gradients_host =
-          Kokkos::create_mirror_view(co_shape_gradients);
-        for (unsigned int i = 0; i < size_shape_values; ++i)
-          {
-            co_shape_gradients_host[i] =
-              shape_info_co.data.front().shape_gradients[i];
-          }
-        Kokkos::deep_copy(co_shape_gradients, co_shape_gradients_host);
+        Kokkos::deep_copy(co_shape_gradients,
+                          Kokkos::View<Number *, Kokkos::HostSpace>(
+                            shape_info_co.data.front().shape_gradients.data(),
+                            size_shape_values));
       }
 
     internal::ReinitHelper<dim, Number> helper(
