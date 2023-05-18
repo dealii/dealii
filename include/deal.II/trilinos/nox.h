@@ -173,6 +173,11 @@ namespace TrilinosWrappers
                 Teuchos::rcp(new Teuchos::ParameterList));
 
     /**
+     * Destructor.
+     */
+    ~NOXSolver();
+
+    /**
      * Clear the internal state.
      */
     void
