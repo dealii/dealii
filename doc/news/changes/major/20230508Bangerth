@@ -9,7 +9,8 @@ positive value for a recoverable error.
 
 This approach does not scale across the many interfaces we have. As a
 consequence, we standardized how callbacks should behave, as
-documented in @ref GlossUserProvidedCallBack "this glossary entry". 
-The interfaces in SUNDIALS::KINSOL have been changed correspondingly.
+documented in @ref GlossUserProvidedCallBack "this glossary entry".
+The interfaces in SUNDIALS::KINSOL and SUNDIALS::ARKode have been
+changed correspondingly.
 <br>
 (Wolfgang Bangerth, 2023/05/08)

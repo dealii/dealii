@@ -27,25 +27,10 @@
 #include "../tests.h"
 
 
-// Test implicit-explicit time stepper. solve_jacobian + custom linear solver +
-// custom mass solver
+// Like _08, but throw a recoverable exception when solving with the linearized
+// system.
 
-/**
- * Test problem inspired by linear 1D FE problem with two unknowns u = [u1 u2]:
- *
- * M*u' = K*u + f
- *
- * where the mass matrix M = [2/3 1/3; 1/3 2/3]
- * and the stiffness matrix K = [1/2 -1/2; 1/2 -1/2]
- * and the force vector f = [1,2].
- * The initial values is chosen as u0 = [1,0].
- *
- * The implicit part is taken as K*u while f is explicit.
- *
- * Note that this is not the classical second-order mechanical system and thus
- * the term "mass matrix" may be misleading. It is still used here to be in line
- * with SUNDIALS nomenclature.
- */
+
 int
 main()
 {
@@ -59,7 +44,7 @@ main()
 
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/arkode_08_in.prm");
+      std::ofstream ofile(SOURCE_DIR "/arkode_10_in.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
       ofile.close();
     }
@@ -95,20 +80,36 @@ main()
                                   const VectorType &y,
                                   const VectorType &fy) { K.vmult(Jv, v); };
 
-  const auto solve_function =
-    [&](SUNDIALS::SundialsOperator<VectorType> &      op,
-        SUNDIALS::SundialsPreconditioner<VectorType> &prec,
-        VectorType &                                  x,
-        const VectorType &                            b,
-        double                                        tol) {
-      ReductionControl     control;
-      SolverCG<VectorType> solver_cg(control);
-      solver_cg.solve(op, x, b, prec);
+  [&](SUNDIALS::SundialsOperator<VectorType> &,
+      SUNDIALS::SundialsPreconditioner<VectorType> &,
+      VectorType &,
+      const VectorType &,
+      double) {
+    deallog << "Reporting recoverable failure." << std::endl;
+    throw RecoverableUserCallbackError();
+  };
+
+  ode.solve_linearized_system =
+    [&](SUNDIALS::SundialsOperator<VectorType> &,
+        SUNDIALS::SundialsPreconditioner<VectorType> &,
+        VectorType &,
+        const VectorType &,
+        double) {
+      deallog << "Reporting recoverable failure when solving linearized system."
+              << std::endl;
+      throw RecoverableUserCallbackError();
     };
 
-  ode.solve_linearized_system = solve_function;
 
-  ode.solve_mass = solve_function;
+  ode.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType> &      op,
+                       SUNDIALS::SundialsPreconditioner<VectorType> &prec,
+                       VectorType &                                  x,
+                       const VectorType &                            b,
+                       double                                        tol) {
+    ReductionControl     control;
+    SolverCG<VectorType> solver_cg(control);
+    solver_cg.solve(op, x, b, prec);
+  };
 
   FullMatrix<double> M_inv(2, 2);
 
@@ -138,5 +139,13 @@ main()
   Vector<double> y(2);
   y[0] = 1;
   y[1] = 0;
-  ode.solve_ode(y);
+
+  try
+    {
+      ode.solve_ode(y);
+    }
+  catch (const std::exception &exc)
+    {
+      deallog << "Caught exception:" << std::endl << exc.what() << std::endl;
+    }
 }
