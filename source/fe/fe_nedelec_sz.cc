@@ -15,6 +15,7 @@
 
 
 #include <deal.II/fe/fe_nedelec_sz.h>
+#include <deal.II/fe/fe_tools.h>
 
 #include <memory>
 
@@ -45,6 +46,104 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int order)
 
   // Generate the 1-D polynomial basis.
   create_polynomials(order);
+
+  // Compute the face embedding.
+  FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
+
+  // The implementation assumes that all faces have the same
+  // number of DoFs.
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 1;
+  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
+    {
+      face_embeddings[i].reinit(this->n_dofs_per_face(face_no),
+                                this->n_dofs_per_face(face_no));
+    }
+
+  FETools::compute_face_embedding_matrices<dim, double>(
+    *this, face_embeddings, 0, 0, 1.e-15 * std::exp(std::pow(order, 1.075)));
+
+  switch (dim)
+    {
+      case 1:
+        {
+          this->interface_constraints.reinit(0, 0);
+          break;
+        }
+
+      case 2:
+        {
+          this->interface_constraints.reinit(2 * this->n_dofs_per_face(face_no),
+                                             this->n_dofs_per_face(face_no));
+          for (unsigned int i = 0; i < GeometryInfo<2>::max_children_per_face;
+               ++i)
+            {
+              for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
+                {
+                  for (unsigned int k = 0; k < this->n_dofs_per_face(face_no);
+                       ++k)
+                    {
+                      this->interface_constraints(
+                        i * this->n_dofs_per_face(face_no) + j, k) =
+                        face_embeddings[i](j, k);
+                    }
+                }
+            }
+          break;
+        }
+
+      case 3:
+        {
+          this->interface_constraints.reinit(
+            4 * (this->n_dofs_per_face(face_no) - this->degree),
+            this->n_dofs_per_face(face_no));
+          unsigned int target_row = 0;
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = this->degree; j < 2 * this->degree;
+                 ++j, ++target_row)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
+                this->interface_constraints(target_row, k) =
+                  face_embeddings[2 * i](j, k);
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 3 * this->degree;
+                 j < GeometryInfo<3>::lines_per_face * this->degree;
+                 ++j, ++target_row)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
+                this->interface_constraints(target_row, k) =
+                  face_embeddings[i](j, k);
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = i * this->degree;
+                   k < (i + 1) * this->degree;
+                   ++k, ++target_row)
+                for (unsigned int l = 0; l < this->n_dofs_per_face(face_no);
+                     ++l)
+                  this->interface_constraints(target_row, l) =
+                    face_embeddings[i + 2 * j](k, l);
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = (i + 2) * this->degree;
+                   k < (i + 3) * this->degree;
+                   ++k, ++target_row)
+                for (unsigned int l = 0; l < this->n_dofs_per_face(face_no);
+                     ++l)
+                  this->interface_constraints(target_row, l) =
+                    face_embeddings[2 * i + j](k, l);
+          for (unsigned int i = 0; i < GeometryInfo<3>::max_children_per_face;
+               ++i)
+            for (unsigned int j =
+                   GeometryInfo<3>::lines_per_face * this->degree;
+                 j < this->n_dofs_per_face(face_no);
+                 ++j, ++target_row)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
+                this->interface_constraints(target_row, k) =
+                  face_embeddings[i](j, k);
+          break;
+        }
+
+      default:
+        Assert(false, ExcNotImplemented());
+    }
 }
 
 
@@ -1531,6 +1630,16 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                   unsigned int v0_glob = cell->vertex_index(v0_loc);
                   unsigned int v1_glob = cell->vertex_index(v1_loc);
 
+                  // Check for hanging edges on the current face. If we
+                  // encounter a hanging edge, we use the vertex indices
+                  // from the parent.
+                  if (cell->face(m)->at_boundary() == false)
+                    if (cell->neighbor_is_coarser(m))
+                      {
+                        v0_glob = cell->parent()->vertex_index(v0_loc);
+                        v1_glob = cell->parent()->vertex_index(v1_loc);
+                      }
+
                   if (v0_glob > v1_glob)
                     {
                       // Opposite to global numbering on our reference element
@@ -1777,6 +1886,142 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                       // Aligns with global numbering on our reference element.
                       edge_sign[m] = 1.0;
                     }
+                }
+
+              // Check for hanging faces. If we encounter hanging faces,
+              // we use the vertex indices from the parent.
+              for (unsigned int f = 0; f < 6; ++f)
+                if (cell->face(f)->at_boundary() == false)
+                  if (cell->neighbor_is_coarser(f))
+                    for (unsigned int m = 0; m < 4; ++m)
+                      {
+                        unsigned int parent_m =
+                          GeometryInfo<dim>::face_to_cell_lines(f, m);
+
+                        unsigned int v0_loc =
+                          GeometryInfo<dim>::line_to_cell_vertices(parent_m, 0);
+                        unsigned int v1_loc =
+                          GeometryInfo<dim>::line_to_cell_vertices(parent_m, 1);
+
+                        unsigned int v0_glob =
+                          cell->parent()->vertex_index(v0_loc);
+                        unsigned int v1_glob =
+                          cell->parent()->vertex_index(v1_loc);
+
+                        if (v0_glob > v1_glob)
+                          {
+                            // Opposite to global numbering on our reference
+                            // element
+                            edge_sign[parent_m] = -1.0;
+                          }
+                        else
+                          {
+                            // Aligns with global numbering on our reference
+                            // element.
+                            edge_sign[parent_m] = 1.0;
+                          }
+                      }
+
+              // Next, we cover the case where we encounter a hanging edge but
+              // not a hanging face. This is always the case if the cell
+              // currently considered shares all faces with cells of the same
+              // refinement level but shares one edge with a coarser cell,
+              // e.g.:
+              //            *----*----*---------*
+              //          /    /    /         / |
+              //        *----*----*         /   |
+              //      /    /    /         /     |
+              //    *----*----*---------*       *
+              //    |    |    |         |     / |
+              //    *----*----*         |   *   *
+              //    |    |    |         | / | / |
+              //    *----*----*----*----*   *   *
+              //    |    |    |    |    | / | /
+              //    *----*----*----*----*   *
+              //    |    |    |    |    | /
+              //    *----*----*----*----*
+              // where the cell at the left bottom is the currently
+              // considered cell.
+              //
+              // In that case, we determine the direction of the hanging edge
+              // based on the vertex indices from the parent cell.
+              //
+              // Note: We assume here that at most eight cells are adjacent to
+              // a single vertex.
+              std::vector<unsigned int> adjacent_faces = {2, 2, 4, 4, 0, 0};
+              for (unsigned int f = 0; f < 6; ++f)
+                {
+                  if (!cell->face(f)->at_boundary() &&
+                      !cell->face(adjacent_faces[f])->at_boundary())
+                    if (!cell->neighbor_is_coarser(f) &&
+                        !cell->neighbor_is_coarser(adjacent_faces[f]))
+                      if (!cell->neighbor(f)
+                             ->face(adjacent_faces[f])
+                             ->at_boundary())
+                        if (cell->neighbor(f)->neighbor_is_coarser(
+                              adjacent_faces[f]))
+                          {
+                            unsigned int parent_m =
+                              GeometryInfo<dim>::face_to_cell_lines(f, 0);
+                            unsigned int v0_loc =
+                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
+                                                                       0);
+                            unsigned int v1_loc =
+                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
+                                                                       1);
+                            unsigned int v0_glob =
+                              cell->parent()->vertex_index(v0_loc);
+                            unsigned int v1_glob =
+                              cell->parent()->vertex_index(v1_loc);
+                            if (v0_glob > v1_glob)
+                              {
+                                // Opposite to global numbering on our reference
+                                // element
+                                edge_sign[parent_m] = -1.0;
+                              }
+                            else
+                              {
+                                // Aligns with global numbering on our reference
+                                // element.
+                                edge_sign[parent_m] = 1.0;
+                              }
+                          }
+
+                  if (!cell->face(f)->at_boundary() &&
+                      !cell->face(adjacent_faces[f] + 1)->at_boundary())
+                    if (!cell->neighbor_is_coarser(f) &&
+                        !cell->neighbor_is_coarser(adjacent_faces[f] + 1))
+                      if (!cell->neighbor(f)
+                             ->face(adjacent_faces[f] + 1)
+                             ->at_boundary())
+                        if (cell->neighbor(f)->neighbor_is_coarser(
+                              adjacent_faces[f] + 1))
+                          {
+                            unsigned int parent_m =
+                              GeometryInfo<dim>::face_to_cell_lines(f, 1);
+                            unsigned int v0_loc =
+                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
+                                                                       0);
+                            unsigned int v1_loc =
+                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
+                                                                       1);
+                            unsigned int v0_glob =
+                              cell->parent()->vertex_index(v0_loc);
+                            unsigned int v1_glob =
+                              cell->parent()->vertex_index(v1_loc);
+                            if (v0_glob > v1_glob)
+                              {
+                                // Opposite to global numbering on our reference
+                                // element
+                                edge_sign[parent_m] = -1.0;
+                              }
+                            else
+                              {
+                                // Aligns with global numbering on our reference
+                                // element.
+                                edge_sign[parent_m] = 1.0;
+                              }
+                          }
                 }
 
               // Define \sigma_{m} = sigma_{e^{m}_{1}} - sigma_{e^{m}_{2}}
@@ -2082,26 +2327,58 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
 
           const unsigned int
             vertices_adjacent_on_face[GeometryInfo<3>::vertices_per_face][2] = {
-              {1, 2}, {0, 3}, {0, 3}, {1, 2}};
+              {1, 2}, {0, 3}, {3, 0}, {2, 1}};
 
           for (unsigned int m = 0; m < faces_per_cell; ++m)
             {
+              // Check, if we are on a hanging face.
+              bool cell_has_coarser_neighbor = false;
+              if (cell->face(m)->at_boundary() == false)
+                if (cell->neighbor_is_coarser(m))
+                  cell_has_coarser_neighbor = true;
+
               // Find the local vertex on this face with the highest global
               // numbering. This is f^m_0.
-              unsigned int current_max  = 0;
-              unsigned int current_glob = cell->vertex_index(
-                GeometryInfo<dim>::face_to_cell_vertices(m, 0));
-              for (unsigned int v = 1; v < vertices_per_face; ++v)
+              unsigned int current_max = 0;
+
+              // We start with the hanging face case, where the face
+              // orientation is determined based on the vertex indices
+              // of the parent cell.
+              if (cell_has_coarser_neighbor)
                 {
-                  if (current_glob <
-                      cell->vertex_index(
-                        GeometryInfo<dim>::face_to_cell_vertices(m, v)))
+                  unsigned int current_glob = cell->parent()->vertex_index(
+                    GeometryInfo<dim>::face_to_cell_vertices(m, 0));
+                  for (unsigned int v = 1; v < vertices_per_face; ++v)
                     {
-                      current_max  = v;
-                      current_glob = cell->vertex_index(
-                        GeometryInfo<dim>::face_to_cell_vertices(m, v));
+                      if (current_glob <
+                          cell->parent()->vertex_index(
+                            GeometryInfo<dim>::face_to_cell_vertices(m, v)))
+                        {
+                          current_max  = v;
+                          current_glob = cell->parent()->vertex_index(
+                            GeometryInfo<dim>::face_to_cell_vertices(m, v));
+                        }
                     }
                 }
+              // Otherwise, the face orientation is based on its own
+              // vertex indices.
+              else
+                {
+                  unsigned int current_glob = cell->vertex_index(
+                    GeometryInfo<dim>::face_to_cell_vertices(m, 0));
+                  for (unsigned int v = 1; v < vertices_per_face; ++v)
+                    {
+                      if (current_glob <
+                          cell->vertex_index(
+                            GeometryInfo<dim>::face_to_cell_vertices(m, v)))
+                        {
+                          current_max  = v;
+                          current_glob = cell->vertex_index(
+                            GeometryInfo<dim>::face_to_cell_vertices(m, v));
+                        }
+                    }
+                }
+
               face_orientation[m][0] =
                 GeometryInfo<dim>::face_to_cell_vertices(m, current_max);
 
@@ -2111,29 +2388,63 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
 
               // Finally, f^m_1 is the vertex with the greater global numbering
               // of the remaining two local vertices. Then, f^m_3 is the other.
-              if (cell->vertex_index(GeometryInfo<dim>::face_to_cell_vertices(
-                    m, vertices_adjacent_on_face[current_max][0])) >
-                  cell->vertex_index(GeometryInfo<dim>::face_to_cell_vertices(
-                    m, vertices_adjacent_on_face[current_max][1])))
+              // Again, we need to distinguish between the hanging face and the
+              // non-hanging face cases. In the case of hanging faces, we
+              // consider the vertex indices from the parent. Otherwise, we
+              // consider the vertex indices of the face itself.
+              if (cell_has_coarser_neighbor)
                 {
-                  face_orientation[m][1] =
-                    GeometryInfo<dim>::face_to_cell_vertices(
-                      m, vertices_adjacent_on_face[current_max][0]);
-                  face_orientation[m][3] =
-                    GeometryInfo<dim>::face_to_cell_vertices(
-                      m, vertices_adjacent_on_face[current_max][1]);
+                  if (cell->parent()->vertex_index(
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][0])) >
+                      cell->parent()->vertex_index(
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][1])))
+                    {
+                      face_orientation[m][1] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][0]);
+                      face_orientation[m][3] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][1]);
+                    }
+                  else
+                    {
+                      face_orientation[m][1] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][1]);
+                      face_orientation[m][3] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][0]);
+                    }
                 }
               else
                 {
-                  face_orientation[m][1] =
-                    GeometryInfo<dim>::face_to_cell_vertices(
-                      m, vertices_adjacent_on_face[current_max][1]);
-                  face_orientation[m][3] =
-                    GeometryInfo<dim>::face_to_cell_vertices(
-                      m, vertices_adjacent_on_face[current_max][0]);
+                  if (cell->vertex_index(
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][0])) >
+                      cell->vertex_index(
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][1])))
+                    {
+                      face_orientation[m][1] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][0]);
+                      face_orientation[m][3] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][1]);
+                    }
+                  else
+                    {
+                      face_orientation[m][1] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][1]);
+                      face_orientation[m][3] =
+                        GeometryInfo<dim>::face_to_cell_vertices(
+                          m, vertices_adjacent_on_face[current_max][0]);
+                    }
                 }
             }
-
           // Now we know the face orientation on the current cell, we can
           // generate the parameterisation:
           std::vector<std::vector<double>> face_xi_values(
@@ -2211,7 +2522,8 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
               // Type-3:
               //
               // \phi^{F_m,3}_{i} = L_{i+2}(\eta_{F_{m}}) \lambda_{F_{m}}
-              // \nabla\xi_{F_{m}} \phi^{F_m,3}_{i+p} = L_{i+2}(\xi_{F_{m}})
+              // \nabla\xi_{F_{m}}
+              // \phi^{F_m,3}_{i+p} = L_{i+2}(\xi_{F_{m}})
               // \lambda_{F_{m}} \nabla\eta_{F_{m}}
               //
               // 0 <= i < degree.
