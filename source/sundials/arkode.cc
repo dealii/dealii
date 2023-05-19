@@ -660,13 +660,13 @@ namespace SUNDIALS
           {
             linear_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_linearized_system
+                solve_linearized_system,
+                pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                 ,
                 arkode_ctx
 #  endif
-                ,
-                pending_exception);
+              );
             sun_linear_solver = *linear_solver;
           }
         else
@@ -763,13 +763,14 @@ namespace SUNDIALS
           {
             mass_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_mass
+                solve_mass,
+
+                pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                 ,
                 arkode_ctx
 #  endif
-                ,
-                pending_exception);
+              );
             sun_mass_linear_solver = *mass_solver;
           }
         else
