@@ -1951,14 +1951,23 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 
       std::vector<bool> hard_vectorization_boundary(
         task_info.face_partition_data.size(), false);
-      if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none &&
-          task_info.partition_row_index[2] <
-            task_info.face_partition_data.size())
-        hard_vectorization_boundary[task_info.partition_row_index[2]] = true;
+      if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none)
+        {
+          // In case we do an MPI data exchange, we must make sure to first
+          // complete all face integrals with results in the ghost range
+          if (task_info.partition_row_index[2] <
+              task_info.face_partition_data.size())
+            hard_vectorization_boundary[task_info.partition_row_index[2]] =
+              true;
+        }
       else
-        std::fill(hard_vectorization_boundary.begin(),
-                  hard_vectorization_boundary.end(),
-                  true);
+        {
+          // If we do threading, we need to strictly adhere to each partition,
+          // as we can't schedule work on conflicting face batches
+          std::fill(hard_vectorization_boundary.begin(),
+                    hard_vectorization_boundary.end(),
+                    true);
+        }
 
       internal::MatrixFreeFunctions::collect_faces_vectorization(
         face_setup.inner_faces,
