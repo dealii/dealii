@@ -35,6 +35,12 @@ test(const ReferenceCell &reference_cell)
   unsigned int       n_samples_inside = 0;
   const unsigned int n_samples        = 200000;
 
+  // sanity check: does the reference cell contain its own nodes?
+  for (unsigned int vertex_no : reference_cell.vertex_indices())
+    AssertThrow(reference_cell.contains_point(
+                  reference_cell.template vertex<dim>(vertex_no)),
+                ExcInternalError());
+
   for (unsigned int n = 0; n < n_samples; ++n)
     {
       // Choose a random point in the box [-1,1]^d that contains all

@@ -2622,7 +2622,7 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
 
           // We are inside the pyramid if the distance from the axis is less
           // than (1-z)
-          return (distance_from_axis < 1 + tolerance - p[z_coordinate]);
+          return (distance_from_axis <= 1 + tolerance - p[z_coordinate]);
         }
       case ReferenceCells::Wedge:
         {
