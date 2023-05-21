@@ -561,9 +561,14 @@ public:
    * VectorizedArray fields of length MatrixFree::n_cell_batches() +
    * MatrixFree::n_ghost_cell_batches() for cell data. It is implemented
    * both for cells and faces (access data to the associated cell).
+   *
+   * The underlying type can be both the Number type as given by the class
+   * template (i.e., VectorizedArrayType) as well as std::array with as many
+   * entries as n_lanes.
    */
-  Number
-  read_cell_data(const AlignedVector<Number> &array) const;
+  template <typename T>
+  T
+  read_cell_data(const AlignedVector<T> &array) const;
 
   /**
    * Provides a unified interface to set data in a vector of
@@ -571,26 +576,9 @@ public:
    * MatrixFree::n_ghost_cell_batches() for cell data. It is implemented
    * both for cells and faces (access data to the associated cell).
    */
-  void
-  set_cell_data(AlignedVector<Number> &array, const Number &value) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
-  template <typename T>
-  std::array<T, Number::size()>
-  read_cell_data(
-    const AlignedVector<std::array<T, Number::size()>> &array) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
   template <typename T>
   void
-  set_cell_data(AlignedVector<std::array<T, Number::size()>> &array,
-                const std::array<T, Number::size()> &         value) const;
+  set_cell_data(AlignedVector<T> &array, const T &value) const;
 
   /**
    * Provides a unified interface to access data in a vector of
@@ -600,8 +588,9 @@ public:
    *
    * @note Only implemented for faces.
    */
-  Number
-  read_face_data(const AlignedVector<Number> &array) const;
+  template <typename T>
+  T
+  read_face_data(const AlignedVector<T> &array) const;
 
   /**
    * Provides a unified interface to set data in a vector of
@@ -611,26 +600,9 @@ public:
    *
    * @note Only implemented for faces.
    */
-  void
-  set_face_data(AlignedVector<Number> &array, const Number &value) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
-  template <typename T>
-  std::array<T, Number::size()>
-  read_face_data(
-    const AlignedVector<std::array<T, Number::size()>> &array) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
   template <typename T>
   void
-  set_face_data(AlignedVector<std::array<T, Number::size()>> &array,
-                const std::array<T, Number::size()> &         value) const;
+  set_face_data(AlignedVector<T> &array, const T &value) const;
 
   /** @} */
 
@@ -1664,13 +1636,13 @@ FEEvaluationData<dim, Number, is_face>::quadrature_point_indices() const
 namespace internal
 {
   template <std::size_t N,
-            typename VectorizedArrayType2,
-            typename GlobalVectorType,
+            typename VectorOfArrayType,
+            typename ArrayType,
             typename FU>
   inline void
   process_cell_or_face_data(const std::array<unsigned int, N> indices,
-                            GlobalVectorType &                array,
-                            VectorizedArrayType2 &            out,
+                            VectorOfArrayType &               array,
+                            ArrayType &                       out,
                             const FU &                        fu)
   {
     for (unsigned int i = 0; i < N; ++i)
@@ -1680,50 +1652,33 @@ namespace internal
           fu(out[i], array[indices[i] / N][indices[i] % N]);
         }
   }
+
+  template <std::size_t N, typename VectorOfArrayType, typename ArrayType>
+  inline void
+  set_valid_element_to_array(const std::array<unsigned int, N> indices,
+                             const VectorOfArrayType &         array,
+                             ArrayType &                       out)
+  {
+    // set all entries in array to a valid element
+    int index = 0;
+    for (; index < N; ++index)
+      if (indices[index] != numbers::invalid_unsigned_int)
+        break;
+    for (unsigned int i = 0; i < N; ++i)
+      out[i] = array[indices[index] / N][indices[index] % N];
+  }
 } // namespace internal
 
 
 
 template <int dim, typename Number, bool is_face>
-inline Number
+template <typename T>
+inline T
 FEEvaluationData<dim, Number, is_face>::read_cell_data(
-  const AlignedVector<Number> &array) const
+  const AlignedVector<T> &array) const
 {
-  Number out = Number(1.);
-  internal::process_cell_or_face_data(this->get_cell_ids(),
-                                      array,
-                                      out,
-                                      [](auto &local, const auto &global) {
-                                        local = global;
-                                      });
-  return out;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline void
-FEEvaluationData<dim, Number, is_face>::set_cell_data(
-  AlignedVector<Number> &array,
-  const Number &         in) const
-{
-  internal::process_cell_or_face_data(this->get_cell_ids(),
-                                      array,
-                                      in,
-                                      [](const auto &local, auto &global) {
-                                        global = local;
-                                      });
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-template <typename T>
-inline std::array<T, Number::size()>
-FEEvaluationData<dim, Number, is_face>::read_cell_data(
-  const AlignedVector<std::array<T, Number::size()>> &array) const
-{
-  std::array<T, Number::size()> out;
+  T out;
+  internal::set_valid_element_to_array(this->get_cell_ids(), array, out);
   internal::process_cell_or_face_data(this->get_cell_ids(),
                                       array,
                                       out,
@@ -1738,9 +1693,8 @@ FEEvaluationData<dim, Number, is_face>::read_cell_data(
 template <int dim, typename Number, bool is_face>
 template <typename T>
 inline void
-FEEvaluationData<dim, Number, is_face>::set_cell_data(
-  AlignedVector<std::array<T, Number::size()>> &array,
-  const std::array<T, Number::size()> &         in) const
+FEEvaluationData<dim, Number, is_face>::set_cell_data(AlignedVector<T> &array,
+                                                      const T &in) const
 {
   internal::process_cell_or_face_data(this->get_cell_ids(),
                                       array,
@@ -1753,45 +1707,13 @@ FEEvaluationData<dim, Number, is_face>::set_cell_data(
 
 
 template <int dim, typename Number, bool is_face>
-inline Number
+template <typename T>
+inline T
 FEEvaluationData<dim, Number, is_face>::read_face_data(
-  const AlignedVector<Number> &array) const
+  const AlignedVector<T> &array) const
 {
-  Number out = Number(1.);
-  internal::process_cell_or_face_data(this->get_face_ids(),
-                                      array,
-                                      out,
-                                      [](auto &local, const auto &global) {
-                                        local = global;
-                                      });
-  return out;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline void
-FEEvaluationData<dim, Number, is_face>::set_face_data(
-  AlignedVector<Number> &array,
-  const Number &         in) const
-{
-  internal::process_cell_or_face_data(this->get_face_ids(),
-                                      array,
-                                      in,
-                                      [](const auto &local, auto &global) {
-                                        global = local;
-                                      });
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-template <typename T>
-inline std::array<T, Number::size()>
-FEEvaluationData<dim, Number, is_face>::read_face_data(
-  const AlignedVector<std::array<T, Number::size()>> &array) const
-{
-  std::array<T, Number::size()> out;
+  T out;
+  internal::set_valid_element_to_array(this->get_cell_ids(), array, out);
   internal::process_cell_or_face_data(this->get_face_ids(),
                                       array,
                                       out,
@@ -1806,9 +1728,8 @@ FEEvaluationData<dim, Number, is_face>::read_face_data(
 template <int dim, typename Number, bool is_face>
 template <typename T>
 inline void
-FEEvaluationData<dim, Number, is_face>::set_face_data(
-  AlignedVector<std::array<T, Number::size()>> &array,
-  const std::array<T, Number::size()> &         in) const
+FEEvaluationData<dim, Number, is_face>::set_face_data(AlignedVector<T> &array,
+                                                      const T &in) const
 {
   internal::process_cell_or_face_data(this->get_face_ids(),
                                       array,
