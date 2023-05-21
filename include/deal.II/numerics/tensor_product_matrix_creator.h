@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A namespace with functions that create input for certain standard matrices
  * for the classes TensorProductMatrixSymmetricSum and
- * TensorProductMatrixSymmetricSumCache.
+ * TensorProductMatrixSymmetricSumCollection.
  */
 namespace TensorProductMatrixCreator
 {
