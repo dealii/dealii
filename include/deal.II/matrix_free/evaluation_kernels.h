@@ -1048,8 +1048,8 @@ namespace internal
                                         dim,
                                         (fe_degree == -1) ? 1 : fe_degree + 1,
                                         n_q_points_1d,
-                                        Number,
                                         normal_dir,
+                                        Number,
                                         Number2>;
 
     using EvalTangent =
@@ -1057,8 +1057,8 @@ namespace internal
                                         dim,
                                         (fe_degree == -1) ? 1 : fe_degree,
                                         n_q_points_1d,
-                                        Number,
                                         normal_dir,
+                                        Number,
                                         Number2>;
     using Eval0 =
       typename std::conditional<normal_dir == 0, EvalNormal, EvalTangent>::type;
@@ -1244,8 +1244,8 @@ namespace internal
                                         dim,
                                         (fe_degree == -1) ? 1 : fe_degree + 1,
                                         n_q_points_1d,
-                                        Number,
                                         normal_dir,
+                                        Number,
                                         Number2>;
 
     using EvalTangent =
@@ -1253,8 +1253,8 @@ namespace internal
                                         dim,
                                         (fe_degree == -1) ? 1 : fe_degree,
                                         n_q_points_1d,
-                                        Number,
                                         normal_dir,
+                                        Number,
                                         Number2>;
     using Eval0 =
       typename std::conditional<normal_dir == 0, EvalNormal, EvalTangent>::type;
@@ -1437,6 +1437,14 @@ namespace internal
    *
    * This class allows for dimension-independent application of the operation,
    * implemented by template recursion. It has been tested up to 6d.
+   *
+   * The last two template arguments in this class are unused. They have a
+   * default type set to bool, but any type will compile. These arguments are
+   * present for backward compatibility of this (internal) interface with
+   * previous versions of deal.II, where the template arguments were used to
+   * indicate the number types These are now part of the do_forward() and
+   * do_backward() functions, and they will be removed from a future version
+   * of deal.II.
    */
   template <EvaluatorVariant  variant,
             EvaluatorQuantity quantity,
@@ -3053,16 +3061,16 @@ namespace internal
                                           dim - 1,
                                           (fe_degree == -1) ? 1 : fe_degree + 1,
                                           n_q_points_1d,
-                                          Number,
                                           normal_dir,
+                                          Number,
                                           Number2>;
       using EvalTangent =
         EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
                                           dim - 1,
                                           (fe_degree == -1) ? 1 : fe_degree,
                                           n_q_points_1d,
-                                          Number,
                                           normal_dir,
+                                          Number,
                                           Number2>;
 
       using TempEval0 = typename std::
@@ -3258,16 +3266,16 @@ namespace internal
                                           dim - 1,
                                           (fe_degree == -1) ? 1 : fe_degree + 1,
                                           n_q_points_1d,
-                                          Number,
                                           normal_dir,
+                                          Number,
                                           Number2>;
       using EvalTangent =
         EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
                                           dim - 1,
                                           (fe_degree == -1) ? 1 : fe_degree,
                                           n_q_points_1d,
-                                          Number,
                                           normal_dir,
+                                          Number,
                                           Number2>;
 
       using TempEval0 = typename std::
@@ -3713,15 +3721,15 @@ namespace internal
                                           dim,
                                           (fe_degree == -1) ? 1 : fe_degree + 1,
                                           0,
-                                          Number,
                                           0,
+                                          Number,
                                           Number2>,
         EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
                                           dim,
                                           (fe_degree == -1) ? 1 : fe_degree,
                                           0,
-                                          Number,
                                           0,
+                                          Number,
                                           Number2>>::type;
       using Evalf1 = typename std::conditional<
         face_direction == 1,
@@ -3729,15 +3737,15 @@ namespace internal
                                           dim,
                                           (fe_degree == -1) ? 1 : fe_degree + 1,
                                           0,
-                                          Number,
                                           1,
+                                          Number,
                                           Number2>,
         EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
                                           dim,
                                           (fe_degree == -1) ? 1 : fe_degree,
                                           0,
-                                          Number,
                                           1,
+                                          Number,
                                           Number2>>::type;
       using Evalf2 = typename std::conditional<
         face_direction == 2,
@@ -3745,15 +3753,15 @@ namespace internal
                                           dim,
                                           (fe_degree == -1) ? 1 : fe_degree + 1,
                                           0,
-                                          Number,
                                           2,
+                                          Number,
                                           Number2>,
         EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
                                           dim,
                                           (fe_degree == -1) ? 1 : fe_degree,
                                           0,
-                                          Number,
                                           2,
+                                          Number,
                                           Number2>>::type;
 
       Evalf0 evalf0 =
