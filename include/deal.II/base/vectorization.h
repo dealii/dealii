@@ -2315,14 +2315,6 @@ public:
   {}
 
   /**
-   * Construct an array with the data field.
-   */
-  VectorizedArray(__m256d const &x)
-  {
-    data = x;
-  }
-
-  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2893,14 +2885,6 @@ public:
   VectorizedArray(const std::initializer_list<U> &list)
     : VectorizedArrayBase<VectorizedArray<float, 8>, 8>(list)
   {}
-
-  /**
-   * Construct an array with the data field.
-   */
-  VectorizedArray(__m256 const &x)
-  {
-    data = x;
-  }
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -3495,14 +3479,6 @@ public:
   {}
 
   /**
-   * Construct an array with the data field.
-   */
-  VectorizedArray(__m128d const &x)
-  {
-    data = x;
-  }
-
-  /**
    * This function can be used to set all data fields to a given scalar.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3991,14 +3967,6 @@ public:
   {
     data = _mm_set1_ps(x);
     return *this;
-  }
-
-  /**
-   * Construct an array with the data field.
-   */
-  VectorizedArray(__m128 const &x)
-  {
-    data = x;
   }
 
   /**
@@ -5002,7 +4970,8 @@ VectorizedArray<float, 4>::horizontal_add()
 inline double
 VectorizedArray<double, 4>::horizontal_add()
 {
-  VectorizedArray<double, 2> t1(this->get_low() + this->get_high());
+  VectorizedArray<double, 2> t1;
+  t1.data = this->get_low() + this->get_high();
   return t1.horizontal_add();
 }
 
@@ -5011,7 +4980,8 @@ VectorizedArray<double, 4>::horizontal_add()
 inline float
 VectorizedArray<float, 8>::horizontal_add()
 {
-  VectorizedArray<float, 4> t1(this->get_low() + this->get_high());
+  VectorizedArray<float, 4> t1;
+  t1.data = this->get_low() + this->get_high();
   return t1.horizontal_add();
 }
 #endif
@@ -5022,7 +4992,8 @@ VectorizedArray<float, 8>::horizontal_add()
 inline double
 VectorizedArray<double, 8>::horizontal_add()
 {
-  VectorizedArray<double, 4> t1(this->get_low() + this->get_high());
+  VectorizedArray<double, 4> t1;
+  t1.data = this->get_low() + this->get_high();
   return t1.horizontal_add();
 }
 
@@ -5031,7 +5002,8 @@ VectorizedArray<double, 8>::horizontal_add()
 inline float
 VectorizedArray<float, 16>::horizontal_add()
 {
-  VectorizedArray<float, 8> t1(this->get_low() + this->get_high());
+  VectorizedArray<float, 8> t1;
+  t1.data = this->get_low() + this->get_high();
   return t1.horizontal_add();
 }
 #endif
