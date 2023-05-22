@@ -495,6 +495,22 @@ namespace GridTools
           {
             if ((*cell)->is_artificial() == false)
               {
+                // marked_vertices are used to filter cell candidates
+                if (marked_vertices.size() > 0)
+                  {
+                    bool any_vertex_marked = false;
+                    for (const auto &v : (*cell)->vertex_indices())
+                      {
+                        if (marked_vertices[(*cell)->vertex_index(v)])
+                          {
+                            any_vertex_marked = true;
+                            break;
+                          }
+                      }
+                    if (!any_vertex_marked)
+                      continue;
+                  }
+
                 try
                   {
                     const Point<dim> p_cell =
@@ -539,12 +555,6 @@ namespace GridTools
 
         // update the number of cells searched
         cells_searched += adjacent_cells.size();
-
-        // if the user provided a custom mask for vertices,
-        // terminate the search without trying to expand the search
-        // to all cells of the triangulation, as done below.
-        if (marked_vertices.size() > 0)
-          cells_searched = n_active_cells;
 
         // if we have not found the cell in
         // question and have not yet searched every
