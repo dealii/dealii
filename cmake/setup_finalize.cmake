@@ -61,6 +61,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
       DEAL_II_HAVE_USABLE_FLAGS_${build}
       ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
+      ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${build}}
       )
   endmacro()
 
