@@ -293,7 +293,7 @@ namespace SUNDIALS
    * -k^2 &0
    * \end{pmatrix}
    * \f]
-   * and $y(0)=(0, k)$.
+   * and $y(0)=(0, k)^T$.
    *
    * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k
    *t)$, $y_1'(t) = -k^2 \sin(k t)$.
@@ -306,22 +306,25 @@ namespace SUNDIALS
    *
    * SUNDIALS::ARKode<VectorType> ode;
    *
-   * const double kappa = 1.0;
+   * const double k = 1.0;
    *
-   * ode.explicit_function = [kappa] (double,
-   *                                  const VectorType &y,
-   *                                  VectorType &ydot) -> int
+   * ode.explicit_function = [k] (const double / * time * /,
+   *                              const VectorType &y,
+   *                              VectorType &ydot)
    * {
    *   ydot[0] = y[1];
-   *   ydot[1] = -kappa*kappa*y[0];
-   *   return 0;
+   *   ydot[1] = -k*k*y[0];
    * };
    *
    * Vector<double> y(2);
-   * y[1] = kappa;
+   * y[1] = k;
    *
    * ode.solve_ode(y);
    * @endcode
+   *
+   * In practice, you would of course at least want to set the end time up
+   * to which the time integrator should run. In the example code shown here,
+   * it is taken from the default value defined by ARKode::AdditionalData.
    */
   template <typename VectorType = Vector<double>>
   class ARKode
