@@ -41,27 +41,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace CUDAWrappers
 {
-  namespace internal
-  {
-    /**
-     * Compute the dof/quad index for a given thread id, dimension, and
-     * number of points in each space dimensions.
-     */
-    template <int dim, int n_points_1d>
-    DEAL_II_HOST_DEVICE inline unsigned int
-    compute_index()
-    {
-      KOKKOS_IF_ON_DEVICE(
-        return (dim == 1 ?
-                  threadIdx.x % n_points_1d :
-                dim == 2 ?
-                  threadIdx.x % n_points_1d + n_points_1d * threadIdx.y :
-                  threadIdx.x % n_points_1d +
-                    n_points_1d * (threadIdx.y + n_points_1d * threadIdx.z));)
-      KOKKOS_IF_ON_HOST(return 0;)
-    }
-  } // namespace internal
-
   /**
    * This class provides all the functions necessary to evaluate functions at
    * quadrature points and cell integrations. In functionality, this class is
@@ -136,9 +115,7 @@ namespace CUDAWrappers
      * Constructor.
      */
     DEAL_II_HOST_DEVICE
-    FEEvaluation(const unsigned int       cell_id,
-                 const data_type *        data,
-                 SharedData<dim, Number> *shdata);
+    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata);
 
     /**
      * For the vector @p src, read out the values on the degrees of freedom of
@@ -185,42 +162,42 @@ namespace CUDAWrappers
      * id.
      */
     DEAL_II_HOST_DEVICE value_type
-    get_value() const;
+    get_value(int q_point) const;
 
     /**
      * Same as above, except that the local dof index is computed from the
      * thread id.
      */
     DEAL_II_HOST_DEVICE value_type
-    get_dof_value() const;
+    get_dof_value(int q_point) const;
 
     /**
      * Same as above, except that the quadrature point is computed from the
      * thread id.
      */
     DEAL_II_HOST_DEVICE void
-    submit_value(const value_type &val_in);
+    submit_value(const value_type &val_in, int q_point);
 
     /**
      * Same as above, except that the local dof index is computed from the
      * thread id.
      */
     DEAL_II_HOST_DEVICE void
-    submit_dof_value(const value_type &val_in);
+    submit_dof_value(const value_type &val_in, int q_point);
 
     /**
      * Same as above, except that the quadrature point is computed from the
      * thread id.
      */
     DEAL_II_HOST_DEVICE gradient_type
-    get_gradient() const;
+    get_gradient(int q_point) const;
 
     /**
      * Same as above, except that the quadrature point is computed from the
      * thread id.
      */
     DEAL_II_HOST_DEVICE void
-    submit_gradient(const gradient_type &grad_in);
+    submit_gradient(const gradient_type &grad_in, int q_point);
 
     // clang-format off
     /**
@@ -239,64 +216,9 @@ namespace CUDAWrappers
     apply_for_each_quad_point(const Functor &func);
 
   private:
-    // FIXME We would like to use
-    // Kokkos::Subview<Kokkos::View<types::global_dof_index **,
-    // MemorySpace::Default::kokkos_space>, int, decltype(Kokkos::ALL)>
-    // but we get error: incomplete type is not allowed. I cannot reproduce
-    // outside of deal.II. Need to investigate more.
-    Kokkos::Subview<Kokkos::View<types::global_dof_index **,
-                                 MemorySpace::Default::kokkos_space>,
-                    int,
-                    Kokkos::pair<int, int>>
-                 local_to_global;
-    unsigned int n_cells;
-    unsigned int padding_length;
-
-    const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-      constraint_mask;
-
-    const bool use_coloring;
-
-    // FIXME We would like to use
-    // Kokkos::Subview<Kokkos::View<Number **[dim][dim],
-    // MemorySpace::Default::kokkos_space>, int, decltype(Kokkos::ALL),
-    // decltype(Kokkos::ALL), decltype(Kokkos::ALL)> but we get error:
-    // incomplete type is not allowed. I cannot reproduce outside of deal.II.
-    // Need to investigate more.
-    Kokkos::Subview<
-      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>,
-      int,
-      Kokkos::pair<int, int>,
-      Kokkos::pair<int, int>,
-      Kokkos::pair<int, int>>
-      inv_jac;
-    // FIXME We would like to use
-    // Kokkos::Subview<Kokkos::View<Number **,
-    // MemorySpace::Default::kokkos_space>, int, decltype(Kokkos::ALL)>
-    // but we get error: incomplete type is not allowed. I cannot reproduce
-    // outside of deal.II. Need to investigate more.
-    Kokkos::Subview<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>,
-                    int,
-                    Kokkos::pair<int, int>>
-      JxW;
-
-    // Data shared by multiple cells
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_gradients;
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-      co_shape_gradients;
-    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-      constraint_weights;
-
-    // Internal buffer
-    Kokkos::Subview<Kokkos::View<Number *, MemorySpace::Default::kokkos_space>,
-                    Kokkos::pair<int, int>>
-      values;
-    Kokkos::Subview<
-      Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>,
-      Kokkos::pair<int, int>,
-      Kokkos::pair<int, int>>
-      gradients;
+    const data_type *        data;
+    SharedData<dim, Number> *shared_data;
+    int                      cell_id;
   };
 
 
@@ -308,33 +230,10 @@ namespace CUDAWrappers
             typename Number>
   DEAL_II_HOST_DEVICE
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(const unsigned int       cell_id,
-                 const data_type *        data,
-                 SharedData<dim, Number> *shdata)
-    : local_to_global(Kokkos::subview(
-        data->local_to_global,
-        cell_id,
-        Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim))))
-    , n_cells(data->n_cells)
-    , padding_length(data->padding_length)
-    , constraint_mask(data->constraint_mask[cell_id])
-    , use_coloring(data->use_coloring)
-    , inv_jac(Kokkos::subview(
-        data->inv_jacobian,
-        cell_id,
-        Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim)),
-        Kokkos::pair<int, int>(0, dim),
-        Kokkos::pair<int, int>(0, dim)))
-    , JxW(Kokkos::subview(
-        data->JxW,
-        cell_id,
-        Kokkos::pair<int, int>(0, Utilities::pow(n_q_points_1d, dim))))
-    , shape_values(data->shape_values)
-    , shape_gradients(data->shape_gradients)
-    , co_shape_gradients(data->co_shape_gradients)
-    , constraint_weights(data->constraint_weights)
-    , values(shdata->values)
-    , gradients(shdata->gradients)
+    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata)
+    : data(data)
+    , shared_data(shdata)
+    , cell_id(shared_data->team_member.league_rank())
   {}
 
 
@@ -350,15 +249,20 @@ namespace CUDAWrappers
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
-    const unsigned int idx = internal::compute_index<dim, n_q_points_1d>();
+    // Populate the scratch memory
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                 n_q_points),
+                         [&](const int &i) {
+                           shared_data->values(i) =
+                             src[data->local_to_global(cell_id, i)];
+                         });
+    shared_data->team_member.team_barrier();
 
-    const types::global_dof_index src_idx = local_to_global[idx];
-    values[idx]                           = src[src_idx];
-    KOKKOS_IF_ON_DEVICE(__syncthreads();)
-
-    internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_weights,
-                                                           constraint_mask,
-                                                           values);
+    internal::resolve_hanging_nodes<dim, fe_degree, false>(
+      shared_data->team_member,
+      data->constraint_weights,
+      data->constraint_mask(cell_id),
+      shared_data->values);
   }
 
 
@@ -374,18 +278,31 @@ namespace CUDAWrappers
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
-    internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_weights,
-                                                          constraint_mask,
-                                                          values);
 
-    const unsigned int idx = internal::compute_index<dim, n_q_points_1d>();
+    internal::resolve_hanging_nodes<dim, fe_degree, true>(
+      shared_data->team_member,
+      data->constraint_weights,
+      data->constraint_mask(cell_id),
+      shared_data->values);
 
-    const types::global_dof_index destination_idx = local_to_global[idx];
-
-    if (use_coloring)
-      dst[destination_idx] += values[idx];
+    if (data->use_coloring)
+      {
+        Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                     n_q_points),
+                             [&](const int &i) {
+                               dst[data->local_to_global(cell_id, i)] +=
+                                 shared_data->values(i);
+                             });
+      }
     else
-      atomicAdd(&dst[destination_idx], values[idx]);
+      {
+        Kokkos::parallel_for(
+          Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+          [&](const int &i) {
+            Kokkos::atomic_add(&dst[data->local_to_global(cell_id, i)],
+                               shared_data->values(i));
+          });
+      }
   }
 
 
@@ -408,24 +325,26 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product(shape_values,
-                               shape_gradients,
-                               co_shape_gradients);
+      evaluator_tensor_product(shared_data->team_member,
+                               data->shape_values,
+                               data->shape_gradients,
+                               data->co_shape_gradients);
     if (evaluate_val == true && evaluate_grad == true)
       {
-        evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
-                                                                gradients);
-        KOKKOS_IF_ON_DEVICE(__syncthreads();)
+        evaluator_tensor_product.value_and_gradient_at_quad_pts(
+          shared_data->values, shared_data->gradients);
+        shared_data->team_member.team_barrier();
       }
     else if (evaluate_grad == true)
       {
-        evaluator_tensor_product.gradient_at_quad_pts(values, gradients);
-        KOKKOS_IF_ON_DEVICE(__syncthreads();)
+        evaluator_tensor_product.gradient_at_quad_pts(shared_data->values,
+                                                      shared_data->gradients);
+        shared_data->team_member.team_barrier();
       }
     else if (evaluate_val == true)
       {
-        evaluator_tensor_product.value_at_quad_pts(values);
-        KOKKOS_IF_ON_DEVICE(__syncthreads();)
+        evaluator_tensor_product.value_at_quad_pts(shared_data->values);
+        shared_data->team_member.team_barrier();
       }
   }
 
@@ -447,24 +366,25 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product(shape_values,
-                               shape_gradients,
-                               co_shape_gradients);
+      evaluator_tensor_product(shared_data->team_member,
+                               data->shape_values,
+                               data->shape_gradients,
+                               data->co_shape_gradients);
     if (integrate_val == true && integrate_grad == true)
       {
-        evaluator_tensor_product.integrate_value_and_gradient(values,
-                                                              gradients);
+        evaluator_tensor_product.integrate_value_and_gradient(
+          shared_data->values, shared_data->gradients);
       }
     else if (integrate_val == true)
       {
-        evaluator_tensor_product.integrate_value(values);
-        KOKKOS_IF_ON_DEVICE(__syncthreads();)
+        evaluator_tensor_product.integrate_value(shared_data->values);
+        shared_data->team_member.team_barrier();
       }
     else if (integrate_grad == true)
       {
-        evaluator_tensor_product.template integrate_gradient<false>(values,
-                                                                    gradients);
-        KOKKOS_IF_ON_DEVICE(__syncthreads();)
+        evaluator_tensor_product.template integrate_gradient<false>(
+          shared_data->values, shared_data->gradients);
+        shared_data->team_member.team_barrier();
       }
   }
 
@@ -480,11 +400,10 @@ namespace CUDAWrappers
                                             n_q_points_1d,
                                             n_components_,
                                             Number>::value_type
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_value() const
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::get_value(
+    int q_point) const
   {
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    return values[q_point];
+    return shared_data->values(q_point);
   }
 
 
@@ -500,10 +419,9 @@ namespace CUDAWrappers
                                             n_components_,
                                             Number>::value_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_dof_value() const
+    get_dof_value(int q_point) const
   {
-    const unsigned int dof = internal::compute_index<dim, fe_degree + 1>();
-    return values[dof];
+    return shared_data->values(q_point);
   }
 
 
@@ -515,10 +433,9 @@ namespace CUDAWrappers
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_value(const value_type &val_in)
+    submit_value(const value_type &val_in, int q_point)
   {
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    values[q_point]            = val_in * JxW[q_point];
+    shared_data->values(q_point) = val_in * data->JxW(cell_id, q_point);
   }
 
 
@@ -530,10 +447,9 @@ namespace CUDAWrappers
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_dof_value(const value_type &val_in)
+    submit_dof_value(const value_type &val_in, int q_point)
   {
-    const unsigned int dof = internal::compute_index<dim, fe_degree + 1>();
-    values[dof]            = val_in;
+    shared_data->values(q_point) = val_in;
   }
 
 
@@ -549,19 +465,18 @@ namespace CUDAWrappers
                                             n_components_,
                                             Number>::gradient_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_gradient() const
+    get_gradient(int q_point) const
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
 
-    // TODO optimize if the mesh is uniform
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    gradient_type      grad;
+    gradient_type grad;
     for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
       {
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jac(q_point, d_2, d_1) * gradients(q_point, d_2);
+          tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                 shared_data->gradients(q_point, d_2);
         grad[d_1] = tmp;
       }
 
@@ -577,16 +492,15 @@ namespace CUDAWrappers
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_gradient(const gradient_type &grad_in)
+    submit_gradient(const gradient_type &grad_in, int q_point)
   {
-    // TODO optimize if the mesh is uniform
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
     for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
       {
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jac(q_point, d_1, d_2) * grad_in[d_2];
-        gradients(q_point, d_1) = tmp * JxW[q_point];
+          tmp += data->inv_jacobian(cell_id, q_point, d_1, d_2) * grad_in[d_2];
+        shared_data->gradients(q_point, d_1) =
+          tmp * data->JxW(cell_id, q_point);
       }
   }
 
@@ -602,9 +516,10 @@ namespace CUDAWrappers
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     apply_for_each_quad_point(const Functor &func)
   {
-    func(this);
-
-    KOKKOS_IF_ON_DEVICE(__syncthreads();)
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                 n_q_points),
+                         [&](const int &i) { func(this, i); });
+    shared_data->team_member.team_barrier();
   }
 } // namespace CUDAWrappers
 

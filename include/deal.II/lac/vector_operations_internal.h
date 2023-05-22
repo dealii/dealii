@@ -2168,7 +2168,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "add_vector",
+          "dealii::add_vector",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2189,7 +2189,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "subtract_vector",
+          "dealii::subtract_vector",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2209,7 +2209,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "add_factor",
+          "dealii::add_factor",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2231,7 +2231,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "add_av",
+          "dealii::add_av",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2258,7 +2258,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "add_avpbw",
+          "dealii::add_avpbw",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2282,7 +2282,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "sadd_xv",
+          "dealii::sadd_xv",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2307,7 +2307,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "sadd_xav",
+          "dealii::sadd_xav",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2335,7 +2335,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "sadd_xavbw",
+          "dealii::sadd_xavbw",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2358,7 +2358,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "multiply_factor",
+          "dealii::multiply_factor",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2379,7 +2379,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "scale",
+          "dealii::scale",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2401,7 +2401,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "equ_au",
+          "dealii::equ_au",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2428,7 +2428,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_for(
-          "equ_aubv",
+          "dealii::equ_aubv",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2452,7 +2452,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
-          "dot",
+          "dealii::dot",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2489,7 +2489,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
-          "mean_value",
+          "dealii::mean_value",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2515,7 +2515,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
-          "norm_1",
+          "dealii::norm_1",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2545,7 +2545,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
-          "norm_p",
+          "dealii::norm_p",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
@@ -2580,7 +2580,7 @@ namespace internal
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
         Kokkos::parallel_reduce(
-          "add_and_dot",
+          "dealii::add_and_dot",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),

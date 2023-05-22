@@ -59,16 +59,20 @@ DEAL_II_HOST_DEVICE void
 DummyOperator<dim, fe_degree>::operator()(
   const unsigned int                                          cell,
   const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-  CUDAWrappers::SharedData<dim, double> *,
+  CUDAWrappers::SharedData<dim, double> *                     shared_data,
   const double *,
   double *dst) const
 {
-  const unsigned int pos = CUDAWrappers::local_q_point_id<dim, double>(
-    cell, gpu_data, n_dofs_1d, n_q_points);
-  auto point = CUDAWrappers::get_quadrature_point<dim, double>(cell,
-                                                               gpu_data,
-                                                               fe_degree + 1);
-  dst[pos]   = dim == 2 ? point(0) + point(1) : point(0) + point(1) + point(2);
+  Kokkos::parallel_for(
+    Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+    [&](const int q_point) {
+      const unsigned int pos =
+        gpu_data->local_q_point_id(cell, n_q_points, q_point);
+
+      auto point = gpu_data->get_quadrature_point(cell, q_point);
+      dst[pos] =
+        dim == 2 ? point(0) + point(1) : point(0) + point(1) + point(2);
+    });
 }
 
 
@@ -158,10 +162,8 @@ test()
           for (unsigned int i = 0; i < n_q_points_per_cell; ++i)
             {
               unsigned int const pos =
-                CUDAWrappers::local_q_point_id_host<dim, double>(
-                  cell_id, gpu_data_host, n_q_points_per_cell, i);
-              auto p = CUDAWrappers::get_quadrature_point_host<dim, double>(
-                cell_id, gpu_data_host, i);
+                gpu_data_host.local_q_point_id(cell_id, n_q_points_per_cell, i);
+              auto         p = gpu_data_host.get_quadrature_point(cell_id, i);
               const double p_val = dim == 2 ? p(0) + p(1) : p(0) + p(1) + p(2);
               AssertThrow(std::abs(coef[pos] - p_val) < 1e-12,
                           ExcInternalError());

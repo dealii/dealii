@@ -41,7 +41,6 @@ test()
   tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  cell = tria.begin_active();
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
     {
       cell                 = tria.begin_active();
