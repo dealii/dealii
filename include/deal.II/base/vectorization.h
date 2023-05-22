@@ -4971,7 +4971,7 @@ inline double
 VectorizedArray<double, 4>::horizontal_add()
 {
   VectorizedArray<double, 2> t1;
-  t1.data = this->get_low() + this->get_high();
+  t1.data = _mm_add_pd(this->get_low(), this->get_high());
   return t1.horizontal_add();
 }
 
@@ -4981,7 +4981,7 @@ inline float
 VectorizedArray<float, 8>::horizontal_add()
 {
   VectorizedArray<float, 4> t1;
-  t1.data = this->get_low() + this->get_high();
+  t1.data = _mm_add_ps(this->get_low(), this->get_high());
   return t1.horizontal_add();
 }
 #endif
@@ -4993,7 +4993,7 @@ inline double
 VectorizedArray<double, 8>::horizontal_add()
 {
   VectorizedArray<double, 4> t1;
-  t1.data = this->get_low() + this->get_high();
+  t1.data = _mm256_add_pd(this->get_low(), this->get_high());
   return t1.horizontal_add();
 }
 
@@ -5003,7 +5003,7 @@ inline float
 VectorizedArray<float, 16>::horizontal_add()
 {
   VectorizedArray<float, 8> t1;
-  t1.data = this->get_low() + this->get_high();
+  t1.data = _mm256_add_ps(this->get_low(), this->get_high());
   return t1.horizontal_add();
 }
 #endif
