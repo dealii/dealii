@@ -45,32 +45,22 @@ endif()
 # compare https://gitlab.kitware.com/cmake/cmake/issues/18865
 # and https://lists.boost.org/Archives/boost/2019/02/245016.php
 set(Boost_NO_BOOST_CMAKE ON)
-
 set(Boost_NO_WARN_NEW_VERSIONS TRUE)
+
 if(DEAL_II_WITH_ZLIB)
   find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
     iostreams serialization system thread
     )
+  set(_targets Boost::iostreams Boost::serialization Boost::system Boost::thread)
 else()
   find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
     serialization system thread
     )
-endif()
-
-unset(Boost_NO_BOOST_CMAKE)
-
-if(Boost_FOUND)
-  set(BOOST_VERSION_MAJOR "${Boost_MAJOR_VERSION}")
-  set(BOOST_VERSION_MINOR "${Boost_MINOR_VERSION}")
-  set(BOOST_VERSION_SUBMINOR "${Boost_SUBMINOR_VERSION}")
-  set(BOOST_VERSION
-    "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}"
-    )
+  set(_targets Boost::serialization Boost::system Boost::thread)
 endif()
 
 process_feature(BOOST
-  LIBRARIES REQUIRED Boost_LIBRARIES
-  INCLUDE_DIRS REQUIRED Boost_INCLUDE_DIRS
+  TARGETS REQUIRED _targets
   CLEAR
     Boost_DIR Boost_INCLUDE_DIRS Boost_IOSTREAMS_LIBRARY_DEBUG
     Boost_IOSTREAMS_LIBRARY_RELEASE Boost_LIBRARY_DIR
@@ -83,3 +73,12 @@ process_feature(BOOST
     BOOST_IOSTREAMS_USABLE # clean up check in configure_boost.cmake
     BOOST_SERIALIZATION_USABLE # clean up check in configure_boost.cmake
   )
+
+if(BOOST_FOUND)
+  set(BOOST_VERSION_MAJOR "${Boost_MAJOR_VERSION}")
+  set(BOOST_VERSION_MINOR "${Boost_MINOR_VERSION}")
+  set(BOOST_VERSION_SUBMINOR "${Boost_SUBMINOR_VERSION}")
+  set(BOOST_VERSION
+    "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}"
+    )
+endif()
