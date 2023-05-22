@@ -1245,17 +1245,17 @@ private:
    */
   DEAL_II_ALWAYS_INLINE
   __m256d
-  get_low() const
+  get_lower() const
   {
     return _mm512_castpd512_pd256(data);
   }
 
   /**
-   * Extract higher half of data field.
+   * Extract upper half of data field.
    */
   DEAL_II_ALWAYS_INLINE
   __m256d
-  get_high() const
+  get_upper() const
   {
     return _mm512_extractf64x4_pd(data, 1);
   }
@@ -1844,17 +1844,17 @@ private:
    */
   DEAL_II_ALWAYS_INLINE
   __m256
-  get_low() const
+  get_lower() const
   {
     return _mm512_castps512_ps256(data);
   }
 
   /**
-   * Extract higher half of data field.
+   * Extract upper half of data field.
    */
   DEAL_II_ALWAYS_INLINE
   __m256
-  get_high() const
+  get_upper() const
   {
     return _mm256_castpd_ps(_mm512_extractf64x4_pd(_mm512_castps_pd(data), 1));
   }
@@ -2548,17 +2548,17 @@ private:
    */
   DEAL_II_ALWAYS_INLINE
   __m128d
-  get_low() const
+  get_lower() const
   {
     return _mm256_castpd256_pd128(data);
   }
 
   /**
-   * Extract higher half of data field.
+   * Extract upper half of data field.
    */
   DEAL_II_ALWAYS_INLINE
   __m128d
-  get_high() const
+  get_upper() const
   {
     return _mm256_extractf128_pd(data, 1);
   }
@@ -3106,17 +3106,17 @@ private:
    */
   DEAL_II_ALWAYS_INLINE
   __m128
-  get_low() const
+  get_lower() const
   {
     return _mm256_castps256_ps128(data);
   }
 
   /**
-   * Extract higher half of data field.
+   * Extract upper half of data field.
    */
   DEAL_II_ALWAYS_INLINE
   __m128
-  get_high() const
+  get_upper() const
   {
     return _mm256_extractf128_ps(data, 1);
   }
@@ -4971,7 +4971,7 @@ inline double
 VectorizedArray<double, 4>::horizontal_add()
 {
   VectorizedArray<double, 2> t1;
-  t1.data = _mm_add_pd(this->get_low(), this->get_high());
+  t1.data = _mm_add_pd(this->get_lower(), this->get_upper());
   return t1.horizontal_add();
 }
 
@@ -4981,7 +4981,7 @@ inline float
 VectorizedArray<float, 8>::horizontal_add()
 {
   VectorizedArray<float, 4> t1;
-  t1.data = _mm_add_ps(this->get_low(), this->get_high());
+  t1.data = _mm_add_ps(this->get_lower(), this->get_upper());
   return t1.horizontal_add();
 }
 #endif
@@ -4993,7 +4993,7 @@ inline double
 VectorizedArray<double, 8>::horizontal_add()
 {
   VectorizedArray<double, 4> t1;
-  t1.data = _mm256_add_pd(this->get_low(), this->get_high());
+  t1.data = _mm256_add_pd(this->get_lower(), this->get_upper());
   return t1.horizontal_add();
 }
 
@@ -5003,7 +5003,7 @@ inline float
 VectorizedArray<float, 16>::horizontal_add()
 {
   VectorizedArray<float, 8> t1;
-  t1.data = _mm256_add_ps(this->get_low(), this->get_high());
+  t1.data = _mm256_add_ps(this->get_lower(), this->get_upper());
   return t1.horizontal_add();
 }
 #endif
