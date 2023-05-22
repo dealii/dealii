@@ -144,21 +144,47 @@ macro(process_feature _feature)
 
       else()
 
-        if("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
+        #
+        # We prefer that values are specified directly but also have to
+        # support the old behavior of supplying a variable name:
+        #
+        set(_value "${_arg}")
+        if(DEFINED "${_value}")
+          # We have encountered a variable name:
+          set(_value "${${_value}}")
+        endif()
+
+        #
+        # Sanity checks:
+        #
+        #  - The final string must neither end in -NOTFOUND which is
+        #    CMake's way of telling us that it wasn't able to find a
+        #    library/file, nor be only whitespace:
+        #
+        if("${_value}" MATCHES "-NOTFOUND" OR "${_value}" MATCHES "^\\s*$")
           if(_required)
-            if("${${_arg}}" MATCHES "^\\s*$")
-              message(STATUS
-                "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" empty ***"
-                )
-            else()
-              message(STATUS
-                "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
-                )
-            endif()
+            message(STATUS
+              "  ${_feature}_${_current_suffix}: *** Required value/variable \"${_arg}\" empty or set to NOTFOUND ***"
+              )
+            set(${_feature}_FOUND FALSE)
+          endif()
+        #
+        #  - The final string must either be a target, a (list) of
+        #    file paths, compile/link flags, or a generator expression.
+        #
+        elseif( NOT TARGET "${_value}" AND
+                NOT "${_value}" MATCHES "[;\.\\/]" AND
+                NOT "${_value}" MATCHES "^-" AND
+                NOT "${_value}" MATCHES "^\$" AND
+                NOT "${_current_suffix}" MATCHES "DEFINITION")
+          if(_required)
+            message(STATUS
+              "  ${_feature}_${_current_suffix}: *** Required value/variable \"${_arg}\" not set empty or empty ***"
+              )
             set(${_feature}_FOUND FALSE)
           endif()
         else()
-          list(APPEND _temp_${_current_suffix} ${${_arg}})
+          list(APPEND _temp_${_current_suffix} ${_value})
         endif()
       endif()
     endif()
