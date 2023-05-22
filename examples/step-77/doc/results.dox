@@ -194,7 +194,9 @@ But iterative solvers also afford other opportunities. For example (and as
 discussed briefly in the introduction), we may not need to solve to
 very high accuracy (small tolerances) in early nonlinear iterations as long
 as we are still far away from the actual solution. This was the basis of the
-Eisenstat-Walker trick mentioned there.
+Eisenstat-Walker trick mentioned there. (This is also the underlying reason
+why one can store the matrix in single precision rather than double precision,
+see the discussion in the "Possibilities for extensions" section of step-15.)
 
 KINSOL provides the function that does the linear solution with a target
 tolerance that needs to be reached. We ignore it in the program above
