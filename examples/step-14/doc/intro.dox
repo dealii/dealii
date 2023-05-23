@@ -46,7 +46,7 @@ value $J(u_h)$ is within certain limits of the exact value $J(u)$, i.e. we
 want to bound the error with respect to this functional, $J(u)-J(u_h)$.
 
 For simplicity of exposition, we henceforth assume that both the quantity of
-interest $J$, as well as the equation are linear, and we will in particular
+interest $J$ as well as the equation are linear, and we will in particular
 show the derivation for the Laplace equation with homogeneous Dirichlet
 boundary conditions, although the concept is much more general. For this
 general case, we refer to the references listed above.  The goal is to obtain
@@ -88,8 +88,8 @@ integrate by parts on each of them:
   \sum_K (-\Delta (u-u_h), z-\varphi_h)_K
   + (\partial_n (u-u_h), z-z_h)_{\partial K}.
 @f}
-Next we use that $-\Delta u=f$, and that for solutions of the Laplace
-equation, the solution is smooth enough that $\partial_n u$ is
+Next we use that $-\Delta u=f$, and that
+the solution of the Laplace equation is smooth enough that $\partial_n u$ is
 continuous almost everywhere -- so the terms involving $\partial_n u$ on one
 cell cancels with that on its neighbor, where the normal vector has the
 opposite sign. (The same is not true for $\partial_n u_h$, though.)
@@ -116,8 +116,8 @@ with the neighbor cell $K'$, to obtain
   - \frac 12 (\partial_n u_h|_K + \partial_{n'} u_h|_{K'},
               z-\varphi_h)_{\partial K\backslash \partial\Omega}.
 @f}
-Using that for the normal vectors on adjacent cells we have $n'=-n$, we define the jump of the
-normal derivative by
+Using that for the normal vectors on adjacent cells we have $n'=-n$, we define
+the jump of the normal derivative by
 @f[
   [\partial_n u_h] \dealcoloneq \partial_n u_h|_K + \partial_{n'} u_h|_{K'}
   =
@@ -139,9 +139,9 @@ element discretization with respect to arbitrary (linear) functionals
 $J(\cdot)$. Its structure is a weighted form of a residual estimator, as both
 $f+\Delta u_h$ and $[\partial_n u_h]$ are cell and edge residuals that vanish
 on the exact solution, and $z-I_h z$ are weights indicating how important the
-residuals on a certain cell is for the evaluation of the given functional.
+residual on a certain cell is for the evaluation of the given functional.
 Furthermore, it is a cell-wise quantity, so we can use it as a mesh refinement
-criterion. The question, is: how to evaluate it? After all, the evaluation
+criterion. The question is: how to evaluate it? After all, the evaluation
 requires knowledge of the dual solution $z$, which carries the information
 about the quantity we want to know to best accuracy.
 
@@ -259,5 +259,5 @@ example programs, regarding the mathematical complexity, as well as the
 simplicity to add extensions. If you use this program as a basis for your own
 programs, we would kindly like to ask you to state this fact and the name of
 the author of the example program, Wolfgang Bangerth, in publications that
-arise from that, of your program consists in a considerable part of the
+arise from that, if your program consists in a considerable part of the
 example program.
