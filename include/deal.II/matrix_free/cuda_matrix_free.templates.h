@@ -70,9 +70,6 @@ namespace CUDAWrappers
       void
       resize(const unsigned int n_colors);
 
-      void
-      setup(const unsigned int color);
-
       template <typename CellFilter>
       void
       fill_data(
@@ -155,11 +152,16 @@ namespace CUDAWrappers
 
 
     template <int dim, typename Number>
+    template <typename CellFilter>
     void
-    ReinitHelper<dim, Number>::setup(const unsigned int color)
+    ReinitHelper<dim, Number>::fill_data(
+      const unsigned int                                        color,
+      const std::vector<CellFilter> &                           graph,
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
     {
       const unsigned int n_cells = data->n_cells[color];
 
+      // Create the Views
       data->local_to_global[color] =
         Kokkos::View<types::global_dof_index **,
                      MemorySpace::Default::kokkos_space>(
@@ -198,33 +200,22 @@ namespace CUDAWrappers
         Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
                      MemorySpace::Default::kokkos_space>(
           "constraint_mask_" + std::to_string(color), n_cells);
-    }
 
-
-
-    template <int dim, typename Number>
-    template <typename CellFilter>
-    void
-    ReinitHelper<dim, Number>::fill_data(
-      const unsigned int                                        color,
-      const std::vector<CellFilter> &                           graph,
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
-    {
+      // Create the host mirrow Views and fill them
       auto constraint_mask_host =
-        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
-                                            data->constraint_mask[color]);
+        Kokkos::create_mirror_view(data->constraint_mask[color]);
+
       auto local_to_global_host =
-        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
-                                            data->local_to_global[color]);
+        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                   data->local_to_global[color]);
       auto q_points_host =
-        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
-                                            data->q_points[color]);
-      auto JxW_host =
-        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
-                                            data->JxW[color]);
+        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                   data->q_points[color]);
+      auto JxW_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                                 data->JxW[color]);
       auto inv_jacobian_host =
-        Kokkos::create_mirror_view_and_copy(MemorySpace::Host::kokkos_space{},
-                                            data->inv_jacobian[color]);
+        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                   data->inv_jacobian[color]);
 
       auto cell = graph.cbegin(), end_cell = graph.cend();
       for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
@@ -286,6 +277,7 @@ namespace CUDAWrappers
             }
         }
 
+      // Copy the data on the device
       Kokkos::deep_copy(data->constraint_mask[color], constraint_mask_host);
       Kokkos::deep_copy(data->local_to_global[color], local_to_global_host);
       Kokkos::deep_copy(data->q_points[color], q_points_host);
@@ -858,7 +850,6 @@ namespace CUDAWrappers
     for (unsigned int i = 0; i < n_colors; ++i)
       {
         n_cells[i] = graph[i].size();
-        helper.setup(i);
         helper.fill_data(i, graph[i], partitioner);
       }
 
