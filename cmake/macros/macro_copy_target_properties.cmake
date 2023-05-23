@@ -52,9 +52,21 @@ function(copy_target_properties _destination_target)
     list(APPEND _processed_targets ${_entry})
     message(STATUS "    copying ${_entry} into ${_destination_target} ...")
 
-    get_target_property(_location ${_entry} IMPORTED_LOCATION)
-    if("${_location}" MATCHES "-NOTFOUND")
-      set(_location)
+    #
+    # Only query the LOCATION from non-interface libraries. An interface
+    # library is a CMake target that only consists of "INTERFACE" target
+    # properties and does not by itself refer to an executable or shared
+    # object/static archive. CMake prior to 3.19 will throw an error if we
+    # query for the LOCATION. Newer CMake versions simply return
+    # "-NOTFOUND".
+    #
+    set(_location)
+    get_target_property(_test ${_entry} TYPE)
+    if(NOT "${_test}" STREQUAL "INTERFACE_LIBRARY")
+      get_target_property(_location ${_entry} LOCATION)
+      if("${_location}" MATCHES "-NOTFOUND")
+        set(_location)
+      endif()
     endif()
 
     get_target_property(_values ${_entry} INTERFACE_LINK_LIBRARIES)
@@ -73,7 +85,7 @@ function(copy_target_properties _destination_target)
             "of target »${_entry}«"
             )
         endif()
-        list(APPEND _libraries ${_entry})
+        list(APPEND _libraries ${_lib})
       endif()
     endforeach()
 
