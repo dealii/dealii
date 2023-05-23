@@ -92,6 +92,16 @@ function(define_interface_target _feature)
       ${${_feature}_LIBRARIES} ${${_feature}_LIBRARIES_${_build}}
       )
     if(NOT "${_libraries}" STREQUAL "")
+      foreach(_lib ${_libraries})
+        # Warn loudly if we encounter an undefined target:
+        if("${_lib}" MATCHES "::")
+          message(WARNING
+            "Undefined imported target name »${_lib}« present when defining "
+            "interface target »${_interface_target}«"
+            )
+        endif()
+      endforeach()
+
       message(STATUS "    LINK_LIBRARIES:      ${_libraries}")
       target_link_libraries(${_interface_target} INTERFACE ${_libraries})
     endif()
