@@ -75,6 +75,7 @@ function(copy_target_properties _destination_target)
     endif()
 
     foreach(_lib ${_location} ${_values})
+      strip_known_generator_expressions(_lib)
       if(TARGET ${_lib})
         list(APPEND _source_targets ${_lib})
       else()
