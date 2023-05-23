@@ -79,11 +79,13 @@ function(copy_target_properties _destination_target)
       if(TARGET ${_lib})
         list(APPEND _source_targets ${_lib})
       else()
-        # Warn loudly if we encounter an undefined target:
+        #
+        # Complain loudly if we encounter an undefined target:
+        #
         if("${_lib}" MATCHES "::")
-          message(WARNING
+          message(FATAL_ERROR
             "Undefined imported target name »${_lib}« present in interface "
-            "of target »${_entry}«"
+            "of target »${_entry}«."
             )
         endif()
         list(APPEND _libraries ${_lib})

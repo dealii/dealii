@@ -93,9 +93,11 @@ function(define_interface_target _feature)
       )
     if(NOT "${_libraries}" STREQUAL "")
       foreach(_lib ${_libraries})
-        # Warn loudly if we encounter an undefined target:
+        #
+        # Complain loudly if we encounter an undefined target:
+        #
         if("${_lib}" MATCHES "::")
-          message(WARNING
+          message(FATAL_ERROR
             "Undefined imported target name »${_lib}« present when defining "
             "interface target »${_interface_target}«"
             )
