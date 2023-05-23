@@ -25,49 +25,76 @@
 # ${_var} is set to true, otherwise it is set to false.
 #
 
-macro(check_compiler_setup _compiler_flags_unstr _linker_flags_unstr _var)
-  #
-  # Strip leading and trailing whitespace to make CMake 2.8.8 happy
-  #
-  string(STRIP "${_compiler_flags_unstr}" _compiler_flags)
-  string(STRIP "${_linker_flags_unstr}" _linker_flags)
-
-  separate_arguments(_compiler_flags)
+macro(check_compiler_setup _compiler_flags _linker_flags _var)
+  message(STATUS "Performing Test ${_var}")
 
   #
-  # Rerun this test if flags have changed:
+  # We used to do some fancy caching here, but for now simply rerun this
+  # check every time and do not bother with an elaborate caching strategy.
+  # We simply keep the build directory for the check around and rely on the
+  # build system to skip unnecessary recompilation.
   #
-  if(NOT "${_compiler_flags}" STREQUAL "${CACHED_${_var}_compiler_flags}"
-     OR NOT "${_linker_flags}" STREQUAL "${CACHED_${_var}_linker_flags}"
-     OR NOT "${ARGN}" STREQUAL "${CACHED_${_var}_ARGN}")
-    unset(${_var} CACHE)
-  endif()
 
-  set(CACHED_${_var}_compiler_flags "${_compiler_flags}"
-    CACHE INTERNAL "" FORCE
-    )
-  set(CACHED_${_var}_linker_flags "${_linker_flags}"
-    CACHE INTERNAL "" FORCE
-    )
-  set(CACHED_${_var}_ARGN "${ARGN}" CACHE INTERNAL "" FORCE)
+  #
+  # Prepare compile and link options:
+  #
 
-  message(STATUS "Testing ${_var}")
+  separate_arguments(_compile_options UNIX_COMMAND "${_compiler_flags}")
+  shell_escape_option_groups(_compile_options)
+  separate_arguments(_link_options UNIX_COMMAND "${_linker_flags}")
+  shell_escape_option_groups(_link_options)
+
+  #
+  # Ideally, we would like to simply list our internal interface_* targets,
+  # which might recursively list imported targets... But unfortunately,
+  # CMake as of version 3.25 does not support this operation.
+  #
+  # Remark: What we try to accomplish here is somewhat fundamentally
+  # incompatible with how CMake envisions import targets to function.
+  # Namely, the final link line is only constructed after the "configure
+  # phase" during the "generator phase".
+  #
+  # As a workaround, at least for now, let us make the assumption that we
+  # only ever encounter an interface_* target and that imported targets
+  # have been expanded.
+  #
+
+  set(_libraries)
+  foreach(_entry ${ARGN})
+    if(TARGET ${_entry})
+      get_target_property(_value ${_entry} INTERFACE_LINK_LIBRARIES)
+      if(NOT "${_value}" MATCHES "-NOTFOUND")
+        list(APPEND _libraries ${_value})
+      endif()
+      get_target_property(_values ${_entry} INTERFACE_COMPILE_OPTIONS)
+      if(NOT "${_values}" MATCHES "-NOTFOUND")
+        list(APPEND _compile_options ${_values})
+      endif()
+      get_target_property(_values ${_entry} INTERFACE_LINK_OPTIONS)
+      if(NOT "${_values}" MATCHES "-NOTFOUND")
+        list(APPEND _link_options ${_values})
+      endif()
+    else()
+      list(APPEND _libraries ${_entry})
+    endif()
+  endforeach()
 
   try_compile(
     ${_var}
-    ${CMAKE_CURRENT_BINARY_DIR}/check_compiler_setup/CheckCompilerSetup${_var}
+    ${CMAKE_CURRENT_BINARY_DIR}/check_compiler_setup/${_var}
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/macros/check_compiler_setup
     CheckCompilerSetup${_var}
-    CMAKE_FLAGS "-DTEST_COMPILE_FLAGS=${_compiler_flags}"
-                "-DTEST_LINK_OPTIONS=${_linker_flags}"
-                "-DTEST_LINK_LIBRARIES=${ARGN}"
+    CMAKE_FLAGS "-DTEST_COMPILE_OPTIONS=${_compile_options}"
+                "-DTEST_LINK_OPTIONS=${_link_options}"
+                "-DTEST_LINK_LIBRARIES=${_libraries}"
                 "-DCMAKE_VERBOSE_MAKEFILE=ON"
-    OUTPUT_VARIABLE _output)
+    OUTPUT_VARIABLE _output
+    )
 
   if(${_var})
-    set(${_var} TRUE CACHE INTERNAL "")
-    file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/check_compiler_setup/CheckCompilerSetup${var})
+    message(STATUS "Performing Test ${_var} - Success")
   else()
-    message(STATUS "Compiler setup check for ${_var} failed with:\n${_output}")
+    message(STATUS "Performing Test ${_var} - Failed")
+    message(STATUS "Compiler output:\n\n${_output}")
   endif()
 endmacro()
