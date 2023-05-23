@@ -1090,7 +1090,6 @@ namespace SUNDIALS
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
 
-  public:
     /**
      * A pointer to any exception that may have been thrown in user-defined
      * call-backs and that we have to deal after the KINSOL function we call
