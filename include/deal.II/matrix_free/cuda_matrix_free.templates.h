@@ -728,7 +728,7 @@ namespace CUDAWrappers
           Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("co_shape_gradients",
                                Kokkos::WithoutInitializing),
-            size_shape_values);
+            n_q_points_1d * n_q_points_1d);
         Kokkos::deep_copy(
           co_shape_gradients,
           Kokkos::View<Number *, Kokkos::HostSpace>(
