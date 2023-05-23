@@ -251,3 +251,53 @@ done implicitly? That is in fact possible, and runs under the name
 "automatic differentiation". step-71 discusses this very
 concept in general terms, and step-72 illustrates how this can be
 applied in practice for the very problem we are considering here.
+
+
+<h4> Storing the Jacobian matrix in lower-precision floating point variables </h4>
+
+On modern computer systems, *accessing* data in main memory takes far
+longer than *actually doing* something with it: We can do many floating
+point operations for the time it takes to load one floating point
+number from memory onto the processor. Unfortunately, when we do things
+such as matrix-vector products, we only multiply each matrix entry once
+with another number (the corresponding entry of the vector) and then we
+add it to something else -- so two floating point operations for one
+load. (Strictly speaking, we also have to load the corresponding vector
+entry, but at least sometimes we get to re-use that vector entry in
+doing the products that correspond to the next row of the matrix.) This
+is a fairly low "arithmetic intensity", and consequently we spend most
+of our time during matrix-vector products waiting for data to arrive
+from memory rather than actually doing floating point operations.
+
+This is of course one of the rationales for the "matrix-free" approach to
+solving linear systems (see step-37, for example). But if you don't quite
+want to go all that way to change the structure of the program, then
+here is a different approach: Storing the system matrix (the "Jacobian")
+in single-precision instead of double precision floating point numbers
+(i.e., using `float` instead of `double` as the data type). This reduces
+the amount of memory necessary by a factor of 1.5 (each matrix entry
+in a SparseMatrix object requires storing the column index -- 4 bytes --
+and the actual value -- either 4 or 8 bytes), and consequently
+will speed up matrix-vector products by a factor of around 1.5 as well because,
+as pointed out above, most of the time is spent loading data from memory
+and loading 2/3 the amount of data should be roughly 3/2 times as fast. All
+of this could be done using SparseMatrix<float> as the data type
+for the system matrix. (In principle, we would then also like it if
+the SparseDirectUMFPACK solver we use in this program computes and
+stores its sparse decomposition in `float` arithmetic. This is not
+currently implemented, though could be done.)
+
+Of course, there is a downside to this: Lower precision data storage
+also implies that we will not solve the linear system of the Newton
+step as accurately as we might with `double` precision. At least
+while we are far away from the solution of the nonlinear problem,
+this may not be terrible: If we can do a Newton iteration in half
+the time, we can afford to do a couple more Newton steps if the
+search directions aren't as good.
+But it turns out that even that isn't typically necessary: Both
+theory and computational experience shows that it is entirely
+sufficient to store the Jacobian matrix in single precision
+*as long as one stores the right hand side in double precision*.
+A great overview of why this is so, along with numerical
+experiments that also consider "half precision" floating point
+numbers, can be found in @cite Kelley2022 .
