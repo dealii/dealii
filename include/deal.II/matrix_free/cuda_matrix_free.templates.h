@@ -222,8 +222,8 @@ namespace CUDAWrappers
         {
           (*cell)->get_dof_indices(local_dof_indices);
           // When using MPI, we need to transform the local_dof_indices, which
-          // contains global dof indices, to get local (to the current MPI
-          // process) dof indices.
+          // contain global numbers of dof indices in the MPI universe, to get
+          // local (to the current MPI process) dof indices.
           if (partitioner)
             for (auto &index : local_dof_indices)
               index = partitioner->global_to_local(index);
@@ -250,19 +250,14 @@ namespace CUDAWrappers
           // Quadrature points
           if (update_flags & update_quadrature_points)
             {
-              const std::vector<Point<dim>> &q_points_vec =
-                fe_values.get_quadrature_points();
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                q_points_host(cell_id, i) = q_points_vec[i];
+                q_points_host(cell_id, i) = fe_values.quadrature_point(i);
             }
 
           if (update_flags & update_JxW_values)
             {
-              std::vector<double> JxW_values_double =
-                fe_values.get_JxW_values();
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                JxW_host(cell_id, i) =
-                  static_cast<Number>(JxW_values_double[i]);
+                JxW_host(cell_id, i) = fe_values.JxW(i);
             }
 
           if (update_flags & update_gradients)
@@ -270,14 +265,14 @@ namespace CUDAWrappers
               const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
                 fe_values.get_inverse_jacobians();
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                for (unsigned int j = 0; j < dim; ++j)
-                  for (unsigned int k = 0; k < dim; ++k)
-                    inv_jacobian_host(cell_id, i, j, k) =
-                      inv_jacobians[i][j][k];
+                for (unsigned int d = 0; d < dim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    inv_jacobian_host(cell_id, i, d, e) =
+                      fe_values.inverse_jacobian(i)[d][e];
             }
         }
 
-      // Copy the data on the device
+      // Copy the data to the device
       Kokkos::deep_copy(data->constraint_mask[color], constraint_mask_host);
       Kokkos::deep_copy(data->local_to_global[color], local_to_global_host);
       Kokkos::deep_copy(data->q_points[color], q_points_host);
@@ -709,10 +704,6 @@ namespace CUDAWrappers
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
-    FE_DGQArbitraryNodes<1>                                    fe_quad_co(quad);
-    ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info_co(
-      quad, fe_quad_co);
-
     shape_values = Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
       Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
       size_shape_values);
@@ -738,10 +729,11 @@ namespace CUDAWrappers
             Kokkos::view_alloc("co_shape_gradients",
                                Kokkos::WithoutInitializing),
             size_shape_values);
-        Kokkos::deep_copy(co_shape_gradients,
-                          Kokkos::View<Number *, Kokkos::HostSpace>(
-                            shape_info_co.data.front().shape_gradients.data(),
-                            size_shape_values));
+        Kokkos::deep_copy(
+          co_shape_gradients,
+          Kokkos::View<Number *, Kokkos::HostSpace>(
+            shape_info.data.front().shape_gradients_collocation.data(),
+            n_q_points_1d * n_q_points_1d));
       }
 
     internal::ReinitHelper<dim, Number> helper(
