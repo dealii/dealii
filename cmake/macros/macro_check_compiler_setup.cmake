@@ -49,7 +49,7 @@ macro(check_compiler_setup _compiler_flags _linker_flags _var)
   # which might recursively list imported targets... But unfortunately,
   # CMake as of version 3.25 does not support this operation.
   #
-  # Rermak: What we try to accomplish here is somewhat fundamentally
+  # Remark: What we try to accomplish here is somewhat fundamentally
   # incompatible with how CMake envisions import targets to function.
   # Namely, the final link line is only constructed after the "configure
   # phase" during the "generator phase".
