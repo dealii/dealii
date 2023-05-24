@@ -260,13 +260,11 @@ namespace CUDAWrappers
 
           if (update_flags & update_gradients)
             {
-              const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
-                fe_values.get_inverse_jacobians();
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
                 for (unsigned int d = 0; d < dim; ++d)
                   for (unsigned int e = 0; e < dim; ++e)
                     inv_jacobian_host(cell_id, i, d, e) =
-                      inv_jacobians[i][d][e];
+                      fe_values.inverse_jacobian(i)[d][e];
             }
         }
 
