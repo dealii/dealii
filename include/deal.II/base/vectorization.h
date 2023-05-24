@@ -657,7 +657,8 @@ public:
   }
 
   /**
-   * Returns sum over entries of data field.
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
    */
   DEAL_II_ALWAYS_INLINE
   Number
@@ -1227,7 +1228,8 @@ public:
   }
 
   /**
-   * Returns sum over entries of data field.
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
    */
   double
   sum();
@@ -1826,7 +1828,8 @@ public:
   }
 
   /**
-   * Returns sum over entries of data field.
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
    */
   float
   sum();
@@ -2530,7 +2533,8 @@ public:
   }
 
   /**
-   * Returns sum over entries of data field.
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
    */
   double
   sum();
@@ -3088,7 +3092,8 @@ public:
   }
 
   /**
-   * Returns sum over entries of data field.
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
    */
   float
   sum();
@@ -3676,7 +3681,8 @@ public:
   }
 
   /**
-   * Returns sum over entries of data field.
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
    */
   double
   sum();
@@ -4138,7 +4144,8 @@ public:
   }
 
   /**
-   * Returns sum over entries of data field.
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
    */
   float
   sum();
