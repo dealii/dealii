@@ -2067,7 +2067,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
               ETT::write_value(vectorized_input,
                                comp,
                                solution_renumbered_vectorized[i]);
-              input[i] = vectorized_input.horizontal_add();
+              input[i] = vectorized_input.sum();
             }
 
           internal::FEFaceNormalEvaluationImpl<dim, -1, ScalarNumber>::
@@ -2089,7 +2089,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
               VectorizedArrayType result;
               ETT::write_value(result, comp, solution_renumbered_vectorized[i]);
               solution_values[renumber[comp * dofs_per_component + i]] =
-                result.horizontal_add();
+                result.sum();
             }
         }
     }

@@ -657,11 +657,11 @@ public:
   }
 
   /**
-   * Returns horizontal sum of data field.
+   * Returns sum over entries of data field.
    */
   DEAL_II_ALWAYS_INLINE
   Number
-  horizontal_add()
+  sum()
   {
     return data;
   }
@@ -1227,10 +1227,10 @@ public:
   }
 
   /**
-   * Returns horizontal sum of data field.
+   * Returns sum over entries of data field.
    */
   double
-  horizontal_add();
+  sum();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -1826,10 +1826,10 @@ public:
   }
 
   /**
-   * Returns horizontal sum of data field.
+   * Returns sum over entries of data field.
    */
   float
-  horizontal_add();
+  sum();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -2530,10 +2530,10 @@ public:
   }
 
   /**
-   * Returns horizontal sum of data field.
+   * Returns sum over entries of data field.
    */
   double
-  horizontal_add();
+  sum();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -3088,10 +3088,10 @@ public:
   }
 
   /**
-   * Returns horizontal sum of data field.
+   * Returns sum over entries of data field.
    */
   float
-  horizontal_add();
+  sum();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -3676,10 +3676,10 @@ public:
   }
 
   /**
-   * Returns horizontal sum of data field.
+   * Returns sum over entries of data field.
    */
   double
-  horizontal_add();
+  sum();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -4138,10 +4138,10 @@ public:
   }
 
   /**
-   * Returns horizontal sum of data field.
+   * Returns sum over entries of data field.
    */
   float
-  horizontal_add();
+  sum();
 
   /**
    * Actual data field. To be consistent with the standard layout type and to
@@ -4939,12 +4939,12 @@ private:
 #endif // DOXYGEN
 
 /**
- * horizontal_add() functions.
+ * sum() functions.
  */
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
 inline double
-VectorizedArray<double, 2>::horizontal_add()
+VectorizedArray<double, 2>::sum()
 {
   __m128d t1 = _mm_unpackhi_pd(data, data);
   __m128d t2 = _mm_add_pd(data, t1);
@@ -4954,7 +4954,7 @@ VectorizedArray<double, 2>::horizontal_add()
 
 
 inline float
-VectorizedArray<float, 4>::horizontal_add()
+VectorizedArray<float, 4>::sum()
 {
   __m128 t1 = _mm_movehl_ps(data, data);
   __m128 t2 = _mm_add_ps(data, t1);
@@ -4968,21 +4968,21 @@ VectorizedArray<float, 4>::horizontal_add()
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256 && defined(__AVX__)
 inline double
-VectorizedArray<double, 4>::horizontal_add()
+VectorizedArray<double, 4>::sum()
 {
   VectorizedArray<double, 2> t1;
   t1.data = _mm_add_pd(this->get_lower(), this->get_upper());
-  return t1.horizontal_add();
+  return t1.sum();
 }
 
 
 
 inline float
-VectorizedArray<float, 8>::horizontal_add()
+VectorizedArray<float, 8>::sum()
 {
   VectorizedArray<float, 4> t1;
   t1.data = _mm_add_ps(this->get_lower(), this->get_upper());
-  return t1.horizontal_add();
+  return t1.sum();
 }
 #endif
 
@@ -4990,21 +4990,21 @@ VectorizedArray<float, 8>::horizontal_add()
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512 && defined(__AVX512F__)
 inline double
-VectorizedArray<double, 8>::horizontal_add()
+VectorizedArray<double, 8>::sum()
 {
   VectorizedArray<double, 4> t1;
   t1.data = _mm256_add_pd(this->get_lower(), this->get_upper());
-  return t1.horizontal_add();
+  return t1.sum();
 }
 
 
 
 inline float
-VectorizedArray<float, 16>::horizontal_add()
+VectorizedArray<float, 16>::sum()
 {
   VectorizedArray<float, 8> t1;
   t1.data = _mm256_add_ps(this->get_lower(), this->get_upper());
-  return t1.horizontal_add();
+  return t1.sum();
 }
 #endif
 
