@@ -14,27 +14,23 @@
 // ---------------------------------------------------------------------
 
 
+
 // this function tests the correctness of the implementation of matrix free
 // matrix-vector products by comparing with the result of deal.II sparse
-// matrix. The mesh uses a hypershell mesh without hanging nodes (only cell
-// type: 2)
+// matrix. The mesh uses a hypercube mesh with no hanging nodes and no other
+// constraints
 
 #include "../tests.h"
 
-#include "matrix_vector_common.h"
-
+#include "matrix_vector_device_common.h"
 
 template <int dim, int fe_degree, typename Number>
 void
 test()
 {
-  const SphericalManifold<dim> manifold;
-  Triangulation<dim>           tria;
-  GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1., 96, true);
-  tria.set_all_manifold_ids(0);
-  tria.set_manifold(0, manifold);
-  if (dim == 2)
-    tria.refine_global(2);
+  Triangulation<dim> tria;
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(5 - dim);
 
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
@@ -45,6 +41,6 @@ test()
   do_test<dim,
           fe_degree,
           Number,
-          LinearAlgebra::CUDAWrappers::Vector<Number>,
+          LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>,
           fe_degree + 1>(dof, constraints, tria.n_active_cells());
 }

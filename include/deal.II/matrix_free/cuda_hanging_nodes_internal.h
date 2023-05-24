@@ -18,13 +18,11 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#include <deal.II/base/cuda_size.h>
 
-#  include <deal.II/base/cuda_size.h>
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
 
-#  include <deal.II/matrix_free/hanging_nodes_internal.h>
-
-#  include <Kokkos_Macros.hpp>
+#include <Kokkos_Macros.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 namespace CUDAWrappers
@@ -463,6 +461,4 @@ namespace CUDAWrappers
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-#endif
-
 #endif

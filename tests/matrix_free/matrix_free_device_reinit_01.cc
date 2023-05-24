@@ -15,7 +15,7 @@
 
 
 
-// Test CUDAWrappers::MatrixFree::initialize_dof_vector.
+// Test that initializing with CUDAWrappers::MatrixFree with empty ranges work.
 
 #include <deal.II/distributed/tria.h>
 
@@ -27,7 +27,6 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/cuda_vector.h>
 
 #include <deal.II/matrix_free/cuda_matrix_free.h>
 
@@ -36,29 +35,8 @@
 #include "../tests.h"
 
 
-template <typename Number>
-void
-check(const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-        &                                vector,
-      const Utilities::MPI::Partitioner &reference_partitioner)
-{
-  Assert(vector.get_partitioner()->locally_owned_range() ==
-           reference_partitioner.locally_owned_range(),
-         ExcInternalError());
-  Assert(vector.get_partitioner()->ghost_indices() ==
-           reference_partitioner.ghost_indices(),
-         ExcInternalError());
-}
 
-template <typename Number>
-void
-check(const LinearAlgebra::CUDAWrappers::Vector<Number> &vector,
-      const Utilities::MPI::Partitioner &                reference_partitioner)
-{
-  AssertDimension(vector.size(), reference_partitioner.size());
-}
-
-template <int dim, int fe_degree, typename VectorType>
+template <int dim, int fe_degree>
 void
 test()
 {
@@ -66,7 +44,7 @@ test()
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(2);
+  tria.refine_global(1);
 
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
@@ -80,9 +58,14 @@ test()
   owned_set.print(deallog.get_file_stream());
 
   deallog << "locally relevant dofs :" << std::endl;
-  relevant_set.print(deallog.get_file_stream());
+  owned_set.print(deallog.get_file_stream());
 
   AffineConstraints<double> constraints(relevant_set);
+  DoFTools::make_hanging_node_constraints(dof, constraints);
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   MappingQ<dim>                         mapping(fe_degree);
@@ -90,15 +73,10 @@ test()
   const QGauss<1>                       quad(fe_degree + 1);
   typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
     additional_data;
+  additional_data.mapping_update_flags = update_values | update_gradients |
+                                         update_JxW_values |
+                                         update_quadrature_points;
   mf_data.reinit(mapping, dof, constraints, quad, additional_data);
-
-  VectorType vector;
-  mf_data.initialize_dof_vector(vector);
-
-  Utilities::MPI::Partitioner reference_partitioner(owned_set,
-                                                    relevant_set,
-                                                    MPI_COMM_WORLD);
-  check(vector, reference_partitioner);
 
   deallog << "OK" << std::endl;
 }
@@ -113,14 +91,7 @@ main(int argc, char **argv)
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-  init_cuda(true);
   MPILogInitAll mpi_inilog;
 
-  test<2,
-       1,
-       LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>();
-  if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1)
-    test<2, 1, LinearAlgebra::CUDAWrappers::Vector<double>>();
-
-  return 0;
+  test<2, 1>();
 }

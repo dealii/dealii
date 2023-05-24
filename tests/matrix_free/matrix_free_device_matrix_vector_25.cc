@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// Same as matrix_free_matrix_vector_25 test but we only perform the operator
-// evaluation on the cells that have a fe_index equal to 0
+// Same as matrix_free_matrix_vector_10 test but we only perform the operator
+// evaluation on the cells that have a material ID equal to zero.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
@@ -24,11 +24,9 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
-#include "deal.II/grid/filtered_iterator.h"
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
@@ -42,7 +40,7 @@
 
 #include "../tests.h"
 
-#include "matrix_vector_mf.h"
+#include "matrix_vector_device_mf.h"
 
 
 
@@ -82,22 +80,18 @@ test()
             cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
+  // Set material ID
+  for (cell = tria.begin_active(); cell < endc; ++cell)
+    {
+      if (cell->center()[0] < 0.5)
+        cell->set_material_id(0);
+      else
+        cell->set_material_id(1);
+    }
 
-  hp::FECollection<dim> fe_collection;
-  fe_collection.push_back(FE_Q<dim>(fe_degree));
-  fe_collection.push_back(FE_Nothing<dim>());
-
+  FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
-  // Set FE_Index
-  for (auto &cell_ : dof.active_cell_iterators())
-    if (cell_->is_locally_owned())
-      {
-        if (cell_->center()[0] < 0.5)
-          cell_->set_active_fe_index(0);
-        else
-          cell_->set_active_fe_index(1);
-      }
-  dof.distribute_dofs(fe_collection);
+  dof.distribute_dofs(fe);
 
   IndexSet owned_set = dof.locally_owned_dofs();
   IndexSet relevant_set;
@@ -121,18 +115,19 @@ test()
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;
-  IteratorFilters::ActiveFEIndexEqualTo filter(0, true);
+  IteratorFilters::MaterialIdEqualTo filter(0, true);
   mf_data.reinit(mapping, dof, constraints, quad, filter, additional_data);
 
   const unsigned int coef_size =
     tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 Number,
-                 LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
+  MatrixFreeTest<
+    dim,
+    fe_degree,
+    Number,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>
     mf(mf_data, coef_size);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev;
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev;
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> in_dev;
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> out_dev;
   mf_data.initialize_dof_vector(in_dev);
   mf_data.initialize_dof_vector(out_dev);
 
@@ -190,7 +185,7 @@ test()
     typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
                                                    endc = dof.end();
     for (; cell != endc; ++cell)
-      if (cell->is_locally_owned() && cell->active_fe_index() == 0)
+      if (cell->is_locally_owned() && cell->material_id() == 0)
         {
           cell_matrix = 0;
           fe_values.reinit(cell);
@@ -232,8 +227,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

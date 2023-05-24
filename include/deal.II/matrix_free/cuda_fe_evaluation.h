@@ -18,21 +18,19 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#include <deal.II/base/memory_space.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
-#  include <deal.II/base/memory_space.h>
-#  include <deal.II/base/tensor.h>
-#  include <deal.II/base/utilities.h>
+#include <deal.II/lac/cuda_atomic.h>
+#include <deal.II/lac/cuda_vector.h>
 
-#  include <deal.II/lac/cuda_atomic.h>
-#  include <deal.II/lac/cuda_vector.h>
+#include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
+#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
+#include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
 
-#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
-#  include <deal.II/matrix_free/cuda_matrix_free.h>
-#  include <deal.II/matrix_free/cuda_matrix_free.templates.h>
-#  include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
-
-#  include <Kokkos_Core.hpp>
+#include <Kokkos_Core.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -524,7 +522,5 @@ namespace CUDAWrappers
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

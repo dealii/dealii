@@ -19,29 +19,29 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/cuda.h>
+#include <deal.II/base/cuda_size.h>
+#include <deal.II/base/graph_coloring.h>
+#include <deal.II/base/memory_space.h>
+
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
+#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/shape_info.h>
+
+#include <Kokkos_Core.hpp>
 #ifdef DEAL_II_WITH_CUDA
-
-#  include <deal.II/base/cuda.h>
-#  include <deal.II/base/cuda_size.h>
-#  include <deal.II/base/graph_coloring.h>
-#  include <deal.II/base/memory_space.h>
-
-#  include <deal.II/dofs/dof_tools.h>
-
-#  include <deal.II/fe/fe_dgq.h>
-#  include <deal.II/fe/fe_values.h>
-#  include <deal.II/fe/mapping_q1.h>
-
-#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
-#  include <deal.II/matrix_free/cuda_matrix_free.h>
-#  include <deal.II/matrix_free/shape_info.h>
-
-#  include <Kokkos_Core.hpp>
 #  include <cuda_runtime_api.h>
+#endif
 
-#  include <cmath>
-#  include <functional>
-#  include <string>
+#include <cmath>
+#include <functional>
+#include <string>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -132,8 +132,6 @@ namespace CUDAWrappers
       // We need at least three colors when we are using CUDA-aware MPI and
       // overlapping the communication
       data->n_cells.resize(std::max(n_colors, 3U), 0);
-      data->grid_dim.resize(n_colors);
-      data->block_dim.resize(n_colors);
       data->local_to_global.resize(n_colors);
       data->constraint_mask.resize(n_colors);
 
@@ -309,6 +307,7 @@ namespace CUDAWrappers
       }
     };
 
+#ifdef DEAL_II_WITH_CUDA
     template <>
     struct VectorLocalSize<LinearAlgebra::CUDAWrappers::Vector<double>>
     {
@@ -328,6 +327,7 @@ namespace CUDAWrappers
         return vec.size();
       }
     };
+#endif
 
 
 
@@ -557,7 +557,7 @@ namespace CUDAWrappers
   }
 
 
-
+#ifdef DEAL_II_WITH_CUDA
   template <int dim, typename Number>
   void
   MatrixFree<dim, Number>::initialize_dof_vector(
@@ -565,13 +565,14 @@ namespace CUDAWrappers
   {
     vec.reinit(n_dofs);
   }
+#endif
 
 
 
   template <int dim, typename Number>
   void
   MatrixFree<dim, Number>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &vec) const
   {
     if (partitioner)
       vec.reinit(partitioner);
@@ -635,7 +636,6 @@ namespace CUDAWrappers
     // First compute the size of n_cells, row_starts, kernel launch parameters,
     // and constrained_dofs
     std::size_t bytes = n_cells.size() * sizeof(unsigned int) * 2 +
-                        2 * n_colors * sizeof(dim3) +
                         n_constrained_dofs * sizeof(unsigned int);
 
     // For each color, add local_to_global, inv_jacobian, JxW, and q_points.
@@ -667,9 +667,6 @@ namespace CUDAWrappers
     const AdditionalData             additional_data)
   {
     dof_handler = &dof_handler_;
-
-    if (typeid(Number) == typeid(double))
-      cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
 
     UpdateFlags update_flags = additional_data.mapping_update_flags;
     if (update_flags & update_gradients)
@@ -937,9 +934,9 @@ namespace CUDAWrappers
   template <typename Functor>
   void
   MatrixFree<dim, Number>::distributed_cell_loop(
-    const Functor &                                                      func,
-    const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
+    const Functor &func,
+    const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &src,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst) const
   {
     MemorySpace::Default::kokkos_space::execution_space exec;
 
@@ -1046,12 +1043,13 @@ namespace CUDAWrappers
     else
       {
         // Create the ghosted source and the ghosted destination
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
           ghosted_src(partitioner);
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
           ghosted_dst(ghosted_src);
         ghosted_src = src;
         ghosted_dst = dst;
+        ghosted_dst.zero_out_ghost_values();
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
@@ -1062,7 +1060,10 @@ namespace CUDAWrappers
                 team_policy(exec, n_cells[i], Kokkos::AUTO);
 
               internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                func, get_data(i), src.get_values(), dst.get_values());
+                func,
+                get_data(i),
+                ghosted_src.get_values(),
+                ghosted_dst.get_values());
 
               Kokkos::parallel_for(
                 "dealii::MatrixFree::distributed_cell_loop_" +
@@ -1077,8 +1078,7 @@ namespace CUDAWrappers
       }
   }
 
-
-
+#ifdef DEAL_II_WITH_CUDA
   template <int dim, typename Number>
   template <typename Functor>
   void
@@ -1089,10 +1089,9 @@ namespace CUDAWrappers
   {
     Assert(false, ExcInternalError());
   }
+#endif
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

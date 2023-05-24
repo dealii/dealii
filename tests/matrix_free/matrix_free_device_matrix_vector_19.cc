@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,13 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-// Same as matrix_free_matrix_vector_10 test but we only perform the operator
-// evaluation on the cells that have a material ID equal to zero.
+
+
+// same as matrix_vector_10 but using parallel::shared::Triangulation rather
+// than parallel::distributed::Triangulation
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -40,7 +42,7 @@
 
 #include "../tests.h"
 
-#include "matrix_vector_mf.h"
+#include "matrix_vector_device_mf.h"
 
 
 
@@ -50,24 +52,25 @@ test()
 {
   using Number = double;
 
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    ::Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::partition_zoltan);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    if (cell->is_locally_owned())
-      if (cell->center().norm() < 0.2)
-        cell->set_refine_flag();
+    if (cell->center().norm() < 0.2)
+      cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   if (dim < 3 && fe_degree < 2)
     tria.refine_global(2);
   else
     tria.refine_global(1);
-  if (tria.begin(tria.n_levels() - 1)->is_locally_owned())
-    tria.begin(tria.n_levels() - 1)->set_refine_flag();
-  if (tria.last()->is_locally_owned())
-    tria.last()->set_refine_flag();
+  tria.begin(tria.n_levels() - 1)->set_refine_flag();
+  tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   cell = tria.begin_active();
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
@@ -75,18 +78,9 @@ test()
       cell                 = tria.begin_active();
       unsigned int counter = 0;
       for (; cell != endc; ++cell, ++counter)
-        if (cell->is_locally_owned())
-          if (counter % (7 - i) == 0)
-            cell->set_refine_flag();
+        if (counter % (7 - i) == 0)
+          cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
-    }
-  // Set material ID
-  for (cell = tria.begin_active(); cell < endc; ++cell)
-    {
-      if (cell->center()[0] < 0.5)
-        cell->set_material_id(0);
-      else
-        cell->set_material_id(1);
     }
 
   FE_Q<dim>       fe(fe_degree);
@@ -115,20 +109,20 @@ test()
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;
-  IteratorFilters::MaterialIdEqualTo filter(0, true);
-  mf_data.reinit(mapping, dof, constraints, quad, filter, additional_data);
+  mf_data.reinit(mapping, dof, constraints, quad, additional_data);
 
   const unsigned int coef_size =
     tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 Number,
-                 LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
+  MatrixFreeTest<
+    dim,
+    fe_degree,
+    Number,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>
     mf(mf_data, coef_size);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev;
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev;
-  mf_data.initialize_dof_vector(in_dev);
-  mf_data.initialize_dof_vector(out_dev);
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> in_dev(
+    owned_set, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> out_dev(
+    owned_set, MPI_COMM_WORLD);
 
   LinearAlgebra::ReadWriteVector<Number> rw_in(owned_set);
   for (unsigned int i = 0; i < in_dev.local_size(); ++i)
@@ -184,7 +178,7 @@ test()
     typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
                                                    endc = dof.end();
     for (; cell != endc; ++cell)
-      if (cell->is_locally_owned() && cell->material_id() == 0)
+      if (cell->is_locally_owned())
         {
           cell_matrix = 0;
           fe_values.reinit(cell);
@@ -226,8 +220,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

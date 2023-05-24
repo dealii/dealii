@@ -4,8 +4,3 @@ DEAL:0:0::locally owned dofs :
 DEAL:0:0::locally relevant dofs :
 {[0,24]}
 DEAL:0:0::OK
-DEAL:0:0::locally owned dofs :
-{[0,24]}
-DEAL:0:0::locally relevant dofs :
-{[0,24]}
-DEAL:0:0::OK

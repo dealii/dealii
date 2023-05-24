@@ -14,14 +14,15 @@
 // ---------------------------------------------------------------------
 
 
-// Same as matrix_free_matrix_vector_06b but uses varying coefficients
+// Same as matrix_free_matrix_vector_06a but uses LA::distributed::Vector
+// instead of CUDAWrappers::Vector
 
 #include <deal.II/base/function.h>
 
 #include "../tests.h"
 
 #include "create_mesh.h"
-#include "matrix_vector_common.h"
+#include "matrix_vector_device_common.h"
 
 template <int dim, int fe_degree, typename Number>
 void
@@ -70,6 +71,6 @@ test()
   do_test<dim,
           fe_degree,
           Number,
-          LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>,
-          fe_degree + 1>(dof, constraints, tria.n_active_cells(), false);
+          LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>,
+          fe_degree + 1>(dof, constraints, tria.n_active_cells());
 }

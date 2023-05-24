@@ -19,28 +19,26 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#include <deal.II/base/cuda_size.h>
+#include <deal.II/base/memory_space.h>
+#include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/partitioner.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
-#  include <deal.II/base/cuda_size.h>
-#  include <deal.II/base/memory_space.h>
-#  include <deal.II/base/mpi_stub.h>
-#  include <deal.II/base/partitioner.h>
-#  include <deal.II/base/quadrature.h>
-#  include <deal.II/base/tensor.h>
-#  include <deal.II/base/utilities.h>
+#include <deal.II/dofs/dof_handler.h>
 
-#  include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping.h>
 
-#  include <deal.II/fe/fe_update_flags.h>
-#  include <deal.II/fe/mapping.h>
+#include <deal.II/grid/filtered_iterator.h>
 
-#  include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/cuda_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
-#  include <deal.II/lac/affine_constraints.h>
-#  include <deal.II/lac/cuda_vector.h>
-#  include <deal.II/lac/la_parallel_vector.h>
-
-#  include <Kokkos_Core.hpp>
+#include <Kokkos_Core.hpp>
 
 
 
@@ -58,13 +56,13 @@ namespace internal
 namespace CUDAWrappers
 {
   // forward declaration
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
   namespace internal
   {
     template <int dim, typename Number>
     class ReinitHelper;
   }
-#  endif
+#endif
 
   /**
    * This class collects all the data that is stored for the matrix free
@@ -118,12 +116,12 @@ namespace CUDAWrappers
         , use_coloring(use_coloring)
         , overlap_communication_computation(overlap_communication_computation)
       {
-#  ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
+#ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
         AssertThrow(
           overlap_communication_computation == false,
           ExcMessage(
             "Overlapping communication and computation requires CUDA-aware MPI."));
-#  endif
+#endif
         if (overlap_communication_computation == true)
           AssertThrow(
             use_coloring == false || overlap_communication_computation == false,
@@ -377,6 +375,7 @@ namespace CUDAWrappers
     void
     set_constrained_values(const Number val, VectorType &dst) const;
 
+#ifdef DEAL_II_WITH_CUDA
     /**
      * Initialize a serial vector. The size corresponds to the number of degrees
      * of freedom in the DoFHandler object.
@@ -384,6 +383,7 @@ namespace CUDAWrappers
     void
     initialize_dof_vector(
       LinearAlgebra::CUDAWrappers::Vector<Number> &vec) const;
+#endif
 
     /**
      * Initialize a distributed vector. The local elements correspond to the
@@ -392,7 +392,8 @@ namespace CUDAWrappers
      */
     void
     initialize_dof_vector(
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const;
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &vec)
+      const;
 
     /**
      * Return the colored graph of locally owned active cells.
@@ -456,10 +457,13 @@ namespace CUDAWrappers
     template <typename Functor>
     void
     distributed_cell_loop(
-      const Functor &                                                      func,
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
+      const Functor &func,
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+        &                                                               src,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
+      const;
 
+#ifdef DEAL_II_WITH_CUDA
     /**
      * This function should never be called. Calling it results in an internal
      * error. This function exists only because cell_loop needs
@@ -471,6 +475,7 @@ namespace CUDAWrappers
       const Functor &                                    func,
       const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
       LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
+#endif
 
     /**
      * Unique ID associated with the object.
@@ -590,18 +595,6 @@ namespace CUDAWrappers
      */
     Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
       constraint_weights;
-
-    /**
-     * Grid dimensions associated to the different colors. The grid dimensions
-     * are used to launch the CUDA kernels.
-     */
-    std::vector<dim3> grid_dim;
-
-    /**
-     * Block dimensions associated to the different colors. The block dimensions
-     * are used to launch the CUDA kernels.
-     */
-    std::vector<dim3> block_dim;
 
     /**
      * Shared pointer to a Partitioner for distributed Vectors used in
@@ -788,8 +781,6 @@ namespace CUDAWrappers
     data_host.row_start      = data.row_start;
     data_host.use_coloring   = data.use_coloring;
 
-    const unsigned int n_elements =
-      data_host.n_cells * data_host.padding_length;
     if (update_flags & update_quadrature_points)
       {
         data_host.q_points = Kokkos::create_mirror(data.q_points);
@@ -820,7 +811,7 @@ namespace CUDAWrappers
 
   /*----------------------- Inline functions ---------------------------------*/
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 
   template <int dim, typename Number>
   inline const std::vector<std::vector<
@@ -850,11 +841,10 @@ namespace CUDAWrappers
     return *dof_handler;
   }
 
-#  endif
+#endif
 
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
 #endif
