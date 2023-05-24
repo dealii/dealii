@@ -156,7 +156,7 @@
  * define a convenience macro that allows us to write a 'requires'
  * clause that is simply removed when not using C++20.
  */
-#ifdef DEAL_II_HAVE_CXX20
+#if defined(DEAL_II_HAVE_CXX20) && !defined(DEAL_II_DOXYGEN_DO_NOT_PARSE_REQUIRES_CLAUSES)
 #  define DEAL_II_CXX20_REQUIRES(condition) requires(condition)
 #else
 #  define DEAL_II_CXX20_REQUIRES(condition)
