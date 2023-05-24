@@ -249,6 +249,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_TRILINOS_WITH_ZOLTAN=1 \
                          DEAL_II_TRILINOS_VERSION_GTE=1 \
                          DEAL_II_WITH_UMFPACK=1 \
+                         DEAL_II_WITH_VTK=1 \
                          DEAL_II_WITH_ZLIB=1
 
 # do not expand exception declarations
