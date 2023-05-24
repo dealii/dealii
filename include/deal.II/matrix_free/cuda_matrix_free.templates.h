@@ -266,7 +266,7 @@ namespace CUDAWrappers
                 for (unsigned int d = 0; d < dim; ++d)
                   for (unsigned int e = 0; e < dim; ++e)
                     inv_jacobian_host(cell_id, i, d, e) =
-                      fe_values.inverse_jacobian(i)[d][e];
+                      inv_jacobians[i][d][e];
             }
         }
 
