@@ -295,8 +295,15 @@ namespace PETScWrappers
   template <typename VectorType  = PETScWrappers::VectorBase,
             typename PMatrixType = PETScWrappers::MatrixBase,
             typename AMatrixType = PMatrixType>
-  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
-                          std::constructible_from<VectorType, Vec>))
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_petsc_vector_type<VectorType> ||
+     std::constructible_from<
+       VectorType,
+       Vec>)&&(concepts::is_dealii_petsc_matrix_type<PMatrixType> ||
+               std::constructible_from<
+                 PMatrixType,
+                 Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
+                         std::constructible_from<AMatrixType, Mat>))
   class TimeStepper
   {
   public:
