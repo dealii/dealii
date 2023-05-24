@@ -79,16 +79,15 @@ public:
     time_stepper.residual = [&](const double      t,
                                 const VectorType &y,
                                 const VectorType &y_dot,
-                                VectorType &      res) -> int {
+                                VectorType &      res) {
       res = y_dot;
       A.vmult_add(res, y);
-      return 0;
     };
 
     time_stepper.setup_jacobian = [&](const double,
                                       const VectorType &,
                                       const VectorType &,
-                                      const double alpha) -> int {
+                                      const double alpha) {
       A(0, 1) = -1.0;
       A(1, 0) = kappa * kappa;
 
@@ -96,26 +95,21 @@ public:
 
       J(0, 0) = alpha;
       J(1, 1) = alpha;
-
-      return 0;
     };
 
-    time_stepper.solve_with_jacobian = [&](const VectorType &src,
-                                           VectorType &      dst,
-                                           const double      tolerance) -> int {
-      SolverControl               solver_control(1000, tolerance, false, false);
-      SolverGMRES<Vector<double>> solver(solver_control);
-      solver.solve(J, dst, src, PreconditionIdentity());
-      return 0;
-    };
+    time_stepper.solve_with_jacobian =
+      [&](const VectorType &src, VectorType &dst, const double tolerance) {
+        SolverControl solver_control(1000, tolerance, false, false);
+        SolverGMRES<Vector<double>> solver(solver_control);
+        solver.solve(J, dst, src, PreconditionIdentity());
+      };
 
     time_stepper.output_step = [&](const double       t,
                                    const VectorType & sol,
                                    const VectorType & sol_dot,
-                                   const unsigned int step_number) -> int {
+                                   const unsigned int step_number) {
       deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
               << sol_dot[1] << std::endl;
-      return 0;
     };
   }
 
@@ -158,5 +152,4 @@ main()
 
   HarmonicOscillator ode(1.0, data);
   ode.run();
-  return 0;
 }

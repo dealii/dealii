@@ -76,16 +76,15 @@ public:
     time_stepper.residual = [&](const double /*t*/,
                                 const VectorType &y,
                                 const VectorType &y_dot,
-                                VectorType &      res) -> int {
+                                VectorType &      res) {
       res = y_dot;
       A.vmult_add(res, y);
-      return 0;
     };
 
     time_stepper.setup_jacobian = [&](const double,
                                       const VectorType &,
                                       const VectorType &,
-                                      const double alpha) -> int {
+                                      const double alpha) {
       A(0, 1) = -1.0;
       A(1, 0) = kappa * kappa;
 
@@ -95,21 +94,18 @@ public:
       J(1, 1) = alpha;
 
       Jinv.invert(J);
-      return 0;
     };
 
     time_stepper.solve_with_jacobian =
-      [&](const VectorType &rhs, VectorType &dst, const double /*tol*/) -> int {
-      Jinv.vmult(dst, rhs);
-      return 0;
-    };
+      [&](const VectorType &rhs, VectorType &dst, const double /*tol*/) {
+        Jinv.vmult(dst, rhs);
+      };
 
     time_stepper.output_step = [&](const double /*t*/,
                                    const VectorType & /*sol*/,
                                    const VectorType & /*sol_dot*/,
-                                   const unsigned int /*step_number*/) -> int {
+                                   const unsigned int /*step_number*/) {
       // In this test, don't output anything.
-      return 0;
     };
 
     time_stepper.solver_should_restart =
