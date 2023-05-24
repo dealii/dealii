@@ -116,95 +116,6 @@ namespace SUNDIALS
   } // namespace
 
 
-  namespace
-  {
-    template <typename VectorType>
-    int
-    residual_callback(realtype tt,
-                      N_Vector yy,
-                      N_Vector yp,
-                      N_Vector rr,
-                      void *   user_data)
-    {
-      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
-
-      auto *src_yy   = internal::unwrap_nvector_const<VectorType>(yy);
-      auto *src_yp   = internal::unwrap_nvector_const<VectorType>(yp);
-      auto *residual = internal::unwrap_nvector<VectorType>(rr);
-
-      return call_and_possibly_capture_exception(solver.residual,
-                                                 solver.pending_exception,
-                                                 tt,
-                                                 *src_yy,
-                                                 *src_yp,
-                                                 *residual);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    setup_jacobian_callback(realtype tt,
-                            realtype cj,
-                            N_Vector yy,
-                            N_Vector yp,
-                            N_Vector /* residual */,
-                            SUNMatrix /* ignored */,
-                            void *user_data,
-                            N_Vector /* tmp1 */,
-                            N_Vector /* tmp2 */,
-                            N_Vector /* tmp3 */)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
-
-      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
-      auto *src_yp = internal::unwrap_nvector_const<VectorType>(yp);
-
-      return call_and_possibly_capture_exception(solver.setup_jacobian,
-                                                 solver.pending_exception,
-                                                 tt,
-                                                 *src_yy,
-                                                 *src_yp,
-                                                 cj);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    solve_with_jacobian_callback(SUNLinearSolver LS,
-                                 SUNMatrix /*ignored*/,
-                                 N_Vector x,
-                                 N_Vector b,
-                                 realtype tol)
-    {
-      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
-
-      auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
-      auto *dst_x = internal::unwrap_nvector<VectorType>(x);
-      if (solver.solve_with_jacobian)
-        return call_and_possibly_capture_exception(solver.solve_with_jacobian,
-                                                   solver.pending_exception,
-                                                   *src_b,
-                                                   *dst_x,
-                                                   tol);
-      else if (solver.solve_jacobian_system)
-        return call_and_possibly_capture_exception(solver.solve_jacobian_system,
-                                                   solver.pending_exception,
-                                                   *src_b,
-                                                   *dst_x);
-      else
-        {
-          // We have already checked this outside, so we should never get here.
-          Assert(false, ExcInternalError());
-          return -1;
-        }
-    }
-  } // namespace
-
-
-
   template <typename VectorType>
   IDA<VectorType>::IDA(const AdditionalData &data)
     : IDA(data, MPI_COMM_SELF)
@@ -385,8 +296,26 @@ namespace SUNDIALS
 #  endif
     );
 
-    status =
-      IDAInit(ida_mem, residual_callback<VectorType>, current_time, yy, yp);
+    status = IDAInit(
+      ida_mem,
+      [](realtype tt, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data)
+        -> int {
+        IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
+
+        auto *src_yy   = internal::unwrap_nvector_const<VectorType>(yy);
+        auto *src_yp   = internal::unwrap_nvector_const<VectorType>(yp);
+        auto *residual = internal::unwrap_nvector<VectorType>(rr);
+
+        return call_and_possibly_capture_exception(solver.residual,
+                                                   solver.pending_exception,
+                                                   tt,
+                                                   *src_yy,
+                                                   *src_yp,
+                                                   *residual);
+      },
+      current_time,
+      yy,
+      yp);
     AssertIDA(status);
     if (get_local_tolerances)
       {
@@ -482,7 +411,33 @@ namespace SUNDIALS
     AssertThrow(solve_jacobian_system || solve_with_jacobian,
                 ExcFunctionNotProvided(
                   "solve_jacobian_system or solve_with_jacobian"));
-    LS->ops->solve = solve_with_jacobian_callback<VectorType>;
+    LS->ops->solve = [](SUNLinearSolver LS,
+                        SUNMatrix /*ignored*/,
+                        N_Vector x,
+                        N_Vector b,
+                        realtype tol) -> int {
+      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
+
+      auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
+      auto *dst_x = internal::unwrap_nvector<VectorType>(x);
+      if (solver.solve_with_jacobian)
+        return call_and_possibly_capture_exception(solver.solve_with_jacobian,
+                                                   solver.pending_exception,
+                                                   *src_b,
+                                                   *dst_x,
+                                                   tol);
+      else if (solver.solve_jacobian_system)
+        return call_and_possibly_capture_exception(solver.solve_jacobian_system,
+                                                   solver.pending_exception,
+                                                   *src_b,
+                                                   *dst_x);
+      else
+        {
+          // We have already checked this outside, so we should never get here.
+          Assert(false, ExcInternalError());
+          return -1;
+        }
+    };
 
     // When we set an iterative solver IDA requires that resid is provided. From
     // SUNDIALS docs If an iterative method computes the preconditioned initial
@@ -537,7 +492,31 @@ namespace SUNDIALS
     // Finally tell IDA about
     // it as well. The manual says that this must happen *after*
     // calling IDASetLinearSolver
-    status = IDASetJacFn(ida_mem, &setup_jacobian_callback<VectorType>);
+    status = IDASetJacFn(
+      ida_mem,
+      [](realtype tt,
+         realtype cj,
+         N_Vector yy,
+         N_Vector yp,
+         N_Vector /* residual */,
+         SUNMatrix /* ignored */,
+         void *user_data,
+         N_Vector /* tmp1 */,
+         N_Vector /* tmp2 */,
+         N_Vector /* tmp3 */) -> int {
+        Assert(user_data != nullptr, ExcInternalError());
+        IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
+
+        auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+        auto *src_yp = internal::unwrap_nvector_const<VectorType>(yp);
+
+        return call_and_possibly_capture_exception(solver.setup_jacobian,
+                                                   solver.pending_exception,
+                                                   tt,
+                                                   *src_yy,
+                                                   *src_yp,
+                                                   cj);
+      });
     AssertIDA(status);
     status = IDASetMaxOrd(ida_mem, data.maximum_order);
     AssertIDA(status);

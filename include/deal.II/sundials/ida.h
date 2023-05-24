@@ -906,7 +906,6 @@ namespace SUNDIALS
      */
     GrowingVectorMemory<VectorType> mem;
 
-  public:
     /**
      * A pointer to any exception that may have been thrown in user-defined
      * call-backs and that we have to deal after the KINSOL function we call
