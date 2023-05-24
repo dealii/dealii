@@ -38,24 +38,56 @@ DEAL_II_NAMESPACE_OPEN
       }                                              \
     while (0)
 
-// Shorthand notation for User error codes.
-#  define AssertUser(code, name)                                               \
-    do                                                                         \
-      {                                                                        \
-        int ierr = (code);                                                     \
-        AssertThrow(ierr == 0,                                                 \
-                    StandardExceptions::ExcFunctionNonzeroReturn(name, ierr)); \
-      }                                                                        \
-    while (0)
-
 namespace PETScWrappers
 {
+  namespace
+  {
+    /**
+     * A function that calls the function object given by its first argument
+     * with the set of arguments following at the end. If the call returns
+     * regularly, the current function returns zero to indicate success. If
+     * the call fails with an exception, then the current function returns with
+     * an error code of -1. In that case, the exception thrown by `f` is
+     * captured and `eptr` is set to the exception. In case of success,
+     * `eptr` is set to `nullptr`.
+     */
+    template <typename F, typename... Args>
+    int
+    call_and_possibly_capture_exception(const F &           f,
+                                        std::exception_ptr &eptr,
+                                        Args &&...args)
+    {
+      // See whether there is already something in the exception pointer
+      // variable. There is no reason why this should be so, and
+      // we should probably bail out:
+      AssertThrow(eptr == nullptr, ExcInternalError());
+
+      // Call the function and if that succeeds, return zero:
+      try
+        {
+          f(std::forward<Args>(args)...);
+          eptr = nullptr;
+          return 0;
+        }
+      // In case of an exception, capture the exception and
+      // return -1:
+      catch (...)
+        {
+          eptr = std::current_exception();
+          return -1;
+        }
+    }
+  } // namespace
+
+
+
   template <typename VectorType, typename PMatrixType, typename AMatrixType>
   DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
                           std::constructible_from<VectorType, Vec>))
   TimeStepper<VectorType, PMatrixType, AMatrixType>::TimeStepper(
     const TimeStepperData &data,
     const MPI_Comm         mpi_comm)
+    : pending_exception(nullptr)
   {
     AssertPETSc(TSCreate(mpi_comm, &ts));
     AssertPETSc(TSSetApplicationContext(ts, this));
@@ -70,6 +102,8 @@ namespace PETScWrappers
   TimeStepper<VectorType, PMatrixType, AMatrixType>::~TimeStepper()
   {
     AssertPETSc(TSDestroy(&ts));
+
+    Assert(pending_exception == nullptr, ExcInternalError());
   }
 
 
@@ -252,10 +286,15 @@ namespace PETScWrappers
       VectorType xdealii(x);
       VectorType xdotdealii(xdot);
       VectorType fdealii(f);
-      AssertUser(user->implicit_function(t, xdealii, xdotdealii, fdealii),
-                 "implicit_function");
+      const int  err =
+        call_and_possibly_capture_exception(user->implicit_function,
+                                            user->pending_exception,
+                                            t,
+                                            xdealii,
+                                            xdotdealii,
+                                            fdealii);
       petsc_increment_state_counter(f);
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(err);
     };
 
     const auto ts_ijacobian =
@@ -269,9 +308,16 @@ namespace PETScWrappers
       AMatrixType Adealii(A);
       PMatrixType Pdealii(P);
 
-      AssertUser(
-        user->implicit_jacobian(t, xdealii, xdotdealii, s, Adealii, Pdealii),
-        "implicit_jacobian");
+      const int err =
+        call_and_possibly_capture_exception(user->implicit_jacobian,
+                                            user->pending_exception,
+                                            t,
+                                            xdealii,
+                                            xdotdealii,
+                                            s,
+                                            Adealii,
+                                            Pdealii);
+
       petsc_increment_state_counter(P);
 
       // Handle the Jacobian-free case
@@ -286,7 +332,8 @@ namespace PETScWrappers
         }
       else
         petsc_increment_state_counter(A);
-      PetscFunctionReturn(0);
+
+      PetscFunctionReturn(err);
     };
 
     const auto ts_ijacobian_with_setup =
@@ -302,8 +349,14 @@ namespace PETScWrappers
 
       user->A = &Adealii;
       user->P = &Pdealii;
-      AssertUser(user->setup_jacobian(t, xdealii, xdotdealii, s),
-                 "setup_jacobian");
+      const int err =
+        call_and_possibly_capture_exception(user->setup_jacobian,
+                                            user->pending_exception,
+                                            t,
+                                            xdealii,
+                                            xdotdealii,
+                                            s);
+
       petsc_increment_state_counter(P);
 
       // Handle older versions of PETSc for which we cannot pass a MATSHELL
@@ -330,7 +383,8 @@ namespace PETScWrappers
         }
       else
         petsc_increment_state_counter(A);
-      PetscFunctionReturn(0);
+
+      PetscFunctionReturn(err);
     };
 
     const auto ts_rhsfunction =
@@ -341,10 +395,10 @@ namespace PETScWrappers
       VectorType xdealii(x);
       VectorType fdealii(f);
 
-      AssertUser(user->explicit_function(t, xdealii, fdealii),
-                 "explicit_function");
+      const int err = call_and_possibly_capture_exception(
+        user->explicit_function, user->pending_exception, t, xdealii, fdealii);
       petsc_increment_state_counter(f);
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(err);
     };
 
     const auto ts_rhsjacobian =
@@ -356,8 +410,14 @@ namespace PETScWrappers
       AMatrixType Adealii(A);
       PMatrixType Pdealii(P);
 
-      AssertUser(user->explicit_jacobian(t, xdealii, Adealii, Pdealii),
-                 "explicit_jacobian");
+      const int err =
+        call_and_possibly_capture_exception(user->explicit_jacobian,
+                                            user->pending_exception,
+                                            t,
+                                            xdealii,
+                                            Adealii,
+                                            Pdealii);
+
       petsc_increment_state_counter(P);
 
       // Handle older versions of PETSc for which we cannot pass a MATSHELL
@@ -382,7 +442,8 @@ namespace PETScWrappers
         }
       else
         petsc_increment_state_counter(A);
-      PetscFunctionReturn(0);
+
+      PetscFunctionReturn(err);
     };
 
     const auto ts_monitor =
@@ -391,8 +452,9 @@ namespace PETScWrappers
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType xdealii(x);
-      AssertUser(user->monitor(t, xdealii, it), "monitor");
-      PetscFunctionReturn(0);
+      const int  err = call_and_possibly_capture_exception(
+        user->monitor, user->pending_exception, t, xdealii, it);
+      PetscFunctionReturn(err);
     };
 
     AssertThrow(explicit_function || implicit_function,
@@ -482,7 +544,10 @@ namespace PETScWrappers
         precond.vmult = [&](VectorBase &indst, const VectorBase &insrc) -> int {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
-          return solve_with_jacobian(src, dst);
+          return call_and_possibly_capture_exception(solve_with_jacobian,
+                                                     pending_exception,
+                                                     src,
+                                                     dst);
         };
 
         // Default Krylov solver (preconditioner only)
@@ -528,8 +593,31 @@ namespace PETScWrappers
       }
 
     // Having set everything up, now do the actual work
-    // and let PETSc do the time stepping.
-    AssertPETSc(TSSolve(ts, nullptr));
+    // and let PETSc do the time stepping. If there is
+    // a pending exception, then one of the user callbacks
+    // threw an exception we didn't know how to deal with
+    // at the time. It is possible that PETSc managed to
+    // recover anyway and in that case would have returned
+    // a zero error code -- if so, just eat the exception and
+    // continue on; otherwise, just rethrow the exception
+    // and get outta here.
+    const int status = TSSolve(ts, nullptr);
+    if (pending_exception)
+      {
+        try
+          {
+            std::rethrow_exception(pending_exception);
+          }
+        catch (...)
+          {
+            pending_exception = nullptr;
+            if (status == 0)
+              /* just eat the exception */;
+            else
+              throw;
+          }
+      }
+    AssertPETSc(status);
 
     // Get the number of steps taken.
     auto nt = ts_get_step_number(ts);

@@ -29,6 +29,8 @@
 
 #  include <petscts.h>
 
+#  include <exception>
+
 #  if defined(DEAL_II_HAVE_CXX20)
 #    include <concepts>
 #  endif
@@ -421,11 +423,19 @@ namespace PETScWrappers
 
     /**
      * Callback for the computation of the implicit residual $F(t, y, \dot y)$.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's TS package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const real_type   t,
-                      const VectorType &y,
-                      const VectorType &y_dot,
-                      VectorType &      res)>
+    std::function<void(const real_type   t,
+                       const VectorType &y,
+                       const VectorType &y_dot,
+                       VectorType &      res)>
       implicit_function;
 
     /**
@@ -436,29 +446,53 @@ namespace PETScWrappers
      * All implicit solvers implementations are recast to use the above
      * linearization. The $\alpha$ parameter is time-step and solver-type
      * specific.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's TS package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const real_type   t,
-                      const VectorType &y,
-                      const VectorType &y_dot,
-                      const real_type   alpha,
-                      AMatrixType &     A,
-                      PMatrixType &     P)>
+    std::function<void(const real_type   t,
+                       const VectorType &y,
+                       const VectorType &y_dot,
+                       const real_type   alpha,
+                       AMatrixType &     A,
+                       PMatrixType &     P)>
       implicit_jacobian;
 
     /**
      * Callback for the computation of the explicit residual $G(t, y)$.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's TS package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const real_type t, const VectorType &y, VectorType &res)>
+    std::function<void(const real_type t, const VectorType &y, VectorType &res)>
       explicit_function;
 
     /**
      * Callback for the computation of the explicit Jacobian $\dfrac{\partial
      * G}{\partial y}$.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's TS package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const real_type   t,
-                      const VectorType &y,
-                      AMatrixType &     A,
-                      PMatrixType &     P)>
+    std::function<void(const real_type   t,
+                       const VectorType &y,
+                       AMatrixType &     A,
+                       PMatrixType &     P)>
       explicit_jacobian;
 
     /**
@@ -466,10 +500,18 @@ namespace PETScWrappers
      *
      * This function is called by TimeStepper at the beginning
      * of each time step.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's TS package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const real_type    t,
-                      const VectorType & y,
-                      const unsigned int step_number)>
+    std::function<void(const real_type    t,
+                       const VectorType & y,
+                       const unsigned int step_number)>
       monitor;
 
     /**
@@ -485,11 +527,19 @@ namespace PETScWrappers
      * specific.
      *
      * Solvers must be provided via TimeStepper::solve_with_jacobian.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's TS package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const real_type   t,
-                      const VectorType &y,
-                      const VectorType &ydot,
-                      const real_type   alpha)>
+    std::function<void(const real_type   t,
+                       const VectorType &y,
+                       const VectorType &ydot,
+                       const real_type   alpha)>
       setup_jacobian;
 
     /**
@@ -497,8 +547,16 @@ namespace PETScWrappers
      * TimeStepper::setup_jacobian.
      *
      * This is used as a preconditioner inside the Krylov process.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's TS package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &src, VectorType &dst)>
+    std::function<void(const VectorType &src, VectorType &dst)>
       solve_with_jacobian;
 
     /**
@@ -529,6 +587,13 @@ namespace PETScWrappers
      * This flag is used to support versions of PETSc older than 3.13.
      */
     bool need_dummy_assemble;
+
+    /**
+     * A pointer to any exception that may have been thrown in user-defined
+     * call-backs and that we have to deal after the KINSOL function we call
+     * has returned.
+     */
+    mutable std::exception_ptr pending_exception;
   };
 
 } // namespace PETScWrappers

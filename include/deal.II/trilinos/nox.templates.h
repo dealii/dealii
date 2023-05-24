@@ -49,9 +49,9 @@ namespace TrilinosWrappers
          * A function that calls the function object given by its first argument
          * with the set of arguments following at the end. If the call returns
          * regularly, the current function returns zero to indicate success. If
-         * the call fails with an, then the current function returns with an
-         * error code of -1. In that case, the exception thrown by `f` is
-         * captured and `eptr` is set to the exception. In case of success,
+         * the call fails with an exception, then the current function returns
+         * with an error code of -1. In that case, the exception thrown by `f`
+         * is captured and `eptr` is set to the exception. In case of success,
          * `eptr` is set to `nullptr`.
          */
         template <typename F, typename... Args>
