@@ -54,11 +54,11 @@ test()
   LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
   rw_vector(myid * 2)     = myid * 2.0;
   rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
-  v.import(rw_vector, VectorOperation::insert);
+  v.import_elements(rw_vector, VectorOperation::insert);
 
   v *= 2.0;
 
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
   AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
@@ -68,9 +68,9 @@ test()
   ghost_entry.add_index(1);
   LinearAlgebra::ReadWriteVector<double> rw_ghost_entry(ghost_entry);
   rw_ghost_entry(1) = 7.;
-  v.import(rw_ghost_entry, VectorOperation::insert);
+  v.import_elements(rw_ghost_entry, VectorOperation::insert);
 
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   if (myid == 0)
     {
       deallog << myid * 2 << ":" << rw_vector(myid * 2) << std::endl;
@@ -79,7 +79,7 @@ test()
   // import ghosts onto all procs
   v.update_ghost_values();
   rw_ghost_entry(1) = 0.;
-  rw_ghost_entry.import(v, VectorOperation::insert);
+  rw_ghost_entry.import_elements(v, VectorOperation::insert);
   AssertThrow(rw_ghost_entry(1) == 7.0, ExcInternalError());
 
   // check l2 norm

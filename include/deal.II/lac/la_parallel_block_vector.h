@@ -524,10 +524,23 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
+      import_elements(
+        const LinearAlgebra::ReadWriteVector<Number> &V,
+        VectorOperation::values                       operation,
+        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          communication_pattern = {}) override;
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      DEAL_II_DEPRECATED_EARLY virtual void
       import(const LinearAlgebra::ReadWriteVector<Number> &V,
              VectorOperation::values                       operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override;
+               communication_pattern = {}) override
+      {
+        import_elements(V, operation, communication_pattern);
+      }
 
       /**
        * Return the scalar product of two vectors.

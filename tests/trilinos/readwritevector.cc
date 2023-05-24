@@ -55,7 +55,7 @@ test()
     readwrite_is.add_range(2, 6);
   readwrite_is.compress();
   LinearAlgebra::ReadWriteVector<double> readwrite(readwrite_is);
-  readwrite.import(tril_vector, VectorOperation::insert);
+  readwrite.import_elements(tril_vector, VectorOperation::insert);
   if (rank == 0)
     {
       std::vector<double> comp(4);
@@ -80,7 +80,7 @@ test()
                     ExcMessage("Element not copied correctly"));
     }
 
-  readwrite.import(tril_vector, VectorOperation::add);
+  readwrite.import_elements(tril_vector, VectorOperation::add);
 
   if (rank == 0)
     {

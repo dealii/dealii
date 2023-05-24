@@ -56,10 +56,10 @@ test()
   rw_vector(myid * 2)     = myid * 2.0;
   rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
 
-  v.import(rw_vector, VectorOperation::insert);
+  v.import_elements(rw_vector, VectorOperation::insert);
   v *= 2.0;
 
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
   AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 

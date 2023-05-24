@@ -108,13 +108,13 @@ test(Utilities::CUDA::Handle &cuda_handle)
   LinearAlgebra::ReadWriteVector<double>      rw_vector(size);
   for (unsigned int i = 0; i < size; ++i)
     rw_vector[i] = static_cast<double>(i);
-  rhs_dev.import(rw_vector, VectorOperation::insert);
+  rhs_dev.import_elements(rw_vector, VectorOperation::insert);
   SolverRelaxation<LinearAlgebra::CUDAWrappers::Vector<double>> relaxation_dev(
     control);
   relaxation_dev.solve(A_dev, sol_dev, rhs_dev, relaxation_operator_dev);
 
   // Check the result
-  rw_vector.import(sol_dev, VectorOperation::insert);
+  rw_vector.import_elements(sol_dev, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
     AssertThrow(std::fabs(rw_vector[i] - sol_host[i]) < 1e-8,
                 ExcInternalError());

@@ -77,7 +77,7 @@ test()
   LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
   for (unsigned i = 0; i < local_size; ++i)
     rw_vector.local_element(i) = 2.0 * (i + my_start);
-  w.import(rw_vector, VectorOperation::insert);
+  w.import_elements(rw_vector, VectorOperation::insert);
 
   v = w;
   v.update_ghost_values();
@@ -88,9 +88,9 @@ test()
     v_move = std::move(v_copy);
 
     LinearAlgebra::ReadWriteVector<double> v_rw(local_relevant);
-    v_rw.import(v, VectorOperation::insert);
+    v_rw.import_elements(v, VectorOperation::insert);
     LinearAlgebra::ReadWriteVector<double> v_move_rw(local_relevant);
-    v_move_rw.import(v_move, VectorOperation::insert);
+    v_move_rw.import_elements(v_move, VectorOperation::insert);
 
     for (unsigned int i = 0; i < v_rw.locally_owned_size(); ++i)
       AssertThrow(v_move_rw.local_element(i) == v_rw.local_element(i),
@@ -106,14 +106,14 @@ test()
   }
 
   // check local values for correctness
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   for (unsigned int i = 0; i < local_size; ++i)
     AssertThrow(rw_vector.local_element(i) == 2.0 * (i + my_start),
                 ExcInternalError());
 
   // check non-local entries on all processors
   LinearAlgebra::ReadWriteVector<double> ghost_vector(local_relevant);
-  ghost_vector.import(v, VectorOperation::insert);
+  ghost_vector.import_elements(v, VectorOperation::insert);
   for (unsigned int i = 0; i < 10; ++i)
     AssertThrow(ghost_vector(ghost_indices[i]) == 2. * ghost_indices[i],
                 ExcInternalError());
@@ -125,13 +125,13 @@ test()
   v = w;
 
   // check local values for correctness
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   for (unsigned int i = 0; i < local_size; ++i)
     AssertThrow(rw_vector.local_element(i) == 2.0 * (i + my_start),
                 ExcInternalError());
 
   // check non-local entries on all processors
-  ghost_vector.import(v, VectorOperation::insert);
+  ghost_vector.import_elements(v, VectorOperation::insert);
   for (unsigned int i = 0; i < 10; ++i)
     AssertThrow(ghost_vector(ghost_indices[i]) == 2. * ghost_indices[i],
                 ExcInternalError());

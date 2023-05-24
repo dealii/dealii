@@ -48,34 +48,34 @@ namespace LinearAlgebra
 
 #ifndef DOXYGEN
     template void
-    Vector<float, ::dealii::MemorySpace::Host>::import<
+    Vector<float, ::dealii::MemorySpace::Host>::import_elements<
       ::dealii::MemorySpace::Default>(
       const Vector<float, ::dealii::MemorySpace::Default> &,
       VectorOperation::values);
     template void
-    Vector<double, ::dealii::MemorySpace::Host>::import<
+    Vector<double, ::dealii::MemorySpace::Host>::import_elements<
       ::dealii::MemorySpace::Default>(
       const Vector<double, ::dealii::MemorySpace::Default> &,
       VectorOperation::values);
 
     template void
-    Vector<float, ::dealii::MemorySpace::Default>::import<
+    Vector<float, ::dealii::MemorySpace::Default>::import_elements<
       ::dealii::MemorySpace::Host>(
       const Vector<float, ::dealii::MemorySpace::Host> &,
       VectorOperation::values);
     template void
-    Vector<double, ::dealii::MemorySpace::Default>::import<
+    Vector<double, ::dealii::MemorySpace::Default>::import_elements<
       ::dealii::MemorySpace::Host>(
       const Vector<double, ::dealii::MemorySpace::Host> &,
       VectorOperation::values);
 
     template void
-    Vector<float, ::dealii::MemorySpace::Default>::import<
+    Vector<float, ::dealii::MemorySpace::Default>::import_elements<
       ::dealii::MemorySpace::Default>(
       const Vector<float, ::dealii::MemorySpace::Default> &,
       VectorOperation::values);
     template void
-    Vector<double, ::dealii::MemorySpace::Default>::import<
+    Vector<double, ::dealii::MemorySpace::Default>::import_elements<
       ::dealii::MemorySpace::Default>(
       const Vector<double, ::dealii::MemorySpace::Default> &,
       VectorOperation::values);

@@ -51,11 +51,11 @@ test()
   LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
   rw_vector(myid * 2)     = myid * 2.0;
   rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
-  v.import(rw_vector, VectorOperation::insert);
+  v.import_elements(rw_vector, VectorOperation::insert);
 
   v *= 2.0;
 
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   if (myid == 0)
     {
       deallog << myid * 2 << ":" << rw_vector(myid * 2) << std::endl;

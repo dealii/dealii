@@ -55,7 +55,7 @@ test()
   rw_vector(my_second_index) = my_id + 100;
   rw_vector(0)               = 1.;
   // rw_vector(2) = 1.;
-  v.import(rw_vector, VectorOperation::add);
+  v.import_elements(rw_vector, VectorOperation::add);
   deallog << "Tpetra first import add:" << std::endl;
   v.print(deallog.get_file_stream());
   rw_vector.print(deallog.get_file_stream());
@@ -64,12 +64,12 @@ test()
   rw_vector(my_second_index) = my_id + 200;
   rw_vector(0)               = 2.;
   // rw_vector(2) = 3.;
-  v.import(rw_vector, VectorOperation::add);
+  v.import_elements(rw_vector, VectorOperation::add);
   deallog << "Tpetra second import add:" << std::endl;
   v.print(deallog.get_file_stream());
   rw_vector.print(deallog.get_file_stream());
 
-  rw_vector.import(v, VectorOperation::add);
+  rw_vector.import_elements(v, VectorOperation::add);
   deallog << "ReadWrite import add:" << std::endl;
   rw_vector.print(deallog.get_file_stream());
 
@@ -77,7 +77,7 @@ test()
   rw_vector(my_second_index) = 1;
   rw_vector(0)               = 4.;
   // rw_vector(2) = 3.;
-  rw_vector.import(v, VectorOperation::min);
+  rw_vector.import_elements(v, VectorOperation::min);
   deallog << "ReadWrite import min:" << std::endl;
   rw_vector.print(deallog.get_file_stream());
 
@@ -85,7 +85,7 @@ test()
   rw_vector(my_second_index) = 1;
   rw_vector(0)               = 4.;
   // rw_vector(2) = 3.;
-  rw_vector.import(v, VectorOperation::max);
+  rw_vector.import_elements(v, VectorOperation::max);
   deallog << "ReadWrite import max:" << std::endl;
   rw_vector.print(deallog.get_file_stream());
 }

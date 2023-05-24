@@ -38,7 +38,7 @@ test()
       read_write_1[i] = i;
     }
 
-  cuda_vector.import(read_write_1, VectorOperation::insert);
+  cuda_vector.import_elements(read_write_1, VectorOperation::insert);
 
   cuda_vector.print(deallog.get_file_stream());
 }

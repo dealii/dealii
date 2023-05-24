@@ -54,27 +54,27 @@ test()
   LinearAlgebra::ReadWriteVector<double> rw_vector(local_owned);
   rw_vector(myid * 2)     = myid * 2.0;
   rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
-  v.import(rw_vector, VectorOperation::add);
+  v.import_elements(rw_vector, VectorOperation::add);
 
   v *= 2.0;
 
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
   AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   // set ghost dof, compress
   LinearAlgebra::ReadWriteVector<double> rw_relevant_vector(numproc * 2);
   rw_relevant_vector(1) = 7;
-  v.import(rw_relevant_vector, VectorOperation::add);
+  v.import_elements(rw_relevant_vector, VectorOperation::add);
 
-  rw_vector.import(v, VectorOperation::insert);
+  rw_vector.import_elements(v, VectorOperation::insert);
   if (myid == 0)
     {
       deallog << myid * 2 << ":" << rw_vector(myid * 2) << std::endl;
       deallog << myid * 2 + 1 << ":" << rw_vector(myid * 2 + 1) << std::endl;
     }
 
-  rw_relevant_vector.import(v, VectorOperation::insert);
+  rw_relevant_vector.import_elements(v, VectorOperation::insert);
   AssertThrow(rw_relevant_vector(1) == 7. * numproc + 2, ExcInternalError());
 
   // check l2 norm

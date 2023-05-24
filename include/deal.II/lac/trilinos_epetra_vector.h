@@ -127,10 +127,24 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
+      import_elements(
+        const ReadWriteVector<double> &V,
+        VectorOperation::values        operation,
+        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          communication_pattern = {}) override;
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      virtual void
       import(const ReadWriteVector<double> &V,
              VectorOperation::values        operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override;
+               communication_pattern = {}) override
+      {
+        import_elements(V, operation, communication_pattern);
+      }
 
       /**
        * Multiply the entire vector by a fixed factor.

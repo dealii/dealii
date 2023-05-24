@@ -881,13 +881,13 @@ namespace internal
       {
         LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
         temp.reinit(src.locally_owned_elements());
-        temp.import(src, VectorOperation::insert);
+        temp.import_elements(src, VectorOperation::insert);
 
         LinearAlgebra::ReadWriteVector<Number> temp2;
         temp2.reinit(temp, true);
         temp2 = temp;
 
-        dst.import(temp2, VectorOperation::insert);
+        dst.import_elements(temp2, VectorOperation::insert);
       }
 
 #ifdef DEAL_II_WITH_TRILINOS

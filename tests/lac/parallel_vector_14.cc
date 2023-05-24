@@ -66,7 +66,7 @@ test()
           rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
         }
 
-      v.import(rw_vector, VectorOperation::insert);
+      v.import_elements(rw_vector, VectorOperation::insert);
 
       LinearAlgebra::distributed::Vector<double, MemorySpace::Default> w(v),
         u(v);
@@ -82,7 +82,7 @@ test()
           u.update_ghost_values();
         }
 
-      rw_vector.import(v, VectorOperation::insert);
+      rw_vector.import_elements(v, VectorOperation::insert);
       if (myid < 2)
         {
           Assert(rw_vector(myid * 2) == myid * 4.0 + 1, ExcInternalError());
@@ -105,7 +105,7 @@ test()
       u = u_dist;
       u.update_ghost_values();
 
-      rw_vector.import(u_dist, VectorOperation::insert);
+      rw_vector.import_elements(u_dist, VectorOperation::insert);
       if (myid < 2)
         {
           Assert(rw_vector(myid * 2) == myid * 2.0 + 1, ExcInternalError());
@@ -113,7 +113,7 @@ test()
                  ExcInternalError());
         }
 
-      rw_vector.import(u, VectorOperation::insert);
+      rw_vector.import_elements(u, VectorOperation::insert);
       if (myid < 2)
         {
           Assert(rw_vector(myid * 2) == myid * 2.0 + 1, ExcInternalError());
@@ -125,7 +125,7 @@ test()
       u_ghost_set.add_index(1);
       u_ghost_set.add_index(3);
       LinearAlgebra::ReadWriteVector<double> u_ghost_vector(u_ghost_set);
-      u_ghost_vector.import(u, VectorOperation::insert);
+      u_ghost_vector.import_elements(u, VectorOperation::insert);
       Assert(u_ghost_vector(1) == 2., ExcInternalError());
       if (numproc > 1)
         {
@@ -135,7 +135,7 @@ test()
               v_ghost_set.add_index(3);
               LinearAlgebra::ReadWriteVector<double> v_ghost_vector(
                 v_ghost_set);
-              v_ghost_vector.import(v, VectorOperation::insert);
+              v_ghost_vector.import_elements(v, VectorOperation::insert);
               Assert(v_ghost_vector(3) == 7., ExcInternalError());
             }
           Assert(u_ghost_vector(3) == 4., ExcInternalError());

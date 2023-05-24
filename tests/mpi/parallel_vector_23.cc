@@ -58,7 +58,7 @@ test()
   read_write_vector.local_element(0) = myid;
   read_write_vector(1)               = 2. * myid;
 
-  v.import(read_write_vector, VectorOperation::max);
+  v.import_elements(read_write_vector, VectorOperation::max);
   v.update_ghost_values();
 
   deallog << myid << ':' << "ghost entry after max: " << v(1) << std::endl;
@@ -66,7 +66,7 @@ test()
   if (!myid)
     read_write_vector(1) = -1.0;
 
-  v.import(read_write_vector, VectorOperation::min);
+  v.import_elements(read_write_vector, VectorOperation::min);
   v.update_ghost_values();
 
   deallog << myid << ':' << "ghost entry after min: " << v(1) << std::endl;

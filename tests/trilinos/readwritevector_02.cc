@@ -72,7 +72,7 @@ test()
     LinearAlgebra::ReadWriteVector<double> readwrite(readwrite_is);
     try
       {
-        readwrite.import(tril_vector_ghosted, VectorOperation::insert);
+        readwrite.import_elements(tril_vector_ghosted, VectorOperation::insert);
         deallog << "RWVector contents:" << std::endl;
         readwrite.print(deallog.get_file_stream());
       }
@@ -84,7 +84,7 @@ test()
   {
     deallog << "import of distributed vector should work:" << std::endl;
     LinearAlgebra::ReadWriteVector<double> readwrite(readwrite_is);
-    readwrite.import(tril_vector, VectorOperation::insert);
+    readwrite.import_elements(tril_vector, VectorOperation::insert);
     deallog << "RWVector contents:" << std::endl;
     readwrite.print(deallog.get_file_stream());
   }

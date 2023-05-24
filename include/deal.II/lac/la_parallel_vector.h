@@ -206,13 +206,13 @@ namespace LinearAlgebra
      *                   Kokkos::View<double,
      * MemorySpace::Default::kokkos_space>( vector_dev, n_local_elements));
      * @endcode
-     * <li> use import():
+     * <li> use import_elements():
      * @code
      * Vector<double, MemorySpace::Default> vector(local_range, comm);
      * ReadWriteVector<double> rw_vector(local_range);
      * for (auto & val : rw_vector)
      *   val = 1.;
-     * vector.import(rw_vector, VectorOperations::insert);
+     * vector.import_elements(rw_vector, VectorOperations::insert);
      * @endcode
      * </ul>
      * The import method is a lot safer and will perform an MPI communication if
@@ -691,8 +691,19 @@ namespace LinearAlgebra
        */
       template <typename MemorySpace2>
       void
+      import_elements(const Vector<Number, MemorySpace2> &src,
+                      VectorOperation::values             operation);
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      template <typename MemorySpace2>
+      DEAL_II_DEPRECATED_EARLY void
       import(const Vector<Number, MemorySpace2> &src,
-             VectorOperation::values             operation);
+             VectorOperation::values             operation)
+      {
+        import_elements(src, operation);
+      }
 
       /** @} */
 
@@ -745,10 +756,23 @@ namespace LinearAlgebra
        * be moved to the @ref GlossDevice "device".
        */
       virtual void
+      import_elements(
+        const LinearAlgebra::ReadWriteVector<Number> &V,
+        VectorOperation::values                       operation,
+        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          communication_pattern = {}) override;
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      DEAL_II_DEPRECATED_EARLY virtual void
       import(const LinearAlgebra::ReadWriteVector<Number> &V,
              VectorOperation::values                       operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override;
+               communication_pattern = {}) override
+      {
+        import_elements(V, operation, communication_pattern);
+      }
 
       /**
        * Return the scalar product of two vectors.

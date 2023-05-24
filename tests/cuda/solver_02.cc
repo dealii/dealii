@@ -72,7 +72,7 @@ test(Utilities::CUDA::Handle &cuda_handle)
   LinearAlgebra::CUDAWrappers::Vector<double> rhs_dev(size);
   LinearAlgebra::ReadWriteVector<double>      rhs_host(size);
   std::copy(rhs.begin(), rhs.end(), rhs_host.begin());
-  rhs_dev.import(rhs_host, VectorOperation::insert);
+  rhs_dev.import_elements(rhs_host, VectorOperation::insert);
 
   LinearAlgebra::CUDAWrappers::Vector<double> solution_dev(size);
   const std::array<std::string, 3>            solver_names{
@@ -91,7 +91,7 @@ test(Utilities::CUDA::Handle &cuda_handle)
 
       // Move the result back to the host
       LinearAlgebra::ReadWriteVector<double> solution_host(size);
-      solution_host.import(solution_dev, VectorOperation::insert);
+      solution_host.import_elements(solution_dev, VectorOperation::insert);
 
       // Check the result
       for (unsigned int i = 0; i < size; ++i)

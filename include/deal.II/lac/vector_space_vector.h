@@ -108,6 +108,17 @@ namespace LinearAlgebra
      * performance.
      */
     virtual void
+    import_elements(
+      const ReadWriteVector<Number> &V,
+      VectorOperation::values        operation,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        communication_pattern = {}) = 0;
+
+    /**
+     * @deprecated Use import_elements() instead.
+     */
+    DEAL_II_DEPRECATED_EARLY
+    virtual void
     import(const ReadWriteVector<Number> &V,
            VectorOperation::values        operation,
            std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>

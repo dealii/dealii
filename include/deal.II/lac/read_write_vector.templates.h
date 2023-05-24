@@ -96,11 +96,12 @@ namespace LinearAlgebra
     struct read_write_vector_functions
     {
       static void
-      import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-               &                           communication_pattern,
-             const Number *                values,
-             const VectorOperation::values operation,
-             ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
+      import_elements(
+        const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+          &                                               communication_pattern,
+        const Number *                                    values,
+        const VectorOperation::values                     operation,
+        ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
         (void)communication_pattern;
         (void)values;
@@ -123,11 +124,12 @@ namespace LinearAlgebra
 
 
       static void
-      import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-               &                           communication_pattern,
-             const Number *                values,
-             const VectorOperation::values operation,
-             ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
+      import_elements(
+        const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+          &                                               communication_pattern,
+        const Number *                                    values,
+        const VectorOperation::values                     operation,
+        ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
           communication_pattern);
@@ -166,11 +168,12 @@ namespace LinearAlgebra
       using size_type = types::global_dof_index;
 
       static void
-      import(const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-               &                           communication_pattern,
-             const Number *                values,
-             const VectorOperation::values operation,
-             ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
+      import_elements(
+        const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+          &                                               communication_pattern,
+        const Number *                                    values,
+        const VectorOperation::values                     operation,
+        ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
         distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
           communication_pattern);
@@ -446,7 +449,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const dealii::Vector<Number> &vec,
     VectorOperation::values       operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -461,7 +464,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const LinearAlgebra::Vector<Number> &vec,
     VectorOperation::values              operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -477,7 +480,7 @@ namespace LinearAlgebra
   template <typename Number>
   template <typename MemorySpace>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const distributed::Vector<Number, MemorySpace> &vec,
     VectorOperation::values                         operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -504,7 +507,7 @@ namespace LinearAlgebra
       }
 
 
-    internal::read_write_vector_functions<Number, MemorySpace>::import(
+    internal::read_write_vector_functions<Number, MemorySpace>::import_elements(
       comm_pattern, vec.begin(), operation, *this);
   }
 
@@ -545,7 +548,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const PETScWrappers::MPI::Vector &petsc_vec,
     VectorOperation::values /*operation*/,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -578,7 +581,7 @@ namespace LinearAlgebra
   template <typename Dummy>
   std::enable_if_t<std::is_same<Dummy, Number>::value &&
                    dealii::is_tpetra_type<Number>::value>
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const Tpetra::Vector<Number, int, types::signed_global_dof_index> &vector,
     const IndexSet &        source_elements,
     VectorOperation::values operation,
@@ -695,7 +698,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const Epetra_MultiVector &multivector,
     const IndexSet &          source_elements,
     VectorOperation::values   operation,
@@ -836,7 +839,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const TrilinosWrappers::MPI::Vector &trilinos_vec,
     VectorOperation::values              operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -849,11 +852,11 @@ namespace LinearAlgebra
       !trilinos_vec.has_ghost_elements(),
       ExcMessage(
         "Import() from TrilinosWrappers::MPI::Vector with ghost entries is not supported!"));
-    import(trilinos_vec.trilinos_vector(),
-           trilinos_vec.locally_owned_elements(),
-           operation,
-           trilinos_vec.get_mpi_communicator(),
-           communication_pattern);
+    import_elements(trilinos_vec.trilinos_vector(),
+                    trilinos_vec.locally_owned_elements(),
+                    operation,
+                    trilinos_vec.get_mpi_communicator(),
+                    communication_pattern);
   }
 
 
@@ -863,17 +866,17 @@ namespace LinearAlgebra
   template <typename Dummy>
   std::enable_if_t<std::is_same<Dummy, Number>::value &&
                    dealii::is_tpetra_type<Number>::value>
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const LinearAlgebra::TpetraWrappers::Vector<Number> &trilinos_vec,
     VectorOperation::values                              operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
-    import(trilinos_vec.trilinos_vector(),
-           trilinos_vec.locally_owned_elements(),
-           operation,
-           trilinos_vec.get_mpi_communicator(),
-           communication_pattern);
+    import_elements(trilinos_vec.trilinos_vector(),
+                    trilinos_vec.locally_owned_elements(),
+                    operation,
+                    trilinos_vec.get_mpi_communicator(),
+                    communication_pattern);
   }
 #  endif
 
@@ -881,17 +884,17 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const LinearAlgebra::EpetraWrappers::Vector &trilinos_vec,
     VectorOperation::values                      operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {
-    import(trilinos_vec.trilinos_vector(),
-           trilinos_vec.locally_owned_elements(),
-           operation,
-           trilinos_vec.get_mpi_communicator(),
-           communication_pattern);
+    import_elements(trilinos_vec.trilinos_vector(),
+                    trilinos_vec.locally_owned_elements(),
+                    operation,
+                    trilinos_vec.get_mpi_communicator(),
+                    communication_pattern);
   }
 #endif
 
@@ -900,7 +903,7 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_CUDA
   template <typename Number>
   void
-  ReadWriteVector<Number>::import(
+  ReadWriteVector<Number>::import_elements(
     const LinearAlgebra::CUDAWrappers::Vector<Number> &cuda_vec,
     VectorOperation::values                            operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)

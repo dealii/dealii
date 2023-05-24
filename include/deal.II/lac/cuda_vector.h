@@ -141,10 +141,23 @@ namespace LinearAlgebra
        * copy a vector to the GPU.
        */
       virtual void
+      import_elements(
+        const ReadWriteVector<Number> &V,
+        VectorOperation::values        operation,
+        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          communication_pattern = {}) override;
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      DEAL_II_DEPRECATED_EARLY virtual void
       import(const ReadWriteVector<Number> &V,
              VectorOperation::values        operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override;
+               communication_pattern = {}) override
+      {
+        import_elements(V, operation, communication_pattern);
+      }
 
       /**
        * Sets all elements of the vector to the scalar @p s. This operation is

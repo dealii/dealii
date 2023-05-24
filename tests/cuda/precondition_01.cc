@@ -51,7 +51,7 @@ test(Utilities::CUDA::Handle &cuda_handle)
   LinearAlgebra::ReadWriteVector<Number>      rw_vector(size);
   for (unsigned int i = 0; i < size; ++i)
     rw_vector[i] = static_cast<Number>(i);
-  rhs_dev.import(rw_vector, VectorOperation::insert);
+  rhs_dev.import_elements(rw_vector, VectorOperation::insert);
   const Number  tolerance = 1000. * std::numeric_limits<Number>::epsilon();
   SolverControl control(100, tolerance);
   SolverCG<LinearAlgebra::CUDAWrappers::Vector<Number>> cg_dev(control);

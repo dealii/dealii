@@ -90,9 +90,9 @@ test()
   v1 = 2;
   // check assignment in initial state
   LinearAlgebra::ReadWriteVector<double> v0_rw(local_owned0);
-  v0_rw.import(v0, VectorOperation::insert);
+  v0_rw.import_elements(v0, VectorOperation::insert);
   LinearAlgebra::ReadWriteVector<double> v1_rw(local_owned1);
-  v1_rw.import(v1, VectorOperation::insert);
+  v1_rw.import_elements(v1, VectorOperation::insert);
   for (unsigned int i = 0; i < v0.local_size(); ++i)
     AssertThrow(v0_rw.local_element(i) == 1.,
                 ExcNonEqual(v0_rw.local_element(i), 1.));
@@ -104,9 +104,9 @@ test()
   v0.update_ghost_values();
   v1.update_ghost_values();
   LinearAlgebra::ReadWriteVector<double> v0_ghost_rw(local_relevant0);
-  v0_ghost_rw.import(v0, VectorOperation::insert);
+  v0_ghost_rw.import_elements(v0, VectorOperation::insert);
   LinearAlgebra::ReadWriteVector<double> v1_ghost_rw(local_relevant1);
-  v1_ghost_rw.import(v1, VectorOperation::insert);
+  v1_ghost_rw.import_elements(v1, VectorOperation::insert);
   AssertThrow(v0_ghost_rw(2) == 1., ExcNonEqual(v0_ghost_rw(2), 1.));
   if (numproc > 2)
     AssertThrow(v0_ghost_rw(8) == 1., ExcNonEqual(v0_ghost_rw(8), 2.));
@@ -127,11 +127,11 @@ test()
   AssertDimension(v1.local_size(), actual_local_size0);
   AssertDimension(v0.size(), global_size1);
   AssertDimension(v1.size(), global_size0);
-  v1_rw.import(v0, VectorOperation::insert);
+  v1_rw.import_elements(v0, VectorOperation::insert);
   for (unsigned int i = 0; i < local_size1; ++i)
     AssertThrow(v1_rw.local_element(i) == 2.,
                 ExcNonEqual(v1_rw.local_element(i), 2.));
-  v0_rw.import(v1, VectorOperation::insert);
+  v0_rw.import_elements(v1, VectorOperation::insert);
   for (unsigned int i = 0; i < actual_local_size0; ++i)
     AssertThrow(v0_rw.local_element(i) == 1.,
                 ExcNonEqual(v0_rw.local_element(i), 1.));
@@ -140,11 +140,11 @@ test()
     deallog << "First swap OK" << std::endl;
   v0.update_ghost_values();
   v1.update_ghost_values();
-  v0_ghost_rw.import(v1, VectorOperation::insert);
+  v0_ghost_rw.import_elements(v1, VectorOperation::insert);
   AssertThrow(v0_ghost_rw(2) == 1., ExcNonEqual(v0_ghost_rw(2), 1.));
   if (numproc > 2)
     AssertThrow(v0_ghost_rw(8) == 1., ExcNonEqual(v0_ghost_rw(8), 1.));
-  v1_ghost_rw.import(v0, VectorOperation::insert);
+  v1_ghost_rw.import_elements(v0, VectorOperation::insert);
   AssertThrow(v1_ghost_rw(0) == 2., ExcNonEqual(v1_ghost_rw(0), 2.));
   AssertThrow(v1_ghost_rw(2) == 2., ExcNonEqual(v1_ghost_rw(2), 2.));
   if (numproc > 2)
@@ -162,11 +162,11 @@ test()
   v1 = 42.;
   v0.update_ghost_values();
   v1.update_ghost_values();
-  v0_ghost_rw.import(v1, VectorOperation::insert);
+  v0_ghost_rw.import_elements(v1, VectorOperation::insert);
   AssertThrow(v0_ghost_rw(2) == 42., ExcNonEqual(v0_ghost_rw(2), 42.));
   if (numproc > 2)
     AssertThrow(v0_ghost_rw(8) == 42., ExcNonEqual(v0_ghost_rw(8), 42.));
-  v1_ghost_rw.import(v0, VectorOperation::insert);
+  v1_ghost_rw.import_elements(v0, VectorOperation::insert);
   AssertThrow(v1_ghost_rw(0) == 7., ExcNonEqual(v1_ghost_rw(0), 7.));
   AssertThrow(v1_ghost_rw(2) == 7., ExcNonEqual(v1_ghost_rw(2), 7.));
   if (numproc > 2)
@@ -184,7 +184,7 @@ test()
   AssertDimension(v0.size(), 0);
   AssertDimension(v2.size(), global_size1);
   AssertDimension(v2.local_size(), local_size1);
-  v1_rw.import(v2, VectorOperation::insert);
+  v1_rw.import_elements(v2, VectorOperation::insert);
   for (int i = my_start1; i < my_end1; ++i)
     AssertThrow(v1_rw(i) == 7., ExcNonEqual(v1_rw(i), 7.));
   MPI_Barrier(MPI_COMM_WORLD);
@@ -192,7 +192,7 @@ test()
     deallog << "Second swap OK" << std::endl;
   v2 = -1.;
   v2.update_ghost_values();
-  v1_ghost_rw.import(v2, VectorOperation::insert);
+  v1_ghost_rw.import_elements(v2, VectorOperation::insert);
   AssertThrow(v1_ghost_rw(0) == -1., ExcNonEqual(v1_ghost_rw(0), -1.));
   AssertThrow(v1_ghost_rw(2) == -1., ExcNonEqual(v1_ghost_rw(2), -1.));
   if (numproc > 2)

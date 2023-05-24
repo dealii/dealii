@@ -145,7 +145,7 @@ test()
 
   mf.eval(coef_device);
   cudaDeviceSynchronize();
-  coef.import(coef_device, VectorOperation::insert);
+  coef.import_elements(coef_device, VectorOperation::insert);
 
   // Computation the host
   auto               graph    = mf_data.get_colored_graph();

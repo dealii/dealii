@@ -131,21 +131,21 @@ test()
         continue;
       rw_in.local_element(i) = random_value<double>();
     }
-  in_dev.import(rw_in, VectorOperation::insert);
+  in_dev.import_elements(rw_in, VectorOperation::insert);
   mf.vmult(out_dev, in_dev);
 
   LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> out_host(
     owned_set, MPI_COMM_WORLD);
   LinearAlgebra::ReadWriteVector<Number> rw_out(owned_set);
-  rw_out.import(out_dev, VectorOperation::insert);
-  out_host.import(rw_out, VectorOperation::insert);
+  rw_out.import_elements(out_dev, VectorOperation::insert);
+  out_host.import_elements(rw_out, VectorOperation::insert);
 
   // assemble trilinos sparse matrix with
   // (\nabla v, \nabla u) + (v, 10 * u) for
   // reference
   LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> in_host(
     owned_set, MPI_COMM_WORLD);
-  in_host.import(rw_in, VectorOperation::insert);
+  in_host.import_elements(rw_in, VectorOperation::insert);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> ref(
     owned_set, MPI_COMM_WORLD);
   TrilinosWrappers::SparseMatrix sparse_matrix;
