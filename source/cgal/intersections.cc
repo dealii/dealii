@@ -39,7 +39,6 @@
 #  include <CGAL/Delaunay_mesher_2.h>
 #  include <CGAL/Delaunay_triangulation_2.h>
 #  include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
-#  include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #  include <CGAL/Kernel_traits.h>
 #  include <CGAL/Polygon_2.h>
 #  include <CGAL/Polygon_with_holes_2.h>
@@ -62,28 +61,25 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace CGALWrappers
 {
-  using K         = CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt;
-  using K_exact   = CGAL::Exact_predicates_exact_constructions_kernel;
-  using K_inexact = CGAL::Exact_predicates_inexact_constructions_kernel;
-  using CGALPolygon            = CGAL::Polygon_2<K>;
-  using Polygon_with_holes_2   = CGAL::Polygon_with_holes_2<K>;
-  using CGALTriangle2          = K::Triangle_2;
-  using CGALTriangle3          = K::Triangle_3;
-  using CGALTriangle3_exact    = K_exact::Triangle_3;
-  using CGALPoint2             = K::Point_2;
-  using CGALPoint3             = K::Point_3;
-  using CGALPoint3_exact       = K_exact::Point_3;
-  using CGALPoint3_inexact     = K_inexact::Point_3;
-  using CGALSegment2           = K::Segment_2;
-  using Surface_mesh           = CGAL::Surface_mesh<K_inexact::Point_3>;
-  using CGALSegment3           = K::Segment_3;
-  using CGALSegment3_exact     = K_exact::Segment_3;
-  using CGALTetra              = K::Tetrahedron_3;
-  using CGALTetra_exact        = K_exact::Tetrahedron_3;
-  using Triangulation2         = CGAL::Triangulation_2<K>;
-  using Triangulation3         = CGAL::Triangulation_3<K>;
-  using Triangulation3_exact   = CGAL::Triangulation_3<K_exact>;
-  using Triangulation3_inexact = CGAL::Triangulation_3<K_inexact>;
+  using K       = CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt;
+  using K_exact = CGAL::Exact_predicates_exact_constructions_kernel;
+  using CGALPolygon          = CGAL::Polygon_2<K>;
+  using Polygon_with_holes_2 = CGAL::Polygon_with_holes_2<K>;
+  using CGALTriangle2        = K::Triangle_2;
+  using CGALTriangle3        = K::Triangle_3;
+  using CGALTriangle3_exact  = K_exact::Triangle_3;
+  using CGALPoint2           = K::Point_2;
+  using CGALPoint3           = K::Point_3;
+  using CGALPoint3_exact     = K_exact::Point_3;
+  using CGALSegment2         = K::Segment_2;
+  using Surface_mesh         = CGAL::Surface_mesh<K_exact::Point_3>;
+  using CGALSegment3         = K::Segment_3;
+  using CGALSegment3_exact   = K_exact::Segment_3;
+  using CGALTetra            = K::Tetrahedron_3;
+  using CGALTetra_exact      = K_exact::Tetrahedron_3;
+  using Triangulation2       = CGAL::Triangulation_2<K>;
+  using Triangulation3       = CGAL::Triangulation_3<K>;
+  using Triangulation3_exact = CGAL::Triangulation_3<K_exact>;
 
   struct FaceInfo2
   {
@@ -682,25 +678,25 @@ namespace CGALWrappers
       AssertDimension(hexa0.size(), 8);
       AssertDimension(hexa0.size(), hexa1.size());
 
-      std::array<CGALPoint3_inexact, 8> pts_hex0;
-      std::array<CGALPoint3_inexact, 8> pts_hex1;
+      std::array<CGALPoint3_exact, 8> pts_hex0;
+      std::array<CGALPoint3_exact, 8> pts_hex1;
 
       std::transform(
         hexa0.begin(),
         hexa0.end(),
         pts_hex0.begin(),
-        &CGALWrappers::dealii_point_to_cgal_point<CGALPoint3_inexact, 3>);
+        &CGALWrappers::dealii_point_to_cgal_point<CGALPoint3_exact, 3>);
 
       std::transform(
         hexa1.begin(),
         hexa1.end(),
         pts_hex1.begin(),
-        &CGALWrappers::dealii_point_to_cgal_point<CGALPoint3_inexact, 3>);
+        &CGALWrappers::dealii_point_to_cgal_point<CGALPoint3_exact, 3>);
 
       Surface_mesh surf0, surf1, sm;
       // Subdivide hex into tetrahedrons
       std::vector<std::array<Point<3>, 4>> vertices;
-      Triangulation3_inexact               tria0, tria1;
+      Triangulation3_exact                 tria0, tria1;
 
       tria0.insert(pts_hex0.begin(), pts_hex0.end());
       tria1.insert(pts_hex1.begin(), pts_hex1.end());
@@ -729,7 +725,7 @@ namespace CGALWrappers
               if (PMP::volume(sm) > tol && test_intersection)
                 {
                   // Collect tetrahedrons
-                  Triangulation3_inexact triangulation_hexa;
+                  Triangulation3_exact triangulation_hexa;
                   triangulation_hexa.insert(sm.points().begin(),
                                             sm.points().end());
                   for (const auto &c : triangulation_hexa.finite_cell_handles())
