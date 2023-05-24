@@ -2063,8 +2063,7 @@ namespace TrilinosWrappers
 
     // Reinit a temporary vector with fast argument set, which does not
     // overwrite the content (to save time).
-    VectorType tmp_vector;
-    tmp_vector.reinit(dst, true);
+    auto tmp_vector = VectorType::create_with_same_size(dst, true);
     vmult(tmp_vector, src);
     dst += tmp_vector;
   }
@@ -2079,8 +2078,7 @@ namespace TrilinosWrappers
 
     // Reinit a temporary vector with fast argument set, which does not
     // overwrite the content (to save time).
-    VectorType tmp_vector;
-    tmp_vector.reinit(dst, true);
+    auto tmp_vector = VectorType::create_with_same_size(dst, true);
     Tvmult(tmp_vector, src);
     dst += tmp_vector;
   }
@@ -2092,8 +2090,7 @@ namespace TrilinosWrappers
   {
     Assert(matrix->RowMap().SameAs(matrix->DomainMap()), ExcNotQuadratic());
 
-    MPI::Vector temp_vector;
-    temp_vector.reinit(v, true);
+    auto temp_vector = MPI::Vector::create_with_same_size(v, true);
 
     vmult(temp_vector, v);
     return temp_vector * v;
@@ -2107,8 +2104,7 @@ namespace TrilinosWrappers
   {
     Assert(matrix->RowMap().SameAs(matrix->DomainMap()), ExcNotQuadratic());
 
-    MPI::Vector temp_vector;
-    temp_vector.reinit(v, true);
+    auto temp_vector = MPI::Vector::create_with_same_size(v, true);
 
     vmult(temp_vector, v);
     return u * temp_vector;

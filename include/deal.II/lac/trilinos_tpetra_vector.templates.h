@@ -79,6 +79,18 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    Vector<Number>
+    Vector<Number>::create_with_same_size(const VectorSpaceVector<Number> &V,
+                                          const bool omit_zeroing_entries)
+    {
+      Vector<Number> result;
+      result.reinit(V, omit_zeroing_entries);
+      return result;
+    }
+
+
+
+    template <typename Number>
     void
     Vector<Number>::reinit(const IndexSet &parallel_partitioner,
                            const MPI_Comm  communicator,

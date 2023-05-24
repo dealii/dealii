@@ -79,6 +79,19 @@ Vector<Number>::Vector(const Vector<OtherNumber> &v)
 
 
 
+template <typename Number>
+template <typename OtherNumber>
+Vector<Number>
+Vector<Number>::create_with_same_size(const Vector<OtherNumber> &V,
+                                      const bool omit_zeroing_entries)
+{
+  Vector<Number> result;
+  result.reinit(V.size(), omit_zeroing_entries);
+  return result;
+}
+
+
+
 #ifdef DEAL_II_WITH_PETSC
 namespace internal
 {

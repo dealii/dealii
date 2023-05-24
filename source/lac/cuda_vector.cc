@@ -62,6 +62,18 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    Vector<Number>
+    Vector<Number>::create_with_same_size(const VectorSpaceVector<Number> &V,
+                                          const bool omit_zeroing_entries)
+    {
+      Vector result;
+      result.reinit(V, omit_zeroing_entries);
+      return result;
+    }
+
+
+
+    template <typename Number>
     Vector<Number> &
     Vector<Number>::operator=(const Vector<Number> &V)
     {

@@ -1479,163 +1479,68 @@ namespace FETools
     template <class VectorType>
     using BlockType = typename BlockTypeHelper<VectorType>::type;
 
-    template <class VectorType, class DH>
-    void
-    reinit_distributed(const DH &dh, VectorType &vector)
-    {
-      vector.reinit(dh.n_dofs());
-    }
 
-#ifdef DEAL_II_WITH_PETSC
-    template <int dim, int spacedim>
-    void
-    reinit_distributed(const DoFHandler<dim, spacedim> &dh,
-                       PETScWrappers::MPI::Vector &     vector)
+
+    template <class VectorType, int dim, int spacedim>
+    std::enable_if_t<!is_serial_vector<VectorType>::value, VectorType>
+    create_distributed_vector(const DoFHandler<dim, spacedim> &dh)
     {
       const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
       Assert(parallel_tria != nullptr, ExcNotImplemented());
-
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      return VectorType(locally_owned_dofs, parallel_tria->get_communicator());
     }
-#endif // DEAL_II_WITH_PETSC
 
-#ifdef DEAL_II_WITH_TRILINOS
-    template <int dim, int spacedim>
-    void
-    reinit_distributed(const DoFHandler<dim, spacedim> &dh,
-                       TrilinosWrappers::MPI::Vector &  vector)
+    template <class VectorType, int dim, int spacedim>
+    std::enable_if_t<is_serial_vector<VectorType>::value, VectorType>
+    create_distributed_vector(const DoFHandler<dim, spacedim> &dh)
+    {
+      return VectorType(dh.n_dofs());
+    }
+
+
+
+    template <class VectorType, int dim, int spacedim>
+    std::enable_if_t<IsBlockVector<VectorType>::value, BlockType<VectorType>>
+    create_block_type(const VectorType &, const DoFHandler<dim, spacedim> &dh)
+    {
+      return create_distributed_vector<BlockType<VectorType>>(dh);
+    }
+
+    template <class VectorType, int dim, int spacedim>
+    std::enable_if_t<!IsBlockVector<VectorType>::value, BlockType<VectorType>>
+    create_block_type(const VectorType &v, const DoFHandler<dim, spacedim> &)
+    {
+      return BlockType<VectorType>::create_with_same_size(v);
+    }
+
+
+
+    template <class VectorType, int dim, int spacedim>
+    std::enable_if_t<!is_serial_vector<VectorType>::value, VectorType>
+    create_distributed_vector_with_ghosts(const DoFHandler<dim, spacedim> &dh)
     {
       const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
       Assert(parallel_tria != nullptr, ExcNotImplemented());
-
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      IndexSet        locally_relevant_dofs;
+      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+      return VectorType(locally_owned_dofs,
+                        locally_relevant_dofs,
+                        parallel_tria->get_communicator());
     }
 
-
-
-#  ifdef DEAL_II_WITH_MPI
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <int dim, int spacedim, typename Number>
-    void
-    reinit_distributed(const DoFHandler<dim, spacedim> &              dh,
-                       LinearAlgebra::TpetraWrappers::Vector<Number> &vector)
-    {
-      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
-        dynamic_cast<
-          const parallel::distributed::Triangulation<dim, spacedim> *>(
-          &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
-
-      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
-    }
-#    endif
-
-    template <int dim, int spacedim>
-    void
-    reinit_distributed(const DoFHandler<dim, spacedim> &      dh,
-                       LinearAlgebra::EpetraWrappers::Vector &vector)
-    {
-      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
-        dynamic_cast<
-          const parallel::distributed::Triangulation<dim, spacedim> *>(
-          &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
-
-      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
-    }
-#  endif
-#endif // DEAL_II_WITH_TRILINOS
-
-    template <int dim, int spacedim, typename Number>
-    void
-    reinit_distributed(const DoFHandler<dim, spacedim> &           dh,
-                       LinearAlgebra::distributed::Vector<Number> &vector)
-    {
-      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
-        dynamic_cast<
-          const parallel::distributed::Triangulation<dim, spacedim> *>(
-          &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
-
-      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
-    }
-
-
-
-    template <class VectorType, class DH>
-    void
-    reinit_ghosted(const DH & /*dh*/, VectorType & /*vector*/)
+    template <class VectorType, int dim, int spacedim>
+    std::enable_if_t<is_serial_vector<VectorType>::value, VectorType>
+    create_distributed_vector_with_ghosts(const DoFHandler<dim, spacedim> &)
     {
       Assert(false, ExcNotImplemented());
-    }
-
-#ifdef DEAL_II_WITH_PETSC
-    template <int dim, int spacedim>
-    void
-    reinit_ghosted(const DoFHandler<dim, spacedim> &dh,
-                   PETScWrappers::MPI::Vector &     vector)
-    {
-      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
-        dynamic_cast<
-          const parallel::distributed::Triangulation<dim, spacedim> *>(
-          &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
-      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      IndexSet        locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
-      vector.reinit(locally_owned_dofs,
-                    locally_relevant_dofs,
-                    parallel_tria->get_communicator());
-    }
-#endif // DEAL_II_WITH_PETSC
-
-#ifdef DEAL_II_WITH_TRILINOS
-    template <int dim, int spacedim>
-    void
-    reinit_ghosted(const DoFHandler<dim, spacedim> &dh,
-                   TrilinosWrappers::MPI::Vector &  vector)
-    {
-      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
-        dynamic_cast<
-          const parallel::distributed::Triangulation<dim, spacedim> *>(
-          &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
-      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      IndexSet        locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
-      vector.reinit(locally_owned_dofs,
-                    locally_relevant_dofs,
-                    parallel_tria->get_communicator());
-    }
-#endif // DEAL_II_WITH_TRILINOS
-
-    template <int dim, int spacedim, typename Number>
-    void
-    reinit_ghosted(const DoFHandler<dim, spacedim> &           dh,
-                   LinearAlgebra::distributed::Vector<Number> &vector)
-    {
-      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
-        dynamic_cast<
-          const parallel::distributed::Triangulation<dim, spacedim> *>(
-          &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
-      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      IndexSet        locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
-      vector.reinit(locally_owned_dofs,
-                    locally_relevant_dofs,
-                    parallel_tria->get_communicator());
     }
 
 
@@ -1737,11 +1642,10 @@ namespace FETools
                ExcGridNotRefinedAtLeastOnce());
       }
 
-
-    internal::BlockType<OutVector> u3;
-    internal::reinit_distributed(dof2, u3);
-    if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                       *>(&dof2.get_triangulation()) != nullptr)
+    auto u3 = internal::create_block_type(u2, dof2);
+    if (auto parallel_tria = dynamic_cast<
+          const parallel::distributed::Triangulation<dim, spacedim> *>(
+          &dof2.get_triangulation()))
       {
         Assert(dof1.get_fe(0).reference_cell() ==
                  ReferenceCells::get_hypercube<dim>(),
@@ -1752,8 +1656,8 @@ namespace FETools
 
         interpolate(dof1, u1, dof2, constraints, u3);
 
-        internal::BlockType<OutVector> u3_relevant;
-        internal::reinit_ghosted(dof2, u3_relevant);
+        auto u3_relevant = internal::create_distributed_vector_with_ghosts<
+          internal::BlockType<OutVector>>(dof2);
         u3_relevant = u3;
 
         internal::ExtrapolateImplementation<dim, spacedim, OutVector>

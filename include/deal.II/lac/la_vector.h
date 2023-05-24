@@ -113,6 +113,15 @@ namespace LinearAlgebra
     Vector(const InputIterator first, const InputIterator last);
 
     /**
+     * Creates a new vector with the same size as the input vector @p V. If
+     * @p omit_zeroing_entries is false, the entries of the new vector will be
+     * initialized with zeros.
+     */
+    static Vector
+    create_with_same_size(const VectorSpaceVector<Number> &V,
+                          const bool omit_zeroing_entries = false);
+
+    /**
      * Set the global size of the vector to @p size. The stored elements have
      * their index in [0,size).
      *
@@ -446,6 +455,18 @@ namespace LinearAlgebra
   {
     this->reinit(complete_index_set(std::distance(first, last)), true);
     std::copy(first, last, this->begin());
+  }
+
+
+
+  template <typename Number>
+  Vector<Number>
+  Vector<Number>::create_with_same_size(const VectorSpaceVector<Number> &V,
+                                        const bool omit_zeroing_entries)
+  {
+    Vector result;
+    result.reinit(V, omit_zeroing_entries);
+    return result;
   }
 
 

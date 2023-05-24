@@ -145,6 +145,15 @@ namespace PETScWrappers
       explicit BlockVector(const std::array<Vec, num_blocks> &);
 
       /**
+       * Creates a new block vector with the same size as the input vector @p V. If
+       * @p omit_zeroing_entries is false, the entries of the new vector will be
+       * initialized with zeros.
+       */
+      static BlockVector
+      create_with_same_size(const BlockVector &V,
+                            const bool         omit_zeroing_entries = false);
+
+      /**
        * Destructor. Clears memory
        */
       ~BlockVector() override;
@@ -444,6 +453,17 @@ namespace PETScWrappers
       for (auto i = 0; i < num_blocks; ++i)
         this->components[i].reinit(arrayV[i]);
       this->collect_sizes();
+    }
+
+
+
+    inline BlockVector
+    BlockVector::create_with_same_size(const BlockVector &v,
+                                       bool               omit_zeroing_entries)
+    {
+      BlockVector result;
+      result.reinit(v, omit_zeroing_entries);
+      return result;
     }
 
 

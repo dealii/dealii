@@ -177,6 +177,16 @@ namespace LinearAlgebra
                   const MPI_Comm               communicator);
 
       /**
+       * Creates a new block vector with the same size as the input vector @p V. If
+       * @p omit_zeroing_entries is false, the entries of the new vector will be
+       * initialized with zeros.
+       */
+      template <typename Number2>
+      static BlockVector
+      create_with_same_size(const BlockVector<Number2> &V,
+                            const bool omit_zeroing_entries = false);
+
+      /**
        * Destructor.
        *
        * @note We need to explicitly provide a destructor, otherwise the

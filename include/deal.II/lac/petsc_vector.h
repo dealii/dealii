@@ -254,6 +254,15 @@ namespace PETScWrappers
       Vector(const Vector &v);
 
       /**
+       * Creates a new vector with the same size as the input vector @p v. If
+       * @p omit_zeroing_entries is false, the entries of the new vector will be
+       * initialized with zeros.
+       */
+      static Vector
+      create_with_same_size(const Vector &v,
+                            const bool    omit_zeroing_entries = false);
+
+      /**
        * Release all memory and return to a state just like after having
        * called the default constructor.
        */

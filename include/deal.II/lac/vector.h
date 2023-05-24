@@ -252,6 +252,16 @@ public:
   Vector(const InputIterator first, const InputIterator last);
 
   /**
+   * Creates a new vector with the same size as the input vector @p V. If
+   * @p omit_zeroing_entries is false, the entries of the new vector will be
+   * initialized with zeros.
+   */
+  template <typename Number2>
+  static Vector
+  create_with_same_size(const Vector<Number2> &V,
+                        const bool             omit_zeroing_entries = false);
+
+  /**
    * Destructor, deallocates memory. Made virtual to allow for derived classes
    * to behave properly.
    */

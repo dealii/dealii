@@ -879,12 +879,12 @@ namespace internal
         const VectorType &                          src,
         LinearAlgebra::distributed::Vector<Number> &dst)
       {
-        LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
-        temp.reinit(src.locally_owned_elements());
+        LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp(
+          src.locally_owned_elements());
         temp.import(src, VectorOperation::insert);
 
-        LinearAlgebra::ReadWriteVector<Number> temp2;
-        temp2.reinit(temp, true);
+        auto temp2 =
+          LinearAlgebra::ReadWriteVector<Number>::create_with_same_size(temp);
         temp2 = temp;
 
         dst.import(temp2, VectorOperation::insert);

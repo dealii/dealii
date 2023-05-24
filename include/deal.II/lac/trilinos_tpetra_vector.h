@@ -141,6 +141,15 @@ namespace LinearAlgebra
                       const MPI_Comm  communicator);
 
       /**
+       * Creates a new vector with the same size as the input vector @p V. If
+       * @p omit_zeroing_entries is false, the entries of the new vector will be
+       * initialized with zeros.
+       */
+      static Vector
+      create_with_same_size(const VectorSpaceVector<Number> &V,
+                            bool omit_zeroing_entries = false);
+
+      /**
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning. The flag
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be

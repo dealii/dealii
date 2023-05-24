@@ -62,6 +62,17 @@ namespace LinearAlgebra
 
 
 
+    Vector
+    Vector::create_with_same_size(const VectorSpaceVector<double> &V,
+                                  const bool omit_zeroing_entries)
+    {
+      Vector result;
+      result.reinit(V, omit_zeroing_entries);
+      return result;
+    }
+
+
+
     void
     Vector::reinit(const IndexSet &parallel_partitioner,
                    const MPI_Comm  communicator,
