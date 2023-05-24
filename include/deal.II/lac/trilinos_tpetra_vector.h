@@ -194,7 +194,7 @@ namespace LinearAlgebra
        */
       DEAL_II_DEPRECATED_EARLY
       virtual void
-      import(const ReadWriteVector<double> &V,
+      import(const ReadWriteVector<Number> &V,
              VectorOperation::values        operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
                communication_pattern = {}) override
