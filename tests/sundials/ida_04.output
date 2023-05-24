@@ -1,0 +1,18 @@
+
+DEAL::Intermediate output:
+DEAL::  t =0.000000000
+DEAL::  y =1.000000000  (exact: 1.000000000)
+DEAL::  y'=-2.000000000  (exact: -2.000000000)
+DEAL::Evaluating residual at t=0.2000000000
+DEAL::Time step is too large: 0.2000000000. Failing irrecoverably.
+DEAL::Caught an irrecoverable exception in a callback:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    Irrecoverable exception.
+--------------------------------------------------------
+
