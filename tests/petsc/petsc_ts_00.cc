@@ -84,11 +84,10 @@ public:
         time_stepper.implicit_function = [&](const real_type   t,
                                              const VectorType &y,
                                              const VectorType &y_dot,
-                                             VectorType &      res) -> int {
+                                             VectorType &      res) -> void {
           res(0) = y_dot(0) - y(1);
           res(1) = y_dot(1) + kappa * kappa * y(0);
           res.compress(VectorOperation::insert);
-          return 0;
         };
 
         // We either have the possibility of using PETSc standard
@@ -109,13 +108,12 @@ public:
                                                  const VectorType &y_dot,
                                                  const real_type   shift,
                                                  MatrixType &      A,
-                                                 MatrixType &      P) -> int {
+                                                 MatrixType &      P) -> void {
               P.set(0, 0, shift);
               P.set(0, 1, -1);
               P.set(1, 0, kappa * kappa);
               P.set(1, 1, shift);
               P.compress(VectorOperation::insert);
-              return 0;
             };
           }
         else if (user)
@@ -127,20 +125,18 @@ public:
             time_stepper.setup_jacobian = [&](const real_type   t,
                                               const VectorType &y,
                                               const VectorType &y_dot,
-                                              const real_type   shift) -> int {
+                                              const real_type   shift) -> void {
               myshift = shift;
-              return 0;
             };
 
             // In the solve phase we se the stored shift to solve
             // for the implicit Jacobian system
             time_stepper.solve_with_jacobian = [&](const VectorType &src,
-                                                   VectorType &dst) -> int {
+                                                   VectorType &dst) -> void {
               auto sf = 1. / (kappa * kappa + myshift * myshift);
               dst(0)  = sf * (myshift * src(0) + src(1));
               dst(1)  = sf * (-kappa * kappa * src(0) + myshift * src(1));
               dst.compress(VectorOperation::insert);
-              return 0;
             };
           }
       }
@@ -149,11 +145,10 @@ public:
         // This is the only function one would populate in case an explicit
         // solver is used.
         time_stepper.explicit_function =
-          [&](const real_type t, const VectorType &y, VectorType &res) -> int {
+          [&](const real_type t, const VectorType &y, VectorType &res) -> void {
           res(0) = y(1);
           res(1) = -kappa * kappa * y(0);
           res.compress(VectorOperation::insert);
-          return 0;
         };
 
         // The explicit Jacobian callback is not needed in case
@@ -165,13 +160,12 @@ public:
             time_stepper.explicit_jacobian = [&](const real_type   t,
                                                  const VectorType &y,
                                                  MatrixType &      A,
-                                                 MatrixType &      P) -> int {
+                                                 MatrixType &      P) -> void {
               P.set(0, 0, 0);
               P.set(0, 1, 1);
               P.set(1, 0, -kappa * kappa);
               P.set(1, 1, 0);
               P.compress(VectorOperation::insert);
-              return 0;
             };
           }
       }
@@ -180,13 +174,12 @@ public:
     // solution to the log file.
     time_stepper.monitor = [&](const real_type    t,
                                const VectorType & y,
-                               const unsigned int step_number) -> int {
+                               const unsigned int step_number) -> void {
       std::vector<real_type> exact(2);
       exact[0] = std::sin(kappa * t);
       exact[1] = kappa * std::cos(kappa * t);
       out << t << " " << y(0) << " (" << exact[0] << ")"
           << " " << y(1) << " (" << exact[1] << ")" << std::endl;
-      return 0;
     };
   }
 
@@ -259,5 +252,4 @@ main(int argc, char **argv)
     HarmonicOscillator ode_user(1.0, data, true, true, true, out);
     ode_user.run();
   }
-  return 0;
 }

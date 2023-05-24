@@ -47,11 +47,10 @@ public:
     implicit_function = [&](const real_type   t,
                             const VectorType &y,
                             const VectorType &y_dot,
-                            VectorType &      res) -> int {
+                            VectorType &      res) -> void {
       res(0) = y_dot(0) - y(0);
       res(1) = y(1) - y(0);
       res.compress(VectorOperation::insert);
-      return 0;
     };
 
     // Return the index set representing the
@@ -86,5 +85,4 @@ main(int argc, char **argv)
 
   Dummy dae;
   dae.solve();
-  return 0;
 }

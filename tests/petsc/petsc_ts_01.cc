@@ -83,5 +83,4 @@ main(int argc, char **argv)
     {
       deallog << exc.what() << std::endl;
     }
-  return 0;
 }
