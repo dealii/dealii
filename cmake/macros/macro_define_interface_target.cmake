@@ -90,9 +90,20 @@ function(define_interface_target _feature)
     set(_libraries)
     list(APPEND _libraries
       ${${_feature}_LIBRARIES} ${${_feature}_LIBRARIES_${_build}}
-      ${${_feature}_TARGETS} ${${_feature}_TARGETS_${_build}}
       )
     if(NOT "${_libraries}" STREQUAL "")
+      foreach(_lib ${_libraries})
+        #
+        # Complain loudly if we encounter an undefined target:
+        #
+        if("${_lib}" MATCHES "::")
+          message(FATAL_ERROR
+            "Undefined imported target name »${_lib}« present when defining "
+            "interface target »${_interface_target}«"
+            )
+        endif()
+      endforeach()
+
       message(STATUS "    LINK_LIBRARIES:      ${_libraries}")
       target_link_libraries(${_interface_target} INTERFACE ${_libraries})
     endif()
@@ -127,6 +138,12 @@ function(define_interface_target _feature)
     if(NOT "${_link_options}" STREQUAL "")
       message(STATUS "    LINK_OPTIONS:        ${_link_options}")
       target_link_options(${_interface_target} INTERFACE ${_link_options})
+    endif()
+
+    if(NOT "${${_feature}_TARGETS}${${_feature}_TARGETS_${_build}}" STREQUAL "")
+      set(_targets ${${_feature}_TARGETS}${${_feature}_TARGETS_${_build}})
+      message(STATUS "    IMPORTED TARGETS:    ${_targets}")
+      copy_target_properties(${_interface_target} ${${_feature}_TARGETS} ${${_feature}_TARGETS_${_build}})
     endif()
 
     export(TARGETS ${_interface_target}
