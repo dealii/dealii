@@ -665,13 +665,13 @@ namespace CUDAWrappers
   template <typename IteratorFiltersType>
   void
   MatrixFree<dim, Number>::internal_reinit(
-    const Mapping<dim> &             mapping,
-    const DoFHandler<dim> &          dof_handler_,
-    const AffineConstraints<Number> &constraints,
-    const Quadrature<1> &            quad,
-    const IteratorFiltersType &      iterator_filter,
-    std::shared_ptr<const MPI_Comm>  comm,
-    const AdditionalData             additional_data)
+    const Mapping<dim> &                   mapping,
+    const DoFHandler<dim> &                dof_handler_,
+    const AffineConstraints<Number> &      constraints,
+    const Quadrature<1> &                  quad,
+    const IteratorFiltersType &            iterator_filter,
+    const std::shared_ptr<const MPI_Comm> &comm,
+    const AdditionalData                   additional_data)
   {
     dof_handler = &dof_handler_;
 

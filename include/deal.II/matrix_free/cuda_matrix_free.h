@@ -432,13 +432,13 @@ namespace CUDAWrappers
      */
     template <typename IteratorFiltersType>
     void
-    internal_reinit(const Mapping<dim> &             mapping,
-                    const DoFHandler<dim> &          dof_handler,
-                    const AffineConstraints<Number> &constraints,
-                    const Quadrature<1> &            quad,
-                    const IteratorFiltersType &      iterator_filter,
-                    std::shared_ptr<const MPI_Comm>  comm,
-                    const AdditionalData             additional_data);
+    internal_reinit(const Mapping<dim> &                   mapping,
+                    const DoFHandler<dim> &                dof_handler,
+                    const AffineConstraints<Number> &      constraints,
+                    const Quadrature<1> &                  quad,
+                    const IteratorFiltersType &            iterator_filter,
+                    const std::shared_ptr<const MPI_Comm> &comm,
+                    const AdditionalData                   additional_data);
 
     /**
      * Helper function. Loop over all the cells and apply the functor on each
