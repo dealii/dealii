@@ -1764,9 +1764,10 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
             dim - 1,
             scalar_value_type,
             VectorizedArrayType,
-            2>(shapes_faces.data() + qb * n_shapes,
-               n_shapes,
-               solution_renumbered.data());
+            2,
+            true>(shapes_faces.data() + qb * n_shapes,
+                  n_shapes,
+                  solution_renumbered.data());
 
       value = interpolated_value[dim - 1];
       // reorder derivative from tangential/normal derivatives into tensor in
@@ -1816,9 +1817,11 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
           internal::evaluate_tensor_product_value_and_gradient_shapes<
             dim,
             scalar_value_type,
-            VectorizedArrayType>(shapes.data() + qb * n_shapes,
-                                 n_shapes,
-                                 solution_renumbered.data());
+            VectorizedArrayType,
+            1,
+            true>(shapes.data() + qb * n_shapes,
+                  n_shapes,
+                  solution_renumbered.data());
       gradient[0] = result[0];
       if (dim > 1)
         gradient[1] = result[1];

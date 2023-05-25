@@ -3042,7 +3042,8 @@ namespace internal
             int length,
             typename Number2,
             typename Number,
-            int n_values = 1>
+            int  n_values    = 1,
+            bool no_renumber = false>
   inline
 #ifndef DEBUG
     DEAL_II_ALWAYS_INLINE
@@ -3078,7 +3079,7 @@ namespace internal
 
         // Distinguish the inner loop based on whether we have a
         // renumbering or not
-        if (renumber.empty())
+        if (no_renumber || renumber.empty())
           for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
             {
               // gradient
@@ -3129,7 +3130,11 @@ namespace internal
    * Interpolates the values and gradients into the points specified in
    * @p compute_values_of_array() with help of the precomputed @p shapes.
    */
-  template <int dim, typename Number, typename Number2, int n_values = 1>
+  template <int dim,
+            typename Number,
+            typename Number2,
+            int  n_values    = 1,
+            bool no_renumber = false>
   inline std::array<typename ProductTypeNoPoint<Number, Number2>::type,
                     dim + n_values>
   evaluate_tensor_product_value_and_gradient_shapes(
@@ -3164,23 +3169,29 @@ namespace internal
         // Generate separate code with known loop bounds for the most common
         // cases
         if (n_shapes == 2)
-          inner_result = do_interpolate_xy<dim, 2, Number2, Number, n_values>(
-            values, renumber, shapes, n_shapes, i);
+          inner_result =
+            do_interpolate_xy<dim, 2, Number2, Number, n_values, no_renumber>(
+              values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 3)
-          inner_result = do_interpolate_xy<dim, 3, Number2, Number, n_values>(
-            values, renumber, shapes, n_shapes, i);
+          inner_result =
+            do_interpolate_xy<dim, 3, Number2, Number, n_values, no_renumber>(
+              values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 4)
-          inner_result = do_interpolate_xy<dim, 4, Number2, Number, n_values>(
-            values, renumber, shapes, n_shapes, i);
+          inner_result =
+            do_interpolate_xy<dim, 4, Number2, Number, n_values, no_renumber>(
+              values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 5)
-          inner_result = do_interpolate_xy<dim, 5, Number2, Number, n_values>(
-            values, renumber, shapes, n_shapes, i);
+          inner_result =
+            do_interpolate_xy<dim, 5, Number2, Number, n_values, no_renumber>(
+              values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 6)
-          inner_result = do_interpolate_xy<dim, 6, Number2, Number, n_values>(
-            values, renumber, shapes, n_shapes, i);
+          inner_result =
+            do_interpolate_xy<dim, 6, Number2, Number, n_values, no_renumber>(
+              values, renumber, shapes, n_shapes, i);
         else
-          inner_result = do_interpolate_xy<dim, -1, Number2, Number, n_values>(
-            values, renumber, shapes, n_shapes, i);
+          inner_result =
+            do_interpolate_xy<dim, -1, Number2, Number, n_values, no_renumber>(
+              values, renumber, shapes, n_shapes, i);
         if (dim == 3)
           {
             // derivative + interpolation in z direction
