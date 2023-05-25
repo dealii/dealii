@@ -268,6 +268,8 @@ namespace Step7
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
+    RightHandSide() = default;
+
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };

@@ -582,6 +582,8 @@ namespace Step85
   class AnalyticalSolution : public Function<dim>
   {
   public:
+    AnalyticalSolution() = default;
+
     double value(const Point<dim> & point,
                  const unsigned int component = 0) const override;
   };

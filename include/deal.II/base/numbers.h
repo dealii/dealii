@@ -326,7 +326,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2);
 
   /**
@@ -351,7 +351,7 @@ namespace numbers
    * by the input arguments.
    */
   template <typename Number>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   value_is_zero(const Number &value);
 
   /**
@@ -919,7 +919,7 @@ namespace numbers
 
 
   template <typename Number1, typename Number2>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2)
   {
     return (value_1 == dealii::internal::NumberType<Number1>::value(value_2));
@@ -935,7 +935,7 @@ namespace numbers
 
 
   template <typename Number>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   value_is_zero(const Number &value)
   {
     return values_are_equal(value, 0.0);

@@ -87,6 +87,8 @@ namespace Step47
     public:
       static_assert(dim == 2, "Only dim==2 is implemented.");
 
+      Solution() = default;
+
       virtual double value(const Point<dim> &p,
                            const unsigned int /*component*/ = 0) const override
       {
@@ -126,6 +128,8 @@ namespace Step47
     {
     public:
       static_assert(dim == 2, "Only dim==2 is implemented");
+
+      RightHandSide() = default;
 
       virtual double value(const Point<dim> &p,
                            const unsigned int /*component*/ = 0) const override

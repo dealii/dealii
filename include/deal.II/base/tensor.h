@@ -693,8 +693,8 @@ public:
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  constexpr Tensor &
-  operator=(const Number &d) &;
+  constexpr DEAL_II_HOST_DEVICE Tensor &
+                                operator=(const Number &d) &;
 
   /**
    * Assign a scalar to the current object. This overload is used for
@@ -845,7 +845,7 @@ public:
    * Return an unrolled index in the range $[0,\text{dim}^{\text{rank}}-1]$
    * for the element of the tensor indexed by the argument to the function.
    */
-  static constexpr unsigned int
+  DEAL_II_HOST_DEVICE static constexpr unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
 
   /**
@@ -853,7 +853,7 @@ public:
    * $[0, \text{dim}^{\text{rank}}-1]$, return which set of indices it would
    * correspond to.
    */
-  static constexpr TableIndices<rank_>
+  DEAL_II_HOST_DEVICE static constexpr TableIndices<rank_>
   unrolled_to_component_indices(const unsigned int i);
 
   /**
@@ -1559,8 +1559,9 @@ Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, OtherNumber> &t)
 
 
 template <int rank_, int dim, typename Number>
-constexpr inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
-Tensor<rank_, dim, Number>::operator=(const Number &d) &
+constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
+  Tensor<rank_, dim, Number> &
+  Tensor<rank_, dim, Number>::operator=(const Number &d) &
 {
   Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
   (void)d;
@@ -1820,14 +1821,14 @@ namespace internal
   // and rank=2. Make sure we don't have compiler warnings.
 
   template <int dim>
-  inline constexpr unsigned int
+  DEAL_II_HOST_DEVICE inline constexpr unsigned int
   mod(const unsigned int x)
   {
     return x % dim;
   }
 
   template <>
-  inline unsigned int
+  DEAL_II_HOST_DEVICE inline unsigned int
   mod<0>(const unsigned int x)
   {
     Assert(false, ExcInternalError());
@@ -1835,14 +1836,14 @@ namespace internal
   }
 
   template <int dim>
-  inline constexpr unsigned int
+  DEAL_II_HOST_DEVICE inline constexpr unsigned int
   div(const unsigned int x)
   {
     return x / dim;
   }
 
   template <>
-  inline unsigned int
+  DEAL_II_HOST_DEVICE inline unsigned int
   div<0>(const unsigned int x)
   {
     Assert(false, ExcInternalError());
@@ -1857,7 +1858,10 @@ template <int rank_, int dim, typename Number>
 constexpr inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 {
-  AssertIndexRange(i, n_independent_components);
+  // Work-around nvcc warning
+  unsigned int dummy = n_independent_components;
+  AssertIndexRange(i, dummy);
+  (void)dummy;
 
   TableIndices<rank_> indices;
 
