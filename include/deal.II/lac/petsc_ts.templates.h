@@ -664,7 +664,6 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 
 #  undef AssertPETSc
-#  undef AssertUser
 
 DEAL_II_NAMESPACE_CLOSE
 
