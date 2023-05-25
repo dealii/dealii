@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2022 by the deal.II authors
+## Copyright (C) 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -39,43 +39,27 @@ if(VTK_FOUND)
   set(VTK_MINOR_VERSION "${VTK_MINOR_VERSION}")
 
   set(VTK_INCLUDE_DIR
-      ${VTK_PREFIX_PATH}/include/vtk-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION})
+    ${VTK_PREFIX_PATH}/include/vtk-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION})
 
-  #
-  # We'd like to have the full library names but the VTK package only
-  # exports a list with namespace-qualified names, e.g. VTK::CommonCore.
-  # So we check again for every lib and store the full path:
-  #
-  set(_libraries "")
+  # Try to find full paths from targets contained in VTK_LIBRARIES.
+  set(_libraries)
+  foreach(_library ${VTK_LIBRARIES})
+    if(NOT ${_library} MATCHES "Python"
+	AND NOT ${_library} MATCHES "MPI4Py")
+      get_target_property(_configurations ${_library} IMPORTED_CONFIGURATIONS)
 
-  foreach(_component ${VTK_AVAILABLE_COMPONENTS})
-    deal_ii_find_library(VTK_LIBRARY_${_component}
-      NAMES libvtk${_component}-${VTK_VERSION_MAJOR}.${VTK_VERSION_MINOR}.so
-      HINTS ${VTK_PREFIX_PATH}/lib
-      NO_DEFAULT_PATH
-      NO_CMAKE_ENVIRONMENT_PATH
-      NO_CMAKE_PATH
-      NO_SYSTEM_ENVIRONMENT_PATH
-      NO_CMAKE_SYSTEM_PATH
-      NO_CMAKE_FIND_ROOT_PATH
-    )
-
-    if (NOT "${VTK_LIBRARY_${_component}}" MATCHES "-NOTFOUND")
-      list(APPEND _libraries VTK_LIBRARY_${_component})
-    else()
-      # VTK_AVAILABLE_COMPONENTS contains also header-only modules.
-      # If the library has not been found, check if corresponding
-      # headers exist.
-      if (NOT EXISTS "${VTK_INCLUDE_DIR}/${_component}" AND
-          NOT EXISTS "${VTK_INCLUDE_DIR}/vtk_${_component}.h")
-        message(FATAL_ERROR "VTK: component ${_component} not found.")
+      if(_configurations)
+	foreach(_configuration ${_configurations})
+          get_target_property(_imported_location ${_library} IMPORTED_LOCATION_${_configuration})
+          list(APPEND _libraries ${_imported_location})
+	endforeach()
       endif()
     endif()
   endforeach()
 endif()
 
 process_feature(VTK
-  LIBRARIES REQUIRED ${_libraries}
+  LIBRARIES REQUIRED _libraries
   INCLUDE_DIRS REQUIRED VTK_INCLUDE_DIR
-  CLEAR VTK_INCLUDE_DIR VTK_LIBRARIES ${_libraries}
+  CLEAR VTK_INCLUDE_DIR VTK_LIBRARIES _libraries
 )
