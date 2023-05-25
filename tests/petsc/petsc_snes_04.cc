@@ -42,9 +42,8 @@ main(int argc, char **argv)
 
     Solver solver(data);
 
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       F.equ(2, X);
-      return 0;
     };
 
     auto       commsize = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -61,5 +60,4 @@ main(int argc, char **argv)
         deallog << exc.what() << std::endl;
       }
   }
-  return 0;
 }

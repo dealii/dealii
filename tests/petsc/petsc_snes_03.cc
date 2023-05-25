@@ -46,14 +46,12 @@ main(int argc, char **argv)
   {
     Solver solver;
 
-    solver.energy = [&](const VectorType &X, real_type &v) -> int {
+    solver.energy = [&](const VectorType &X, real_type &v) -> void {
       v = X.norm_sqr();
-      return 0;
     };
 
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       F.equ(2, X);
-      return 0;
     };
 
     auto       commsize = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -66,5 +64,4 @@ main(int argc, char **argv)
     deallog << "Iterations " << nit << std::endl;
     x.print(deallog.get_file_stream());
   }
-  return 0;
 }

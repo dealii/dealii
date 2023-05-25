@@ -69,21 +69,19 @@ main(int argc, char **argv)
     // Here we only pass the callback for the function evaluation
     // The tangent system will be approximated via matrix-free finite
     // differencing.
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       auto x = X[0];
       auto y = X[1];
       F(0)   = std::pow(x - std::pow(y, 3) + 1, 3) - std::pow(y, 3);
       F(1)   = x + 2 * y - 3;
       F.compress(VectorOperation::insert);
-      return 0;
     };
 
     // Test attaching a user-defined monitoring routine
     solver.monitor = [&](const VectorType & X,
                          const unsigned int step,
-                         const real_type    fval) -> int {
+                         const real_type    fval) -> void {
       out << "#    " << step << ": " << fval << std::endl;
-      return 0;
     };
 
     // Create and initialize solution vector
@@ -102,13 +100,12 @@ main(int argc, char **argv)
 
     Solver solver(data);
 
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       auto x = X[0];
       auto y = X[1];
       F(0)   = std::pow(x - std::pow(y, 3) + 1, 3) - std::pow(y, 3);
       F(1)   = x + 2 * y - 3;
       F.compress(VectorOperation::insert);
-      return 0;
     };
 
     // Here we use the Jacobian callback following the PETSc style,
@@ -118,7 +115,7 @@ main(int argc, char **argv)
     // will handle the case of users requesting Jacobian-free Newton
     // Krylov (i.e. using -snes_mf_operator)
     solver.jacobian =
-      [&](const VectorType &X, MatrixType &A, MatrixType &P) -> int {
+      [&](const VectorType &X, MatrixType &A, MatrixType &P) -> void {
       auto x    = X[0];
       auto y    = X[1];
       auto f0_x = 3 * std::pow(x - std::pow(y, 3) + 1, 2);
@@ -129,7 +126,6 @@ main(int argc, char **argv)
       P.set(1, 0, 1);
       P.set(1, 1, 2);
       P.compress(VectorOperation::insert);
-      return 0;
     };
 
     VectorType x(MPI_COMM_SELF, 2, 2);
@@ -150,13 +146,12 @@ main(int argc, char **argv)
 
     Solver solver(data);
 
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       auto x = X[0];
       auto y = X[1];
       F(0)   = std::pow(x - std::pow(y, 3) + 1, 3) - std::pow(y, 3);
       F(1)   = x + 2 * y - 3;
       F.compress(VectorOperation::insert);
-      return 0;
     };
 
     // When users want to be in full control of the linear system
@@ -165,7 +160,7 @@ main(int argc, char **argv)
     // during setup_jacobian and we use it in the solve phase
     FullMatrix<double> Jinv(2, 2);
 
-    solver.setup_jacobian = [&](const VectorType &X) -> int {
+    solver.setup_jacobian = [&](const VectorType &X) -> void {
       auto x    = X[0];
       auto y    = X[1];
       auto f0_x = 3 * std::pow(x - std::pow(y, 3) + 1, 2);
@@ -177,7 +172,6 @@ main(int argc, char **argv)
       J(1, 0) = 1;
       J(1, 1) = 2;
       Jinv.invert(J);
-      return 0;
     };
 
     // Solve phase. By default, PETSc will use this callback as a preconditioner
@@ -185,11 +179,10 @@ main(int argc, char **argv)
     // solvers can still be used in a Jacobian-free way and selected at command
     // line or within user code.
     solver.solve_with_jacobian = [&](const VectorType &src,
-                                     VectorType &      dst) -> int {
+                                     VectorType &      dst) -> void {
       dst(0) = Jinv(0, 0) * src(0) + Jinv(0, 1) * src(1);
       dst(1) = Jinv(1, 0) * src(0) + Jinv(1, 1) * src(1);
       dst.compress(VectorOperation::insert);
-      return 0;
     };
 
     VectorType x(MPI_COMM_SELF, 2, 2);
@@ -201,6 +194,4 @@ main(int argc, char **argv)
     out << "#   Solution " << x[0] << ", " << x[1] << std::endl;
     out << "#   Iterations " << nit << std::endl;
   }
-
-  return 0;
 }
