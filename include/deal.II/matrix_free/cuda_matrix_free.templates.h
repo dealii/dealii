@@ -203,6 +203,7 @@ namespace CUDAWrappers
       auto constraint_mask_host =
         Kokkos::create_mirror_view(data->constraint_mask[color]);
 
+#if KOKKOS_VERSION >= 30600
       auto local_to_global_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                    data->local_to_global[color]);
@@ -214,6 +215,14 @@ namespace CUDAWrappers
       auto inv_jacobian_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                    data->inv_jacobian[color]);
+#else
+      auto local_to_global_host =
+        Kokkos::create_mirror_view(data->local_to_global[color]);
+      auto q_points_host = Kokkos::create_mirror_view(data->q_points[color]);
+      auto JxW_host      = Kokkos::create_mirror_view(data->JxW[color]);
+      auto inv_jacobian_host =
+        Kokkos::create_mirror_view(data->inv_jacobian[color]);
+#endif
 
       auto cell = graph.cbegin(), end_cell = graph.cend();
       for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
