@@ -38,16 +38,6 @@ DEAL_II_NAMESPACE_OPEN
       }                                              \
     while (0)
 
-// Shorthand notation for User error codes.
-#  define AssertUser(code, name)                                               \
-    do                                                                         \
-      {                                                                        \
-        int ierr = (code);                                                     \
-        AssertThrow(ierr == 0,                                                 \
-                    StandardExceptions::ExcFunctionNonzeroReturn(name, ierr)); \
-      }                                                                        \
-    while (0)
-
 namespace PETScWrappers
 {
   namespace
@@ -514,7 +504,6 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 
 #  undef AssertPETSc
-#  undef AssertUser
 
 DEAL_II_NAMESPACE_CLOSE
 
