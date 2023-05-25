@@ -1,0 +1,11 @@
+
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the Jacobian at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Evaluating the Jacobian at x=-0.557408
+DEAL::Evaluating the residual at x=0.0659365
+DEAL::Evaluating the Jacobian at x=0.0659365
+DEAL::Evaluating the residual at x=-9.57219e-05
+DEAL::Evaluating the Jacobian at x=-9.57219e-05
+DEAL::Evaluating the residual at x=2.92357e-13
+DEAL::Found the solution x=2.92357e-13 after 4 iterations.
