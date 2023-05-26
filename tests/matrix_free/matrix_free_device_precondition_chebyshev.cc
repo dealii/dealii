@@ -47,7 +47,7 @@
 
 #include "../tests.h"
 
-#include "matrix_vector_mf.h"
+#include "matrix_vector_device_mf.h"
 
 
 
@@ -118,15 +118,16 @@ test()
 
   const unsigned int coef_size =
     tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 Number,
-                 LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
+  MatrixFreeTest<
+    dim,
+    fe_degree,
+    Number,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>
     mf(mf_data, coef_size);
   mf.internal_m = owned_set.size();
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev(
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> in_dev(
     owned_set, MPI_COMM_WORLD);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev(
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> out_dev(
     owned_set, MPI_COMM_WORLD);
 
   LinearAlgebra::ReadWriteVector<Number> rw_in(owned_set);
@@ -223,13 +224,13 @@ test()
       dim,
       fe_degree,
       Number,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>,
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>;
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>;
   DevicePreconditionerType precondition_chebyshev_device;
   typename DevicePreconditionerType::AdditionalData device_preconditioner_data;
   device_preconditioner_data.preconditioner = std::make_shared<DiagonalMatrix<
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>>(
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>(
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>>(
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>(
       ref.get_partitioner()));
   device_preconditioner_data.preconditioner->get_vector().import_elements(
     matrix_diagonal, VectorOperation::insert);
@@ -261,8 +262,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {
