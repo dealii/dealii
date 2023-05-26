@@ -1610,7 +1610,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_reinit()
 
   // use face path if mapping_info in face state and number of quadrature points
   // is large enough
-  use_face_path = mapping_info->is_face_state() && n_q_points_scalar >= 9;
+  use_face_path = mapping_info->is_face_state() && n_q_points_scalar >= 6;
 
   // set unit point pointer
   const unsigned int unit_point_offset =
