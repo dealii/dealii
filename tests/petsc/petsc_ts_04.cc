@@ -26,53 +26,27 @@
 /**
  * Like the _03 test, but throw an error whenever we find that the
  * time step for evaluating the residual is too large.
- *
- * Solves the equations of exponential decay:
- *
- * u' = -k u
- * u (t0) = 1
- *
- * using the PETScWrappers::TimeStepper class
- * that interfaces PETSc TS ODE solver object.
- * The ODE can be an EXPLICIT first order ode:
- *
- * y[0]' = - k   y[0]     -> y' = G(y,t)
- *
- * or specified in IMPLICIT form:
- *
- * y[0]' +  k  y[1]  = 0  -> F(y',y,t) = 0
- *
- * The exact solution is, in either case,
- *
- * y[0](t) = exp(-kt)
- *
- * We use the same class to test both formulations.
- * The class also supports a third approach where
- * control for linear systems generation and
- * solution is completely on users. In this case
- * users are in charge of solving for the
- * implicit Jacobian.
- * The model used to wrap PETSc's TS is the same
- * used for the nonlinear solver SNES. Check
- * petsc_snes_00.cc for additional information.
- *
+ * We test throwing two types of errors. When using recoverable errors
+ * we expect PETSc to shrink the time step and continue the simulation.
  */
 using VectorType  = PETScWrappers::MPI::Vector;
 using MatrixType  = PETScWrappers::MatrixBase;
 using TimeStepper = PETScWrappers::TimeStepper<VectorType, MatrixType>;
 using real_type   = TimeStepper::real_type;
 
-class HarmonicOscillator
+class ExponentialDecay
 {
 public:
-  HarmonicOscillator(real_type                                      _kappa,
-                     const typename PETScWrappers::TimeStepperData &data,
-                     bool                                           setjac,
-                     bool                                           implicit,
-                     bool                                           user)
+  ExponentialDecay(real_type                                      _kappa,
+                   const typename PETScWrappers::TimeStepperData &data,
+                   bool                                           setjac,
+                   bool                                           implicit,
+                   bool                                           user,
+                   bool                                           recoverable)
     : time_stepper(data)
     , kappa(_kappa)
     , last_eval_time(0)
+    , recoverable_error(recoverable)
   {
     // In this case we use the implicit form
     if (implicit)
@@ -87,7 +61,11 @@ public:
             {
               deallog << "Time step too large: last_eval_time="
                       << last_eval_time << ", t=" << t << std::endl;
-              throw RecoverableUserCallbackError();
+              if (recoverable_error)
+                throw RecoverableUserCallbackError();
+              else
+                throw std::runtime_error(
+                  "Unrecoverable error in implicit_function");
             }
 
 
@@ -157,7 +135,11 @@ public:
             {
               deallog << "Time step too large: last_eval_time="
                       << last_eval_time << ", t=" << t << std::endl;
-              throw RecoverableUserCallbackError();
+              if (recoverable_error)
+                throw RecoverableUserCallbackError();
+              else
+                throw std::runtime_error(
+                  "Unrecoverable error in explicit_function");
             }
 
           res(0) = -kappa * y(0);
@@ -226,6 +208,7 @@ private:
   real_type   kappa;   // Defines the oscillator
   real_type   myshift; // Used by the user solve
   double      last_eval_time;
+  bool        recoverable_error;
 };
 
 
@@ -248,28 +231,36 @@ main(int argc, char **argv)
   deallog << "# Testing Parameters" << std::endl;
   prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortText);
 
-  for (int setjaci = 0; setjaci < 2; setjaci++)
+  for (int recerri = 0; recerri < 2; recerri++)
     {
-      bool setjac = setjaci ? true : false;
+      bool recerr = recerri ? false : true;
 
-      {
-        deallog << "# Test explicit interface (J " << setjac << ")"
-                << std::endl;
-        HarmonicOscillator ode_expl(1.0, data, setjac, false, false);
-        ode_expl.run();
-      }
+      if (recerr)
+        deallog << "# Test recoverable errors" << std::endl;
+      else
+        deallog << "# Test unrecoverable errors" << std::endl;
+      for (int setjaci = 0; setjaci < 2; setjaci++)
+        {
+          bool setjac = setjaci ? true : false;
 
+          {
+            deallog << "# Test explicit interface (J " << setjac << ")"
+                    << std::endl;
+            ExponentialDecay ode_expl(1.0, data, setjac, false, false, recerr);
+            ode_expl.run();
+          }
+
+          {
+            deallog << "# Test implicit interface (J " << setjac << ")"
+                    << std::endl;
+            ExponentialDecay ode_impl(1.0, data, setjac, true, false, recerr);
+            ode_impl.run();
+          }
+        }
       {
-        deallog << "# Test implicit interface (J " << setjac << ")"
-                << std::endl;
-        HarmonicOscillator ode_impl(1.0, data, setjac, true, false);
-        ode_impl.run();
+        deallog << "# Test user interface" << std::endl;
+        ExponentialDecay ode_user(1.0, data, true, true, true, recerr);
+        ode_user.run();
       }
     }
-
-  {
-    deallog << "# Test user interface" << std::endl;
-    HarmonicOscillator ode_user(1.0, data, true, true, true);
-    ode_user.run();
-  }
 }

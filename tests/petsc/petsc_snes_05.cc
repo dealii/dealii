@@ -63,6 +63,7 @@ main(int argc, char **argv)
     auto       commrank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
     VectorType x(MPI_COMM_WORLD, 1, commrank == commsize - 1 ? 1 : 0);
     x(0) = 1.0;
+    x.compress(VectorOperation::insert);
 
     try
       {

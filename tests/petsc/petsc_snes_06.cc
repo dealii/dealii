@@ -30,7 +30,7 @@
  * This test lets the residual function throw an exception if the step
  * length was too large from the previous point of evaluation. Let's
  * see whether PETSc SNES manages to recover by reducing the step
- * length.
+ * length in case of a recoverable error.
  */
 using VectorType = PETScWrappers::MPI::Vector;
 using MatrixType = PETScWrappers::MPI::SparseMatrix;
@@ -66,31 +66,38 @@ main(int argc, char **argv)
       last_residual_eval = X(0);
     };
 
-    solver.jacobian =
-      [&](const VectorType &X, MatrixType &A, MatrixType &P) -> void {
-      deallog << "Evaluating the Jacobian at x=" << X(0) << std::endl;
-
-      P.set(0, 0, std::cos(X(0)));
-      P.compress(VectorOperation::insert);
-      A.set(0, 0, std::cos(X(0)));
-      A.compress(VectorOperation::insert);
-    };
-
-    auto       commsize = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-    auto       commrank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-    VectorType x(MPI_COMM_WORLD, 1, commrank == commsize - 1 ? 1 : 0);
-    x(0) = starting_x;
-
-    try
+    for (int setjac = 0; setjac < 2; setjac++)
       {
-        const auto nit = solver.solve(x);
+        if (setjac)
+          solver.jacobian =
+            [&](const VectorType &X, MatrixType &A, MatrixType &P) -> void {
+            deallog << "Evaluating the Jacobian at x=" << X(0) << std::endl;
 
-        deallog << "Found the solution x=" << x(0) << " after " << nit
-                << " iterations." << std::endl;
-      }
-    catch (std::exception &exc)
-      {
-        deallog << exc.what() << std::endl;
+            P.set(0, 0, std::cos(X(0)));
+            P.compress(VectorOperation::insert);
+            A.set(0, 0, std::cos(X(0)));
+            A.compress(VectorOperation::insert);
+          };
+
+        auto       commsize = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+        auto       commrank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+        VectorType x(MPI_COMM_WORLD, 1, commrank == commsize - 1 ? 1 : 0);
+        x(0) = starting_x;
+        x.compress(VectorOperation::insert);
+
+        deallog << "Solving with setjac " << setjac << std::endl;
+        try
+          {
+            solver.reinit(data);
+            const auto nit = solver.solve(x);
+
+            deallog << "Found the solution x=" << x(0) << " after " << nit
+                    << " iterations." << std::endl;
+          }
+        catch (std::exception &exc)
+          {
+            deallog << exc.what() << std::endl;
+          }
       }
   }
 }

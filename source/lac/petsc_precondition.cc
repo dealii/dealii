@@ -1077,6 +1077,8 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     ierr = PCShellSetContext(pc, static_cast<void *>(this));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = PCShellSetSetUp(pc, PreconditionShell::pcsetup);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
     ierr = PCShellSetApply(pc, PreconditionShell::pcapply);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     ierr = PCShellSetApplyTranspose(pc, PreconditionShell::pcapply_transpose);
@@ -1094,43 +1096,106 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
-  int
+#  ifndef PetscCall
+#    define PetscCall(code)             \
+      do                                \
+        {                               \
+          PetscErrorCode ierr = (code); \
+          CHKERRQ(ierr);                \
+        }                               \
+      while (0)
+#  endif
+
+  PetscErrorCode
+  PreconditionShell::pcsetup(PC ppc)
+  {
+    PetscFunctionBeginUser;
+    // Failed reason is not reset uniformly within the
+    // interface code of PCSetUp in PETSc.
+    // We handle it here.
+    PetscCall(PCSetFailedReason(ppc, PC_NOERROR));
+    PetscFunctionReturn(0);
+  }
+
+  PetscErrorCode
   PreconditionShell::pcapply(PC ppc, Vec x, Vec y)
   {
     void *ctx;
 
     PetscFunctionBeginUser;
-    PetscErrorCode ierr = PCShellGetContext(ppc, &ctx);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    PetscCall(PCShellGetContext(ppc, &ctx));
 
     auto user = static_cast<PreconditionShell *>(ctx);
-    AssertThrow(user->vmult,
-                StandardExceptions::ExcFunctionNotProvided(
-                  "std::function vmult"));
+    if (!user->vmult)
+      SETERRQ(
+        PetscObjectComm((PetscObject)ppc),
+        PETSC_ERR_LIB,
+        "Failure in dealii::PETScWrappers::PreconditionShell::pcapply. Missing std::function vmult");
 
     VectorBase src(x);
     VectorBase dst(y);
-    user->vmult(dst, src);
+    const int  lineno = __LINE__;
+    try
+      {
+        user->vmult(dst, src);
+      }
+    catch (const RecoverableUserCallbackError &)
+      {
+        PetscCall(PCSetFailedReason(ppc, PC_SUBPC_ERROR));
+      }
+    catch (...)
+      {
+        return PetscError(
+          PetscObjectComm((PetscObject)ppc),
+          lineno + 3,
+          "vmult",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in pcapply from dealii::PETScWrappers::NonlinearSolver");
+      }
+    petsc_increment_state_counter(y);
     PetscFunctionReturn(0);
   }
 
-  int
+  PetscErrorCode
   PreconditionShell::pcapply_transpose(PC ppc, Vec x, Vec y)
   {
     void *ctx;
 
     PetscFunctionBeginUser;
-    PetscErrorCode ierr = PCShellGetContext(ppc, &ctx);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    PetscCall(PCShellGetContext(ppc, &ctx));
 
     auto user = static_cast<PreconditionShell *>(ctx);
-    AssertThrow(user->vmultT,
-                StandardExceptions::ExcFunctionNotProvided(
-                  "std::function vmultT"));
+    if (!user->vmultT)
+      SETERRQ(
+        PetscObjectComm((PetscObject)ppc),
+        PETSC_ERR_LIB,
+        "Failure in dealii::PETScWrappers::PreconditionShell::pcapply_transpose. Missing std::function vmultT");
 
     VectorBase src(x);
     VectorBase dst(y);
-    user->vmult(dst, src);
+    const int  lineno = __LINE__;
+    try
+      {
+        user->vmultT(dst, src);
+      }
+    catch (const RecoverableUserCallbackError &)
+      {
+        PetscCall(PCSetFailedReason(ppc, PC_SUBPC_ERROR));
+      }
+    catch (...)
+      {
+        return PetscError(
+          PetscObjectComm((PetscObject)ppc),
+          lineno + 3,
+          "vmultT",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in pcapply_transpose from dealii::PETScWrappers::NonlinearSolver");
+      }
+    petsc_increment_state_counter(y);
     PetscFunctionReturn(0);
   }
 

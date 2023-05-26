@@ -59,14 +59,14 @@ using MatrixType  = PETScWrappers::MatrixBase;
 using TimeStepper = PETScWrappers::TimeStepper<VectorType, MatrixType>;
 using real_type   = TimeStepper::real_type;
 
-class HarmonicOscillator
+class ExponentialDecay
 {
 public:
-  HarmonicOscillator(real_type                                      _kappa,
-                     const typename PETScWrappers::TimeStepperData &data,
-                     bool                                           setjac,
-                     bool                                           implicit,
-                     bool                                           user)
+  ExponentialDecay(real_type                                      _kappa,
+                   const typename PETScWrappers::TimeStepperData &data,
+                   bool                                           setjac,
+                   bool                                           implicit,
+                   bool                                           user)
     : time_stepper(data)
     , kappa(_kappa)
   {
@@ -190,7 +190,7 @@ public:
 
 private:
   TimeStepper time_stepper;
-  real_type   kappa;   // Defines the oscillator
+  real_type   kappa;   // Defines the decay
   real_type   myshift; // Used by the user solve
 };
 
@@ -221,21 +221,21 @@ main(int argc, char **argv)
       {
         deallog << "# Test explicit interface (J " << setjac << ")"
                 << std::endl;
-        HarmonicOscillator ode_expl(1.0, data, setjac, false, false);
+        ExponentialDecay ode_expl(1.0, data, setjac, false, false);
         ode_expl.run();
       }
 
       {
         deallog << "# Test implicit interface (J " << setjac << ")"
                 << std::endl;
-        HarmonicOscillator ode_impl(1.0, data, setjac, true, false);
+        ExponentialDecay ode_impl(1.0, data, setjac, true, false);
         ode_impl.run();
       }
     }
 
   {
     deallog << "# Test user interface" << std::endl;
-    HarmonicOscillator ode_user(1.0, data, true, true, true);
+    ExponentialDecay ode_user(1.0, data, true, true, true);
     ode_user.run();
   }
 }

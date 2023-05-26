@@ -441,10 +441,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's TS package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const real_type   t,
                        const VectorType &y,
@@ -464,10 +461,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's TS package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const real_type   t,
                        const VectorType &y,
@@ -483,10 +477,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's TS package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const real_type t, const VectorType &y, VectorType &res)>
       explicit_function;
@@ -498,10 +489,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's TS package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const real_type   t,
                        const VectorType &y,
@@ -518,10 +506,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's TS package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const real_type    t,
                        const VectorType & y,
@@ -545,10 +530,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's TS package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const real_type   t,
                        const VectorType &y,
@@ -565,10 +547,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's TS package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const VectorType &src, VectorType &dst)>
       solve_with_jacobian;
@@ -589,6 +568,9 @@ namespace PETScWrappers
      */
     TS ts;
 
+    /**
+     * Pointers to the internal PETSc matrix objects.
+     */
     SmartPointer<AMatrixType, TimeStepper> A;
     SmartPointer<PMatrixType, TimeStepper> P;
 
@@ -608,6 +590,11 @@ namespace PETScWrappers
      * has returned.
      */
     mutable std::exception_ptr pending_exception;
+
+    /**
+     * Internal data to handle recoverable errors.
+     */
+    bool error_in_function;
   };
 
 } // namespace PETScWrappers
