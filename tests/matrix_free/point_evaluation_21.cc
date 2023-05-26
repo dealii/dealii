@@ -130,15 +130,16 @@ test(const unsigned int degree)
           evaluator_move.submit_gradient(evaluator_move.get_gradient(i), i);
         }
 
-      evaluator.integrate(solution_values,
-                          EvaluationFlags::values | EvaluationFlags::gradients);
+      evaluator.test_and_sum(solution_values,
+                             EvaluationFlags::values |
+                               EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
         deallog << factor_float * i << ' ';
 
-      evaluator_move.integrate(solution_values,
-                               EvaluationFlags::values |
-                                 EvaluationFlags::gradients);
+      evaluator_move.test_and_sum(solution_values,
+                                  EvaluationFlags::values |
+                                    EvaluationFlags::gradients);
 
       deallog << std::endl;
 

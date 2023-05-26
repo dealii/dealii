@@ -137,12 +137,12 @@ test()
           evaluator2.submit_gradient(evaluator2.get_gradient(i), i);
         }
 
-      evaluator1.integrate(solution_values,
-                           EvaluationFlags::values |
-                             EvaluationFlags::gradients);
-      evaluator2.integrate(solution_values2,
-                           EvaluationFlags::values |
-                             EvaluationFlags::gradients);
+      evaluator1.test_and_sum(solution_values,
+                              EvaluationFlags::values |
+                                EvaluationFlags::gradients);
+      evaluator2.test_and_sum(solution_values2,
+                              EvaluationFlags::values |
+                                EvaluationFlags::gradients);
 
       for (unsigned int i = 0; i < solution_values.size(); ++i)
         deallog << solution_values[i] - solution_values2[i] << ' ';

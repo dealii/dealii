@@ -384,7 +384,7 @@ compute_force_vector_sharp_interface(
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           phi_force.submit_value(force_JxW[q], q);
 
-        phi_force.integrate(buffer, EvaluationFlags::values);
+        phi_force.test_and_sum(buffer, EvaluationFlags::values);
 
         constraints.distribute_local_to_global(buffer,
                                                local_dof_indices,

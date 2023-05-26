@@ -852,21 +852,16 @@ public:
   /**
    * This function multiplies the quantities passed in by previous
    * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points. This is
-   * similar to the integration of a bilinear form in terms of the test
-   * function, with the difference that this formula does not include a `JxW`
-   * factor. This allows the class to naturally embed point information
-   * (e.g. particles) into a finite element formulation. Of course, by
-   * multiplication of a `JxW` information of the data given to
-   * submit_value(), the integration can also be represented by this class.
+   * test functions, and performs summation over all given points multiplied be
+   * the Jacobian determinant times the quadrature weight (JxW).
    *
    * @param[out] solution_values This array will contain the result of the
    * integral, which can be used to during
    * `cell->set_dof_values(solution_values, global_vector)` or
    * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
    * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries not touched by this class will
-   * be zeroed out.
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
    *
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
@@ -875,6 +870,32 @@ public:
   void
   integrate(const ArrayView<ScalarNumber> &         solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points. This is
+   * similar to the integration of a bilinear form in terms of the test
+   * function, with the difference that this formula does not include a `JxW`
+   * factor (in contrast to the integrate function of this class). This allows
+   * the class to naturally embed point information (e.g. particles) into a
+   * finite element formulation.
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used to during
+   * `cell->set_dof_values(solution_values, global_vector)` or
+   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   */
+  void
+  test_and_sum(const ArrayView<ScalarNumber> &         solution_values,
+               const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
    * Return the value at quadrature point number @p point_index after a call to
@@ -1071,6 +1092,7 @@ private:
   /**
    * Fast path of the integrate function.
    */
+  template <bool do_JxW>
   void
   integrate_fast(const ArrayView<ScalarNumber> &         solution_values,
                  const EvaluationFlags::EvaluationFlags &integration_flags);
@@ -1078,10 +1100,18 @@ private:
   /**
    * Slow path of the integrate function using FEValues.
    */
+  template <bool do_JxW>
   void
   integrate_slow(const ArrayView<ScalarNumber> &         solution_values,
                  const EvaluationFlags::EvaluationFlags &integration_flags);
 
+  /**
+   * Implementation of the integrate/test_and_sum function.
+   */
+  template <bool do_JxW>
+  void
+  do_integrate(const ArrayView<ScalarNumber> &         solution_values,
+               const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
    * Number of quadrature batches of the current cell/face.
@@ -1310,6 +1340,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   , n_q_points_scalar(numbers::invalid_unsigned_int)
   , mapping(&mapping)
   , fe(&fe)
+  , JxW_ptr(nullptr)
   , use_face_path(false)
   , update_flags(update_flags)
   , mapping_info_on_the_fly(
@@ -1335,6 +1366,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   , n_q_points_scalar(numbers::invalid_unsigned_int)
   , mapping(&mapping_info.get_mapping())
   , fe(&fe)
+  , JxW_ptr(nullptr)
   , use_face_path(false)
   , update_flags(mapping_info.get_update_flags())
   , mapping_info(&mapping_info)
@@ -2141,6 +2173,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
+template <bool do_JxW>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
   const ArrayView<ScalarNumber> &         solution_values,
@@ -2185,7 +2218,12 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
           for (unsigned int v = 0;
                v < stride && (stride == 1 || q + v < n_q_points_scalar);
                ++v)
-            ETT::get_value(value, v, values[qb * stride + v]);
+            {
+              const unsigned int offset = qb * stride + v;
+              if (do_JxW)
+                values[offset] *= JxW_ptr[offset];
+              ETT::get_value(value, v, values[offset]);
+            }
         }
       if (integration_flags & EvaluationFlags::gradients)
         {
@@ -2205,6 +2243,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
                ++v)
             {
               const unsigned int offset = qb * stride + v;
+              if (do_JxW)
+                gradients[offset] *= JxW_ptr[offset];
               ETT::get_gradient(
                 gradient,
                 v,
@@ -2223,6 +2263,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
+template <bool do_JxW>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
   const ArrayView<ScalarNumber> &         solution_values,
@@ -2250,7 +2291,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
                      v < n_lanes_user_interface && q + v < n_points;
                      ++v)
                   solution_values[i] += fe_values->shape_value(i, q + v) *
-                                        ETT::access(values[qb], v, d);
+                                        ETT::access(values[qb], v, d) *
+                                        (do_JxW ? fe_values->JxW(q + v) : 1.);
             else if (nonzero_shape_function_component[i][d])
               for (unsigned int qb = 0, q = 0; q < n_points;
                    ++qb, q += n_lanes_user_interface)
@@ -2259,7 +2301,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
                      ++v)
                   solution_values[i] +=
                     fe_values->shape_value_component(i, q + v, d) *
-                    ETT::access(values[qb], v, d);
+                    ETT::access(values[qb], v, d) *
+                    (do_JxW ? fe_values->JxW(q + v) : 1.);
         }
     }
 
@@ -2277,7 +2320,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
                      v < n_lanes_user_interface && q + v < n_points;
                      ++v)
                   solution_values[i] += fe_values->shape_grad(i, q + v) *
-                                        ETT::access(gradients[qb], v, d);
+                                        ETT::access(gradients[qb], v, d) *
+                                        (do_JxW ? fe_values->JxW(q + v) : 1.);
             else if (nonzero_shape_function_component[i][d])
               for (unsigned int qb = 0, q = 0; q < n_points;
                    ++qb, q += n_lanes_user_interface)
@@ -2286,7 +2330,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
                      ++v)
                   solution_values[i] +=
                     fe_values->shape_grad_component(i, q + v, d) *
-                    ETT::access(gradients[qb], v, d);
+                    ETT::access(gradients[qb], v, d) *
+                    (do_JxW ? fe_values->JxW(q + v) : 1.);
         }
     }
 }
@@ -2294,8 +2339,9 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
+template <bool do_JxW>
 void
-FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
   const ArrayView<ScalarNumber> &         solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
@@ -2318,11 +2364,38 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
       return;
     }
 
+  Assert(
+    !do_JxW || JxW_ptr != nullptr,
+    ExcMessage(
+      "JxW pointer is not set! If you do not want to integrate() use test_and_sum()"));
+
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
   if (fast_path)
-    integrate_fast(solution_values, integration_flags);
+    integrate_fast<do_JxW>(solution_values, integration_flags);
   else
-    integrate_slow(solution_values, integration_flags);
+    integrate_slow<do_JxW>(solution_values, integration_flags);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
+  const ArrayView<ScalarNumber> &         solution_values,
+  const EvaluationFlags::EvaluationFlags &integration_flags)
+{
+  do_integrate<true>(solution_values, integration_flags);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
+  const ArrayView<ScalarNumber> &         solution_values,
+  const EvaluationFlags::EvaluationFlags &integration_flags)
+{
+  do_integrate<false>(solution_values, integration_flags);
 }
 
 

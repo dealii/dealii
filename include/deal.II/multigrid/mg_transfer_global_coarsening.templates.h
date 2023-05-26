@@ -4080,7 +4080,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
           evaluator.submit_value(
             values[q + cell_data.reference_point_ptrs[cell]], q);
 
-        evaluator.integrate(solution_values, EvaluationFlags::values);
+        evaluator.test_and_sum(solution_values, EvaluationFlags::values);
 
         // resolve constraints and scatter
         internal::VectorDistributorLocalToGlobal<Number, VectorizedArrayType>

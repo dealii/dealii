@@ -211,9 +211,8 @@ test(const bool filtered_compression)
 
         for (const auto q : fe_point.quadrature_point_indices())
           {
-            fe_point.submit_value(fe_point.JxW(q) * fe_point.get_value(q), q);
-            fe_point.submit_gradient(fe_point.JxW(q) * fe_point.get_gradient(q),
-                                     q);
+            fe_point.submit_value(fe_point.get_value(q), q);
+            fe_point.submit_gradient(fe_point.get_gradient(q), q);
           }
 
         fe_point.integrate(solution_values_out,
@@ -247,13 +246,12 @@ test(const bool filtered_compression)
 
           for (const auto q : fe_point_faces_m.quadrature_point_indices())
             {
-              fe_point_faces_m.submit_value(fe_point_faces_m.JxW(q) *
-                                              (fe_point_faces_m.get_value(q) -
-                                               fe_point_faces_p.get_value(q)),
+              fe_point_faces_m.submit_value(fe_point_faces_m.get_value(q) -
+                                              fe_point_faces_p.get_value(q),
                                             q);
               fe_point_faces_m.submit_gradient(
-                fe_point_faces_m.JxW(q) * (fe_point_faces_m.get_gradient(q) -
-                                           fe_point_faces_p.get_gradient(q)),
+                fe_point_faces_m.get_gradient(q) -
+                  fe_point_faces_p.get_gradient(q),
                 q);
             }
 
