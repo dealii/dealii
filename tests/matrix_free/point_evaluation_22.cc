@@ -170,9 +170,9 @@ main()
   test<2>(2);
   test<2>(6);
   test<3>(1);
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS > 0
   test<3, double, VectorizedArray<double, 2>>(5);
-
   test<3, float, VectorizedArray<float, 4>>(5);
-
+#endif
   test<3>(1, false);
 }
