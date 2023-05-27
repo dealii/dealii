@@ -13,4 +13,4 @@ Some of them have been deprecated, some are replaced because we imagine them onl
 Further, the serialization of parallel::distributed::Triangulation objects is also affected by this change
 as we write FE indices to disk. Thus, the version in the serialization metafile has been bumped to `5`.
 <br>
-(Marc Fehling, 10/27/2022)
+(Marc Fehling, 2022/10/27)
