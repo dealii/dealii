@@ -40,6 +40,10 @@ template <int dim, typename Number>
 void
 do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
 {
+  using VectorizedArrayTrait = dealii::internal::VectorizedArrayTrait<Number>;
+  using ScalarNumber         = typename VectorizedArrayTrait::value_type;
+  static constexpr std::size_t width = VectorizedArrayTrait::width();
+
   using FDM = TensorProductMatrixSymmetricSumCollection<dim, Number>;
 
   const unsigned int fe_degree = 3;
@@ -58,38 +62,62 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
   FDM collection_2(typename FDM::AdditionalData(true, true));
   FDM collection_3(typename FDM::AdditionalData(false, true));
 
-  collection_0.reserve(tria.n_active_cells());
-  collection_1.reserve(tria.n_active_cells());
-  collection_2.reserve(tria.n_active_cells());
-  collection_3.reserve(tria.n_active_cells());
+  const auto n_cell_batches = (tria.n_active_cells() + width - 1) / width;
 
-  for (const auto &cell : tria.active_cell_iterators())
+  collection_0.reserve(n_cell_batches);
+  collection_1.reserve(n_cell_batches);
+  collection_2.reserve(n_cell_batches);
+  collection_3.reserve(n_cell_batches);
+
+  auto cell = tria.begin_active();
+
+  for (unsigned int counter = 0; counter < n_cell_batches; ++counter)
     {
-      const auto &patch_extent =
-        harmonic_patch_extent[cell->active_cell_index()];
+      std::array<Table<2, Number>, dim> Ms;
+      std::array<Table<2, Number>, dim> Ks;
 
-      const auto M_and_K = TensorProductMatrixCreator::
-        create_laplace_tensor_product_matrix<dim, Number>(
-          cell,
-          std::set<unsigned int>{0},
-          std::set<unsigned int>{},
-          fe_1D,
-          quadrature_1D,
-          patch_extent,
-          n_overlap);
+      for (unsigned int v = 0; (v < width) && (cell != tria.end()); ++v, ++cell)
+        {
+          const auto &patch_extent =
+            harmonic_patch_extent[cell->active_cell_index()];
 
-      collection_0.insert(cell->active_cell_index(),
-                          M_and_K.first,
-                          M_and_K.second);
-      collection_1.insert(cell->active_cell_index(),
-                          M_and_K.first,
-                          M_and_K.second);
-      collection_2.insert(cell->active_cell_index(),
-                          M_and_K.first,
-                          M_and_K.second);
-      collection_3.insert(cell->active_cell_index(),
-                          M_and_K.first,
-                          M_and_K.second);
+          const auto M_and_K_scalar = TensorProductMatrixCreator::
+            create_laplace_tensor_product_matrix<dim, ScalarNumber>(
+              cell,
+              std::set<unsigned int>{0},
+              std::set<unsigned int>{},
+              fe_1D,
+              quadrature_1D,
+              patch_extent,
+              n_overlap);
+
+          const auto Ms_scalar = M_and_K_scalar.first;
+          const auto Ks_scalar = M_and_K_scalar.second;
+
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              if (Ms[d].size(0) == 0 || Ms[d].size(1) == 0)
+                {
+                  Ms[d].reinit(Ms_scalar[d].size(0), Ms_scalar[d].size(1));
+                  Ks[d].reinit(Ks_scalar[d].size(0), Ks_scalar[d].size(1));
+                }
+
+              for (unsigned int i = 0; i < Ms_scalar[d].size(0); ++i)
+                for (unsigned int j = 0; j < Ms_scalar[d].size(0); ++j)
+                  VectorizedArrayTrait::get(Ms[d][i][j], v) =
+                    Ms_scalar[d][i][j];
+
+              for (unsigned int i = 0; i < Ks_scalar[d].size(0); ++i)
+                for (unsigned int j = 0; j < Ks_scalar[d].size(0); ++j)
+                  VectorizedArrayTrait::get(Ks[d][i][j], v) =
+                    Ks_scalar[d][i][j];
+            }
+        }
+
+      collection_0.insert(counter, Ms, Ks);
+      collection_1.insert(counter, Ms, Ks);
+      collection_2.insert(counter, Ms, Ks);
+      collection_3.insert(counter, Ms, Ks);
     }
 
   collection_0.finalize();
@@ -100,15 +128,15 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
   deallog << "Storage sizes: " << collection_0.storage_size() << " "
           << collection_1.storage_size() << std::endl;
 
-  Vector<Number>        src(fe.n_dofs_per_cell());
-  Vector<Number>        dst(fe.n_dofs_per_cell());
+  AlignedVector<Number> src(fe.n_dofs_per_cell());
+  AlignedVector<Number> dst(fe.n_dofs_per_cell());
   AlignedVector<Number> tmp;
-  FullMatrix<Number>    matrix_0(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
-  FullMatrix<Number>    matrix_1(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
-  FullMatrix<Number>    matrix_2(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
-  FullMatrix<Number>    matrix_3(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
+  Table<2, Number>      matrix_0(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
+  Table<2, Number>      matrix_1(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
+  Table<2, Number>      matrix_2(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
+  Table<2, Number>      matrix_3(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
 
-  for (unsigned int cell = 0; cell < tria.n_active_cells(); ++cell)
+  for (unsigned int cell = 0; cell < n_cell_batches; ++cell)
     {
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
         {
@@ -116,29 +144,29 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
             src[j] = i == j;
 
           collection_0.apply_inverse(cell,
-                                     make_array_view(dst),
-                                     make_array_view(src),
+                                     make_array_view(dst.begin(), dst.end()),
+                                     make_array_view(src.begin(), src.end()),
                                      tmp);
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_0[j][i] = dst[j];
 
           collection_1.apply_inverse(cell,
-                                     make_array_view(dst),
-                                     make_array_view(src),
+                                     make_array_view(dst.begin(), dst.end()),
+                                     make_array_view(src.begin(), src.end()),
                                      tmp);
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_1[j][i] = dst[j];
 
           collection_2.apply_inverse(cell,
-                                     make_array_view(dst),
-                                     make_array_view(src),
+                                     make_array_view(dst.begin(), dst.end()),
+                                     make_array_view(src.begin(), src.end()),
                                      tmp);
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_2[j][i] = dst[j];
 
           collection_3.apply_inverse(cell,
-                                     make_array_view(dst),
-                                     make_array_view(src),
+                                     make_array_view(dst.begin(), dst.end()),
+                                     make_array_view(src.begin(), src.end()),
                                      tmp);
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_3[j][i] = dst[j];
@@ -244,8 +272,56 @@ main()
 {
   initlog();
 
-  do_test<double>();
-  do_test<float>();
+  {
+    deallog.push("v=0");
+    do_test<double>();
+    deallog << std::endl;
+    do_test<float>();
+    deallog.pop();
+    deallog << std::endl;
+  }
+
+  {
+    deallog.push("v=64");
+    do_test<VectorizedArray<double, 1>>();
+    deallog << std::endl;
+    do_test<VectorizedArray<float, 1>>();
+    deallog.pop();
+    deallog << std::endl;
+  }
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
+  {
+    deallog.push("v=128");
+    do_test<VectorizedArray<double, 2>>();
+    deallog << std::endl;
+    do_test<VectorizedArray<float, 4>>();
+    deallog.pop();
+    deallog << std::endl;
+  }
+#endif
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
+  {
+    deallog.push("v=256");
+    do_test<VectorizedArray<double, 4>>();
+    deallog << std::endl;
+    do_test<VectorizedArray<float, 8>>();
+    deallog.pop();
+    deallog << std::endl;
+  }
+#endif
+
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
+  {
+    deallog.push("v=512");
+    do_test<VectorizedArray<double, 8>>();
+    deallog << std::endl;
+    do_test<VectorizedArray<float, 16>>();
+    deallog.pop();
+    deallog << std::endl;
+  }
+#endif
 
   return 0;
 }

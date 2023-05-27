@@ -281,11 +281,14 @@ namespace internal
     template <typename Number>
     struct MatrixPairComparator
     {
-      using MatrixPairType = std::pair<Table<2, Number>, Table<2, Number>>;
       using VectorizedArrayTrait =
         dealii::internal::VectorizedArrayTrait<Number>;
       using ScalarNumber = typename VectorizedArrayTrait::value_type;
       static constexpr std::size_t width = VectorizedArrayTrait::width();
+
+      using MatrixPairType =
+        std::pair<std::bitset<width>,
+                  std::pair<Table<2, Number>, Table<2, Number>>>;
 
       MatrixPairComparator()
         : eps(std::sqrt(std::numeric_limits<ScalarNumber>::epsilon()))
@@ -294,29 +297,15 @@ namespace internal
       bool
       operator()(const MatrixPairType &left, const MatrixPairType &right) const
       {
-        const auto &M_0 = left.first;
-        const auto &K_0 = left.second;
-        const auto &M_1 = right.first;
-        const auto &K_1 = right.second;
+        const auto &M_0 = left.second.first;
+        const auto &K_0 = left.second.second;
+        const auto &M_1 = right.second.first;
+        const auto &K_1 = right.second.second;
 
         std::bitset<width> mask;
 
         for (unsigned int v = 0; v < width; ++v)
-          {
-            ScalarNumber a = 0.0;
-            ScalarNumber b = 0.0;
-
-            for (unsigned int i = 0; i < M_0.size(0); ++i)
-              for (unsigned int j = 0; j < M_0.size(1); ++j)
-                {
-                  a += std::abs(VectorizedArrayTrait::get(M_0[i][j], v));
-                  a += std::abs(VectorizedArrayTrait::get(K_0[i][j], v));
-                  b += std::abs(VectorizedArrayTrait::get(M_1[i][j], v));
-                  b += std::abs(VectorizedArrayTrait::get(K_1[i][j], v));
-                }
-
-            mask[v] = (a != 0.0) && (b != 0.0);
-          }
+          mask[v] = left.first[v] && right.first[v];
 
         const FloatingPointComparator<Number> comparator(
           eps, false /*use relative tolerance*/, mask);
@@ -366,6 +355,10 @@ template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSumCollection
 {
   using MatrixPairType = std::pair<Table<2, Number>, Table<2, Number>>;
+
+  using MatrixPairTypeWithMask = std::pair<
+    std::bitset<dealii::internal::VectorizedArrayTrait<Number>::width()>,
+    MatrixPairType>;
 
 public:
   /**
@@ -467,7 +460,7 @@ private:
    * matrices. The memory is freed during finalize().
    */
   std::map<
-    MatrixPairType,
+    MatrixPairTypeWithMask,
     unsigned int,
     internal::TensorProductMatrixSymmetricSum::MatrixPairComparator<Number>>
     cache;
@@ -1157,18 +1150,85 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::insert(
 
   for (unsigned int d = 0; d < dim; ++d)
     {
-      const MatrixPairType matrix(Ms[d], Ks[d]);
-
       if (compress_matrices == false)
         {
+          const MatrixPairType matrix(Ms[d], Ks[d]);
           mass_and_derivative_matrices[index * dim + d] = matrix;
         }
       else
         {
+          using VectorizedArrayTrait =
+            dealii::internal::VectorizedArrayTrait<Number>;
+
+          std::bitset<VectorizedArrayTrait::width()> mask;
+
+          for (unsigned int v = 0; v < VectorizedArrayTrait::width(); ++v)
+            {
+              typename VectorizedArrayTrait::value_type a = 0.0;
+
+              for (unsigned int i = 0; i < Ms[d].size(0); ++i)
+                for (unsigned int j = 0; j < Ms[d].size(1); ++j)
+                  {
+                    a += std::abs(VectorizedArrayTrait::get(Ms[d][i][j], v));
+                    a += std::abs(VectorizedArrayTrait::get(Ks[d][i][j], v));
+                  }
+
+              mask[v] = (a != 0.0);
+            }
+
+          const MatrixPairTypeWithMask matrix{mask, {Ms[d], Ks[d]}};
+
           const auto ptr = cache.find(matrix);
 
           if (ptr != cache.end())
-            indices[index * dim + d] = ptr->second;
+            {
+              const auto ptr_index     = ptr->second;
+              indices[index * dim + d] = ptr_index;
+
+              if ([&]() {
+                    for (unsigned int v = 0; v < VectorizedArrayTrait::width();
+                         ++v)
+                      if ((mask[v] == true) && (ptr->first.first[v] == false))
+                        return false;
+
+                    return true;
+                  }())
+                {
+                  // nothing to do
+                }
+              else
+                {
+                  auto mask_new = ptr->first.first;
+                  auto Ms_new   = ptr->first.second.first;
+                  auto Ks_new   = ptr->first.second.second;
+
+                  for (unsigned int v = 0; v < VectorizedArrayTrait::width();
+                       ++v)
+                    if (mask_new[v] == false && mask[v] == true)
+                      {
+                        mask_new[v] = true;
+
+                        for (unsigned int i = 0; i < Ms_new.size(0); ++i)
+                          for (unsigned int j = 0; j < Ms_new.size(1); ++j)
+                            {
+                              VectorizedArrayTrait::get(Ms_new[i][j], v) =
+                                VectorizedArrayTrait::get(Ms[d][i][j], v);
+                              VectorizedArrayTrait::get(Ks_new[i][j], v) =
+                                VectorizedArrayTrait::get(Ks[d][i][j], v);
+                            }
+                      }
+
+                  cache.erase(ptr);
+
+                  const MatrixPairTypeWithMask entry_new{mask_new,
+                                                         {Ms_new, Ks_new}};
+
+                  const auto ptr_ = cache.find(entry_new);
+                  AssertThrow(ptr_ == cache.end(), ExcNotImplemented());
+
+                  cache[entry_new] = ptr_index;
+                }
+            }
           else
             {
               const auto size          = cache.size();
@@ -1260,7 +1320,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
       std::map<unsigned int, MatrixPairType> inverted_cache;
 
       for (const auto &i : cache)
-        inverted_cache[i.second] = i.first;
+        inverted_cache[i.second] = i.first.second;
 
       for (unsigned int i = 0; i < indices.size(); ++i)
         {
@@ -1296,7 +1356,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
 
       for (const auto &i : cache)
         {
-          const auto &M = i.first.first;
+          const auto &M = i.first.second.first;
 
           this->vector_ptr[i.second + 1] = M.n_rows();
           this->matrix_ptr[i.second + 1] = M.n_rows() * M.n_cols();
@@ -1314,7 +1374,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
       this->eigenvalues.resize_fast(vector_ptr.back());
 
       for (const auto &i : cache)
-        store(i.second, i.first);
+        store(i.second, i.first.second);
 
       cache.clear();
     }
