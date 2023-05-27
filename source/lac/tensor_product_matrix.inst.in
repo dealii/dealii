@@ -35,7 +35,8 @@ for (deal_II_dimension : DIMENSIONS;
       const std::array<const deal_II_scalar_vectorized *, deal_II_dimension>
         &eigenvectors,
       const std::array<const deal_II_scalar_vectorized *, deal_II_dimension>
-        &eigenvalues);
+        &                              eigenvalues,
+      const deal_II_scalar_vectorized *inverted_eigenvalues);
   }
 
 for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
@@ -55,5 +56,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
       AlignedVector<deal_II_scalar> &                              tmp,
       const unsigned int                                           n_rows,
       const std::array<const deal_II_scalar *, deal_II_dimension> &eigenvectors,
-      const std::array<const deal_II_scalar *, deal_II_dimension> &eigenvalues);
+      const std::array<const deal_II_scalar *, deal_II_dimension> &eigenvalues,
+      const deal_II_scalar *inverted_eigenvalues);
   }

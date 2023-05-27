@@ -376,12 +376,18 @@ public:
     /**
      * Constructor.
      */
-    AdditionalData(const bool compress_matrices = true);
+    AdditionalData(const bool compress_matrices           = true,
+                   const bool precompute_inverse_diagonal = true);
 
     /**
      * Try to compress internal matrices. Default: true.
      */
     bool compress_matrices;
+
+    /**
+     * Precompute inverse diagonal.
+     */
+    bool precompute_inverse_diagonal;
   };
 
   /**
@@ -446,6 +452,11 @@ private:
   const bool compress_matrices;
 
   /**
+   * Precompute inverse diagonal.
+   */
+  const bool precompute_inverse_diagonal;
+
+  /**
    * Container used to collect 1d matrices if no compression is
    * requested. The memory is freed during finalize().
    */
@@ -491,6 +502,11 @@ private:
   AlignedVector<Number> eigenvalues;
 
   /**
+   * Vector of inverted eigenvalues.
+   */
+  AlignedVector<Number> inverted_eigenvalues;
+
+  /**
    * Pointer into mass_matrices, derivative_matrices, and eigenvalues.
    */
   std::vector<unsigned int> vector_ptr;
@@ -499,6 +515,11 @@ private:
    * Pointer into mass_matrices, derivative_matrices, and eigenvalues.
    */
   std::vector<unsigned int> matrix_ptr;
+
+  /**
+   * Number of rows in 1 of each cell.
+   */
+  std::vector<unsigned int> vector_n_rows_1d;
 };
 
 
@@ -810,7 +831,8 @@ namespace internal
                   AlignedVector<Number> &tmp,
                   const unsigned int     n_rows_1d_non_templated,
                   const std::array<const Number *, dim> &eigenvectors,
-                  const std::array<const Number *, dim> &eigenvalues)
+                  const std::array<const Number *, dim> &eigenvalues,
+                  const Number *inverted_eigenvalues = nullptr)
     {
       const unsigned int n_rows_1d = n_rows_1d_templated == 0 ?
                                        n_rows_1d_non_templated :
@@ -836,8 +858,13 @@ namespace internal
         {
           const Number *S = eigenvectors[0];
           eval.template apply<0, true, false>(S, src, t);
+
           for (unsigned int i = 0; i < n_rows_1d; ++i)
-            t[i] /= eigenvalues[0][i];
+            if (inverted_eigenvalues)
+              t[i] *= inverted_eigenvalues[i];
+            else
+              t[i] /= eigenvalues[0][i];
+
           eval.template apply<0, false, false>(S, t, dst);
         }
 
@@ -847,9 +874,14 @@ namespace internal
           const Number *S1 = eigenvectors[1];
           eval.template apply<0, true, false>(S0, src, t);
           eval.template apply<1, true, false>(S1, t, dst);
+
           for (unsigned int i1 = 0, c = 0; i1 < n_rows_1d; ++i1)
             for (unsigned int i0 = 0; i0 < n_rows_1d; ++i0, ++c)
-              dst[c] /= (eigenvalues[1][i1] + eigenvalues[0][i0]);
+              if (inverted_eigenvalues)
+                dst[c] *= inverted_eigenvalues[c];
+              else
+                dst[c] /= (eigenvalues[1][i1] + eigenvalues[0][i0]);
+
           eval.template apply<0, false, false>(S0, dst, t);
           eval.template apply<1, false, false>(S1, t, dst);
         }
@@ -862,11 +894,16 @@ namespace internal
           eval.template apply<0, true, false>(S0, src, t);
           eval.template apply<1, true, false>(S1, t, dst);
           eval.template apply<2, true, false>(S2, dst, t);
+
           for (unsigned int i2 = 0, c = 0; i2 < n_rows_1d; ++i2)
             for (unsigned int i1 = 0; i1 < n_rows_1d; ++i1)
               for (unsigned int i0 = 0; i0 < n_rows_1d; ++i0, ++c)
-                t[c] /= (eigenvalues[2][i2] + eigenvalues[1][i1] +
-                         eigenvalues[0][i0]);
+                if (inverted_eigenvalues)
+                  t[c] *= inverted_eigenvalues[c];
+                else
+                  t[c] /= (eigenvalues[2][i2] + eigenvalues[1][i1] +
+                           eigenvalues[0][i0]);
+
           eval.template apply<0, false, false>(S0, t, dst);
           eval.template apply<1, false, false>(S1, dst, t);
           eval.template apply<2, false, false>(S2, t, dst);
@@ -896,7 +933,8 @@ namespace internal
                          AlignedVector<Number> &                tmp,
                          const unsigned int                     n_rows_1d,
                          const std::array<const Number *, dim> &eigenvectors,
-                         const std::array<const Number *, dim> &eigenvalues);
+                         const std::array<const Number *, dim> &eigenvalues,
+                         const Number *inverted_eigenvalues = nullptr);
   } // namespace TensorProductMatrixSymmetricSum
 } // namespace internal
 
@@ -1073,8 +1111,10 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit(
 
 template <int dim, typename Number, int n_rows_1d>
 TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
-  AdditionalData::AdditionalData(const bool compress_matrices)
+  AdditionalData::AdditionalData(const bool compress_matrices,
+                                 const bool precompute_inverse_diagonal)
   : compress_matrices(compress_matrices)
+  , precompute_inverse_diagonal(precompute_inverse_diagonal)
 {}
 
 
@@ -1084,6 +1124,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
   TensorProductMatrixSymmetricSumCollection(
     const AdditionalData &additional_data)
   : compress_matrices(additional_data.compress_matrices)
+  , precompute_inverse_diagonal(additional_data.precompute_inverse_diagonal)
 {}
 
 
@@ -1248,7 +1289,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
     }
   else
     {
-      // case 2) compression requested but none possible
+      // case 3) compress
 
       this->vector_ptr.resize(cache.size() + 1);
       this->matrix_ptr.resize(cache.size() + 1);
@@ -1277,6 +1318,137 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
 
       cache.clear();
     }
+
+  if (precompute_inverse_diagonal)
+    {
+      if (dim == 1)
+        {
+          // 1D case: simply invert 1D eigenvalues
+          for (unsigned int i = 0; i < this->eigenvalues.size(); ++i)
+            this->eigenvalues[i] = Number(1.0) / this->eigenvalues[i];
+          std::swap(this->inverted_eigenvalues, eigenvalues);
+        }
+      else
+        {
+          // 2D and 3D case: we have 2 or 3 1d eigenvalues so that we
+          // need to combine these
+
+          // step 1) if eigenvalues/eigenvectors are compressed, we
+          // need to compress the diagonal (the combination of ev
+          // indices) as well. This is an optional step.
+          std::vector<unsigned int> indices_ev;
+
+          if (indices.size() > 0)
+            {
+              // 1a) create cache (ev indics -> diag index)
+              const unsigned int n_cells = indices.size() / dim;
+              std::map<std::array<unsigned int, dim>, unsigned int> cache_ev;
+              std::vector<unsigned int> cache_ev_idx(n_cells);
+
+              for (unsigned int i = 0, c = 0; i < n_cells; ++i)
+                {
+                  std::array<unsigned int, dim> id;
+
+                  for (unsigned int d = 0; d < dim; ++d, ++c)
+                    id[d] = indices[c];
+
+                  const auto id_ptr = cache_ev.find(id);
+
+                  if (id_ptr == cache_ev.end())
+                    {
+                      const auto size = cache_ev.size();
+                      cache_ev_idx[i] = size;
+                      cache_ev[id]    = size;
+                    }
+                  else
+                    {
+                      cache_ev_idx[i] = id_ptr->second;
+                    }
+                }
+
+              // 1b) store diagonal indices for each cell
+              std::vector<unsigned int> new_indices;
+              new_indices.reserve(indices.size() / dim * (dim + 1));
+
+              for (unsigned int i = 0, c = 0; i < n_cells; ++i)
+                {
+                  for (unsigned int d = 0; d < dim; ++d, ++c)
+                    new_indices.push_back(indices[c]);
+                  new_indices.push_back(cache_ev_idx[i]);
+                }
+
+              // 1c) transpose cache (diag index -> ev indices)
+              indices_ev.resize(cache_ev.size() * dim);
+              for (const auto &entry : cache_ev)
+                for (unsigned int d = 0; d < dim; ++d)
+                  indices_ev[entry.second * dim + d] = entry.first[d];
+
+              std::swap(this->indices, new_indices);
+            }
+
+          // step 2) allocate memory and set pointers
+          const unsigned int n_diag =
+            ((indices_ev.size() > 0) ? indices_ev.size() :
+                                       (matrix_ptr.size() - 1)) /
+            dim;
+
+          std::vector<unsigned int> new_vector_ptr(n_diag + 1, 0);
+          std::vector<unsigned int> new_vector_n_rows_1d(n_diag, 0);
+
+          for (unsigned int i = 0; i < n_diag; ++i)
+            {
+              const unsigned int c = (indices_ev.size() > 0) ?
+                                       indices_ev[dim * i + 0] :
+                                       (dim * i + 0);
+
+              const unsigned int n_rows = vector_ptr[c + 1] - vector_ptr[c];
+
+              new_vector_n_rows_1d[i] = n_rows;
+              new_vector_ptr[i + 1]   = Utilities::pow(n_rows, dim);
+            }
+
+          for (unsigned int i = 0; i < n_diag; ++i)
+            new_vector_ptr[i + 1] += new_vector_ptr[i];
+
+          this->inverted_eigenvalues.resize(new_vector_ptr.back());
+
+          // step 3) loop over all unique diagonal entries and invert
+          for (unsigned int i = 0; i < n_diag; ++i)
+            {
+              std::array<Number *, dim> evs;
+
+              for (unsigned int d = 0; d < dim; ++d)
+                evs[d] =
+                  &this
+                     ->eigenvalues[this->vector_ptr[(indices_ev.size() > 0) ?
+                                                      indices_ev[dim * i + d] :
+                                                      (dim * i + d)]];
+
+              const unsigned int mm = new_vector_n_rows_1d[i];
+              if (dim == 2)
+                {
+                  for (unsigned int i1 = 0, c = 0; i1 < mm; ++i1)
+                    for (unsigned int i0 = 0; i0 < mm; ++i0, ++c)
+                      this->inverted_eigenvalues[new_vector_ptr[i] + c] =
+                        Number(1.0) / (evs[1][i1] + evs[0][i0]);
+                }
+              else
+                {
+                  for (unsigned int i2 = 0, c = 0; i2 < mm; ++i2)
+                    for (unsigned int i1 = 0; i1 < mm; ++i1)
+                      for (unsigned int i0 = 0; i0 < mm; ++i0, ++c)
+                        this->inverted_eigenvalues[new_vector_ptr[i] + c] =
+                          Number(1.0) / (evs[2][i2] + evs[1][i1] + evs[0][i0]);
+                }
+            }
+
+          // step 4) clean up
+          std::swap(this->vector_ptr, new_vector_ptr);
+          std::swap(this->vector_n_rows_1d, new_vector_n_rows_1d);
+        }
+
+      this->eigenvalues.clear();
+    }
 }
 
 
@@ -1292,28 +1464,92 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
   Number *      dst = dst_in.begin();
   const Number *src = src_in.begin();
 
-  std::array<const Number *, dim> eigenvectors, eigenvalues;
-  unsigned int                    n_rows_1d_non_templated = 0;
-
-  for (unsigned int d = 0; d < dim; ++d)
+  if (this->eigenvalues.empty() == false)
     {
-      const unsigned int translated_index =
-        (indices.size() > 0) ? indices[dim * index + d] : (dim * index + d);
+      std::array<const Number *, dim> eigenvectors;
+      std::array<const Number *, dim> eigenvalues;
+      unsigned int                    n_rows_1d_non_templated = 0;
 
-      eigenvectors[d] =
-        this->eigenvectors.data() + matrix_ptr[translated_index];
-      eigenvalues[d] = this->eigenvalues.data() + vector_ptr[translated_index];
-      n_rows_1d_non_templated =
-        vector_ptr[translated_index + 1] - vector_ptr[translated_index];
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          const unsigned int translated_index =
+            (indices.size() > 0) ? indices[dim * index + d] : (dim * index + d);
+
+          eigenvectors[d] =
+            this->eigenvectors.data() + matrix_ptr[translated_index];
+          eigenvalues[d] =
+            this->eigenvalues.data() + vector_ptr[translated_index];
+          n_rows_1d_non_templated =
+            vector_ptr[translated_index + 1] - vector_ptr[translated_index];
+        }
+
+      if (n_rows_1d != -1)
+        internal::TensorProductMatrixSymmetricSum::apply_inverse<
+          n_rows_1d == -1 ? 0 : n_rows_1d>(dst,
+                                           src,
+                                           tmp_array,
+                                           n_rows_1d_non_templated,
+                                           eigenvectors,
+                                           eigenvalues);
+      else
+        internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
+          dst,
+          src,
+          tmp_array,
+          n_rows_1d_non_templated,
+          eigenvectors,
+          eigenvalues);
     }
-
-  if (n_rows_1d != -1)
-    internal::TensorProductMatrixSymmetricSum::apply_inverse<
-      n_rows_1d == -1 ? 0 : n_rows_1d>(
-      dst, src, tmp_array, n_rows_1d_non_templated, eigenvectors, eigenvalues);
   else
-    internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
-      dst, src, tmp_array, n_rows_1d_non_templated, eigenvectors, eigenvalues);
+    {
+      std::array<const Number *, dim> eigenvectors;
+      const Number *                  inverted_eigenvalues    = nullptr;
+      unsigned int                    n_rows_1d_non_templated = 0;
+
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          const unsigned int translated_index =
+            (indices.size() > 0) ?
+              indices[((dim == 1) ? 1 : (dim + 1)) * index + d] :
+              (dim * index + d);
+
+          eigenvectors[d] =
+            this->eigenvectors.data() + matrix_ptr[translated_index];
+        }
+
+      {
+        const unsigned int translated_index =
+          ((indices.size() > 0) && (dim != 1)) ?
+            indices[(dim + 1) * index + dim] :
+            index;
+
+        inverted_eigenvalues =
+          this->inverted_eigenvalues.data() + vector_ptr[translated_index];
+        n_rows_1d_non_templated =
+          (dim == 1) ?
+            (vector_ptr[translated_index + 1] - vector_ptr[translated_index]) :
+            vector_n_rows_1d[translated_index];
+      }
+
+      if (n_rows_1d != -1)
+        internal::TensorProductMatrixSymmetricSum::apply_inverse<
+          n_rows_1d == -1 ? 0 : n_rows_1d>(dst,
+                                           src,
+                                           tmp_array,
+                                           n_rows_1d_non_templated,
+                                           eigenvectors,
+                                           {},
+                                           inverted_eigenvalues);
+      else
+        internal::TensorProductMatrixSymmetricSum::select_apply_inverse<1>(
+          dst,
+          src,
+          tmp_array,
+          n_rows_1d_non_templated,
+          eigenvectors,
+          {},
+          inverted_eigenvalues);
+    }
 }
 
 
