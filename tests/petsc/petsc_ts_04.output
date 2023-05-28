@@ -1,0 +1,200 @@
+
+DEAL::# Default Parameters
+subsection Error control
+  set absolute error tolerance = -1
+  set adaptor type             = none
+  set ignore algebraic lte     = true
+  set maximum step size        = -1
+  set minimum step size        = -1
+  set relative error tolerance = -1
+end
+subsection Running parameters
+  set final time              = 0
+  set initial step size       = 0
+  set initial time            = 0
+  set match final time        = false
+  set maximum number of steps = -1
+  set options prefix          = 
+  set solver type             = 
+end
+DEAL::# Testing Parameters
+subsection Error control
+  set absolute error tolerance = 0.0001
+  set adaptor type             = none
+  set ignore algebraic lte     = true
+  set maximum step size        = 1e+7
+  set minimum step size        = 1e-7
+  set relative error tolerance = -1
+end
+subsection Running parameters
+  set final time              = 2.0
+  set initial step size       = 0.2
+  set initial time            = 0
+  set match final time        = false
+  set maximum number of steps = -1
+  set options prefix          = 
+  set solver type             = bdf
+end
+DEAL::# Test explicit interface (J 0)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Time stepper aborted with an exception:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    A user call-back function encountered a recoverable error, but the
+    underlying library that called the call-back did not manage to recover
+    from the error and aborted its operation.
+    
+    See the glossary entry on user call-back functions for more
+    information.
+--------------------------------------------------------
+
+DEAL::# Test implicit interface (J 0)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Time stepper aborted with an exception:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    A user call-back function encountered a recoverable error, but the
+    underlying library that called the call-back did not manage to recover
+    from the error and aborted its operation.
+    
+    See the glossary entry on user call-back functions for more
+    information.
+--------------------------------------------------------
+
+DEAL::# Test explicit interface (J 1)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit Jacobian at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit Jacobian at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Time stepper aborted with an exception:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    A user call-back function encountered a recoverable error, but the
+    underlying library that called the call-back did not manage to recover
+    from the error and aborted its operation.
+    
+    See the glossary entry on user call-back functions for more
+    information.
+--------------------------------------------------------
+
+DEAL::# Test implicit interface (J 1)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit Jacobian at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit Jacobian at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Time stepper aborted with an exception:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    A user call-back function encountered a recoverable error, but the
+    underlying library that called the call-back did not manage to recover
+    from the error and aborted its operation.
+    
+    See the glossary entry on user call-back functions for more
+    information.
+--------------------------------------------------------
+
+DEAL::# Test user interface
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Time stepper aborted with an exception:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    A user call-back function encountered a recoverable error, but the
+    underlying library that called the call-back did not manage to recover
+    from the error and aborted its operation.
+    
+    See the glossary entry on user call-back functions for more
+    information.
+--------------------------------------------------------
+
