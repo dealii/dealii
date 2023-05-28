@@ -177,8 +177,7 @@ test_transfer_operator(
 template <int dim, typename Number, typename MeshType>
 void
 test_non_nested_transfer(
-  const MGTwoLevelTransferNonNested<dim,
-                                    LinearAlgebra::distributed::Vector<Number>>
+  const MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
                               &transfer,
   const MeshType              &dof_handler_fine,
   const MeshType              &dof_handler_coarse,
