@@ -65,23 +65,9 @@ jobs:
 
     name: linux debug parallel simplex
     runs-on: [ubuntu-22.04]
+    container:
+      image: dealii/dependencies:jammy
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: modules
-      run: |
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository -y ppa:ginggs/deal.ii-9.4.0-backports
-        sudo apt-get update
-        sudo apt-get install -yq --no-install-recommends \
-            numdiff \
-            libboost-all-dev \
-            libcgal-dev \
-            libp4est-dev \
-            trilinos-all-dev \
-            petsc-dev \
-            libmetis-dev \
-            libhdf5-mpi-dev
     - name: info
       run: |
         mpicc -v
