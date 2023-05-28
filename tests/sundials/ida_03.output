@@ -1,0 +1,49 @@
+
+DEAL::Intermediate output:
+DEAL::  t =0.000000000
+DEAL::  y =1.000000000  (exact: 1.000000000)
+DEAL::  y'=-2.000000000  (exact: -2.000000000)
+DEAL::Intermediate output:
+DEAL::  t =0.2000000000
+DEAL::  y =0.6703200457  (exact: 0.6703200460)
+DEAL::  y'=-1.340640088  (exact: -1.340640092)
+DEAL::Intermediate output:
+DEAL::  t =0.4000000000
+DEAL::  y =0.4493289638  (exact: 0.4493289641)
+DEAL::  y'=-0.8986579256  (exact: -0.8986579282)
+DEAL::Intermediate output:
+DEAL::  t =0.6000000000
+DEAL::  y =0.3011942117  (exact: 0.3011942119)
+DEAL::  y'=-0.6023884233  (exact: -0.6023884238)
+DEAL::Intermediate output:
+DEAL::  t =0.8000000000
+DEAL::  y =0.2018965179  (exact: 0.2018965180)
+DEAL::  y'=-0.4037930380  (exact: -0.4037930360)
+DEAL::Intermediate output:
+DEAL::  t =1.000000000
+DEAL::  y =0.1353352831  (exact: 0.1353352832)
+DEAL::  y'=-0.2706705663  (exact: -0.2706705665)
+DEAL::Intermediate output:
+DEAL::  t =1.200000000
+DEAL::  y =0.09071795314  (exact: 0.09071795329)
+DEAL::  y'=-0.1814359026  (exact: -0.1814359066)
+DEAL::Intermediate output:
+DEAL::  t =1.400000000
+DEAL::  y =0.06081006262  (exact: 0.06081006263)
+DEAL::  y'=-0.1216201252  (exact: -0.1216201253)
+DEAL::Intermediate output:
+DEAL::  t =1.600000000
+DEAL::  y =0.04076220398  (exact: 0.04076220398)
+DEAL::  y'=-0.08152441186  (exact: -0.08152440796)
+DEAL::Intermediate output:
+DEAL::  t =1.800000000
+DEAL::  y =0.02732372240  (exact: 0.02732372245)
+DEAL::  y'=-0.05464744495  (exact: -0.05464744489)
+DEAL::Intermediate output:
+DEAL::  t =2.000000000
+DEAL::  y =0.01831563874  (exact: 0.01831563889)
+DEAL::  y'=-0.03663127757  (exact: -0.03663127778)
+DEAL::Intermediate output:
+DEAL::  t =2.000000000
+DEAL::  y =0.01831563874  (exact: 0.01831563889)
+DEAL::  y'=-0.03663127757  (exact: -0.03663127778)

@@ -24,35 +24,25 @@
 
 
 /**
- * Solve the Harmonic oscillator problem, using a direct solver for the
- * jacobian system.
+ * Solve the exponential decay problem:
  *
- * u'' = -k^2 u
- * u (0) = 0
- * u'(0) = k
+ * y' = -k y
+ * y (0) = 1
  *
- * write in terms of a first order ode:
+ * with k=2. That is
  *
- * y[0]' -     y[1]  = 0
- * y[1]' + k^2 y[0]  = 0
- *
- * That is
- *
- * F(y', y, t) = y' + A y = 0
- *
- * A = [ 0 , -1; k^2, 0 ]
- *
- * y_0  = 0, k
- * y_0' = k, 0
+ * F(y', y, t) = y' + k y = 0
+ * y_0  = 1
  *
  * The exact solution is
  *
- * y[0](t) = sin(k t)
- * y[1](t) = k cos(k t)
+ * y(t) = exp(-k*t)
  *
- * The Jacobian to assemble is the following:
+ * The Jacobian we then need to assemble is the following:
  *
- * J = alpha I + A
+ * J = dF/dy + alpha dF/dy'
+ *   = k + alpha 1
+ *   = (k+alpha)
  */
 class HarmonicOscillator
 {
@@ -61,76 +51,67 @@ public:
     double                                                        _kappa,
     const typename SUNDIALS::IDA<Vector<double>>::AdditionalData &data)
     : time_stepper(data)
-    , y(2)
-    , y_dot(2)
-    , J(2, 2)
-    , A(2, 2)
-    , Jinv(2, 2)
+    , y(1)
+    , y_dot(1)
     , kappa(_kappa)
   {
     using VectorType = Vector<double>;
 
-    time_stepper.reinit_vector = [&](VectorType &v) { v.reinit(2); };
+    time_stepper.reinit_vector = [&](VectorType &v) { v.reinit(1); };
 
 
     time_stepper.residual = [&](const double      t,
                                 const VectorType &y,
                                 const VectorType &y_dot,
                                 VectorType &      res) {
-      res = y_dot;
-      A.vmult_add(res, y);
+      res[0] = y_dot[0] + kappa * y[0];
     };
 
     time_stepper.setup_jacobian = [&](const double,
                                       const VectorType &,
                                       const VectorType &,
                                       const double alpha) {
-      A(0, 1) = -1.0;
-      A(1, 0) = kappa * kappa;
-
-      J = A;
-
-      J(0, 0) = alpha;
-      J(1, 1) = alpha;
-
-      Jinv.invert(J);
+      J = kappa + alpha;
     };
 
     // Used only in ver < 4.0.0
     time_stepper.solve_jacobian_system =
-      [&](const VectorType &src, VectorType &dst) { Jinv.vmult(dst, src); };
+      [&](const VectorType &src, VectorType &dst) { dst[0] = src[0] / J; };
 
     // Used in ver >= 4.0.0
     time_stepper.solve_with_jacobian =
       [&](const VectorType &src, VectorType &dst, const double) {
-        Jinv.vmult(dst, src);
+        dst[0] = src[0] / J;
       };
 
     time_stepper.output_step = [&](const double       t,
                                    const VectorType & sol,
                                    const VectorType & sol_dot,
                                    const unsigned int step_number) {
-      deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
-              << sol_dot[1] << std::endl;
+      deallog << "Intermediate output:" << std::endl;
+      deallog << "  t =" << t << std::endl;
+      deallog << "  y =" << sol[0] << "  (exact: " << std::exp(-kappa * t)
+              << ')' << std::endl;
+      deallog << "  y'=" << sol_dot[0]
+              << "  (exact: " << -kappa * std::exp(-kappa * t) << ')'
+              << std::endl;
     };
   }
 
   void
   run()
   {
-    y[1]     = kappa;
-    y_dot[0] = kappa;
+    y[0]     = 1;
+    y_dot[0] = -kappa;
     time_stepper.solve_dae(y, y_dot);
   }
   SUNDIALS::IDA<Vector<double>> time_stepper;
 
 private:
-  Vector<double>     y;
-  Vector<double>     y_dot;
-  FullMatrix<double> J;
-  FullMatrix<double> A;
-  FullMatrix<double> Jinv;
-  double             kappa;
+  Vector<double> y;
+  Vector<double> y_dot;
+  double         J;
+  double         kappa;
 };
 
 
@@ -144,14 +125,14 @@ main()
   ParameterHandler                              prm;
   data.add_parameters(prm);
 
-  // std::ofstream ofile(SOURCE_DIR "/ida_01.prm");
+  // std::ofstream ofile(SOURCE_DIR "/ida_03.prm");
   // prm.print_parameters(ofile, ParameterHandler::ShortText);
   // ofile.close();
 
-  std::ifstream ifile(SOURCE_DIR "/ida_01_in.prm");
+  std::ifstream ifile(SOURCE_DIR "/ida_03_in.prm");
   prm.parse_input(ifile);
 
 
-  HarmonicOscillator ode(1.0, data);
+  HarmonicOscillator ode(2.0, data);
   ode.run();
 }
