@@ -29,6 +29,7 @@
 
 #  include <petscsnes.h>
 
+#  include <exception>
 #  if defined(DEAL_II_HAVE_CXX20)
 #    include <concepts>
 #  endif
@@ -350,14 +351,30 @@ namespace PETScWrappers
 
     /**
      * Callback for the computation of the nonlinear residual $F(x)$.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's SNES package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &x, VectorType &res)> residual;
+    std::function<void(const VectorType &x, VectorType &res)> residual;
 
     /**
      * Callback for the computation of the Jacobian
      * $\dfrac{\partial F}{\partial x}$.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's SNES package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &x, AMatrixType &A, PMatrixType &P)>
+    std::function<void(const VectorType &x, AMatrixType &A, PMatrixType &P)>
       jacobian;
 
     /**
@@ -366,10 +383,18 @@ namespace PETScWrappers
      * This function is called by NonlinearSolver at the beginning
      * of each time step. Input arguments are the current step number
      * and the current value for ||F(x)||.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's SNES package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType & x,
-                      const unsigned int step_number,
-                      const real_type    f_norm)>
+    std::function<void(const VectorType & x,
+                       const unsigned int step_number,
+                       const real_type    f_norm)>
       monitor;
 
     /**
@@ -379,16 +404,32 @@ namespace PETScWrappers
      * operator $\dfrac{\partial F}{\partial x}$.
      *
      * Solvers must be provided via NonlinearSolver::solve_with_jacobian.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's SNES package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &x)> setup_jacobian;
+    std::function<void(const VectorType &x)> setup_jacobian;
 
     /**
      * Callback for the solution of the tangent system set up with
      * NonlinearSolver::setup_jacobian.
      *
      * This is used as a preconditioner inside the Krylov process.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's SNES package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &src, VectorType &dst)>
+    std::function<void(const VectorType &src, VectorType &dst)>
       solve_with_jacobian;
 
     /**
@@ -402,8 +443,16 @@ namespace PETScWrappers
      * the reduction in a trust region step.
      *
      * The value of the energy function must be returned in @p energy_value.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. PETSc's SNES package can not deal
+     * with "recoverable" errors, so if a callback
+     * throws an exception of type RecoverableUserCallbackError, then this
+     * exception is treated like any other exception.
      */
-    std::function<int(const VectorType &x, real_type &energy_value)> energy;
+    std::function<void(const VectorType &x, real_type &energy_value)> energy;
 
   private:
     /**
@@ -418,6 +467,13 @@ namespace PETScWrappers
      * This flag is used to support versions of PETSc older than 3.13.
      */
     bool need_dummy_assemble;
+
+    /**
+     * A pointer to any exception that may have been thrown in user-defined
+     * call-backs and that we have to deal after the KINSOL function we call
+     * has returned.
+     */
+    mutable std::exception_ptr pending_exception;
   };
 
 } // namespace PETScWrappers

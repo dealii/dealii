@@ -51,14 +51,13 @@ main(int argc, char **argv)
 
     Solver solver;
 
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       auto x = X.block(0)[0];
       auto y = X.block(1)[0];
 
       F.block(0)[0] = std::pow(x - std::pow(y, 3) + 1, 3) - std::pow(y, 3);
       F.block(1)[0] = x + 2 * y - 3;
       F.compress(VectorOperation::insert);
-      return 0;
     };
 
     VectorType x(2, MPI_COMM_SELF, 1, 1);
@@ -75,18 +74,17 @@ main(int argc, char **argv)
 
     Solver solver;
 
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       auto x = X.block(0)[0];
       auto y = X.block(1)[0];
 
       F.block(0)[0] = std::pow(x - std::pow(y, 3) + 1, 3) - std::pow(y, 3);
       F.block(1)[0] = x + 2 * y - 3;
       F.compress(VectorOperation::insert);
-      return 0;
     };
 
     solver.jacobian =
-      [&](const VectorType &X, MatrixType &A, MatrixType &P) -> int {
+      [&](const VectorType &X, MatrixType &A, MatrixType &P) -> void {
       auto x    = X.block(0)[0];
       auto y    = X.block(1)[0];
       auto f0_x = 3 * std::pow(x - std::pow(y, 3) + 1, 2);
@@ -97,7 +95,6 @@ main(int argc, char **argv)
       P.block(1, 0).set(0, 0, 1);
       P.block(1, 1).set(0, 0, 2);
       P.compress(VectorOperation::insert);
-      return 0;
     };
 
     VectorType x(2, MPI_COMM_SELF, 1, 1);
@@ -132,19 +129,18 @@ main(int argc, char **argv)
 
     Solver solver;
 
-    solver.residual = [&](const VectorType &X, VectorType &F) -> int {
+    solver.residual = [&](const VectorType &X, VectorType &F) -> void {
       auto x = X.block(0)[0];
       auto y = X.block(1)[0];
 
       F.block(0)[0] = std::pow(x - std::pow(y, 3) + 1, 3) - std::pow(y, 3);
       F.block(1)[0] = x + 2 * y - 3;
       F.compress(VectorOperation::insert);
-      return 0;
     };
 
     FullMatrix<double> Jinv(2, 2);
 
-    solver.setup_jacobian = [&](const VectorType &X) -> int {
+    solver.setup_jacobian = [&](const VectorType &X) -> void {
       auto x    = X.block(0)[0];
       auto y    = X.block(1)[0];
       auto f0_x = 3 * std::pow(x - std::pow(y, 3) + 1, 2);
@@ -156,17 +152,15 @@ main(int argc, char **argv)
       J(1, 0) = 1;
       J(1, 1) = 2;
       Jinv.invert(J);
-      return 0;
     };
 
     solver.solve_with_jacobian = [&](const VectorType &src,
-                                     VectorType &      dst) -> int {
+                                     VectorType &      dst) -> void {
       dst.block(0)[0] =
         Jinv(0, 0) * src.block(0)[0] + Jinv(0, 1) * src.block(1)[0];
       dst.block(1)[0] =
         Jinv(1, 0) * src.block(0)[0] + Jinv(1, 1) * src.block(1)[0];
       dst.compress(VectorOperation::insert);
-      return 0;
     };
 
     VectorType x(2, MPI_COMM_SELF, 1, 1);
@@ -177,6 +171,4 @@ main(int argc, char **argv)
     out << "#   Solution " << x[0] << ", " << x[1] << std::endl;
     out << "#   Iterations " << nit << std::endl;
   }
-
-  return 0;
 }

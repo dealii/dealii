@@ -1,0 +1,20 @@
+
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the Jacobian at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Too large a step. Throwing a recoverable exception.
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    A user call-back function encountered a recoverable error, but the
+    underlying library that called the call-back did not manage to recover
+    from the error and aborted its operation.
+    
+    See the glossary entry on user call-back functions for more
+    information.
+--------------------------------------------------------
+

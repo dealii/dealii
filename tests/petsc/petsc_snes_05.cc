@@ -24,10 +24,12 @@
 #include "../tests.h"
 
 /**
- * Tests exception raise for non convergence.
+ * Find the solution of f(x)=sin(x)=0, which is rather simple to solve, starting
+ * at x=1.
  */
 using VectorType = PETScWrappers::MPI::Vector;
-using Solver     = PETScWrappers::NonlinearSolver<VectorType>;
+using MatrixType = PETScWrappers::MPI::SparseMatrix;
+using Solver     = PETScWrappers::NonlinearSolver<VectorType, MatrixType>;
 using real_type  = Solver::real_type;
 
 int
@@ -38,22 +40,36 @@ main(int argc, char **argv)
 
   {
     PETScWrappers::NonlinearSolverData data;
-    data.maximum_non_linear_iterations = 0;
-
-    Solver solver(data);
+    Solver                             solver(data);
 
     solver.residual = [&](const VectorType &X, VectorType &F) -> void {
-      F.equ(2, X);
+      deallog << "Evaluating the residual at x=" << X(0) << std::endl;
+
+      F(0) = std::sin(X(0));
+      F.compress(VectorOperation::insert);
+    };
+
+    solver.jacobian =
+      [&](const VectorType &X, MatrixType &A, MatrixType &P) -> void {
+      deallog << "Evaluating the Jacobian at x=" << X(0) << std::endl;
+
+      P.set(0, 0, std::cos(X(0)));
+      P.compress(VectorOperation::insert);
+      A.set(0, 0, std::cos(X(0)));
+      A.compress(VectorOperation::insert);
     };
 
     auto       commsize = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
     auto       commrank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-    VectorType x(MPI_COMM_WORLD, 10, commrank == commsize - 1 ? 10 : 0);
-    x = 1.0;
+    VectorType x(MPI_COMM_WORLD, 1, commrank == commsize - 1 ? 1 : 0);
+    x(0) = 1.0;
 
     try
       {
-        auto nit = solver.solve(x);
+        const auto nit = solver.solve(x);
+
+        deallog << "Found the solution x=" << x(0) << " after " << nit
+                << " iterations." << std::endl;
       }
     catch (std::exception &exc)
       {
