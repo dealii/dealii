@@ -21,6 +21,14 @@
 #
 
 macro(strip_known_generator_expressions _variable)
-  string(REGEX REPLACE "^\\$<LINK_ONLY:(.*)>$" "\\1" ${_variable} "${${_variable}}")
+  set(generator_expressions
+    "^\\$<LINK_ONLY:(.*)>$"
+    "^\\$<\\$<LINK_LANGUAGE:CXX>:(.*)>$"
+    "^\\$<\\$<COMPILE_LANGUAGE:CXX>:(.*)>$"
+    )
+
+  foreach(expression ${generator_expressions})
+    string(REGEX REPLACE ${expression} "\\1" ${_variable} "${${_variable}}")
+  endforeach()
 endmacro()
 
