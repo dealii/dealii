@@ -68,6 +68,7 @@ jobs:
     container:
       image: dealii/dependencies:jammy
 
+    steps:
     - name: info
       run: |
         mpicc -v
