@@ -664,6 +664,9 @@ namespace PETScWrappers
   {
     class Vector;
     class BlockVector;
+
+    class SparseMatrix;
+    class BlockSparseMatrix;
   } // namespace MPI
 } // namespace PETScWrappers
 #endif
@@ -823,6 +826,28 @@ namespace concepts
       is_dealii_petsc_vector_type<dealii::PETScWrappers::MPI::BlockVector> =
         true;
 #  endif
+
+
+    /**
+     * A template variable that returns whether the template argument is
+     * a valid deal.II matrix type that is internally built on PETSc
+     * functionality. Its general definition is `false`, with
+     * specializations dealing with actual matrix types for which the
+     * predicate is `true`.
+     */
+    template <typename T>
+    inline constexpr bool is_dealii_petsc_matrix_type = false;
+
+#  ifdef DEAL_II_WITH_PETSC
+    template <>
+    inline constexpr bool
+      is_dealii_petsc_matrix_type<dealii::PETScWrappers::MPI::SparseMatrix> =
+        true;
+
+    template <>
+    inline constexpr bool is_dealii_petsc_matrix_type<
+      dealii::PETScWrappers::MPI::BlockSparseMatrix> = true;
+#  endif
   } // namespace internal
 
 
@@ -867,6 +892,17 @@ namespace concepts
   concept is_dealii_petsc_vector_type =
     internal::is_dealii_petsc_vector_type<VectorType>;
 
+  /**
+   * A concept that tests whether a given template argument is a deal.II
+   * matrix type that internally builds on PETSc functionality. This
+   * concept is used to constrain some classes that implement advanced
+   * functionality based on PETSc and that requires that the matrix
+   * it works on are PETSc matrices. This includes, for example, the
+   * time stepping and nonlinear solver classes in namespace PETScWrappers.
+   */
+  template <typename VectorType>
+  concept is_dealii_petsc_matrix_type =
+    internal::is_dealii_petsc_matrix_type<VectorType>;
 #endif
 } // namespace concepts
 
