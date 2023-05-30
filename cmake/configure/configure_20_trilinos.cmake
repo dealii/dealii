@@ -355,15 +355,6 @@ macro(feature_trilinos_find_external var)
 
     if(${TRILINOS_WITH_SACADO})
       #
-      # Look for Sacado_config.h - we'll query it to determine C++11 support:
-      #
-      deal_ii_find_file(SACADO_CONFIG_H Sacado_config.h
-        HINTS ${Trilinos_INCLUDE_DIRS}
-        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
-        NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
-        )
-
-      #
       # GCC 6.3.0 has a bug that prevents the creation of complex
       # numbers templated on Sacado::Rad::ADvar types:
       #
