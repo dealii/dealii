@@ -480,12 +480,12 @@ namespace LineMinimization
 
   template <typename NumberType>
   NumberType
-  poly_fit_three_points(const NumberType                     x1,
-                        const NumberType                     f1,
-                        const NumberType                     g1,
-                        const NumberType                     x2,
-                        const NumberType                     f2,
-                        const NumberType                     g2,
+  poly_fit_three_points(const NumberType x1,
+                        const NumberType f1,
+                        const NumberType g1,
+                        const NumberType x2,
+                        const NumberType f2,
+                        const NumberType /*g2*/,
                         const FiniteSizeHistory<NumberType> &x_rec,
                         const FiniteSizeHistory<NumberType> &f_rec,
                         const FiniteSizeHistory<NumberType> & /*g_rec*/,

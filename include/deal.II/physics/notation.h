@@ -677,7 +677,7 @@ namespace Physics
 
         template <int dim>
         std::pair<unsigned int, unsigned int>
-        indices_from_component(const unsigned int component_n, const bool)
+        indices_from_component(const unsigned int /*component_n*/, const bool)
         {
           AssertThrow(false, ExcNotImplemented());
           return std::make_pair(0u, 0u);

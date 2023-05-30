@@ -66,8 +66,8 @@ namespace NonMatching
     // Tensor products of each quadrature in q_collection_1d. Used on the
     // non-intersected cells.
     hp::QCollection<dim> q_collection;
-    for (unsigned int i = 0; i < q_collection_1D.size(); ++i)
-      q_collection.push_back(Quadrature<dim>(q_collection_1D[i]));
+    for (const auto &quadrature : q_collection_1D)
+      q_collection.push_back(Quadrature<dim>(quadrature));
 
     initialize(q_collection);
   }
@@ -292,8 +292,8 @@ namespace NonMatching
     // Tensor products of each quadrature in q_collection_1d. Used on the
     // non-intersected cells.
     hp::QCollection<dim - 1> q_collection;
-    for (unsigned int i = 0; i < q_collection_1D.size(); ++i)
-      q_collection.push_back(Quadrature<dim - 1>(q_collection_1D[i]));
+    for (const auto &quadrature : q_collection_1D)
+      q_collection.push_back(quadrature);
 
     initialize(q_collection);
   }

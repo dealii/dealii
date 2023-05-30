@@ -861,8 +861,8 @@ namespace NonMatching
         , low_dim_algorithm(q_collection1D, additional_data)
         , up_through_dimension_creator(q_collection1D, additional_data)
       {
-        for (unsigned int i = 0; i < q_collection1D.size(); ++i)
-          tensor_products.push_back(Quadrature<dim>(q_collection1D[i]));
+        for (const auto &quadrature : q_collection1D)
+          tensor_products.push_back(quadrature);
       }
 
 

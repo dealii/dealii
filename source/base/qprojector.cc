@@ -845,8 +845,8 @@ QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
   else
     {
       AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
-      for (unsigned int i = 0; i < quadrature.size(); ++i)
-        n_points_total += quadrature[i].size();
+      for (const auto &q : quadrature)
+        n_points_total += q.size();
     }
 
   // first fix quadrature points
@@ -1011,8 +1011,8 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
       else
         {
           AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
-          for (unsigned int i = 0; i < quadrature.size(); ++i)
-            n_points_total += quadrature[i].size();
+          for (const auto &q : quadrature)
+            n_points_total += q.size();
         }
 
       n_points_total *= 8;
