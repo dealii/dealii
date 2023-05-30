@@ -115,7 +115,6 @@ main(int argc, char **argv)
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-  // init_cuda(true);
   MPILogInitAll mpi_inilog;
 
   test<2,
