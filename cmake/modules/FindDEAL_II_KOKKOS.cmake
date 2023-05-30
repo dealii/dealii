@@ -38,6 +38,8 @@ else()
     HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
     )
 
+  set(KOKKOS_FOUND ${Kokkos_FOUND})
+
   if(Kokkos_FOUND)
     # We need to disable SIMD vectorization for CUDA device code.
     # Otherwise, nvcc compilers from version 9 on will emit an error message like:
