@@ -67,6 +67,7 @@ jobs:
     runs-on: [ubuntu-22.04]
     container:
       image: dealii/dependencies:jammy
+      options: --user root
 
     steps:
     - name: info
