@@ -67,7 +67,7 @@ jobs:
     runs-on: [ubuntu-22.04]
     container:
       image: dealii/dependencies:jammy
-      options: --user root
+      options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
     - uses: actions/checkout@v3
