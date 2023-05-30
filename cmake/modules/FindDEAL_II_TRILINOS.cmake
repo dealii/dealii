@@ -48,16 +48,7 @@ find_package(TRILINOS_CONFIG
   NO_SYSTEM_ENVIRONMENT_PATH
   )
 
-set(_target Trilinos::all_libs)
-process_feature(TRILINOS
-  TARGETS REQUIRED _target
-  CLEAR
-    EPETRA_CONFIG_H
-    TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
-  )
-
-
-if(TRILINOS_FOUND)
+if(Trilinos_FOUND)
   #
   # Extract version numbers:
   #
@@ -117,3 +108,89 @@ if(TRILINOS_FOUND)
     endif()
   endif()
 endif()
+
+if(TRILINOS_VERSION VERSION_GREATER_EQUAL 14)
+  set(_target Trilinos::all_libs)
+  process_feature(TRILINOS
+    TARGETS REQUIRED _target
+    CLEAR
+      EPETRA_CONFIG_H TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
+    )
+else()
+  #
+  # *Boy* Sanitize variables that are exported by TrilinosConfig.cmake...
+  #
+  # Especially deduplicate stuff...
+  #
+  remove_duplicates(Trilinos_LIBRARIES REVERSE)
+  remove_duplicates(Trilinos_TPL_LIBRARIES REVERSE)
+
+  remove_duplicates(Trilinos_INCLUDE_DIRS)
+  string(REGEX REPLACE
+    "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
+    Trilinos_INCLUDE_DIRS "${Trilinos_INCLUDE_DIRS}"
+    )
+
+  remove_duplicates(Trilinos_TPL_INCLUDE_DIRS)
+
+  if(TARGET Kokkos::kokkos)
+    get_property(KOKKOS_COMPILE_FLAGS_FULL TARGET Kokkos::kokkos PROPERTY INTERFACE_COMPILE_OPTIONS)
+    string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>" "\\1" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS_FULL}")
+    string(REPLACE ";" " " KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
+
+    #
+    # Extract missing openmp linker options from the
+    # "INTERFACE_LINK_LIBRARIES" property of the Kokkos::kokkos target:
+    #
+    set(_kokkos_openmp_flags)
+    get_property(_libraries TARGET Kokkos::kokkos PROPERTY INTERFACE_LINK_LIBRARIES)
+    foreach(_entry ${_libraries})
+      if(${_entry} MATCHES "^-f?openmp")
+        add_flags(_kokkos_openmp_flags "${_entry}")
+      endif()
+    endforeach()
+
+    # Some Kokkos versions included in Trilinos before 13.2.0 add "-x cuda" when 
+    # using clang++ as compiler even if Kokkos has not been configured with Cuda
+    # support. Simply strip that flag from what we are using in that case.
+    if(NOT Kokkos_ENABLE_CUDA)
+      string(REPLACE "-x cuda" "" KOKKOS_COMPILE_FLAGS "${KOKKOS_COMPILE_FLAGS}")
+    endif()
+  endif()
+
+  #
+  # We'd like to have the full library names but the Trilinos package only
+  # exports a list with short names...
+  # So we check again for every lib and store the full path:
+  #
+  set(_libraries "")
+  foreach(_library ${Trilinos_LIBRARIES})
+    list(APPEND _libraries TRILINOS_LIBRARY_${_library})
+    deal_ii_find_library(TRILINOS_LIBRARY_${_library}
+      NAMES ${_library}
+      HINTS ${Trilinos_LIBRARY_DIRS}
+      NO_DEFAULT_PATH
+      NO_CMAKE_ENVIRONMENT_PATH
+      NO_CMAKE_PATH
+      NO_SYSTEM_ENVIRONMENT_PATH
+      NO_CMAKE_SYSTEM_PATH
+      NO_CMAKE_FIND_ROOT_PATH
+      )
+  endforeach()
+
+  process_feature(TRILINOS
+    LIBRARIES
+      REQUIRED ${_libraries}
+      OPTIONAL Trilinos_TPL_LIBRARIES MPI_CXX_LIBRARIES
+    INCLUDE_DIRS
+      REQUIRED Trilinos_INCLUDE_DIRS
+      OPTIONAL Trilinos_TPL_INCLUDE_DIRS
+    CXX_FLAGS
+      OPTIONAL KOKKOS_COMPILE_FLAGS
+    LINKER_FLAGS
+    OPTIONAL Trilinos_EXTRA_LD_FLAGS _kokkos_openmp_flags
+    CLEAR
+      EPETRA_CONFIG_H ${_libraries} TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
+    )
+endif()
+
