@@ -496,15 +496,6 @@ MappingFEField<dim, spacedim, VectorType>::requires_update_flags(
            update_jacobian_pushed_forward_3rd_derivatives))
         out |= update_covariant_transformation;
 
-      // The contravariant transformation
-      // is a Piola transformation, which
-      // requires the determinant of the
-      // Jacobi matrix of the transformation.
-      // Therefore these values have to be
-      // updated for each cell.
-      if (out & update_contravariant_transformation)
-        out |= update_JxW_values;
-
       if (out & update_normal_vectors)
         out |= update_JxW_values;
     }
