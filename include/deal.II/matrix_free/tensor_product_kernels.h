@@ -149,8 +149,8 @@ namespace internal
             int              dim,
             int              n_rows,
             int              n_columns,
+            int              normal_dir,
             typename Number,
-            int normal_dir,
             typename Number2 = Number>
   struct EvaluatorTensorProductAnisotropic
   {};
@@ -2534,15 +2534,15 @@ namespace internal
   template <int dim,
             int n_rows,
             int n_columns,
-            typename Number,
             int normal_dir,
+            typename Number,
             typename Number2>
   struct EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
                                            dim,
                                            n_rows,
                                            n_columns,
-                                           Number,
                                            normal_dir,
+                                           Number,
                                            Number2>
   {
     static constexpr unsigned int n_rows_of_product =
@@ -2666,8 +2666,8 @@ namespace internal
   template <int dim,
             int n_rows,
             int n_columns,
-            typename Number,
             int normal_dir,
+            typename Number,
             typename Number2>
   template <int direction, bool contract_over_rows, bool add, bool one_line>
   inline void
@@ -2676,8 +2676,8 @@ namespace internal
     dim,
     n_rows,
     n_columns,
-    Number,
     normal_dir,
+    Number,
     Number2>::apply(const Number2 *DEAL_II_RESTRICT shape_data,
                     const Number *                  in,
                     Number *                        out)
@@ -2759,8 +2759,8 @@ namespace internal
   template <int dim,
             int n_rows,
             int n_columns,
-            typename Number,
             int normal_dir,
+            typename Number,
             typename Number2>
   template <int  face_direction,
             bool contract_onto_face,
@@ -2772,8 +2772,8 @@ namespace internal
     dim,
     n_rows,
     n_columns,
-    Number,
     normal_dir,
+    Number,
     Number2>::apply_face(const Number *DEAL_II_RESTRICT in,
                          Number *DEAL_II_RESTRICT       out) const
   {
