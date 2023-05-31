@@ -35,9 +35,6 @@
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <Kokkos_Core.hpp>
-#ifdef DEAL_II_WITH_CUDA
-#  include <cuda_runtime_api.h>
-#endif
 
 #include <cmath>
 #include <functional>
