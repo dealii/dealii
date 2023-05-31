@@ -3043,7 +3043,7 @@ namespace internal
             typename Number2,
             typename Number,
             int  n_values    = 1,
-            bool no_renumber = false>
+            bool do_renumber = true>
   inline
 #ifndef DEBUG
     DEAL_II_ALWAYS_INLINE
@@ -3079,17 +3079,7 @@ namespace internal
 
         // Distinguish the inner loop based on whether we have a
         // renumbering or not
-        if (no_renumber || renumber.empty())
-          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-            {
-              // gradient
-              inner_result[0] += shapes[i0][1][0] * values[i];
-              // values
-              inner_result[1] += shapes[i0][0][0] * values[i];
-              if (n_values > 1)
-                inner_result[2] += shapes[i0][0][0] * values_2[i];
-            }
-        else
+        if (do_renumber && !renumber.empty())
           for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
             {
               // gradient
@@ -3098,6 +3088,16 @@ namespace internal
               inner_result[1] += shapes[i0][0][0] * values[renumber[i]];
               if (n_values > 1)
                 inner_result[2] += shapes[i0][0][0] * values_2[renumber[i]];
+            }
+        else
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            {
+              // gradient
+              inner_result[0] += shapes[i0][1][0] * values[i];
+              // values
+              inner_result[1] += shapes[i0][0][0] * values[i];
+              if (n_values > 1)
+                inner_result[2] += shapes[i0][0][0] * values_2[i];
             }
 
         if (dim > 1)
@@ -3134,7 +3134,7 @@ namespace internal
             typename Number,
             typename Number2,
             int  n_values    = 1,
-            bool no_renumber = false>
+            bool do_renumber = true>
   inline std::array<typename ProductTypeNoPoint<Number, Number2>::type,
                     dim + n_values>
   evaluate_tensor_product_value_and_gradient_shapes(
@@ -3170,27 +3170,27 @@ namespace internal
         // cases
         if (n_shapes == 2)
           inner_result =
-            do_interpolate_xy<dim, 2, Number2, Number, n_values, no_renumber>(
+            do_interpolate_xy<dim, 2, Number2, Number, n_values, do_renumber>(
               values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 3)
           inner_result =
-            do_interpolate_xy<dim, 3, Number2, Number, n_values, no_renumber>(
+            do_interpolate_xy<dim, 3, Number2, Number, n_values, do_renumber>(
               values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 4)
           inner_result =
-            do_interpolate_xy<dim, 4, Number2, Number, n_values, no_renumber>(
+            do_interpolate_xy<dim, 4, Number2, Number, n_values, do_renumber>(
               values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 5)
           inner_result =
-            do_interpolate_xy<dim, 5, Number2, Number, n_values, no_renumber>(
+            do_interpolate_xy<dim, 5, Number2, Number, n_values, do_renumber>(
               values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 6)
           inner_result =
-            do_interpolate_xy<dim, 6, Number2, Number, n_values, no_renumber>(
+            do_interpolate_xy<dim, 6, Number2, Number, n_values, do_renumber>(
               values, renumber, shapes, n_shapes, i);
         else
           inner_result =
-            do_interpolate_xy<dim, -1, Number2, Number, n_values, no_renumber>(
+            do_interpolate_xy<dim, -1, Number2, Number, n_values, do_renumber>(
               values, renumber, shapes, n_shapes, i);
         if (dim == 3)
           {
