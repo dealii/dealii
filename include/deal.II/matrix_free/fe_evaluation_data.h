@@ -1659,6 +1659,8 @@ namespace internal
                              const VectorOfArrayType &         array,
                              ArrayType &                       out)
   {
+    AssertDimension(indices.size(), out.size());
+    AssertDimension(indices.size(), array[0].size());
     // set all entries in array to a valid element
     int index = 0;
     for (; index < N; ++index)
