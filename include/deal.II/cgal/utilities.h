@@ -594,6 +594,25 @@ namespace CGALWrappers
   }
 
 
+
+  /**
+   * Resort vertices in deal.II order to vertices in CGAL order.
+   *
+   * @param structdim Dimension of the entity which is described by the vertices.
+   * @param vertices Vertices in deal.II order which are resorted to CGAL order.
+   */
+  template <int spacedim>
+  void
+  resort_dealii_vertices_to_cgal_order(const unsigned int            structdim,
+                                       std::vector<Point<spacedim>> &vertices)
+  {
+    if (ReferenceCell::n_vertices_to_type(structdim, vertices.size()) ==
+        ReferenceCells::Quadrilateral)
+      std::swap(vertices[2], vertices[3]);
+  }
+
+
+
   /**
    * Get vertices of cell in CGAL ordering.
    *
@@ -618,12 +637,12 @@ namespace CGALWrappers
                 n_vertices,
                 ordered_vertices.begin());
 
-    if (ReferenceCell::n_vertices_to_type(dim, n_vertices) ==
-        ReferenceCells::Quadrilateral)
-      std::swap(ordered_vertices[2], ordered_vertices[3]);
+    resort_dealii_vertices_to_cgal_order(dim, ordered_vertices);
 
     return ordered_vertices;
   }
+
+
 
   /**
    * Get vertices of face in CGAL ordering
@@ -652,9 +671,7 @@ namespace CGALWrappers
                 n_vertices,
                 ordered_vertices.begin());
 
-    if (ReferenceCell::n_vertices_to_type(dim - 1, n_vertices) ==
-        ReferenceCells::Quadrilateral)
-      std::swap(ordered_vertices[2], ordered_vertices[3]);
+    resort_dealii_vertices_to_cgal_order(dim - 1, ordered_vertices);
 
     return ordered_vertices;
   }

@@ -20,6 +20,11 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 
+#ifdef DEAL_II_WITH_CGAL
+#  include <deal.II/cgal/intersections.h>
+#  include <deal.II/cgal/utilities.h>
+#endif
+
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/shared_tria.h>
@@ -6155,6 +6160,7 @@ namespace GridTools
     }
 
 
+
     template <int dim, int spacedim>
     DistributedComputePointLocationsInternal<dim, spacedim>
     distributed_compute_point_locations(
@@ -6316,6 +6322,474 @@ namespace GridTools
 
       return result;
     }
+
+
+
+    template <int structdim, int spacedim>
+    template <int dim>
+    DistributedComputePointLocationsInternal<dim, spacedim>
+    DistributedComputeIntersectionLocationsInternal<structdim, spacedim>::
+      convert_to_distributed_compute_point_locations_internal(
+        const unsigned int                  n_quadrature_points,
+        const Triangulation<dim, spacedim> &tria,
+        const Mapping<dim, spacedim> &      mapping,
+        const bool consistent_numbering_of_sender_and_receiver) const
+    {
+      using CellIterator =
+        typename Triangulation<dim, spacedim>::active_cell_iterator;
+
+      GridTools::internal::DistributedComputePointLocationsInternal<dim,
+                                                                    spacedim>
+        result;
+
+      // We need quadrature rules for the intersections. We are using a
+      // QGaussSimplex quadrature rule since CGAL always returns simplices
+      // as intersections.
+      const QGaussSimplex<structdim> quadrature(n_quadrature_points);
+
+      // Resulting quadrature points get different indices. In the case the
+      // requested intersections are unique also the resulting quadrature
+      // points are unique and we can simply number the points in an
+      // ascending way.
+      for (auto const &recv_component : recv_components)
+        {
+          // dependent on the size of the intersection an empty quadrature
+          // is returned. Therefore, we have to compute the quadrature also
+          // here.
+          const Quadrature<spacedim> &quad =
+            quadrature.compute_affine_transformation(
+              std::get<2>(recv_component));
+
+          for (unsigned int i = 0; i < quad.size(); ++i)
+            {
+              // the third component of result.recv_components is not needed
+              // before finalize_setup.
+              result.recv_components.emplace_back(
+                std::get<0>(recv_component),
+                result.recv_components.size(), // number of point
+                numbers::invalid_unsigned_int);
+            }
+        }
+
+      // since empty quadratures might be present we have to set the number
+      // of searched points after inserting the point indices into
+      // recv_components
+      result.n_searched_points = result.recv_components.size();
+
+      // send_ranks, counter, and indices_of_rank is only needed if
+      // consistent_numbering_of_sender_and_receiver==true
+      // indices_of_rank is always empty if deal.II is compiled without MPI
+      std::map<unsigned int, std::vector<unsigned int>> indices_of_rank;
+      std::map<unsigned int, unsigned int>              counter;
+      std::set<unsigned int>                            send_ranks;
+      if (consistent_numbering_of_sender_and_receiver)
+        {
+          for (const auto &sc : send_components)
+            send_ranks.insert(std::get<1>(sc));
+
+          for (const auto rank : send_ranks)
+            counter[rank] = 0;
+
+          // indices assigned at recv side needed to fill send_components
+          indices_of_rank = communicate_indices(result.recv_components,
+                                                tria.get_communicator());
+        }
+
+      for (const auto &send_component : send_components)
+        {
+          const CellIterator cell(&tria,
+                                  std::get<0>(send_component).first,
+                                  std::get<0>(send_component).second);
+
+          const Quadrature<spacedim> &quad =
+            quadrature.compute_affine_transformation(
+              std::get<3>(send_component));
+
+          const auto rank = std::get<1>(send_component);
+
+          for (unsigned int q = 0; q < quad.size(); ++q)
+            {
+              // the fifth component of result.send_components is filled
+              // during sorting the data and initializing the CRS structures
+              result.send_components.emplace_back(std::make_tuple(
+                std::get<0>(send_component),
+                rank,
+                indices_of_rank.empty() ?
+                  result.send_components.size() :
+                  indices_of_rank.at(rank)[counter.at(rank)],
+                mapping.transform_real_to_unit_cell(cell, quad.point(q)),
+                quad.point(q),
+                numbers::invalid_unsigned_int));
+
+              if (!indices_of_rank.empty())
+                ++counter[rank];
+            }
+        }
+
+      result.finalize_setup();
+
+      return result;
+    }
+
+
+
+    template <int structdim, int spacedim>
+    std::map<unsigned int, std::vector<unsigned int>>
+    DistributedComputeIntersectionLocationsInternal<structdim, spacedim>::
+      communicate_indices(
+        const std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>
+          &            point_recv_components,
+        const MPI_Comm comm) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      Assert(false, ExcNeedsMPI());
+      (void)point_recv_components;
+      (void)comm;
+      return {};
+#else
+      // since we are converting to DistributedComputePointLocationsInternal
+      // we use the RPE tag
+      const auto mpi_tag =
+        Utilities::MPI::internal::Tags::remote_point_evaluation;
+
+      const unsigned int my_rank = Utilities::MPI::this_mpi_process(comm);
+
+      std::set<unsigned int> send_ranks;
+      for (const auto &sc : send_components)
+        send_ranks.insert(std::get<1>(sc));
+      std::set<unsigned int> recv_ranks;
+      for (const auto &rc : recv_components)
+        recv_ranks.insert(std::get<0>(rc));
+
+      std::vector<MPI_Request> requests;
+      requests.reserve(send_ranks.size());
+
+      // rank to used indices on the rank needed on sending side
+      std::map<unsigned int, std::vector<unsigned int>> indices_of_rank;
+      indices_of_rank[my_rank] = std::vector<unsigned int>();
+
+      // rank to used indices on the rank known on recv side
+      std::map<unsigned int, std::vector<unsigned int>> send_indices_of_rank;
+      for (const auto rank : recv_ranks)
+        if (rank != my_rank)
+          send_indices_of_rank[rank] = std::vector<unsigned int>();
+
+      // fill the maps
+      for (const auto &point_recv_component : point_recv_components)
+        {
+          const auto rank = std::get<0>(point_recv_component);
+          const auto idx  = std::get<1>(point_recv_component);
+
+          if (rank == my_rank)
+            indices_of_rank[rank].emplace_back(idx);
+          else
+            send_indices_of_rank[rank].emplace_back(idx);
+        }
+
+      // send indices to the ranks we normally receive from
+      for (const auto rank : recv_ranks)
+        {
+          if (rank == my_rank)
+            continue;
+
+          auto buffer = Utilities::pack(send_indices_of_rank[rank], false);
+
+          requests.push_back(MPI_Request());
+
+          const int ierr = MPI_Isend(buffer.data(),
+                                     buffer.size(),
+                                     MPI_CHAR,
+                                     rank,
+                                     mpi_tag,
+                                     comm,
+                                     &requests.back());
+          AssertThrowMPI(ierr);
+        }
+
+      // receive indices at the ranks we normally send from
+      for (const auto rank : send_ranks)
+        {
+          if (rank == my_rank)
+            continue;
+
+          MPI_Status status;
+          int        ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
+          AssertThrowMPI(ierr);
+
+          int message_length;
+          ierr = MPI_Get_count(&status, MPI_CHAR, &message_length);
+          AssertThrowMPI(ierr);
+
+          std::vector<char> buffer(message_length);
+
+          ierr = MPI_Recv(buffer.data(),
+                          buffer.size(),
+                          MPI_CHAR,
+                          status.MPI_SOURCE,
+                          mpi_tag,
+                          comm,
+                          MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+
+          indices_of_rank[status.MPI_SOURCE] =
+            Utilities::unpack<std::vector<unsigned int>>(buffer, false);
+        }
+
+      // make sure all messages have been sent
+      const int ierr =
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
+
+      return indices_of_rank;
+#endif
+    }
+
+
+
+    template <int structdim, int dim, int spacedim>
+    DistributedComputeIntersectionLocationsInternal<structdim, spacedim>
+    distributed_compute_intersection_locations(
+      const Cache<dim, spacedim> &                     cache,
+      const std::vector<std::vector<Point<spacedim>>> &intersection_requests,
+      const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+      const std::vector<bool> &                              marked_vertices,
+      const double                                           tolerance)
+    {
+      using IntersectionRequest = std::vector<Point<spacedim>>;
+
+      using IntersectionAnswer =
+        typename DistributedComputeIntersectionLocationsInternal<
+          structdim,
+          spacedim>::IntersectionType;
+
+      const auto comm = cache.get_triangulation().get_communicator();
+
+      DistributedComputeIntersectionLocationsInternal<structdim, spacedim>
+        result;
+
+      auto &send_components = result.send_components;
+      auto &recv_components = result.recv_components;
+      auto &recv_ptrs       = result.recv_ptrs;
+
+      // search for potential owners
+      const auto potential_owners = internal::guess_owners_of_entities(
+        comm, global_bboxes, intersection_requests, tolerance);
+
+      const auto &potential_owners_ranks   = std::get<0>(potential_owners);
+      const auto &potential_owners_ptrs    = std::get<1>(potential_owners);
+      const auto &potential_owners_indices = std::get<2>(potential_owners);
+
+      const auto translate = [&](const unsigned int other_rank) {
+        const auto ptr = std::find(potential_owners_ranks.begin(),
+                                   potential_owners_ranks.end(),
+                                   other_rank);
+
+        Assert(ptr != potential_owners_ranks.end(), ExcInternalError());
+
+        const auto other_rank_index =
+          std::distance(potential_owners_ranks.begin(), ptr);
+
+        return other_rank_index;
+      };
+
+      Assert(
+        (marked_vertices.size() == 0) ||
+          (marked_vertices.size() == cache.get_triangulation().n_vertices()),
+        ExcMessage(
+          "The marked_vertices vector has to be either empty or its size has "
+          "to equal the number of vertices of the triangulation."));
+
+      // In the case that a marked_vertices vector has been given and none
+      // of its entries is true, we know that this process does not own
+      // any of the incoming points (and it will not send any data) so
+      // that we can take a short cut.
+      const bool has_relevant_vertices =
+        (marked_vertices.size() == 0) ||
+        (std::find(marked_vertices.begin(), marked_vertices.end(), true) !=
+         marked_vertices.end());
+
+      // intersection between two cells:
+      // One rank requests all intersections of owning cell:
+      // owning cell index, cgal vertices of cell
+      using RequestType =
+        std::vector<std::pair<unsigned int, IntersectionRequest>>;
+      // Other ranks send back all found intersections for requesting cell:
+      // requesting cell index, cgal vertices of found intersections
+      using AnswerType =
+        std::vector<std::pair<unsigned int, IntersectionAnswer>>;
+
+      const auto create_request = [&](const unsigned int other_rank) {
+        const auto other_rank_index = translate(other_rank);
+
+        RequestType request;
+        request.reserve(potential_owners_ptrs[other_rank_index + 1] -
+                        potential_owners_ptrs[other_rank_index]);
+
+        for (unsigned int i = potential_owners_ptrs[other_rank_index];
+             i < potential_owners_ptrs[other_rank_index + 1];
+             ++i)
+          request.emplace_back(
+            potential_owners_indices[i],
+            intersection_requests[potential_owners_indices[i]]);
+
+        return request;
+      };
+
+
+      // TODO: this is potentially useful in many cases and it would be nice to
+      // have cache.get_locally_owned_cell_bounding_boxes_rtree(marked_vertices)
+      const auto construct_locally_owned_cell_bounding_boxes_rtree =
+        [&cache](const std::vector<bool> &marked_verts) {
+          const auto cell_marked = [&marked_verts](const auto &cell) {
+            for (const unsigned int v : cell->vertex_indices())
+              if (marked_verts[cell->vertex_index(v)])
+                return true;
+            return false;
+          };
+
+          const auto &boxes_and_cells =
+            cache.get_locally_owned_cell_bounding_boxes_rtree();
+
+          if (marked_verts.size() == 0)
+            return boxes_and_cells;
+
+          std::vector<std::pair<
+            BoundingBox<spacedim>,
+            typename Triangulation<dim, spacedim>::active_cell_iterator>>
+            potential_boxes_and_cells;
+
+          for (const auto &box_and_cell : boxes_and_cells)
+            if (cell_marked(box_and_cell.second))
+              potential_boxes_and_cells.emplace_back(box_and_cell);
+
+          return pack_rtree(potential_boxes_and_cells);
+        };
+
+
+      RTree<
+        std::pair<BoundingBox<spacedim>,
+                  typename Triangulation<dim, spacedim>::active_cell_iterator>>
+        marked_cell_tree;
+
+      const auto answer_request =
+        [&](const unsigned int &other_rank,
+            const RequestType & request) -> AnswerType {
+        AnswerType answer;
+
+        if (has_relevant_vertices)
+          {
+            if (marked_cell_tree.empty())
+              {
+                marked_cell_tree =
+                  construct_locally_owned_cell_bounding_boxes_rtree(
+                    marked_vertices);
+              }
+
+            // process requests
+            for (unsigned int i = 0; i < request.size(); ++i)
+              {
+                // create a bounding box with tolerance
+                const auto bb = BoundingBox<spacedim>(request[i].second)
+                                  .create_extended(tolerance);
+
+                for (const auto &box_cell :
+                     marked_cell_tree |
+                       boost::geometry::index::adaptors::queried(
+                         boost::geometry::index::intersects(bb)))
+                  {
+#ifdef DEAL_II_WITH_CGAL
+                    const auto &cell                   = box_cell.second;
+                    const auto &request_index          = request[i].first;
+                    auto        requested_intersection = request[i].second;
+                    CGALWrappers::resort_dealii_vertices_to_cgal_order(
+                      structdim, requested_intersection);
+
+                    auto const &try_intersection =
+                      CGALWrappers::get_vertices_in_cgal_order(
+                        cell, cache.get_mapping());
+
+                    const auto &found_intersections = CGALWrappers::
+                      compute_intersection_of_cells<dim, structdim, spacedim>(
+                        try_intersection, requested_intersection, tolerance);
+
+                    if (found_intersections.size() > 0)
+                      {
+                        for (const auto &found_intersection :
+                             found_intersections)
+                          {
+                            answer.emplace_back(request_index,
+                                                found_intersection);
+
+                            send_components.emplace_back(
+                              std::make_pair(cell->level(), cell->index()),
+                              other_rank,
+                              request_index,
+                              found_intersection);
+                          }
+                      }
+#else
+                    (void)other_rank;
+                    (void)box_cell;
+                    Assert(false, ExcNeedsCGAL());
+#endif
+                  }
+              }
+          }
+
+        return answer;
+      };
+
+      const auto process_answer = [&](const unsigned int other_rank,
+                                      const AnswerType & answer) {
+        for (unsigned int i = 0; i < answer.size(); ++i)
+          recv_components.emplace_back(other_rank,
+                                       answer[i].first,
+                                       answer[i].second);
+      };
+
+      Utilities::MPI::ConsensusAlgorithms::selector<RequestType, AnswerType>(
+        potential_owners_ranks,
+        create_request,
+        answer_request,
+        process_answer,
+        comm);
+
+      // sort according to 1) intersection index and 2) rank (keeping the order
+      // of recv components with same indices and ranks)
+      std::stable_sort(recv_components.begin(),
+                       recv_components.end(),
+                       [&](const auto &a, const auto &b) {
+                         // intersecton index
+                         if (std::get<1>(a) != std::get<1>(b))
+                           return std::get<1>(a) < std::get<1>(b);
+
+                         // rank
+                         return std::get<0>(a) < std::get<0>(b);
+                       });
+
+      // sort according to 1) rank and 2) intersection index (keeping the
+      // order of recv components with same indices and ranks)
+      std::stable_sort(send_components.begin(),
+                       send_components.end(),
+                       [&](const auto &a, const auto &b) {
+                         // rank
+                         if (std::get<1>(a) != std::get<1>(b))
+                           return std::get<1>(a) < std::get<1>(b);
+
+                         // intersection idx
+                         return std::get<2>(a) < std::get<2>(b);
+                       });
+
+      // construct recv_ptrs
+      recv_ptrs.assign(intersection_requests.size() + 1, 0);
+      for (const auto &rc : recv_components)
+        ++recv_ptrs[std::get<1>(rc) + 1];
+      for (unsigned int i = 0; i < intersection_requests.size(); ++i)
+        recv_ptrs[i + 1] += recv_ptrs[i];
+
+      return result;
+    }
+
   } // namespace internal
 
 
