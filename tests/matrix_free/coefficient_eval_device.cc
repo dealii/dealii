@@ -84,7 +84,8 @@ public:
   DummyMatrixFree(const CUDAWrappers::MatrixFree<dim, double> &data_in,
                   const unsigned int                           size);
   void
-  eval(LinearAlgebra::CUDAWrappers::Vector<double> &dst) const;
+  eval(LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &dst)
+    const;
 
 private:
   const CUDAWrappers::MatrixFree<dim, double> &data;
@@ -101,10 +102,10 @@ DummyMatrixFree<dim, fe_degree>::DummyMatrixFree(
 template <int dim, int fe_degree>
 void
 DummyMatrixFree<dim, fe_degree>::eval(
-  LinearAlgebra::CUDAWrappers::Vector<double> &dst) const
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &dst) const
 {
-  LinearAlgebra::CUDAWrappers::Vector<double> src(dst);
-  DummyOperator<dim, fe_degree>               dummy_operator;
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> src(dst);
+  DummyOperator<dim, fe_degree> dummy_operator;
   data.cell_loop(dummy_operator, src, dst);
 }
 
@@ -140,11 +141,12 @@ test()
                                      tria.n_active_cells() *
                                        n_q_points_per_cell);
   const unsigned int size = tria.n_active_cells() * n_q_points_per_cell;
-  LinearAlgebra::ReadWriteVector<double>      coef(size);
-  LinearAlgebra::CUDAWrappers::Vector<double> coef_device(size);
+  LinearAlgebra::ReadWriteVector<double>                           coef(size);
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef_device(
+    size);
 
   mf.eval(coef_device);
-  cudaDeviceSynchronize();
+  Kokkos::fence();
   coef.import_elements(coef_device, VectorOperation::insert);
 
   // Computation the host

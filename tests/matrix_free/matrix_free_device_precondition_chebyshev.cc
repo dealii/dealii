@@ -15,13 +15,17 @@
 
 
 
-// same as matrix_vector_10 but using parallel::shared::Triangulation rather
-// than parallel::distributed::Triangulation
+// this tests the correctness of MPI-parallel matrix free matrix-vector
+// products by comparing the result with a Trilinos sparse matrix assembled in
+// the usual way. The mesh is distributed among processors (hypercube) and has
+// both hanging nodes (by randomly refining some cells, so the mesh is going
+// to be different when run with different numbers of processors) and
+// Dirichlet boundary conditions
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -33,6 +37,7 @@
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
@@ -42,7 +47,7 @@
 
 #include "../tests.h"
 
-#include "matrix_vector_mf.h"
+#include "matrix_vector_device_mf.h"
 
 
 
@@ -52,25 +57,24 @@ test()
 {
   using Number = double;
 
-  parallel::shared::Triangulation<dim> tria(
-    MPI_COMM_WORLD,
-    ::Triangulation<dim>::none,
-    false,
-    parallel::shared::Triangulation<dim>::partition_zoltan);
+  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    if (cell->center().norm() < 0.2)
-      cell->set_refine_flag();
+    if (cell->is_locally_owned())
+      if (cell->center().norm() < 0.2)
+        cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   if (dim < 3 && fe_degree < 2)
     tria.refine_global(2);
   else
     tria.refine_global(1);
-  tria.begin(tria.n_levels() - 1)->set_refine_flag();
-  tria.last()->set_refine_flag();
+  if (tria.begin(tria.n_levels() - 1)->is_locally_owned())
+    tria.begin(tria.n_levels() - 1)->set_refine_flag();
+  if (tria.last()->is_locally_owned())
+    tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   cell = tria.begin_active();
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
@@ -78,8 +82,9 @@ test()
       cell                 = tria.begin_active();
       unsigned int counter = 0;
       for (; cell != endc; ++cell, ++counter)
-        if (counter % (7 - i) == 0)
-          cell->set_refine_flag();
+        if (cell->is_locally_owned())
+          if (counter % (7 - i) == 0)
+            cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
@@ -113,14 +118,16 @@ test()
 
   const unsigned int coef_size =
     tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 Number,
-                 LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
+  MatrixFreeTest<
+    dim,
+    fe_degree,
+    Number,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>
     mf(mf_data, coef_size);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev(
+  mf.internal_m = owned_set.size();
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> in_dev(
     owned_set, MPI_COMM_WORLD);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev(
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> out_dev(
     owned_set, MPI_COMM_WORLD);
 
   LinearAlgebra::ReadWriteVector<Number> rw_in(owned_set);
@@ -132,13 +139,6 @@ test()
       rw_in.local_element(i) = random_value<double>();
     }
   in_dev.import_elements(rw_in, VectorOperation::insert);
-  mf.vmult(out_dev, in_dev);
-
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> out_host(
-    owned_set, MPI_COMM_WORLD);
-  LinearAlgebra::ReadWriteVector<Number> rw_out(owned_set);
-  rw_out.import_elements(out_dev, VectorOperation::insert);
-  out_host.import_elements(rw_out, VectorOperation::insert);
 
   // assemble trilinos sparse matrix with
   // (\nabla v, \nabla u) + (v, 10 * u) for
@@ -202,7 +202,50 @@ test()
   }
   sparse_matrix.compress(VectorOperation::add);
 
-  sparse_matrix.vmult(ref, in_host);
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> matrix_diagonal(
+    ref.get_partitioner());
+  for (const auto index : matrix_diagonal.locally_owned_elements())
+    matrix_diagonal[index] = sparse_matrix(index, index);
+
+  using HostPreconditionerType = PreconditionChebyshev<
+    TrilinosWrappers::SparseMatrix,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>;
+  HostPreconditionerType                          precondition_chebyshev_host;
+  typename HostPreconditionerType::AdditionalData host_preconditioner_data;
+  host_preconditioner_data.preconditioner = std::make_shared<DiagonalMatrix<
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>>(
+    matrix_diagonal);
+  host_preconditioner_data.constraints.copy_from(constraints);
+  precondition_chebyshev_host.initialize(sparse_matrix,
+                                         host_preconditioner_data);
+
+  using DevicePreconditionerType = PreconditionChebyshev<
+    MatrixFreeTest<
+      dim,
+      fe_degree,
+      Number,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>;
+  DevicePreconditionerType precondition_chebyshev_device;
+  typename DevicePreconditionerType::AdditionalData device_preconditioner_data;
+  device_preconditioner_data.preconditioner = std::make_shared<DiagonalMatrix<
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>>(
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>(
+      ref.get_partitioner()));
+  device_preconditioner_data.preconditioner->get_vector().import_elements(
+    matrix_diagonal, VectorOperation::insert);
+  device_preconditioner_data.constraints.copy_from(constraints);
+  precondition_chebyshev_device.initialize(mf, device_preconditioner_data);
+
+  precondition_chebyshev_device.vmult(out_dev, in_dev);
+
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> out_host(
+    owned_set, MPI_COMM_WORLD);
+  LinearAlgebra::ReadWriteVector<Number> rw_out(owned_set);
+  rw_out.import_elements(out_dev, VectorOperation::insert);
+  out_host.import_elements(rw_out, VectorOperation::insert);
+
+  precondition_chebyshev_host.vmult(ref, in_host);
   out_host -= ref;
 
   const double diff_norm = out_host.linfty_norm();
@@ -219,8 +262,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

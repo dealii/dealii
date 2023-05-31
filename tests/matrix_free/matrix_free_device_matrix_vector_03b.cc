@@ -25,7 +25,7 @@
 
 #include "../tests.h"
 
-#include "matrix_vector_common.h"
+#include "matrix_vector_device_common.h"
 
 template <int dim, int fe_degree, typename Number>
 void
@@ -68,6 +68,6 @@ test()
   do_test<dim,
           fe_degree,
           Number,
-          LinearAlgebra::CUDAWrappers::Vector<Number>,
+          LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>,
           fe_degree + 1>(dof, constraints, tria.n_active_cells(), true, true);
 }

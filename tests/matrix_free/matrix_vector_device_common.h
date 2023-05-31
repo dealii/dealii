@@ -47,7 +47,7 @@
 #include "../tests.h"
 
 #include "Kokkos_Core.hpp"
-#include "matrix_vector_mf.h"
+#include "matrix_vector_device_mf.h"
 
 
 // forward declare this function. will be implemented in .cc files
@@ -116,7 +116,7 @@ do_test(const DoFHandler<dim> &          dof,
 
   in_device.import_elements(in, VectorOperation::insert);
   mf.vmult(out_device, in_device);
-  cudaDeviceSynchronize();
+  Kokkos::fence();
   out.import_elements(out_device, VectorOperation::insert);
 
   // assemble sparse matrix with (\nabla v, \nabla u) + (v, 10 * u)
@@ -196,8 +196,6 @@ main()
   deallog << std::setprecision(3);
 
   Kokkos::initialize();
-
-  init_cuda();
 
   {
     deallog.push("double");

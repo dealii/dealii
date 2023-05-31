@@ -40,7 +40,7 @@
 
 #include "../tests.h"
 
-#include "matrix_vector_mf.h"
+#include "matrix_vector_device_mf.h"
 
 
 
@@ -120,13 +120,14 @@ test()
 
   const unsigned int coef_size =
     tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);
-  MatrixFreeTest<dim,
-                 fe_degree,
-                 Number,
-                 LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
+  MatrixFreeTest<
+    dim,
+    fe_degree,
+    Number,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>
     mf(mf_data, coef_size);
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev;
-  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev;
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> in_dev;
+  LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> out_dev;
   mf_data.initialize_dof_vector(in_dev);
   mf_data.initialize_dof_vector(out_dev);
 
@@ -226,8 +227,6 @@ main(int argc, char **argv)
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
-
-  init_cuda(true);
 
   if (myid == 0)
     {

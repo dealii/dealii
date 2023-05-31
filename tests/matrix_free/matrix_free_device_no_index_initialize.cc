@@ -83,15 +83,12 @@ public:
   void
   test() const
   {
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> dst_dummy;
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> src_dummy;
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> dst_dummy;
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> src_dummy;
 
     data.cell_loop(*this, src_dummy, dst_dummy);
 
-    // Check that the kernel was launched correctly
-    AssertCuda(cudaPeekAtLastError());
-    // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
+    Kokkos::fence();
 
     deallog << "OK" << std::endl;
   };
@@ -160,7 +157,6 @@ main()
   initlog();
 
   Kokkos::initialize();
-  init_cuda();
 
   test<2, 1>();
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,21 +8,21 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
 
-
-
 // this function tests the correctness of the implementation of matrix free
 // matrix-vector products by comparing with the result of deal.II sparse
-// matrix. The mesh uses a hypercube mesh with no hanging nodes and no other
-// constraints
+// matrix. The mesh uses a hypercube mesh with no hanging nodes, but with zero
+// Dirichlet conditions.
+
+#include <deal.II/base/function.h>
 
 #include "../tests.h"
 
-#include "matrix_vector_common.h"
+#include "matrix_vector_device_common.h"
 
 template <int dim, int fe_degree, typename Number>
 void
@@ -36,11 +36,15 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   AffineConstraints<Number> constraints;
+  VectorTools::interpolate_boundary_values(dof,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
+                                           constraints);
   constraints.close();
 
   do_test<dim,
           fe_degree,
           Number,
-          LinearAlgebra::CUDAWrappers::Vector<Number>,
+          LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>,
           fe_degree + 1>(dof, constraints, tria.n_active_cells());
 }

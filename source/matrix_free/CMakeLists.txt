@@ -14,6 +14,7 @@
 ## ---------------------------------------------------------------------
 
 set(_src
+  cuda_matrix_free.cc
   dof_info.cc
   evaluation_template_factory.cc
   evaluation_template_factory_inst2.cc
@@ -51,16 +52,6 @@ set(_inst
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
-
-if(DEAL_II_WITH_CUDA)
-  set(_src
-    cuda_matrix_free.cc
-    ${_src}
-    )
-  set(_inst
-    ${_inst}
-    )
-endif()
 
 define_object_library(object_matrix_free OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_matrix_free "${_inst}")

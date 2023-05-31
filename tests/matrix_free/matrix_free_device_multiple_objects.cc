@@ -44,24 +44,27 @@
 #include "../tests.h"
 
 #include "Kokkos_Core.hpp"
-#include "matrix_vector_mf.h"
+#include "matrix_vector_device_mf.h"
 
 template <int fe_degree, int n_q_points_1d>
 void
-do_test(const DoFHandler<2> &            dof,
-        MatrixFreeTest<2,
-                       fe_degree,
-                       double,
-                       LinearAlgebra::CUDAWrappers::Vector<double>,
-                       n_q_points_1d> &  mf,
+do_test(const DoFHandler<2> &dof,
+        MatrixFreeTest<
+          2,
+          fe_degree,
+          double,
+          LinearAlgebra::distributed::Vector<double, MemorySpace::Default>,
+          n_q_points_1d> &               mf,
         unsigned int                     n_dofs,
         MappingQ<2> &                    mapping,
         const AffineConstraints<double> &constraints)
 {
-  Vector<double>                              in_host(n_dofs), out_host(n_dofs);
-  LinearAlgebra::ReadWriteVector<double>      in(n_dofs), out(n_dofs);
-  LinearAlgebra::CUDAWrappers::Vector<double> in_device(n_dofs);
-  LinearAlgebra::CUDAWrappers::Vector<double> out_device(n_dofs);
+  Vector<double>                         in_host(n_dofs), out_host(n_dofs);
+  LinearAlgebra::ReadWriteVector<double> in(n_dofs), out(n_dofs);
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> in_device(
+    n_dofs);
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> out_device(
+    n_dofs);
 
   for (unsigned int i = 0; i < n_dofs; ++i)
     {
@@ -73,7 +76,7 @@ do_test(const DoFHandler<2> &            dof,
 
   in_device.import_elements(in, VectorOperation::insert);
   mf.vmult(out_device, in_device);
-  cudaDeviceSynchronize();
+  Kokkos::fence();
   out.import_elements(out_device, VectorOperation::insert);
 
   // assemble sparse matrix with (\nabla v, \nabla u) + (v, 10 * u)
@@ -149,7 +152,6 @@ main()
   deallog << std::setprecision(3);
 
   Kokkos::initialize();
-  init_cuda();
 
   {
     Triangulation<2> tria;
@@ -174,11 +176,12 @@ main()
     const QGauss<1> quad_1(n_q_points_1d_1);
     mf_data_1.reinit(mapping_1, dof_1, constraints, quad_1, additional_data_1);
     const unsigned int n_dofs_1 = dof_1.n_dofs();
-    MatrixFreeTest<2,
-                   fe_degree_1,
-                   double,
-                   LinearAlgebra::CUDAWrappers::Vector<double>,
-                   n_q_points_1d_1>
+    MatrixFreeTest<
+      2,
+      fe_degree_1,
+      double,
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>,
+      n_q_points_1d_1>
       mf_1(mf_data_1,
            n_dofs_1 * std::pow(n_q_points_1d_1, 2),
            constant_coefficient);
@@ -198,11 +201,12 @@ main()
     const QGauss<1> quad_2(n_q_points_1d_2);
     mf_data_2.reinit(mapping_2, dof_2, constraints, quad_2, additional_data_2);
     const unsigned int n_dofs_2 = dof_2.n_dofs();
-    MatrixFreeTest<2,
-                   fe_degree_2,
-                   double,
-                   LinearAlgebra::CUDAWrappers::Vector<double>,
-                   n_q_points_1d_2>
+    MatrixFreeTest<
+      2,
+      fe_degree_2,
+      double,
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>,
+      n_q_points_1d_2>
       mf_2(mf_data_2,
            n_dofs_2 * std::pow(n_q_points_1d_2, 2),
            constant_coefficient);

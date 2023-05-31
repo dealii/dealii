@@ -172,8 +172,9 @@ VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::operator()(
 template <int dim,
           int fe_degree,
           typename Number,
-          typename VectorType = LinearAlgebra::CUDAWrappers::Vector<Number>,
-          int n_q_points_1d   = fe_degree + 1>
+          typename VectorType =
+            LinearAlgebra::distributed::Vector<double, MemorySpace::Default>,
+          int n_q_points_1d = fe_degree + 1>
 class MatrixFreeTest : public Subscriptor
 {
 public:
@@ -196,8 +197,8 @@ public:
   types::global_dof_index internal_m;
 
 private:
-  const CUDAWrappers::MatrixFree<dim, Number> &data;
-  LinearAlgebra::CUDAWrappers::Vector<Number>  coef;
+  const CUDAWrappers::MatrixFree<dim, Number> &                    data;
+  LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef;
 };
 
 template <int dim,
