@@ -792,6 +792,13 @@ private:
    * rank.
    */
   std::vector<unsigned int> level_dof_indices_fine;
+
+  /**
+   * CRS like structure which points to DoFs associated with the same support
+   * point. The vector stays empty if only one DoF corresponds to one support
+   * point.
+   */
+  std::vector<unsigned int> level_dof_indices_fine_ptrs;
 };
 
 
