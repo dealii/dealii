@@ -53,9 +53,9 @@ namespace PETScWrappers
      */
     template <typename F, typename... Args>
     int
-    call_and_possibly_capture_exception(const F &           f,
-                                        std::exception_ptr &eptr,
-                                        Args &&...args)
+    call_and_possibly_capture_ts_exception(const F &           f,
+                                           std::exception_ptr &eptr,
+                                           Args &&...args)
     {
       // See whether there is already something in the exception pointer
       // variable. There is no reason why this should be so, and
@@ -371,12 +371,12 @@ namespace PETScWrappers
       VectorType xdotdealii(xdot);
       VectorType fdealii(f);
       const int  err =
-        call_and_possibly_capture_exception(user->implicit_function,
-                                            user->pending_exception,
-                                            t,
-                                            xdealii,
-                                            xdotdealii,
-                                            fdealii);
+        call_and_possibly_capture_ts_exception(user->implicit_function,
+                                               user->pending_exception,
+                                               t,
+                                               xdealii,
+                                               xdotdealii,
+                                               fdealii);
       petsc_increment_state_counter(f);
       PetscFunctionReturn(err);
     };
@@ -393,14 +393,14 @@ namespace PETScWrappers
       PMatrixType Pdealii(P);
 
       const int err =
-        call_and_possibly_capture_exception(user->implicit_jacobian,
-                                            user->pending_exception,
-                                            t,
-                                            xdealii,
-                                            xdotdealii,
-                                            s,
-                                            Adealii,
-                                            Pdealii);
+        call_and_possibly_capture_ts_exception(user->implicit_jacobian,
+                                               user->pending_exception,
+                                               t,
+                                               xdealii,
+                                               xdotdealii,
+                                               s,
+                                               Adealii,
+                                               Pdealii);
 
       petsc_increment_state_counter(P);
 
@@ -434,12 +434,12 @@ namespace PETScWrappers
       user->A = &Adealii;
       user->P = &Pdealii;
       const int err =
-        call_and_possibly_capture_exception(user->setup_jacobian,
-                                            user->pending_exception,
-                                            t,
-                                            xdealii,
-                                            xdotdealii,
-                                            s);
+        call_and_possibly_capture_ts_exception(user->setup_jacobian,
+                                               user->pending_exception,
+                                               t,
+                                               xdealii,
+                                               xdotdealii,
+                                               s);
 
       petsc_increment_state_counter(P);
 
@@ -479,7 +479,7 @@ namespace PETScWrappers
       VectorType xdealii(x);
       VectorType fdealii(f);
 
-      const int err = call_and_possibly_capture_exception(
+      const int err = call_and_possibly_capture_ts_exception(
         user->explicit_function, user->pending_exception, t, xdealii, fdealii);
       petsc_increment_state_counter(f);
       PetscFunctionReturn(err);
@@ -495,12 +495,12 @@ namespace PETScWrappers
       PMatrixType Pdealii(P);
 
       const int err =
-        call_and_possibly_capture_exception(user->explicit_jacobian,
-                                            user->pending_exception,
-                                            t,
-                                            xdealii,
-                                            Adealii,
-                                            Pdealii);
+        call_and_possibly_capture_ts_exception(user->explicit_jacobian,
+                                               user->pending_exception,
+                                               t,
+                                               xdealii,
+                                               Adealii,
+                                               Pdealii);
 
       petsc_increment_state_counter(P);
 
@@ -536,7 +536,7 @@ namespace PETScWrappers
       auto user = static_cast<TimeStepper *>(ctx);
 
       VectorType xdealii(x);
-      const int  err = call_and_possibly_capture_exception(
+      const int  err = call_and_possibly_capture_ts_exception(
         user->monitor, user->pending_exception, t, xdealii, it);
       PetscFunctionReturn(err);
     };
@@ -628,10 +628,10 @@ namespace PETScWrappers
         precond.vmult = [&](VectorBase &indst, const VectorBase &insrc) -> int {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
-          return call_and_possibly_capture_exception(solve_with_jacobian,
-                                                     pending_exception,
-                                                     src,
-                                                     dst);
+          return call_and_possibly_capture_ts_exception(solve_with_jacobian,
+                                                        pending_exception,
+                                                        src,
+                                                        dst);
         };
 
         // Default Krylov solver (preconditioner only)

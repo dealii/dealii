@@ -53,9 +53,9 @@ namespace PETScWrappers
      */
     template <typename F, typename... Args>
     int
-    call_and_possibly_capture_exception(const F &           f,
-                                        std::exception_ptr &eptr,
-                                        Args &&...args)
+    call_and_possibly_capture_snes_exception(const F &           f,
+                                             std::exception_ptr &eptr,
+                                             Args &&...args)
     {
       // See whether there is already something in the exception pointer
       // variable. There is no reason why this should be so, and
@@ -305,7 +305,7 @@ namespace PETScWrappers
 
       VectorType xdealii(x);
       VectorType fdealii(f);
-      const int  err = call_and_possibly_capture_exception(
+      const int  err = call_and_possibly_capture_snes_exception(
         user->residual, user->pending_exception, xdealii, fdealii);
       petsc_increment_state_counter(f);
       PetscFunctionReturn(err);
@@ -320,7 +320,7 @@ namespace PETScWrappers
       AMatrixType Adealii(A);
       PMatrixType Pdealii(P);
 
-      const int err = call_and_possibly_capture_exception(
+      const int err = call_and_possibly_capture_snes_exception(
         user->jacobian, user->pending_exception, xdealii, Adealii, Pdealii);
       petsc_increment_state_counter(P);
 
@@ -351,9 +351,9 @@ namespace PETScWrappers
       user->A = &Adealii;
       user->P = &Pdealii;
       const int err =
-        call_and_possibly_capture_exception(user->setup_jacobian,
-                                            user->pending_exception,
-                                            xdealii);
+        call_and_possibly_capture_snes_exception(user->setup_jacobian,
+                                                 user->pending_exception,
+                                                 xdealii);
       petsc_increment_state_counter(P);
 
       // Handle older versions of PETSc for which we cannot pass a MATSHELL
@@ -389,7 +389,7 @@ namespace PETScWrappers
       Vec x;
       AssertPETSc(SNESGetSolution(snes, &x));
       VectorType xdealii(x);
-      const int  err = call_and_possibly_capture_exception(
+      const int  err = call_and_possibly_capture_snes_exception(
         user->monitor, user->pending_exception, xdealii, it, f);
       PetscFunctionReturn(err);
     };
@@ -401,7 +401,7 @@ namespace PETScWrappers
 
       real_type  v;
       VectorType xdealii(x);
-      const int  err = call_and_possibly_capture_exception(
+      const int  err = call_and_possibly_capture_snes_exception(
         user->energy, user->pending_exception, xdealii, v);
       *f = v;
       PetscFunctionReturn(err);
@@ -478,10 +478,10 @@ namespace PETScWrappers
         precond.vmult = [&](VectorBase &indst, const VectorBase &insrc) -> int {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
-          return call_and_possibly_capture_exception(solve_with_jacobian,
-                                                     pending_exception,
-                                                     src,
-                                                     dst);
+          return call_and_possibly_capture_snes_exception(solve_with_jacobian,
+                                                          pending_exception,
+                                                          src,
+                                                          dst);
         };
 
         // Default Krylov solver (preconditioner only)
