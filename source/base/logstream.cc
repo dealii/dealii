@@ -81,7 +81,7 @@ LogStream::LogStream()
   , print_thread_id(false)
   , at_newline(true)
 {
-  get_prefixes().push("DEAL:");
+  get_prefixes().emplace("DEAL:");
 }
 
 

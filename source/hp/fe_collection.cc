@@ -388,8 +388,8 @@ namespace hp
           if (fe_index_1 != fe_index_2)
             for (const auto &identity :
                  query_identities(fe_index_1, fe_index_2))
-              identities_graph.emplace(Edge(Node(fe_index_1, identity.first),
-                                            Node(fe_index_2, identity.second)));
+              identities_graph.emplace(Node(fe_index_1, identity.first),
+                                       Node(fe_index_2, identity.second));
 
 #ifdef DEBUG
       // Now verify that indeed the graph is symmetric: If one element
