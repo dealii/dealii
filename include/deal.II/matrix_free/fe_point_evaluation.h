@@ -1693,19 +1693,21 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
     {
       if (use_face_path)
         {
-          ScalarNumber *input  = scratch_data_scalar.begin();
-          ScalarNumber *output = input + dofs_per_component;
-
+          const ScalarNumber *input;
           if (renumber.empty())
-            input = const_cast<ScalarNumber *>(solution_values.data());
+            input = solution_values.data();
           else
             {
               const unsigned int *renumber_ptr =
                 renumber.data() +
                 (component_in_base_element + comp) * dofs_per_component;
               for (unsigned int i = 0; i < dofs_per_component; ++i)
-                input[i] = solution_values[renumber_ptr[i]];
+                scratch_data_scalar[i] = solution_values[renumber_ptr[i]];
+              input = scratch_data_scalar.data();
             }
+
+          ScalarNumber *output =
+            scratch_data_scalar.begin() + dofs_per_component;
 
           internal::FEFaceNormalEvaluationImpl<dim, -1, ScalarNumber>::
             template interpolate<true, false>(1,
