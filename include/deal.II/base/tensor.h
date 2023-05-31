@@ -845,7 +845,7 @@ public:
    * Return an unrolled index in the range $[0,\text{dim}^{\text{rank}}-1]$
    * for the element of the tensor indexed by the argument to the function.
    */
-  DEAL_II_HOST_DEVICE static constexpr unsigned int
+  static constexpr DEAL_II_HOST_DEVICE unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
 
   /**
@@ -853,7 +853,7 @@ public:
    * $[0, \text{dim}^{\text{rank}}-1]$, return which set of indices it would
    * correspond to.
    */
-  DEAL_II_HOST_DEVICE static constexpr TableIndices<rank_>
+  static constexpr DEAL_II_HOST_DEVICE TableIndices<rank_>
   unrolled_to_component_indices(const unsigned int i);
 
   /**

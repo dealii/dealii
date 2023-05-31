@@ -582,8 +582,6 @@ namespace Step85
   class AnalyticalSolution : public Function<dim>
   {
   public:
-    AnalyticalSolution() = default;
-
     double value(const Point<dim> & point,
                  const unsigned int component = 0) const override;
   };
@@ -627,8 +625,8 @@ namespace Step85
     // We then iterate iterate over the cells that have LocationToLevelSetValue
     // value inside or intersected again. For each quadrature point, we compute
     // the pointwise error and use this to compute the integral.
-    const AnalyticalSolution<dim> analytical_solution;
-    double                        error_L2_squared = 0;
+    AnalyticalSolution<dim> analytical_solution;
+    double                  error_L2_squared = 0;
 
     for (const auto &cell :
          dof_handler.active_cell_iterators() |

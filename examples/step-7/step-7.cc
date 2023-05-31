@@ -268,8 +268,6 @@ namespace Step7
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    RightHandSide() = default;
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
@@ -571,8 +569,8 @@ namespace Step7
     // Note that the operations we will do with the right hand side object are
     // only querying data, never changing the object. We can therefore declare
     // it <code>const</code>:
-    const RightHandSide<dim> right_hand_side;
-    std::vector<double>      rhs_values(n_q_points);
+    RightHandSide<dim>  right_hand_side;
+    std::vector<double> rhs_values(n_q_points);
 
     // Finally we define an object denoting the exact solution function. We
     // will use it to compute the Neumann values at the boundary from
