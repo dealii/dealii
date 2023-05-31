@@ -485,9 +485,9 @@ MappingFEField<dim, spacedim, VectorType>::requires_update_flags(
       if (out & (update_JxW_values | update_normal_vectors))
         out |= update_boundary_forms;
 
-      if (out & (update_covariant_transformation | update_JxW_values |
-                 update_jacobians | update_jacobian_grads |
-                 update_boundary_forms | update_normal_vectors))
+      if (out &
+          (update_covariant_transformation | update_jacobian_grads |
+           update_jacobians | update_boundary_forms | update_normal_vectors))
         out |= update_contravariant_transformation;
 
       if (out &
@@ -496,8 +496,17 @@ MappingFEField<dim, spacedim, VectorType>::requires_update_flags(
            update_jacobian_pushed_forward_3rd_derivatives))
         out |= update_covariant_transformation;
 
+      // The contravariant transformation is used in the Piola
+      // transformation, which requires the determinant of the Jacobi
+      // matrix of the transformation.  Because we have no way of
+      // knowing here whether the finite element wants to use the
+      // contravariant or the Piola transforms, we add the volume elements
+      // to the list of flags to be updated for each cell.
+      if (out & update_contravariant_transformation)
+        out |= update_volume_elements;
+
       if (out & update_normal_vectors)
-        out |= update_JxW_values;
+        out |= update_volume_elements;
     }
 
   return out;
@@ -1373,15 +1382,6 @@ namespace internal
                       Point<spacedim>(output_data.boundary_forms[i] /
                                       output_data.boundary_forms[i].norm());
                 }
-
-            if (update_flags & update_jacobians)
-              for (unsigned int point = 0; point < n_q_points; ++point)
-                output_data.jacobians[point] = data.contravariant[point];
-
-            if (update_flags & update_inverse_jacobians)
-              for (unsigned int point = 0; point < n_q_points; ++point)
-                output_data.inverse_jacobians[point] =
-                  data.covariant[point].transpose();
           }
       }
 
@@ -1418,6 +1418,18 @@ namespace internal
 
         maybe_update_Jacobians<dim, spacedim, VectorType>(
           data_set, data, fe, fe_mask, fe_to_real);
+
+        const UpdateFlags  update_flags = data.update_each;
+        const unsigned int n_q_points   = data.contravariant.size();
+
+        if (update_flags & update_jacobians)
+          for (unsigned int point = 0; point < n_q_points; ++point)
+            output_data.jacobians[point] = data.contravariant[point];
+
+        if (update_flags & update_inverse_jacobians)
+          for (unsigned int point = 0; point < n_q_points; ++point)
+            output_data.inverse_jacobians[point] =
+              data.covariant[point].transpose();
 
         maybe_update_jacobian_grads<dim, spacedim, VectorType>(
           data_set, data, fe, fe_mask, fe_to_real, output_data.jacobian_grads);
@@ -1533,7 +1545,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_values(
         {
           if (dim == spacedim)
             {
-              const double det = data.contravariant[point].determinant();
+              const double det = data.volume_elements[point];
 
               // check for distorted cells.
 
@@ -1813,7 +1825,7 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_immersed_surface_values(
 
       for (unsigned int point = 0; point < n_q_points; ++point)
         {
-          const double det = data.contravariant[point].determinant();
+          const double det = data.volume_elements[point];
 
           // check for distorted cells.
 
