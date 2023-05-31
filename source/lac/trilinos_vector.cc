@@ -411,12 +411,25 @@ namespace TrilinosWrappers
     void
     Vector::reinit(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      const bool                                                make_ghosted,
       const bool                                                vector_writable)
     {
-      this->reinit(partitioner->locally_owned_range(),
-                   partitioner->ghost_indices(),
-                   partitioner->get_mpi_communicator(),
-                   vector_writable);
+      if (make_ghosted)
+        {
+          Assert(partitioner->ghost_indices_initialized(),
+                 ExcMessage("You asked to create a ghosted vector, but the "
+                            "partitioner does not provide ghost indices."));
+
+          this->reinit(partitioner->locally_owned_range(),
+                       partitioner->ghost_indices(),
+                       partitioner->get_mpi_communicator(),
+                       vector_writable);
+        }
+      else
+        {
+          this->reinit(partitioner->locally_owned_range(),
+                       partitioner->get_mpi_communicator());
+        }
     }
 
 

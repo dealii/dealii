@@ -1,0 +1,5 @@
+New: TrilinosWrappers::MPI::Vector and PETScWrappers::MPI::Vector now both have
+reinit functions that take a Utilities::MPI::Partitioner as an argument, so
+their interface is compatible to LinearAlgebra::distributed::Vector.
+<br>
+(Marc Fehling, 2022/12/05)

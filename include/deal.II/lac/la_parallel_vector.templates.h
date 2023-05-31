@@ -696,6 +696,18 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
+    void
+    Vector<Number, MemorySpaceType>::reinit(
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in,
+      const bool /*make_ghosted*/,
+      const MPI_Comm &comm_sm)
+    {
+      this->reinit(partitioner_in, comm_sm);
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector()
       : partitioner(std::make_shared<Utilities::MPI::Partitioner>())
       , allocated_size(0)

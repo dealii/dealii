@@ -404,6 +404,18 @@ namespace LinearAlgebra
         const MPI_Comm comm_sm = MPI_COMM_SELF);
 
       /**
+       * This function exists purely for reasons of compatibility with the
+       * PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector classes.
+       *
+       * It calls the function above, and ignores the parameter @p make_ghosted.
+       */
+      void
+      reinit(
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const bool                                                make_ghosted,
+        const MPI_Comm &comm_sm = MPI_COMM_SELF);
+
+      /**
        * Initialize vector with @p local_size locally-owned and @p ghost_size
        * ghost degrees of freedoms.
        *

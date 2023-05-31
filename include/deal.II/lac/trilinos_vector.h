@@ -617,10 +617,17 @@ namespace TrilinosWrappers
       /**
        * Initialize the vector given to the parallel partitioning described in
        * @p partitioner using the function above.
+       *
+       * You can decide whether your vector will contain ghost elements with
+       * @p make_ghosted.
+       *
+       * The parameter @p vector_writable only has effect on ghosted vectors
+       * and is ignored for non-ghosted vectors.
        */
       void
       reinit(
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const bool make_ghosted    = true,
         const bool vector_writable = false);
 
       /**
