@@ -1475,6 +1475,14 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::setup(
       poly = internal::FEPointEvaluation::get_polynomial_space(
         fe->base_element(base_element_number));
 
+      bool is_lexicographic = true;
+      for (unsigned int i = 0; i < renumber.size(); ++i)
+        if (i != renumber[i])
+          is_lexicographic = false;
+
+      if (is_lexicographic)
+        renumber.clear();
+
       polynomials_are_hat_functions =
         (poly.size() == 2 && poly[0].value(0.) == 1. &&
          poly[0].value(1.) == 0. && poly[1].value(0.) == 0. &&
@@ -1683,16 +1691,23 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
     }
   for (unsigned int comp = 0; comp < n_components; ++comp)
     {
-      const unsigned int *renumber_ptr =
-        renumber.data() +
-        (component_in_base_element + comp) * dofs_per_component;
       if (use_face_path)
         {
-          ScalarNumber *input  = scratch_data_scalar.begin();
-          ScalarNumber *output = input + dofs_per_component;
+          const ScalarNumber *input;
+          if (renumber.empty())
+            input = solution_values.data();
+          else
+            {
+              const unsigned int *renumber_ptr =
+                renumber.data() +
+                (component_in_base_element + comp) * dofs_per_component;
+              for (unsigned int i = 0; i < dofs_per_component; ++i)
+                scratch_data_scalar[i] = solution_values[renumber_ptr[i]];
+              input = scratch_data_scalar.data();
+            }
 
-          for (unsigned int i = 0; i < dofs_per_component; ++i)
-            input[i] = solution_values[renumber_ptr[i]];
+          ScalarNumber *output =
+            scratch_data_scalar.begin() + dofs_per_component;
 
           internal::FEFaceNormalEvaluationImpl<dim, -1, ScalarNumber>::
             template interpolate<true, false>(1,
@@ -1707,10 +1722,19 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
         }
       else
         {
-          for (unsigned int i = 0; i < dofs_per_component; ++i)
-            ETT::read_value(solution_values[renumber_ptr[i]],
-                            comp,
-                            solution_renumbered[i]);
+          if (renumber.empty())
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
+              ETT::read_value(solution_values[i], comp, solution_renumbered[i]);
+          else
+            {
+              const unsigned int *renumber_ptr =
+                renumber.data() +
+                (component_in_base_element + comp) * dofs_per_component;
+              for (unsigned int i = 0; i < dofs_per_component; ++i)
+                ETT::read_value(solution_values[renumber_ptr[i]],
+                                comp,
+                                solution_renumbered[i]);
+            }
         }
     }
 
@@ -1742,9 +1766,10 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
             dim - 1,
             scalar_value_type,
             VectorizedArrayType,
-            2>(shapes_faces.data() + qb * n_shapes,
-               n_shapes,
-               solution_renumbered.data());
+            2,
+            false>(shapes_faces.data() + qb * n_shapes,
+                   n_shapes,
+                   solution_renumbered.data());
 
       value = interpolated_value[dim - 1];
       // reorder derivative from tangential/normal derivatives into tensor in
@@ -1794,9 +1819,11 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
           internal::evaluate_tensor_product_value_and_gradient_shapes<
             dim,
             scalar_value_type,
-            VectorizedArrayType>(shapes.data() + qb * n_shapes,
-                                 n_shapes,
-                                 solution_renumbered.data());
+            VectorizedArrayType,
+            1,
+            false>(shapes.data() + qb * n_shapes,
+                   n_shapes,
+                   solution_renumbered.data());
       gradient[0] = result[0];
       if (dim > 1)
         gradient[1] = result[1];
@@ -2078,19 +2105,35 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
                                                output,
                                                current_face_number);
 
-          for (unsigned int i = 0; i < dofs_per_component; ++i)
-            solution_values[renumber[comp * dofs_per_component + i]] =
-              output[i];
+          if (renumber.empty())
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
+              solution_values[comp * dofs_per_component + i] = output[i];
+          else
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
+              solution_values[renumber[comp * dofs_per_component + i]] =
+                output[i];
         }
       else
         {
-          for (unsigned int i = 0; i < dofs_per_component; ++i)
-            {
-              VectorizedArrayType result;
-              ETT::write_value(result, comp, solution_renumbered_vectorized[i]);
-              solution_values[renumber[comp * dofs_per_component + i]] =
-                result.sum();
-            }
+          if (renumber.empty())
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
+              {
+                VectorizedArrayType result;
+                ETT::write_value(result,
+                                 comp,
+                                 solution_renumbered_vectorized[i]);
+                solution_values[comp * dofs_per_component + i] = result.sum();
+              }
+          else
+            for (unsigned int i = 0; i < dofs_per_component; ++i)
+              {
+                VectorizedArrayType result;
+                ETT::write_value(result,
+                                 comp,
+                                 solution_renumbered_vectorized[i]);
+                solution_values[renumber[comp * dofs_per_component + i]] =
+                  result.sum();
+              }
         }
     }
 }
