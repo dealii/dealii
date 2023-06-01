@@ -130,7 +130,6 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
 
   AlignedVector<Number> src(fe.n_dofs_per_cell());
   AlignedVector<Number> dst(fe.n_dofs_per_cell());
-  AlignedVector<Number> tmp;
   Table<2, Number>      matrix_0(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
   Table<2, Number>      matrix_1(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
   Table<2, Number>      matrix_2(fe.n_dofs_per_cell(), fe.n_dofs_per_cell());
@@ -145,29 +144,25 @@ do_test_mesh(const Mapping<dim> &mapping, const Triangulation<dim> &tria)
 
           collection_0.apply_inverse(cell,
                                      make_array_view(dst.begin(), dst.end()),
-                                     make_array_view(src.begin(), src.end()),
-                                     tmp);
+                                     make_array_view(src.begin(), src.end()));
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_0[j][i] = dst[j];
 
           collection_1.apply_inverse(cell,
                                      make_array_view(dst.begin(), dst.end()),
-                                     make_array_view(src.begin(), src.end()),
-                                     tmp);
+                                     make_array_view(src.begin(), src.end()));
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_1[j][i] = dst[j];
 
           collection_2.apply_inverse(cell,
                                      make_array_view(dst.begin(), dst.end()),
-                                     make_array_view(src.begin(), src.end()),
-                                     tmp);
+                                     make_array_view(src.begin(), src.end()));
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_2[j][i] = dst[j];
 
           collection_3.apply_inverse(cell,
                                      make_array_view(dst.begin(), dst.end()),
-                                     make_array_view(src.begin(), src.end()),
-                                     tmp);
+                                     make_array_view(src.begin(), src.end()));
           for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
             matrix_3[j][i] = dst[j];
         }
