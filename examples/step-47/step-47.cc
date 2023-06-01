@@ -407,7 +407,7 @@ namespace Step47
 
       cell->get_dof_indices(copy_data.local_dof_indices);
 
-      const ExactSolution::RightHandSide<dim> right_hand_side;
+      ExactSolution::RightHandSide<dim> right_hand_side;
 
       const unsigned int dofs_per_cell =
         scratch_data.fe_values.get_fe().n_dofs_per_cell();
@@ -610,8 +610,8 @@ namespace Step47
         fe_interface_values.get_normal_vectors();
 
 
-      const ExactSolution::Solution<dim> exact_solution;
-      std::vector<Tensor<1, dim>>        exact_gradients(q_points.size());
+      ExactSolution::Solution<dim> exact_solution;
+      std::vector<Tensor<1, dim>>  exact_gradients(q_points.size());
       exact_solution.gradient_list(q_points, exact_gradients);
 
 
