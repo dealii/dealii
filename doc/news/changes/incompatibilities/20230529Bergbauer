@@ -1,0 +1,6 @@
+Changed: The integrate() function of FEPointEvaluation now multiplies the submitted
+entities internally with a JxW value to represent a proper integration like in FEEvaluation.
+The old behavior (where the entities are only multiplied with the test functions and summed up)
+is available through the new function test_and_sum().
+<br>
+(Maximilian Bergbauer, 2023/05/29)

@@ -147,8 +147,9 @@ test(const unsigned int degree, const bool is_mapping_q = true)
           evaluator.submit_gradient(evaluator.get_gradient(i), i);
         }
 
-      evaluator.integrate(solution_values,
-                          EvaluationFlags::values | EvaluationFlags::gradients);
+      evaluator.test_and_sum(solution_values,
+                             EvaluationFlags::values |
+                               EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
         deallog << factor_float * i << ' ';

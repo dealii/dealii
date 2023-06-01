@@ -313,7 +313,7 @@ compute_force_vector_sharp_interface(
 
         // integrate_scatter force
         {
-          phi_force.integrate(buffer_dim, EvaluationFlags::values);
+          phi_force.test_and_sum(buffer_dim, EvaluationFlags::values);
 
           constraints.distribute_local_to_global(buffer_dim,
                                                  local_dof_indices_dim,

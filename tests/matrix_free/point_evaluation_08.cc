@@ -168,16 +168,17 @@ test(const unsigned int degree)
           evaluator_scalar.submit_gradient(evaluator_scalar.get_gradient(i), i);
         }
 
-      evaluator.integrate(solution_values,
-                          EvaluationFlags::values | EvaluationFlags::gradients);
+      evaluator.test_and_sum(solution_values,
+                             EvaluationFlags::values |
+                               EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
         deallog << i << ' ';
       deallog << std::endl;
 
-      evaluator_scalar.integrate(solution_values,
-                                 EvaluationFlags::values |
-                                   EvaluationFlags::gradients);
+      evaluator_scalar.test_and_sum(solution_values,
+                                    EvaluationFlags::values |
+                                      EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
         deallog << i << ' ';

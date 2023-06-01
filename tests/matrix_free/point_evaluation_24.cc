@@ -138,9 +138,9 @@ test(const unsigned int degree)
               evaluator.submit_gradient(evaluator.get_gradient(i), i);
             }
 
-          evaluator.integrate(solution_values_out,
-                              EvaluationFlags::values |
-                                EvaluationFlags::gradients);
+          evaluator.test_and_sum(solution_values_out,
+                                 EvaluationFlags::values |
+                                   EvaluationFlags::gradients);
 
           for (double i : solution_values_out)
             deallog << i << ' ';
