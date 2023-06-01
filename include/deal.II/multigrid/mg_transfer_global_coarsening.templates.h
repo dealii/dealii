@@ -2624,7 +2624,7 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
   this->update_ghost_values(*vec_coarse_ptr);
 
-  if (fine_element_is_continuous && (use_dst_inplace == false))
+  if (use_dst_inplace == false)
     *vec_fine_ptr = Number(0.);
 
   this->prolongate_and_add_internal(*vec_fine_ptr, *vec_coarse_ptr);
