@@ -22,9 +22,9 @@
 
 macro(strip_known_generator_expressions _variable)
   set(generator_expressions
-    "^\\$<LINK_ONLY:(.*)>$"
-    "^\\$<\\$<LINK_LANGUAGE:CXX>:(.*)>$"
-    "^\\$<\\$<COMPILE_LANGUAGE:CXX>:(.*)>$"
+    "\\$<LINK_ONLY:([^>]*)>"
+    "\\$<\\$<LINK_LANGUAGE:CXX>:([^>]*)>"
+    "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>"
     )
 
   foreach(expression ${generator_expressions})
