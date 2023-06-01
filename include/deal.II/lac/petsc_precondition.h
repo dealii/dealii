@@ -975,11 +975,17 @@ namespace PETScWrappers
    * @cite zampini2016pcbddc. It mainly consists of two elements:
    *
    * <ul>
-   *   <li> Local solvers: Solvers for each subdomain. These are performed concurrently by each processor
-   *   <li> A coarse solver: Continuity between each subdomain is imposed in a small number of DoFs, referred to as <em>primal DoFs</em>. This solver solves such problem.
+   *   <li> Local solvers: Solvers for each subdomain. These are performed
+   *     concurrently by each processor</li>
+   *   <li> A coarse solver: Continuity between each subdomain is imposed in a
+   *     small number of DoFs, referred to as <em>primal DoFs</em>. This solver
+   *     solves such problem.</li>
    * </ul>
    *
-   * The size of the primal space is determined through the @p AdditionalData parameters. A thorough study of the performance of this solver in the context of cardiac mechanics, together with further details on this interface, is available in @cite Barnafi2022.
+   * The size of the primal space is determined through the @p AdditionalData
+   * parameters. A thorough study of the performance of this solver in the
+   * context of cardiac mechanics, together with further details on this
+   * interface, is available in @cite Barnafi2022.
    *
    * @ingroup PETScWrappers
    */
