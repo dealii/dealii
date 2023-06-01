@@ -27,6 +27,7 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
 
+#include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>
 
 #include <cstdlib>
@@ -133,7 +134,7 @@ namespace LinearAlgebra
    * get the first index of the largest range.
    */
   template <typename Number>
-  class ReadWriteVector : public Subscriptor
+  class ReadWriteVector : public Subscriptor, public ReadVector<Number>
   {
   public:
     /**
@@ -537,7 +538,7 @@ namespace LinearAlgebra
      * number returned by the current function.
      */
     size_type
-    size() const;
+    size() const override;
 
     /**
      * This function returns the number of elements stored. It is smaller or
@@ -654,6 +655,14 @@ namespace LinearAlgebra
     void
     extract_subvector_to(const std::vector<size_type> &indices,
                          std::vector<Number2> &        values) const;
+
+    /**
+     * Extract a range of elements all at once.
+     */
+    virtual void
+    extract_subvector_to(
+      const ArrayView<const types::global_dof_index> &indices,
+      ArrayView<Number> &                             entries) const override;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -1076,6 +1085,19 @@ namespace LinearAlgebra
   {
     for (size_type i = 0; i < indices.size(); ++i)
       extracted_values[i] = operator()(indices[i]);
+  }
+
+
+
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::extract_subvector_to(
+    const ArrayView<const types::global_dof_index> &indices,
+    ArrayView<Number> &                             entries) const
+  {
+    AssertDimension(indices.size(), entries.size());
+    for (unsigned int i = 0; i < indices.size(); ++i)
+      entries[i] = (*this)[indices[i]];
   }
 
 

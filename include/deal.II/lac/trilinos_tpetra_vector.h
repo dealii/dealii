@@ -25,6 +25,7 @@
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/subscriptor.h>
 
+#  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_space_vector.h>
@@ -113,7 +114,9 @@ namespace LinearAlgebra
      * @ingroup Vectors
      */
     template <typename Number>
-    class Vector : public VectorSpaceVector<Number>, public Subscriptor
+    class Vector : public VectorSpaceVector<Number>,
+                   public ReadVector<Number>,
+                   public Subscriptor
     {
     public:
       using value_type = Number;
@@ -158,6 +161,14 @@ namespace LinearAlgebra
       virtual void
       reinit(const VectorSpaceVector<Number> &V,
              const bool omit_zeroing_entries = false) override;
+
+      /**
+       * Extract a range of elements all at once.
+       */
+      virtual void
+      extract_subvector_to(
+        const ArrayView<const types::global_dof_index> &indices,
+        ArrayView<Number> &elements) const override;
 
       /**
        * Copy function. This function takes a Vector and copies all the

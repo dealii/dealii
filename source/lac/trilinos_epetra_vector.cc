@@ -99,6 +99,26 @@ namespace LinearAlgebra
 
 
 
+    void
+    Vector::extract_subvector_to(
+      const ArrayView<const types::global_dof_index> &indices,
+      ArrayView<double> &                             elements) const
+    {
+      AssertDimension(indices.size(), elements.size());
+      const auto &vector = trilinos_vector();
+      const auto &map    = vector.Map();
+
+      for (unsigned int i = 0; i < indices.size(); ++i)
+        {
+          AssertIndexRange(indices[i], size());
+          const auto trilinos_i =
+            map.LID(static_cast<TrilinosWrappers::types::int_type>(indices[i]));
+          elements[i] = vector[0][trilinos_i];
+        }
+    }
+
+
+
     Vector &
     Vector::operator=(const Vector &V)
     {
