@@ -3007,7 +3007,8 @@ namespace internal
   compute_values_of_array(
     dealii::ndarray<Number, 2, dim> *                   shapes,
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const Point<dim, Number> &                          p)
+    const Point<dim, Number> &                          p,
+    const unsigned int                                  derivative = 1)
   {
     const int n_shapes = poly.size();
 
@@ -3016,7 +3017,7 @@ namespace internal
     for (unsigned int d = 0; d < dim; ++d)
       point[d] = p[d];
     for (int i = 0; i < n_shapes; ++i)
-      poly[i].values_of_array(point, 1, shapes[i].data());
+      poly[i].values_of_array(point, derivative, shapes[i].data());
   }
 
 
@@ -3028,7 +3029,8 @@ namespace internal
   inline void
   compute_values_of_array(dealii::ndarray<Number, 2, 0> *,
                           const std::vector<Polynomials::Polynomial<double>> &,
-                          const Point<0, Number> &)
+                          const Point<0, Number> &,
+                          const unsigned int)
   {
     Assert(false, ExcInternalError());
   }
@@ -3387,6 +3389,204 @@ namespace internal
     return std::make_pair(result[dim],
                           Tensor<1, dim, Number3>(
                             ArrayView<Number3>(result.data(), dim)));
+  }
+
+
+
+  template <int dim,
+            int length,
+            typename Number2,
+            typename Number,
+            bool do_renumber = true>
+  inline
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+    typename ProductTypeNoPoint<Number, Number2>::type
+    do_interpolate_xy_value(const Number *                          values,
+                            const std::vector<unsigned int> &       renumber,
+                            const dealii::ndarray<Number2, 2, dim> *shapes,
+                            const int n_shapes_runtime,
+                            int &     i)
+  {
+    const int n_shapes = length > 0 ? length : n_shapes_runtime;
+    using Number3      = typename ProductTypeNoPoint<Number, Number2>::type;
+    Number3 result     = {};
+    for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+      {
+        // Interpolation x direction
+        Number3 value = {};
+
+        // Distinguish the inner loop based on whether we have a
+        // renumbering or not
+        if (do_renumber && !renumber.empty())
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            value += shapes[i0][0][0] * values[renumber[i]];
+        else
+          for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+            value += shapes[i0][0][0] * values[i];
+
+        if (dim > 1)
+          result += value * shapes[i1][0][1];
+        else
+          result = value;
+      }
+    return result;
+  }
+
+
+
+  template <int dim, typename Number, typename Number2, bool do_renumber = true>
+  inline typename ProductTypeNoPoint<Number, Number2>::type
+  evaluate_tensor_product_value_shapes(
+    const dealii::ndarray<Number2, 2, dim> *shapes,
+    const int                               n_shapes,
+    const Number *                          values,
+    const std::vector<unsigned int> &       renumber = {})
+  {
+    static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
+
+    // we only need the value on faces of a 1d element
+    if (dim == 0)
+      {
+        return values[0];
+      }
+
+    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
+
+    // Go through the tensor product of shape functions and interpolate
+    // with optimal algorithm
+    Number3 result = {};
+    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+      {
+        Number3 inner_result;
+        // Generate separate code with known loop bounds for the most common
+        // cases
+        if (n_shapes == 2)
+          inner_result =
+            do_interpolate_xy_value<dim, 2, Number2, Number, do_renumber>(
+              values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 3)
+          inner_result =
+            do_interpolate_xy_value<dim, 3, Number2, Number, do_renumber>(
+              values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 4)
+          inner_result =
+            do_interpolate_xy_value<dim, 4, Number2, Number, do_renumber>(
+              values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 5)
+          inner_result =
+            do_interpolate_xy_value<dim, 5, Number2, Number, do_renumber>(
+              values, renumber, shapes, n_shapes, i);
+        else if (n_shapes == 6)
+          inner_result =
+            do_interpolate_xy_value<dim, 6, Number2, Number, do_renumber>(
+              values, renumber, shapes, n_shapes, i);
+        else
+          inner_result =
+            do_interpolate_xy_value<dim, -1, Number2, Number, do_renumber>(
+              values, renumber, shapes, n_shapes, i);
+        if (dim == 3)
+          {
+            // Interpolation + derivative in z direction
+            result += inner_result * shapes[i2][0][2];
+          }
+        else
+          {
+            result = inner_result;
+          }
+      }
+
+    return result;
+  }
+
+
+
+  template <int dim, typename Number, typename Number2>
+  inline typename ProductTypeNoPoint<Number, Number2>::type
+  evaluate_tensor_product_value_linear(
+    const unsigned int               n_shapes,
+    const Number *                   values,
+    const Point<dim, Number2> &      p,
+    const std::vector<unsigned int> &renumber = {})
+  {
+    (void)n_shapes;
+    static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
+
+    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
+
+    AssertDimension(n_shapes, 2);
+    for (unsigned int i = 0; i < renumber.size(); ++i)
+      AssertDimension(renumber[i], i);
+
+    if (dim == 0)
+      {
+        // we only need the value on faces of a 1d element
+        return values[0];
+      }
+    else if (dim == 1)
+      {
+        return (1. - p[0]) * values[0] + p[0] * values[1];
+      }
+    else if (dim == 2)
+      {
+        const Number2 x0 = 1. - p[0], x1 = p[0];
+        const Number3 tmp0   = x0 * values[0] + x1 * values[1];
+        const Number3 tmp1   = x0 * values[2] + x1 * values[3];
+        const Number3 mapped = (1. - p[1]) * tmp0 + p[1] * tmp1;
+        return mapped;
+      }
+    else if (dim == 3)
+      {
+        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
+                      z0 = 1. - p[2], z1 = p[2];
+        const Number3 tmp0   = x0 * values[0] + x1 * values[1];
+        const Number3 tmp1   = x0 * values[2] + x1 * values[3];
+        const Number3 tmpy0  = y0 * tmp0 + y1 * tmp1;
+        const Number3 tmp2   = x0 * values[4] + x1 * values[5];
+        const Number3 tmp3   = x0 * values[6] + x1 * values[7];
+        const Number3 tmpy1  = y0 * tmp2 + y1 * tmp3;
+        const Number3 mapped = z0 * tmpy0 + z1 * tmpy1;
+        return mapped;
+      }
+
+    // work around a compile error: missing return statement
+    return Number3();
+  }
+
+
+
+  template <int dim, typename Number, typename Number2>
+  inline typename ProductTypeNoPoint<Number, Number2>::type
+  evaluate_tensor_product_value(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const std::vector<Number> &                         values,
+    const Point<dim, Number2> &                         p,
+    const bool                                          d_linear = false,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    typename ProductTypeNoPoint<Number, Number2>::type result;
+    if (d_linear)
+      {
+        result = evaluate_tensor_product_value_linear(poly.size(),
+                                                      values.data(),
+                                                      p,
+                                                      renumber);
+      }
+    else
+      {
+        AssertIndexRange(poly.size(), 200);
+        std::array<dealii::ndarray<Number2, 2, dim>, 200> shapes;
+        const int                n_shapes = poly.size();
+        std::array<Number2, dim> point;
+        for (unsigned int d = 0; d < dim; ++d)
+          point[d] = p[d];
+        for (int i = 0; i < n_shapes; ++i)
+          poly[i].values_of_array(point, 0, shapes[i].data());
+        result = evaluate_tensor_product_value_shapes<dim, Number, Number2>(
+          shapes.data(), n_shapes, values.data(), renumber);
+      }
+    return result;
   }
 
 
@@ -4000,6 +4200,279 @@ namespace internal
             Number2,
             false,
             n_values>(shapes, n_shapes, value, gradient, values);
+      }
+  }
+
+
+
+  /**
+   * Test inner dimensions of tensor product shape functions and accumulate.
+   */
+  template <int dim, int length, typename Number2, typename Number, bool add>
+  inline
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+    void
+    do_apply_test_functions_xy_value(
+      Number2 *                              values,
+      const dealii::ndarray<Number, 2, dim> *shapes,
+      const Number2 &                        test_value,
+      const int                              n_shapes_runtime,
+      int &                                  i)
+  {
+    if (length > 0)
+      {
+        constexpr unsigned int         array_size = length > 0 ? length : 1;
+        std::array<Number, array_size> shape_values_x;
+        for (unsigned int i1 = 0; i1 < array_size; ++i1)
+          shape_values_x[i1] = shapes[i1][0][0];
+        for (unsigned int i1 = 0; i1 < (dim > 1 ? length : 1); ++i1)
+          {
+            const Number2 test_value_y =
+              dim > 1 ? test_value * shapes[i1][0][1] : test_value;
+
+            Number2 *values_ptr = values + i + i1 * length;
+            for (unsigned int i0 = 0; i0 < length; ++i0)
+              {
+                if (add)
+                  values_ptr[i0] += shape_values_x[i0] * test_value_y;
+                else
+                  values_ptr[i0] = shape_values_x[i0] * test_value_y;
+              }
+          }
+        i += (dim > 1 ? length * length : length);
+      }
+    else
+      {
+        for (int i1 = 0; i1 < (dim > 1 ? n_shapes_runtime : 1); ++i1)
+          {
+            const Number2 test_value_y =
+              dim > 1 ? test_value * shapes[i1][0][1] : test_value;
+
+            Number2 *values_ptr = values + i + i1 * n_shapes_runtime;
+            for (int i0 = 0; i0 < n_shapes_runtime; ++i0)
+              {
+                if (add)
+                  values_ptr[i0] += shapes[i0][0][0] * test_value_y;
+                else
+                  values_ptr[i0] = shapes[i0][0][0] * test_value_y;
+              }
+          }
+        i += (dim > 1 ? n_shapes_runtime * n_shapes_runtime : n_shapes_runtime);
+      }
+  }
+
+
+
+  /**
+   * Same as evaluate_tensor_product_value_shapes() but for integration.
+   */
+  template <int dim, typename Number, typename Number2, bool add>
+  inline void
+  integrate_add_tensor_product_value_shapes(
+    const dealii::ndarray<Number, 2, dim> *shapes,
+    const int                              n_shapes,
+    const Number2 &                        value,
+    Number2 *                              values)
+  {
+    static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
+
+    // as in evaluate, use `int` type to produce better code in this context
+
+    if (dim == 0)
+      {
+        if (add)
+          values[0] += value;
+        else
+          values[0] = value;
+        return;
+      }
+
+    // Implement the transpose of the function above
+    Number2 test_value;
+    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+      {
+        // test value z
+        test_value = dim > 2 ? value * shapes[i2][0][2] : value;
+
+        // Generate separate code with known loop bounds for the most common
+        // cases
+        if (n_shapes == 2)
+          do_apply_test_functions_xy_value<dim, 2, Number2, Number, add>(
+            values, shapes, test_value, n_shapes, i);
+        else if (n_shapes == 3)
+          do_apply_test_functions_xy_value<dim, 3, Number2, Number, add>(
+            values, shapes, test_value, n_shapes, i);
+        else if (n_shapes == 4)
+          do_apply_test_functions_xy_value<dim, 4, Number2, Number, add>(
+            values, shapes, test_value, n_shapes, i);
+        else if (n_shapes == 5)
+          do_apply_test_functions_xy_value<dim, 5, Number2, Number, add>(
+            values, shapes, test_value, n_shapes, i);
+        else if (n_shapes == 6)
+          do_apply_test_functions_xy_value<dim, 6, Number2, Number, add>(
+            values, shapes, test_value, n_shapes, i);
+        else
+          do_apply_test_functions_xy_value<dim, -1, Number2, Number, add>(
+            values, shapes, test_value, n_shapes, i);
+      }
+  }
+
+
+
+  /**
+   * Specializes @p integrate_tensor_product_value_shapes() for linear
+   * polynomials which massively reduces the necessary instructions.
+   */
+  template <int dim, typename Number, typename Number2, bool add>
+  inline void
+  integrate_add_tensor_product_value_linear(const unsigned int        n_shapes,
+                                            const Number2 &           value,
+                                            Number2 *                 values,
+                                            const Point<dim, Number> &p)
+  {
+    (void)n_shapes;
+    static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
+
+    AssertDimension(n_shapes, 2);
+
+    if (dim == 0)
+      {
+        if (add)
+          values[0] += value;
+        else
+          values[0] = value;
+      }
+    else if (dim == 1)
+      {
+        const auto x0 = 1. - p[0], x1 = p[0];
+
+        if (add)
+          {
+            values[0] += value * x0;
+            values[1] += value * x1;
+          }
+        else
+          {
+            values[0] = value * x0;
+            values[1] = value * x1;
+          }
+      }
+    else if (dim == 2)
+      {
+        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
+
+        const auto test_value_y0 = value * y0;
+        const auto test_value_y1 = value * y1;
+
+        if (add)
+          {
+            values[0] += x0 * test_value_y0;
+            values[1] += x1 * test_value_y0;
+            values[2] += x0 * test_value_y1;
+            values[3] += x1 * test_value_y1;
+          }
+        else
+          {
+            values[0] = x0 * test_value_y0;
+            values[1] = x1 * test_value_y0;
+            values[2] = x0 * test_value_y1;
+            values[3] = x1 * test_value_y1;
+          }
+      }
+    else if (dim == 3)
+      {
+        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
+                   z0 = 1. - p[2], z1 = p[2];
+
+        const auto test_value_z0 = value * z0;
+        const auto test_value_z1 = value * z1;
+
+        const auto test_value_y00 = test_value_z0 * y0;
+        const auto test_value_y01 = test_value_z0 * y1;
+        const auto test_value_y10 = test_value_z1 * y0;
+        const auto test_value_y11 = test_value_z1 * y1;
+
+        if (add)
+          {
+            values[0] += x0 * test_value_y00;
+            values[1] += x1 * test_value_y00;
+            values[2] += x0 * test_value_y01;
+            values[3] += x1 * test_value_y01;
+            values[4] += x0 * test_value_y10;
+            values[5] += x1 * test_value_y10;
+            values[6] += x0 * test_value_y11;
+            values[7] += x1 * test_value_y11;
+          }
+        else
+          {
+            values[0] = x0 * test_value_y00;
+            values[1] = x1 * test_value_y00;
+            values[2] = x0 * test_value_y01;
+            values[3] = x1 * test_value_y01;
+            values[4] = x0 * test_value_y10;
+            values[5] = x1 * test_value_y10;
+            values[6] = x0 * test_value_y11;
+            values[7] = x1 * test_value_y11;
+          }
+      }
+  }
+
+
+
+  /**
+   * Calls the correct @p integrate_add_tensor_product_value_...()
+   * function depending on if values should be added to or set and if
+   * polynomials are linear.
+   */
+  template <int dim, typename Number, typename Number2>
+  inline void
+  integrate_tensor_product_value(const dealii::ndarray<Number, 2, dim> *shapes,
+                                 const unsigned int        n_shapes,
+                                 const Number2 &           value,
+                                 Number2 *                 values,
+                                 const Point<dim, Number> &p,
+                                 const bool                is_linear,
+                                 const bool                do_add)
+  {
+    if (do_add)
+      {
+        if (is_linear)
+          internal::integrate_add_tensor_product_value_linear<dim,
+                                                              Number,
+                                                              Number2,
+                                                              true>(n_shapes,
+                                                                    value,
+                                                                    values,
+                                                                    p);
+        else
+          internal::integrate_add_tensor_product_value_shapes<dim,
+                                                              Number,
+                                                              Number2,
+                                                              true>(shapes,
+                                                                    n_shapes,
+                                                                    value,
+                                                                    values);
+      }
+    else
+      {
+        if (is_linear)
+          internal::integrate_add_tensor_product_value_linear<dim,
+                                                              Number,
+                                                              Number2,
+                                                              false>(n_shapes,
+                                                                     value,
+                                                                     values,
+                                                                     p);
+        else
+          internal::integrate_add_tensor_product_value_shapes<dim,
+                                                              Number,
+                                                              Number2,
+                                                              false>(shapes,
+                                                                     n_shapes,
+                                                                     value,
+                                                                     values);
       }
   }
 

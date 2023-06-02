@@ -290,13 +290,12 @@ MappingQ<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim> &                                          p) const
 {
-  return Point<spacedim>(internal::evaluate_tensor_product_value_and_gradient(
-                           polynomials_1d,
-                           this->compute_mapping_support_points(cell),
-                           p,
-                           polynomials_1d.size() == 2,
-                           renumber_lexicographic_to_hierarchic)
-                           .first);
+  return Point<spacedim>(internal::evaluate_tensor_product_value(
+    polynomials_1d,
+    this->compute_mapping_support_points(cell),
+    p,
+    polynomials_1d.size() == 2,
+    renumber_lexicographic_to_hierarchic));
 }
 
 
