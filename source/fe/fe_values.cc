@@ -32,18 +32,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/la_parallel_block_vector.h>
-#include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
-#include <deal.II/lac/petsc_block_vector.h>
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/trilinos_epetra_vector.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_tpetra_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_element_access.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -56,25 +45,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  template <class VectorType>
-  typename VectorType::value_type inline get_vector_element(
-    const VectorType &            vector,
-    const types::global_dof_index cell_number)
-  {
-    return internal::ElementAccess<VectorType>::get(vector, cell_number);
-  }
-
-
-
-  IndexSet::value_type inline get_vector_element(
-    const IndexSet &              is,
-    const types::global_dof_index cell_number)
-  {
-    return (is.is_element(cell_number) ? 1 : 0);
-  }
-
-
-
   template <int dim, int spacedim>
   inline std::vector<unsigned int>
   make_shape_function_to_row_table(const FiniteElement<dim, spacedim> &fe)
@@ -1643,12 +1613,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_hessians(
-    const InputVector &fe_function,
-    std::vector<solution_hessian_type<typename InputVector::value_type>>
-      &hessians) const
+    const ReadVector<Number> &                  fe_function,
+    std::vector<solution_hessian_type<Number>> &hessians) const
   {
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -1659,8 +1628,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_derivatives<2, dim, spacedim>(
@@ -1697,12 +1665,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_laplacians(
-    const InputVector &fe_function,
-    std::vector<solution_laplacian_type<typename InputVector::value_type>>
-      &laplacians) const
+    const ReadVector<Number> &                    fe_function,
+    std::vector<solution_laplacian_type<Number>> &laplacians) const
   {
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -1713,8 +1680,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_laplacians<dim, spacedim>(
@@ -1751,13 +1717,12 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_third_derivatives(
-    const InputVector &fe_function,
-    std::vector<
-      solution_third_derivative_type<typename InputVector::value_type>>
-      &third_derivatives) const
+    const ReadVector<Number> &                           fe_function,
+    std::vector<solution_third_derivative_type<Number>> &third_derivatives)
+    const
   {
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -1768,8 +1733,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_derivatives<3, dim, spacedim>(
@@ -1909,13 +1873,12 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_symmetric_gradients(
-    const InputVector &fe_function,
-    std::vector<
-      solution_symmetric_gradient_type<typename InputVector::value_type>>
-      &symmetric_gradients) const
+    const ReadVector<Number> &                             fe_function,
+    std::vector<solution_symmetric_gradient_type<Number>> &symmetric_gradients)
+    const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -1926,8 +1889,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_symmetric_gradients<dim, spacedim>(
@@ -1965,12 +1927,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_divergences(
-    const InputVector &fe_function,
-    std::vector<solution_divergence_type<typename InputVector::value_type>>
-      &divergences) const
+    const ReadVector<Number> &                     fe_function,
+    std::vector<solution_divergence_type<Number>> &divergences) const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -1982,8 +1943,7 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_divergences<dim, spacedim>(
@@ -2020,12 +1980,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_curls(
-    const InputVector &fe_function,
-    std::vector<solution_curl_type<typename InputVector::value_type>> &curls)
-    const
+    const ReadVector<Number> &               fe_function,
+    std::vector<solution_curl_type<Number>> &curls) const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -2036,8 +1995,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_curls<dim, spacedim>(
@@ -2074,12 +2032,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_hessians(
-    const InputVector &fe_function,
-    std::vector<solution_hessian_type<typename InputVector::value_type>>
-      &hessians) const
+    const ReadVector<Number> &                  fe_function,
+    std::vector<solution_hessian_type<Number>> &hessians) const
   {
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -2090,8 +2047,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_derivatives<2, dim, spacedim>(
@@ -2128,12 +2084,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_laplacians(
-    const InputVector &fe_function,
-    std::vector<solution_value_type<typename InputVector::value_type>>
-      &laplacians) const
+    const ReadVector<Number> &                fe_function,
+    std::vector<solution_value_type<Number>> &laplacians) const
   {
     Assert(fe_values->update_flags & update_hessians,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -2149,8 +2104,7 @@ namespace FEValuesViews
                            fe_values->present_cell.n_dofs_for_dof_handler()));
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_laplacians<dim, spacedim>(
@@ -2190,13 +2144,12 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Vector<dim, spacedim>::get_function_third_derivatives(
-    const InputVector &fe_function,
-    std::vector<
-      solution_third_derivative_type<typename InputVector::value_type>>
-      &third_derivatives) const
+    const ReadVector<Number> &                           fe_function,
+    std::vector<solution_third_derivative_type<Number>> &third_derivatives)
+    const
   {
     Assert(fe_values->update_flags & update_3rd_derivatives,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -2207,8 +2160,7 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_derivatives<3, dim, spacedim>(
@@ -2296,12 +2248,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   SymmetricTensor<2, dim, spacedim>::get_function_divergences(
-    const InputVector &fe_function,
-    std::vector<solution_divergence_type<typename InputVector::value_type>>
-      &divergences) const
+    const ReadVector<Number> &                     fe_function,
+    std::vector<solution_divergence_type<Number>> &divergences) const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -2313,8 +2264,7 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_divergences<dim, spacedim>(
@@ -2402,12 +2352,11 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Tensor<2, dim, spacedim>::get_function_divergences(
-    const InputVector &fe_function,
-    std::vector<solution_divergence_type<typename InputVector::value_type>>
-      &divergences) const
+    const ReadVector<Number> &                     fe_function,
+    std::vector<solution_divergence_type<Number>> &divergences) const
   {
     Assert(fe_values->update_flags & update_gradients,
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
@@ -2419,8 +2368,7 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values(
-      fe_values->dofs_per_cell);
+    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell.get_interpolated_dof_values(fe_function,
                                                         dof_values);
     internal::do_function_divergences<dim, spacedim>(
@@ -3469,7 +3417,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   auto view = make_array_view(dof_values.begin(), dof_values.end());
   fe_function.extract_subvector_to(indices, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_gradients,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -3481,14 +3429,12 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const InputVector &fe_function,
-  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
-  const
+  const ReadVector<Number> &                fe_function,
+  std::vector<Tensor<2, spacedim, Number>> &hessians) const
 {
-  using Number = typename InputVector::value_type;
   AssertDimension(fe->n_components(), 1);
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -3507,25 +3453,22 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const InputVector &                             fe_function,
+  const ReadVector<Number> &                      fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
-  const
+  std::vector<Tensor<2, spacedim, Number>> &      hessians) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
   AssertDimension(indices.size(), dofs_per_cell);
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
-  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
-  internal::do_function_derivatives(make_array_view(dof_values.begin(),
-                                                    dof_values.end()),
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
+  internal::do_function_derivatives(view,
                                     this->finite_element_output.shape_hessians,
                                     hessians);
 }
@@ -3533,16 +3476,13 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const InputVector &fe_function,
-  std::vector<
-    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-    &        hessians,
+  const ReadVector<Number> &                             fe_function,
+  std::vector<std::vector<Tensor<2, spacedim, Number>>> &hessians,
   const bool quadrature_points_fastest) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -3563,26 +3503,24 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const InputVector &                             fe_function,
-  const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-             hessians,
+  const ReadVector<Number> &                          fe_function,
+  const ArrayView<const types::global_dof_index> &    indices,
+  ArrayView<std::vector<Tensor<2, spacedim, Number>>> hessians,
   const bool quadrature_points_fastest) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
-  for (unsigned int i = 0; i < indices.size(); ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -3594,13 +3532,12 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                            fe_function,
-  std::vector<typename InputVector::value_type> &laplacians) const
+  const ReadVector<Number> &fe_function,
+  std::vector<Number> &     laplacians) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe->n_components(), 1);
@@ -3619,24 +3556,22 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                             fe_function,
+  const ReadVector<Number> &                      fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<typename InputVector::value_type> & laplacians) const
+  std::vector<Number> &                           laplacians) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe->n_components(), 1);
   AssertDimension(indices.size(), dofs_per_cell);
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
-  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
-  internal::do_function_laplacians(make_array_view(dof_values.begin(),
-                                                   dof_values.end()),
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
+  internal::do_function_laplacians(view,
                                    this->finite_element_output.shape_hessians,
                                    laplacians);
 }
@@ -3644,13 +3579,12 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                                    fe_function,
-  std::vector<Vector<typename InputVector::value_type>> &laplacians) const
+  const ReadVector<Number> &   fe_function,
+  std::vector<Vector<Number>> &laplacians) const
 {
-  using Number = typename InputVector::value_type;
   Assert(present_cell.is_initialized(), ExcNotReinited());
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -3670,14 +3604,13 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                                    fe_function,
-  const ArrayView<const types::global_dof_index> &       indices,
-  std::vector<Vector<typename InputVector::value_type>> &laplacians) const
+  const ReadVector<Number> &                      fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  std::vector<Vector<Number>> &                   laplacians) const
 {
-  using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
@@ -3686,10 +3619,10 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
          ExcAccessToUninitializedField("update_hessians"));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
-  for (unsigned int i = 0; i < indices.size(); ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_laplacians(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -3701,25 +3634,24 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                                         fe_function,
-  const ArrayView<const types::global_dof_index> &            indices,
-  std::vector<std::vector<typename InputVector::value_type>> &laplacians,
+  const ReadVector<Number> &                      fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  std::vector<std::vector<Number>> &              laplacians,
   const bool quadrature_points_fastest) const
 {
-  using Number = typename InputVector::value_type;
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
-  for (unsigned int i = 0; i < indices.size(); ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_laplacians(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -3731,14 +3663,12 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const InputVector &fe_function,
-  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
-    &third_derivatives) const
+  const ReadVector<Number> &                fe_function,
+  std::vector<Tensor<3, spacedim, Number>> &third_derivatives) const
 {
-  using Number = typename InputVector::value_type;
   AssertDimension(fe->n_components(), 1);
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
@@ -3757,42 +3687,35 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const InputVector &                             fe_function,
+  const ReadVector<Number> &                      fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
-    &third_derivatives) const
+  std::vector<Tensor<3, spacedim, Number>> &      third_derivatives) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
   AssertDimension(indices.size(), dofs_per_cell);
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
-  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
-    this->finite_element_output.shape_3rd_derivatives,
-    third_derivatives);
+    view, this->finite_element_output.shape_3rd_derivatives, third_derivatives);
 }
 
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const InputVector &fe_function,
-  std::vector<
-    std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-    &        third_derivatives,
+  const ReadVector<Number> &                             fe_function,
+  std::vector<std::vector<Tensor<3, spacedim, Number>>> &third_derivatives,
   const bool quadrature_points_fastest) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -3813,26 +3736,24 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
 
 
 template <int dim, int spacedim>
-template <class InputVector>
+template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const InputVector &                             fe_function,
-  const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-             third_derivatives,
+  const ReadVector<Number> &                          fe_function,
+  const ArrayView<const types::global_dof_index> &    indices,
+  ArrayView<std::vector<Tensor<3, spacedim, Number>>> third_derivatives,
   const bool quadrature_points_fastest) const
 {
-  using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
-  for (unsigned int i = 0; i < indices.size(); ++i)
-    dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  fe_function.extract_subvector_to(indices, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_3rd_derivatives,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
