@@ -344,6 +344,9 @@ namespace GridTools
    * n_active_cells but the aspect ratio is only computed for the cells that
    * are locally owned and placed at index CellAccessor::active_cell_index(),
    * respectively. All other values are set to 0.
+   *
+   * @note This function can only be used if deal.II was configured with
+   * support for LAPACK.
    */
   template <int dim>
   Vector<double>
