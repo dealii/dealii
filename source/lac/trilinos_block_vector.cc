@@ -114,6 +114,29 @@ namespace TrilinosWrappers
 
 
     void
+    BlockVector::reinit(
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &        partitioners,
+      const bool make_ghosted,
+      const bool vector_writable)
+    {
+      // update the number of blocks
+      this->block_indices.reinit(partitioners.size(), 0);
+
+      // initialize each block
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(partitioners[i],
+                                   make_ghosted,
+                                   vector_writable);
+
+      // update block_indices content
+      this->collect_sizes();
+    }
+
+
+
+    void
     BlockVector::reinit(const BlockVector &v, const bool omit_zeroing_entries)
     {
       if (this->n_blocks() != v.n_blocks())
