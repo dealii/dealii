@@ -389,8 +389,8 @@ namespace LinearAlgebra
       /**
        * Initialize the vector given to the parallel partitioning described in
        * @p partitioner. The input argument is a shared pointer, which stores
-       * the partitioner data only once and share it between several vectors
-       * with the same layout.
+       * the partitioner data only once and can be shared between several
+       * vectors with the same layout.
        *
        * The optional argument @p comm_sm, which consists of processes on
        * the same shared-memory domain, allows users have read-only access to
