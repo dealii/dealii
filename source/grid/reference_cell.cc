@@ -16,6 +16,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx17/algorithm.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/fe/fe_pyramid_p.h>
@@ -803,6 +804,329 @@ ReferenceCell::gmsh_element_type() const
     }
 
   return numbers::invalid_unsigned_int;
+}
+
+
+
+namespace
+{
+  // Compute the nearest point to @p on the line segment and the square of its
+  // distance to @p.
+  template <int dim>
+  std::pair<Point<dim>, double>
+  project_to_line(const Point<dim> &x0,
+                  const Point<dim> &x1,
+                  const Point<dim> &p)
+  {
+    Assert(x0 != x1, ExcInternalError());
+    // t is the convex combination coefficient (x = (1 - t) * x0 + t * x1)
+    // defining the position of the closest point on the line (not line segment)
+    // to p passing through x0 and x1. This formula is equivalent to the
+    // standard 'project a vector onto another vector', where each vector is
+    // shifted to start at x0.
+    const double t = ((x1 - x0) * (p - x0)) / ((x1 - x0).norm_square());
+
+    // Only consider points between x0 and x1
+    if (t <= 0)
+      return std::make_pair(x0, x0.distance_square(p));
+    else if (t <= 1)
+      {
+        const auto p2 = x0 + t * (x1 - x0);
+        return std::make_pair(p2, p2.distance_square(p));
+      }
+    else
+      return std::make_pair(x1, x1.distance_square(p));
+  }
+
+  // template base-case
+  template <int dim>
+  std::pair<Point<dim>, double>
+  project_to_quad(const std::array<Point<dim>, 3> & /*vertices*/,
+                  const Point<dim> & /*p*/,
+                  const ReferenceCell /*reference_cell*/)
+  {
+    Assert(false, ExcInternalError());
+    return std::make_pair(Point<dim>(),
+                          std::numeric_limits<double>::signaling_NaN());
+  }
+
+  /**
+   * Compute the nearest point on a quad (in the deal.II sense: i.e., something
+   * with structdim = 2 and spacedim = 3) and the square of that point's
+   * distance to @p p. Here, the quad is described with three vertices: either
+   * the three vertices of a Triangle or the first three of a Quadrilateral (as
+   * the fourth one can be computed, in that case, from the first three).
+   *
+   * If the given point cannot be projected via a normal vector (i.e., if the
+   * line parallel to the normal vector intersecting @p p does not intersect the
+   * quad) then this function returns the origin and the largest double
+   * precision number. distance_to_line_square() is in charge of computing the
+   * distance to lines.
+   *
+   * @note This function is for Quadrilaterals and Triangles because it is
+   * intended to find the shortest distance to the face of a reference cell
+   * (which must be a Triangle or Quadrilateral) in 3d.
+   */
+  template <>
+  std::pair<Point<3>, double>
+  project_to_quad(const std::array<Point<3>, 3> &vertices,
+                  const Point<3> &               p,
+                  const ReferenceCell            face_reference_cell)
+  {
+    Assert(face_reference_cell == ReferenceCells::Triangle ||
+             face_reference_cell == ReferenceCells::Quadrilateral,
+           ExcNotImplemented());
+
+    // Make the problem slightly easier by shifting everything to avoid a point
+    // at the origin (this way we can invert the matrix of vertices). Use 2.0 so
+    // that the bottom left vertex of a Pyramid is now at x = 1.
+    std::array<Point<3>, 3> shifted_vertices = vertices;
+    const Tensor<1, 3>      shift{{2.0, 2.0, 2.0}};
+    for (Point<3> &shifted_vertex : shifted_vertices)
+      shifted_vertex += shift;
+    const Point<3> shifted_p = p + shift;
+
+    // As we are projecting onto a face of a reference cell, the vectors
+    // describing its local coordinate system should be orthogonal. We don't
+    // know which of the three vectors computed from p are mutually orthogonal
+    // for triangles so that case requires an extra check.
+    Tensor<1, 3>   e0;
+    Tensor<1, 3>   e1;
+    const Point<3> vertex = shifted_vertices[0];
+    // Triangles are difficult because of two cases:
+    // 1. the top face of a Tetrahedron, which does not have a right angle
+    // 2. wedges and pyramids, whose faces do not lie on the reference simplex
+    //
+    // Deal with both by creating a locally orthogonal (but not necessarily
+    // orthonormal) coordinate system and testing if the projected point is in
+    // the triangle by expressing it as a convex combination of the vertices.
+    if (face_reference_cell == ReferenceCells::Triangle)
+      {
+        e0 = shifted_vertices[1] - shifted_vertices[0];
+        e1 = shifted_vertices[2] - shifted_vertices[0];
+        e1 -= (e0 * e1) * e0 / (e0.norm_square());
+      }
+    else
+      {
+        e0 = shifted_vertices[1] - shifted_vertices[0];
+        e1 = shifted_vertices[2] - shifted_vertices[0];
+      }
+    Assert(std::abs(e0 * e1) <= 1e-14, ExcInternalError());
+    // the quadrilaterals on pyramids and wedges don't necessarily have edge
+    // lengths of 1 so we cannot skip the denominator
+    const double   c0 = e0 * (shifted_p - vertex) / e0.norm_square();
+    const double   c1 = e1 * (shifted_p - vertex) / e1.norm_square();
+    const Point<3> projected_shifted_p = vertex + c0 * e0 + c1 * e1;
+
+    bool in_quad = false;
+    if (face_reference_cell == ReferenceCells::Triangle)
+      {
+        Tensor<2, 3> shifted_vertex_matrix;
+        for (unsigned int i = 0; i < 3; ++i)
+          shifted_vertex_matrix[i] = shifted_vertices[i];
+        const Tensor<1, 3> combination_coordinates =
+          invert(transpose(shifted_vertex_matrix)) * projected_shifted_p;
+        bool is_convex_combination = true;
+        for (unsigned int i = 0; i < 3; ++i)
+          is_convex_combination = is_convex_combination &&
+                                  (0.0 <= combination_coordinates[i]) &&
+                                  (combination_coordinates[i] <= 1.0);
+        in_quad = is_convex_combination;
+      }
+    else
+      in_quad = (0.0 <= c0 && c0 <= 1.0 && 0.0 <= c1 && c1 <= 1.0);
+
+    if (in_quad)
+      return std::make_pair(projected_shifted_p - shift,
+                            shifted_p.distance_square(projected_shifted_p));
+    else
+      return std::make_pair(Point<3>(), std::numeric_limits<double>::max());
+  }
+} // namespace
+
+
+
+template <int dim>
+Point<dim>
+ReferenceCell::closest_point(const Point<dim> &p) const
+{
+  AssertDimension(dim, get_dimension());
+
+  // Handle simple cases first:
+  if (dim == 0)
+    return p;
+  if (contains_point(p, 0.0))
+    return p;
+  if (dim == 1)
+    return project_to_line(vertex<dim>(0), vertex<dim>(1), p).first;
+
+  // Find the closest vertex so that we only need to check adjacent faces and
+  // lines.
+  Point<dim>   result;
+  unsigned int closest_vertex_no        = 0;
+  double closest_vertex_distance_square = vertex<dim>(0).distance_square(p);
+  for (unsigned int i = 1; i < n_vertices(); ++i)
+    {
+      const double new_vertex_distance_square =
+        vertex<dim>(i).distance_square(p);
+      if (new_vertex_distance_square < closest_vertex_distance_square)
+        {
+          closest_vertex_no              = i;
+          closest_vertex_distance_square = new_vertex_distance_square;
+        }
+    }
+
+  double min_distance_square = std::numeric_limits<double>::max();
+  if (dim == 2)
+    {
+      for (const unsigned int face_no :
+           faces_for_given_vertex(closest_vertex_no))
+        {
+          const Point<dim> v0 = vertex<dim>(line_to_cell_vertices(face_no, 0));
+          const Point<dim> v1 = vertex<dim>(line_to_cell_vertices(face_no, 1));
+
+          auto pair = project_to_line(v0, v1, p);
+          if (pair.second < min_distance_square)
+            {
+              result              = pair.first;
+              min_distance_square = pair.second;
+            }
+        }
+    }
+  else
+    {
+      // Check faces and then lines.
+      //
+      // For reference cells with sloped faces (i.e., all 3D shapes except
+      // Hexahedra), we might be able to do a valid normal projection to a face
+      // with a different slope which is on the 'other side' of the reference
+      // cell. To catch that case we have to unconditionally check lines after
+      // checking faces.
+      //
+      // For pyramids the closest vertex might not be on the closest face: for
+      // example, the origin is closest to vertex 4 which is not on the bottom
+      // plane. Get around that by just checking all faces for pyramids.
+      const std::array<unsigned int, 5> all_pyramid_faces{{0, 1, 2, 3, 4}};
+      const auto &faces = *this == ReferenceCells::Pyramid ?
+                            ArrayView<const unsigned int>(all_pyramid_faces) :
+                            faces_for_given_vertex(closest_vertex_no);
+      for (const unsigned int face_no : faces)
+        {
+          auto face_cell = face_reference_cell(face_no);
+          // We only need the first three points since for quads the last point
+          // is redundant
+          std::array<Point<dim>, 3> vertices;
+          for (unsigned int vertex_no = 0; vertex_no < 3; ++vertex_no)
+            vertices[vertex_no] = vertex<dim>(face_to_cell_vertices(
+              face_no, vertex_no, default_combined_face_orientation()));
+
+          auto pair = project_to_quad(vertices, p, face_cell);
+          if (pair.second < min_distance_square)
+            {
+              result              = pair.first;
+              min_distance_square = pair.second;
+            }
+        }
+
+      for (const unsigned int face_no :
+           faces_for_given_vertex(closest_vertex_no))
+        {
+          auto face_cell = face_reference_cell(face_no);
+          for (const unsigned int face_line_no : face_cell.line_indices())
+            {
+              const auto cell_line_no =
+                face_to_cell_lines(face_no,
+                                   face_line_no,
+                                   default_combined_face_orientation());
+              const auto v0 =
+                vertex<dim>(line_to_cell_vertices(cell_line_no, 0));
+              const auto v1 =
+                vertex<dim>(line_to_cell_vertices(cell_line_no, 1));
+              auto pair = project_to_line(v0, v1, p);
+              if (pair.second < min_distance_square)
+                {
+                  result              = pair.first;
+                  min_distance_square = pair.second;
+                }
+            }
+        }
+    }
+
+  Assert(min_distance_square < std::numeric_limits<double>::max(),
+         ExcInternalError());
+
+  // If necessary, slightly adjust the computed point so that it is closer to
+  // being on the surface of the reference cell. Due to roundoff it is difficult
+  // to place points on sloped surfaces (e.g., for Pyramids) so this check isn't
+  // perfect but does improve the accuracy of the projected point.
+  if (!contains_point(result, 0.0))
+    {
+      constexpr unsigned int x_index = 0;
+      constexpr unsigned int y_index = (dim >= 2 ? 1 : 0);
+      constexpr unsigned int z_index = (dim >= 3 ? 2 : 0);
+      switch (this->kind)
+        {
+          case ReferenceCells::Vertex:
+            Assert(false, ExcInternalError());
+            break;
+            // the bounds for each dimension of a hypercube are mutually
+            // independent:
+          case ReferenceCells::Line:
+          case ReferenceCells::Quadrilateral:
+          case ReferenceCells::Hexahedron:
+            for (unsigned int d = 0; d < dim; ++d)
+              result[d] = std_cxx17::clamp(result[d], 0.0, 1.0);
+            // simplices can use the standard definition of a simplex:
+            break;
+          case ReferenceCells::Triangle:
+            result[x_index] = std_cxx17::clamp(result[x_index], 0.0, 1.0);
+            result[y_index] =
+              std_cxx17::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+            break;
+          case ReferenceCells::Tetrahedron:
+            result[x_index] = std_cxx17::clamp(result[x_index], 0.0, 1.0);
+            result[y_index] =
+              std_cxx17::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+            result[z_index] =
+              std_cxx17::clamp(result[z_index],
+                               0.0,
+                               1.0 - result[x_index] - result[y_index]);
+            break;
+          // wedges and pyramids are more ad-hoc:
+          case ReferenceCells::Wedge:
+            result[x_index] = std_cxx17::clamp(result[x_index], 0.0, 1.0);
+            result[y_index] =
+              std_cxx17::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+            result[z_index] = std_cxx17::clamp(result[z_index], 0.0, 1.0);
+            break;
+          case ReferenceCells::Pyramid:
+            {
+              result[x_index] = std_cxx17::clamp(result[x_index], -1.0, 1.0);
+              result[y_index] = std_cxx17::clamp(result[y_index], -1.0, 1.0);
+              // It suffices to transform everything to the first quadrant to
+              // adjust z:
+              const auto x_abs = std::abs(result[x_index]);
+              const auto y_abs = std::abs(result[y_index]);
+
+              if (y_abs <= x_abs)
+                result[z_index] =
+                  std_cxx17::clamp(result[z_index], 0.0, 1.0 - x_abs);
+              else
+                result[z_index] =
+                  std_cxx17::clamp(result[z_index], 0.0, 1.0 - y_abs);
+            }
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
+        }
+    }
+  // We should be within 4 * eps of the cell by this point. The roundoff error
+  // comes from, e.g., computing (1 - x) + x when moving points onto the top of
+  // a Pyramid.
+  Assert(contains_point(result, 4.0 * std::numeric_limits<double>::epsilon()),
+         ExcInternalError());
+
+  return result;
 }
 
 
