@@ -1479,9 +1479,9 @@ namespace Step70
         Assert(pic.begin() == particle, ExcInternalError());
         for (const auto &p : pic)
           {
-            const auto &ref_q  = p.get_reference_location();
-            const auto &real_q = p.get_location();
-            const auto &JxW    = p.get_properties()[0];
+            const Point<spacedim> ref_q  = p.get_reference_location();
+            const Point<spacedim> real_q = p.get_location();
+            const double          JxW    = p.get_properties()[0];
 
             for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
