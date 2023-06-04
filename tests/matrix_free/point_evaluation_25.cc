@@ -115,7 +115,7 @@ test(const unsigned int degree)
       for (const auto q : evaluator.quadrature_point_indices())
         evaluator.submit_value(evaluator.get_value(q), q);
 
-      evaluator.integrate(solution_values, EvaluationFlags::values);
+      evaluator.test_and_sum(solution_values, EvaluationFlags::values);
 
       for (const auto i : solution_values)
         deallog << factor_float * i << ' ';
