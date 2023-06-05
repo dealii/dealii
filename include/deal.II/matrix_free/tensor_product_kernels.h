@@ -4045,119 +4045,125 @@ namespace internal
       }
     else if (dim == 1)
       {
-        const auto x0 = 1. - p[0], x1 = p[0];
+        const Number2 difference = value[0] * p[0] + gradient[0];
         if (add)
           {
-            values[0] += value[0] * x0 - gradient[0];
-            values[1] += value[0] * x1 + gradient[0];
+            values[0] += value[0] - difference;
+            values[1] += difference;
           }
         else
           {
-            values[0] = value[0] * x0 - gradient[0];
-            values[1] = value[0] * x1 + gradient[0];
+            values[0] = value[0] - difference;
+            values[1] = difference;
           }
         if (n_values > 1)
           {
+            const Number2 product = value[1] * p[0];
             if (add)
               {
-                values[2] += value[1] * x0;
-                values[3] += value[1] * x1;
+                values[2] += value[1] - product;
+                values[3] += product;
               }
             else
               {
-                values[2] = value[1] * x0;
-                values[3] = value[1] * x1;
+                values[2] = value[1] - product;
+                values[3] = product;
               }
           }
       }
     else if (dim == 2)
       {
-        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
-
-        const auto test_value_y0 = value[0] * y0 - gradient[1];
-        const auto test_grad_xy0 = gradient[0] * y0;
-        const auto test_value_y1 = value[0] * y1 + gradient[1];
-        const auto test_grad_xy1 = gradient[0] * y1;
+        const Number2 test_value_y1 = value[0] * p[1] + gradient[1];
+        const Number2 test_value_y0 = value[0] - test_value_y1;
+        const Number2 test_grad_xy1 = gradient[0] * p[1];
+        const Number2 test_grad_xy0 = gradient[0] - test_grad_xy1;
+        const Number2 value0        = p[0] * test_value_y0 + test_grad_xy0;
+        const Number2 value1        = p[0] * test_value_y1 + test_grad_xy1;
 
         if (add)
           {
-            values[0] += x0 * test_value_y0 - test_grad_xy0;
-            values[1] += x1 * test_value_y0 + test_grad_xy0;
-            values[2] += x0 * test_value_y1 - test_grad_xy1;
-            values[3] += x1 * test_value_y1 + test_grad_xy1;
+            values[0] += test_value_y0 - value0;
+            values[1] += value0;
+            values[2] += test_value_y1 - value1;
+            values[3] += value1;
           }
         else
           {
-            values[0] = x0 * test_value_y0 - test_grad_xy0;
-            values[1] = x1 * test_value_y0 + test_grad_xy0;
-            values[2] = x0 * test_value_y1 - test_grad_xy1;
-            values[3] = x1 * test_value_y1 + test_grad_xy1;
+            values[0] = test_value_y0 - value0;
+            values[1] = value0;
+            values[2] = test_value_y1 - value1;
+            values[3] = value1;
           }
 
         if (n_values > 1)
           {
-            const auto test_value_y0_2 = value[1] * y0;
-            const auto test_value_y1_2 = value[1] * y1;
+            const Number2 test_value_y1_2 = value[1] * p[1];
+            const Number2 test_value_y0_2 = value[1] - test_value_y1_2;
+            const Number2 value0_2        = p[0] * test_value_y1_2;
+            const Number2 value1_2        = p[0] * test_value_y1_2;
 
             if (add)
               {
-                values[4] += x0 * test_value_y0_2;
-                values[5] += x1 * test_value_y0_2;
-                values[6] += x0 * test_value_y1_2;
-                values[7] += x1 * test_value_y1_2;
+                values[4] += test_value_y0_2 - value0_2;
+                values[5] += value0_2;
+                values[6] += test_value_y1_2 - value1_2;
+                values[7] += value1_2;
               }
             else
               {
-                values[4] = x0 * test_value_y0_2;
-                values[5] = x1 * test_value_y0_2;
-                values[6] = x0 * test_value_y1_2;
-                values[7] = x1 * test_value_y1_2;
+                values[4] = test_value_y0_2 - value0_2;
+                values[5] = value0_2;
+                values[6] = test_value_y1_2 - value1_2;
+                values[7] = value1_2;
               }
           }
       }
     else if (dim == 3)
       {
         Assert(n_values == 1, ExcNotImplemented());
-        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                   z0 = 1. - p[2], z1 = p[2];
 
-        const auto test_value_z0 = value[0] * z0 - gradient[2];
-        const auto test_grad_x0  = gradient[0] * z0;
-        const auto test_grad_y0  = gradient[1] * z0;
-        const auto test_value_z1 = value[0] * z1 + gradient[2];
-        const auto test_grad_x1  = gradient[0] * z1;
-        const auto test_grad_y1  = gradient[1] * z1;
+        const Number2 test_value_z1 = value[0] * p[2] + gradient[2];
+        const Number2 test_value_z0 = value[0] - test_value_z1;
+        const Number2 test_grad_x1  = gradient[0] * p[2];
+        const Number2 test_grad_x0  = gradient[0] - test_grad_x1;
+        const Number2 test_grad_y1  = gradient[1] * p[2];
+        const Number2 test_grad_y0  = gradient[1] - test_grad_y1;
 
-        const auto test_value_y00 = test_value_z0 * y0 - test_grad_y0;
-        const auto test_grad_xy00 = test_grad_x0 * y0;
-        const auto test_value_y01 = test_value_z0 * y1 + test_grad_y0;
-        const auto test_grad_xy01 = test_grad_x0 * y1;
-        const auto test_value_y10 = test_value_z1 * y0 - test_grad_y1;
-        const auto test_grad_xy10 = test_grad_x1 * y0;
-        const auto test_value_y11 = test_value_z1 * y1 + test_grad_y1;
-        const auto test_grad_xy11 = test_grad_x1 * y1;
+        const Number2 test_value_y01 = test_value_z0 * p[1] + test_grad_y0;
+        const Number2 test_value_y00 = test_value_z0 - test_value_y01;
+        const Number2 test_grad_xy01 = test_grad_x0 * p[1];
+        const Number2 test_grad_xy00 = test_grad_x0 - test_grad_xy01;
+        const Number2 test_value_y11 = test_value_z1 * p[1] + test_grad_y1;
+        const Number2 test_value_y10 = test_value_z1 - test_value_y11;
+        const Number2 test_grad_xy11 = test_grad_x1 * p[1];
+        const Number2 test_grad_xy10 = test_grad_x1 - test_grad_xy11;
+
+        const Number2 value00 = p[0] * test_value_y00 + test_grad_xy00;
+        const Number2 value01 = p[0] * test_value_y01 + test_grad_xy01;
+        const Number2 value10 = p[0] * test_value_y10 + test_grad_xy10;
+        const Number2 value11 = p[0] * test_value_y11 + test_grad_xy11;
 
         if (add)
           {
-            values[0] += x0 * test_value_y00 - test_grad_xy00;
-            values[1] += x1 * test_value_y00 + test_grad_xy00;
-            values[2] += x0 * test_value_y01 - test_grad_xy01;
-            values[3] += x1 * test_value_y01 + test_grad_xy01;
-            values[4] += x0 * test_value_y10 - test_grad_xy10;
-            values[5] += x1 * test_value_y10 + test_grad_xy10;
-            values[6] += x0 * test_value_y11 - test_grad_xy11;
-            values[7] += x1 * test_value_y11 + test_grad_xy11;
+            values[0] += test_value_y00 - value00;
+            values[1] += value00;
+            values[2] += test_value_y01 - value01;
+            values[3] += value01;
+            values[4] += test_value_y10 - value10;
+            values[5] += value10;
+            values[6] += test_value_y11 - value11;
+            values[7] += value11;
           }
         else
           {
-            values[0] = x0 * test_value_y00 - test_grad_xy00;
-            values[1] = x1 * test_value_y00 + test_grad_xy00;
-            values[2] = x0 * test_value_y01 - test_grad_xy01;
-            values[3] = x1 * test_value_y01 + test_grad_xy01;
-            values[4] = x0 * test_value_y10 - test_grad_xy10;
-            values[5] = x1 * test_value_y10 + test_grad_xy10;
-            values[6] = x0 * test_value_y11 - test_grad_xy11;
-            values[7] = x1 * test_value_y11 + test_grad_xy11;
+            values[0] = test_value_y00 - value00;
+            values[1] = value00;
+            values[2] = test_value_y01 - value01;
+            values[3] = value01;
+            values[4] = test_value_y10 - value10;
+            values[5] = value10;
+            values[6] = test_value_y11 - value11;
+            values[7] = value11;
           }
       }
   }
