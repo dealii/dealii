@@ -347,7 +347,7 @@ jobs:
       run: |
         source /opt/intel/oneapi/setvars.sh
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: quicktest
       run: |
         source /opt/intel/oneapi/setvars.sh
