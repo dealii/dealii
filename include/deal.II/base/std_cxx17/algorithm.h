@@ -34,4 +34,4 @@ namespace std_cxx17
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii_cxx17_variant_h
+#endif // dealii_cxx17_algorithm_h
