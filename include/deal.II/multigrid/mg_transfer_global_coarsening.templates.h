@@ -3857,7 +3857,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
     // on element faces or vertices and therefore, the partitioner is fine
     IndexSet locally_relevant_dofs(dof_handler_fine.n_dofs());
     if (!this->fine_element_is_continuous &&
-        !dof_handler_fine.get_fe().degree == 0)
+        dof_handler_fine.get_fe().degree != 0)
       locally_relevant_dofs.add_indices(global_dof_indices.begin(),
                                         global_dof_indices.end());
 
