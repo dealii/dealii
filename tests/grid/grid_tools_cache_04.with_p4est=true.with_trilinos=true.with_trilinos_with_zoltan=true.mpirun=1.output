@@ -1,238 +1,1453 @@
 
 DEAL:0::Testing for dim = 1
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.375000 p2 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 p2 0.625000 rank owner: 0
-DEAL:0::Bounding box: p1 0.375000 p2 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.625000 p2 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 p2 0.625000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 p2 0.625000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.625000 p2 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.625000 p2 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.625000 p2 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 p2 0.625000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
-DEAL:0::Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.375000 p2 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.375000 p2 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.125000 p2 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 p2 0.625000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 p2 0.625000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 p2 0.625000 rank owner: 0
-DEAL:0::Bounding box: p1 0.375000 p2 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.875000 p2 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 p2 0.375000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 p2 0.875000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
+DEAL:0::  Checking cell with points #0
+DEAL:0::    Checking point #31 at 0.839112
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #0 at 0.840188
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #1
+DEAL:0::    Checking point #1 at 0.394383
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #2
+DEAL:0::    Checking point #2 at 0.783099
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #3
+DEAL:0::    Checking point #3 at 0.798440
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #23 at 0.804177
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #4
+DEAL:0::    Checking point #4 at 0.911647
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #5
+DEAL:0::    Checking point #5 at 0.197551
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #6
+DEAL:0::    Checking point #6 at 0.335223
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #7
+DEAL:0::    Checking point #7 at 0.768230
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #41 at 0.769914
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #39 at 0.771358
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #8
+DEAL:0::    Checking point #8 at 0.277775
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #9
+DEAL:0::    Checking point #9 at 0.553970
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #10
+DEAL:0::    Checking point #10 at 0.477397
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #11
+DEAL:0::    Checking point #11 at 0.628871
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #12
+DEAL:0::    Checking point #12 at 0.364784
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #13
+DEAL:0::    Checking point #30 at 0.512932
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #13 at 0.513401
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #14
+DEAL:0::    Checking point #49 at 0.949327
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #14 at 0.952230
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #15
+DEAL:0::    Checking point #15 at 0.916195
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #47 at 0.919026
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #16
+DEAL:0::    Checking point #16 at 0.635712
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #34 at 0.637552
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #17
+DEAL:0::    Checking point #17 at 0.717297
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #18
+DEAL:0::    Checking point #18 at 0.141603
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #19
+DEAL:0::    Checking point #19 at 0.606969
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #20
+DEAL:0::    Checking point #20 at 0.0163006
+DEAL:0::      Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #21
+DEAL:0::    Checking point #21 at 0.242887
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #22
+DEAL:0::    Checking point #22 at 0.137232
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #23
+DEAL:0::    Checking point #24 at 0.156679
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #24
+DEAL:0::    Checking point #42 at 0.400229
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #25 at 0.400944
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #25
+DEAL:0::    Checking point #26 at 0.129790
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #26
+DEAL:0::    Checking point #27 at 0.108809
+DEAL:0::      Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #27
+DEAL:0::    Checking point #28 at 0.998925
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #28
+DEAL:0::    Checking point #29 at 0.218257
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #29
+DEAL:0::    Checking point #32 at 0.612640
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #30
+DEAL:0::    Checking point #38 at 0.292517
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #33 at 0.296032
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #31
+DEAL:0::    Checking point #40 at 0.526745
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::    Checking point #35 at 0.524287
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #32
+DEAL:0::    Checking point #36 at 0.493583
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #33
+DEAL:0::    Checking point #37 at 0.972775
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #34
+DEAL:0::    Checking point #43 at 0.891529
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #35
+DEAL:0::    Checking point #44 at 0.283315
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #36
+DEAL:0::    Checking point #45 at 0.352458
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #37
+DEAL:0::    Checking point #46 at 0.807725
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #38
+DEAL:0::    Checking point #48 at 0.0697553
+DEAL:0::      Bounding box: p1 0.00000 p2 0.125000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.375000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.625000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 0.875000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 p2 1.00000 rank owner: 0
 DEAL:0::Test for dim 1 finished.
 DEAL:0::Testing for dim = 2
-DEAL:0::Bounding box: p1 0.500000 0.00000 p2 0.750000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 p2 0.750000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 p2 0.250000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.250000 p2 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.00000 p2 0.500000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.750000 p2 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.500000 p2 0.500000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 p2 0.750000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 p2 0.750000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.500000 p2 1.00000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.500000 p2 0.500000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 p2 0.750000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.250000 p2 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.500000 p2 0.500000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.500000 p2 1.00000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.750000 p2 0.750000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.750000 p2 0.750000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.00000 p2 0.500000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.750000 p2 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.250000 p2 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.00000 p2 0.500000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.250000 p2 0.250000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.750000 p2 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.00000 p2 0.500000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 p2 0.750000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 p2 0.250000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 p2 0.250000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 p2 0.250000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.500000 p2 1.00000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.750000 p2 0.750000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.750000 p2 0.750000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.750000 p2 0.750000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.00000 p2 1.00000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.00000 p2 1.00000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.00000 p2 1.00000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.00000 p2 1.00000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 p2 0.750000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.250000 p2 0.250000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.750000 p2 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.500000 p2 0.500000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 p2 0.750000 0.250000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.750000 p2 0.750000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.250000 0.750000 p2 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.750000 p2 0.750000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 p2 0.750000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 p2 0.250000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.750000 p2 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.750000 p2 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.500000 p2 1.00000 0.750000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.750000 p2 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.250000 p2 0.750000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.750000 p2 0.250000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.750000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::  Checking cell with points #0
+DEAL:0::    Checking point #52 at 0.520210 0.0782321
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::    Checking point #0 at 0.525995 0.0860558
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #1
+DEAL:0::    Checking point #1 at 0.192214 0.663227
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #2
+DEAL:0::    Checking point #2 at 0.890233 0.348893
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #3
+DEAL:0::    Checking point #3 at 0.0641713 0.0200230
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #4
+DEAL:0::    Checking point #4 at 0.457702 0.0630958
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #5
+DEAL:0::    Checking point #5 at 0.238280 0.970634
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #6
+DEAL:0::    Checking point #6 at 0.902208 0.850920
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #7
+DEAL:0::    Checking point #7 at 0.266666 0.539760
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #8
+DEAL:0::    Checking point #8 at 0.375207 0.760249
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #9
+DEAL:0::    Checking point #9 at 0.512535 0.667724
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #10
+DEAL:0::    Checking point #10 at 0.531606 0.0392803
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #11
+DEAL:0::    Checking point #22 at 0.439560 0.923970
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::    Checking point #11 at 0.437638 0.931835
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #12
+DEAL:0::    Checking point #12 at 0.930810 0.720952
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #13
+DEAL:0::    Checking point #13 at 0.284293 0.738534
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #14
+DEAL:0::    Checking point #14 at 0.639979 0.354049
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #15
+DEAL:0::    Checking point #15 at 0.687861 0.165974
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #16
+DEAL:0::    Checking point #16 at 0.440105 0.880075
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #17
+DEAL:0::    Checking point #17 at 0.829201 0.330337
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #18
+DEAL:0::    Checking point #18 at 0.228968 0.893372
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #19
+DEAL:0::    Checking point #19 at 0.350360 0.686670
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #20
+DEAL:0::    Checking point #20 at 0.956468 0.588640
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #21
+DEAL:0::    Checking point #21 at 0.657304 0.858676
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #22
+DEAL:0::    Checking point #23 at 0.398437 0.814767
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #23
+DEAL:0::    Checking point #24 at 0.684219 0.910972
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #24
+DEAL:0::    Checking point #25 at 0.482491 0.215825
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #25
+DEAL:0::    Checking point #26 at 0.950252 0.920128
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #26
+DEAL:0::    Checking point #27 at 0.147660 0.881062
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #27
+DEAL:0::    Checking point #28 at 0.641081 0.431953
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #28
+DEAL:0::    Checking point #29 at 0.619596 0.281059
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #29
+DEAL:0::    Checking point #30 at 0.786002 0.307458
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #30
+DEAL:0::    Checking point #31 at 0.447034 0.226107
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #31
+DEAL:0::    Checking point #32 at 0.187533 0.276235
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #32
+DEAL:0::    Checking point #33 at 0.556444 0.416501
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #33
+DEAL:0::    Checking point #34 at 0.169607 0.906804
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #34
+DEAL:0::    Checking point #35 at 0.103171 0.126075
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #35
+DEAL:0::    Checking point #36 at 0.495444 0.760475
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #36
+DEAL:0::    Checking point #37 at 0.984752 0.935004
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #37
+DEAL:0::    Checking point #38 at 0.684445 0.383188
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #38
+DEAL:0::    Checking point #39 at 0.749771 0.368664
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #39
+DEAL:0::    Checking point #40 at 0.294160 0.232262
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #40
+DEAL:0::    Checking point #41 at 0.584489 0.244413
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #41
+DEAL:0::    Checking point #42 at 0.152390 0.732149
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #42
+DEAL:0::    Checking point #43 at 0.125475 0.793470
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #43
+DEAL:0::    Checking point #44 at 0.164102 0.745071
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #44
+DEAL:0::    Checking point #45 at 0.0745298 0.950104
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #45
+DEAL:0::    Checking point #46 at 0.0525293 0.521563
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #46
+DEAL:0::    Checking point #47 at 0.176211 0.240062
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #47
+DEAL:0::    Checking point #48 at 0.797798 0.732654
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #48
+DEAL:0::    Checking point #49 at 0.656564 0.967405
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #49
+DEAL:0::    Checking point #50 at 0.639458 0.759735
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #50
+DEAL:0::    Checking point #51 at 0.0934805 0.134902
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #51
+DEAL:0::    Checking point #53 at 0.0699064 0.204655
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #52
+DEAL:0::    Checking point #54 at 0.461420 0.819677
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #53
+DEAL:0::    Checking point #55 at 0.573319 0.755581
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #54
+DEAL:0::    Checking point #56 at 0.0519388 0.157807
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #55
+DEAL:0::    Checking point #57 at 0.999994 0.204329
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #56
+DEAL:0::    Checking point #58 at 0.889956 0.125468
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #57
+DEAL:0::    Checking point #59 at 0.997799 0.0540576
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #58
+DEAL:0::    Checking point #60 at 0.870540 0.0723288
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #59
+DEAL:0::    Checking point #61 at 0.00416161 0.923069
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #60
+DEAL:0::    Checking point #62 at 0.593892 0.180372
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #61
+DEAL:0::    Checking point #63 at 0.163131 0.391690
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #62
+DEAL:0::    Checking point #64 at 0.913027 0.819695
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #63
+DEAL:0::    Checking point #65 at 0.359095 0.552485
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #64
+DEAL:0::    Checking point #66 at 0.579430 0.452576
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #65
+DEAL:0::    Checking point #67 at 0.687387 0.0996401
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #66
+DEAL:0::    Checking point #68 at 0.530808 0.757294
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #67
+DEAL:0::    Checking point #69 at 0.304295 0.992228
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #68
+DEAL:0::    Checking point #70 at 0.576971 0.877614
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #69
+DEAL:0::    Checking point #71 at 0.747809 0.628910
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #70
+DEAL:0::    Checking point #72 at 0.0354209 0.747803
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #71
+DEAL:0::    Checking point #73 at 0.833239 0.925377
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #72
+DEAL:0::    Checking point #74 at 0.873271 0.831038
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #73
+DEAL:0::    Checking point #75 at 0.979434 0.743811
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #74
+DEAL:0::    Checking point #76 at 0.903366 0.983596
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #75
+DEAL:0::    Checking point #77 at 0.666880 0.497259
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #76
+DEAL:0::    Checking point #78 at 0.163968 0.830012
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.250000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 0.750000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #77
+DEAL:0::    Checking point #79 at 0.888949 0.0769947
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.250000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 0.750000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 p2 1.00000 1.00000 rank owner: 0
 DEAL:0::Test for dim 2 finished.
 DEAL:0::Testing for dim = 3
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.500000 p2 1.00000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.00000 0.500000 p2 0.500000 0.500000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.500000 0.500000 0.500000 p2 1.00000 1.00000 1.00000 rank owner: 0
-DEAL:0::Bounding box: p1 0.00000 0.500000 0.500000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #0
+DEAL:0::    Checking point #0 at 0.649707 0.248044 0.629480
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::    Checking point #3 at 0.633072 0.223656 0.651132
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #1
+DEAL:0::    Checking point #1 at 0.229137 0.700620 0.316867
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #2
+DEAL:0::    Checking point #2 at 0.328777 0.231428 0.0741610
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #3
+DEAL:0::    Checking point #4 at 0.510686 0.971466 0.280042
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #4
+DEAL:0::    Checking point #5 at 0.546107 0.719269 0.113281
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #5
+DEAL:0::    Checking point #6 at 0.471483 0.592540 0.944318
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #6
+DEAL:0::    Checking point #7 at 0.450918 0.336351 0.847684
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #7
+DEAL:0::    Checking point #8 at 0.434513 0.00323146 0.344943
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #8
+DEAL:0::    Checking point #9 at 0.598481 0.833243 0.233892
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #9
+DEAL:0::    Checking point #10 at 0.675476 0.482950 0.481936
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #10
+DEAL:0::    Checking point #11 at 0.304956 0.712087 0.182556
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #11
+DEAL:0::    Checking point #12 at 0.621823 0.0408643 0.413984
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #12
+DEAL:0::    Checking point #13 at 0.695984 0.673936 0.637640
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #13
+DEAL:0::    Checking point #14 at 0.347116 0.184622 0.609106
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #14
+DEAL:0::    Checking point #15 at 0.627158 0.730729 0.328374
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #15
+DEAL:0::    Checking point #16 at 0.740438 0.202213 0.920914
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #16
+DEAL:0::    Checking point #17 at 0.684757 0.653130 0.257265
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #17
+DEAL:0::    Checking point #18 at 0.532441 0.0876436 0.260497
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #18
+DEAL:0::    Checking point #19 at 0.877384 0.686125 0.0937402
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #19
+DEAL:0::    Checking point #20 at 0.111276 0.361601 0.576691
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #20
+DEAL:0::    Checking point #21 at 0.593211 0.666557 0.288778
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #21
+DEAL:0::    Checking point #22 at 0.775767 0.288379 0.329642
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #22
+DEAL:0::    Checking point #23 at 0.189751 0.984363 0.00357857
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #23
+DEAL:0::    Checking point #24 at 0.827391 0.331479 0.188201
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #24
+DEAL:0::    Checking point #25 at 0.436497 0.958637 0.918930
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #25
+DEAL:0::    Checking point #26 at 0.764871 0.699075 0.121143
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #26
+DEAL:0::    Checking point #27 at 0.685786 0.383832 0.774273
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #27
+DEAL:0::    Checking point #28 at 0.943051 0.916273 0.861917
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #28
+DEAL:0::    Checking point #29 at 0.203548 0.793657 0.548042
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #29
+DEAL:0::    Checking point #30 at 0.297288 0.904932 0.909643
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #30
+DEAL:0::    Checking point #31 at 0.873979 0.498144 0.576200
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #31
+DEAL:0::    Checking point #32 at 0.162757 0.273911 0.864579
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #32
+DEAL:0::    Checking point #33 at 0.492399 0.463662 0.848942
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #33
+DEAL:0::    Checking point #34 at 0.495977 0.291053 0.180421
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #34
+DEAL:0::    Checking point #35 at 0.684178 0.727550 0.139058
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #35
+DEAL:0::    Checking point #36 at 0.603109 0.492422 0.838134
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #36
+DEAL:0::    Checking point #37 at 0.724252 0.178208 0.221966
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #37
+DEAL:0::    Checking point #38 at 0.498525 0.121259 0.138238
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #38
+DEAL:0::    Checking point #39 at 0.360443 0.324807 0.931895
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #39
+DEAL:0::    Checking point #40 at 0.908485 0.622095 0.836828
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #40
+DEAL:0::    Checking point #41 at 0.818128 0.496074 0.334972
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #41
+DEAL:0::    Checking point #42 at 0.394327 0.658831 0.608883
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #42
+DEAL:0::    Checking point #43 at 0.258906 0.151230 0.0725450
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #43
+DEAL:0::    Checking point #44 at 0.107848 0.647207 0.363598
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #44
+DEAL:0::    Checking point #45 at 0.288270 0.331386 0.0911486
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #45
+DEAL:0::    Checking point #46 at 0.427328 0.934495 0.583570
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #46
+DEAL:0::    Checking point #47 at 0.265461 0.658747 0.761778
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #47
+DEAL:0::    Checking point #48 at 0.487427 0.157272 0.883037
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #48
+DEAL:0::    Checking point #49 at 0.625665 0.517715 0.207844
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #49
+DEAL:0::    Checking point #50 at 0.557561 0.426199 0.829939
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #50
+DEAL:0::    Checking point #51 at 0.394388 0.244327 0.326013
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #51
+DEAL:0::    Checking point #52 at 0.729360 0.638654 0.984845
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #52
+DEAL:0::    Checking point #53 at 0.338243 0.897560 0.136075
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #53
+DEAL:0::    Checking point #54 at 0.410788 0.00540855 0.783282
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #54
+DEAL:0::    Checking point #55 at 0.774386 0.293678 0.114668
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #55
+DEAL:0::    Checking point #56 at 0.865535 0.721006 0.0491625
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #56
+DEAL:0::    Checking point #57 at 0.449105 0.986467 0.707909
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #57
+DEAL:0::    Checking point #58 at 0.210883 0.473894 0.865181
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #58
+DEAL:0::    Checking point #59 at 0.0939195 0.0995593 0.382896
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #59
+DEAL:0::    Checking point #60 at 0.301763 0.657120 0.809095
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #60
+DEAL:0::    Checking point #61 at 0.131702 0.0515083 0.0534223
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #61
+DEAL:0::    Checking point #62 at 0.457716 0.780868 0.692076
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #62
+DEAL:0::    Checking point #63 at 0.442560 0.119111 0.589637
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #63
+DEAL:0::    Checking point #64 at 0.578635 0.529899 0.595045
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #64
+DEAL:0::    Checking point #65 at 0.361917 0.304285 0.888723
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #65
+DEAL:0::    Checking point #66 at 0.476585 0.169820 0.609729
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #66
+DEAL:0::    Checking point #67 at 0.525747 0.618925 0.596196
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #67
+DEAL:0::    Checking point #68 at 0.233656 0.829808 0.0700902
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #68
+DEAL:0::    Checking point #69 at 0.0988374 0.923728 0.169650
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #69
+DEAL:0::    Checking point #70 at 0.481733 0.225491 0.826769
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #70
+DEAL:0::    Checking point #71 at 0.290829 0.357193 0.878278
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #71
+DEAL:0::    Checking point #72 at 0.344251 0.814909 0.659146
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #72
+DEAL:0::    Checking point #73 at 0.0363274 0.257469 0.778257
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #73
+DEAL:0::    Checking point #74 at 0.625964 0.836104 0.308157
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #74
+DEAL:0::    Checking point #75 at 0.221009 0.198021 0.612442
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #75
+DEAL:0::    Checking point #76 at 0.109733 0.674605 0.782262
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #76
+DEAL:0::    Checking point #77 at 0.719462 0.200352 0.401188
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #77
+DEAL:0::    Checking point #78 at 0.315658 0.434009 0.230996
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #78
+DEAL:0::    Checking point #79 at 0.385748 0.532846 0.154724
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #79
+DEAL:0::    Checking point #80 at 0.555398 0.0145793 0.380215
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #80
+DEAL:0::    Checking point #81 at 0.382167 0.305408 0.737408
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #81
+DEAL:0::    Checking point #82 at 0.260445 0.649659 0.552316
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #82
+DEAL:0::    Checking point #83 at 0.919591 0.685986 0.809785
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #83
+DEAL:0::    Checking point #84 at 0.697848 0.311950 0.645889
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #84
+DEAL:0::    Checking point #85 at 0.00600477 0.532960 0.843910
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #85
+DEAL:0::    Checking point #86 at 0.618447 0.642693 0.518515
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #86
+DEAL:0::    Checking point #87 at 0.400709 0.362154 0.718867
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #87
+DEAL:0::    Checking point #88 at 0.801897 0.677812 0.152876
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #88
+DEAL:0::    Checking point #89 at 0.0328927 0.0635606 0.685722
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #89
+DEAL:0::    Checking point #90 at 0.187616 0.618958 0.700301
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #90
+DEAL:0::    Checking point #91 at 0.567831 0.00112548 0.00570914
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #91
+DEAL:0::    Checking point #92 at 0.305239 0.261570 0.655368
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #92
+DEAL:0::    Checking point #93 at 0.857555 0.181161 0.341354
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 0.500000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #93
+DEAL:0::    Checking point #94 at 0.667341 0.879009 0.653305
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #94
+DEAL:0::    Checking point #95 at 0.313230 0.885014 0.186265
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #95
+DEAL:0::    Checking point #96 at 0.157139 0.503461 0.828957
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #96
+DEAL:0::    Checking point #97 at 0.675654 0.904170 0.191112
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 0.500000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #97
+DEAL:0::    Checking point #98 at 0.394521 0.706067 0.868924
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #98
+DEAL:0::    Checking point #99 at 0.547397 0.738959 0.932485
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
+DEAL:0::  Checking cell with points #99
+DEAL:0::    Checking point #100 at 0.233119 0.926576 0.551443
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 0.500000 1.00000 1.00000 rank owner: 0
+DEAL:0::      Bounding box: p1 0.00000 0.00000 0.00000 p2 1.00000 1.00000 1.00000 rank owner: 0
 DEAL:0::Test for dim 3 finished.

@@ -1,0 +1,12 @@
+Removed: The BoundingBox class had a function `get_boundary_points()`
+that returned a writable reference to internal data structures. While
+the constructors enforced that the corner points of the bounding box
+are indeed bottom left and top right (i.e., that for each coordinate
+direction, the first corner point was less than or equal than the
+second corner point), it was not possible to enforce this invariant
+throughout the life of the object because users could set internal
+variables to arbitrary values via the aforementioned function. The
+function has consequently been removed; only the `const` version of
+the function remains that returns a read-only reference.
+<br>
+(Wolfgang Bangerth, 2023/03/24)

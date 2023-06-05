@@ -39,7 +39,7 @@ namespace bgi = boost::geometry::index;
 
 template <int dim>
 void
-test(unsigned int n_points)
+test(const unsigned int n_points)
 {
   deallog << "Testing for dim = " << dim << std::endl;
 
@@ -57,9 +57,9 @@ test(unsigned int n_points)
 
   const auto &global_description = cache.get_covering_rtree();
 
-  // Creating the random points
+  // Create a bunch of random points
   std::vector<Point<dim>> points;
-
+  points.reserve(n_points);
   for (size_t i = 0; i < n_points; ++i)
     points.push_back(random_point<dim>());
 
@@ -67,26 +67,40 @@ test(unsigned int n_points)
 
   const auto cell_qpoint_map =
     GridTools::compute_point_locations(cache, points);
-  const auto & cells   = std::get<0>(cell_qpoint_map);
-  const auto & maps    = std::get<2>(cell_qpoint_map);
-  unsigned int n_cells = cells.size();
+  const auto & cells               = std::get<0>(cell_qpoint_map);
+  const auto & maps                = std::get<2>(cell_qpoint_map);
+  unsigned int n_cells_with_points = cells.size();
 
-  for (unsigned int c = 0; c < n_cells; ++c)
+  for (unsigned int c = 0; c < n_cells_with_points; ++c)
     {
+      deallog << "  Checking cell with points #" << c << std::endl;
+
       // We know the owner as we're working on a shared triangulation
-      unsigned int cell_owner = cells[c]->subdomain_id();
+      const unsigned int cell_owner = cells[c]->subdomain_id();
+
+      // Loop over the indices of the points that were found in
+      // cells[c]:
       for (unsigned int idx : maps[c])
         {
+          deallog << "    Checking point #" << idx << " at " << points[idx]
+                  << std::endl;
+
+          // For the current point, figure out which processes (with
+          // their corresponding bounding boxes) could possibly own
+          // the point:
           std::vector<std::pair<BoundingBox<dim>, unsigned int>> test_results;
           global_description.query(bgi::intersects(points[idx]),
                                    std::back_inserter(test_results));
-          bool found = false;
 
-          // Printing and checking function output
+          // Then loop over the possible owners of the point and see
+          // if the known correct owner is indeed among them.
+          bool found = false;
           for (const auto &ans : test_results)
             {
+              Assert(ans.first.point_inside(points[idx]), ExcInternalError());
+
               const auto &bd_points = ans.first.get_boundary_points();
-              deallog << "Bounding box: p1 " << bd_points.first << " p2 "
+              deallog << "      Bounding box: p1 " << bd_points.first << " p2 "
                       << bd_points.second << " rank owner: " << ans.second
                       << std::endl;
               // Check if the guess made from the tree contains the answer

@@ -162,6 +162,14 @@ public:
    * Standard constructor for non-empty boxes: it uses a pair of points
    * which describe the box: one for the bottom and one for the top
    * corner.
+   *
+   * @pre The two points given need to be ordered properly so that the
+   *   first point is indeed the bottom left and the second point the
+   *   top right point. In other words, for each `d` between zero
+   *   and `spacedim`, the condition
+   *   `boundary_points.first[d] <= boundary_points.second[d]` needs
+   *   to be satisfied. This condition is maintained as an invariant
+   *   throughout the life of the object.
    */
   BoundingBox(const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
                 &boundary_points);
@@ -175,12 +183,6 @@ public:
    */
   template <class Container>
   BoundingBox(const Container &points);
-
-  /**
-   * Return a reference to the boundary_points
-   */
-  std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
-  get_boundary_points();
 
   /**
    * Return a const reference to the boundary_points
@@ -382,6 +384,10 @@ public:
   serialize(Archive &ar, const unsigned int version);
 
 private:
+  /**
+   * A pair of points that denote the bottom-left and top-right corners of
+   * the bounding box.
+   */
   std::pair<Point<spacedim, Number>, Point<spacedim, Number>> boundary_points;
 };
 
@@ -520,15 +526,6 @@ inline BoundingBox<spacedim, Number>::BoundingBox(const Container &points)
             max[d] = std::max(max[d], point[d]);
           }
     }
-}
-
-
-
-template <int spacedim, typename Number>
-inline std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
-BoundingBox<spacedim, Number>::get_boundary_points()
-{
-  return this->boundary_points;
 }
 
 
