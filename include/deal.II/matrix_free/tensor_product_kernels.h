@@ -3272,49 +3272,59 @@ namespace internal
     else if (dim == 1)
       {
         // gradient
-        result[0] = values[1] - values[0];
+        result[0] = Number3(values[1]) - Number3(values[0]);
         // values
-        const Number2 x0 = 1. - p[0], x1 = p[0];
-        result[1] = x0 * values[0] + x1 * values[1];
+        result[1] = Number3(values[0]) + p[0] * result[0];
         if (n_values > 1)
-          result[2] = x0 * values_2[0] + x1 * values_2[1];
+          result[2] = Number3(values_2[0]) + p[0] * (values_2[1] - values_2[0]);
       }
     else if (dim == 2)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
-        const Number3 tmp0 = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1 = x0 * values[2] + x1 * values[3];
+        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
+        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+
         // gradient
-        result[0] = y0 * (values[1] - values[0]) + y1 * (values[3] - values[2]);
+        result[0] = val10 + p[1] * (val32 - val10);
         result[1] = tmp1 - tmp0;
+
         // values
-        result[2] = y0 * tmp0 + y1 * tmp1;
+        result[2] = tmp0 + p[1] * result[1];
+
         if (n_values > 1)
           {
-            const Number3 tmp0_2 = x0 * values_2[0] + x1 * values_2[1];
-            const Number3 tmp1_2 = x0 * values_2[2] + x1 * values_2[3];
-            result[3]            = y0 * tmp0_2 + y1 * tmp1_2;
+            const Number3 tmp0_2 =
+              Number3(values_2[0]) + p[0] * (values_2[1] - values_2[0]);
+            const Number3 tmp1_2 =
+              Number3(values_2[2]) + p[0] * (values_2[3] - values_2[0]);
+            result[3] = tmp0_2 + p[1] * (tmp1_2 - tmp0_2);
           }
       }
     else if (dim == 3)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                      z0 = 1. - p[2], z1 = p[2];
-        const Number3 tmp0  = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1  = x0 * values[2] + x1 * values[3];
-        const Number3 tmpy0 = y0 * tmp0 + y1 * tmp1;
-        const Number3 tmp2  = x0 * values[4] + x1 * values[5];
-        const Number3 tmp3  = x0 * values[6] + x1 * values[7];
-        const Number3 tmpy1 = y0 * tmp2 + y1 * tmp3;
+        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
+        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmp10 = tmp1 - tmp0;
+        const Number3 tmpy0 = tmp0 + p[1] * tmp10;
+
+        const Number3 val54 = Number3(values[5]) - Number3(values[4]);
+        const Number3 val76 = Number3(values[7]) - Number3(values[6]);
+        const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
+        const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
+        const Number3 tmp32 = tmp3 - tmp2;
+        const Number3 tmpy1 = tmp2 + p[1] * tmp32;
 
         // gradient
-        result[2] = tmpy1 - tmpy0;
-        result[1] = z0 * (tmp1 - tmp0) + z1 * (tmp3 - tmp2);
-        result[0] =
-          z0 * (y0 * (values[1] - values[0]) + y1 * (values[3] - values[2])) +
-          z1 * (y0 * (values[5] - values[4]) + y1 * (values[7] - values[6]));
+        result[2]           = tmpy1 - tmpy0;
+        result[1]           = tmp10 + p[2] * (tmp32 - tmp10);
+        const Number3 tmpz0 = val10 + p[1] * (val32 - val10);
+        result[0] = tmpz0 + p[2] * (val54 + p[1] * (val76 - val54) - tmpz0);
+
         // value
-        result[3] = z0 * tmpy0 + z1 * tmpy1;
+        result[3] = tmpy0 + p[2] * result[2];
         Assert(n_values == 1, ExcNotImplemented());
       }
 
@@ -3526,28 +3536,32 @@ namespace internal
       }
     else if (dim == 1)
       {
-        return (1. - p[0]) * values[0] + p[0] * values[1];
+        return Number3(values[0]) +
+               p[0] * (Number3(values[1]) - Number3(values[0]));
       }
     else if (dim == 2)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0];
-        const Number3 tmp0   = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1   = x0 * values[2] + x1 * values[3];
-        const Number3 mapped = (1. - p[1]) * tmp0 + p[1] * tmp1;
-        return mapped;
+        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
+        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        return tmp0 + p[1] * (tmp1 - tmp0);
       }
     else if (dim == 3)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                      z0 = 1. - p[2], z1 = p[2];
-        const Number3 tmp0   = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1   = x0 * values[2] + x1 * values[3];
-        const Number3 tmpy0  = y0 * tmp0 + y1 * tmp1;
-        const Number3 tmp2   = x0 * values[4] + x1 * values[5];
-        const Number3 tmp3   = x0 * values[6] + x1 * values[7];
-        const Number3 tmpy1  = y0 * tmp2 + y1 * tmp3;
-        const Number3 mapped = z0 * tmpy0 + z1 * tmpy1;
-        return mapped;
+        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
+        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmpy0 = tmp0 + p[1] * (tmp1 - tmp0);
+
+        const Number3 val54 = Number3(values[5]) - Number3(values[4]);
+        const Number3 val76 = Number3(values[7]) - Number3(values[6]);
+        const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
+        const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
+        const Number3 tmpy1 = tmp2 + p[1] * (tmp3 - tmp2);
+
+        return tmpy0 + p[2] * (tmpy1 - tmpy0);
       }
 
     // work around a compile error: missing return statement
