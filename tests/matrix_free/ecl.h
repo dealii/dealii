@@ -167,10 +167,10 @@ test(const unsigned int geometry      = 0,
           phi_p.read_dof_values(src);
           phi_p.evaluate(true, true);
           VectorizedArrayType sigmaF =
-            (std::abs((phi_m.get_normal_vector(0) *
-                       phi_m.inverse_jacobian(0))[dim - 1]) +
-             std::abs((phi_m.get_normal_vector(0) *
-                       phi_p.inverse_jacobian(0))[dim - 1])) *
+            (std::abs(
+               (phi_m.normal_vector(0) * phi_m.inverse_jacobian(0))[dim - 1]) +
+             std::abs(
+               (phi_m.normal_vector(0) * phi_p.inverse_jacobian(0))[dim - 1])) *
             (Number)(std::max(fe_degree, 1) * (fe_degree + 1.0));
 
           for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
@@ -200,8 +200,8 @@ test(const unsigned int geometry      = 0,
           phi_m.read_dof_values(src);
           phi_m.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
           VectorizedArrayType sigmaF =
-            std::abs((phi_m.get_normal_vector(0) *
-                      phi_m.inverse_jacobian(0))[dim - 1]) *
+            std::abs(
+              (phi_m.normal_vector(0) * phi_m.inverse_jacobian(0))[dim - 1]) *
             Number(std::max(fe_degree, 1) * (fe_degree + 1.0)) * 2.0;
 
           for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
@@ -258,7 +258,7 @@ test(const unsigned int geometry      = 0,
                   phi_m.evaluate(EvaluationFlags::values |
                                  EvaluationFlags::gradients);
                   VectorizedArrayType sigmaF =
-                    std::abs((phi_m.get_normal_vector(0) *
+                    std::abs((phi_m.normal_vector(0) *
                               phi_m.inverse_jacobian(0))[dim - 1]) *
                     Number(std::max(fe_degree, 1) * (fe_degree + 1.0)) * 2.0;
 
@@ -291,9 +291,9 @@ test(const unsigned int geometry      = 0,
                                  EvaluationFlags::gradients);
 
                   VectorizedArrayType sigmaF =
-                    (std::abs((phi_m.get_normal_vector(0) *
+                    (std::abs((phi_m.normal_vector(0) *
                                phi_m.inverse_jacobian(0))[dim - 1]) +
-                     std::abs((phi_m.get_normal_vector(0) *
+                     std::abs((phi_m.normal_vector(0) *
                                phi_p.inverse_jacobian(0))[dim - 1])) *
                     (Number)(std::max(fe_degree, 1) * (fe_degree + 1.0));
 

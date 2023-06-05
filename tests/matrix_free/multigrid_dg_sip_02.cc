@@ -220,9 +220,9 @@ private:
         fe_eval_neighbor.evaluate(EvaluationFlags::values |
                                   EvaluationFlags::gradients);
         VectorizedArray<number> sigmaF =
-          (std::abs((fe_eval.get_normal_vector(0) *
+          (std::abs((fe_eval.normal_vector(0) *
                      fe_eval.inverse_jacobian(0))[dim - 1]) +
-           std::abs((fe_eval.get_normal_vector(0) *
+           std::abs((fe_eval.normal_vector(0) *
                      fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
           (number)(std::max(fe_degree, 1) * (fe_degree + 1.0));
 
@@ -262,8 +262,8 @@ private:
         fe_eval.read_dof_values(src);
         fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         VectorizedArray<number> sigmaF =
-          std::abs((fe_eval.get_normal_vector(0) *
-                    fe_eval.inverse_jacobian(0))[dim - 1]) *
+          std::abs(
+            (fe_eval.normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) *
           (number)(std::max(1, fe_degree) * (fe_degree + 1.0)) * 2.;
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
@@ -328,8 +328,8 @@ private:
           {
             phif.reinit(cell, face);
             VectorizedArray<number> sigmaF =
-              std::abs((phif.get_normal_vector(0) *
-                        phif.inverse_jacobian(0))[dim - 1]) *
+              std::abs(
+                (phif.normal_vector(0) * phif.inverse_jacobian(0))[dim - 1]) *
               (number)(std::max(1, fe_degree) * (fe_degree + 1.0)) * 2.;
             std::array<types::boundary_id, VectorizedArray<number>::size()>
               boundary_ids = data.get_faces_by_cells_boundary_id(cell, face);

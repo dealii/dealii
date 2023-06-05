@@ -15,13 +15,14 @@
 
 
 
-// similar to advect_1d but for a system of 3 components
+// Same as advect_1d.cc using the deprecated FEEval::get_normal_vector()
+// to ensure user code is not broken. This test can be removed once
+// get_normal_vector() is removed.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -114,14 +115,7 @@ private:
         phi.read_dof_values(src);
         phi.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
-          {
-            Tensor<1, n_components, Tensor<1, dim, VectorizedArray<number>>>
-              grad;
-            for (unsigned int c = 0; c < n_components; ++c)
-              for (unsigned int d = 0; d < dim; ++d)
-                grad[c][d] = advection[d] * phi.get_value(q)[c];
-            phi.submit_gradient(grad, q);
-          }
+          phi.submit_gradient(advection * phi.get_value(q), q);
         phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
@@ -158,7 +152,7 @@ private:
             value_type u_minus = phi_m.get_value(q),
                        u_plus  = phi_p.get_value(q);
             const VectorizedArray<number> normal_times_advection =
-              advection * phi_m.normal_vector(q);
+              advection * phi_m.get_normal_vector(q);
             const value_type flux_times_normal =
               make_vectorized_array<number>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
@@ -200,7 +194,7 @@ private:
             value_type                    u_minus = fe_eval.get_value(q);
             value_type                    u_plus  = -u_minus;
             const VectorizedArray<number> normal_times_advection =
-              advection * fe_eval.normal_vector(q);
+              advection * fe_eval.get_normal_vector(q);
             const value_type flux_times_normal =
               make_vectorized_array<number>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
@@ -227,13 +221,13 @@ class AnalyticFunction : public Function<dim>
 public:
   static_assert(dim == 1, "Only 1D implemented");
   AnalyticFunction()
-    : Function<dim>(3)
+    : Function<dim>(1)
   {}
 
   virtual double
-  value(const Point<dim> &p, const unsigned int component) const override
+  value(const Point<dim> &p, const unsigned int) const override
   {
-    return std::sin(3 * numbers::PI * p[0] / 0.8) * (component + 1.2);
+    return std::sin(3 * numbers::PI * p[0] / 0.8);
   }
 };
 
@@ -245,18 +239,18 @@ class AnalyticDerivative : public Function<dim>
 public:
   static_assert(dim == 1, "Only 1D implemented");
   AnalyticDerivative()
-    : Function<dim>(3)
+    : Function<dim>(1)
   {}
 
   virtual double
-  value(const Point<dim> &p, const unsigned int component) const override
+  value(const Point<dim> &p, const unsigned int) const override
   {
     Tensor<1, dim> advection;
     for (unsigned int d = 0; d < dim; ++d)
       advection[d] = 0.4 + 0.12 * d;
 
     return -std::cos(3 * numbers::PI * p[0] / 0.8) * advection[0] * 3 *
-           numbers::PI / 0.8 * (component + 1.2);
+           numbers::PI / 0.8;
   }
 };
 
@@ -270,8 +264,7 @@ test(const unsigned int n_refine)
   GridGenerator::hyper_cube(tria, 0, 0.8);
   tria.refine_global(n_refine);
 
-  FE_DGQ<dim>     fe_dgq(fe_degree);
-  FESystem<dim>   fe(fe_dgq, 3);
+  FE_DGQ<dim>     fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   AffineConstraints<double> constraints;
@@ -305,8 +298,7 @@ test(const unsigned int n_refine)
                            fe_degree,
                            fe_degree + 1,
                            double,
-                           LinearAlgebra::distributed::Vector<double>,
-                           3>
+                           LinearAlgebra::distributed::Vector<double>>
     mf2(mf_data);
   mf2.vmult(out, in);
 

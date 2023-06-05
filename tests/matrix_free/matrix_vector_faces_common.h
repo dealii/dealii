@@ -156,9 +156,9 @@ private:
         fe_eval_neighbor.evaluate(EvaluationFlags::values |
                                   EvaluationFlags::gradients);
         VectorizedArrayType sigmaF =
-          (std::abs((fe_eval.get_normal_vector(0) *
+          (std::abs((fe_eval.normal_vector(0) *
                      fe_eval.inverse_jacobian(0))[dim - 1]) +
-           std::abs((fe_eval.get_normal_vector(0) *
+           std::abs((fe_eval.normal_vector(0) *
                      fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
           (number)(std::max(actual_degree, 1) * (actual_degree + 1.0));
 
@@ -217,8 +217,8 @@ private:
         fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         VectorizedArrayType sigmaF =
           2.0 *
-          std::abs((fe_eval.get_normal_vector(0) *
-                    fe_eval.inverse_jacobian(0))[dim - 1]) *
+          std::abs(
+            (fe_eval.normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) *
           number(std::max(actual_degree, 1) * (actual_degree + 1.0));
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
@@ -362,9 +362,9 @@ private:
                                            EvaluationFlags::gradients);
 
         VectorizedArrayType sigmaF =
-          (std::abs((fe_eval.get_normal_vector(0) *
+          (std::abs((fe_eval.normal_vector(0) *
                      fe_eval.inverse_jacobian(0))[dim - 1]) +
-           std::abs((fe_eval.get_normal_vector(0) *
+           std::abs((fe_eval.normal_vector(0) *
                      fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
           (number)(std::max(actual_degree, 1) * (actual_degree + 1.0));
 
@@ -423,8 +423,8 @@ private:
                                 EvaluationFlags::values |
                                   EvaluationFlags::gradients);
         VectorizedArrayType sigmaF =
-          std::abs((fe_eval.get_normal_vector(0) *
-                    fe_eval.inverse_jacobian(0))[dim - 1]) *
+          std::abs(
+            (fe_eval.normal_vector(0) * fe_eval.inverse_jacobian(0))[dim - 1]) *
           number(std::max(actual_degree, 1) * (actual_degree + 1.0)) * 2.0;
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
@@ -598,7 +598,7 @@ private:
             value_type u_minus = phi_m.get_value(q),
                        u_plus  = phi_p.get_value(q);
             const VectorizedArrayType normal_times_advection =
-              advection * phi_m.get_normal_vector(q);
+              advection * phi_m.normal_vector(q);
             const value_type flux_times_normal =
               make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
@@ -646,7 +646,7 @@ private:
           {
             value_type                u_minus = fe_eval.get_value(q);
             const VectorizedArrayType normal_times_advection =
-              advection * fe_eval.get_normal_vector(q);
+              advection * fe_eval.normal_vector(q);
             const value_type flux_times_normal =
               make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +

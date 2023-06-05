@@ -1199,7 +1199,7 @@ namespace Euler_DG
             const auto numerical_flux =
               euler_numerical_flux<dim>(phi_m.get_value(q),
                                         phi_p.get_value(q),
-                                        phi_m.get_normal_vector(q));
+                                        phi_m.normal_vector(q));
             //	    std::cout<<" phim: "<<phi_m.get_value(q)
             //	     <<" phip: "<<phi_p.get_value(q)<<std::endl;
             phi_m.submit_value(-numerical_flux, q);
@@ -1286,7 +1286,7 @@ namespace Euler_DG
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
             const auto w_m    = phi.get_value(q);
-            const auto normal = phi.get_normal_vector(q);
+            const auto normal = phi.normal_vector(q);
 
             auto rho_u_dot_n = w_m[1] * normal[0];
             for (unsigned int d = 1; d < dim; ++d)

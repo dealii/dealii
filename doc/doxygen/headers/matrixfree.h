@@ -211,7 +211,7 @@ digraph G
  * information, respectively. Besides access to the function values with
  * FEEvaluationAccess::get_value() or gradients with
  * FEEvaluationAccess::get_gradient(), the face evaluator also enables the
- * access to the normal vector by FEEvaluationAccess::get_normal_vector() and
+ * access to the normal vector by FEEvaluationAccess::normal_vector() and
  * a specialized field FEEvaluationAccess::get_normal_derivative(), which
  * returns the derivative of the solution field normal to the face. This
  * quantity is computed as the gradient (in real space) multiplied by the

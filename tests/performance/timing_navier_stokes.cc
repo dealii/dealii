@@ -845,9 +845,9 @@ namespace NavierStokes_DG
                                         EvaluationFlags::gradients);
 
                 const auto tau_ip =
-                  (std::abs((phi_m.get_normal_vector(0) *
+                  (std::abs((phi_m.normal_vector(0) *
                              phi_m.inverse_jacobian(0))[dim - 1]) +
-                   std::abs((phi_p.get_normal_vector(0) *
+                   std::abs((phi_p.normal_vector(0) *
                              phi_p.inverse_jacobian(0))[dim - 1])) *
                   Number(viscosity * (degree + 1) * (degree + 1));
 
@@ -855,7 +855,7 @@ namespace NavierStokes_DG
                   {
                     const auto w_m    = phi_m.get_value(q);
                     const auto w_p    = phi_p.get_value(q);
-                    const auto normal = phi_m.get_normal_vector(q);
+                    const auto normal = phi_m.normal_vector(q);
                     auto       numerical_flux =
                       -euler_numerical_flux<dim>(w_m, w_p, normal);
                     const auto grad_w_m = phi_m.get_gradient(q);
@@ -882,14 +882,14 @@ namespace NavierStokes_DG
             else
               {
                 const auto tau_ip =
-                  std::abs((phi_m.get_normal_vector(0) *
+                  std::abs((phi_m.normal_vector(0) *
                             phi_m.inverse_jacobian(0))[dim - 1]) *
                   Number(2. * viscosity * (degree + 1) * (degree + 1));
 
                 for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
                   {
                     const auto w_m      = phi_m.get_value(q);
-                    const auto normal   = phi_m.get_normal_vector(q);
+                    const auto normal   = phi_m.normal_vector(q);
                     const auto grad_w_m = phi_m.get_gradient(q);
                     const auto grad_w_p = grad_w_m;
 
@@ -1225,9 +1225,9 @@ namespace NavierStokes_DG
                               EvaluationFlags::values |
                                 EvaluationFlags::gradients);
 
-        const auto tau_ip = (std::abs((phi_m.get_normal_vector(0) *
+        const auto tau_ip = (std::abs((phi_m.normal_vector(0) *
                                        phi_m.inverse_jacobian(0))[dim - 1]) +
-                             std::abs((phi_p.get_normal_vector(0) *
+                             std::abs((phi_p.normal_vector(0) *
                                        phi_p.inverse_jacobian(0))[dim - 1])) *
                             Number(viscosity * (degree + 1) * (degree + 1));
 
@@ -1235,7 +1235,7 @@ namespace NavierStokes_DG
           {
             const auto w_m      = phi_m.get_value(q);
             const auto w_p      = phi_p.get_value(q);
-            const auto normal   = phi_m.get_normal_vector(q);
+            const auto normal   = phi_m.normal_vector(q);
             auto numerical_flux = -euler_numerical_flux<dim>(w_m, w_p, normal);
             const auto grad_w_m = phi_m.get_gradient(q);
             const auto grad_w_p = phi_p.get_gradient(q);
@@ -1294,7 +1294,7 @@ namespace NavierStokes_DG
 
         const auto tau_ip =
           std::abs(
-            (phi_m.get_normal_vector(0) * phi_m.inverse_jacobian(0))[dim - 1]) *
+            (phi_m.normal_vector(0) * phi_m.inverse_jacobian(0))[dim - 1]) *
           Number(2. * viscosity * (degree + 1) * (degree + 1));
 
         const auto boundary_id = data.get_boundary_id(face);
@@ -1302,7 +1302,7 @@ namespace NavierStokes_DG
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
             const auto w_m      = phi_m.get_value(q);
-            const auto normal   = phi_m.get_normal_vector(q);
+            const auto normal   = phi_m.normal_vector(q);
             const auto grad_w_m = phi_m.get_gradient(q);
             const auto grad_w_p = grad_w_m;
 

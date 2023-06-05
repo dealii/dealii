@@ -579,9 +579,9 @@ namespace Step59
         // take the absolute value of these factors as the normal could point
         // into either positive or negative direction.
         const VectorizedArray<number> inverse_length_normal_to_face =
-          0.5 * (std::abs((phi_inner.get_normal_vector(0) *
+          0.5 * (std::abs((phi_inner.normal_vector(0) *
                            phi_inner.inverse_jacobian(0))[dim - 1]) +
-                 std::abs((phi_outer.get_normal_vector(0) *
+                 std::abs((phi_outer.normal_vector(0) *
                            phi_outer.inverse_jacobian(0))[dim - 1]));
         const VectorizedArray<number> sigma =
           inverse_length_normal_to_face * get_penalty_factor();
@@ -680,9 +680,8 @@ namespace Step59
                                   EvaluationFlags::values |
                                     EvaluationFlags::gradients);
 
-        const VectorizedArray<number> inverse_length_normal_to_face =
-          std::abs((phi_inner.get_normal_vector(0) *
-                    phi_inner.inverse_jacobian(0))[dim - 1]);
+        const VectorizedArray<number> inverse_length_normal_to_face = std::abs((
+          phi_inner.normal_vector(0) * phi_inner.inverse_jacobian(0))[dim - 1]);
         const VectorizedArray<number> sigma =
           inverse_length_normal_to_face * get_penalty_factor();
 
@@ -1134,9 +1133,8 @@ namespace Step59
       {
         phi_face.reinit(face);
 
-        const VectorizedArray<double> inverse_length_normal_to_face =
-          std::abs((phi_face.get_normal_vector(0) *
-                    phi_face.inverse_jacobian(0))[dim - 1]);
+        const VectorizedArray<double> inverse_length_normal_to_face = std::abs(
+          (phi_face.normal_vector(0) * phi_face.inverse_jacobian(0))[dim - 1]);
         const VectorizedArray<double> sigma =
           inverse_length_normal_to_face * system_matrix.get_penalty_factor();
 
@@ -1169,7 +1167,7 @@ namespace Step59
                   {
                     Tensor<1, dim> normal;
                     for (unsigned int d = 0; d < dim; ++d)
-                      normal[d] = phi_face.get_normal_vector(q)[d][v];
+                      normal[d] = phi_face.normal_vector(q)[d][v];
                     test_normal_derivative[v] =
                       -normal * exact_solution.gradient(single_point);
                   }

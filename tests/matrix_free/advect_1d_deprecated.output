@@ -1,0 +1,22 @@
+
+DEAL::Testing FE_DGQ<1>(2)
+DEAL::Norm of difference:          0.531539 
+DEAL::Norm of difference:          0.135407 
+DEAL::Norm of difference:          0.0340112 
+DEAL::Norm of difference:          0.00851279 
+DEAL::Norm of difference:          0.00212882 
+DEAL::Norm of difference:          0.000532245 
+DEAL::Testing FE_DGQ<1>(4)
+DEAL::Norm of difference:          0.00529591 
+DEAL::Norm of difference:          0.000336014 
+DEAL::Norm of difference:          2.10801e-05 
+DEAL::Norm of difference:          1.31874e-06 
+DEAL::Norm of difference:          8.24413e-08 
+DEAL::Norm of difference:          5.15331e-09 
+DEAL::Testing FE_DGQ<1>(5)
+DEAL::Norm of difference:          0.000346887 
+DEAL::Norm of difference:          1.09982e-05 
+DEAL::Norm of difference:          3.44938e-07 
+DEAL::Norm of difference:          1.07881e-08 
+DEAL::Norm of difference:          3.35085e-10 
+DEAL::Norm of difference:          9.72689e-12 
