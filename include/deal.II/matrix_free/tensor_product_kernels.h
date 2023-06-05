@@ -3272,7 +3272,7 @@ namespace internal
     else if (dim == 1)
       {
         // gradient
-        result[0] = Number3(values[1]) - Number3(values[0]);
+        result[0] = Number3(values[1] - values[0]);
         // values
         result[1] = Number3(values[0]) + p[0] * result[0];
         if (n_values > 1)
@@ -3280,8 +3280,8 @@ namespace internal
       }
     else if (dim == 2)
       {
-        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
-        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
         const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
 
@@ -3303,15 +3303,15 @@ namespace internal
       }
     else if (dim == 3)
       {
-        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
-        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
         const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
         const Number3 tmp10 = tmp1 - tmp0;
         const Number3 tmpy0 = tmp0 + p[1] * tmp10;
 
-        const Number3 val54 = Number3(values[5]) - Number3(values[4]);
-        const Number3 val76 = Number3(values[7]) - Number3(values[6]);
+        const Number3 val54 = Number3(values[5] - values[4]);
+        const Number3 val76 = Number3(values[7] - values[6]);
         const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
         const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
         const Number3 tmp32 = tmp3 - tmp2;
@@ -3536,27 +3536,26 @@ namespace internal
       }
     else if (dim == 1)
       {
-        return Number3(values[0]) +
-               p[0] * (Number3(values[1]) - Number3(values[0]));
+        return Number3(values[0]) + p[0] * Number3(values[1] - values[0]);
       }
     else if (dim == 2)
       {
-        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
-        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
         const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
         return tmp0 + p[1] * (tmp1 - tmp0);
       }
     else if (dim == 3)
       {
-        const Number3 val10 = Number3(values[1]) - Number3(values[0]);
-        const Number3 val32 = Number3(values[3]) - Number3(values[2]);
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
         const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
         const Number3 tmpy0 = tmp0 + p[1] * (tmp1 - tmp0);
 
-        const Number3 val54 = Number3(values[5]) - Number3(values[4]);
-        const Number3 val76 = Number3(values[7]) - Number3(values[6]);
+        const Number3 val54 = Number3(values[5] - values[4]);
+        const Number3 val76 = Number3(values[7] - values[6]);
         const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
         const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
         const Number3 tmpy1 = tmp2 + p[1] * (tmp3 - tmp2);
