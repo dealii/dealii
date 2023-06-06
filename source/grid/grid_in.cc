@@ -64,35 +64,41 @@ namespace
    * boundary indicators on vertices after the triangulation has already been
    * created.
    *
-   * TODO: Fix this properly via SubcellData
+   * This function ignores all non-boundary vertices. Boundary ids can only be
+   * assigned to internal vertices - however, the grid fixup routines (e.g.,
+   * combining duplicated vertices) may switch vertices from boundary to
+   * non-boundary. Get around this in two ways:
+   *
+   * 1. Ignore any attempt to set a boundary id on a non-boundary vertex.
+   * 2. Work around possible vertex renumberings by using Point<spacedim>
+   *   instead of the corresponding vertex number (which may be out of date)
+   *
+   * TODO: fix this properly via SubCellData
    */
   template <int spacedim>
   void
   assign_1d_boundary_ids(
-    const std::map<unsigned int, types::boundary_id> &boundary_ids,
-    Triangulation<1, spacedim> &                      triangulation)
+    const std::vector<std::pair<Point<spacedim>, types::boundary_id>>
+      &                         boundary_ids,
+    Triangulation<1, spacedim> &triangulation)
   {
-    if (boundary_ids.size() > 0)
-      for (const auto &cell : triangulation.active_cell_iterators())
-        for (unsigned int f : GeometryInfo<1>::face_indices())
-          if (boundary_ids.find(cell->vertex_index(f)) != boundary_ids.end())
-            {
-              AssertThrow(
-                cell->at_boundary(f),
-                ExcMessage(
-                  "You are trying to prescribe boundary ids on the face "
-                  "of a 1d cell (i.e., on a vertex), but this face is not actually at "
-                  "the boundary of the mesh. This is not allowed."));
-              cell->face(f)->set_boundary_id(
-                boundary_ids.find(cell->vertex_index(f))->second);
-            }
+    for (auto &cell : triangulation.active_cell_iterators())
+      for (unsigned int face_no : ReferenceCells::Line.face_indices())
+        if (cell->face(face_no)->at_boundary())
+          for (const auto &pair : boundary_ids)
+            if (cell->face(face_no)->vertex(0) == pair.first)
+              {
+                cell->face(face_no)->set_boundary_id(pair.second);
+                break;
+              }
   }
 
 
   template <int dim, int spacedim>
   void
-  assign_1d_boundary_ids(const std::map<unsigned int, types::boundary_id> &,
-                         Triangulation<dim, spacedim> &)
+  assign_1d_boundary_ids(
+    const std::vector<std::pair<Point<spacedim>, types::boundary_id>> &,
+    Triangulation<dim, spacedim> &)
   {
     // we shouldn't get here since boundary ids are not assigned to
     // vertices except in 1d
@@ -2319,6 +2325,12 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   SubCellData                                subcelldata;
   std::map<unsigned int, types::boundary_id> boundary_ids_1d;
 
+  // Track the number of times each vertex is used in 1D. This determines
+  // whether or not we can assign a boundary id to a vertex. This is necessary
+  // because sometimes gmsh saves internal vertices in the $ELEM list in codim
+  // 1 or codim 2.
+  std::map<unsigned int, unsigned int> vertex_counts;
+
   {
     static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
       {0, 1, 5, 4, 2, 3, 7, 6}};
@@ -2485,22 +2497,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
                 // allocate and read indices
                 cells.emplace_back();
-                cells.back().vertices.resize(vertices_per_cell);
+                CellData<dim> &cell = cells.back();
+                cell.vertices.resize(vertices_per_cell);
                 for (unsigned int i = 0; i < vertices_per_cell; ++i)
                   {
                     // hypercube cells need to be reordered
                     if (vertices_per_cell ==
                         GeometryInfo<dim>::vertices_per_cell)
-                      {
-                        in >> cells.back()
-                                .vertices[dim == 3 ?
+                      in >> cell.vertices[dim == 3 ?
                                             local_vertex_numbering[i] :
                                             GeometryInfo<dim>::ucd_to_deal[i]];
-                      }
                     else
-                      {
-                        in >> cells.back().vertices[i];
-                      }
+                      in >> cell.vertices[i];
                   }
 
                 // to make sure that the cast won't fail
@@ -2514,21 +2522,21 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                 // numbers::invalid_material_id-1
                 AssertIndexRange(material_id, numbers::invalid_material_id);
 
-                cells.back().material_id = material_id;
+                cell.material_id = material_id;
 
                 // transform from gmsh to consecutive numbering
                 for (unsigned int i = 0; i < vertices_per_cell; ++i)
                   {
-                    AssertThrow(
-                      vertex_indices.find(cells.back().vertices[i]) !=
-                        vertex_indices.end(),
-                      ExcInvalidVertexIndexGmsh(cell_per_entity,
-                                                elm_number,
-                                                cells.back().vertices[i]));
+                    AssertThrow(vertex_indices.find(cell.vertices[i]) !=
+                                  vertex_indices.end(),
+                                ExcInvalidVertexIndexGmsh(cell_per_entity,
+                                                          elm_number,
+                                                          cell.vertices[i]));
 
-                    // vertex with this index exists
-                    cells.back().vertices[i] =
-                      vertex_indices[cells.back().vertices[i]];
+                    const auto vertex = vertex_indices[cell.vertices[i]];
+                    if (dim == 1)
+                      vertex_counts[vertex] += 1u;
+                    cell.vertices[i] = vertex;
                   }
               }
             else if ((cell_type == 1) &&
@@ -2662,13 +2670,23 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
               ExcGmshNoCellInformation(subcelldata.boundary_lines.size(),
                                        subcelldata.boundary_quads.size()));
 
+  // apply_grid_fixup_functions() may invalidate the vertex indices (since it
+  // will delete duplicated or unused vertices). Get around this by storing
+  // Points directly in that case so that the comparisons are valid.
+  std::vector<std::pair<Point<spacedim>, types::boundary_id>> boundary_id_pairs;
+  if (dim == 1)
+    for (const auto &pair : vertex_counts)
+      if (pair.second == 1u)
+        boundary_id_pairs.emplace_back(vertices[pair.first],
+                                       boundary_ids_1d[pair.first]);
+
   apply_grid_fixup_functions(vertices, cells, subcelldata);
   tria->create_triangulation(vertices, cells, subcelldata);
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
-  // currently work through the call above
+  // currently work through the call above.
   if (dim == 1)
-    assign_1d_boundary_ids(boundary_ids_1d, *tria);
+    assign_1d_boundary_ids(boundary_id_pairs, *tria);
 }
 
 
@@ -2698,6 +2716,12 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
   std::vector<CellData<dim>>                 cells;
   SubCellData                                subcelldata;
   std::map<unsigned int, types::boundary_id> boundary_ids_1d;
+
+  // Track the number of times each vertex is used in 1D. This determines
+  // whether or not we can assign a boundary id to a vertex. This is necessary
+  // because sometimes gmsh saves internal vertices in the $ELEM list in codim
+  // 1 or codim 2.
+  std::map<unsigned int, unsigned int> vertex_counts;
 
   gmsh::initialize();
   gmsh::option::setNumber("General.Verbosity", 0);
@@ -2832,8 +2856,12 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
                   cells.emplace_back(n_vertices);
                   auto &cell = cells.back();
                   for (unsigned int v = 0; v < n_vertices; ++v)
-                    cell.vertices[v] =
-                      nodes[n_vertices * j + gmsh_to_dealii[type][v]] - 1;
+                    {
+                      cell.vertices[v] =
+                        nodes[n_vertices * j + gmsh_to_dealii[type][v]] - 1;
+                      if (dim == 1)
+                        vertex_counts[cell.vertices[v]] += 1u;
+                    }
                   cell.manifold_id = manifold_id;
                   cell.material_id = boundary_id;
                 }
@@ -2870,13 +2898,23 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
         }
     }
 
+  // apply_grid_fixup_functions() may invalidate the vertex indices (since it
+  // will delete duplicated or unused vertices). Get around this by storing
+  // Points directly in that case so that the comparisons are valid.
+  std::vector<std::pair<Point<spacedim>, types::boundary_id>> boundary_id_pairs;
+  if (dim == 1)
+    for (const auto &pair : vertex_counts)
+      if (pair.second == 1u)
+        boundary_id_pairs.emplace_back(vertices[pair.first],
+                                       boundary_ids_1d[pair.first]);
+
   apply_grid_fixup_functions(vertices, cells, subcelldata);
   tria->create_triangulation(vertices, cells, subcelldata);
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
-  // currently work through the call above
+  // currently work through the call above.
   if (dim == 1)
-    assign_1d_boundary_ids(boundary_ids_1d, *tria);
+    assign_1d_boundary_ids(boundary_id_pairs, *tria);
 
   gmsh::clear();
   gmsh::finalize();
