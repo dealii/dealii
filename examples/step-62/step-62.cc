@@ -1386,9 +1386,7 @@ int main(int argc, char *argv[])
 
       // Each of the simulations (displacement and calibration) is stored in a
       // separate HDF5 group:
-      const std::vector<std::string> group_names = {"displacement",
-                                                    "calibration"};
-      for (auto group_name : group_names)
+      for (const std::string &group_name : {"displacement", "calibration"})
         {
           // For each of these two group names, we now create the group and put
           // attributes into these groups.
@@ -1420,7 +1418,7 @@ int main(int argc, char *argv[])
           group.set_attribute<double>("youngs_modulus", 270000000000.0);
           group.set_attribute<double>("material_a_rho", 3200);
 
-          if (group_name == std::string("displacement"))
+          if (group_name == "displacement")
             group.set_attribute<double>("material_b_rho", 2000);
           else
             group.set_attribute<double>("material_b_rho", 3200);
