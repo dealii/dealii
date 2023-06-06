@@ -432,7 +432,7 @@ namespace Utilities
       const double b = unwanted_spectrum.second;
       Assert(degree > 0, ExcMessage("Only positive degrees make sense."));
 
-      const bool scale = (a_L < std::numeric_limits<double>::infinity());
+      const bool scale = numbers::is_finite(a_L);
       Assert(
         a < b,
         ExcMessage(

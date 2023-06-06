@@ -1261,11 +1261,11 @@ namespace Particles
         auto particle = pic.begin();
         for (const auto &p_unit : reference_locations)
           {
-            if (p_unit[0] == std::numeric_limits<double>::infinity() ||
-                !GeometryInfo<dim>::is_inside_unit_cell(p_unit))
-              particles_out_of_cell.push_back(particle);
-            else
+            if (numbers::is_finite(p_unit[0]) &&
+                GeometryInfo<dim>::is_inside_unit_cell(p_unit))
               particle->set_reference_location(p_unit);
+            else
+              particles_out_of_cell.push_back(particle);
 
             ++particle;
           }
