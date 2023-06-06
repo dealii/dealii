@@ -613,7 +613,7 @@ namespace parallel
 
     const auto unpack = [&](const auto &cell, const auto &vertices) {
       for (const auto v : cell->vertex_indices())
-        if (std::isnan(vertices[v][0]) == false)
+        if (numbers::is_nan(vertices[v][0]) == false)
           cell->vertex(v) = vertices[v];
     };
 
