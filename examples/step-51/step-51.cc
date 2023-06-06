@@ -544,14 +544,14 @@ namespace Step51
       , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
       , exact_solution()
     {
-      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe_local.n_dofs_per_cell(); ++i)
           {
             if (fe_local.has_support_on_face(i, face_no))
               fe_local_support_on_face[face_no].push_back(i);
           }
 
-      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
         for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
             if (fe.has_support_on_face(i, face_no))

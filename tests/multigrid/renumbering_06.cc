@@ -50,7 +50,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
       {
         cell->get_dof_indices(dof_indices);
         deallog << "cell " << cell->id() << ": ";
-        for (types::global_dof_index i : dof_indices)
+        for (const types::global_dof_index i : dof_indices)
           deallog << i << ' ';
         deallog << std::endl;
       }
@@ -62,7 +62,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
           {
             cell->get_mg_dof_indices(dof_indices);
             deallog << "cell " << cell->id() << ": ";
-            for (types::global_dof_index i : dof_indices)
+            for (const types::global_dof_index i : dof_indices)
               deallog << i << ' ';
             deallog << std::endl;
           }

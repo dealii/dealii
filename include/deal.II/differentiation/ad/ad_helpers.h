@@ -1168,7 +1168,7 @@ namespace Differentiation
      *       // Add contribution from external energy:
      *       // Loop over faces and accumulate external energy into cell
      *       // total energy.
-     *       for (unsigned int face : ...)
+     *       for (const unsigned int face : ...)
      *         if (cell->face(face)->at_boundary())
      *           energy_ad += ...
      *
@@ -1498,7 +1498,7 @@ namespace Differentiation
      *       // linearized.
      *       // Loop over faces and accumulate external contributions into the
      *       // cell total residual.
-     *       for (unsigned int face : ...)
+     *       for (const unsigned int face : ...)
      *         if (cell->face(face)->at_boundary())
      *           residual_ad[I] += ...
      *

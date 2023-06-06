@@ -923,7 +923,7 @@ namespace internal
           // categories) to the 'other_cells'. The cells with correct group
           // size are immediately appended to the temporary cell numbering
           auto group_it = grouped_cells.begin();
-          for (unsigned int length : n_cells_per_group)
+          for (const unsigned int length : n_cells_per_group)
             if (length < n_cells_per_parent)
               for (unsigned int j = 0; j < length; ++j)
                 other_cells.push_back((group_it++)->second);

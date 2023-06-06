@@ -37,7 +37,7 @@ test()
   GridGenerator::subdivided_hyper_cube(tria, 3, 0., 1.);
 
   for (const auto &cell : tria.cell_iterators())
-    for (unsigned int face_index : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_index : GeometryInfo<dim>::face_indices())
       {
         if (std::abs(cell->face(face_index)->center()(face_index / 2)) < 1e-12)
           cell->face(face_index)->set_all_boundary_ids(face_index);
@@ -65,7 +65,7 @@ test()
           {
             deallog << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) << ' '
                     << cell->id() << " neighbor subdomain ids: ";
-            for (unsigned int f : GeometryInfo<dim>::face_indices())
+            for (const unsigned int f : GeometryInfo<dim>::face_indices())
               {
                 deallog << cell->neighbor_or_periodic_neighbor(f)->id() << ' ';
                 if (cell->is_active())

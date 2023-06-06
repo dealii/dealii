@@ -561,7 +561,7 @@ namespace Step15
     // function from namespace DoFTools:
     hanging_node_constraints.condense(residual);
 
-    for (types::global_dof_index i :
+    for (const types::global_dof_index i :
          DoFTools::extract_boundary_dofs(dof_handler))
       residual(i) = 0;
 

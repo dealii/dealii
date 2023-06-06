@@ -83,7 +83,7 @@ namespace
     Triangulation<1, spacedim> &triangulation)
   {
     for (auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int face_no : ReferenceCells::Line.face_indices())
+      for (const unsigned int face_no : ReferenceCells::Line.face_indices())
         if (cell->face(face_no)->at_boundary())
           for (const auto &pair : boundary_ids)
             if (cell->face(face_no)->vertex(0) == pair.first)
@@ -3902,7 +3902,7 @@ GridIn<dim, spacedim>::read_exodusii(
            elem_n += n_nodes_per_element)
         {
           CellData<dim> cell(type.n_vertices());
-          for (unsigned int i : type.vertex_indices())
+          for (const unsigned int i : type.vertex_indices())
             {
               cell.vertices[type.exodusii_vertex_to_deal_vertex(i)] =
                 connection[elem_n + i] - 1;

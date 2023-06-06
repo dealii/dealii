@@ -1885,7 +1885,7 @@ namespace NavierStokes_DG
 
     GridGenerator::hyper_rectangle(triangulation, lower_left, upper_right);
     for (const auto &cell : triangulation.cell_iterators())
-      for (unsigned int face : cell->face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->at_boundary(face))
           cell->face(face)->set_boundary_id(face);
     std::vector<

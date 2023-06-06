@@ -924,7 +924,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
       for (const auto &cell : tria.active_cell_iterators())
         {
           // Little trick to get -1 for the interior
-          for (unsigned int f : GeometryInfo<dim>::face_indices())
+          for (const unsigned int f : GeometryInfo<dim>::face_indices())
             {
               out << ' '
                   << static_cast<std::make_signed<types::boundary_id>::type>(
@@ -3913,7 +3913,7 @@ GridOut::write_msh_faces(const Triangulation<dim, spacedim> &tria,
             << static_cast<unsigned int>(face->boundary_id()) << ' '
             << face->n_vertices();
         // note: vertex numbers are 1-base
-        for (unsigned int vertex : face->vertex_indices())
+        for (const unsigned int vertex : face->vertex_indices())
           {
             if (face->reference_cell() == ReferenceCells::Quadrilateral)
               out << ' '

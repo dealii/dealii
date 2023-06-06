@@ -36,7 +36,7 @@ test(const ReferenceCell &reference_cell)
   const unsigned int n_samples        = 200000;
 
   // sanity check: does the reference cell contain its own nodes?
-  for (unsigned int vertex_no : reference_cell.vertex_indices())
+  for (const unsigned int vertex_no : reference_cell.vertex_indices())
     AssertThrow(reference_cell.contains_point(
                   reference_cell.template vertex<dim>(vertex_no)),
                 ExcInternalError());

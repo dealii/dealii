@@ -170,7 +170,7 @@ LaplaceOperator<dim, fe_degree, number>::vmult(
   const LinearAlgebra::distributed::Vector<number> &src) const
 {
   this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src, true);
-  for (unsigned int i : this->data->get_constrained_dofs())
+  for (const unsigned int i : this->data->get_constrained_dofs())
     dst.local_element(i) = src.local_element(i);
 }
 
@@ -192,7 +192,7 @@ LaplaceOperator<dim, fe_degree, number>::vmult(
                         src,
                         operation_before_loop,
                         operation_after_loop);
-  for (unsigned int i : this->data->get_constrained_dofs())
+  for (const unsigned int i : this->data->get_constrained_dofs())
     dst.local_element(i) = src.local_element(i);
 }
 

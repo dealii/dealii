@@ -2766,7 +2766,7 @@ namespace DoFRenumbering
               // cell batch range that touched a particular dof)
               data.get_dof_info(component).get_dof_indices_on_cell_batch(
                 dofs_extracted, cell);
-              for (unsigned int dof_index : dofs_extracted)
+              for (const unsigned int dof_index : dofs_extracted)
                 if (dof_index < n_owned_dofs &&
                     last_touch_by_cell_batch_range[dof_index] !=
                       cell_range.first)
@@ -2847,7 +2847,7 @@ namespace DoFRenumbering
     // comparator for std::sort to then order the unknowns by the specified
     // matrix-free loop order
     const std::vector<unsigned int> &purely_local_dofs = dofs_by_rank_access[0];
-    for (unsigned int i : purely_local_dofs)
+    for (const unsigned int i : purely_local_dofs)
       if (local_numbering.second[i] == 1)
         new_numbers.push_back(i);
 

@@ -423,7 +423,7 @@ namespace Utilities
           // first translate tight ghost indices into indices within the large
           // set:
           std::vector<unsigned int> expanded_numbering;
-          for (dealii::IndexSet::size_type index : ghost_indices_data)
+          for (const dealii::IndexSet::size_type index : ghost_indices_data)
             {
               Assert(larger_ghost_index_set.is_element(index),
                      ExcMessage("The given larger ghost index set must contain "

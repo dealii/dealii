@@ -71,18 +71,18 @@ BarycentricPolynomials<dim>::get_fe_p_basis(const unsigned int degree)
         break;
       case 1:
         {
-          for (unsigned int v : reference_cell.vertex_indices())
+          for (const unsigned int v : reference_cell.vertex_indices())
             polys.push_back(BarycentricPolynomial<dim, double>::monomial(v));
           break;
         }
       case 2:
         {
           // vertices, then lines:
-          for (unsigned int v : reference_cell.vertex_indices())
+          for (const unsigned int v : reference_cell.vertex_indices())
             polys.push_back(
               BarycentricPolynomial<dim, double>::monomial(v) *
               (2 * BarycentricPolynomial<dim, double>::monomial(v) - 1));
-          for (unsigned int l : reference_cell.line_indices())
+          for (const unsigned int l : reference_cell.line_indices())
             {
               const auto v0 = reference_cell.line_to_cell_vertices(l, 0);
               const auto v1 = reference_cell.line_to_cell_vertices(l, 1);
