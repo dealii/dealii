@@ -2837,7 +2837,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
     *this, dof_indices, this->active_fe_index());
 
   // distribute cell vector
-  global_destination.add(n_dofs, dof_indices.data(), local_source_begin);
+  global_destination.add(n_dofs, dof_indices.data(), &(*local_source_begin));
 }
 
 
