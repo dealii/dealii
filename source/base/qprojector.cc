@@ -769,7 +769,8 @@ QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
     {
       const auto support_points_line =
         [](const auto &face, const auto &orientation) -> std::vector<Point<2>> {
-        const Point<2> *          vertices_ptr = face.first.begin();
+        // MSVC struggles when using face.first.begin()
+        const Point<2, double> *  vertices_ptr = &face.first[0];
         ArrayView<const Point<2>> vertices(vertices_ptr, face.first.size());
         const auto                temp =
           ReferenceCells::Line.permute_by_combined_orientation(vertices,
