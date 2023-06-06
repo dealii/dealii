@@ -266,6 +266,23 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
+    std::vector<unsigned int>
+    RemotePointEvaluation<dim, spacedim>::get_point_indices_not_found() const
+    {
+      if (all_points_found_flag)
+        return {};
+
+      std::vector<unsigned int> points_not_found;
+      for (unsigned int i = 0; i < point_ptrs.size() - 1; ++i)
+        if (!point_found(i))
+          points_not_found.push_back(i);
+
+      return points_not_found;
+    }
+
+
+
+    template <int dim, int spacedim>
     const Triangulation<dim, spacedim> &
     RemotePointEvaluation<dim, spacedim>::get_triangulation() const
     {

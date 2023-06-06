@@ -206,6 +206,12 @@ namespace Utilities
       point_found(const unsigned int i) const;
 
       /**
+       * Return a list of point indices which have not been found.
+       */
+      std::vector<unsigned int>
+      get_point_indices_not_found() const;
+
+      /**
        * Return the Triangulation object used during reinit().
        */
       const Triangulation<dim, spacedim> &
