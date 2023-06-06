@@ -115,7 +115,7 @@ void
 Test<dim>::print_quadrature_point_difference_on_both_sides(
   const dealii::FEInterfaceValues<dim> &fe_interface_values)
 {
-  for (unsigned int q : fe_interface_values.quadrature_point_indices())
+  for (const unsigned int q : fe_interface_values.quadrature_point_indices())
     {
       const Point<dim> &point_on_side_0 =
         fe_interface_values.get_fe_face_values(0).quadrature_point(q);
@@ -150,7 +150,7 @@ Test<dim>::run()
 
   // Test that the points agree only on the interface between the two cells,
   // which face this is depends on the incoming triangulation.
-  for (unsigned int face : cell->face_indices())
+  for (const unsigned int face : cell->face_indices())
     if (!cell->face(face)->at_boundary())
       {
         const unsigned int invalid_subface =

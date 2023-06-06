@@ -1772,7 +1772,7 @@ namespace SAND
       SolutionBlocks::density_lower_slack_multiplier,
       SolutionBlocks::density_upper_slack_multiplier};
     double constraint_norm = 0;
-    for (unsigned int multiplier_i : equality_constraint_multipliers)
+    for (const unsigned int multiplier_i : equality_constraint_multipliers)
       constraint_norm += system_rhs.block(multiplier_i).linfty_norm();
 
 

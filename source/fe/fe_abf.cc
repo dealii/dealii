@@ -354,7 +354,7 @@ FE_ABF<dim>::initialize_restriction()
   const unsigned int n_face_points = q_base.size();
   // First, compute interpolation on
   // subfaces
-  for (unsigned int face : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     {
       // The shape functions of the
       // child cell are evaluated
@@ -577,7 +577,7 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);
 
   const unsigned int n_face_points = boundary_weights.size(0);
-  for (unsigned int face : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     for (unsigned int k = 0; k < n_face_points; ++k)
       for (unsigned int i = 0; i < boundary_weights.size(1); ++i)
         {
@@ -616,7 +616,7 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
           support_point_values[k + start_cell_points][d];
 
   // Face integral of ABF terms
-  for (unsigned int face : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     {
       const double n_orient = GeometryInfo<dim>::unit_normal_orientation[face];
       for (unsigned int fp = 0; fp < n_face_points; ++fp)

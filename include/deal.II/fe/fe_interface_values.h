@@ -3489,7 +3489,7 @@ namespace FEInterfaceViews
 
     AssertDimension(interface_dof_indices.size(), local_dof_values.size());
 
-    for (unsigned int i : this->fe_interface->dof_indices())
+    for (const unsigned int i : this->fe_interface->dof_indices())
       local_dof_values[i] = dof_values(interface_dof_indices[i]);
   }
 
@@ -4044,7 +4044,7 @@ namespace FEInterfaceViews
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -4088,7 +4088,7 @@ namespace FEInterfaceViews
     AssertDimension(third_derivatives.size(),
                     this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -4681,7 +4681,7 @@ namespace FEInterfaceViews
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -4725,7 +4725,7 @@ namespace FEInterfaceViews
     AssertDimension(third_derivatives.size(),
                     this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)

@@ -10906,7 +10906,7 @@ namespace internal
           return true;
 
         const RefinementCase<dim> ref_case = cell->refinement_case();
-        for (unsigned int n : GeometryInfo<dim>::face_indices())
+        for (const unsigned int n : GeometryInfo<dim>::face_indices())
           {
             // if the cell is not refined along that face, coarsening
             // will not change anything, so do nothing. the same
@@ -14952,7 +14952,7 @@ void Triangulation<dim, spacedim>::execute_coarsening()
             const unsigned int n_lines = std::min(cell->n_lines(), 12u);
             for (unsigned int l = 0; l < n_lines; ++l)
               ++line_cell_count[line_indices[l]];
-            for (unsigned int q : cell->face_indices())
+            for (const unsigned int q : cell->face_indices())
               ++quad_cell_count[cell->face_index(q)];
           }
         else
@@ -15234,7 +15234,7 @@ namespace
     // count all neighbors that will be refined along the face of our
     // cell after the next step
     unsigned int count = 0;
-    for (unsigned int n : GeometryInfo<dim>::face_indices())
+    for (const unsigned int n : GeometryInfo<dim>::face_indices())
       {
         const typename Triangulation<dim, spacedim>::cell_iterator neighbor =
           cell->neighbor(n);

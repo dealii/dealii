@@ -994,7 +994,7 @@ std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceP<dim, spacedim>::get_constant_modes() const
 {
   Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
-  for (unsigned int face : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face : GeometryInfo<dim>::face_indices())
     constant_modes(0, face * this->n_dofs_per_face(face)) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));

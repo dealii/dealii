@@ -159,7 +159,7 @@ namespace Step11
     // of what is to come later:
     mean_value_constraints.clear();
     mean_value_constraints.add_line(first_boundary_dof);
-    for (types::global_dof_index i : boundary_dofs)
+    for (const types::global_dof_index i : boundary_dofs)
       if (i != first_boundary_dof)
         mean_value_constraints.add_entry(first_boundary_dof, i, -1);
     mean_value_constraints.close();

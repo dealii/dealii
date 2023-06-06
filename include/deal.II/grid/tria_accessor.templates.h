@@ -979,7 +979,7 @@ namespace internal
         // For 2d cells the access cell->line_orientation() is already
         // efficient
         std::array<unsigned int, 4> line_indices = {};
-        for (unsigned int line : cell.line_indices())
+        for (const unsigned int line : cell.line_indices())
           line_indices[line] = cell.line_index(line);
         return line_indices;
       }
@@ -1096,7 +1096,7 @@ namespace internal
         // For 2d cells the access cell->line_orientation() is already
         // efficient
         std::array<bool, 4> line_orientations = {};
-        for (unsigned int line : cell.line_indices())
+        for (const unsigned int line : cell.line_indices())
           line_orientations[line] = cell.line_orientation(line);
         return line_orientations;
       }
@@ -3508,7 +3508,7 @@ CellAccessor<dim, spacedim>::face_iterators() const
     GeometryInfo<dim>::faces_per_cell>
     face_iterators(this->n_faces());
 
-  for (unsigned int i : this->face_indices())
+  for (const unsigned int i : this->face_indices())
     face_iterators[i] =
       dealii::internal::CellAccessorImplementation::get_face(*this, i);
 

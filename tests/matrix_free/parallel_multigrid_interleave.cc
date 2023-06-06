@@ -137,7 +137,7 @@ public:
         const LinearAlgebra::distributed::Vector<number> &src) const
   {
     data.cell_loop(&LaplaceOperator::local_apply, this, dst, src, true);
-    for (unsigned int i : data.get_constrained_dofs())
+    for (const unsigned int i : data.get_constrained_dofs())
       dst.local_element(i) = src.local_element(i);
   }
 
@@ -170,7 +170,7 @@ public:
             const LinearAlgebra::distributed::Vector<number> &src) const
   {
     data.cell_loop(&LaplaceOperator::local_apply, this, dst, src);
-    for (unsigned int i : data.get_constrained_dofs())
+    for (const unsigned int i : data.get_constrained_dofs())
       dst.local_element(i) += src.local_element(i);
   }
 

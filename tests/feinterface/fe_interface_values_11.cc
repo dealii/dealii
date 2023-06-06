@@ -162,8 +162,8 @@ int
 main()
 {
   initlog();
-  for (unsigned int p : {1, 2})
+  for (const unsigned int p : {1, 2})
     test<2>(p);
-  for (unsigned int p : {1})
+  for (const unsigned int p : {1})
     test<3>(p);
 }

@@ -481,7 +481,7 @@ namespace Step85
         // using FEInterfaceValues. Assembling in this we will traverse each
         // internal face in the mesh twice, so in order to get the penalty
         // constant we expect, we multiply the penalty term with a factor 1/2.
-        for (unsigned int f : cell->face_indices())
+        for (const unsigned int f : cell->face_indices())
           if (face_has_ghost_penalty(cell, f))
             {
               const unsigned int invalid_subface =

@@ -985,11 +985,11 @@ QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
     {
       std::vector<std::vector<Point<3>>> face_vertex_locations(
         reference_cell.n_faces());
-      for (unsigned int f : reference_cell.face_indices())
+      for (const unsigned int f : reference_cell.face_indices())
         {
           face_vertex_locations[f].resize(
             reference_cell.face_reference_cell(f).n_vertices());
-          for (unsigned int v :
+          for (const unsigned int v :
                reference_cell.face_reference_cell(f).vertex_indices())
             face_vertex_locations[f][v] =
               reference_cell.face_vertex_location<3>(f, v);

@@ -986,7 +986,7 @@ internal::GenericDoFsPerObject::generate(const FiniteElementData<dim> &fe)
 
   unsigned int counter = 0;
 
-  for (unsigned int v : reference_cell.vertex_indices())
+  for (const unsigned int v : reference_cell.vertex_indices())
     {
       const auto c = fe.template n_dofs_per_object<0>(v);
 
@@ -998,7 +998,7 @@ internal::GenericDoFsPerObject::generate(const FiniteElementData<dim> &fe)
     }
 
   if (dim >= 2)
-    for (unsigned int l : reference_cell.line_indices())
+    for (const unsigned int l : reference_cell.line_indices())
       {
         const auto c = fe.template n_dofs_per_object<1>(l);
 
@@ -1011,7 +1011,7 @@ internal::GenericDoFsPerObject::generate(const FiniteElementData<dim> &fe)
       }
 
   if (dim == 3)
-    for (unsigned int f : reference_cell.face_indices())
+    for (const unsigned int f : reference_cell.face_indices())
       {
         const auto c = fe.template n_dofs_per_object<2>(f);
 
@@ -1040,7 +1040,7 @@ internal::GenericDoFsPerObject::generate(const FiniteElementData<dim> &fe)
     }
 
   result.first_object_index_on_face.resize(3);
-  for (unsigned int face_no : reference_cell.face_indices())
+  for (const unsigned int face_no : reference_cell.face_indices())
     {
       result.first_object_index_on_face[0].emplace_back(0);
 

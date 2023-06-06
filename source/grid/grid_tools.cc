@@ -611,7 +611,7 @@ namespace GridTools
                     line->manifold_id() != numbers::flat_manifold_id)
                   {
                     CellData<1> line_cell_data(line->n_vertices());
-                    for (unsigned int vertex_n : line->vertex_indices())
+                    for (const unsigned int vertex_n : line->vertex_indices())
                       line_cell_data.vertices[vertex_n] =
                         line->vertex_index(vertex_n);
                     line_cell_data.boundary_id = line->boundary_id();
@@ -2357,7 +2357,7 @@ namespace GridTools
       endc = tria.end();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int i : cell->face_indices())
+        for (const unsigned int i : cell->face_indices())
           {
             const typename Triangulation<dim, spacedim>::face_iterator &face =
               cell->face(i);
@@ -3404,7 +3404,7 @@ namespace GridTools
     cell = triangulation.begin_active();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int i : cell->face_indices())
+        for (const unsigned int i : cell->face_indices())
           {
             if ((cell->at_boundary(i) == false) &&
                 (cell->neighbor(i)->is_active()))
@@ -3542,7 +3542,7 @@ namespace GridTools
         // received.
         if (cell->is_ghost())
           {
-            for (unsigned int i : cell->face_indices())
+            for (const unsigned int i : cell->face_indices())
               {
                 if (cell->at_boundary(i) == false)
                   {

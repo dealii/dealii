@@ -739,7 +739,7 @@ LaplaceProblem<dim>::embed_solution_to_dg()
       dg_eval.gather_evaluate(dg_solution, EvaluationFlags::values);
       Solution<dim> solution;
       double        local_error = 0;
-      for (unsigned int q : dg_eval.quadrature_point_indices())
+      for (const unsigned int q : dg_eval.quadrature_point_indices())
         for (unsigned int v = 0;
              v <
              system_matrix.get_matrix_free().n_active_entries_per_cell_batch(

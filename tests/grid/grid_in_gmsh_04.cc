@@ -38,7 +38,7 @@ print_mesh_info(const Triangulation<dim, spacedim> &triangulation,
   {
     std::map<types::boundary_id, unsigned int> boundary_count;
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int face_no : cell->face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         if (cell->face(face_no)->at_boundary())
           boundary_count[cell->face(face_no)->boundary_id()]++;
 

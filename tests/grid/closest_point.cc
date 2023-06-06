@@ -21,7 +21,7 @@ test(const ReferenceCell &reference_cell,
 
   // The distance we get should be at least as good as the distance to the
   // nearest vertex
-  for (unsigned int vertex_no : reference_cell.vertex_indices())
+  for (const unsigned int vertex_no : reference_cell.vertex_indices())
     AssertThrow(distance_square <=
                   p.distance_square(
                     reference_cell.template vertex<dim>(vertex_no)),

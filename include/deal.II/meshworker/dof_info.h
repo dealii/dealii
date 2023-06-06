@@ -431,7 +431,7 @@ namespace MeshWorker
     : cell(seed)
     , cell_valid(true)
   {
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       {
         exterior[i]                = seed;
         interior[i]                = seed;
@@ -447,7 +447,7 @@ namespace MeshWorker
     : cell(other.cell)
     , cell_valid(other.cell_valid)
   {
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       {
         exterior[i]                = other.exterior[i];
         interior[i]                = other.interior[i];
@@ -463,7 +463,7 @@ namespace MeshWorker
   {
     cell       = other.cell;
     cell_valid = other.cell_valid;
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       {
         exterior[i]                = other.exterior[i];
         interior[i]                = other.interior[i];
@@ -479,7 +479,7 @@ namespace MeshWorker
   DoFInfoBox<dim, DOFINFO>::reset()
   {
     cell_valid = false;
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       {
         interior_face_available[i] = false;
         exterior_face_available[i] = false;
@@ -496,7 +496,7 @@ namespace MeshWorker
       return;
 
     assembler.assemble(cell);
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       {
         // Only do something if data available
         if (interior_face_available[i])

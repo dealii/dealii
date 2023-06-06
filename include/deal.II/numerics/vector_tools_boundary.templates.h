@@ -2405,7 +2405,7 @@ namespace VectorTools
     const hp::MappingCollection<dim> mapping_collection(mapping);
     hp::QCollection<dim>             quadrature_collection;
 
-    for (unsigned int face : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face : GeometryInfo<dim>::face_indices())
       quadrature_collection.push_back(QProjector<dim>::project_to_face(
         ReferenceCells::get_hypercube<dim>(), face_quadrature, face));
 
@@ -2567,7 +2567,7 @@ namespace VectorTools
 
         face_quadrature_collection.push_back(quadrature);
 
-        for (unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : GeometryInfo<dim>::face_indices())
           quadrature_collection.push_back(QProjector<dim>::project_to_face(
             ReferenceCells::get_hypercube<dim>(), quadrature, face));
       }

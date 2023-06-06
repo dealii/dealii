@@ -77,7 +77,7 @@ print_cell_and_face_locations(
     classifier.location_to_level_set(cell);
   deallog << "cell " << location_to_string(cell_location) << std::endl;
 
-  for (unsigned int f : cell->face_indices())
+  for (const unsigned int f : cell->face_indices())
     {
       const NonMatching::LocationToLevelSet face_location =
         classifier.location_to_level_set(cell, f);
