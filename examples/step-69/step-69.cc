@@ -2060,7 +2060,7 @@ namespace Step69
       TimerOutput::Scope scope(computing_timer,
                                "time_stepping - 4 fix boundary states");
 
-      for (auto it : boundary_normal_map)
+      for (const auto &it : boundary_normal_map)
         {
           const auto i = it.first;
 
