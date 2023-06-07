@@ -2885,6 +2885,7 @@ namespace GridTools
                            return cell_marked(cell);
                          });
     };
+    (void)any_cell_marked;
 
     while (found_cell == false)
       {
