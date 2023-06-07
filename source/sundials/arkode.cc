@@ -38,6 +38,7 @@
 
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
+#  include <deal.II/sundials/utilities.h>
 
 #  include <arkode/arkode_arkstep.h>
 #  include <sunlinsol/sunlinsol_spgmr.h>
@@ -49,79 +50,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-  namespace
-  {
-    /**
-     * A function that calls the function object given by its first argument
-     * with the set of arguments following at the end. If the call returns
-     * regularly, the current function returns zero to indicate success. If the
-     * call fails with an exception of type RecoverableUserCallbackError, then
-     * the current function returns 1 to indicate that the called function
-     * object thought the error it encountered is recoverable. If the call fails
-     * with any other exception, then the current function returns with an error
-     * code of -1. In each of the last two cases, the exception thrown by `f`
-     * is captured and `eptr` is set to the exception. In case of success,
-     * `eptr` is set to `nullptr`.
-     */
-    template <typename F, typename... Args>
-    int
-    call_and_possibly_capture_exception(const F &           f,
-                                        std::exception_ptr &eptr,
-                                        Args &&...args)
-    {
-      // See whether there is already something in the exception pointer
-      // variable. This can only happen if we had previously had
-      // a recoverable exception, and the underlying library actually
-      // did recover successfully. In that case, we can abandon the
-      // exception previously thrown. If eptr contains anything other,
-      // then we really don't know how that could have happened, and
-      // should probably bail out:
-      if (eptr)
-        {
-          try
-            {
-              std::rethrow_exception(eptr);
-            }
-          catch (const RecoverableUserCallbackError &)
-            {
-              // ok, ignore, but reset the pointer
-              eptr = nullptr;
-            }
-          catch (...)
-            {
-              // uh oh:
-              AssertThrow(false, ExcInternalError());
-            }
-        }
-
-      // Call the function and if that succeeds, return zero:
-      try
-        {
-          f(std::forward<Args>(args)...);
-          eptr = nullptr;
-          return 0;
-        }
-      // If the call failed with a recoverable error, then
-      // ignore the exception for now (but store a pointer to it)
-      // and return a positive return value (+1). If the underlying
-      // implementation manages to recover
-      catch (const RecoverableUserCallbackError &)
-        {
-          eptr = std::current_exception();
-          return 1;
-        }
-      // For any other exception, capture the exception and
-      // return -1:
-      catch (const std::exception &)
-        {
-          eptr = std::current_exception();
-          return -1;
-        }
-    }
-  } // namespace
-
-
-
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data)
     : ARKode(data, MPI_COMM_SELF)
@@ -350,11 +278,12 @@ namespace SUNDIALS
       auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
       auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
 
-      return call_and_possibly_capture_exception(solver.explicit_function,
-                                                 solver.pending_exception,
-                                                 tt,
-                                                 *src_yy,
-                                                 *dst_yp);
+      return Utilities::call_and_possibly_capture_exception(
+        solver.explicit_function,
+        solver.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
     };
 
 
@@ -367,11 +296,12 @@ namespace SUNDIALS
       auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
       auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
 
-      return call_and_possibly_capture_exception(solver.implicit_function,
-                                                 solver.pending_exception,
-                                                 tt,
-                                                 *src_yy,
-                                                 *dst_yp);
+      return Utilities::call_and_possibly_capture_exception(
+        solver.implicit_function,
+        solver.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
     };
 
     arkode_mem = ARKStepCreate(explicit_function ? explicit_function_callback :
@@ -501,7 +431,7 @@ namespace SUNDIALS
 
           auto *dst_Jv = internal::unwrap_nvector<VectorType>(Jv);
 
-          return call_and_possibly_capture_exception(
+          return Utilities::call_and_possibly_capture_exception(
             solver.jacobian_times_vector,
             solver.pending_exception,
             *src_v,
@@ -520,7 +450,7 @@ namespace SUNDIALS
           auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
           auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
 
-          return call_and_possibly_capture_exception(
+          return Utilities::call_and_possibly_capture_exception(
             solver.jacobian_times_setup,
             solver.pending_exception,
             t,
@@ -554,7 +484,7 @@ namespace SUNDIALS
 
               auto *dst_z = internal::unwrap_nvector<VectorType>(z);
 
-              return call_and_possibly_capture_exception(
+              return Utilities::call_and_possibly_capture_exception(
                 solver.jacobian_preconditioner_solve,
                 solver.pending_exception,
                 t,
@@ -581,7 +511,7 @@ namespace SUNDIALS
               auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
               auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
 
-              return call_and_possibly_capture_exception(
+              return Utilities::call_and_possibly_capture_exception(
                 solver.jacobian_preconditioner_setup,
                 solver.pending_exception,
                 t,
@@ -696,9 +626,8 @@ namespace SUNDIALS
           ARKode<VectorType> &solver =
             *static_cast<ARKode<VectorType> *>(mtimes_data);
 
-          return call_and_possibly_capture_exception(solver.mass_times_setup,
-                                                     solver.pending_exception,
-                                                     t);
+          return Utilities::call_and_possibly_capture_exception(
+            solver.mass_times_setup, solver.pending_exception, t);
         };
 
         auto mass_matrix_times_vector_callback =
@@ -710,11 +639,12 @@ namespace SUNDIALS
           auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
           auto *dst_Mv = internal::unwrap_nvector<VectorType>(Mv);
 
-          return call_and_possibly_capture_exception(solver.mass_times_vector,
-                                                     solver.pending_exception,
-                                                     t,
-                                                     *src_v,
-                                                     *dst_Mv);
+          return Utilities::call_and_possibly_capture_exception(
+            solver.mass_times_vector,
+            solver.pending_exception,
+            t,
+            *src_v,
+            *dst_Mv);
         };
 
         status = ARKStepSetMassTimes(arkode_mem,
@@ -733,7 +663,7 @@ namespace SUNDIALS
               ARKode<VectorType> &solver =
                 *static_cast<ARKode<VectorType> *>(user_data);
 
-              return call_and_possibly_capture_exception(
+              return Utilities::call_and_possibly_capture_exception(
                 solver.mass_preconditioner_setup, solver.pending_exception, t);
             };
 
@@ -750,7 +680,7 @@ namespace SUNDIALS
               auto *src_r = internal::unwrap_nvector_const<VectorType>(r);
               auto *dst_z = internal::unwrap_nvector<VectorType>(z);
 
-              return call_and_possibly_capture_exception(
+              return Utilities::call_and_possibly_capture_exception(
                 solver.mass_preconditioner_solve,
                 solver.pending_exception,
                 t,
