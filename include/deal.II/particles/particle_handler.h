@@ -1341,9 +1341,9 @@ namespace Particles
                     get_next_free_particle_index() * spacedim);
     for (auto &p : *this)
       {
-        auto       new_point(displace_particles ? p.get_location() :
-                                                  Point<spacedim>());
-        const auto id = p.get_id();
+        Point<spacedim> new_point(displace_particles ? p.get_location() :
+                                                       Point<spacedim>());
+        const auto      id = p.get_id();
         for (unsigned int i = 0; i < spacedim; ++i)
           new_point[i] += input_vector[id * spacedim + i];
         p.set_location(new_point);
