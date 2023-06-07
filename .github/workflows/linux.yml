@@ -300,7 +300,7 @@ jobs:
     - name: collect versioned dependencies of apt packages
       run : |
         # oneapi-ci/scripts/apt_depends.sh
-        apt-cache depends intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+        apt-cache depends intel-oneapi-compiler-dpcpp-cpp \
                           intel-oneapi-mpi-devel \
                           intel-oneapi-mkl-devel \
                           intel-oneapi-tbb-devel | tee dependencies.txt
@@ -314,7 +314,7 @@ jobs:
       if: steps.cache-install.outputs.cache-hit != 'true'
       run: |
         # oneapi-ci/scripts/install_linux_apt.sh
-        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp \
                                 intel-oneapi-mpi-devel \
                                 intel-oneapi-mkl-devel \
                                 intel-oneapi-tbb-devel
@@ -322,6 +322,7 @@ jobs:
     - name: info
       run: |
         source /opt/intel/oneapi/setvars.sh
+        export I_MPI_CXX=icpx
         mpiicpc -v
         cmake --version
     - name: configure deal.II
