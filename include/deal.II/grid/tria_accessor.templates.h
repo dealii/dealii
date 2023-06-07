@@ -2397,8 +2397,6 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::n_faces() const
 {
-  AssertDimension(structdim, dim);
-
   return this->reference_cell().n_faces();
 }
 
