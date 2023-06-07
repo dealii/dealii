@@ -202,7 +202,6 @@ namespace Step45
     const SmartPointer<const MatrixType>         matrix;
     const SmartPointer<const PreconditionerType> preconditioner;
 
-    const MPI_Comm *                      mpi_communicator;
     mutable TrilinosWrappers::MPI::Vector tmp;
   };
 
@@ -216,7 +215,6 @@ namespace Step45
     const MPI_Comm            mpi_communicator)
     : matrix(&m)
     , preconditioner(&preconditioner)
-    , mpi_communicator(&mpi_communicator)
     , tmp(locally_owned, mpi_communicator)
   {}
 
