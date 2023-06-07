@@ -110,9 +110,13 @@ if(Trilinos_FOUND)
 endif()
 
 if(TRILINOS_VERSION VERSION_GREATER_EQUAL 14)
-  set(_target Trilinos::all_libs)
+  set(_targets Trilinos::all_libs)
+  if(TARGET Kokkos::kokkos)
+    list(APPEND _targets Kokkos::kokkos)
+  endif()
+
   process_feature(TRILINOS
-    TARGETS REQUIRED _target
+    TARGETS REQUIRED _targets
     CLEAR
       EPETRA_CONFIG_H TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
     )
