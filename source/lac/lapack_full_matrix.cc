@@ -2461,7 +2461,7 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream &     out,
       for (size_type j = 0; j < nc; ++j)
         // we might have complex numbers, so use abs also to check for nan
         // since there is no isnan on complex numbers
-        if (std::isnan(std::abs((*this)(i, j))))
+        if (numbers::is_nan(std::abs((*this)(i, j))))
           out << std::setw(width) << (*this)(i, j) << ' ';
         else if (std::abs(this->el(i, j)) > threshold)
           out << std::setw(width) << this->el(i, j) * denominator << ' ';
