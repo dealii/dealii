@@ -214,7 +214,7 @@ namespace GridTools
         for (const auto &cell : tria->active_cell_iterators())
           {
             if (cell->is_ghost())
-              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+              for (const unsigned int v : cell->vertex_indices())
                 vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
                   cell->subdomain_id());
           }
