@@ -508,10 +508,11 @@ namespace GridTools
                     const Point<dim> p_cell =
                       mapping.transform_real_to_unit_cell(cell, p);
 
-                    // calculate the infinity norm of
+                    // calculate the Euclidean norm of
                     // the distance vector to the unit cell.
                     const double dist =
-                      GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+                      cell->reference_cell().closest_point(p_cell).distance(
+                        p_cell);
 
                     // We compare if the point is inside the
                     // unit cell (or at least not too far
@@ -731,7 +732,7 @@ namespace GridTools
       }
 
     const double original_distance_to_unit_cell =
-      GeometryInfo<dim>::distance_to_unit_cell(unit_point);
+      my_cell->reference_cell().closest_point(unit_point).distance(unit_point);
     for (const auto &cell : cells_to_add)
       {
         if (cell != my_cell)
@@ -739,8 +740,8 @@ namespace GridTools
             {
               const Point<dim> p_unit =
                 mapping.transform_real_to_unit_cell(cell, p);
-              if (GeometryInfo<dim>::distance_to_unit_cell(p_unit) <
-                  original_distance_to_unit_cell + tolerance)
+              if (cell->reference_cell().closest_point(p_unit).distance(
+                    p_unit) < original_distance_to_unit_cell + tolerance)
                 cells_and_points.emplace_back(cell, p_unit);
             }
           catch (typename Mapping<dim>::ExcTransformationFailed &)
@@ -1369,10 +1370,11 @@ namespace GridTools
                         .transform_real_to_unit_cell(cell, p);
 
 
-                    // calculate the infinity norm of
+                    // calculate the Euclidean norm of
                     // the distance vector to the unit cell.
                     const double dist =
-                      GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+                      cell->reference_cell().closest_point(p_cell).distance(
+                        p_cell);
 
                     // We compare if the point is inside the
                     // unit cell (or at least not too far
