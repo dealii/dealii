@@ -100,11 +100,323 @@ wants to see, but no more.
 
 
 
+<a name="postprocessing"></a>
+<h3> Postprocessing: What to do with the solution? </h3>
+
+This tutorial -- like most of the other programs -- principally only shows how
+to numerically approximate the solution of a partial differential equation, and
+then how to visualize this solution graphically. But
+solving a PDE is of course not the goal in most practical applications (unless
+you are a numerical methods developer and the *method* is the goal): We generally
+want to solve a PDE because we want to *extract information* from it. Examples
+for what people are interested in from solutions include the following:
+- Let's say you solve the equations of elasticity (which we will do in step-8),
+  then that's presumably because you want to know about the deformation of an
+  elastic object under a given load. From an engineering perspective, what you
+  then presumably want to learn is the degree of deformation of the object,
+  say at a specific point; or you may want to know the maximum
+  [stress](https://en.wikipedia.org/wiki/Stress_(mechanics)) in order to
+  determine whether the applied load exceeds the safe maximal stress the
+  material can withstand.
+- If you are solving fluid flow problems (such as in step-22, step-57, step-67,
+  and step-69), then you might be interested in the fluid velocity at specific
+  points, and oftentimes the forces the fluid exerts on the boundary of the
+  fluid domain. The latter is important in many applications: If the fluid
+  in question is the air flowing around an airplane, then we are typically
+  interested in the drag and lift forces on the fuselage and wings. If the
+  fluid is water flowing around a ship, then we typically care about
+  the drag force on the ship.
+- If you are solving the Maxwell equations of electromagnetics, you are
+  typically interested in how much energy is radiated in certain directions
+  (say, in order to know the range of information transmission via an
+  antenna, or to determine the
+  [radar cross section](https://en.wikipedia.org/wiki/Radar_cross_section)
+  of planes or ships).
+
+The point here is that from an engineering perspective, *solving* the
+PDE is only the first step. The second step is to *evaluate* the computed
+solution in order to extract relevant numbers that allow us to
+either *optimize a design*, or to *make decisions*. This second step is often
+called "postprocessing the solution".
+
+This program does not solve a solid or fluid mechanics problem, so we
+should try to illustrate postprocessing with something that makes sense
+in the context of the equation we solve here. The Poisson equation in two
+space dimensions is a model for the vertical deformation of a membrane
+that is clamped at the boundary and is subject to a vertical force. For this
+kind of situation, it makes sense to evaluate the *average vertical
+displacement*,
+@f[
+  \bar u_h = \frac{\int_\Omega u_h(\mathbf x) \, dx}{|\Omega|},
+@f]
+where $|\Omega| = \int_\Omega 1 \, dx$ is the area of the domain. To compute
+$\bar u_h$, as usual we replace integrals over the domain by a sum of integrals
+over cells,
+@f[
+  \int_\Omega u_h(\mathbf x) \, dx
+  =
+  \sum_K \int_K u_h(\mathbf x) \, dx,
+@f]
+and then integrals over cells are approximated by quadrature:
+@f{align*}{
+  \int_\Omega u_h(\mathbf x) \, dx
+  &=
+  \sum_K \int_K u_h(\mathbf x) \, dx,
+  \\
+  &=
+  \sum_K \sum_q u_h(\mathbf x_q^K) w_q^K,
+@f}
+where $w_q^K$ is the weight of the $q$th quadrature point evaluated on
+cell $K$. All of this is as always provided by the FEValues class -- the
+entry point for all integrals in deal.II.
+
+The actual implementation of this is straightforward once you know how
+to get the values of the solution $u$ at the quadrature points of a cell.
+This functionality is provided by FEValues::get_function_values(), a
+function that takes a global vector of nodal values as input and returns
+a vector of function values at the quadrature points of the current cell.
+Using this function, to see how it all works together you can
+place the following code snippet anywhere in the program after the
+solution has been computed (the `output_results()` function seems like a good
+place to also do postprocessing, for example):
+@code
+  QGauss<dim>   quadrature_formula(fe.degree + 1);
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_JxW_values);
+
+  std::vector<double> solution_values(quadrature_formula.size());
+  double              integral_of_u   = 0;
+  double              volume_of_omega = 0;
+
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      fe_values.reinit(cell);
+      fe_values.get_function_values(solution, solution_values);
+
+      for (const unsigned int q_point : fe_values.quadrature_point_indices())
+        {
+          integral_of_u += solution_values[q_point] * fe_values.JxW(q_point);
+          volume_of_omega += 1 * fe_values.JxW(q_point);
+        }
+    }
+  std::cout << "   Mean value of u=" << integral_of_u / volume_of_omega
+            << std::endl;
+@endcode
+In this code snippet, we also compute the volume (or, since we are currently
+thinking about a two-dimensional situation: the area) $|\Omega|$ by computing
+the integral $|\Omega| = \int_\Omega 1 \, dx$ in exactly the same way, via
+quadrature; this could be avoided by using the fact that deal.II has a function
+for this, GridTools::volume(), but it is efficient to compute the two integrals
+at the same time, and so that's what we do.
+
+This program of course also solves the same Poisson equation in three space
+dimensions. In this situation, the Poisson equation is often used as a model
+for diffusion of either a physical species (say, of ink in a tank of water,
+or a pollutant in the air) or of energy (specifically, of thermal energy in
+a solid body). In that context, the quantity
+@f[
+  \Phi_h = \int_{\partial\Omega} \nabla u_h(\mathbf x) \cdot \mathbf n(\mathbf x) \; dx
+@f]
+is the *flux* of this species or energy across the boundary. (In actual
+physical models, one would also have to multiply the right hand side by
+a diffusivity or conductivity constant, but let us ignore this here.) In
+much the same way as before, we compute such integrals by splitting
+it over integrals of *faces* of cells, and then applying quadrature:
+@f{align*}{
+  \Phi_h
+  &=
+  \int_{\partial\Omega} \nabla u_h(\mathbf x) \cdot \mathbf n(\mathbf x) \; dx
+  \\
+  &=
+  \sum_K
+  \sum_{f \in \text{faces of $K$}, f\subset\partial\Omega}
+  \int_f \nabla u_h(\mathbf x) \cdot \mathbf n(\mathbf x) \; dx
+  \\
+  &=
+  \sum_K
+  \sum_{f \in \text{faces of $K$}, f\subset\partial\Omega}
+  \sum_q \nabla u_h(\mathbf x_q^f) \cdot \mathbf n(\mathbf x_q^f) w_q^f,
+@f}
+where now $\mathbf x_q^f$ are the quadrature points located on face $f$,
+and $w_q^f$ are the weights associated with these faces. The second
+of the sum symbols loops over all faces of cell $K$, but restricted to
+those that are actually at the boundary.
+
+This all is easily implemented by the following code that replaces the use of the
+FEValues class (which is used for integrating over cells -- i.e., domain integrals)
+by the FEFaceValues class (which is used for integrating over faces -- i.e.,
+boundary integrals):
+@code
+  QGauss<dim - 1>   face_quadrature_formula(fe.degree + 1);
+  FEFaceValues<dim> fe_face_values(fe,
+                                   face_quadrature_formula,
+                                   update_gradients | update_normal_vectors |
+                                     update_JxW_values);
+
+  std::vector<Tensor<1, dim>> solution_gradients(face_quadrature_formula.size());
+  double                      flux = 0;
+
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    for (const auto &face : cell->face_iterators())
+      if (face->at_boundary())
+        {
+          fe_face_values.reinit(cell, face);
+          fe_face_values.get_function_gradients(solution, solution_gradients);
+
+          for (const unsigned int q_point :
+               fe_face_values.quadrature_point_indices())
+            {
+              flux += solution_gradients[q_point] *
+                      fe_face_values.normal_vector(q_point) *
+                      fe_face_values.JxW(q_point);
+            }
+        }
+  std::cout << "   Flux=" << flux << std::endl;
+@endcode
+
+If you add these two code snippets to the code, you will get output like the
+following when you run the program:
+@code
+Solving problem in 2 space dimensions.
+   Number of active cells: 256
+   Total number of cells: 341
+   Number of degrees of freedom: 289
+   26 CG iterations needed to obtain convergence.
+   Mean value of u=1.33303
+   Flux=-3.68956
+Solving problem in 3 space dimensions.
+   Number of active cells: 4096
+   Total number of cells: 4681
+   Number of degrees of freedom: 4913
+   30 CG iterations needed to obtain convergence.
+   Mean value of u=1.58058
+   Flux=-8.29435
+@endcode
+
+This makes some sense: If you look, for example, at the 2d output above,
+the solution varies between values of 1 and 2, but with a larger part of the
+solution closer to one than two; so an average value of 1.33 for the mean value
+is reasonable. For the flux, recall that $\nabla u \cdot \mathbf n$ is the
+directional derivative in the normal direction -- in other words, how the
+solution changes as we move from the interior of the domain towards the
+boundary. If you look at the 2d solution, you will realize that for most parts
+of the boundary, the solution *decreases* as we approach the boundary, so the
+normal derivative is negative -- so if we integrate along the boundary, we
+should expect (and obtain!) a negative value.
+
+
+
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
+There are many ways with which one can play with this program. The simpler
+ones include essentially all the possibilities already discussed in the
+<a href="step_3.html#extensions" target="body">Possibilities for extensions in the documentation of step 3</a>,
+except that you will have to think about whether something now also applies
+to the 3d case discussed in the current program.
 
-Essentially the possibilities for playing around with the program are the same
-as for the previous one, except that they will now also apply to the 3d
-case. For inspiration read up on <a href="step_3.html#extensions"
-target="body">possible extensions in the documentation of step 3</a>.
+It is also worthwhile considering the postprocessing options discussed
+above. The documentation states two numbers (the mean value and the
+normal flux) for both the 2d and 3d cases. Can we trust these
+numbers? We have convinced ourselves that at least the mean value
+is reasonable, and that the sign of the flux is probably correct.
+But are these numbers accurate?
+
+A general rule is that we should never trust a number unless we have
+verified it in some way. From the theory of finite element methods,
+we know that as we make the mesh finer and finer, the numerical
+solution $u_h$ we compute here must converge to the exact solution
+$u$. As a consequence, we also expect that $\bar u_h \rightarrow \bar u$
+and $\Phi_h \rightarrow \Phi$, but that does not mean that for any
+given mesh $\bar u_h$ or $\Phi_h$ are particularly accurate approximations.
+
+To test this kind of thing, we have already considered the convergence of
+a point value in step-3. We can do the same here by selecting how many
+times the mesh is globally refined in the `make_grid()` function of this
+program. For the mean value of the solution, we then get the following
+numbers:
+  <table align="center" class="doxtable">
+    <tr> <th># of refinements</th>
+         <th>$\bar u_h$ in 2d</th>
+         <th>$\bar u_h$ in 3d</th>
+    </tr>
+    <tr> <td>4</td> <td>1.33303</td> <td>1.58058</td> </tr>
+    <tr> <td>5</td> <td>1.33276</td> <td>1.57947</td> </tr>
+    <tr> <td>6</td> <td>1.3327</td>  <td>1.5792</td> </tr>
+    <tr> <td>7</td> <td>1.33269</td> <td>1.57914</td> </tr>
+    <tr> <td>8</td> <td>1.33268</td> <td></td> </tr>
+    <tr> <td>9</td> <td>1.33268</td> <td></td> </tr>
+  </table>
+I did not have the patience to run the last two values for the 3d case --
+one needs quite a fine mesh for this, with correspondingly long run times.
+But we can be reasonably assured that values around 1.33 (for the 2d case)
+and 1.58 (for the 3d case) are about right -- and at least for engineering
+applications, three digits of accuracy are good enough.
+
+The situation looks very different for the flux. Here, we get results
+such as the following:
+  <table align="center" class="doxtable">
+    <tr> <th># of refinements</th>
+         <th>$\Phi_h$ in 2d</th>
+         <th>$\Phi_h$ in 3d</th>
+    </tr>
+    <tr> <td>4</td>   <td>-3.68956</td>   <td>-8.29435</td>  </tr>
+    <tr> <td>5</td>   <td>-4.90147</td>   <td>-13.0691</td>  </tr>
+    <tr> <td>6</td>   <td>-5.60745</td>   <td>-15.9171</td>  </tr>
+    <tr> <td>7</td>   <td>-5.99111</td>   <td>-17.4918</td>  </tr>
+    <tr> <td>8</td>   <td>-6.19196</td>   <td></td>          </tr>
+    <tr> <td>9</td>   <td>-6.29497</td>   <td></td>          </tr>
+    <tr> <td>10</td>   <td>-6.34721</td>  <td></td>          </tr>
+    <tr> <td>11</td>   <td>-6.37353</td>  <td></td>          </tr>
+  </table>
+So this is not great. For the 2d case, we might infer that perhaps
+a value around -6.4 might be right if we just refine the mesh enough --
+though 11 refinements already leads to some 4,194,304 cells. In any
+case, the first number (the one shown in the beginning where we
+discussed postprocessing) was off by almost a factor of 2!
+
+For the 3d case, the last number shown was on a mesh with 2,097,152
+cells; the next one would have had 8 times as many cells. In any case, the
+numbers mean that we can't even be sure
+that the first digit of that last number is correct! In other words,
+it was worth checking, or we would have just believed all of these
+numbers. In fact, that last column isn't even doing a particularly
+good job convincing that the code might be correctly implemented.
+
+If you keep reading through the tutorial, you will find many ways
+to make these sorts of computations more accurate and to come to
+believe that the flux actually does converge to a correct value.
+For example, we can dramatically increase the accuracy of the computation
+by using adaptive mesh refinement (step-6) near the boundary, and
+in particular by using higher polynomial degree finite elements (also
+step-6, but also step-7). Using the latter, using cubic elements
+(polynomial degree 3), we can actually compute the flux pretty
+accurately even in 3d: $\Phi_h=-19.0148$ with 4 global refinement steps,
+and $\Phi_h=-19.1533$ with 5 refinement steps. These numbers are already
+pretty close together and give us a reasonable idea of the first
+two correct digits of the "true" answer.
+
+@note We would be remiss to not also comment on the fact that there
+  are good theoretical reasons why computing the flux accurately
+  appears to be so much more difficult than the average value.
+  This has to do with the fact that finite element theory
+  provides us with the estimate
+  $\|u-u_h\|_{L_2(\Omega)} \le C h^2 \|\nabla^2u\|_{L_2(\Omega)}$
+  when using the linear elements this program uses -- that is, for
+  every global mesh refinement, $h$ is reduced by a factor of two
+  and the error goes down by a factor of 4. Now, the $L_2$ error is
+  not equivalent to the error in the mean value, but the two are
+  related: They are both integrals over the domain, using the *value*
+  of the solution. We expect the mean value to converge no worse than
+  the $L_2$ norm of the error. At the same time, theory also provides
+  us with this estimate:
+  $\|\nabla (u-u_h)\|_{L_2(\partial\Omega)} \le
+    C h^{1/2} \|\nabla^2u\|_{L_2(\Omega)}$. The move from values to
+  gradients reduces the convergence rates by one order, and the move
+  from domain to boundary by another half order. Here, then, each
+  refinement step reduces the error not by a factor of 4 any more,
+  by only by a factor of $\sqrt{2} \approx 1.4$. It takes a lot
+  of global refinement steps to reduce the error by, say, a factor
+  ten or hundred, and this is reflected in the very slow convergence
+  evidenced by the table.
