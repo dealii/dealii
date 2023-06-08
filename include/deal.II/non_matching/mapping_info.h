@@ -208,6 +208,27 @@ namespace NonMatching
       Number>::vectorized_value_type;
 
     /**
+     * Collects the options which can be used to specify the behavior during
+     * reinitialization.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor which sets the default arguments.
+       */
+      AdditionalData(const bool use_global_weights = false)
+        : use_global_weights(use_global_weights)
+      {}
+
+      /**
+       * During initialization, assume that the Quadrature object contains
+       * global weights as, e.g., obtained by
+       * QSimplex::compute_affine_transformation().
+       */
+      bool use_global_weights;
+    };
+
+    /**
      * Constructor.
      *
      * @param mapping The Mapping class describing the geometry of a cell.
@@ -215,8 +236,13 @@ namespace NonMatching
      * @param update_flags Specify the quantities to be computed by the mapping
      * during the call of reinit(). These update flags are also handed to a
      * FEEvaluation object if you construct it with this MappingInfo object.
+     *
+     * @param additional_data Additional data for the class to specify the
+     * behavior during reinitialization.
      */
-    MappingInfo(const Mapping<dim> &mapping, const UpdateFlags update_flags);
+    MappingInfo(const Mapping<dim> & mapping,
+                const UpdateFlags    update_flags,
+                const AdditionalData additional_data = AdditionalData());
 
     /**
      * Compute the mapping information for the incoming cell and unit
@@ -448,10 +474,11 @@ namespace NonMatching
      * Store the requested mapping data.
      */
     void
-    store_mapping_data(const unsigned int unit_points_index_offset,
-                       const unsigned int n_q_points,
-                       const unsigned int n_q_points_unvectorized,
-                       const MappingData &mapping_data);
+    store_mapping_data(const unsigned int         unit_points_index_offset,
+                       const unsigned int         n_q_points,
+                       const unsigned int         n_q_points_unvectorized,
+                       const MappingData &        mapping_data,
+                       const std::vector<double> &weights);
 
     /**
      * Compute the compressed cell index.
@@ -522,6 +549,11 @@ namespace NonMatching
      * The update flags for the desired mapping information.
      */
     UpdateFlags update_flags_mapping;
+
+    /**
+     * AdditionalData for this object.
+     */
+    const AdditionalData additional_data;
 
     /**
      * Stores the index offset into the arrays @p JxW_values, @p jacobians,
@@ -602,11 +634,13 @@ namespace NonMatching
 
   template <int dim, int spacedim, typename Number>
   MappingInfo<dim, spacedim, Number>::MappingInfo(
-    const Mapping<dim> &mapping,
-    const UpdateFlags   update_flags)
+    const Mapping<dim> & mapping,
+    const UpdateFlags    update_flags,
+    const AdditionalData additional_data)
     : mapping(&mapping)
     , update_flags(update_flags)
     , update_flags_mapping(update_default)
+    , additional_data(additional_data)
   {
     // translate update flags
     if (update_flags & update_jacobians)
@@ -704,7 +738,8 @@ namespace NonMatching
     store_mapping_data(0,
                        n_q_points_data,
                        n_q_points_unvectorized[0],
-                       mapping_data);
+                       mapping_data,
+                       quadrature.get_weights());
 
     state = State::single_cell;
     is_reinitialized();
@@ -814,7 +849,8 @@ namespace NonMatching
         store_mapping_data(data_index_offsets[cell_index],
                            n_q_points_data,
                            n_q_points_unvectorized[cell_index],
-                           mapping_data);
+                           mapping_data,
+                           quadrature_vector[cell_index].get_weights());
 
         if (do_cell_index_compression)
           cell_index_to_compressed_cell_index[cell->active_cell_index()] =
@@ -837,6 +873,11 @@ namespace NonMatching
     const std::vector<ImmersedSurfaceQuadrature<dim>> &quadrature_vector,
     const unsigned int                                 n_unfiltered_cells)
   {
+    Assert(
+      additional_data.use_global_weights == false,
+      ExcMessage(
+        "There is no known use-case for AdditionalData::use_global_weights=true and reinit_surface()"));
+
     do_cell_index_compression =
       n_unfiltered_cells != numbers::invalid_unsigned_int;
 
@@ -911,7 +952,8 @@ namespace NonMatching
         store_mapping_data(data_index_offsets[cell_index],
                            n_q_points_data,
                            n_q_points_unvectorized[cell_index],
-                           mapping_data);
+                           mapping_data,
+                           quadrature_vector[cell_index].get_weights());
 
         if (do_cell_index_compression)
           cell_index_to_compressed_cell_index[cell->active_cell_index()] =
@@ -1051,7 +1093,8 @@ namespace NonMatching
             store_mapping_data(data_index_offsets[current_face_index],
                                n_q_points_data,
                                n_q_points_unvectorized[current_face_index],
-                               mapping_data);
+                               mapping_data,
+                               quadrature_on_face.get_weights());
           }
         if (do_cell_index_compression)
           cell_index_to_compressed_cell_index[cell->active_cell_index()] =
@@ -1219,7 +1262,8 @@ namespace NonMatching
     const unsigned int              unit_points_index_offset,
     const unsigned int              n_q_points,
     const unsigned int              n_q_points_unvectorized,
-    const MappingInfo::MappingData &mapping_data)
+    const MappingInfo::MappingData &mapping_data,
+    const std::vector<double> &     weights)
   {
     const unsigned int n_lanes =
       dealii::internal::VectorizedArrayTrait<Number>::width();
@@ -1244,9 +1288,19 @@ namespace NonMatching
                     inverse_jacobians[offset][s][d], v) =
                     mapping_data.inverse_jacobians[q * n_lanes + v][s][d];
             if (update_flags_mapping & UpdateFlags::update_JxW_values)
-              dealii::internal::VectorizedArrayTrait<Number>::get(
-                JxW_values[offset], v) =
-                mapping_data.JxW_values[q * n_lanes + v];
+              {
+                if (additional_data.use_global_weights)
+                  {
+                    dealii::internal::VectorizedArrayTrait<Number>::get(
+                      JxW_values[offset], v) = weights[q * n_lanes + v];
+                  }
+                else
+                  {
+                    dealii::internal::VectorizedArrayTrait<Number>::get(
+                      JxW_values[offset], v) =
+                      mapping_data.JxW_values[q * n_lanes + v];
+                  }
+              }
             if (update_flags_mapping & UpdateFlags::update_normal_vectors)
               for (unsigned int s = 0; s < spacedim; ++s)
                 dealii::internal::VectorizedArrayTrait<Number>::get(
