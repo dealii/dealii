@@ -369,15 +369,10 @@ namespace GridTools
       // have not yet searched.
       std::set<cell_iterator> adjacent_cells_new;
 
-      typename std::set<cell_iterator>::const_iterator cell =
-                                                         adjacent_cells.begin(),
-                                                       endc =
-                                                         adjacent_cells.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : adjacent_cells)
         {
           std::vector<cell_iterator> active_neighbors;
-          get_active_neighbors<MeshType<dim, spacedim>>(*cell,
-                                                        active_neighbors);
+          get_active_neighbors<MeshType<dim, spacedim>>(cell, active_neighbors);
           for (unsigned int i = 0; i < active_neighbors.size(); ++i)
             if (searched_cells.find(active_neighbors[i]) ==
                 searched_cells.end())
@@ -483,26 +478,22 @@ namespace GridTools
     // the cell and have not searched
     // every cell in the triangulation,
     // we keep on looking.
-    const unsigned int n_active_cells =
-      mesh.get_triangulation().n_active_cells();
+    const auto   n_active_cells = mesh.get_triangulation().n_active_cells();
     bool         found          = false;
     unsigned int cells_searched = 0;
     while (!found && cells_searched < n_active_cells)
       {
-        typename std::set<active_cell_iterator>::const_iterator
-          cell = adjacent_cells.begin(),
-          endc = adjacent_cells.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : adjacent_cells)
           {
-            if ((*cell)->is_artificial() == false)
+            if (cell->is_artificial() == false)
               {
                 // marked_vertices are used to filter cell candidates
                 if (marked_vertices.size() > 0)
                   {
                     bool any_vertex_marked = false;
-                    for (const auto &v : (*cell)->vertex_indices())
+                    for (const auto &v : cell->vertex_indices())
                       {
-                        if (marked_vertices[(*cell)->vertex_index(v)])
+                        if (marked_vertices[cell->vertex_index(v)])
                           {
                             any_vertex_marked = true;
                             break;
@@ -515,7 +506,7 @@ namespace GridTools
                 try
                   {
                     const Point<dim> p_cell =
-                      mapping.transform_real_to_unit_cell(*cell, p);
+                      mapping.transform_real_to_unit_cell(cell, p);
 
                     // calculate the infinity norm of
                     // the distance vector to the unit cell.
@@ -528,12 +519,12 @@ namespace GridTools
                     // that the cell has a more refined state
                     if ((dist < best_distance) ||
                         ((dist == best_distance) &&
-                         ((*cell)->level() > best_level)))
+                         (cell->level() > best_level)))
                       {
                         found         = true;
                         best_distance = dist;
-                        best_level    = (*cell)->level();
-                        best_cell     = std::make_pair(*cell, p_cell);
+                        best_level    = cell->level();
+                        best_cell     = std::make_pair(cell, p_cell);
                       }
                   }
                 catch (
@@ -1364,21 +1355,18 @@ namespace GridTools
         // the cell and have not searched
         // every cell in the triangulation,
         // we keep on looking.
-        const unsigned int n_cells        = mesh.get_triangulation().n_cells();
-        bool               found          = false;
-        unsigned int       cells_searched = 0;
+        const auto   n_cells        = mesh.get_triangulation().n_cells();
+        bool         found          = false;
+        unsigned int cells_searched = 0;
         while (!found && cells_searched < n_cells)
           {
-            typename std::set<cell_iterator>::const_iterator
-              cell = adjacent_cells.begin(),
-              endc = adjacent_cells.end();
-            for (; cell != endc; ++cell)
+            for (const auto &cell : adjacent_cells)
               {
                 try
                   {
                     const Point<dim> p_cell =
-                      mapping[(*cell)->active_fe_index()]
-                        .transform_real_to_unit_cell(*cell, p);
+                      mapping[cell->active_fe_index()]
+                        .transform_real_to_unit_cell(cell, p);
 
 
                     // calculate the infinity norm of
@@ -1390,13 +1378,13 @@ namespace GridTools
                     // unit cell (or at least not too far
                     // outside). If it is, it is also checked
                     // that the cell has a more refined state
-                    if (dist < best_distance || (dist == best_distance &&
-                                                 (*cell)->level() > best_level))
+                    if (dist < best_distance ||
+                        (dist == best_distance && cell->level() > best_level))
                       {
                         found         = true;
                         best_distance = dist;
-                        best_level    = (*cell)->level();
-                        best_cell     = std::make_pair(*cell, p_cell);
+                        best_level    = cell->level();
+                        best_cell     = std::make_pair(cell, p_cell);
                       }
                   }
                 catch (
