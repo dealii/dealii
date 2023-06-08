@@ -365,7 +365,7 @@ public:
    * to the face: $\boldsymbol \nabla u(\mathbf x_q) \cdot \mathbf n(\mathbf
    * x_q)$
    *
-   * This call is equivalent to calling get_gradient() * get_normal_vector()
+   * This call is equivalent to calling get_gradient() * normal_vector()
    * but will use a more efficient internal representation of data.
    *
    * @note The derived class FEEvaluationAccess overloads this operation

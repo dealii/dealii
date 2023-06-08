@@ -150,7 +150,7 @@ test(const unsigned int n_refinements)
             for (const auto q : phi.quadrature_point_indices())
               {
                 auto gradient = phi.get_gradient(q);
-                auto normal   = phi.get_normal_vector(q);
+                auto normal   = phi.normal_vector(q);
 
                 if (is_interior_face == false) // fix sign!
                   normal *= -1.0;

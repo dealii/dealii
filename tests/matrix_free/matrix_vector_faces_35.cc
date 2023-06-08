@@ -196,7 +196,7 @@ private:
             value_type u_minus = phi_m.get_value(q),
                        u_plus  = phi_p.get_value(q);
             const VectorizedArrayType normal_times_advection =
-              advection * phi_m.get_normal_vector(q);
+              advection * phi_m.normal_vector(q);
             const value_type flux_times_normal =
               make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +
@@ -247,7 +247,7 @@ private:
           {
             value_type                u_minus = fe_eval.get_value(q);
             const VectorizedArrayType normal_times_advection =
-              advection * fe_eval.get_normal_vector(q);
+              advection * fe_eval.normal_vector(q);
             const value_type flux_times_normal =
               make_vectorized_array<number, VectorizedArrayType::size()>(0.5) *
               ((u_minus + u_plus) * normal_times_advection +

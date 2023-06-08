@@ -187,9 +187,9 @@ public:
                                              EvaluationFlags::values |
                                                EvaluationFlags::gradients);
             VectorizedArray<number> sigmaF = PENALTY;
-            //  (std::abs((fe_eval.get_normal_vector(0) *
+            //  (std::abs((fe_eval.normal_vector(0) *
             //             fe_eval.inverse_jacobian(0))[dim - 1]) +
-            //   std::abs((fe_eval.get_normal_vector(0) *
+            //   std::abs((fe_eval.normal_vector(0) *
             //             fe_eval_neighbor.inverse_jacobian(0))[dim - 1])) *
             //  (number)(std::max(fe_degree, 1) * (fe_degree + 1.0));
 
@@ -225,7 +225,7 @@ public:
             fe_eval.evaluate(EvaluationFlags::values |
                              EvaluationFlags::gradients);
             VectorizedArray<number> sigmaF = PENALTY;
-            //  std::abs((fe_eval.get_normal_vector(0) *
+            //  std::abs((fe_eval.normal_vector(0) *
             //            fe_eval.inverse_jacobian(0))[dim - 1]) *
             //  number(std::max(fe_degree, 1) * (fe_degree + 1.0)) * 2.0;
 
