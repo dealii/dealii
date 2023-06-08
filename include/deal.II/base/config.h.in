@@ -70,6 +70,7 @@
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_FEATURE_UMFPACK_BUNDLED_CONFIGURED
+#cmakedefine DEAL_II_WITH_VTK
 #cmakedefine DEAL_II_WITH_ZLIB
 
 #ifdef DEAL_II_WITH_TBB
