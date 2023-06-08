@@ -1127,13 +1127,9 @@ namespace FETools
       // in the input argument to this function might be destined for
       // the same process, so we have to only look at the unique set of
       // destinations:
-      std::vector<types::subdomain_id> destinations;
-      destinations.reserve(cells_to_send.size());
+      std::set<types::subdomain_id> destinations;
       for (const auto &cell : cells_to_send)
-        destinations.emplace_back(cell.receiver);
-      std::sort(destinations.begin(), destinations.end());
-      destinations.erase(std::unique(destinations.begin(), destinations.end()),
-                         destinations.end());
+        destinations.insert(cell.receiver);
 
       // Then set up the send/receive operation. This is best done through
       // the 'consensus algorithm' setup that is used for point-to-point
@@ -1167,7 +1163,11 @@ namespace FETools
         };
 
       Utilities::MPI::ConsensusAlgorithms::selector<std::vector<CellData>>(
-        destinations, create_request, process_request, communicator);
+        std::vector<types::subdomain_id>(destinations.begin(),
+                                         destinations.end()),
+        create_request,
+        process_request,
+        communicator);
     }
 
 
