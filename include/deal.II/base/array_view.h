@@ -705,7 +705,13 @@ make_array_view(const Iterator begin, const Iterator end)
 {
   static_assert(
     std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
-                 typename std::random_access_iterator_tag>::value,
+                 typename std::random_access_iterator_tag>::value
+#ifdef DEAL_II_HAVE_CXX20
+      ||
+      std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+                   typename std::contiguous_iterator_tag>::value
+#endif
+    ,
     "The provided iterator needs to be a random access iterator.");
   Assert(begin <= end,
          ExcMessage(
