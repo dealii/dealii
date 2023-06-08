@@ -142,7 +142,11 @@ public:
   /**
    * Iterator category.
    */
+#ifdef DEAL_II_HAVE_CXX20
+  using iterator_category = std::contiguous_iterator_tag;
+#else
   using iterator_category = std::random_access_iterator_tag;
+#endif
 
   /**
    * An alias for the type you get when you dereference an iterator of the
