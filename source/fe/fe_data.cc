@@ -157,7 +157,7 @@ FiniteElementData<dim>::FiniteElementData(
   const Conformity                      conformity,
   const BlockIndices &                  block_indices)
   : reference_cell_kind(reference_cell)
-  , number_unique_quads(
+  , number_of_unique_2d_subobjects(
       internal::number_unique_entries(data.dofs_per_object_inclusive[2]))
   , number_unique_faces(
       internal::number_unique_entries(data.dofs_per_object_inclusive[dim - 1]))
