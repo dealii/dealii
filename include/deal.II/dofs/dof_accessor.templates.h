@@ -2829,6 +2829,12 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   Assert(!this->has_children(), ExcMessage("Cell must be active"));
 
+  Assert(
+    internal::ArrayViewHelper::is_contiguous(local_source_begin,
+                                             local_source_end),
+    ExcMessage(
+      "This function can not be called with iterator types that do not point to contiguous memory."));
+
   const unsigned int n_dofs = local_source_end - local_source_begin;
 
   internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
