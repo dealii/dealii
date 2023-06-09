@@ -369,15 +369,10 @@ namespace GridTools
       // have not yet searched.
       std::set<cell_iterator> adjacent_cells_new;
 
-      typename std::set<cell_iterator>::const_iterator cell =
-                                                         adjacent_cells.begin(),
-                                                       endc =
-                                                         adjacent_cells.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : adjacent_cells)
         {
           std::vector<cell_iterator> active_neighbors;
-          get_active_neighbors<MeshType<dim, spacedim>>(*cell,
-                                                        active_neighbors);
+          get_active_neighbors<MeshType<dim, spacedim>>(cell, active_neighbors);
           for (unsigned int i = 0; i < active_neighbors.size(); ++i)
             if (searched_cells.find(active_neighbors[i]) ==
                 searched_cells.end())
@@ -483,26 +478,22 @@ namespace GridTools
     // the cell and have not searched
     // every cell in the triangulation,
     // we keep on looking.
-    const unsigned int n_active_cells =
-      mesh.get_triangulation().n_active_cells();
+    const auto   n_active_cells = mesh.get_triangulation().n_active_cells();
     bool         found          = false;
     unsigned int cells_searched = 0;
     while (!found && cells_searched < n_active_cells)
       {
-        typename std::set<active_cell_iterator>::const_iterator
-          cell = adjacent_cells.begin(),
-          endc = adjacent_cells.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : adjacent_cells)
           {
-            if ((*cell)->is_artificial() == false)
+            if (cell->is_artificial() == false)
               {
                 // marked_vertices are used to filter cell candidates
                 if (marked_vertices.size() > 0)
                   {
                     bool any_vertex_marked = false;
-                    for (const auto &v : (*cell)->vertex_indices())
+                    for (const auto &v : cell->vertex_indices())
                       {
-                        if (marked_vertices[(*cell)->vertex_index(v)])
+                        if (marked_vertices[cell->vertex_index(v)])
                           {
                             any_vertex_marked = true;
                             break;
@@ -515,12 +506,13 @@ namespace GridTools
                 try
                   {
                     const Point<dim> p_cell =
-                      mapping.transform_real_to_unit_cell(*cell, p);
+                      mapping.transform_real_to_unit_cell(cell, p);
 
-                    // calculate the infinity norm of
+                    // calculate the Euclidean norm of
                     // the distance vector to the unit cell.
                     const double dist =
-                      GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+                      cell->reference_cell().closest_point(p_cell).distance(
+                        p_cell);
 
                     // We compare if the point is inside the
                     // unit cell (or at least not too far
@@ -528,12 +520,12 @@ namespace GridTools
                     // that the cell has a more refined state
                     if ((dist < best_distance) ||
                         ((dist == best_distance) &&
-                         ((*cell)->level() > best_level)))
+                         (cell->level() > best_level)))
                       {
                         found         = true;
                         best_distance = dist;
-                        best_level    = (*cell)->level();
-                        best_cell     = std::make_pair(*cell, p_cell);
+                        best_level    = cell->level();
+                        best_cell     = std::make_pair(cell, p_cell);
                       }
                   }
                 catch (
@@ -740,7 +732,7 @@ namespace GridTools
       }
 
     const double original_distance_to_unit_cell =
-      GeometryInfo<dim>::distance_to_unit_cell(unit_point);
+      my_cell->reference_cell().closest_point(unit_point).distance(unit_point);
     for (const auto &cell : cells_to_add)
       {
         if (cell != my_cell)
@@ -748,8 +740,8 @@ namespace GridTools
             {
               const Point<dim> p_unit =
                 mapping.transform_real_to_unit_cell(cell, p);
-              if (GeometryInfo<dim>::distance_to_unit_cell(p_unit) <
-                  original_distance_to_unit_cell + tolerance)
+              if (cell->reference_cell().closest_point(p_unit).distance(
+                    p_unit) < original_distance_to_unit_cell + tolerance)
                 cells_and_points.emplace_back(cell, p_unit);
             }
           catch (typename Mapping<dim>::ExcTransformationFailed &)
@@ -1364,39 +1356,37 @@ namespace GridTools
         // the cell and have not searched
         // every cell in the triangulation,
         // we keep on looking.
-        const unsigned int n_cells        = mesh.get_triangulation().n_cells();
-        bool               found          = false;
-        unsigned int       cells_searched = 0;
+        const auto   n_cells        = mesh.get_triangulation().n_cells();
+        bool         found          = false;
+        unsigned int cells_searched = 0;
         while (!found && cells_searched < n_cells)
           {
-            typename std::set<cell_iterator>::const_iterator
-              cell = adjacent_cells.begin(),
-              endc = adjacent_cells.end();
-            for (; cell != endc; ++cell)
+            for (const auto &cell : adjacent_cells)
               {
                 try
                   {
                     const Point<dim> p_cell =
-                      mapping[(*cell)->active_fe_index()]
-                        .transform_real_to_unit_cell(*cell, p);
+                      mapping[cell->active_fe_index()]
+                        .transform_real_to_unit_cell(cell, p);
 
 
-                    // calculate the infinity norm of
+                    // calculate the Euclidean norm of
                     // the distance vector to the unit cell.
                     const double dist =
-                      GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+                      cell->reference_cell().closest_point(p_cell).distance(
+                        p_cell);
 
                     // We compare if the point is inside the
                     // unit cell (or at least not too far
                     // outside). If it is, it is also checked
                     // that the cell has a more refined state
-                    if (dist < best_distance || (dist == best_distance &&
-                                                 (*cell)->level() > best_level))
+                    if (dist < best_distance ||
+                        (dist == best_distance && cell->level() > best_level))
                       {
                         found         = true;
                         best_distance = dist;
-                        best_level    = (*cell)->level();
-                        best_cell     = std::make_pair(*cell, p_cell);
+                        best_level    = cell->level();
+                        best_cell     = std::make_pair(cell, p_cell);
                       }
                   }
                 catch (
