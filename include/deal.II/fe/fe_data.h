@@ -541,15 +541,25 @@ public:
   reference_cell() const;
 
   /**
-   * Number of unique quads. If all quads have the same type, the value is
-   * one; else it equals the number of quads.
+   * Number of unique 2d subobjects. If all two-dimensional subobjects
+   * are of the same kind, the value is one; else it equals the number
+   * of two-dimensional subobjects. For example, for hex reference
+   * cells with the usual finite elements, each face has the same
+   * geometric shape (a square) and each face has the same number and
+   * kind of shape functions associated with it; as a consequence, the
+   * returned value is one. On the other hand, for a wedge element,
+   * the two-dimensional subobjects can be both quadrilaterals and
+   * triangles, and so the returned value equals the number of faces
+   * of these objects (i.e., five).
    */
   unsigned int
-  n_unique_quads() const;
+  n_unique_2d_subobjects() const;
 
   /**
-   * Number of unique faces. If all faces have the same type, the value is
-   * one; else it equals the number of faces.
+   * Number of unique faces. If all faces have the same type (i.e.,
+   * have the same shape and also have the same kind and number of
+   * DoFs associated with them), the value is one; else it equals the
+   * number of faces.
    */
   unsigned int
   n_unique_faces() const;
@@ -774,7 +784,7 @@ FiniteElementData<dim>::reference_cell() const
 
 template <int dim>
 inline unsigned int
-FiniteElementData<dim>::n_unique_quads() const
+FiniteElementData<dim>::n_unique_2d_subobjects() const
 {
   return number_of_unique_2d_subobjects;
 }
