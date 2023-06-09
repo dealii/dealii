@@ -1,0 +1,5 @@
+Fixed: The numbering applied within FEPointEvaluation did not work correctly
+for multiple components and when used with first_selected_component!=0 for
+certain FiniteElement types, leading to wrong results. This is now fixed.
+<br>
+(Johannes Heinz, Peter Munch, 2023/06/11)
