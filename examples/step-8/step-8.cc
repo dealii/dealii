@@ -344,7 +344,7 @@ namespace Step8
                      fe_values.quadrature_point_indices())
                   {
                     cell_matrix(i, j) +=
-                      // The first term is $\lambda \partial_i u_i, \partial_j
+                      // The first term is $(\lambda \partial_i u_i, \partial_j
                       // v_j) + (\mu \partial_i u_j, \partial_j v_i)$. Note
                       // that <code>shape_grad(i,q_point)</code> returns the
                       // gradient of the only nonzero component of the i-th
