@@ -141,6 +141,13 @@ namespace internal
        * by algorithms to enquire about the specifics of the iterators they
        * work on. (Example: `std::next()`, which needs to know about a local
        * type named `difference_type`.)
+       *
+       * As for the iterator_category, C++20 has a more specialized
+       * contiguous_iterator_tag, but the elements of block vectors are
+       * not stored in a contiguous manner. They can be accessed in a
+       * random access order, though, with O(1) effort as long as we
+       * assume that the number of blocks of a vector is a constant
+       * (even though the *size* of the vector is not).
        */
       using iterator_category = std::random_access_iterator_tag;
       using difference_type   = std::ptrdiff_t;

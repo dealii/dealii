@@ -6052,9 +6052,13 @@ namespace std
   template <class T>
   struct iterator_traits<dealii::VectorizedArrayIterator<T>>
   {
+#ifdef DEAL_II_HAVE_CXX20
+    using iterator_category = contiguous_iterator_tag;
+#else
     using iterator_category = random_access_iterator_tag;
-    using value_type        = typename T::value_type;
-    using difference_type   = std::ptrdiff_t;
+#endif
+    using value_type      = typename T::value_type;
+    using difference_type = std::ptrdiff_t;
   };
 
 } // namespace std
