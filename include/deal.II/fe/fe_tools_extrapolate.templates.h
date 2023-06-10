@@ -1224,9 +1224,15 @@ namespace FETools
       const CellData &       cell_data,
       std::vector<CellData> &cells_list)
     {
+      // Find the place to insert the cell:
       typename std::vector<CellData>::iterator bound =
         std::lower_bound(cells_list.begin(), cells_list.end(), cell_data);
 
+      // There are three possibilities: The cell needs to be inserted
+      // at the end, the cell needs to be inserted just before the place
+      // std::lower_bound found, or the cell already exists in the list
+      // and no longer needs to be inserted. In that last case,
+      // cell_data==*bound.
       if ((bound == cells_list.end()) || (cell_data < *bound))
         cells_list.insert(bound, 1, cell_data);
     }
@@ -1267,8 +1273,8 @@ namespace FETools
       unsigned int ready = 0;
       do
         {
-          for (unsigned int i = 0; i < received_needs.size(); ++i)
-            cell_data_insert(received_needs[i], cells_to_compute);
+          for (const auto &need : received_needs)
+            cell_data_insert(need, cells_to_compute);
 
           compute_cells(dof2, u, cells_to_compute, computed_cells, new_needs);
 
