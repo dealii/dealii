@@ -1249,9 +1249,6 @@ namespace FETools
       std::vector<CellData> cells_we_need, cells_to_compute, received_cells,
         received_needs, new_needs, computed_cells, cells_to_send;
 
-      // reset the round count we will use in send_cells
-      round = 0;
-
       // Compute all the cells needed from other processes.
       compute_needs(dof2, cells_we_need);
 
@@ -1307,10 +1304,6 @@ namespace FETools
                 }
             }
 
-          // increase the round counter, such that we are sure to only send
-          // and receive data from the correct call
-          ++round;
-
           exchange_data_on_cells(cells_to_send, received_cells);
 
           // store received cell_data
@@ -1319,11 +1312,7 @@ namespace FETools
               cell_data_insert(recv, available_cells);
             }
 
-          // increase the round counter, such that we are sure to only send
-          // and receive data from the correct call
-          ++round;
-
-          // finally send and receive new needs and start a new round
+          // finally send and receive new needs
           exchange_data_on_cells(new_needs, received_needs);
         }
       while (ready != 0);
