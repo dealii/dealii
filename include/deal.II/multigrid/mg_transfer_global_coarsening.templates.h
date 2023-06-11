@@ -2673,8 +2673,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         (scheme.prolongation_matrix.size() == 0 &&
          scheme.prolongation_matrix_1d.size() == 0) == false;
 
-      evaluation_data_fine.resize(scheme.n_dofs_per_cell_fine);
-      evaluation_data_coarse.resize(scheme.n_dofs_per_cell_fine);
+      evaluation_data_fine.clear();
+      evaluation_data_coarse.clear();
+
+      const unsigned int max_n_dofs_per_cell =
+        std::max(scheme.n_dofs_per_cell_fine, scheme.n_dofs_per_cell_coarse);
+      evaluation_data_fine.resize(max_n_dofs_per_cell);
+      evaluation_data_coarse.resize(max_n_dofs_per_cell);
 
       CellTransferFactory cell_transfer(scheme.degree_fine,
                                         scheme.degree_coarse);
@@ -2844,8 +2849,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         (scheme.prolongation_matrix.size() == 0 &&
          scheme.prolongation_matrix_1d.size() == 0) == false;
 
-      evaluation_data_fine.resize(scheme.n_dofs_per_cell_fine);
-      evaluation_data_coarse.resize(scheme.n_dofs_per_cell_fine);
+      evaluation_data_fine.clear();
+      evaluation_data_coarse.clear();
+
+      const unsigned int max_n_dofs_per_cell =
+        std::max(scheme.n_dofs_per_cell_fine, scheme.n_dofs_per_cell_coarse);
+      evaluation_data_fine.resize(max_n_dofs_per_cell);
+      evaluation_data_coarse.resize(max_n_dofs_per_cell);
 
       CellTransferFactory cell_transfer(scheme.degree_fine,
                                         scheme.degree_coarse);
