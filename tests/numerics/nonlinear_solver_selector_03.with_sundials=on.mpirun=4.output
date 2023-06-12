@@ -1,0 +1,131 @@
+
+DEAL::Running with Trilinos on 4 MPI rank(s)...
+DEAL::  Target_tolerance: 0.00100000
+DEAL::
+DEAL::  Computing residual vector... norm=0.170956
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 9.85645e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.170956
+DEAL::  Computing residual vector... norm=0.129347
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 7.11784e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.129347
+DEAL::  Computing residual vector... norm=0.103614
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 5.28808e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.103614
+DEAL::  Computing residual vector... norm=0.0861914
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 3.98596e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.0861914
+DEAL::  Computing residual vector... norm=0.0865470
+DEAL::  Computing residual vector... norm=0.0795265
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 3.14097e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.0795265
+DEAL::  Computing residual vector... norm=0.0814816
+DEAL::  Computing residual vector... norm=0.0774703
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 2.72056e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.0774703
+DEAL::  Computing residual vector... norm=0.0715560
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 2.76383e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.0715560
+DEAL::  Computing residual vector... norm=0.0635000
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 4.09086e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.0635000
+DEAL::  Computing residual vector... norm=0.0647100
+DEAL::  Computing residual vector... norm=0.0549834
+DEAL::  Solving linear system
+DEAL::Convergence step 2 value 3.01833e-16
+DEAL::   Solved in 2 iterations.
+DEAL::  Computing residual vector... norm=0.0549834
+DEAL::  Computing residual vector... norm=0.0638162
+DEAL::  Computing residual vector... norm=0.0525536
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 3.51125e-13
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0525536
+DEAL::  Computing residual vector... norm=0.0468639
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 3.11947e-13
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0468639
+DEAL::  Computing residual vector... norm=0.0361431
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 2.33506e-13
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0361430
+DEAL::  Computing residual vector... norm=0.0292451
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 1.77355e-13
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0292451
+DEAL::  Computing residual vector... norm=0.0244098
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 1.36440e-13
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0244098
+DEAL::  Computing residual vector... norm=0.0208326
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 1.06488e-13
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0208326
+DEAL::  Computing residual vector... norm=0.0180857
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 8.45632e-14
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0180857
+DEAL::  Computing residual vector... norm=0.0159160
+DEAL::  Computing residual vector... norm=0.0139269
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 5.34166e-14
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0139268
+DEAL::  Computing residual vector... norm=0.0125307
+DEAL::  Computing residual vector... norm=0.0112272
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 3.69276e-14
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.0112272
+DEAL::  Computing residual vector... norm=0.0102440
+DEAL::  Computing residual vector... norm=0.00931379
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 2.64848e-14
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.00931378
+DEAL::  Computing residual vector... norm=0.00857916
+DEAL::  Computing residual vector... norm=0.00787754
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 1.93828e-14
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.00787753
+DEAL::  Computing residual vector... norm=0.00730638
+DEAL::  Computing residual vector... norm=0.00675703
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 3.03169e-14
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.00675702
+DEAL::  Computing residual vector... norm=0.00509054
+DEAL::  Solving linear system
+DEAL::Convergence step 1 value 2.28021e-14
+DEAL::   Solved in 1 iterations.
+DEAL::  Computing residual vector... norm=0.00509053
+DEAL::  Computing residual vector... norm=0.00400011
+DEAL::
