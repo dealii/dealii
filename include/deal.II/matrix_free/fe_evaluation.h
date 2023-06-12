@@ -3377,11 +3377,40 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       AssertIndexRange(
         this->cell,
         dof_info.index_storage_variants[this->dof_access_index].size());
-      if (dof_info.index_storage_variants
-            [is_face ? this->dof_access_index :
-                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-            [this->cell] >= internal::MatrixFreeFunctions::DoFInfo::
-                              IndexStorageVariants::contiguous)
+
+      bool is_contiguous = true;
+      // check if exterior cells are not contiguous (ECL case)
+      if (is_face && !this->interior_face &&
+          (this->dof_access_index ==
+           internal::MatrixFreeFunctions::DoFInfo::dof_access_cell))
+        {
+          const std::array<unsigned int, VectorizedArrayType::size()> &cells =
+            this->get_cell_ids();
+          const unsigned int n_filled_lanes =
+            dof_info.n_vectorization_lanes_filled
+              [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+              [this->cell];
+          // we have to check all filled lanes which are active in the mask
+          for (unsigned int v = 0; v < n_filled_lanes; ++v)
+            if (mask[v] == true &&
+                dof_info.index_storage_variants
+                    [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+                    [cells[v] / VectorizedArrayType::size()] <
+                  internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                    contiguous)
+              is_contiguous = false;
+        } // or if cell/face batch is not contiguous
+      else if (dof_info.index_storage_variants
+                 [is_face ?
+                    this->dof_access_index :
+                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+                 [this->cell] < internal::MatrixFreeFunctions::DoFInfo::
+                                  IndexStorageVariants::contiguous)
+        {
+          is_contiguous = false;
+        }
+
+      if (is_contiguous)
         {
           read_write_operation_contiguous(operation, src, src_sm, mask);
           return;
