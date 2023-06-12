@@ -1127,13 +1127,9 @@ namespace FETools
       // in the input argument to this function might be destined for
       // the same process, so we have to only look at the unique set of
       // destinations:
-      std::vector<types::subdomain_id> destinations;
-      destinations.reserve(cells_to_send.size());
+      std::set<types::subdomain_id> destinations;
       for (const auto &cell : cells_to_send)
-        destinations.emplace_back(cell.receiver);
-      std::sort(destinations.begin(), destinations.end());
-      destinations.erase(std::unique(destinations.begin(), destinations.end()),
-                         destinations.end());
+        destinations.insert(cell.receiver);
 
       // Then set up the send/receive operation. This is best done through
       // the 'consensus algorithm' setup that is used for point-to-point
@@ -1167,7 +1163,11 @@ namespace FETools
         };
 
       Utilities::MPI::ConsensusAlgorithms::selector<std::vector<CellData>>(
-        destinations, create_request, process_request, communicator);
+        std::vector<types::subdomain_id>(destinations.begin(),
+                                         destinations.end()),
+        create_request,
+        process_request,
+        communicator);
     }
 
 
@@ -1224,9 +1224,15 @@ namespace FETools
       const CellData &       cell_data,
       std::vector<CellData> &cells_list)
     {
+      // Find the place to insert the cell:
       typename std::vector<CellData>::iterator bound =
         std::lower_bound(cells_list.begin(), cells_list.end(), cell_data);
 
+      // There are three possibilities: The cell needs to be inserted
+      // at the end, the cell needs to be inserted just before the place
+      // std::lower_bound found, or the cell already exists in the list
+      // and no longer needs to be inserted. In that last case,
+      // cell_data==*bound.
       if ((bound == cells_list.end()) || (cell_data < *bound))
         cells_list.insert(bound, 1, cell_data);
     }
@@ -1242,9 +1248,6 @@ namespace FETools
     {
       std::vector<CellData> cells_we_need, cells_to_compute, received_cells,
         received_needs, new_needs, computed_cells, cells_to_send;
-
-      // reset the round count we will use in send_cells
-      round = 0;
 
       // Compute all the cells needed from other processes.
       compute_needs(dof2, cells_we_need);
@@ -1267,8 +1270,8 @@ namespace FETools
       unsigned int ready = 0;
       do
         {
-          for (unsigned int i = 0; i < received_needs.size(); ++i)
-            cell_data_insert(received_needs[i], cells_to_compute);
+          for (const auto &need : received_needs)
+            cell_data_insert(need, cells_to_compute);
 
           compute_cells(dof2, u, cells_to_compute, computed_cells, new_needs);
 
@@ -1301,10 +1304,6 @@ namespace FETools
                 }
             }
 
-          // increase the round counter, such that we are sure to only send
-          // and receive data from the correct call
-          ++round;
-
           exchange_data_on_cells(cells_to_send, received_cells);
 
           // store received cell_data
@@ -1313,11 +1312,7 @@ namespace FETools
               cell_data_insert(recv, available_cells);
             }
 
-          // increase the round counter, such that we are sure to only send
-          // and receive data from the correct call
-          ++round;
-
-          // finally send and receive new needs and start a new round
+          // finally send and receive new needs
           exchange_data_on_cells(new_needs, received_needs);
         }
       while (ready != 0);
