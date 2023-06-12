@@ -39,18 +39,9 @@ DEAL::# Test explicit interface (J 0)
 DEAL::Intermediate output:
 DEAL::  t =0.00000
 DEAL::  y =1.00000  (exact: 1.00000)
-DEAL::Evaluating explicit function at t=0.100000
-DEAL::Evaluating explicit function at t=0.100000
-DEAL::Evaluating explicit function at t=0.100000
-DEAL::Evaluating explicit function at t=0.100000
-DEAL::Evaluating explicit function at t=0.200000
-DEAL::Evaluating explicit function at t=0.200000
-DEAL::Evaluating explicit function at t=0.200000
-DEAL::Evaluating explicit function at t=0.200000
 DEAL::Intermediate output:
 DEAL::  t =0.200000
 DEAL::  y =0.823864  (exact: 0.818731)
-DEAL::Evaluating explicit function at t=0.400000
 DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
 DEAL::Time stepper aborted with an exception:
 DEAL::
@@ -105,16 +96,9 @@ DEAL::# Test explicit interface (J 1)
 DEAL::Intermediate output:
 DEAL::  t =0.00000
 DEAL::  y =1.00000  (exact: 1.00000)
-DEAL::Evaluating explicit function at t=0.100000
-DEAL::Evaluating explicit Jacobian at t=0.100000
-DEAL::Evaluating explicit function at t=0.100000
-DEAL::Evaluating explicit function at t=0.200000
-DEAL::Evaluating explicit Jacobian at t=0.200000
-DEAL::Evaluating explicit function at t=0.200000
 DEAL::Intermediate output:
 DEAL::  t =0.200000
 DEAL::  y =0.823864  (exact: 0.818731)
-DEAL::Evaluating explicit function at t=0.400000
 DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
 DEAL::Time stepper aborted with an exception:
 DEAL::
