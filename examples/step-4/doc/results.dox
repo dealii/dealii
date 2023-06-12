@@ -206,9 +206,10 @@ place to also do postprocessing, for example):
 In this code snippet, we also compute the volume (or, since we are currently
 thinking about a two-dimensional situation: the area) $|\Omega|$ by computing
 the integral $|\Omega| = \int_\Omega 1 \, dx$ in exactly the same way, via
-quadrature; this could be avoided by using the fact that deal.II has a function
-for this, GridTools::volume(), but it is efficient to compute the two integrals
-at the same time, and so that's what we do.
+quadrature. (We could avoid having to compute $|\Omega|$ by hand here, using the
+fact that deal.II has a function for this: GridTools::volume(). That said,
+it is efficient to compute the two integrals
+concurrently in the same loop, and so that's what we do.)
 
 This program of course also solves the same Poisson equation in three space
 dimensions. In this situation, the Poisson equation is often used as a model
@@ -382,11 +383,11 @@ numbers mean that we can't even be sure
 that the first digit of that last number is correct! In other words,
 it was worth checking, or we would have just believed all of these
 numbers. In fact, that last column isn't even doing a particularly
-good job convincing that the code might be correctly implemented.
+good job convincing us that the code might be correctly implemented.
 
-If you keep reading through the tutorial, you will find many ways
+If you keep reading through the other tutorial programs, you will find many ways
 to make these sorts of computations more accurate and to come to
-believe that the flux actually does converge to a correct value.
+believe that the flux actually does converge to its correct value.
 For example, we can dramatically increase the accuracy of the computation
 by using adaptive mesh refinement (step-6) near the boundary, and
 in particular by using higher polynomial degree finite elements (also
@@ -419,4 +420,43 @@ two correct digits of the "true" answer.
   by only by a factor of $\sqrt{2} \approx 1.4$. It takes a lot
   of global refinement steps to reduce the error by, say, a factor
   ten or hundred, and this is reflected in the very slow convergence
-  evidenced by the table.
+  evidenced by the table. On the other hand, for cubic elements (i.e.,
+  polynomial degree 3), we would get
+  $\|u-u_h\|_{L_2(\Omega)} \le C h^4 \|\nabla^4u\|_{L_2(\Omega)}$
+  and after reduction by 1.5 orders, we would still have
+  $\|\nabla (u-u_h)\|_{L_2(\partial\Omega)} \le
+    C h^{2+1/2} \|\nabla^4u\|_{L_2(\Omega)}$. This rate,
+  ${\cal O}(h^{2.5})$ is still quite rapid, and it is perhaps not
+  surprising that we get much better answers with these higher
+  order elements. This also illustrates that when trying to
+  approximate anything that relates to a gradient of the solution,
+  using linear elements (polynomial degree one) is really not a
+  good choice at all.
+
+@note In this very specific case, it turns out that we can actually
+  compute the exact value of $\Phi$. This is because for the Poisson
+  equation we compute the solution of here, $-\Delta u = f$, we can
+  integrate over the domain, $-\int_\Omega \Delta u = \int_\Omega f$,
+  and then use that $\Delta = \text{div}\;\text{grad}$; this allows
+  us to use the
+  divergence theorem followed by multiplying by minus one to find
+  $\int_{\partial\Omega} \nabla u \cdot n = -\int_\Omega f$. The
+  left hand side happens to be $\Phi$. For the specific right
+  hand side $f(x_1,x_2)=4(x_1^4+x_2^4)$ we use in 2d, we then
+  get $-\int_\Omega f = -\int_{-1}^{1} \int_{-1}^{1} 4(x_1^4+x_2^4) \; dx_2\; dx_1
+  = -16 \left[\int_{-1}^{1} x^4 \; dx\right] = -16\times\frac 25$,
+  which has a numerical value of exactly -6.4 -- right on with our
+  guess above. In 3d, we can do the same and get that the exact
+  value is
+  $-\int_\Omega f =
+   -\int_{-1}^{1} \int_{-1}^{1} \int_{-1}^{1} 4(x_1^4+x_2^4+x_3^4) \; dx_3 \; dx_2\; dx_1
+   = -48\times\frac 25=-19.2$. What we found with cubic elements
+  is then quite close to this exact value. Of course, in practice
+  we almost never have exact values to compare with: If we could
+  compute something on a piece of paper, we wouldn't have to solve
+  the PDE numerically. But these sorts of situations make for excellent
+  test cases that help us verify that our numerical solver works
+  correctly. In many other cases, the literature contains
+  numbers where others have already computed an answer accurately
+  using their own software, and these are also often useful to
+  compare against in verifying the correctness of our codes.
