@@ -369,22 +369,16 @@ namespace nonlinear_solver_selector_test
       nonlinear_solver.residual = [&](const Vector<double> &evaluation_point,
                                       Vector<double> &      residual) {
         compute_residual(evaluation_point, residual);
-
-        return 0;
       };
 
       nonlinear_solver.setup_jacobian = [&](const Vector<double> &current_u) {
         compute_and_factorize_jacobian(current_u);
-
-        return 0;
       };
 
       nonlinear_solver.solve_with_jacobian = [&](const Vector<double> &rhs,
                                                  Vector<double> &      dst,
                                                  const double tolerance) {
         this->solve(rhs, dst, tolerance);
-
-        return 0;
       };
 
       nonlinear_solver.solve(current_solution);
@@ -402,6 +396,4 @@ main()
 
   MinimalSurfaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run();
-
-  return 0;
 }
