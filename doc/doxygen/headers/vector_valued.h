@@ -75,7 +75,7 @@
  *
  * Let us take for example the elasticity problem from step-8 and even
  * simplify it by choosing $\lambda = 0$ and $\mu = 1$ to highlight the important concepts. Therefore,
- * let consider the following weak formulation: find $\mathbf u \in
+ * let us consider the following weak formulation: find $\mathbf u \in
  * \mathbf V = H^1_0(\Omega; \mathbb R^3)$ such that for all $\mathbf
  * v\in V$ holds
  * @f[
