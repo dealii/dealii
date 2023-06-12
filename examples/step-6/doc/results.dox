@@ -116,27 +116,28 @@ from the optimal square.
 
 <h4>Solvers and preconditioners</h4>
 
-
 One thing that is always worth playing around with if one solves
 problems of appreciable size (much bigger than the one we have here)
 is to try different solvers or preconditioners. In the current case,
 the linear system is symmetric and positive definite, which makes the
-CG algorithm pretty much the canonical choice for solving. However,
+Conjugate Gradient (CG) algorithm pretty much the canonical choice for solving. However,
 the SSOR preconditioner we use in the <code>solve()</code> function is
 up for grabs.
 
-In deal.II, it is relatively simple to change the preconditioner. For
-example, by changing the existing lines of code
+In deal.II, it is relatively simple to change the preconditioner.
+Several simple preconditioner choices are accessible
+by changing the following two lines
 @code
   PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 @endcode
-into
+of code in the program. For example, switching this into
 @code
   PreconditionSSOR<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix, 1.0);
 @endcode
-we can try out different relaxation parameters for SSOR. By using
+allows us to try out a different relaxation parameter for SSOR (1.0 instead
+of the 1.2 in the original program). Similarly, by using
 @code
   PreconditionJacobi<SparseMatrix<double>> preconditioner;
   preconditioner.initialize(system_matrix);
@@ -178,8 +179,9 @@ that it doesn't record). Note that even though it is the simplest
 method, Jacobi is the fastest for this problem.
 
 The situation changes slightly when the finite element is not a
-bi-quadratic one as set in the constructor of this program, but a
-bi-linear one. If one makes this change, the results are as follows:
+bi-quadratic one (i.e., polynomial degree two) as selected in the
+constructor of this program, but a bi-linear one (polynomial degree one).
+If one makes this change, the results are as follows:
 
 <table width="60%" align="center">
   <tr>
@@ -216,17 +218,31 @@ of preconditioners that can achieve this, namely geometric (step-16,
 step-37, step-39)
 or algebraic multigrid (step-31, step-40, and several others)
 preconditioners. They are, however, significantly more complex than
-the preconditioners outlined above.
+the preconditioners outlined above, and so we will leave their use
+to these later tutorial programs. The point to make, however, is
+that "real" finite element programs do not use the preconditioners
+we mention above: These are simply shown for expository purposes.
 
 Finally, the last message to take
 home is that when the data shown above was generated (in 2018), linear
 systems with 100,000 unknowns are
-easily solved on a desktop machine in about a second, making
+easily solved on a desktop or laptop machine in about a second, making
 the solution of relatively simple 2d problems even to very high
-accuracy not that big a task as it used to be even in the
-past. At the time, the situation for 3d problems was entirely different,
-but even that has changed substantially in the intervening time -- though
-solving problems in 3d to high accuracy remains a challenge.
+accuracy not that big a task as it used to be in the
+past. At the same time, the situation for 3d problems continues to be
+quite different: A uniform 2d mesh with 100,000 unknowns corresponds to
+a grid with about $300 \times 300$ nodes; the corresponding 3d mesh has
+$300 \times 300 \times 300$ nodes and 30 million unknowns. Because
+finite element matrices in 3d have many more nonzero entries than in 2d,
+solving these linear systems will not only take 300 times as much CPU
+time, but substantially longer. In other words, achieving the
+same resolution in 3d *is* quite a large problem, and solving it
+within a reasonable amount of time *will* require much more work to
+implement better linear solvers. As mentioned above, multigrid methods
+and matrix-free methods (see, for example, step-37), along with
+parallelization (step-40) will be necessary, but are then also able
+to comfortably solve such linear systems.
+
 
 
 <h4>A better mesh</h4>
