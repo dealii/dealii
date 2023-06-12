@@ -183,6 +183,55 @@ namespace PETScWrappers
 
 
 
+  namespace
+  {
+    template <typename Iterator, typename OutType>
+    class ConvertingIterator
+    {
+      Iterator m_iterator;
+
+    public:
+      ConvertingIterator(const Iterator &iterator)
+        : m_iterator(iterator)
+      {}
+
+      OutType
+      operator*() const
+      {
+        return static_cast<OutType>(*m_iterator);
+      }
+
+      ConvertingIterator &
+      operator++()
+      {
+        ++m_iterator;
+        return *this;
+      }
+
+      ConvertingIterator
+      operator++(int)
+      {
+        ConvertingIterator old = *this;
+        ++m_iterator;
+        return old;
+      }
+
+      bool
+      operator==(const ConvertingIterator &other) const
+      {
+        return this->m_iterator == other.m_iterator;
+      }
+
+      bool
+      operator!=(const ConvertingIterator &other) const
+      {
+        return this->m_iterator != other.m_iterator;
+      }
+    };
+  } // namespace
+
+
+
   void
   VectorBase::determine_ghost_indices()
   {
@@ -236,8 +285,13 @@ namespace PETScWrappers
 
         if (std::is_sorted(&array[end_index - ghost_start_index],
                            &array[n_elements_stored_locally]))
-          ghost_indices.add_indices(&array[end_index - ghost_start_index],
-                                    &array[n_elements_stored_locally]);
+          {
+            ConvertingIterator<PetscScalar *, types::global_dof_index> start(
+              &array[end_index - ghost_start_index]);
+            ConvertingIterator<PetscScalar *, types::global_dof_index> end(
+              &array[n_elements_stored_locally]);
+            ghost_indices.add_indices(start, end);
+          }
         else
           {
             std::vector<PetscInt> sorted_indices(
