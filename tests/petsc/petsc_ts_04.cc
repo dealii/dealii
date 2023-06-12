@@ -151,7 +151,6 @@ public:
         // solver is used.
         time_stepper.explicit_function =
           [&](const real_type t, const VectorType &y, VectorType &res) -> void {
-
           if (t > last_eval_time + 0.1)
             {
               deallog << "Time step too large: last_eval_time="
