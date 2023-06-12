@@ -1730,16 +1730,21 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
     }
   for (unsigned int comp = 0; comp < n_components; ++comp)
     {
+      const std::size_t offset =
+        (component_in_base_element + comp) * dofs_per_component;
+
       if (use_face_path)
         {
           const ScalarNumber *input;
           if (renumber.empty())
-            input = solution_values.data();
+            {
+              for (unsigned int i = 0; i < dofs_per_component; ++i)
+                scratch_data_scalar[i] = solution_values[i + offset];
+              input = scratch_data_scalar.data();
+            }
           else
             {
-              const unsigned int *renumber_ptr =
-                renumber.data() +
-                (component_in_base_element + comp) * dofs_per_component;
+              const unsigned int *renumber_ptr = renumber.data() + offset;
               for (unsigned int i = 0; i < dofs_per_component; ++i)
                 scratch_data_scalar[i] = solution_values[renumber_ptr[i]];
               input = scratch_data_scalar.data();
@@ -1762,13 +1767,15 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
       else
         {
           if (renumber.empty())
-            for (unsigned int i = 0; i < dofs_per_component; ++i)
-              ETT::read_value(solution_values[i], comp, solution_renumbered[i]);
+            {
+              for (unsigned int i = 0; i < dofs_per_component; ++i)
+                ETT::read_value(solution_values[i + offset],
+                                comp,
+                                solution_renumbered[i]);
+            }
           else
             {
-              const unsigned int *renumber_ptr =
-                renumber.data() +
-                (component_in_base_element + comp) * dofs_per_component;
+              const unsigned int *renumber_ptr = renumber.data() + offset;
               for (unsigned int i = 0; i < dofs_per_component; ++i)
                 ETT::read_value(solution_values[renumber_ptr[i]],
                                 comp,
@@ -2188,6 +2195,9 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
   std::fill(solution_values.begin(), solution_values.end(), ScalarNumber());
   for (unsigned int comp = 0; comp < n_components; ++comp)
     {
+      const std::size_t offset =
+        (component_in_base_element + comp) * dofs_per_component;
+
       if (use_face_path)
         {
           const unsigned int size_input = 2 * dofs_per_component_face;
@@ -2213,11 +2223,10 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
 
           if (renumber.empty())
             for (unsigned int i = 0; i < dofs_per_component; ++i)
-              solution_values[comp * dofs_per_component + i] = output[i];
+              solution_values[i + offset] = output[i];
           else
             for (unsigned int i = 0; i < dofs_per_component; ++i)
-              solution_values[renumber[comp * dofs_per_component + i]] =
-                output[i];
+              solution_values[renumber[i + offset]] = output[i];
         }
       else
         {
@@ -2228,7 +2237,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
                 ETT::write_value(result,
                                  comp,
                                  solution_renumbered_vectorized[i]);
-                solution_values[comp * dofs_per_component + i] = result.sum();
+                solution_values[i + offset] = result.sum();
               }
           else
             for (unsigned int i = 0; i < dofs_per_component; ++i)
@@ -2237,8 +2246,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
                 ETT::write_value(result,
                                  comp,
                                  solution_renumbered_vectorized[i]);
-                solution_values[renumber[comp * dofs_per_component + i]] =
-                  result.sum();
+                solution_values[renumber[i + offset]] = result.sum();
               }
         }
     }
