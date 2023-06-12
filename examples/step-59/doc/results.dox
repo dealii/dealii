@@ -333,12 +333,46 @@ the effectiveness of these basis functions.
 
 <h3>Possibilities for extension</h3>
 
-As mentioned in the introduction, the fast diagonalization method is tied to a
-Cartesian mesh with constant coefficients. If we wanted to solve
-variable-coefficient problems, we would need to invest a bit more time in the
-design of the smoother parameters by selecting proper generalizations (e.g.,
-approximating the inverse on the nearest box-shaped element).
+As mentioned in the introduction, the fast diagonalization method as realized
+here is tied to a Cartesian mesh with constant coefficients. When dealing with
+meshes that contain deformed cells or with variable coefficients, it is common
+to determine a nearby Cartesian mesh cell as an approximation. This can be
+done with the class TensorProductMatrixSymmetricSumCollection. Here, one can
+insert cell matrices similarly to the PreconditionBlockJacobi::initialize()
+function of this tutorial program. The benefit of the collection class is that
+cells on which the coefficient of the PDE has the same value can re-use the
+same Laplacian matrix, which reduces the memory consumption for the inverse
+matrices. As compared to the algorithm implemented in this tutorial program,
+one would define the length scales as the distances between opposing
+faces. For continuous elements, the code project <a
+href=https://github.com/peterrum/dealii-dd-and-schwarz">Cache-optimized and
+low-overhead implementations of multigrid smoothers for high-order FEM
+computations</a> presents the computation for continuous elements. There is
+currently no infrastructure in deal.II to automatically generate the 1D
+matrices for discontinuous elements with SIP-DG discretization, as opposed to
+continuous elements, where we provide
+TensorProductMatrixCreator::create_laplace_tensor_product_matrix().
 
 Another way of extending the program would be to include support for adaptive
-meshes, for which interface operations at edges of different refinement
-level become necessary, as discussed in step-39.
+meshes. While the classical approach of defining interface operations at edges
+of different refinement level, as discussed in step-39, is one possibility,
+for Poisson-type problems another option is typically more beneficial. Using
+the class MGTransferGlobalCoarsening, which is explained in the step-75
+tutorial program, one can deal with meshes of hanging nodes on all levels. An
+algorithmic improvement can be obtained by combining the discontinuous
+function space with the auxiliary continuous finite element space of the same
+polynomial degree. This idea, introduced by Antonietti et al.
+@cite antonietti2016uniform in 2016, allows making the multigrid convergence
+independent of the penalty parameter. As demonstrated by Fehn et al.
+@cite fehn2020hybrid, this also gives considerably lower iteration counts than
+a multigrid solver directly working on levels with discontinuous function
+spaces. The latter work also proposes p-multigrid techniques and combination
+with algebraic multigrid coarse spaces as a means to efficiently solve Poisson
+problems with high-order discontinuous Galerkin discretizations on complicated
+geometries, representing the current state-of-the-art for simple Poisson-type
+problems. The class MGTransferGlobalCoarsening provides features for each of
+these three coarsening variants, the discontinuous-continuous auxiliary
+function concept, p-multigrid, and traditional h-multigrid. The main
+ingredient is to define an appropriate MGTwoLevelTransfer object and call
+MGTwoLevelTransfer::reinit_geometric_transfer() or
+MGTwoLevelTranfer::reinit_polynomial_transfer(), respectively.
