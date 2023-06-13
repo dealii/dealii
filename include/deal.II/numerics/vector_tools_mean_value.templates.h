@@ -209,7 +209,9 @@ namespace VectorTools
                         continue;
 
                       // Then adjust its value:
-                      solution(idx) = copy(idx) + constant_adjustment;
+                      solution(idx) =
+                        typename VectorType::value_type(copy(idx)) +
+                        constant_adjustment;
                     }
                 }
             }

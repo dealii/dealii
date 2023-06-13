@@ -198,7 +198,7 @@ namespace PETScWrappers
       OutType
       operator*() const
       {
-        return static_cast<OutType>(*m_iterator);
+        return static_cast<OutType>(std::real(*m_iterator));
       }
 
       ConvertingIterator &
@@ -284,7 +284,10 @@ namespace PETScWrappers
         ghost_indices.set_size(this->size());
 
         if (std::is_sorted(&array[end_index - ghost_start_index],
-                           &array[n_elements_stored_locally]))
+                           &array[n_elements_stored_locally],
+                           [](PetscScalar left, PetscScalar right) {
+                             return std::real(left) < std::real(right);
+                           }))
           {
             ConvertingIterator<PetscScalar *, types::global_dof_index> start(
               &array[end_index - ghost_start_index]);
@@ -294,9 +297,14 @@ namespace PETScWrappers
           }
         else
           {
-            std::vector<PetscInt> sorted_indices(
-              &array[end_index - ghost_start_index],
-              &array[n_elements_stored_locally]);
+            std::vector<PetscInt> sorted_indices;
+            sorted_indices.reserve(n_elements_stored_locally -
+                                   (end_index - ghost_start_index));
+            for (PetscInt i = end_index - ghost_start_index;
+                 i < n_elements_stored_locally;
+                 ++i)
+              sorted_indices.push_back(
+                static_cast<types::global_dof_index>(std::real(array[i])));
             std::sort(sorted_indices.begin(), sorted_indices.end());
             ghost_indices.add_indices(sorted_indices.begin(),
                                       sorted_indices.end());
