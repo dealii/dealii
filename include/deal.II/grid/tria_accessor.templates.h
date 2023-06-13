@@ -2397,7 +2397,10 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::n_faces() const
 {
-  AssertDimension(structdim, dim);
+  Assert(structdim == dim,
+         ExcMessage("This function can only be used on objects "
+                    "that are cells, but not on faces or edges "
+                    "that bound cells."));
 
   return this->reference_cell().n_faces();
 }
