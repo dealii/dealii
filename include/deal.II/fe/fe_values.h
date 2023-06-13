@@ -2676,16 +2676,30 @@ public:
   /** @{ */
 
   /**
-   * Return the values of a finite element function restricted to the current
-   * cell, face or subface selected the last time the <tt>reinit</tt> function
-   * of the derived class was called, at the quadrature points.
+   * Return the values of a finite element function at the quadrature points
+   * of the current cell, face, or subface (selected the last time the reinit()
+   * function was called). That is, if the first argument @p fe_function is a
+   * vector of nodal values of a finite element function $u_h(\mathbf x)$
+   * defined on a DoFHandler object, then the output vector (the second
+   * argument,
+   * @p values) is the vector of values $u_h(\mathbf x_q^K)$ where $x_q^K$ are
+   * the quadrature points on the current cell $K$.
+   * This function is first discussed in the Results
+   * section of step-4, and the related get_function_gradients() function
+   * is also used in step-15 along with numerous other
+   * tutorial programs.
    *
-   * If the present cell is not active then values are interpolated to the
-   * current cell and point values are computed from that.
+   * If the current cell is not active (i.e., it has children), then the finite
+   * element function is, strictly speaking, defined by shape functions
+   * that live on these child cells. Rather than evaluating the shape functions
+   * on the child cells, with the quadrature points defined on the current
+   * cell, this function first interpolates the finite element function to shape
+   * functions defined on the current cell, and then evaluates this interpolated
+   * function.
    *
    * This function may only be used if the finite element in use is a scalar
-   * one, i.e. has only one vector component.  To get values of multi-
-   * component elements, there is another get_function_values() below,
+   * one, i.e. has only one vector component.  To get values of multi-component
+   * elements, there is another get_function_values() below,
    * returning a vector of vectors of results.
    *
    * @param[in] fe_function A vector of values that describes (globally) the
@@ -2849,10 +2863,16 @@ public:
   /** @{ */
 
   /**
-   * Compute the gradients of a finite element at the quadrature points of a
-   * cell. This function is the equivalent of the corresponding
-   * get_function_values() function (see there for more information) but
-   * evaluates the finite element field's gradient instead of its value.
+   * Return the gradients of a finite element function at the quadrature points
+   * of the current cell, face, or subface (selected the last time the reinit()
+   * function was called). That is, if the first argument @p fe_function is a
+   * vector of nodal values of a finite element function $u_h(\mathbf x)$
+   * defined on a DoFHandler object, then the output vector (the second
+   * argument,
+   * @p values) is the vector of values $\nabla u_h(\mathbf x_q^K)$ where
+   * $x_q^K$ are the quadrature points on the current cell $K$. This function is
+   * first discussed in the Results section of step-4, and it is also used in
+   * step-15 along with numerous other tutorial programs.
    *
    * This function may only be used if the finite element in use is a scalar
    * one, i.e. has only one vector component. There is a corresponding
