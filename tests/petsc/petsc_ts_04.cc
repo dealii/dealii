@@ -151,6 +151,8 @@ public:
         // solver is used.
         time_stepper.explicit_function =
           [&](const real_type t, const VectorType &y, VectorType &res) -> void {
+          deallog << "Evaluating explicit function at t=" << t << std::endl;
+
           if (t > last_eval_time + 0.1)
             {
               deallog << "Time step too large: last_eval_time="
@@ -174,6 +176,7 @@ public:
                                                  const VectorType &y,
                                                  MatrixType &      A,
                                                  MatrixType &      P) -> void {
+              deallog << "Evaluating explicit Jacobian at t=" << t << std::endl;
               P.set(0, 0, -kappa);
               P.compress(VectorOperation::insert);
             };
