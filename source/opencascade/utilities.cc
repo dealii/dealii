@@ -710,7 +710,11 @@ namespace OpenCASCADE
     double minDistance = 1e7;
     gp_Pnt tmp_proj(0.0, 0.0, 0.0);
 
-    unsigned int counter      = 0;
+#  ifdef DEAL_II_HAVE_CXX17
+    [[maybe_unused]] unsigned int counter = 0;
+#  else
+    unsigned int     counter = 0;
+#  endif
     unsigned int face_counter = 0;
 
     TopoDS_Shape out_shape;
