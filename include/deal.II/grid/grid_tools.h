@@ -802,6 +802,11 @@ namespace GridTools
    * @p seed is used for the initialization of the random engine. Its
    * default value initializes the engine with the same state as in
    * previous versions of deal.II.
+   *
+   * @note If the Triangulation is of distributed kind (derived from
+   * DistributedTriangulationBase) and computations are done in
+   * parallel, the new vertex locations will be consistently updated
+   * on all ranks.
    */
   template <int dim, int spacedim>
   void
