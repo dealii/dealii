@@ -56,7 +56,11 @@ main()
     entries;
 
   for (unsigned int i = 0; i < 100; ++i)
-    entries.emplace_back(rand() % 10, rand() % 100);
+    {
+      const auto row = Testing::rand() % 10;
+      const auto col = Testing::rand() % 100;
+      entries.emplace_back(row, col);
+    }
 
   for (auto &entry : entries)
     deallog << entry.first << ", " << entry.second << std::endl;
