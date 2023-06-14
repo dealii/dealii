@@ -4299,17 +4299,18 @@ namespace GridTools
       project_to_d_linear_object(const Iterator &       object,
                                  const Point<spacedim> &trial_point)
       {
-        // let's look at this for simplicity for a quad (structdim==2) in a
-        // space with spacedim>2 (notate trial_point by y): all points on the
-        // surface are given by
+        // let's look at this for simplicity for a quadrilateral
+        // (structdim==2) in a space with spacedim>2 (notate trial_point by
+        // y): all points on the surface are given by
         //   x(\xi) = sum_i v_i phi_x(\xi)
-        // where v_i are the vertices of the quad, and \xi=(\xi_1,\xi_2) are the
-        // reference coordinates of the quad. so what we are trying to do is
-        // find a point x on the surface that is closest to the point y. there
-        // are different ways to solve this problem, but in the end it's a
-        // nonlinear problem and we have to find reference coordinates \xi so
-        // that J(\xi) = 1/2 || x(\xi)-y ||^2 is minimal. x(\xi) is a function
-        // that is structdim-linear in \xi, so J(\xi) is a polynomial of degree
+        // where v_i are the vertices of the quadrilateral, and
+        // \xi=(\xi_1,\xi_2) are the reference coordinates of the
+        // quadrilateral. so what we are trying to do is find a point x on the
+        // surface that is closest to the point y. there are different ways to
+        // solve this problem, but in the end it's a nonlinear problem and we
+        // have to find reference coordinates \xi so that J(\xi) = 1/2 ||
+        // x(\xi)-y ||^2 is minimal. x(\xi) is a function that is
+        // structdim-linear in \xi, so J(\xi) is a polynomial of degree
         // 2*structdim that we'd like to minimize. unless structdim==1, we'll
         // have to use a Newton method to find the answer. This leads to the
         // following formulation of Newton steps:
