@@ -191,6 +191,13 @@ namespace PETScWrappers
       Iterator m_iterator;
 
     public:
+      using difference_type =
+        typename std::iterator_traits<Iterator>::difference_type;
+      using value_type        = OutType;
+      using pointer           = OutType *;
+      using reference         = OutType &;
+      using iterator_category = std::forward_iterator_tag;
+
       ConvertingIterator(const Iterator &iterator)
         : m_iterator(iterator)
       {}
@@ -239,7 +246,10 @@ namespace PETScWrappers
     ghosted = false;
     ghost_indices.clear();
 
-    // There's no API to infer ghost indices from a PETSc Vec
+    // There's no API to infer ghost indices from a PETSc Vec which
+    // unfortunately doesn't allow integer entries. We use the
+    // "ConvertingIterator" class above to do an implicit conversion when
+    // sorting and adding ghost indices below.
     PetscErrorCode ierr;
     Vec            ghosted_vec;
     ierr = VecGhostGetLocalForm(vector, &ghosted_vec);
@@ -283,28 +293,22 @@ namespace PETScWrappers
         ghosted = true;
         ghost_indices.set_size(this->size());
 
+        ConvertingIterator<PetscScalar *, types::global_dof_index> begin_ghosts(
+          &array[end_index - ghost_start_index]);
+        ConvertingIterator<PetscScalar *, types::global_dof_index> end_ghosts(
+          &array[n_elements_stored_locally]);
         if (std::is_sorted(&array[end_index - ghost_start_index],
                            &array[n_elements_stored_locally],
                            [](PetscScalar left, PetscScalar right) {
-                             return std::real(left) < std::real(right);
+                             return static_cast<PetscInt>(std::real(left)) <
+                                    static_cast<PetscInt>(std::real(right));
                            }))
           {
-            ConvertingIterator<PetscScalar *, types::global_dof_index> start(
-              &array[end_index - ghost_start_index]);
-            ConvertingIterator<PetscScalar *, types::global_dof_index> end(
-              &array[n_elements_stored_locally]);
-            ghost_indices.add_indices(start, end);
+            ghost_indices.add_indices(begin_ghosts, end_ghosts);
           }
         else
           {
-            std::vector<PetscInt> sorted_indices;
-            sorted_indices.reserve(n_elements_stored_locally -
-                                   (end_index - ghost_start_index));
-            for (PetscInt i = end_index - ghost_start_index;
-                 i < n_elements_stored_locally;
-                 ++i)
-              sorted_indices.push_back(
-                static_cast<types::global_dof_index>(std::real(array[i])));
+            std::vector<PetscInt> sorted_indices(begin_ghosts, end_ghosts);
             std::sort(sorted_indices.begin(), sorted_indices.end());
             ghost_indices.add_indices(sorted_indices.begin(),
                                       sorted_indices.end());
