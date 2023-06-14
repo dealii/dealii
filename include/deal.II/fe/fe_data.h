@@ -140,8 +140,11 @@ namespace internal
   /**
    * Internal data structure for setting up FiniteElementData. It stores for
    * each object the (inclusive/exclusive) number of degrees of freedoms, as
-   * well as, the index of its first degree of freedom within a cell and the
-   * index of the first d-dimensional object within each face.
+   * well as the index of its first degree of freedom within a cell and the
+   * index of the first d-dimensional object within each face. Here, inclusive
+   * means "the number of DoFs located on this object as well as the
+   * lower-dimensional objects that bound it", and exclusive is then the
+   * number not including the lower-dimensional objects.
    *
    * The information is saved as a vector of vectors. One can query the
    * inclusive number of dofs of the i-th d-dimensional object via:
@@ -156,15 +159,15 @@ namespace internal
    * obj_index 0 1 2 3 4 5 | 6 7 8 9 10 11 12 13 14 | 15 15 15 16 17 | 18
    * @endcode
    *
-   * Since the above table looks as follows for:
+   * The above table has these numbers because of the following considerations:
    *
-   * - a triangle:
+   * - For each triangular face:
    * @code
    * dpo_excl  1  1  1 | 1  1  1 |  0
    * obj_index 0  1  2 | 3  4  5 |  6
    * @endcode
    *
-   * - quadrilateral:
+   * - For each quadrilateral face:
    * @code
    * dpo_excl  1  1  1  1 | 1  1  1  1 |  1
    * obj_index 0  1  2  3 | 4  5  6  7 |  8
@@ -305,10 +308,11 @@ private:
   const ReferenceCell reference_cell_kind;
 
   /**
-   * Number of unique quads. If all quads have the same type, the value is
-   * one; else it equals the number of quads.
+   * Number of unique two-dimensional sub-objects. If all
+   * two-dimensional sub-objects have the same type, the value is one;
+   * else it equals the number of quads.
    */
-  const unsigned int number_unique_quads;
+  const unsigned int number_of_unique_2d_subobjects;
 
   /**
    * Number of unique faces. If all faces have the same type, the value is
@@ -537,15 +541,25 @@ public:
   reference_cell() const;
 
   /**
-   * Number of unique quads. If all quads have the same type, the value is
-   * one; else it equals the number of quads.
+   * Number of unique 2d subobjects. If all two-dimensional subobjects
+   * are of the same kind, the value is one; else it equals the number
+   * of two-dimensional subobjects. For example, for hex reference
+   * cells with the usual finite elements, each face has the same
+   * geometric shape (a square) and each face has the same number and
+   * kind of shape functions associated with it; as a consequence, the
+   * returned value is one. On the other hand, for a wedge element,
+   * the two-dimensional subobjects can be both quadrilaterals and
+   * triangles, and so the returned value equals the number of faces
+   * of these objects (i.e., five).
    */
   unsigned int
-  n_unique_quads() const;
+  n_unique_2d_subobjects() const;
 
   /**
-   * Number of unique faces. If all faces have the same type, the value is
-   * one; else it equals the number of faces.
+   * Number of unique faces. If all faces have the same type (i.e.,
+   * have the same shape and also have the same kind and number of
+   * DoFs associated with them), the value is one; else it equals the
+   * number of faces.
    */
   unsigned int
   n_unique_faces() const;
@@ -770,9 +784,9 @@ FiniteElementData<dim>::reference_cell() const
 
 template <int dim>
 inline unsigned int
-FiniteElementData<dim>::n_unique_quads() const
+FiniteElementData<dim>::n_unique_2d_subobjects() const
 {
-  return number_unique_quads;
+  return number_of_unique_2d_subobjects;
 }
 
 

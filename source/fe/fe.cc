@@ -152,9 +152,9 @@ FiniteElement<dim, spacedim>::FiniteElement(
   if (dim == 3)
     {
       adjust_quad_dof_index_for_face_orientation_table.resize(
-        this->n_unique_quads());
+        this->n_unique_2d_subobjects());
 
-      for (unsigned int f = 0; f < this->n_unique_quads(); ++f)
+      for (unsigned int f = 0; f < this->n_unique_2d_subobjects(); ++f)
         {
           adjust_quad_dof_index_for_face_orientation_table[f] =
             Table<2, int>(this->n_dofs_per_quad(f),
@@ -677,7 +677,7 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
   // the function should also not have been
   // called
   AssertIndexRange(index, this->n_dofs_per_quad(face));
-  const auto table_n = this->n_unique_quads() == 1 ? 0 : face;
+  const auto table_n = this->n_unique_2d_subobjects() == 1 ? 0 : face;
   Assert(
     adjust_quad_dof_index_for_face_orientation_table[table_n].n_elements() ==
       (this->reference_cell().n_face_orientations(face)) *
