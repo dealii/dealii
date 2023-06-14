@@ -781,15 +781,14 @@ namespace internal
  *
  * <h3>User flags and data</h3>
  *
- * A triangulation offers one bit per line, quad, etc for user flags. This
- * field can be accessed as all other data using iterators. Normally, this
- * user flag is used if an algorithm walks over all cells and needs
- * information whether another cell, e.g. a neighbor, has already been
- * processed. See
- * @ref GlossUserFlags "the glossary for more information".
+ * A triangulation offers one bit per subobject for user flags. This field can
+ * be accessed as all other data using iterators. Normally, this user flag is
+ * used if an algorithm walks over all cells and needs information whether
+ * another cell, e.g. a neighbor, has already been processed. See @ref
+ * GlossUserFlags "the glossary for more information".
  *
  * There is another set of user data, which can be either an <tt>unsigned
- * int</tt> or a <tt>void *</tt>, for each line, quad, etc. You can access
+ * int</tt> or a <tt>void *</tt>, for each subobject. You can access
  * these through the functions listed under <tt>User data</tt> in the accessor
  * classes. Again, see
  * @ref GlossUserData "the glossary for more information".

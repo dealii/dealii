@@ -179,13 +179,13 @@ class FE_Enriched;
  *
  * <h3>Internal information on numbering of degrees of freedom</h3>
  *
- * The overall numbering of degrees of freedom is as follows: for each
- * subobject (vertex, line, quad, or hex), the degrees of freedom are numbered
- * such that we run over all subelements first, before turning for the next
- * dof on this subobject or for the next subobject. For example, for an
- * element of three components in one space dimension, the first two
- * components being cubic lagrange elements and the third being a quadratic
- * lagrange element, the ordering for the system <tt>s=(u,v,p)</tt> is:
+ * The overall numbering of degrees of freedom is as follows: for each 0d, 1d,
+ * 2d, or 3d subobject, the degrees of freedom are numbered such that we run
+ * over all subelements first, before turning for the next dof on this
+ * subobject or for the next subobject. For example, for an element of three
+ * components in one space dimension, the first two components being cubic
+ * lagrange elements and the third being a quadratic lagrange element, the
+ * ordering for the system <tt>s=(u,v,p)</tt> is:
  *
  * <ul>
  * <li> First vertex: <tt>u0, v0, p0 = s0, s1, s2</tt>

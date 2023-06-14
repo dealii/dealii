@@ -851,15 +851,15 @@ namespace
   }
 
   /**
-   * Compute the nearest point on a quad (in the deal.II sense: i.e., something
-   * with structdim = 2 and spacedim = 3) and the square of that point's
-   * distance to @p p. Here, the quad is described with three vertices: either
-   * the three vertices of a Triangle or the first three of a Quadrilateral (as
-   * the fourth one can be computed, in that case, from the first three).
+   * Compute the nearest point on a 2d subobject (something with structdim = 2
+   * and spacedim = 3) and the square of that point's distance to @p p. Here,
+   * the subobject is described with three vertices: either the three vertices
+   * of a Triangle or the first three of a Quadrilateral (as the fourth one
+   * can be computed, in that case, from the first three).
    *
    * If the given point cannot be projected via a normal vector (i.e., if the
    * line parallel to the normal vector intersecting @p p does not intersect the
-   * quad) then this function returns the origin and the largest double
+   * subobject) then this function returns the origin and the largest double
    * precision number. distance_to_line_square() is in charge of computing the
    * distance to lines.
    *
