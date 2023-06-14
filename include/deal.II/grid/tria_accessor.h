@@ -1740,9 +1740,13 @@ public:
   n_lines() const;
 
   /**
-   * Number of faces.
-   *
-   * @note Only implemented for cells (structdim==dim).
+   * Return the number of faces for a cell. This function is only
+   * implemented for cells (i.e., `structdim==dim`) to avoid the question
+   * of what exactly is meant in a construct such as
+   * `cell->face(f)->n_faces()`. If you want to ask how many bounding
+   * lines a face of a 3d cell has, use `cell->face(f)->n_lines()`; if
+   * you want to ask about the number of vertices of a face of a 2d cell,
+   * use `cell->face(f)->n_vertices()`.
    */
   unsigned int
   n_faces() const;
