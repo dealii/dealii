@@ -97,6 +97,18 @@ protected:
   const CUDAWrappers::MatrixFree<dim, Number> &data;
 };
 
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+const unsigned int
+  MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::n_dofs_1d;
+
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+const unsigned int
+  MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::n_local_dofs;
+
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+const unsigned int
+  MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::n_q_points;
+
 
 
 template <int dim, int fe_degree, typename number>

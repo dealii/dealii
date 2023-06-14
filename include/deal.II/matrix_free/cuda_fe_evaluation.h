@@ -519,6 +519,19 @@ namespace CUDAWrappers
                          [&](const int &i) { func(this, i); });
     shared_data->team_member.team_barrier();
   }
+
+
+
+#ifndef DOXYGEN
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  constexpr unsigned int
+    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+      n_q_points;
+#endif
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE

@@ -624,7 +624,12 @@ namespace CUDAWrappers
             "dealii::MatrixFree::evaluate_coeff",
             Kokkos::MDRangePolicy<
               MemorySpace::Default::kokkos_space::execution_space,
-              Kokkos::Rank<2>>(exec, {0, 0}, {n_cells[i], Functor::n_q_points}),
+              Kokkos::Rank<2>>(
+#if KOKKOS_VERSION >= 20900
+              exec,
+#endif
+              {0, 0},
+              {n_cells[i], Functor::n_q_points}),
             KOKKOS_LAMBDA(const int cell, const int q) {
               func(&color_data, cell, q);
             });
@@ -920,7 +925,12 @@ namespace CUDAWrappers
           MemorySpace::Default::kokkos_space::execution_space exec;
           Kokkos::TeamPolicy<
             MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(exec, n_cells[color], Kokkos::AUTO);
+            team_policy(
+#if KOKKOS_VERSION >= 20900
+              exec,
+#endif
+              n_cells[color],
+              Kokkos::AUTO);
 
           internal::ApplyKernel<dim, Number, Functor> apply_kernel(
             func, get_data(color), src.get_values(), dst.get_values());
@@ -960,7 +970,12 @@ namespace CUDAWrappers
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(exec, n_cells[0], Kokkos::AUTO);
+                  team_policy(
+#if KOKKOS_VERSION >= 20900
+                    exec,
+#endif
+                    n_cells[0],
+                    Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor> apply_kernel(
                   func, get_data(0), src.get_values(), dst.get_values());
@@ -978,7 +993,12 @@ namespace CUDAWrappers
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(exec, n_cells[1], Kokkos::AUTO);
+                  team_policy(
+#if KOKKOS_VERSION >= 20900
+                    exec,
+#endif
+                    n_cells[1],
+                    Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor> apply_kernel(
                   func, get_data(1), src.get_values(), dst.get_values());
@@ -1001,7 +1021,12 @@ namespace CUDAWrappers
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(exec, n_cells[2], Kokkos::AUTO);
+                  team_policy(
+#if KOKKOS_VERSION >= 20900
+                    exec,
+#endif
+                    n_cells[2],
+                    Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor> apply_kernel(
                   func, get_data(2), src.get_values(), dst.get_values());
@@ -1029,7 +1054,12 @@ namespace CUDAWrappers
                 {
                   Kokkos::TeamPolicy<
                     MemorySpace::Default::kokkos_space::execution_space>
-                    team_policy(exec, n_cells[i], Kokkos::AUTO);
+                    team_policy(
+#if KOKKOS_VERSION >= 20900
+                      exec,
+#endif
+                      n_cells[i],
+                      Kokkos::AUTO);
 
                   internal::ApplyKernel<dim, Number, Functor> apply_kernel(
                     func, get_data(i), src.get_values(), dst.get_values());
@@ -1061,7 +1091,12 @@ namespace CUDAWrappers
             {
               Kokkos::TeamPolicy<
                 MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(exec, n_cells[i], Kokkos::AUTO);
+                team_policy(
+#if KOKKOS_VERSION >= 20900
+                  exec,
+#endif
+                  n_cells[i],
+                  Kokkos::AUTO);
 
               internal::ApplyKernel<dim, Number, Functor> apply_kernel(
                 func,
