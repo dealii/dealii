@@ -269,8 +269,20 @@ namespace PETScWrappers
         AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = VecGetArray(tvector, &array);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        // Store the indices we care about in the vector, so that we can then
+        // exchange this information between processes. It is unfortunate that
+        // we have to store integers in floating point numbers. Let's at least
+        // make sure we do that in a way that ensures that when we get these
+        // numbers back as integers later on, we get the same thing.
         for (PetscInt i = 0; i < end_index - ghost_start_index; i++)
-          array[i] = ghost_start_index + i;
+          {
+            Assert(static_cast<PetscInt>(static_cast<PetscScalar>(
+                     ghost_start_index + i)) == (ghost_start_index + i),
+                   ExcInternalError());
+            array[i] = ghost_start_index + i;
+          }
+
         ierr = VecRestoreArray(tvector, &array);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = VecGhostUpdateBegin(tvector, INSERT_VALUES, SCATTER_FORWARD);
