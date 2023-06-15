@@ -2586,7 +2586,54 @@ namespace internal
 
     output.collect_sizes();
   }
+
+
+  namespace AffineConstraints
+  {
+    namespace
+    {
+      // The following classes are used to get a communicator from
+      // a vector. This is easy if the vector type has a .get_communicator()
+      // member function. If not, fake some C++20 concepts and fall back
+      // on returning MPI_COMM_SELF.
+      template <typename T>
+      using get_mpi_communicator_t =
+        decltype(std::declval<T const>().get_mpi_communicator());
+
+      template <typename T>
+      constexpr bool has_get_mpi_communicator =
+        dealii::internal::is_supported_operation<get_mpi_communicator_t, T>;
+
+      template <typename T>
+      using local_size_t = decltype(std::declval<T const>().local_size());
+
+      template <typename T>
+      constexpr bool has_local_size =
+        dealii::internal::is_supported_operation<local_size_t, T>;
+
+      template <typename VectorType,
+                std::enable_if_t<has_get_mpi_communicator<VectorType>,
+                                 VectorType> * = nullptr>
+      MPI_Comm
+      get_mpi_communicator(const VectorType &sparse_matrix)
+      {
+        return sparse_matrix.get_mpi_communicator();
+      }
+
+      template <typename VectorType,
+                std::enable_if_t<!has_get_mpi_communicator<VectorType>,
+                                 VectorType> * = nullptr>
+      MPI_Comm
+      get_mpi_communicator(const VectorType &sparse_matrix)
+      {
+        (void)sparse_matrix;
+        return MPI_COMM_SELF;
+      }
+    } // namespace
+  }   // namespace AffineConstraints
 } // namespace internal
+
+
 
 template <typename number>
 template <typename VectorType>
@@ -2607,7 +2654,9 @@ AffineConstraints<number>::distribute(VectorType &vec) const
   // the last else is for the simple case (sequential vector)
   const IndexSet vec_owned_elements = vec.locally_owned_elements();
 
-  if (dealii::is_serial_vector<VectorType>::value == false)
+  if ((dealii::is_serial_vector<VectorType>::value == false) &&
+      (Utilities::MPI::n_mpi_processes(
+         internal::AffineConstraints::get_mpi_communicator(vec)) > 1))
     {
       // This processor owns only part of the vector. one may think that
       // every processor should be able to simply communicate those elements
@@ -2689,6 +2738,13 @@ AffineConstraints<number>::distribute(VectorType &vec) const
                                                    next_constraint.index,
                                                    vec);
         }
+
+      // Finally, call compress(). This is not necessary for sequential
+      // vector types, but we need it for parallel vector types and
+      // we get here if we use parallel vector types but are on a single
+      // process:
+      if (dealii::is_serial_vector<VectorType>::value == false)
+        vec.compress(VectorOperation::insert);
     }
 }
 
