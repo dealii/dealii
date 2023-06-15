@@ -11,76 +11,79 @@ Timestep 1
 
 Timestep 2
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  24
+  Total number of particles in simulation:  40
   Number of particles lost this time step:  0
 
   Now at t=4.14362e-07, dt=2.01715e-07.
 
 Timestep 3
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  28
+  Total number of particles in simulation:  60
   Number of particles lost this time step:  0
 
-  Now at t=5.96019e-07, dt=1.81657e-07.
+  Now at t=5.23066e-07, dt=1.08704e-07.
 
 Timestep 4
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  32
+  Total number of particles in simulation:  80
   Number of particles lost this time step:  0
 
-  Now at t=7.42634e-07, dt=1.46614e-07.
+  Now at t=6.08431e-07, dt=8.53649e-08.
 
 
 ...
 
 
-  Timestep 1000
+Timestep 1000
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  44
-  Number of particles lost this time step:  6
-  Fraction of particles lost through anode: 0.0601266
+  Total number of particles in simulation:  394
+  Number of particles lost this time step:  2
+  Fraction of particles lost through anode: 0.823188
 
-  Now at t=4.93276e-05, dt=4.87463e-08.
+  Now at t=3.83822e-05, dt=4.18519e-08.
 
 Timestep 1001
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  44
+  Total number of particles in simulation:  392
   Number of particles lost this time step:  0
-  Fraction of particles lost through anode: 0.0601266
+  Fraction of particles lost through anode: 0.823188
 
-  Now at t=4.93759e-05, dt=4.82873e-08.
+  Now at t=3.84244e-05, dt=4.22178e-08.
 
 
 ...
 
 
-Timestep 2091
+Timestep 2478
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  44
+  Total number of particles in simulation:  364
   Number of particles lost this time step:  0
-  Fraction of particles lost through anode: 0.0503338
+  Fraction of particles lost through anode: 0.867745
 
-  Now at t=9.99237e-05, dt=4.26254e-08.
+  Now at t=9.99509e-05, dt=4.20455e-08.
 
-Timestep 2092
+Timestep 2479
   Field degrees of freedom:                 4989
-  Total number of particles in simulation:  44
-  Number of particles lost this time step:  0
-  Fraction of particles lost through anode: 0.0503338
-
-  Now at t=9.99661e-05, dt=4.24442e-08.
-
-Timestep 2093
-  Field degrees of freedom:                 4989
-  Total number of particles in simulation:  44
+  Total number of particles in simulation:  364
   Number of particles lost this time step:  2
-  Fraction of particles lost through anode: 0.050308
+  Fraction of particles lost through anode: 0.867871
 
-  Now at t=0.0001, dt=3.38577e-08.
+  Now at t=9.99929e-05, dt=4.20105e-08.
+
+Timestep 2480
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  362
+  Number of particles lost this time step:  2
+  Fraction of particles lost through anode: 0.867047
+
+  Now at t=0.0001, dt=7.11401e-09.
 ```
 
 Picking a random few time steps, we can visualize the solution in the
-form of streamlines for the electric field and dots for the electrons:
+form of streamlines for the electric field and dots for the electrons
+(the pictures were created with an earlier version of the program and
+are no longer exact representations of the solution as currently
+computed -- but they are conceptually still correct):
 <div class="twocolumn" style="width: 80%">
   <div>
     <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0000.png"
@@ -118,7 +121,8 @@ form of streamlines for the electric field and dots for the electrons:
 
 That said, a more appropriate way to visualize the results of this
 program are by creating a video that shows how these electrons move, and how
-the electric field changes in response to their motion:
+the electric field changes in response to their motion (again showing
+results of an earlier version of the program):
 
 @htmlonly
 <p align="center">
