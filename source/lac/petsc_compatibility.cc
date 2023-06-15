@@ -22,6 +22,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+#  include <petsc/private/pcimpl.h>
 #  include <petsc/private/petscimpl.h>
 #  include <petsc/private/snesimpl.h>
 #  include <petsc/private/tsimpl.h>
@@ -52,11 +53,36 @@ namespace PETScWrappers
     AssertPETSc(PetscObjectStateIncrease(reinterpret_cast<PetscObject>(A)));
   }
 
+  PetscErrorCode
+  pc_set_failed_reason(PC pc, PCFailedReason reason)
+  {
+#  if DEAL_II_PETSC_VERSION_GTE(3, 14, 0)
+    return PCSetFailedReason(pc, reason);
+#  else
+    pc->failedreason = reason;
+    return 0;
+#  endif
+  }
+
   void
   snes_reset_domain_flags(SNES snes)
   {
+#  if DEAL_II_PETSC_VERSION_GTE(3, 11, 0)
     snes->jacobiandomainerror = PETSC_FALSE;
-    snes->domainerror         = PETSC_FALSE;
+#  endif
+    snes->domainerror = PETSC_FALSE;
+  }
+
+  void
+  snes_set_jacobian_domain_error(SNES snes)
+  {
+#  if DEAL_II_PETSC_VERSION_GTE(3, 11, 0)
+    snes->jacobiandomainerror = PETSC_TRUE;
+#  else
+    // There is no equivalent, and since this used to stop
+    // computations, we opt to set the converged reason
+    snes->reason = SNES_DIVERGED_FUNCTION_DOMAIN;
+#  endif
   }
 
   void

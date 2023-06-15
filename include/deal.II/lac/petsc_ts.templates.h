@@ -492,7 +492,7 @@ namespace PETScWrappers
         [ts]() -> void {
           SNES snes;
           AssertPETSc(TSGetSNES(ts, &snes));
-          AssertPETSc(SNESSetJacobianDomainError(snes));
+          snes_set_jacobian_domain_error(snes);
         },
         t,
         xdealii,
@@ -553,7 +553,7 @@ namespace PETScWrappers
         [ts]() -> void {
           SNES snes;
           AssertPETSc(TSGetSNES(ts, &snes));
-          AssertPETSc(SNESSetJacobianDomainError(snes));
+          snes_set_jacobian_domain_error(snes);
         },
         t,
         xdealii,
@@ -653,7 +653,7 @@ namespace PETScWrappers
         [ts]() -> void {
           SNES snes;
           AssertPETSc(TSGetSNES(ts, &snes));
-          AssertPETSc(SNESSetJacobianDomainError(snes));
+          snes_set_jacobian_domain_error(snes);
         },
         t,
         xdealii,
@@ -869,13 +869,14 @@ namespace PETScWrappers
 
     // By default PETSc does not check for Jacobian errors in optimized
     // mode. Here we do it unconditionally.
+#  if DEAL_II_PETSC_VERSION_GTE(3, 11, 0)
     if (ts_has_snes(ts))
       {
         SNES snes;
         AssertPETSc(TSGetSNES(ts, &snes));
         AssertPETSc(SNESSetCheckJacobianDomainError(snes, PETSC_TRUE));
       }
-
+#  endif
     // Having set everything up, now do the actual work
     // and let PETSc do the time stepping. If there is
     // a pending exception, then one of the user callbacks
