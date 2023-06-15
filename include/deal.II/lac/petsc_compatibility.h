@@ -111,6 +111,12 @@ namespace PETScWrappers
   petsc_increment_state_counter(Mat A);
 
   /**
+   * Resets internal domain error flags in the SNES object.
+   */
+  void
+  snes_reset_domain_flags(SNES snes);
+
+  /**
    * Tell PETSc nonlinear solver to use matrix free finite differencing (MFFD).
    *
    * @p mf_operator indicates to use MFFD for the linear system matrix
@@ -151,6 +157,13 @@ namespace PETScWrappers
    */
   unsigned int
   ts_get_step_number(TS ts);
+
+  /**
+   * Return true if the TS has a SNES object.
+   */
+  bool
+  ts_has_snes(TS ts);
+
 } // namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE

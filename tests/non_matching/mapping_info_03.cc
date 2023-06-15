@@ -43,15 +43,14 @@ test()
   FE_Q<dim>     fe(degree);
   MappingQ<dim> mapping(degree);
 
+  NonMatching::MappingInfo<dim>::AdditionalData additional_data;
+  additional_data.use_global_weights = true;
+  NonMatching::MappingInfo<dim> mapping_info(mapping,
+                                             update_JxW_values,
+                                             additional_data);
 
   deallog << "Check JxW faces..." << std::endl;
   {
-    NonMatching::MappingInfo<dim>::AdditionalData additional_data;
-    additional_data.use_global_weights = true;
-    NonMatching::MappingInfo<dim> mapping_info(mapping,
-                                               update_JxW_values,
-                                               additional_data);
-
     // 1) build vector of quadratures
     std::vector<std::vector<Quadrature<dim - 1>>> quad_vec;
     // prescribe JxW (there is no meaning in the actual values, they just have
@@ -96,13 +95,6 @@ test()
 
   deallog << "\n\nCheck JxW cells..." << std::endl;
   {
-    NonMatching::MappingInfo<dim>::AdditionalData additional_data;
-    additional_data.use_global_weights = true;
-    NonMatching::MappingInfo<dim> mapping_info(mapping,
-                                               update_JxW_values,
-                                               additional_data);
-
-
     // 1) build vector of quadratures
     std::vector<Quadrature<dim>> quad_vec;
     // prescribe JxW (there is no meaning in the actual values, they just have

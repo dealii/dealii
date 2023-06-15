@@ -309,8 +309,9 @@ class TriaAccessorBase
 public:
   /**
    * Dimension of the space the object represented by this accessor lives in.
-   * For example, if this accessor represents a quad that is part of a two-
-   * dimensional surface in four-dimensional space, then this value is four.
+   * For example, if this accessor represents a quadrilateral that is part of
+   * a two-dimensional surface in four-dimensional space, then this value is
+   * four.
    */
   static constexpr unsigned int space_dimension = spacedim;
 
@@ -323,8 +324,8 @@ public:
 
   /**
    * Dimensionality of the current object represented by this accessor. For
-   * example, if it is line (irrespective of whether it is part of a quad or
-   * hex, and what dimension we are in), then this value equals 1.
+   * example, if it is line (irrespective of whether it is part of a 2d or 3d
+   * subobject), then this value equals 1.
    */
   static const unsigned int structure_dimension = structdim;
 
@@ -574,8 +575,9 @@ class InvalidAccessor
 public:
   /**
    * Dimension of the space the object represented by this accessor lives in.
-   * For example, if this accessor represents a quad that is part of a two-
-   * dimensional surface in four-dimensional space, then this value is four.
+   * For example, if this accessor represents a quadrilateral that is part of
+   * a two-dimensional surface in four-dimensional space, then this value is
+   * four.
    */
   static constexpr unsigned int space_dimension = spacedim;
 
@@ -588,8 +590,8 @@ public:
 
   /**
    * Dimensionality of the current object represented by this accessor. For
-   * example, if it is line (irrespective of whether it is part of a quad or
-   * hex, and what dimension we are in), then this value equals 1.
+   * example, if it is line (irrespective of whether it is part of a 2d or 3d
+   * subobject), then this value equals 1.
    */
   static const unsigned int structure_dimension = structdim;
 
@@ -1740,9 +1742,13 @@ public:
   n_lines() const;
 
   /**
-   * Number of faces.
-   *
-   * @note Only implemented for cells (structdim==dim).
+   * Return the number of faces for a cell. This function is only
+   * implemented for cells (i.e., `structdim==dim`) to avoid the question
+   * of what exactly is meant in a construct such as
+   * `cell->face(f)->n_faces()`. If you want to ask how many bounding
+   * lines a face of a 3d cell has, use `cell->face(f)->n_lines()`; if
+   * you want to ask about the number of vertices of a face of a 2d cell,
+   * use `cell->face(f)->n_vertices()`.
    */
   unsigned int
   n_faces() const;
@@ -2337,8 +2343,8 @@ public:
 
   /**
    * Dimensionality of the current object represented by this accessor. For
-   * example, if it is line (irrespective of whether it is part of a quad or
-   * hex, and what dimension we are in), then this value equals 1.
+   * example, if it is line (irrespective of whether it is part of a 2d or 3d
+   * subobject), then this value equals 1.
    */
   static const unsigned int structure_dimension = 0;
 
@@ -3551,8 +3557,8 @@ public:
   /**
    * Return whether the cell is at the boundary. Being at the boundary is
    * defined by one face being on the boundary. Note that this does not catch
-   * cases where only one vertex of a quad or of a hex is at the boundary, or
-   * where only one line of a hex is at the boundary while the interiors of
+   * cases where only one vertex of a 2d or 3d subobject is at the boundary,
+   * or where only one line of a hex is at the boundary while the interiors of
    * all faces are in the interior of the domain. For the latter case, the @p
    * has_boundary_lines function is the right one to ask.
    */

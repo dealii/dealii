@@ -288,9 +288,16 @@ public:
    * A function object that users should supply and that is intended to
    * compute the residual `dst = F(src)`.
    *
-   * This function should return an int for either failure or success.
+   * @note This variable represents a
+   * @ref GlossUserProvidedCallBack "user provided callback".
+   * See there for a description of how to deal with errors and other
+   * requirements and conventions. Some of the underlying packages
+   * used by this class can deal with recoverable exceptions, whereas
+   * others cannot. As a consequence, if a callback
+   * throws an exception of type RecoverableUserCallbackError, then this
+   * exception may or may not be treated like any other exception.
    */
-  std::function<int(const VectorType &src, VectorType &dst)> residual;
+  std::function<void(const VectorType &src, VectorType &dst)> residual;
 
   /**
    * A function object that users may supply and that is intended to
@@ -308,8 +315,17 @@ public:
    * approximate Jacobian matrix $L$.
    *
    * @param current_u Current value of $u$
+   *
+   * @note This variable represents a
+   * @ref GlossUserProvidedCallBack "user provided callback".
+   * See there for a description of how to deal with errors and other
+   * requirements and conventions. Some of the underlying packages
+   * used by this class can deal with recoverable exceptions, whereas
+   * others cannot. As a consequence, if a callback
+   * throws an exception of type RecoverableUserCallbackError, then this
+   * exception may or may not be treated like any other exception.
    */
-  std::function<int(const VectorType &current_u)> setup_jacobian;
+  std::function<void(const VectorType &current_u)> setup_jacobian;
 
   /**
    * A function object that users may supply and that is intended to solve
@@ -322,9 +338,18 @@ public:
    * @param[out] dst The solution of $J^{-1} * \texttt{src}$.
    * @param[in] tolerance The tolerance with which to solve the linear system
    *   of equations.
+   *
+   * @note This variable represents a
+   * @ref GlossUserProvidedCallBack "user provided callback".
+   * See there for a description of how to deal with errors and other
+   * requirements and conventions. Some of the underlying packages
+   * used by this class can deal with recoverable exceptions, whereas
+   * others cannot. As a consequence, if a callback
+   * throws an exception of type RecoverableUserCallbackError, then this
+   * exception may or may not be treated like any other exception.
    */
   std::function<
-    int(const VectorType &rhs, VectorType &dst, const double tolerance)>
+    void(const VectorType &rhs, VectorType &dst, const double tolerance)>
     solve_with_jacobian;
 
 private:
@@ -567,12 +592,12 @@ NonlinearSolverSelector<PETScWrappers::MPI::Vector>::solve_with_petsc(
 
   nonlinear_solver.solve_with_jacobian =
     [&](const PETScWrappers::MPI::Vector &src,
-        PETScWrappers::MPI::Vector &      dst) -> int {
-    // PETSc does not gives a tolerance, so we have to choose something
-    // reasonable to provide to the user:
-    const double tolerance = 1e-6;
-    return solve_with_jacobian(src, dst, tolerance);
-  };
+        PETScWrappers::MPI::Vector &      dst) {
+      // PETSc does not gives a tolerance, so we have to choose something
+      // reasonable to provide to the user:
+      const double tolerance = 1e-6;
+      solve_with_jacobian(src, dst, tolerance);
+    };
 
   nonlinear_solver.solve(initial_guess_and_solution);
 }

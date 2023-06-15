@@ -254,12 +254,8 @@ DynamicSparsityPattern::DynamicSparsityPattern(const size_type m,
 
 
 DynamicSparsityPattern::DynamicSparsityPattern(const IndexSet &rowset_)
-  : SparsityPatternBase()
-  , have_entries(false)
-  , rowset(0)
-{
-  reinit(rowset_.size(), rowset_.size(), rowset_);
-}
+  : DynamicSparsityPattern(rowset_.size(), rowset_.size(), rowset_)
+{}
 
 
 DynamicSparsityPattern::DynamicSparsityPattern(const size_type n)

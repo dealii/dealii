@@ -435,6 +435,12 @@ namespace NonMatching
     compute_n_q_points(const unsigned int n_q_points_unvectorized);
 
     /**
+     * Clears fields to make the object reusable.
+     */
+    void
+    clear();
+
+    /**
      * Resize the unit_point data field.
      */
     void
@@ -675,6 +681,17 @@ namespace NonMatching
 
   template <int dim, int spacedim, typename Number>
   void
+  MappingInfo<dim, spacedim, Number>::clear()
+  {
+    n_q_points_unvectorized.clear();
+    unit_points_index.clear();
+    data_index_offsets.clear();
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  void
   MappingInfo<dim, spacedim, Number>::reinit(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const std::vector<Point<dim>> &                             unit_points_in)
@@ -778,6 +795,8 @@ namespace NonMatching
     const std::vector<Quadrature<dim>> &quadrature_vector,
     const unsigned int                  n_unfiltered_cells)
   {
+    clear();
+
     do_cell_index_compression =
       n_unfiltered_cells != numbers::invalid_unsigned_int;
 
@@ -873,6 +892,8 @@ namespace NonMatching
     const std::vector<ImmersedSurfaceQuadrature<dim>> &quadrature_vector,
     const unsigned int                                 n_unfiltered_cells)
   {
+    clear();
+
     Assert(
       additional_data.use_global_weights == false,
       ExcMessage(
@@ -976,6 +997,8 @@ namespace NonMatching
     const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector,
     const unsigned int                                   n_unfiltered_cells)
   {
+    clear();
+
     do_cell_index_compression =
       n_unfiltered_cells != numbers::invalid_unsigned_int;
 

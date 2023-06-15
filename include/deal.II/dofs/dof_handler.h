@@ -108,16 +108,16 @@ namespace parallel
  *
  * It is first used in the step-2 tutorial program.
  *
- * For each vertex, line, quad, etc, this class stores a list of the indices
- * of degrees of freedom living on this object. These indices refer to the
- * unconstrained degrees of freedom, i.e. constrained degrees of freedom are
- * numbered in the same way as unconstrained ones, and are only later
- * eliminated.  This leads to the fact that indices in global vectors and
- * matrices also refer to all degrees of freedom and some kind of condensation
- * is needed to restrict the systems of equations to the unconstrained degrees
- * of freedom only. The actual layout of storage of the indices is described
- * in the dealii::internal::DoFHandlerImplementation::DoFLevel class
- * documentation.
+ * For each 0d, 1d, 2d, and 3d subobject, this class stores a list of the
+ * indices of degrees of freedom defined on this DoFHandler. These indices
+ * refer to the unconstrained degrees of freedom, i.e. constrained degrees of
+ * freedom are numbered in the same way as unconstrained ones, and are only
+ * later eliminated.  This leads to the fact that indices in global vectors
+ * and matrices also refer to all degrees of freedom and some kind of
+ * condensation is needed to restrict the systems of equations to the
+ * unconstrained degrees of freedom only. The actual layout of storage of the
+ * indices is described in the
+ * dealii::internal::DoFHandlerImplementation::DoFLevel class documentation.
  *
  * The class offers iterators to traverse all cells, in much the same way as
  * the Triangulation class does. Using the begin() and end() functions (and

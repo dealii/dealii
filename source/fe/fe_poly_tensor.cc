@@ -200,9 +200,9 @@ FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
   if (dim == 3)
     {
       adjust_quad_dof_sign_for_face_orientation_table.resize(
-        this->n_unique_quads());
+        this->n_unique_2d_subobjects());
 
-      for (unsigned int f = 0; f < this->n_unique_quads(); ++f)
+      for (unsigned int f = 0; f < this->n_unique_2d_subobjects(); ++f)
         {
           adjust_quad_dof_sign_for_face_orientation_table[f] =
             Table<2, bool>(this->n_dofs_per_quad(f),
@@ -255,14 +255,14 @@ FE_PolyTensor<dim, spacedim>::adjust_quad_dof_sign_for_face_orientation(
   // called
   AssertIndexRange(index, this->n_dofs_per_quad(face));
   Assert(adjust_quad_dof_sign_for_face_orientation_table
-             [this->n_unique_quads() == 1 ? 0 : face]
+             [this->n_unique_2d_subobjects() == 1 ? 0 : face]
                .n_elements() ==
            this->reference_cell().n_face_orientations(face) *
              this->n_dofs_per_quad(face),
          ExcInternalError());
 
   return adjust_quad_dof_sign_for_face_orientation_table
-    [this->n_unique_quads() == 1 ? 0 : face](
+    [this->n_unique_2d_subobjects() == 1 ? 0 : face](
       index,
       4 * static_cast<int>(face_orientation) + 2 * static_cast<int>(face_flip) +
         static_cast<int>(face_rotation));

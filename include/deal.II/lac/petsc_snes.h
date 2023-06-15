@@ -369,10 +369,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's SNES package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const VectorType &x, VectorType &res)> residual;
 
@@ -383,10 +380,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's SNES package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const VectorType &x, AMatrixType &A, PMatrixType &P)>
       jacobian;
@@ -401,10 +395,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's SNES package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const VectorType & x,
                        const unsigned int step_number,
@@ -422,10 +413,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's SNES package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const VectorType &x)> setup_jacobian;
 
@@ -438,10 +426,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's SNES package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const VectorType &src, VectorType &dst)>
       solve_with_jacobian;
@@ -461,10 +446,7 @@ namespace PETScWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. PETSc's SNES package can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions.
      */
     std::function<void(const VectorType &x, real_type &energy_value)> energy;
 
@@ -474,6 +456,9 @@ namespace PETScWrappers
      */
     SNES snes;
 
+    /**
+     * Pointers to the internal PETSc matrix objects.
+     */
     SmartPointer<AMatrixType, NonlinearSolver> A;
     SmartPointer<PMatrixType, NonlinearSolver> P;
 

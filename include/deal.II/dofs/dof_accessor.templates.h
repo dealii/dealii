@@ -1083,11 +1083,11 @@ namespace internal
         // correct (cell-local) ordering. The same applies, if the face_rotation
         // or face_orientation is non-standard
         if (structdim == 3 && fe.max_dofs_per_quad() > 0)
-          for (const auto quad : accessor.face_indices())
+          for (const auto face_no : accessor.face_indices())
             {
               const auto combined_orientation = TriaAccessorImplementation::
-                Implementation::combined_face_orientation(accessor, quad);
-              const unsigned int quad_index = accessor.quad_index(quad);
+                Implementation::combined_face_orientation(accessor, face_no);
+              const unsigned int quad_index = accessor.quad_index(face_no);
               if (combined_orientation ==
                   ReferenceCell::default_combined_face_orientation())
                 dof_operation.process_dofs(
@@ -1108,10 +1108,10 @@ namespace internal
                   [&](const auto d) {
                     return fe.adjust_quad_dof_index_for_face_orientation(
                       d,
-                      quad,
-                      accessor.face_orientation(quad),
-                      accessor.face_flip(quad),
-                      accessor.face_rotation(quad));
+                      face_no,
+                      accessor.face_orientation(face_no),
+                      accessor.face_flip(face_no),
+                      accessor.face_rotation(face_no));
                   },
                   std::integral_constant<int, 2>(),
                   dof_indices_ptr,

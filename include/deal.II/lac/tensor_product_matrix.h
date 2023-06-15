@@ -64,10 +64,7 @@ class FullMatrix;
  * $\text{size}(M)^{3d}$ for setting up the inverse of $L$.
  *
  * Interestingly, the exact inverse of the matrix $L$ can be found through
- * tensor products due to an article by <a
- * href="http://dl.acm.org/citation.cfm?id=2716130">R. E. Lynch, J. R. Rice,
- * D. H. Thomas, Direct solution of partial difference equations by tensor
- * product methods, Numerische Mathematik 6, 185-199</a> from 1964,
+ * tensor products due to 1964's work by Lynch et al. @cite Lynch1964,
  * @f{align*}{
  * L^{-1} &= S_1 \otimes S_0 (\Lambda_1 \otimes I + I \otimes \Lambda_0)^{-1}
  * S_1^\mathrm T \otimes S_0^\mathrm T,
