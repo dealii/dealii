@@ -47,7 +47,8 @@ test()
     }
   catch (ExceptionBase &e)
     {
-      deallog << e.what() << std::endl;
+      deallog << "Successfully failed to distribute DoFs with a single "
+              << "nonzero active FE index" << std::endl;
     }
 }
 
