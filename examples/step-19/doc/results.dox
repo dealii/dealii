@@ -3,7 +3,7 @@
 When this program is run, it produces output that looks as follows:
 ```
 Timestep 1
-  Field degrees of freedom:                                 4989
+  Field degrees of freedom:                 4989
   Total number of particles in simulation:  20
   Number of particles lost this time step:  0
 
@@ -162,6 +162,12 @@ electrode.
 
 <h4> More statistics about electrons </h4>
 
+At the end of the day, we are rarely interested in the *solution* of an equation,
+but in numbers that can be *extracted* from it -- in other words, we want to
+*postprocess* the solution (see the results section of step-4 for an extensive
+discussion of this concept). Here, what one would likely be most interested in
+assessing are some statistics about the particles.
+
 The program already computes the fraction of the electrons that leave the
 domain through the hole in the anode. But there are other quantities one might be
 interested in. For example, the average velocity of these particles. It would
@@ -182,13 +188,14 @@ regardless of how many time steps lie between each such point.
 
 The problem we are considering in this program is a coupled, multiphysics
 problem. But the way we solve it is by first computing the (electric) potential
-field and then update the particle locations. This is what is called an
+field and then updating first the particle velocity and finally the
+particle locations. This is what is called an
 "operator-splitting method", a concept we will investigate in more detail
 in step-58.
 
 While it is awkward to think of a way to solve this problem that does not involve
-splitting the problem into a PDE piece and a particles piece, one
-*can* (and probably should!) think of a better way to update the particle
+splitting the problem into a PDE piece and a particles piece, one *can*
+(and probably should!) think of a better way to update the particle
 locations. Specifically, the equations we use to update the particle location
 are
 @f{align*}{
@@ -196,9 +203,21 @@ are
   \\
   \frac{{\mathbf x}_i^{(n)}-{\mathbf x}_i^{(n-1)}}{\Delta t} &= {\mathbf v}_i^{(n)}.
 @f}
-This corresponds to a simple forward-Euler time discretization -- a method of
-first order accuracy in the time step size $\Delta t$ that we know we should
-avoid because we can do better. Rather, one might want to consider a scheme such
+This corresponds to a Lie splitting where we first update one variable
+(the velocity) and then, using the already-updated value of the one variable
+to update the other (the position). It is well understood that the Lie
+splitting incurs a first order error accuracy in the time step (i.e.,
+the error introduced by the splitting is ${\cal O}(\Delta t)$) that we know we should
+avoid because we can do better. Independently, of course, we incur an error
+of the same rate a second time because we use an Euler-like scheme for each of
+the two updates (we replace the time derivative by a simple finite difference
+quotient containing the old and new value, and we evaluate the right hand side
+only at the end time of the interval, at $t_n$), and a better scheme would also
+use a better way to do this kind of update.
+
+Better strategies would replace the Lie splitting by something like a
+[Strang splitting](https://en.wikipedia.org/wiki/Strang_splitting), and the
+update of the particle position and velocity by a scheme such
 as the
 [leapfrog scheme](https://en.wikipedia.org/wiki/Leapfrog_integration)
 or more generally
@@ -217,8 +236,9 @@ used here) but 100,000? If we needed a substantially finer mesh?
 
 In those cases, one would want to run the program not just on a single processor,
 but in fact on as many as one has available. This requires parallelization
-both the PDE solution as well as over particles. In practice, while there
+of both the PDE solution as well as over particles. In practice, while there
 are substantial challenges to making this efficient and scale well, these
-challenges are all addressed in deal.II itself. For example, step-40 shows
+challenges are all addressed in deal.II itself, and have been demonstrated
+on simulations running on 10,000 or more cores. For example, step-40 shows
 how to parallelize the finite element part, and step-70 shows how one can
 then also parallelize the particles part.
