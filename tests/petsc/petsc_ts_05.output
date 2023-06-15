@@ -1,0 +1,1240 @@
+
+DEAL::# Default Parameters
+subsection Error control
+  set absolute error tolerance = -1
+  set adaptor type             = none
+  set ignore algebraic lte     = true
+  set maximum step size        = -1
+  set minimum step size        = -1
+  set relative error tolerance = -1
+end
+subsection Running parameters
+  set final time              = 0
+  set initial step size       = 0
+  set initial time            = 0
+  set match final time        = false
+  set maximum number of steps = -1
+  set options prefix          = 
+  set solver type             = 
+end
+DEAL::# Testing Parameters
+subsection Error control
+  set absolute error tolerance = 0.0001
+  set adaptor type             = none
+  set ignore algebraic lte     = true
+  set maximum step size        = 1e+7
+  set minimum step size        = 1e-7
+  set relative error tolerance = -1
+end
+subsection Running parameters
+  set final time              = 2.0
+  set initial step size       = 0.2
+  set initial time            = 0
+  set match final time        = false
+  set maximum number of steps = -1
+  set options prefix          = 
+  set solver type             = bdf
+end
+DEAL::# Testcase 0
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating implicit Jacobian at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating implicit Jacobian at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating implicit Jacobian at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating implicit Jacobian at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating implicit Jacobian at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating implicit Jacobian at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating implicit Jacobian at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.300364  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating implicit Jacobian at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.245132  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating implicit Jacobian at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.200048  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating implicit Jacobian at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.163253  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating implicit Jacobian at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.133225  (exact: 0.135335)
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Evaluating implicit Jacobian at t=2.20000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.108719  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
+DEAL::# Testcase 1
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Setting up Jacobian at t=0.600000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Setting up Jacobian at t=0.800000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Setting up Jacobian at t=1.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Setting up Jacobian at t=1.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.300364  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Setting up Jacobian at t=1.40000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.245132  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Setting up Jacobian at t=1.60000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.200048  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Setting up Jacobian at t=1.80000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.163253  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Setting up Jacobian at t=2.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.133225  (exact: 0.135335)
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Setting up Jacobian at t=2.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.108719  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
+DEAL::# Testcase 2
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Setting up Jacobian at t=0.600000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Setting up Jacobian at t=0.800000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Setting up Jacobian at t=1.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Setting up Jacobian at t=1.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.300364  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Setting up Jacobian at t=1.40000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.245132  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Setting up Jacobian at t=1.60000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.200048  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Setting up Jacobian at t=1.80000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.163253  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Setting up Jacobian at t=2.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.133225  (exact: 0.135335)
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Setting up Jacobian at t=2.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.108719  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
+DEAL::# Testcase 0 with recoverable error
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating implicit Jacobian at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating implicit Jacobian at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Evaluating implicit Jacobian at t=0.400000
+DEAL::Throwing a recoverable exception from implicit_jacobian.
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Evaluating implicit Jacobian at t=0.250000
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Intermediate output:
+DEAL::  t =0.250000
+DEAL::  y =0.783864  (exact: 0.778801)
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Evaluating implicit Jacobian at t=0.300000
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Intermediate output:
+DEAL::  t =0.300000
+DEAL::  y =0.745674  (exact: 0.740818)
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Evaluating implicit Jacobian at t=0.350000
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Intermediate output:
+DEAL::  t =0.350000
+DEAL::  y =0.709301  (exact: 0.704688)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating implicit Jacobian at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.674687  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Evaluating implicit Jacobian at t=0.450000
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Intermediate output:
+DEAL::  t =0.450000
+DEAL::  y =0.641758  (exact: 0.637628)
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Evaluating implicit Jacobian at t=0.500000
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Intermediate output:
+DEAL::  t =0.500000
+DEAL::  y =0.610433  (exact: 0.606531)
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Evaluating implicit Jacobian at t=0.550000
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Intermediate output:
+DEAL::  t =0.550000
+DEAL::  y =0.580637  (exact: 0.576950)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating implicit Jacobian at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.552295  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Evaluating implicit Jacobian at t=0.650000
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Intermediate output:
+DEAL::  t =0.650000
+DEAL::  y =0.525337  (exact: 0.522046)
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Evaluating implicit Jacobian at t=0.700000
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Intermediate output:
+DEAL::  t =0.700000
+DEAL::  y =0.499694  (exact: 0.496585)
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Evaluating implicit Jacobian at t=0.750000
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Intermediate output:
+DEAL::  t =0.750000
+DEAL::  y =0.475303  (exact: 0.472367)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating implicit Jacobian at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.452103  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Evaluating implicit Jacobian at t=0.850000
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Intermediate output:
+DEAL::  t =0.850000
+DEAL::  y =0.430035  (exact: 0.427415)
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Evaluating implicit Jacobian at t=0.900000
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Intermediate output:
+DEAL::  t =0.900000
+DEAL::  y =0.409044  (exact: 0.406570)
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Evaluating implicit Jacobian at t=0.950000
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Intermediate output:
+DEAL::  t =0.950000
+DEAL::  y =0.389078  (exact: 0.386741)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating implicit Jacobian at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.370086  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Evaluating implicit Jacobian at t=1.05000
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Intermediate output:
+DEAL::  t =1.05000
+DEAL::  y =0.352022  (exact: 0.349938)
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Evaluating implicit Jacobian at t=1.10000
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Intermediate output:
+DEAL::  t =1.10000
+DEAL::  y =0.334839  (exact: 0.332871)
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Evaluating implicit Jacobian at t=1.15000
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Intermediate output:
+DEAL::  t =1.15000
+DEAL::  y =0.318495  (exact: 0.316637)
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating implicit Jacobian at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.302948  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Evaluating implicit Jacobian at t=1.25000
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Intermediate output:
+DEAL::  t =1.25000
+DEAL::  y =0.288161  (exact: 0.286505)
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Evaluating implicit Jacobian at t=1.30000
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Intermediate output:
+DEAL::  t =1.30000
+DEAL::  y =0.274095  (exact: 0.272532)
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Evaluating implicit Jacobian at t=1.35000
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Intermediate output:
+DEAL::  t =1.35000
+DEAL::  y =0.260716  (exact: 0.259240)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating implicit Jacobian at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.247990  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Evaluating implicit Jacobian at t=1.45000
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Intermediate output:
+DEAL::  t =1.45000
+DEAL::  y =0.235885  (exact: 0.234570)
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Evaluating implicit Jacobian at t=1.50000
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Intermediate output:
+DEAL::  t =1.50000
+DEAL::  y =0.224371  (exact: 0.223130)
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Evaluating implicit Jacobian at t=1.55000
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Intermediate output:
+DEAL::  t =1.55000
+DEAL::  y =0.213419  (exact: 0.212248)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating implicit Jacobian at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203002  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Evaluating implicit Jacobian at t=1.65000
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Intermediate output:
+DEAL::  t =1.65000
+DEAL::  y =0.193093  (exact: 0.192050)
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Evaluating implicit Jacobian at t=1.70000
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Intermediate output:
+DEAL::  t =1.70000
+DEAL::  y =0.183668  (exact: 0.182684)
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Evaluating implicit Jacobian at t=1.75000
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Intermediate output:
+DEAL::  t =1.75000
+DEAL::  y =0.174703  (exact: 0.173774)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating implicit Jacobian at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.166175  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Evaluating implicit Jacobian at t=1.85000
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Intermediate output:
+DEAL::  t =1.85000
+DEAL::  y =0.158064  (exact: 0.157237)
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Evaluating implicit Jacobian at t=1.90000
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Intermediate output:
+DEAL::  t =1.90000
+DEAL::  y =0.150348  (exact: 0.149569)
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Evaluating implicit Jacobian at t=1.95000
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Intermediate output:
+DEAL::  t =1.95000
+DEAL::  y =0.143010  (exact: 0.142274)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating implicit Jacobian at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.136029  (exact: 0.135335)
+DEAL::# Number of steps taken: 37
+DEAL::# Testcase 0 with unrecoverable error 
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating implicit Jacobian at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating implicit Jacobian at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Evaluating implicit Jacobian at t=0.400000
+DEAL::Throwing a unrecoverable exception from implicit_jacobian.
+DEAL::Time stepper aborted with an exception:
+DEAL::Unrecoverable error in implicit_jacobian.
+DEAL::# Testcase 1 with recoverable error
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Throwing a recoverable exception from setup_jacobian.
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Setting up Jacobian at t=0.250000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Intermediate output:
+DEAL::  t =0.250000
+DEAL::  y =0.783864  (exact: 0.778801)
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Setting up Jacobian at t=0.300000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Intermediate output:
+DEAL::  t =0.300000
+DEAL::  y =0.745674  (exact: 0.740818)
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Setting up Jacobian at t=0.350000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Intermediate output:
+DEAL::  t =0.350000
+DEAL::  y =0.709301  (exact: 0.704688)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.674687  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Setting up Jacobian at t=0.450000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Intermediate output:
+DEAL::  t =0.450000
+DEAL::  y =0.641758  (exact: 0.637628)
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Setting up Jacobian at t=0.500000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Intermediate output:
+DEAL::  t =0.500000
+DEAL::  y =0.610433  (exact: 0.606531)
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Setting up Jacobian at t=0.550000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Intermediate output:
+DEAL::  t =0.550000
+DEAL::  y =0.580637  (exact: 0.576950)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Setting up Jacobian at t=0.600000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.552295  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Setting up Jacobian at t=0.650000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Intermediate output:
+DEAL::  t =0.650000
+DEAL::  y =0.525337  (exact: 0.522046)
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Setting up Jacobian at t=0.700000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Intermediate output:
+DEAL::  t =0.700000
+DEAL::  y =0.499694  (exact: 0.496585)
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Setting up Jacobian at t=0.750000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Intermediate output:
+DEAL::  t =0.750000
+DEAL::  y =0.475303  (exact: 0.472367)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Setting up Jacobian at t=0.800000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.452103  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Setting up Jacobian at t=0.850000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Intermediate output:
+DEAL::  t =0.850000
+DEAL::  y =0.430035  (exact: 0.427415)
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Setting up Jacobian at t=0.900000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Intermediate output:
+DEAL::  t =0.900000
+DEAL::  y =0.409044  (exact: 0.406570)
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Setting up Jacobian at t=0.950000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Intermediate output:
+DEAL::  t =0.950000
+DEAL::  y =0.389078  (exact: 0.386741)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Setting up Jacobian at t=1.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.370086  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Setting up Jacobian at t=1.05000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Intermediate output:
+DEAL::  t =1.05000
+DEAL::  y =0.352022  (exact: 0.349938)
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Setting up Jacobian at t=1.10000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Intermediate output:
+DEAL::  t =1.10000
+DEAL::  y =0.334839  (exact: 0.332871)
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Setting up Jacobian at t=1.15000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Intermediate output:
+DEAL::  t =1.15000
+DEAL::  y =0.318495  (exact: 0.316637)
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Setting up Jacobian at t=1.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.302948  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Setting up Jacobian at t=1.25000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Intermediate output:
+DEAL::  t =1.25000
+DEAL::  y =0.288161  (exact: 0.286505)
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Setting up Jacobian at t=1.30000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Intermediate output:
+DEAL::  t =1.30000
+DEAL::  y =0.274095  (exact: 0.272532)
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Setting up Jacobian at t=1.35000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Intermediate output:
+DEAL::  t =1.35000
+DEAL::  y =0.260716  (exact: 0.259240)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Setting up Jacobian at t=1.40000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.247990  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Setting up Jacobian at t=1.45000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Intermediate output:
+DEAL::  t =1.45000
+DEAL::  y =0.235885  (exact: 0.234570)
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Setting up Jacobian at t=1.50000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Intermediate output:
+DEAL::  t =1.50000
+DEAL::  y =0.224371  (exact: 0.223130)
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Setting up Jacobian at t=1.55000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Intermediate output:
+DEAL::  t =1.55000
+DEAL::  y =0.213419  (exact: 0.212248)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Setting up Jacobian at t=1.60000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203002  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Setting up Jacobian at t=1.65000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Intermediate output:
+DEAL::  t =1.65000
+DEAL::  y =0.193093  (exact: 0.192050)
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Setting up Jacobian at t=1.70000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Intermediate output:
+DEAL::  t =1.70000
+DEAL::  y =0.183668  (exact: 0.182684)
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Setting up Jacobian at t=1.75000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Intermediate output:
+DEAL::  t =1.75000
+DEAL::  y =0.174703  (exact: 0.173774)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Setting up Jacobian at t=1.80000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.166175  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Setting up Jacobian at t=1.85000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Intermediate output:
+DEAL::  t =1.85000
+DEAL::  y =0.158064  (exact: 0.157237)
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Setting up Jacobian at t=1.90000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Intermediate output:
+DEAL::  t =1.90000
+DEAL::  y =0.150348  (exact: 0.149569)
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Setting up Jacobian at t=1.95000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Intermediate output:
+DEAL::  t =1.95000
+DEAL::  y =0.143010  (exact: 0.142274)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Setting up Jacobian at t=2.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.136029  (exact: 0.135335)
+DEAL::# Number of steps taken: 37
+DEAL::# Testcase 1 with unrecoverable error 
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Throwing a unrecoverable exception from setup_jacobian.
+DEAL::Time stepper aborted with an exception:
+DEAL::Unrecoverable error in setup_jacobian.
+DEAL::# Testcase 2 with recoverable error
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Solving with Jacobian
+DEAL::Throwing a recoverable exception from solve_with_jacobian.
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Setting up Jacobian at t=0.250000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Evaluating explicit function at t=0.250000
+DEAL::Intermediate output:
+DEAL::  t =0.250000
+DEAL::  y =0.783864  (exact: 0.778801)
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Setting up Jacobian at t=0.300000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Evaluating explicit function at t=0.300000
+DEAL::Intermediate output:
+DEAL::  t =0.300000
+DEAL::  y =0.745674  (exact: 0.740818)
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Setting up Jacobian at t=0.350000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Evaluating explicit function at t=0.350000
+DEAL::Intermediate output:
+DEAL::  t =0.350000
+DEAL::  y =0.709301  (exact: 0.704688)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.674687  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Setting up Jacobian at t=0.450000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Evaluating explicit function at t=0.450000
+DEAL::Intermediate output:
+DEAL::  t =0.450000
+DEAL::  y =0.641758  (exact: 0.637628)
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Setting up Jacobian at t=0.500000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Evaluating explicit function at t=0.500000
+DEAL::Intermediate output:
+DEAL::  t =0.500000
+DEAL::  y =0.610433  (exact: 0.606531)
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Setting up Jacobian at t=0.550000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Evaluating explicit function at t=0.550000
+DEAL::Intermediate output:
+DEAL::  t =0.550000
+DEAL::  y =0.580637  (exact: 0.576950)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Setting up Jacobian at t=0.600000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.552295  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Setting up Jacobian at t=0.650000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Evaluating explicit function at t=0.650000
+DEAL::Intermediate output:
+DEAL::  t =0.650000
+DEAL::  y =0.525337  (exact: 0.522046)
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Setting up Jacobian at t=0.700000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Evaluating explicit function at t=0.700000
+DEAL::Intermediate output:
+DEAL::  t =0.700000
+DEAL::  y =0.499694  (exact: 0.496585)
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Setting up Jacobian at t=0.750000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Evaluating explicit function at t=0.750000
+DEAL::Intermediate output:
+DEAL::  t =0.750000
+DEAL::  y =0.475303  (exact: 0.472367)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Setting up Jacobian at t=0.800000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.452103  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Setting up Jacobian at t=0.850000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Evaluating explicit function at t=0.850000
+DEAL::Intermediate output:
+DEAL::  t =0.850000
+DEAL::  y =0.430035  (exact: 0.427415)
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Setting up Jacobian at t=0.900000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Evaluating explicit function at t=0.900000
+DEAL::Intermediate output:
+DEAL::  t =0.900000
+DEAL::  y =0.409044  (exact: 0.406570)
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Setting up Jacobian at t=0.950000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Evaluating explicit function at t=0.950000
+DEAL::Intermediate output:
+DEAL::  t =0.950000
+DEAL::  y =0.389078  (exact: 0.386741)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Setting up Jacobian at t=1.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.370086  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Setting up Jacobian at t=1.05000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Evaluating explicit function at t=1.05000
+DEAL::Intermediate output:
+DEAL::  t =1.05000
+DEAL::  y =0.352022  (exact: 0.349938)
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Setting up Jacobian at t=1.10000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Intermediate output:
+DEAL::  t =1.10000
+DEAL::  y =0.334839  (exact: 0.332871)
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Setting up Jacobian at t=1.15000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Evaluating explicit function at t=1.15000
+DEAL::Intermediate output:
+DEAL::  t =1.15000
+DEAL::  y =0.318495  (exact: 0.316637)
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Setting up Jacobian at t=1.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.302948  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Setting up Jacobian at t=1.25000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Evaluating explicit function at t=1.25000
+DEAL::Intermediate output:
+DEAL::  t =1.25000
+DEAL::  y =0.288161  (exact: 0.286505)
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Setting up Jacobian at t=1.30000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Evaluating explicit function at t=1.30000
+DEAL::Intermediate output:
+DEAL::  t =1.30000
+DEAL::  y =0.274095  (exact: 0.272532)
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Setting up Jacobian at t=1.35000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Evaluating explicit function at t=1.35000
+DEAL::Intermediate output:
+DEAL::  t =1.35000
+DEAL::  y =0.260716  (exact: 0.259240)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Setting up Jacobian at t=1.40000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.247990  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Setting up Jacobian at t=1.45000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Evaluating explicit function at t=1.45000
+DEAL::Intermediate output:
+DEAL::  t =1.45000
+DEAL::  y =0.235885  (exact: 0.234570)
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Setting up Jacobian at t=1.50000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Evaluating explicit function at t=1.50000
+DEAL::Intermediate output:
+DEAL::  t =1.50000
+DEAL::  y =0.224371  (exact: 0.223130)
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Setting up Jacobian at t=1.55000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Evaluating explicit function at t=1.55000
+DEAL::Intermediate output:
+DEAL::  t =1.55000
+DEAL::  y =0.213419  (exact: 0.212248)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Setting up Jacobian at t=1.60000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203002  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Setting up Jacobian at t=1.65000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Evaluating explicit function at t=1.65000
+DEAL::Intermediate output:
+DEAL::  t =1.65000
+DEAL::  y =0.193093  (exact: 0.192050)
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Setting up Jacobian at t=1.70000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Evaluating explicit function at t=1.70000
+DEAL::Intermediate output:
+DEAL::  t =1.70000
+DEAL::  y =0.183668  (exact: 0.182684)
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Setting up Jacobian at t=1.75000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Evaluating explicit function at t=1.75000
+DEAL::Intermediate output:
+DEAL::  t =1.75000
+DEAL::  y =0.174703  (exact: 0.173774)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Setting up Jacobian at t=1.80000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.166175  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Setting up Jacobian at t=1.85000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Evaluating explicit function at t=1.85000
+DEAL::Intermediate output:
+DEAL::  t =1.85000
+DEAL::  y =0.158064  (exact: 0.157237)
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Setting up Jacobian at t=1.90000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Evaluating explicit function at t=1.90000
+DEAL::Intermediate output:
+DEAL::  t =1.90000
+DEAL::  y =0.150348  (exact: 0.149569)
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Setting up Jacobian at t=1.95000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Evaluating explicit function at t=1.95000
+DEAL::Intermediate output:
+DEAL::  t =1.95000
+DEAL::  y =0.143010  (exact: 0.142274)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Setting up Jacobian at t=2.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.136029  (exact: 0.135335)
+DEAL::# Number of steps taken: 37
+DEAL::# Testcase 2 with unrecoverable error 
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Time step too large: last_eval_time=0.200000, t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Solving with Jacobian
+DEAL::Throwing a unrecoverable exception from solve_with_jacobian.
+DEAL::Time stepper aborted with an exception:
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_ts.templates.h> in function
+    unsigned int dealii::PETScWrappers::TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(VectorType&) [with VectorType = dealii::PETScWrappers::MPI::Vector; PMatrixType = dealii::PETScWrappers::MatrixBase; AMatrixType = dealii::PETScWrappers::MatrixBase]
+The violated condition was: 
+    ierr == 0
+Additional information: 
+    deal.II encountered an error while calling a PETSc function.
+    The description of the error provided by PETSc is "Error in external
+    library".
+    The numerical value of the original error code is 76.
+--------------------------------------------------------
+

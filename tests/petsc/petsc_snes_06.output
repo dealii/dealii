@@ -1,20 +1,35 @@
 
+DEAL::Solving with setjac 0
 DEAL::Evaluating the residual at x=1.00000
-DEAL::Evaluating the Jacobian at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
 DEAL::Evaluating the residual at x=-0.557408
 DEAL::Too large a step. Throwing a recoverable exception.
-DEAL::
---------------------------------------------------------
-An error occurred in line <0> of file <> in function
-    
-The violated condition was: 
-    
-Additional information: 
-    A user call-back function encountered a recoverable error, but the
-    underlying library that called the call-back did not manage to recover
-    from the error and aborted its operation.
-    
-    See the glossary entry on user call-back functions for more
-    information.
---------------------------------------------------------
-
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=-0.00368463
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=1.66749e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=-3.30872e-24
+DEAL::Found the solution x=-3.30872e-24 after 4 iterations.
+DEAL::Solving with setjac 1
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Too large a step. Throwing a recoverable exception.
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=-0.00368463
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=1.66749e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=-3.30872e-24
+DEAL::Found the solution x=-3.30872e-24 after 4 iterations.

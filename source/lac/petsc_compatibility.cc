@@ -22,13 +22,9 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  if DEAL_II_PETSC_VERSION_LT(3, 13, 1)
-#    include <petsc/private/snesimpl.h>
-#  endif
-#  if DEAL_II_PETSC_VERSION_LT(3, 8, 0)
-#    include <petsc/private/tsimpl.h>
-#  endif
 #  include <petsc/private/petscimpl.h>
+#  include <petsc/private/snesimpl.h>
+#  include <petsc/private/tsimpl.h>
 
 // Shorthand notation for PETSc error codes.
 #  define AssertPETSc(code)                          \
@@ -54,6 +50,13 @@ namespace PETScWrappers
   petsc_increment_state_counter(Mat A)
   {
     AssertPETSc(PetscObjectStateIncrease(reinterpret_cast<PetscObject>(A)));
+  }
+
+  void
+  snes_reset_domain_flags(SNES snes)
+  {
+    snes->jacobiandomainerror = PETSC_FALSE;
+    snes->domainerror         = PETSC_FALSE;
   }
 
   void
@@ -109,6 +112,12 @@ namespace PETScWrappers
     AssertPETSc(TSGetStepNumber(ts, &step));
 #  endif
     return static_cast<unsigned int>(step);
+  }
+
+  bool
+  ts_has_snes(TS ts)
+  {
+    return ts->snes ? true : false;
   }
 
 } // namespace PETScWrappers

@@ -30,6 +30,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for PETSc error codes.
+// This is used in deal.II code to raise exceptions
 #  define AssertPETSc(code)                          \
     do                                               \
       {                                              \
@@ -38,46 +39,82 @@ DEAL_II_NAMESPACE_OPEN
       }                                              \
     while (0)
 
+// Macro to wrap PETSc inside callbacks.
+// This is used to raise "PETSc" exceptions, i.e.
+// start a cascade of errors inside PETSc
+#  ifndef PetscCall
+#    define PetscCall(code)             \
+      do                                \
+        {                               \
+          PetscErrorCode ierr = (code); \
+          CHKERRQ(ierr);                \
+        }                               \
+      while (0)
+#    define undefPetscCall
+#  endif
+
 namespace PETScWrappers
 {
-  namespace
+  /**
+   * A function that calls the function object given by its first argument
+   * with the set of arguments following at the end. If the call returns
+   * regularly, the current function returns zero to indicate success. If
+   * the call fails with an exception, then the current function returns with
+   * an error code of -1. In that case, the exception thrown by @p f is
+   * captured and @p eptr is set to the exception. In case of success,
+   * @p eptr is set to `nullptr`.
+   *
+   * If the user callback fails with a recoverable exception, then (i) if
+   * @p recoverable_action is set, execute it, eat the exception, and return
+   * zero; (ii) if @p recoverable_action is an empty function object, store the
+   * exception and return -1.
+   */
+  template <typename F, typename... Args>
+  int
+  call_and_possibly_capture_snes_exception(
+    const F &                    f,
+    std::exception_ptr &         eptr,
+    const std::function<void()> &recoverable_action,
+    Args &&...args)
   {
-    /**
-     * A function that calls the function object given by its first argument
-     * with the set of arguments following at the end. If the call returns
-     * regularly, the current function returns zero to indicate success. If
-     * the call fails with an exception, then the current function returns with
-     * an error code of -1. In that case, the exception thrown by `f` is
-     * captured and `eptr` is set to the exception. In case of success,
-     * `eptr` is set to `nullptr`.
-     */
-    template <typename F, typename... Args>
-    int
-    call_and_possibly_capture_snes_exception(const F &           f,
-                                             std::exception_ptr &eptr,
-                                             Args &&...args)
-    {
-      // See whether there is already something in the exception pointer
-      // variable. There is no reason why this should be so, and
-      // we should probably bail out:
-      AssertThrow(eptr == nullptr, ExcInternalError());
+    // See whether there is already something in the exception pointer
+    // variable. There is no reason why this should be so, and
+    // we should probably bail out:
+    AssertThrow(eptr == nullptr, ExcInternalError());
 
-      // Call the function and if that succeeds, return zero:
-      try
-        {
-          f(std::forward<Args>(args)...);
-          eptr = nullptr;
-          return 0;
-        }
-      // In case of an exception, capture the exception and
-      // return -1:
-      catch (...)
-        {
-          eptr = std::current_exception();
-          return -1;
-        }
-    }
-  } // namespace
+    // Call the function and if that succeeds, return zero:
+    try
+      {
+        f(std::forward<Args>(args)...);
+        eptr = nullptr;
+        return 0;
+      }
+    // In case of a recoverable exception call the action if present:
+    catch (const RecoverableUserCallbackError &)
+      {
+        if (recoverable_action)
+          {
+            // recover and eat exception
+            recoverable_action();
+            eptr = nullptr;
+            return 0;
+          }
+        else
+          {
+            // No action provided.
+            // capture exception and return -1
+            eptr = std::current_exception();
+            return -1;
+          }
+      }
+    // In case of an exception, capture the exception and
+    // return -1:
+    catch (...)
+      {
+        eptr = std::current_exception();
+        return -1;
+      }
+  }
 
 
 
@@ -187,6 +224,9 @@ namespace PETScWrappers
   void NonlinearSolver<VectorType, PMatrixType, AMatrixType>::reinit()
   {
     AssertPETSc(SNESReset(snes));
+    // By default PETSc does not check for Jacobian errors in optimized
+    // mode. Here we do it unconditionally.
+    AssertPETSc(SNESSetCheckJacobianDomainError(snes, PETSC_TRUE));
   }
 
 
@@ -299,20 +339,34 @@ namespace PETScWrappers
     VectorType &x)
   {
     const auto snes_function =
-      [](SNES, Vec x, Vec f, void *ctx) -> PetscErrorCode {
+      [](SNES snes, Vec x, Vec f, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
       auto user = static_cast<NonlinearSolver *>(ctx);
 
       VectorType xdealii(x);
       VectorType fdealii(f);
-      const int  err = call_and_possibly_capture_snes_exception(
-        user->residual, user->pending_exception, xdealii, fdealii);
+      const int  lineno = __LINE__;
+      const int  err    = call_and_possibly_capture_snes_exception(
+        user->residual,
+        user->pending_exception,
+        [snes]() -> void { AssertPETSc(SNESSetFunctionDomainError(snes)); },
+        xdealii,
+        fdealii);
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)snes),
+          lineno + 1,
+          "residual",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in snes_function from dealii::PETScWrappers::NonlinearSolver");
       petsc_increment_state_counter(f);
-      PetscFunctionReturn(err);
+      PetscFunctionReturn(0);
     };
 
     const auto snes_jacobian =
-      [](SNES, Vec x, Mat A, Mat P, void *ctx) -> PetscErrorCode {
+      [](SNES snes, Vec x, Mat A, Mat P, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
       auto user = static_cast<NonlinearSolver *>(ctx);
 
@@ -320,27 +374,43 @@ namespace PETScWrappers
       AMatrixType Adealii(A);
       PMatrixType Pdealii(P);
 
-      const int err = call_and_possibly_capture_snes_exception(
-        user->jacobian, user->pending_exception, xdealii, Adealii, Pdealii);
+      const int lineno = __LINE__;
+      const int err    = call_and_possibly_capture_snes_exception(
+        user->jacobian,
+        user->pending_exception,
+        [snes]() -> void { AssertPETSc(SNESSetJacobianDomainError(snes)); },
+        xdealii,
+        Adealii,
+        Pdealii);
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)snes),
+          lineno + 1,
+          "jacobian",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in snes_jacobian from dealii::PETScWrappers::NonlinearSolver");
       petsc_increment_state_counter(P);
 
       // Handle the Jacobian-free case
       // This call allows to resample the linearization point
       // of the MFFD tangent operator
       PetscBool flg;
-      AssertPETSc(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
+      PetscCall(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
       if (flg)
         {
-          AssertPETSc(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
-          AssertPETSc(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
+          PetscCall(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
+          PetscCall(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
         }
       else
         petsc_increment_state_counter(A);
-      PetscFunctionReturn(err);
+
+      PetscFunctionReturn(0);
     };
 
     const auto snes_jacobian_with_setup =
-      [](SNES, Vec x, Mat A, Mat P, void *ctx) -> PetscErrorCode {
+      [](SNES snes, Vec x, Mat A, Mat P, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
       auto user = static_cast<NonlinearSolver *>(ctx);
 
@@ -348,37 +418,47 @@ namespace PETScWrappers
       AMatrixType Adealii(A);
       PMatrixType Pdealii(P);
 
-      user->A = &Adealii;
-      user->P = &Pdealii;
-      const int err =
-        call_and_possibly_capture_snes_exception(user->setup_jacobian,
-                                                 user->pending_exception,
-                                                 xdealii);
+      user->A          = &Adealii;
+      user->P          = &Pdealii;
+      const int lineno = __LINE__;
+      const int err    = call_and_possibly_capture_snes_exception(
+        user->setup_jacobian,
+        user->pending_exception,
+        [snes]() -> void { AssertPETSc(SNESSetJacobianDomainError(snes)); },
+        xdealii);
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)snes),
+          lineno + 1,
+          "setup_jacobian",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in snes_jacobian_with_setup from dealii::PETScWrappers::NonlinearSolver");
       petsc_increment_state_counter(P);
 
       // Handle older versions of PETSc for which we cannot pass a MATSHELL
       // matrix to DMSetMatType. This has been fixed from 3.13 on.
       if (user->need_dummy_assemble)
         {
-          AssertPETSc(MatZeroEntries(P));
-          AssertPETSc(MatAssemblyBegin(P, MAT_FINAL_ASSEMBLY));
-          AssertPETSc(MatAssemblyEnd(P, MAT_FINAL_ASSEMBLY));
+          PetscCall(MatZeroEntries(P));
+          PetscCall(MatAssemblyBegin(P, MAT_FINAL_ASSEMBLY));
+          PetscCall(MatAssemblyEnd(P, MAT_FINAL_ASSEMBLY));
         }
 
       // Handle the Jacobian-free case
       // This call allows to resample the linearization point
       // of the MFFD tangent operator
       PetscBool flg;
-      AssertPETSc(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
+      PetscCall(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
       if (flg)
         {
-          AssertPETSc(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
-          AssertPETSc(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
+          PetscCall(MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY));
+          PetscCall(MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY));
         }
       else
         petsc_increment_state_counter(A);
-
-      PetscFunctionReturn(err);
+      PetscFunctionReturn(0);
     };
 
     const auto snes_monitor =
@@ -387,24 +467,56 @@ namespace PETScWrappers
       auto user = static_cast<NonlinearSolver *>(ctx);
 
       Vec x;
-      AssertPETSc(SNESGetSolution(snes, &x));
+      PetscCall(SNESGetSolution(snes, &x));
       VectorType xdealii(x);
-      const int  err = call_and_possibly_capture_snes_exception(
-        user->monitor, user->pending_exception, xdealii, it, f);
-      PetscFunctionReturn(err);
+      const int  lineno = __LINE__;
+      const int  err    = call_and_possibly_capture_snes_exception(
+        user->monitor,
+        user->pending_exception,
+        []() -> void {},
+        xdealii,
+        it,
+        f);
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)snes),
+          lineno + 1,
+          "monitor",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in snes_monitor from dealii::PETScWrappers::NonlinearSolver");
+      PetscFunctionReturn(0);
     };
 
     const auto snes_objective =
-      [](SNES, Vec x, PetscReal *f, void *ctx) -> PetscErrorCode {
+      [](SNES snes, Vec x, PetscReal *f, void *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
       auto user = static_cast<NonlinearSolver *>(ctx);
 
       real_type  v;
       VectorType xdealii(x);
-      const int  err = call_and_possibly_capture_snes_exception(
-        user->energy, user->pending_exception, xdealii, v);
+      const int  lineno = __LINE__;
+      const int  err    = call_and_possibly_capture_snes_exception(
+        user->energy,
+        user->pending_exception,
+        [snes, &v]() -> void {
+          AssertPETSc(SNESSetFunctionDomainError(snes));
+          v = std::numeric_limits<real_type>::quiet_NaN();
+        },
+        xdealii,
+        v);
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)snes),
+          lineno + 1,
+          "energy",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in snes_objective from dealii::PETScWrappers::NonlinearSolver");
       *f = v;
-      PetscFunctionReturn(err);
+      PetscFunctionReturn(0);
     };
 
     AssertThrow(residual,
@@ -475,13 +587,11 @@ namespace PETScWrappers
       PetscObjectComm(reinterpret_cast<PetscObject>(snes)));
     if (solve_with_jacobian)
       {
-        precond.vmult = [&](VectorBase &indst, const VectorBase &insrc) -> int {
+        precond.vmult = [&](VectorBase &      indst,
+                            const VectorBase &insrc) -> void {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
-          return call_and_possibly_capture_snes_exception(solve_with_jacobian,
-                                                          pending_exception,
-                                                          src,
-                                                          dst);
+          solve_with_jacobian(src, dst);
         };
 
         // Default Krylov solver (preconditioner only)
@@ -586,9 +696,11 @@ namespace PETScWrappers
   }
 
 } // namespace PETScWrappers
-
 #  undef AssertPETSc
-
+#  if defined(undefPetscCall)
+#    undef PetscCall
+#    undef undefPetscCall
+#  endif
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
