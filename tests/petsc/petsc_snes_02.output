@@ -1,11 +1,2 @@
 
-DEAL::
---------------------------------------------------------
-An error occurred in file <petsc_snes.templates.h> in function
-    unsigned int dealii::PETScWrappers::NonlinearSolver<VectorType, PMatrixType, AMatrixType>::solve(VectorType&) [with VectorType = VectorType; PMatrixType = MatrixType; AMatrixType = MatrixType]
-The violated condition was: 
-    residual
-Additional information: 
-    Please provide an implementation for the function "residual"
---------------------------------------------------------
-
+DEAL::catching expected exception
