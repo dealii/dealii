@@ -259,6 +259,7 @@ MappingQ<dim, spacedim>::MappingQ(const MappingQ<dim, spacedim> &mapping)
   , polynomials_1d(mapping.polynomials_1d)
   , renumber_lexicographic_to_hierarchic(
       mapping.renumber_lexicographic_to_hierarchic)
+  , unit_cell_support_points(mapping.unit_cell_support_points)
   , support_point_weights_perimeter_to_interior(
       mapping.support_point_weights_perimeter_to_interior)
   , support_point_weights_cell(mapping.support_point_weights_cell)
