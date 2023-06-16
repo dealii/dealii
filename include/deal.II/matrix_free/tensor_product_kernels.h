@@ -3272,49 +3272,59 @@ namespace internal
     else if (dim == 1)
       {
         // gradient
-        result[0] = values[1] - values[0];
+        result[0] = Number3(values[1] - values[0]);
         // values
-        const Number2 x0 = 1. - p[0], x1 = p[0];
-        result[1] = x0 * values[0] + x1 * values[1];
+        result[1] = Number3(values[0]) + p[0] * result[0];
         if (n_values > 1)
-          result[2] = x0 * values_2[0] + x1 * values_2[1];
+          result[2] = Number3(values_2[0]) + p[0] * (values_2[1] - values_2[0]);
       }
     else if (dim == 2)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
-        const Number3 tmp0 = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1 = x0 * values[2] + x1 * values[3];
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+
         // gradient
-        result[0] = y0 * (values[1] - values[0]) + y1 * (values[3] - values[2]);
+        result[0] = val10 + p[1] * (val32 - val10);
         result[1] = tmp1 - tmp0;
+
         // values
-        result[2] = y0 * tmp0 + y1 * tmp1;
+        result[2] = tmp0 + p[1] * result[1];
+
         if (n_values > 1)
           {
-            const Number3 tmp0_2 = x0 * values_2[0] + x1 * values_2[1];
-            const Number3 tmp1_2 = x0 * values_2[2] + x1 * values_2[3];
-            result[3]            = y0 * tmp0_2 + y1 * tmp1_2;
+            const Number3 tmp0_2 =
+              Number3(values_2[0]) + p[0] * (values_2[1] - values_2[0]);
+            const Number3 tmp1_2 =
+              Number3(values_2[2]) + p[0] * (values_2[3] - values_2[0]);
+            result[3] = tmp0_2 + p[1] * (tmp1_2 - tmp0_2);
           }
       }
     else if (dim == 3)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                      z0 = 1. - p[2], z1 = p[2];
-        const Number3 tmp0  = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1  = x0 * values[2] + x1 * values[3];
-        const Number3 tmpy0 = y0 * tmp0 + y1 * tmp1;
-        const Number3 tmp2  = x0 * values[4] + x1 * values[5];
-        const Number3 tmp3  = x0 * values[6] + x1 * values[7];
-        const Number3 tmpy1 = y0 * tmp2 + y1 * tmp3;
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmp10 = tmp1 - tmp0;
+        const Number3 tmpy0 = tmp0 + p[1] * tmp10;
+
+        const Number3 val54 = Number3(values[5] - values[4]);
+        const Number3 val76 = Number3(values[7] - values[6]);
+        const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
+        const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
+        const Number3 tmp32 = tmp3 - tmp2;
+        const Number3 tmpy1 = tmp2 + p[1] * tmp32;
 
         // gradient
-        result[2] = tmpy1 - tmpy0;
-        result[1] = z0 * (tmp1 - tmp0) + z1 * (tmp3 - tmp2);
-        result[0] =
-          z0 * (y0 * (values[1] - values[0]) + y1 * (values[3] - values[2])) +
-          z1 * (y0 * (values[5] - values[4]) + y1 * (values[7] - values[6]));
+        result[2]           = tmpy1 - tmpy0;
+        result[1]           = tmp10 + p[2] * (tmp32 - tmp10);
+        const Number3 tmpz0 = val10 + p[1] * (val32 - val10);
+        result[0] = tmpz0 + p[2] * (val54 + p[1] * (val76 - val54) - tmpz0);
+
         // value
-        result[3] = z0 * tmpy0 + z1 * tmpy1;
+        result[3] = tmpy0 + p[2] * result[2];
         Assert(n_values == 1, ExcNotImplemented());
       }
 
@@ -3526,28 +3536,31 @@ namespace internal
       }
     else if (dim == 1)
       {
-        return (1. - p[0]) * values[0] + p[0] * values[1];
+        return Number3(values[0]) + p[0] * Number3(values[1] - values[0]);
       }
     else if (dim == 2)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0];
-        const Number3 tmp0   = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1   = x0 * values[2] + x1 * values[3];
-        const Number3 mapped = (1. - p[1]) * tmp0 + p[1] * tmp1;
-        return mapped;
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        return tmp0 + p[1] * (tmp1 - tmp0);
       }
     else if (dim == 3)
       {
-        const Number2 x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                      z0 = 1. - p[2], z1 = p[2];
-        const Number3 tmp0   = x0 * values[0] + x1 * values[1];
-        const Number3 tmp1   = x0 * values[2] + x1 * values[3];
-        const Number3 tmpy0  = y0 * tmp0 + y1 * tmp1;
-        const Number3 tmp2   = x0 * values[4] + x1 * values[5];
-        const Number3 tmp3   = x0 * values[6] + x1 * values[7];
-        const Number3 tmpy1  = y0 * tmp2 + y1 * tmp3;
-        const Number3 mapped = z0 * tmpy0 + z1 * tmpy1;
-        return mapped;
+        const Number3 val10 = Number3(values[1] - values[0]);
+        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
+        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmpy0 = tmp0 + p[1] * (tmp1 - tmp0);
+
+        const Number3 val54 = Number3(values[5] - values[4]);
+        const Number3 val76 = Number3(values[7] - values[6]);
+        const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
+        const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
+        const Number3 tmpy1 = tmp2 + p[1] * (tmp3 - tmp2);
+
+        return tmpy0 + p[2] * (tmpy1 - tmpy0);
       }
 
     // work around a compile error: missing return statement
@@ -4031,119 +4044,125 @@ namespace internal
       }
     else if (dim == 1)
       {
-        const auto x0 = 1. - p[0], x1 = p[0];
+        const Number2 difference = value[0] * p[0] + gradient[0];
         if (add)
           {
-            values[0] += value[0] * x0 - gradient[0];
-            values[1] += value[0] * x1 + gradient[0];
+            values[0] += value[0] - difference;
+            values[1] += difference;
           }
         else
           {
-            values[0] = value[0] * x0 - gradient[0];
-            values[1] = value[0] * x1 + gradient[0];
+            values[0] = value[0] - difference;
+            values[1] = difference;
           }
         if (n_values > 1)
           {
+            const Number2 product = value[1] * p[0];
             if (add)
               {
-                values[2] += value[1] * x0;
-                values[3] += value[1] * x1;
+                values[2] += value[1] - product;
+                values[3] += product;
               }
             else
               {
-                values[2] = value[1] * x0;
-                values[3] = value[1] * x1;
+                values[2] = value[1] - product;
+                values[3] = product;
               }
           }
       }
     else if (dim == 2)
       {
-        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
-
-        const auto test_value_y0 = value[0] * y0 - gradient[1];
-        const auto test_grad_xy0 = gradient[0] * y0;
-        const auto test_value_y1 = value[0] * y1 + gradient[1];
-        const auto test_grad_xy1 = gradient[0] * y1;
+        const Number2 test_value_y1 = value[0] * p[1] + gradient[1];
+        const Number2 test_value_y0 = value[0] - test_value_y1;
+        const Number2 test_grad_xy1 = gradient[0] * p[1];
+        const Number2 test_grad_xy0 = gradient[0] - test_grad_xy1;
+        const Number2 value0        = p[0] * test_value_y0 + test_grad_xy0;
+        const Number2 value1        = p[0] * test_value_y1 + test_grad_xy1;
 
         if (add)
           {
-            values[0] += x0 * test_value_y0 - test_grad_xy0;
-            values[1] += x1 * test_value_y0 + test_grad_xy0;
-            values[2] += x0 * test_value_y1 - test_grad_xy1;
-            values[3] += x1 * test_value_y1 + test_grad_xy1;
+            values[0] += test_value_y0 - value0;
+            values[1] += value0;
+            values[2] += test_value_y1 - value1;
+            values[3] += value1;
           }
         else
           {
-            values[0] = x0 * test_value_y0 - test_grad_xy0;
-            values[1] = x1 * test_value_y0 + test_grad_xy0;
-            values[2] = x0 * test_value_y1 - test_grad_xy1;
-            values[3] = x1 * test_value_y1 + test_grad_xy1;
+            values[0] = test_value_y0 - value0;
+            values[1] = value0;
+            values[2] = test_value_y1 - value1;
+            values[3] = value1;
           }
 
         if (n_values > 1)
           {
-            const auto test_value_y0_2 = value[1] * y0;
-            const auto test_value_y1_2 = value[1] * y1;
+            const Number2 test_value_y1_2 = value[1] * p[1];
+            const Number2 test_value_y0_2 = value[1] - test_value_y1_2;
+            const Number2 value0_2        = p[0] * test_value_y1_2;
+            const Number2 value1_2        = p[0] * test_value_y1_2;
 
             if (add)
               {
-                values[4] += x0 * test_value_y0_2;
-                values[5] += x1 * test_value_y0_2;
-                values[6] += x0 * test_value_y1_2;
-                values[7] += x1 * test_value_y1_2;
+                values[4] += test_value_y0_2 - value0_2;
+                values[5] += value0_2;
+                values[6] += test_value_y1_2 - value1_2;
+                values[7] += value1_2;
               }
             else
               {
-                values[4] = x0 * test_value_y0_2;
-                values[5] = x1 * test_value_y0_2;
-                values[6] = x0 * test_value_y1_2;
-                values[7] = x1 * test_value_y1_2;
+                values[4] = test_value_y0_2 - value0_2;
+                values[5] = value0_2;
+                values[6] = test_value_y1_2 - value1_2;
+                values[7] = value1_2;
               }
           }
       }
     else if (dim == 3)
       {
         Assert(n_values == 1, ExcNotImplemented());
-        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                   z0 = 1. - p[2], z1 = p[2];
 
-        const auto test_value_z0 = value[0] * z0 - gradient[2];
-        const auto test_grad_x0  = gradient[0] * z0;
-        const auto test_grad_y0  = gradient[1] * z0;
-        const auto test_value_z1 = value[0] * z1 + gradient[2];
-        const auto test_grad_x1  = gradient[0] * z1;
-        const auto test_grad_y1  = gradient[1] * z1;
+        const Number2 test_value_z1 = value[0] * p[2] + gradient[2];
+        const Number2 test_value_z0 = value[0] - test_value_z1;
+        const Number2 test_grad_x1  = gradient[0] * p[2];
+        const Number2 test_grad_x0  = gradient[0] - test_grad_x1;
+        const Number2 test_grad_y1  = gradient[1] * p[2];
+        const Number2 test_grad_y0  = gradient[1] - test_grad_y1;
 
-        const auto test_value_y00 = test_value_z0 * y0 - test_grad_y0;
-        const auto test_grad_xy00 = test_grad_x0 * y0;
-        const auto test_value_y01 = test_value_z0 * y1 + test_grad_y0;
-        const auto test_grad_xy01 = test_grad_x0 * y1;
-        const auto test_value_y10 = test_value_z1 * y0 - test_grad_y1;
-        const auto test_grad_xy10 = test_grad_x1 * y0;
-        const auto test_value_y11 = test_value_z1 * y1 + test_grad_y1;
-        const auto test_grad_xy11 = test_grad_x1 * y1;
+        const Number2 test_value_y01 = test_value_z0 * p[1] + test_grad_y0;
+        const Number2 test_value_y00 = test_value_z0 - test_value_y01;
+        const Number2 test_grad_xy01 = test_grad_x0 * p[1];
+        const Number2 test_grad_xy00 = test_grad_x0 - test_grad_xy01;
+        const Number2 test_value_y11 = test_value_z1 * p[1] + test_grad_y1;
+        const Number2 test_value_y10 = test_value_z1 - test_value_y11;
+        const Number2 test_grad_xy11 = test_grad_x1 * p[1];
+        const Number2 test_grad_xy10 = test_grad_x1 - test_grad_xy11;
+
+        const Number2 value00 = p[0] * test_value_y00 + test_grad_xy00;
+        const Number2 value01 = p[0] * test_value_y01 + test_grad_xy01;
+        const Number2 value10 = p[0] * test_value_y10 + test_grad_xy10;
+        const Number2 value11 = p[0] * test_value_y11 + test_grad_xy11;
 
         if (add)
           {
-            values[0] += x0 * test_value_y00 - test_grad_xy00;
-            values[1] += x1 * test_value_y00 + test_grad_xy00;
-            values[2] += x0 * test_value_y01 - test_grad_xy01;
-            values[3] += x1 * test_value_y01 + test_grad_xy01;
-            values[4] += x0 * test_value_y10 - test_grad_xy10;
-            values[5] += x1 * test_value_y10 + test_grad_xy10;
-            values[6] += x0 * test_value_y11 - test_grad_xy11;
-            values[7] += x1 * test_value_y11 + test_grad_xy11;
+            values[0] += test_value_y00 - value00;
+            values[1] += value00;
+            values[2] += test_value_y01 - value01;
+            values[3] += value01;
+            values[4] += test_value_y10 - value10;
+            values[5] += value10;
+            values[6] += test_value_y11 - value11;
+            values[7] += value11;
           }
         else
           {
-            values[0] = x0 * test_value_y00 - test_grad_xy00;
-            values[1] = x1 * test_value_y00 + test_grad_xy00;
-            values[2] = x0 * test_value_y01 - test_grad_xy01;
-            values[3] = x1 * test_value_y01 + test_grad_xy01;
-            values[4] = x0 * test_value_y10 - test_grad_xy10;
-            values[5] = x1 * test_value_y10 + test_grad_xy10;
-            values[6] = x0 * test_value_y11 - test_grad_xy11;
-            values[7] = x1 * test_value_y11 + test_grad_xy11;
+            values[0] = test_value_y00 - value00;
+            values[1] = value00;
+            values[2] = test_value_y01 - value01;
+            values[3] = value01;
+            values[4] = test_value_y10 - value10;
+            values[5] = value10;
+            values[6] = test_value_y11 - value11;
+            values[7] = value11;
           }
       }
   }
