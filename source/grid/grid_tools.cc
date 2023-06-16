@@ -3665,6 +3665,11 @@ namespace GridTools
         AssertThrowMPI(ierr);
       }
 
+    // At this point, wait for all of the isend operations to finish:
+    MPI_Waitall(first_requests.size(),
+                first_requests.data(),
+                MPI_STATUSES_IGNORE);
+
 
     // Send second message
     std::vector<std::vector<char>> cellids_send_buffers(
@@ -3773,6 +3778,12 @@ namespace GridTools
               }
           }
       }
+
+    // At this point, wait for all of the isend operations of the second round
+    // to finish:
+    MPI_Waitall(second_requests.size(),
+                second_requests.data(),
+                MPI_STATUSES_IGNORE);
 #endif
 
     return local_to_global_vertex_index;
