@@ -1,12 +1,2 @@
 
-DEAL::
---------------------------------------------------------
-An error occurred in file <petsc_ts.templates.h> in function
-    unsigned int dealii::PETScWrappers::TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(VectorType&) [with VectorType = VectorType; PMatrixType = MatrixType; AMatrixType = MatrixType]
-The violated condition was: 
-    explicit_function || implicit_function
-Additional information: 
-    Please provide an implementation for the function "explicit_function
-    || implicit_function"
---------------------------------------------------------
-
+DEAL::catching expected exception
