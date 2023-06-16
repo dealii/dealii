@@ -21,7 +21,10 @@
 // levels and solve for a Poisson problem with the performance-oriented
 // matrix-free framework.
 //
-// Status: experimental
+// Status: stable
+//
+// Note: this test is marked "stable" and used for performance
+// instrumentation in our testsuite, https://dealii.org/performance_tests
 //
 
 #include <deal.II/base/function.h>

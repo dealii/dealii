@@ -24,7 +24,10 @@
 // problem with periodic boundary conditions to avoid defining complicated
 // definitions of boundary data and inflow/outflow treatment.
 //
-// Status: experimental
+// Status: stable
+//
+// Note: this test is marked "stable" and used for performance
+// instrumentation in our testsuite, https://dealii.org/performance_tests
 //
 
 #include <deal.II/base/conditional_ostream.h>

@@ -20,7 +20,10 @@
 // instruction cycles for system setup, assembly, solve and postprocessing
 // for a Stokes problem.
 //
-// Status: experimental
+// Status: stable
+//
+// Note: this test is marked "stable" and used for performance
+// instrumentation in our testsuite, https://dealii.org/performance_tests
 //
 
 #include <deal.II/base/function.h>
