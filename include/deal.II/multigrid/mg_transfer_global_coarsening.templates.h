@@ -3837,9 +3837,6 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   Assert(dof_handler_coarse.get_fe().n_components() > 0 &&
            dof_handler_fine.get_fe().n_components() > 0,
          ExcNotImplemented());
-  Assert(dof_handler_fine.n_dofs() > dof_handler_coarse.n_dofs(),
-         ExcMessage(
-           "The coarser DoFHandler has more DoFs than the finer DoFHandler."));
 
   this->fine_element_is_continuous =
     dof_handler_fine.get_fe().n_dofs_per_vertex() > 0;
