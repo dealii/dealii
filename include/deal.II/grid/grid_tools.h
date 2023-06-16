@@ -1361,9 +1361,10 @@ namespace GridTools
       std::vector<unsigned int> recv_ptrs;
 
       /**
-       * Distribute quadrature points on found intersections and construct
-       * GridTools::internal::DistributedComputePointLocationsInternal from
-       * class members. This can be done without searching for points again
+       * Distribute quadrature points according to
+       * QGaussSimplex<structdim>(n_points_1D) on found intersections and
+       * construct GridTools::internal::DistributedComputePointLocationsInternal
+       * from class members. This can be done without searching for points again
        * since all information is locally known.
        *
        * The parameter @p consistent_numbering_of_sender_and_receiver can be used to ensure
@@ -1378,7 +1379,7 @@ namespace GridTools
       GridTools::internal::DistributedComputePointLocationsInternal<dim,
                                                                     spacedim>
       convert_to_distributed_compute_point_locations_internal(
-        const unsigned int                  n_quadrature_points,
+        const unsigned int                  n_points_1D,
         const Triangulation<dim, spacedim> &tria,
         const Mapping<dim, spacedim> &      mapping,
         const bool consistent_numbering_of_sender_and_receiver = false) const;

@@ -6331,7 +6331,7 @@ namespace GridTools
     DistributedComputePointLocationsInternal<dim, spacedim>
     DistributedComputeIntersectionLocationsInternal<structdim, spacedim>::
       convert_to_distributed_compute_point_locations_internal(
-        const unsigned int                  n_quadrature_points,
+        const unsigned int                  n_points_1D,
         const Triangulation<dim, spacedim> &tria,
         const Mapping<dim, spacedim> &      mapping,
         const bool consistent_numbering_of_sender_and_receiver) const
@@ -6346,7 +6346,7 @@ namespace GridTools
       // We need quadrature rules for the intersections. We are using a
       // QGaussSimplex quadrature rule since CGAL always returns simplices
       // as intersections.
-      const QGaussSimplex<structdim> quadrature(n_quadrature_points);
+      const QGaussSimplex<structdim> quadrature(n_points_1D);
 
       // Resulting quadrature points get different indices. In the case the
       // requested intersections are unique also the resulting quadrature
