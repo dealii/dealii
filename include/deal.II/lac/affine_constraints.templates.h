@@ -2610,11 +2610,19 @@ AffineConstraints<number>::distribute(VectorType &vec) const
       // following.
       IndexSet needed_elements = vec_owned_elements;
 
+      std::vector<types::global_dof_index> additional_elements;
       for (const ConstraintLine &line : lines)
         if (vec_owned_elements.is_element(line.index))
           for (const std::pair<size_type, number> &entry : line.entries)
             if (!vec_owned_elements.is_element(entry.first))
-              needed_elements.add_index(entry.first);
+              additional_elements.emplace_back(entry.first);
+      std::sort(additional_elements.begin(), additional_elements.end());
+      additional_elements.erase(std::unique(additional_elements.begin(),
+                                            additional_elements.end()),
+                                additional_elements.end());
+
+      needed_elements.add_indices(additional_elements.begin(),
+                                  additional_elements.end());
 
       VectorType ghosted_vector;
       internal::import_vector_with_ghost_elements(
