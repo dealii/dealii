@@ -23,7 +23,7 @@ On the other hand, sometimes one wants to solve problems in which it is useful
 to track individual objects ("particles") and how their positions evolve. If
 this simply leads to a set of ordinary differential equations, for example
 if you want to track the positions of the planets in the solar system over
-time, then deal.II is clearly not your right tool. On the other hand, if
+time, then deal.II is clearly not the right tool. On the other hand, if
 this evolution is due to the interaction with the solution of partial differential
 equation, or if having a mesh to determine which particles interact
 with others (such as in the
@@ -109,14 +109,12 @@ Second, in principle we would have to model the charge density via
 @f[
   \rho(\mathbf x) = \sum_i e\delta(\mathbf x-\mathbf x_i).
 @f]
-
-@note
 The issue now is that in reality, a cathode ray tube in an old television
 yields a current of somewhere around a few milli-Amperes. In the much higher
 energy beams of particle accelerators, the current may only be a few
 nano-Ampere. But an Ampere is $6\times 10^{18}$ electrons flowing per
 second. Now, as you will see in the results section, we really only simulate
-a few microseconds ($10^{-5}$ seconds), but that still results in very very
+a few microseconds ($10^{-6}$ seconds), but that still results in very very
 large numbers of electrons -- far more than we can hope to simulate
 with a program as small as the current one. As a consequence, let us
 presume that each particle represents $N$ electrons. Then the particle
@@ -125,7 +123,8 @@ solve are
 @f[
   (Nm) {\ddot {\mathbf x}}_i = (Ne)\mathbf E,
 @f]
-which is of course exactly the same as above. On the other hand, the charge
+which is of course exactly the same as above after dividing both sides by $N$.
+On the other hand, the charge
 density for these "clumps" of electrons is given by
 @f[
   \rho(\mathbf x) = \sum_i (Ne)\delta(\mathbf x-\mathbf x_i).
@@ -137,7 +136,7 @@ there are just not enough electrons to actually affect the overall
 electric field. But realism is not our goal here.)
 
 
-@note One may wonder why the equation for the electric field (or, rather,
+As a final thought about the model, one may wonder why the equation for the electric field (or, rather,
 the electric potential) has no time derivative whereas the equations for
 the electron positions do. In essence, this is a modeling assumption: We
 assume that the particles move so slowly that at any given time the
@@ -155,7 +154,7 @@ the movement of the electrons.
 
 <h3>Time discretization</h3>
 
-The equations outlined above form a set of coupled differential equations.
+The equations outlined above then form a set of coupled differential equations.
 Let us bring them all together in one place again to make that clear:
 @f{align*}{
   -\epsilon_0 \Delta V &= \sum_i e\delta(\mathbf x-\mathbf x_i)
@@ -184,8 +183,16 @@ step:
   \\
   \frac{{\mathbf x}_i^{(n)}-{\mathbf x}_i^{(n-1)}}{\Delta t} &= {\mathbf v}_i^{(n)}.
 @f}
+This scheme can be understood in the framework of operator splitting methods (specifically,
+the "Lie splitting" method) wherein a coupled system is solved by updating one
+variable at a time, using either the old values of other variables (e.g., using
+$\mathbf x_i^{(n-1)}$ in the first equation) or the values of variables that have
+already been updated in a previous sub-step (e.g., using $V^{(n)}$ in the second
+equation).
 There are of course many better ways to do a time discretization (for
-example the simple [leapfrog scheme](https://en.wikipedia.org/wiki/Leapfrog_integration))
+example the simple [leapfrog scheme](https://en.wikipedia.org/wiki/Leapfrog_integration)
+when updating the velocity, or more general Strang splitting methods for the coupled
+system)
 but this isn't the point of the tutorial program, and so we will be content
 with what we have here. (We will comment on a piece of this puzzle in the
 <a href="#extensions">possibilities for extensions</a> section of this program,
