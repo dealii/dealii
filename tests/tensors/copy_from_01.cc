@@ -40,7 +40,7 @@ main()
 
   myMatrix.copy_to(myTensor);
 
-  deallog << myTensor.dimension << std::endl;
+  deallog << matrix_dimension << std::endl;
   deallog.get_file_stream() << myTensor << std::endl;
 
   myTensor *= 2;

@@ -74,9 +74,9 @@ test()
                  cell->neighbor_of_neighbor(face_index),
                  numbers::invalid_unsigned_int);
     }
-  catch (ExceptionBase &exc)
+  catch (ExceptionBase & /*exc*/)
     {
-      deallog << exc.what() << std::endl;
+      deallog << "reinit() failed correctly." << std::endl;
     }
 
   deallog << "OK" << std::endl;
