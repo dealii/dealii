@@ -25,7 +25,7 @@ this simply leads to a set of ordinary differential equations, for example
 if you want to track the positions of the planets in the solar system over
 time, then deal.II is clearly not the right tool. On the other hand, if
 this evolution is due to the interaction with the solution of partial differential
-equation, or if having a mesh to determine which particles interact
+equations, or if having a mesh to determine which particles interact
 with others (such as in the
 [smoothed particle hydrodynamics (SPH)](https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics)
 method), then deal.II has support for you.
