@@ -61,11 +61,7 @@ main(int argc, char **argv)
         test(v, w);
       }
 
-#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
-      ierr = VecDestroy(vpetsc);
-#else
       ierr = VecDestroy(&vpetsc);
-#endif
 
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }

@@ -461,7 +461,6 @@ namespace
   void
   check_petsc_allocations()
   {
-#  if DEAL_II_PETSC_VERSION_GTE(3, 2, 0)
     PetscStageLog stageLog;
     PetscLogGetStageLog(&stageLog);
 
@@ -492,7 +491,6 @@ namespace
 
     if (errors)
       throw dealii::ExcMessage("PETSc memory leak");
-#  endif
   }
 } // namespace
 #endif

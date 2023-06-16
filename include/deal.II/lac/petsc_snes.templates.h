@@ -226,7 +226,9 @@ namespace PETScWrappers
     AssertPETSc(SNESReset(snes));
     // By default PETSc does not check for Jacobian errors in optimized
     // mode. Here we do it unconditionally.
+#  if DEAL_II_PETSC_VERSION_GTE(3, 11, 0)
     AssertPETSc(SNESSetCheckJacobianDomainError(snes, PETSC_TRUE));
+#  endif
   }
 
 
@@ -378,7 +380,7 @@ namespace PETScWrappers
       const int err    = call_and_possibly_capture_snes_exception(
         user->jacobian,
         user->pending_exception,
-        [snes]() -> void { AssertPETSc(SNESSetJacobianDomainError(snes)); },
+        [snes]() -> void { snes_set_jacobian_domain_error(snes); },
         xdealii,
         Adealii,
         Pdealii);
@@ -424,7 +426,7 @@ namespace PETScWrappers
       const int err    = call_and_possibly_capture_snes_exception(
         user->setup_jacobian,
         user->pending_exception,
-        [snes]() -> void { AssertPETSc(SNESSetJacobianDomainError(snes)); },
+        [snes]() -> void { snes_set_jacobian_domain_error(snes); },
         xdealii);
       if (err)
         return PetscError(

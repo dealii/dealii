@@ -1113,7 +1113,7 @@ namespace PETScWrappers
     // Failed reason is not reset uniformly within the
     // interface code of PCSetUp in PETSc.
     // We handle it here.
-    PetscCall(PCSetFailedReason(ppc, PC_NOERROR));
+    PetscCall(pc_set_failed_reason(ppc, PC_NOERROR));
     PetscFunctionReturn(0);
   }
 
@@ -1141,7 +1141,7 @@ namespace PETScWrappers
       }
     catch (const RecoverableUserCallbackError &)
       {
-        PetscCall(PCSetFailedReason(ppc, PC_SUBPC_ERROR));
+        PetscCall(pc_set_failed_reason(ppc, PC_SUBPC_ERROR));
       }
     catch (...)
       {
@@ -1182,7 +1182,7 @@ namespace PETScWrappers
       }
     catch (const RecoverableUserCallbackError &)
       {
-        PetscCall(PCSetFailedReason(ppc, PC_SUBPC_ERROR));
+        PetscCall(pc_set_failed_reason(ppc, PC_SUBPC_ERROR));
       }
     catch (...)
       {
