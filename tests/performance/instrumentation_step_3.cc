@@ -20,10 +20,7 @@
 // instruction cycles for system setup, assembly, solve and postprocessing
 // for a Stokes problem.
 //
-// Status: stable
-//
-// Note: this test is marked "stable" and used for performance
-// instrumentation in our testsuite, https://dealii.org/performance_tests
+// Status: experimental
 //
 
 #include <deal.II/base/function.h>
@@ -222,25 +219,15 @@ Step3::run()
 {
   std::map<std::string, std::uint64_t> cycle_count;
 
-  CallgrindWrapper::start_instrumentation();
-  make_grid();
-  cycle_count["make_grid"] = CallgrindWrapper::stop_instrumentation();
-
-  CallgrindWrapper::start_instrumentation();
-  setup_system();
-  cycle_count["setup_system"] = CallgrindWrapper::stop_instrumentation();
-
-  CallgrindWrapper::start_instrumentation();
-  assemble_system();
-  cycle_count["assemble_system"] = CallgrindWrapper::stop_instrumentation();
-
-  CallgrindWrapper::start_instrumentation();
-  solve();
-  cycle_count["solve"] = CallgrindWrapper::stop_instrumentation();
-
-  CallgrindWrapper::start_instrumentation();
-  output_results();
-  cycle_count["output_results"] = CallgrindWrapper::stop_instrumentation();
+  cycle_count["make_grid"] =
+    CallgrindWrapper::count_cycles([this]() { make_grid(); });
+  cycle_count["setup_system"] =
+    CallgrindWrapper::count_cycles([this]() { setup_system(); });
+  cycle_count["assemble_system"] =
+    CallgrindWrapper::count_cycles([this]() { assemble_system(); });
+  cycle_count["solve"] = CallgrindWrapper::count_cycles([this]() { solve(); });
+  cycle_count["output_results"] =
+    CallgrindWrapper::count_cycles([this]() { output_results(); });
 
   return {cycle_count["make_grid"],
           cycle_count["setup_system"],
