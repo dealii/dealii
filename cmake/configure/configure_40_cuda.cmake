@@ -62,6 +62,16 @@ macro(feature_cuda_find_external var)
       endif()
 
       #
+      # We do not support CUDA 12.0 and newer:
+      #
+      if(CUDA_VERSION VERSION_GREATER_EQUAL 12.0)
+        message(FATAL_ERROR "\n"
+          "deal.II's own CUDA backend does not support CUDA version 12.0 or newer.\n"
+          "Instead, configure Kokkos with CUDA enabled."
+        )
+      endif()
+
+      #
       # CUDA Toolkit 10 is incompatible with C++17.
       # Make sure that deal.II is configured appropriately
       #

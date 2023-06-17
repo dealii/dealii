@@ -15,18 +15,14 @@
     <p>
       To compile and run CUDA code, you need to use an external Kokkos
       installation that has been configured with CUDA support.
-      This, in turn, requires a CUDA-enabled GPU, appropriate
-      drivers, the CUDA toolkit, and the nvcc compiler. Unlike other libraries,
-      you need special hardware and compiler to enable CUDA. Because the
-      hardware is always evolving, older GPUs do not support all the
-      capabilities of newer ones. In order to use CUDA with deal.II, you will
-      need your GPU to have compute capability 6.0 or higher. Independently
-      from the GPU itself, you also need a version of CUDA recent enough.
-      deal.II supports CUDA 10.2 and higher.
+
+      To enable deal.II's own CUDA backend, you will need your GPU to have compute
+      capability 6.0 or higher. Independently from the GPU itself, you also need a
+      version of CUDA between 10.2 and 11.8.
     </p>
 
     <p>
-      To configure deal.II with CUDA use the following option:
+      To configure deal.II's own CUDA backend use the following option:
       <pre>
 
         -DDEAL_II_WITH_CUDA=ON
@@ -43,7 +39,6 @@
       supports this feature, you can tell deal.II to use it by configuring with
       <pre>
 
-        -DDEAL_II_WITH_CUDA=ON
         -DDEAL_II_WITH_MPI=ON
         -DDEAL_II_MPI_WITH_DEVICE_SUPPORT=ON
       </pre>
