@@ -28,6 +28,72 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+/**
+ * Standardized data struct to pipe additional data to SolverQMRS.
+ *
+ * The user is able to switch between right and left preconditioning, that
+ * means solving the systems <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>
+ * respectively, using the corresponding parameter. Note that left
+ * preconditioning means to employ the preconditioned (BiCG-)residual and
+ * otherwise the unpreconditioned one. The default is the application from the
+ * right side.
+ *
+ * The @p solver_tolerance threshold is used to define the said bound below which the residual
+ * is computed exactly. See the class documentation for more information. The
+ * default value is 1e-9, that is the default solving precision multiplied by
+ * ten.
+ *
+ * SQMR is susceptible to breakdowns (divisions by zero), so we need a
+ * parameter telling us which numbers are considered zero. The proper
+ * breakdown criterion is very unclear, so experiments may be necessary here.
+ * It is even possible to achieve convergence despite of dividing through by
+ * small numbers. There are even cases in which it is advantageous to accept
+ * such divisions because the cheap iteration cost makes the algorithm the
+ * fastest of all available indefinite iterative solvers. Nonetheless, the
+ * default breakdown threshold value is 1e-16.
+ */
+struct SolverQMRSAdditionalData
+{
+  /**
+   * Constructor.
+   *
+   * The default is right preconditioning, with the @p solver_tolerance chosen to be 1e-9 and
+   * the @p breakdown_threshold set at 1e-16.
+   */
+  explicit SolverQMRSAdditionalData(const bool   left_preconditioning = false,
+                                    const double solver_tolerance     = 1.e-9,
+                                    const bool   breakdown_testing    = true,
+                                    const double breakdown_threshold  = 1.e-16)
+    : left_preconditioning(left_preconditioning)
+    , solver_tolerance(solver_tolerance)
+    , breakdown_testing(breakdown_testing)
+    , breakdown_threshold(breakdown_threshold)
+  {}
+
+  /**
+   * Flag for using a left-preconditioned version.
+   */
+  bool left_preconditioning;
+
+  /**
+   * The threshold below which the current residual is computed exactly.
+   */
+  double solver_tolerance;
+
+  /**
+   * Flag for breakdown testing.
+   */
+  bool breakdown_testing;
+
+  /**
+   * Breakdown threshold. Scalars measured to this bound are used for
+   * divisions.
+   */
+  double breakdown_threshold;
+};
+
+
 /**
  * @addtogroup Solvers
  * @{
@@ -95,68 +161,9 @@ class SolverQMRS : public SolverBase<VectorType>
 {
 public:
   /**
-   * Standardized data struct to pipe additional data to the solver.
-   *
-   * The user is able to switch between right and left preconditioning, that
-   * means solving the systems <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>
-   * respectively, using the corresponding parameter. Note that left
-   * preconditioning means to employ the preconditioned (BiCG-)residual and
-   * otherwise the unpreconditioned one. The default is the application from the
-   * right side.
-   *
-   * The @p solver_tolerance threshold is used to define the said bound below which the residual
-   * is computed exactly. See the class documentation for more information. The
-   * default value is 1e-9, that is the default solving precision multiplied by
-   * ten.
-   *
-   * SQMR is susceptible to breakdowns (divisions by zero), so we need a
-   * parameter telling us which numbers are considered zero. The proper
-   * breakdown criterion is very unclear, so experiments may be necessary here.
-   * It is even possible to achieve convergence despite of dividing through by
-   * small numbers. There are even cases in which it is advantageous to accept
-   * such divisions because the cheap iteration cost makes the algorithm the
-   * fastest of all available indefinite iterative solvers. Nonetheless, the
-   * default breakdown threshold value is 1e-16.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Constructor.
-     *
-     * The default is right preconditioning, with the @p solver_tolerance chosen to be 1e-9 and
-     * the @p breakdown_threshold set at 1e-16.
-     */
-    explicit AdditionalData(const bool   left_preconditioning = false,
-                            const double solver_tolerance     = 1.e-9,
-                            const bool   breakdown_testing    = true,
-                            const double breakdown_threshold  = 1.e-16)
-      : left_preconditioning(left_preconditioning)
-      , solver_tolerance(solver_tolerance)
-      , breakdown_testing(breakdown_testing)
-      , breakdown_threshold(breakdown_threshold)
-    {}
-
-    /**
-     * Flag for using a left-preconditioned version.
-     */
-    bool left_preconditioning;
-
-    /**
-     * The threshold below which the current residual is computed exactly.
-     */
-    double solver_tolerance;
-
-    /**
-     * Flag for breakdown testing.
-     */
-    bool breakdown_testing;
-
-    /**
-     * Breakdown threshold. Scalars measured to this bound are used for
-     * divisions.
-     */
-    double breakdown_threshold;
-  };
+  using AdditionalData = SolverQMRSAdditionalData;
 
   /**
    * Constructor.

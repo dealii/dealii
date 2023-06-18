@@ -29,6 +29,35 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Standardized data struct to pipe additional data to SolverFIRE.
+ */
+struct SolverFIREAdditionalData
+{
+  /**
+   * Constructor. By default, set the initial time step for the (forward)
+   * Euler integration step to 0.1, the maximum time step to 1 and the
+   * maximum change allowed in any variable (per iteration) to 1.
+   */
+  explicit SolverFIREAdditionalData(const double initial_timestep    = 0.1,
+                                    const double maximum_timestep    = 1,
+                                    const double maximum_linfty_norm = 1);
+
+  /**
+   * Initial time step for the (forward) Euler integration step.
+   */
+  const double initial_timestep;
+
+  /**
+   * Maximum time step for the (forward) Euler integration step.
+   */
+  const double maximum_timestep;
+
+  /**
+   * Maximum change allowed in any variable of the objective function.
+   */
+  const double maximum_linfty_norm;
+};
 
 /**
  * @addtogroup Solvers
@@ -92,34 +121,9 @@ class SolverFIRE : public SolverBase<VectorType>
 {
 public:
   /**
-   * Standardized data struct to pipe additional data to the solver.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Constructor. By default, set the initial time step for the (forward)
-     * Euler integration step to 0.1, the maximum time step to 1 and the
-     * maximum change allowed in any variable (per iteration) to 1.
-     */
-    explicit AdditionalData(const double initial_timestep    = 0.1,
-                            const double maximum_timestep    = 1,
-                            const double maximum_linfty_norm = 1);
-
-    /**
-     * Initial time step for the (forward) Euler integration step.
-     */
-    const double initial_timestep;
-
-    /**
-     * Maximum time step for the (forward) Euler integration step.
-     */
-    const double maximum_timestep;
-
-    /**
-     * Maximum change allowed in any variable of the objective function.
-     */
-    const double maximum_linfty_norm;
-  };
+  using AdditionalData = SolverFIREAdditionalData;
 
   /**
    * Constructor.
@@ -187,8 +191,7 @@ protected:
 
 #ifndef DOXYGEN
 
-template <typename VectorType>
-SolverFIRE<VectorType>::AdditionalData::AdditionalData(
+SolverFIREAdditionalData::SolverFIREAdditionalData(
   const double initial_timestep,
   const double maximum_timestep,
   const double maximum_linfty_norm)

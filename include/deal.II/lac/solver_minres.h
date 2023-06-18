@@ -31,6 +31,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * Standardized data struct to pipe additional data to SolverMinRes. This
+ * solver does not need additional data yet.
+ */
+struct SolverMinResAdditionalData
+{};
+
+/**
  * @addtogroup Solvers
  * @{
  */
@@ -71,11 +78,9 @@ class SolverMinRes : public SolverBase<VectorType>
 {
 public:
   /**
-   * Standardized data struct to pipe additional data to the solver. This
-   * solver does not need additional data yet.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {};
+  using AdditionalData = SolverMinResAdditionalData;
 
   /**
    * Constructor.

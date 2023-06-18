@@ -167,7 +167,7 @@ class Vector;
  * Several solvers need additional data, like the damping parameter @p omega
  * of the @p SolverRichardson class or the maximum number of temporary vectors
  * of @p SolverGMRES.  To have a standardized way of constructing solvers,
- * each solver class has a <tt>struct AdditionalData</tt> as a member, and
+ * each solver class has a typedef <tt>AdditionalData</tt> as a member, and
  * constructors of all solver classes take such an argument. Some solvers need
  * no additional data, or may not at the current time. For these solvers the
  * struct @p AdditionalData is empty and calling the constructor may be done

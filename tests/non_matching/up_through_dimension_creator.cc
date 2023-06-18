@@ -58,8 +58,8 @@ template <int dim>
 void
 create_and_print_partitioning(const Function<dim> &level_set)
 {
-  const hp::QCollection<1>                    q_collection1D(QGauss<1>(2));
-  const NonMatching::AdditionalQGeneratorData additional_data;
+  const hp::QCollection<1> q_collection1D(QGauss<1>(2));
+  const NonMatching::QuadratureGeneratorAdditionalData additional_data;
 
   UpThroughDimensionCreator<dim, dim> up_through_dimension_creator(
     q_collection1D, additional_data);

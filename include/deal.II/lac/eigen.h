@@ -33,6 +33,53 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Standardized data struct to pipe additional data to EigenPower.
+ */
+struct EigenPowerAdditionalData
+{
+  /**
+   * Shift parameter. This parameter allows to shift the spectrum to compute
+   * a different eigenvalue.
+   */
+  double shift;
+  /**
+   * Constructor. Set the shift parameter.
+   */
+  EigenPowerAdditionalData(const double shift = 0.)
+    : shift(shift)
+  {}
+};
+
+/**
+ * Standardized data struct to pipe additional data to EigenInverse.
+ */
+struct EigenInverseAdditionalData
+{
+  /**
+   * Damping of the updated shift value.
+   */
+  double relaxation;
+
+  /**
+   * Start step of adaptive shift parameter.
+   */
+  unsigned int start_adaption;
+  /**
+   * Flag for the stopping criterion.
+   */
+  bool use_residual;
+  /**
+   * Constructor.
+   */
+  EigenInverseAdditionalData(double       relaxation     = 1.,
+                             unsigned int start_adaption = 6,
+                             bool         use_residual   = true)
+    : relaxation(relaxation)
+    , start_adaption(start_adaption)
+    , use_residual(use_residual)
+  {}
+};
 
 /**
  * @addtogroup Solvers
@@ -62,22 +109,9 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * Standardized data struct to pipe additional data to the solver.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Shift parameter. This parameter allows to shift the spectrum to compute
-     * a different eigenvalue.
-     */
-    double shift;
-    /**
-     * Constructor. Set the shift parameter.
-     */
-    AdditionalData(const double shift = 0.)
-      : shift(shift)
-    {}
-  };
+  using AdditionalData = EigenPowerAdditionalData;
 
   /**
    * Constructor.
@@ -135,34 +169,9 @@ public:
   using size_type = types::global_dof_index;
 
   /**
-   * Standardized data struct to pipe additional data to the solver.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Damping of the updated shift value.
-     */
-    double relaxation;
-
-    /**
-     * Start step of adaptive shift parameter.
-     */
-    unsigned int start_adaption;
-    /**
-     * Flag for the stopping criterion.
-     */
-    bool use_residual;
-    /**
-     * Constructor.
-     */
-    AdditionalData(double       relaxation     = 1.,
-                   unsigned int start_adaption = 6,
-                   bool         use_residual   = true)
-      : relaxation(relaxation)
-      , start_adaption(start_adaption)
-      , use_residual(use_residual)
-    {}
-  };
+  using AdditionalData = EigenInverseAdditionalData;
 
   /**
    * Constructor.

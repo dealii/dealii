@@ -30,6 +30,30 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * Standardized data struct to pipe additional data to SolverRichardson.
+ */
+struct SolverRichardsonAdditionalData
+{
+  /**
+   * Constructor. By default, set the damping parameter to one.
+   */
+  explicit SolverRichardsonAdditionalData(
+    const double omega                       = 1,
+    const bool   use_preconditioned_residual = false);
+
+  /**
+   * Relaxation parameter.
+   */
+  double omega;
+
+  /**
+   * Parameter for stopping criterion.
+   */
+  bool use_preconditioned_residual;
+};
+
+
+/**
  * @addtogroup Solvers
  * @{
  */
@@ -65,26 +89,9 @@ class SolverRichardson : public SolverBase<VectorType>
 {
 public:
   /**
-   * Standardized data struct to pipe additional data to the solver.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Constructor. By default, set the damping parameter to one.
-     */
-    explicit AdditionalData(const double omega                       = 1,
-                            const bool   use_preconditioned_residual = false);
-
-    /**
-     * Relaxation parameter.
-     */
-    double omega;
-
-    /**
-     * Parameter for stopping criterion.
-     */
-    bool use_preconditioned_residual;
-  };
+  using AdditionalData = SolverRichardsonAdditionalData;
 
   /**
    * Constructor.
@@ -163,8 +170,8 @@ protected:
 
 #ifndef DOXYGEN
 
-template <class VectorType>
-inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
+
+inline SolverRichardsonAdditionalData::SolverRichardsonAdditionalData(
   const double omega,
   const bool   use_preconditioned_residual)
   : omega(omega)

@@ -32,9 +32,49 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * Standardized data struct to pipe additional data to SolverBicgstab.
+ *
+ * There are two possibilities to compute the residual: one is an estimate
+ * using the computed value @p tau. The other is exact computation using
+ * another matrix vector multiplication. This increases the costs of the
+ * algorithm, so it is should be set to false whenever the problem allows
+ * it.
+ *
+ * Bicgstab is susceptible to breakdowns, so we need a parameter telling us,
+ * which numbers are considered zero.
+ */
+template <typename VectorType>
+struct SolverBicgstabAdditionalData
+{
+  /**
+   * Constructor.
+   *
+   * The default is to perform an exact residual computation and breakdown
+   * parameter is the minimum finite value representable by the value_type of
+   * VectorType.
+   */
+  explicit SolverBicgstabAdditionalData(
+    const bool   exact_residual = true,
+    const double breakdown =
+      std::numeric_limits<typename VectorType::value_type>::min())
+    : exact_residual(exact_residual)
+    , breakdown(breakdown)
+  {}
+  /**
+   * Flag for exact computation of residual.
+   */
+  bool exact_residual;
+  /**
+   * Breakdown threshold.
+   */
+  double breakdown;
+};
+
+/**
  * @addtogroup Solvers
  * @{
  */
+
 
 /**
  * Bicgstab algorithm by van der Vorst.
@@ -80,40 +120,9 @@ class SolverBicgstab : public SolverBase<VectorType>
 {
 public:
   /**
-   * There are two possibilities to compute the residual: one is an estimate
-   * using the computed value @p tau. The other is exact computation using
-   * another matrix vector multiplication. This increases the costs of the
-   * algorithm, so it is should be set to false whenever the problem allows
-   * it.
-   *
-   * Bicgstab is susceptible to breakdowns, so we need a parameter telling us,
-   * which numbers are considered zero.
+   * An alias for the solver-specific additional data.
    */
-  struct AdditionalData
-  {
-    /**
-     * Constructor.
-     *
-     * The default is to perform an exact residual computation and breakdown
-     * parameter is the minimum finite value representable by the value_type of
-     * VectorType.
-     */
-    explicit AdditionalData(
-      const bool   exact_residual = true,
-      const double breakdown =
-        std::numeric_limits<typename VectorType::value_type>::min())
-      : exact_residual(exact_residual)
-      , breakdown(breakdown)
-    {}
-    /**
-     * Flag for exact computation of residual.
-     */
-    bool exact_residual;
-    /**
-     * Breakdown threshold.
-     */
-    double breakdown;
-  };
+  using AdditionalData = SolverBicgstabAdditionalData<VectorType>;
 
   /**
    * Constructor.
