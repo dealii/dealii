@@ -1716,10 +1716,10 @@ protected:
  * `evaluation_template_face_factory.templates.h` with the
  * `FE_EVAL_FACTORY_DEGREE_MAX` overriden to the desired value. In the second
  * option, symbols will be available twice, and it depends on your linker and
- * dynamic library loader whether the user-specified setting takes
- * precendence. You can check if fast evaluation/integration for a given
- * degree/n_quadrature_points pair by calling
- * FEEvaluation::fast_evaluation_supported() or
+ * dynamic library loader whether the user-specified setting takes precedence;
+ * use `LD_PRELOAD` to select the desired library. You can check if fast
+ * evaluation/integration for a given degree/n_quadrature_points pair by
+ * calling FEEvaluation::fast_evaluation_supported() or
  * FEFaceEvaluation::fast_evaluation_supported().
  *
  * <h3>Handling multi-component systems</h3>
