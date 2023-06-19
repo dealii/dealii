@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ test()
 
   {
     LinearAlgebra::distributed::BlockVector<double> block_vector(partitioners);
-    deallog << "partitioner: OK" << std::endl;
+    deallog << "partitioners: OK" << std::endl;
   }
 }
 

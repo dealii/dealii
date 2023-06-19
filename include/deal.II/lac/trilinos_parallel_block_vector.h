@@ -215,6 +215,22 @@ namespace TrilinosWrappers
              const MPI_Comm               communicator    = MPI_COMM_WORLD,
              const bool                   vector_writable = false);
 
+      /**
+       * Initialize each block given to each parallel partitioning described in
+       * @p partitioners.
+       *
+       * You can decide whether your vector will contain ghost elements with
+       * @p make_ghosted.
+       *
+       * The parameter @p vector_writable only has effect on ghosted vectors
+       * and is ignored for non-ghosted vectors.
+       */
+      void
+      reinit(
+        const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+          &        partitioners,
+        const bool make_ghosted    = true,
+        const bool vector_writable = false);
 
       /**
        * Change the dimension to that of the vector <tt>V</tt>. The same

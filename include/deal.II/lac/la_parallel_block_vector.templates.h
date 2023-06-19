@@ -221,6 +221,19 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    void
+    BlockVector<Number>::reinit(
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &partitioners,
+      const bool /*make_ghosted*/,
+      const MPI_Comm &comm_sm)
+    {
+      reinit(partitioners, comm_sm);
+    }
+
+
+
+    template <typename Number>
     BlockVector<Number> &
     BlockVector<Number>::operator=(const value_type s)
     {

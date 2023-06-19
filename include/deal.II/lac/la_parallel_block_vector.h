@@ -364,6 +364,19 @@ namespace LinearAlgebra
         const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       /**
+       * This function exists purely for reasons of compatibility with the
+       * PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector classes.
+       *
+       * It calls the function above, and ignores the parameter @p make_ghosted.
+       */
+      void
+      reinit(
+        const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+          &             partitioners,
+        const bool      make_ghosted,
+        const MPI_Comm &comm_sm = MPI_COMM_SELF);
+
+      /**
        * This function copies the data that has accumulated in the data buffer
        * for ghost indices to the owning processor. For the meaning of the
        * argument @p operation, see the entry on
