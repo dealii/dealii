@@ -28,6 +28,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/orthogonalization.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
@@ -198,21 +199,6 @@ public:
    */
   struct AdditionalData
   {
-    enum class OrthogonalizationStrategy
-    {
-      /**
-       * Use modified Gram-Schmidt algorithm.
-       */
-      modified_gram_schmidt,
-      /**
-       * Use classical Gram-Schmidt algorithm. Since this approach works on
-       * multi-vectors and performs a global reduction only once, it is
-       * more efficient than the modified Gram-Schmidt algorithm.
-       * However, it might be numerically unstable.
-       */
-      classical_gram_schmidt
-    };
-
     /**
      * Constructor. By default, set the number of temporary vectors to 30,
      * i.e. do a restart every 28 iterations. Also set preconditioning from
@@ -221,13 +207,14 @@ public:
      * reduced functionality to track information is disabled by default.
      */
     explicit AdditionalData(
-      const unsigned int              max_n_tmp_vectors          = 30,
-      const bool                      right_preconditioning      = false,
-      const bool                      use_default_residual       = true,
-      const bool                      force_re_orthogonalization = false,
-      const bool                      batched_mode               = false,
-      const OrthogonalizationStrategy orthogonalization_strategy =
-        OrthogonalizationStrategy::modified_gram_schmidt);
+      const unsigned int max_n_tmp_vectors          = 30,
+      const bool         right_preconditioning      = false,
+      const bool         use_default_residual       = true,
+      const bool         force_re_orthogonalization = false,
+      const bool         batched_mode               = false,
+      const LinearAlgebra::OrthogonalizationStrategy
+        orthogonalization_strategy =
+          LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt);
 
     /**
      * Maximum number of temporary vectors. This parameter controls the size
@@ -270,7 +257,7 @@ public:
     /**
      * Strategy to orthogonalize vectors.
      */
-    OrthogonalizationStrategy orthogonalization_strategy;
+    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
   };
 
   /**
@@ -520,14 +507,24 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
-    explicit AdditionalData(const unsigned int max_basis_size = 30)
+    explicit AdditionalData(
+      const unsigned int max_basis_size = 30,
+      const LinearAlgebra::OrthogonalizationStrategy
+        orthogonalization_strategy =
+          LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt)
       : max_basis_size(max_basis_size)
+      , orthogonalization_strategy(orthogonalization_strategy)
     {}
 
     /**
      * Maximum basis size.
      */
     unsigned int max_basis_size;
+
+    /**
+     * Strategy to orthogonalize vectors.
+     */
+    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
   };
 
   /**
@@ -659,12 +656,12 @@ namespace internal
 
 template <class VectorType>
 inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
-  const unsigned int              max_n_tmp_vectors,
-  const bool                      right_preconditioning,
-  const bool                      use_default_residual,
-  const bool                      force_re_orthogonalization,
-  const bool                      batched_mode,
-  const OrthogonalizationStrategy orthogonalization_strategy)
+  const unsigned int                             max_n_tmp_vectors,
+  const bool                                     right_preconditioning,
+  const bool                                     use_default_residual,
+  const bool                                     force_re_orthogonalization,
+  const bool                                     batched_mode,
+  const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy)
   : max_n_tmp_vectors(max_n_tmp_vectors)
   , right_preconditioning(right_preconditioning)
   , use_default_residual(use_default_residual)
@@ -1135,8 +1132,7 @@ namespace internal
     template <class VectorType>
     inline double
     iterated_gram_schmidt(
-      const typename SolverGMRES<VectorType>::AdditionalData::
-        OrthogonalizationStrategy orthogonalization_strategy,
+      const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
         &                                       orthogonal_vectors,
       const unsigned int                        dim,
@@ -1167,8 +1163,7 @@ namespace internal
           double norm_vv = 0.0;
 
           if (orthogonalization_strategy ==
-              SolverGMRES<VectorType>::AdditionalData::
-                OrthogonalizationStrategy::modified_gram_schmidt)
+              LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt)
             {
               double htmp = vv * orthogonal_vectors[0];
               h(0) += htmp;
@@ -1184,8 +1179,8 @@ namespace internal
                 vv.add_and_dot(-htmp, orthogonal_vectors[dim - 1], vv));
             }
           else if (orthogonalization_strategy ==
-                   SolverGMRES<VectorType>::AdditionalData::
-                     OrthogonalizationStrategy::classical_gram_schmidt)
+                   LinearAlgebra::OrthogonalizationStrategy::
+                     classical_gram_schmidt)
             {
               Tvmult_add(dim, vv, orthogonal_vectors, h);
               norm_vv = substract_and_norm(dim, orthogonal_vectors, h, vv);
@@ -1780,8 +1775,7 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
           bool         re_orthogonalize = false;
           const double s =
             internal::SolverGMRESImplementation::iterated_gram_schmidt<
-              VectorType>(SolverGMRES<VectorType>::AdditionalData::
-                            OrthogonalizationStrategy::modified_gram_schmidt,
+              VectorType>(additional_data.orthogonalization_strategy,
                           v,
                           j + 1,
                           0,
