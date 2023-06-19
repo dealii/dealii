@@ -23,7 +23,10 @@
 // nodes. It also uses a setup with multiple DoFHandler objects, imitating the
 // projection from a related (higher-order) DG function space.
 //
-// Status: experimental
+// Status: stable
+//
+// Note: this test is marked "stable" and used for performance
+// instrumentation in our testsuite, https://dealii.org/performance_tests
 //
 
 #include <deal.II/base/quadrature_lib.h>
