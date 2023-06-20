@@ -119,7 +119,26 @@ do {
         # meaning somehow, but I don't know how...)
         s/\$//g;
 
-        print " * $_";
+        # Then print the line. doxygen has the annoying habit of eating
+        # the maximal number of spaces at the front of each code block,
+        # leading to visually wrong indentation if one, for example, has
+        # ```
+        #   if (cond)
+        #   {
+        # ```
+        # in one block, and then
+        # ```
+        #     some_function();
+        # ```
+        # in the next block -- the call to some_function() is not shown any
+        # further to the right than the if(cond) before. Work around this by
+        # prefixing all code lines with a non-printing Unicode space 0x00A0
+        # that doxygen interprets as the first non-space character for
+        # determining indentation, but that does not actually print as anything
+        # other than a space (and that compilers appear to successfully ignore
+        # when one copy-pastes code snippets from the generated doxygen pages
+        # into an editor).
+        print " *   $_";   # Note the (invisible) Unicode space after the '* '
     }
     elsif ($state == $skip_mode)
     {
