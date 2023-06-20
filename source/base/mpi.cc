@@ -794,7 +794,7 @@ namespace Utilities
         argv_new[argc]     = const_cast<char *>(threads_flag_string.c_str());
         argv_new[argc + 1] = nullptr;
         // The first argument in Kokkos::initialize is of type int&. Hence, we
-        // need to define a new variable to pass to it (insted of using argc+1
+        // need to define a new variable to pass to it (instead of using argc+1
         // inline).
         int argc_new = argc + 1;
         Kokkos::initialize(argc_new, argv_new.data());

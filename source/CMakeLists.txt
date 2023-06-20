@@ -37,7 +37,7 @@ endif()
 
 #
 # Automatically add the current source and binary directory as include
-# directory. The binary directory is needed in order to find the expaned
+# directory. The binary directory is needed in order to find the expanded
 # .inst include files.
 #
 set(CMAKE_INCLUDE_CURRENT_DIR true)
@@ -77,7 +77,7 @@ add_subdirectory(arborx)
 
 #
 # Define a "dealii", i.e., "${DEAL_II_TARGET_NAME}", target that contains
-# DEAL_II_CXX_FLAGS[_DEBUG|_RELEASE] and otherwsie aliases dealii_debug or
+# DEAL_II_CXX_FLAGS[_DEBUG|_RELEASE] and otherwise aliases dealii_debug or
 # dealii_release depending on the downstream CMAKE_BUILD_TYPE.
 #
 

@@ -50,11 +50,11 @@ namespace TimeStepping
     AssertThrow(
       F.size() == 0,
       ExcMessage(
-        "RungeKutta methods cannot handle more that one function to integate."));
+        "RungeKutta methods cannot handle more that one function to integrate."));
     AssertThrow(
       J_inverse.size() == 0,
       ExcMessage(
-        "RungeKutta methods cannot handle more that one function to integate."));
+        "RungeKutta methods cannot handle more that one function to integrate."));
 
     return evolve_one_time_step(F[0], J_inverse[0], t, delta_t, y);
   }

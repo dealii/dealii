@@ -2155,7 +2155,7 @@ public:
 
   /**
    * Return the jump in the third derivatives of the
-   * the finite element function characterized by <tt>fe_function</tt> at
+   * finite element function characterized by <tt>fe_function</tt> at
    * the quadrature points of the cell interface selected the last time
    * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
    *
@@ -2191,7 +2191,7 @@ public:
 
   /**
    * Return the average of the gradients of the
-   * the finite element function characterized by <tt>fe_function</tt> at the
+   * finite element function characterized by <tt>fe_function</tt> at the
    * quadrature points of the cell interface selected the last time
    * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
    * @dealiiRequiresUpdateFlags{update_gradients}
@@ -2205,7 +2205,7 @@ public:
 
   /**
    * Return the average of the Hessians of the
-   * the finite element function characterized by <tt>fe_function</tt> at the
+   * finite element function characterized by <tt>fe_function</tt> at the
    * quadrature points of the cell interface selected the last time
    * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
    * @dealiiRequiresUpdateFlags{update_hessians}

@@ -75,7 +75,7 @@ namespace PETScWrappers
      * associated to the @p indices_want only.
      *
      * This emulates the corresponding constructor in
-     * Utilies::MPI::NoncontiguousPartitioner.
+     * Utilities::MPI::NoncontiguousPartitioner.
      */
     void
     reinit(const std::vector<types::global_dof_index> &indices_locally_owned,

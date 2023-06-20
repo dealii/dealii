@@ -364,7 +364,7 @@ public:
   };
 
   /**
-   * Consturctor.
+   * Constructor.
    */
   TensorProductMatrixSymmetricSumCollection(
     const AdditionalData &additional_data = AdditionalData());

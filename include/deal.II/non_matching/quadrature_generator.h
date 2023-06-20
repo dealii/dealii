@@ -473,7 +473,7 @@ namespace NonMatching
   /**
    * This class generates the same type of immersed quadrature rules as those
    * described in the QuadratureGenerator class. The difference is that this
-   * class handles the case when the the domain is a discrete level set
+   * class handles the case when the domain is a discrete level set
    * function, i.e., when the level set function is described as a
    * (DoFHandler, Vector) pair. The generate()-function of this class takes a
    * cell in real space and constructs the immersed quadrature rules in
@@ -529,7 +529,7 @@ namespace NonMatching
   /**
    * This class generates the same type of immersed quadrature rules as those
    * described in the FaceQuadratureGenerator class. The difference is that this
-   * class handles the case when the the domain is a discrete level set
+   * class handles the case when the domain is a discrete level set
    * function, i.e., when the level set function is described as a
    * (DoFHandler, Vector) pair. The generate()-function of this class takes a
    * cell in real space plus the respective face index and constructs the

@@ -73,7 +73,7 @@
 
 // Defined in these two headers are some operations that are pertinent to
 // finite strain elasticity. The first will help us compute some kinematic
-// quantities, and the second provides some stanard tensor definitions.
+// quantities, and the second provides some standard tensor definitions.
 #include <deal.II/physics/elasticity/kinematics.h>
 #include <deal.II/physics/elasticity/standard_tensors.h>
 

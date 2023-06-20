@@ -337,7 +337,7 @@ struct ExtractLevelVisitor
 
   /**
    * Implements the visitor interface for InternalNode objects. If the node
-   * belongs to the @p target_leve, then fill the bounding box vector.
+   * belongs to the @p target_level, then fill the bounding box vector.
    */
   inline void
   operator()(InternalNode const &node);
@@ -500,7 +500,7 @@ void
 ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
   const ExtractLevelVisitor::InternalNode &node)
 {
-  using ElmentsType =
+  using ElementsType =
     typename boost::geometry::index::detail::rtree::elements_type<
       InternalNode>::type;
 
@@ -512,7 +512,7 @@ ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
       boxes.resize(offset + elements.size());
 
       unsigned int i = offset;
-      for (typename ElmentsType::const_iterator it = elements.begin();
+      for (typename ElementsType::const_iterator it = elements.begin();
            it != elements.end();
            ++it)
         {
@@ -525,7 +525,7 @@ ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
   const size_t level_backup = level;
   ++level;
 
-  for (typename ElmentsType::const_iterator it = elements.begin();
+  for (typename ElementsType::const_iterator it = elements.begin();
        it != elements.end();
        ++it)
     {

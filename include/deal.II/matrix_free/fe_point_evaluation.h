@@ -1308,7 +1308,7 @@ private:
   bool fast_path;
 
   /**
-   * Connection to NonMatching::MappingInfo to check wheter mapping data
+   * Connection to NonMatching::MappingInfo to check whether mapping data
    * has been invalidated.
    */
   boost::signals2::connection connection_is_reinitialized;

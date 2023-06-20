@@ -121,7 +121,7 @@
 /*
  * This sets the largest number of vectorization bits detected for the given
  * compiler flags and hardware (e.g. 256 for AVX on x86-64 architectures) for
- * use in deal.II's instrinsics-based VectorizedArray class.
+ * use in deal.II's intrinsics-based VectorizedArray class.
  */
 #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS @DEAL_II_VECTORIZATION_WIDTH_IN_BITS@
 

@@ -1090,7 +1090,7 @@ namespace GridGenerator
                     const double alpha = bias_alpha(1 - (1.0 * iy) / n_cells_y);
                     // define points on upper/lower horizontal far field side,
                     // i.e. face DG or FI. Incline factor to move points G and I
-                    // to the right by distance incline_facor*lenght_b2
+                    // to the right by distance incline_factor*length_b2
                     const Point<2> p(ix * dx + center_mesh +
                                        incline_factor * length_b2 * ix /
                                          n_cells_x_1,

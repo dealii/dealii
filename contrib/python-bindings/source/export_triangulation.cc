@@ -229,8 +229,8 @@ namespace python
     "with respect to the origin. Additional points are sums of these dim    \n"
     "vectors. Colorizing is done according to hyper_rectangle().            \n"
     "Note: This function silently reorders the vertices on the cells to     \n"
-    "lexicographic ordering (see GridReordering::reoder_grid()). In other   \n"
-    "words, if reordering of the vertices does occur, the ordering of       \n"
+    "lexicographic ordering (see GridTools::consistently_order_cells()). In \n"
+    "other words, if reordering of the vertices does occur, the ordering of \n"
     "vertices in the array of corners will no longer refer to the same      \n"
     "triangulation.                                                         \n";
 

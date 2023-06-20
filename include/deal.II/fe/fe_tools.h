@@ -495,7 +495,7 @@ namespace FETools
    * with M>N unknowns is well-defined, but often yields funny and non-
    * intuitive results. Secondly, one would think that if the quadrature point
    * data is defined in the support points of the finite element, i.e. the
-   * quadrature points of <tt>ths_quadrature</tt> equal
+   * quadrature points of <tt>rhs_quadrature</tt> equal
    * <tt>fe.get_unit_support_points()</tt>, then the projection should be the
    * identity, i.e. each degree of freedom of the finite element equals the
    * value of the given data in the support point of the corresponding shape

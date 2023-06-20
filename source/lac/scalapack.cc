@@ -2020,10 +2020,10 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
   Assert(row_block_size == column_block_size,
          ExcDimensionMismatch(row_block_size, column_block_size));
 
-  const bool left_singluar_vectors  = (U != nullptr) ? true : false;
-  const bool right_singluar_vectors = (VT != nullptr) ? true : false;
+  const bool left_singular_vectors  = (U != nullptr) ? true : false;
+  const bool right_singular_vectors = (VT != nullptr) ? true : false;
 
-  if (left_singluar_vectors)
+  if (left_singular_vectors)
     {
       Assert(n_rows == U->n_rows, ExcDimensionMismatch(n_rows, U->n_rows));
       Assert(U->n_rows == U->n_columns,
@@ -2035,7 +2035,7 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
       Assert(grid->blacs_context == U->grid->blacs_context,
              ExcDimensionMismatch(grid->blacs_context, U->grid->blacs_context));
     }
-  if (right_singluar_vectors)
+  if (right_singular_vectors)
     {
       Assert(n_columns == VT->n_rows,
              ExcDimensionMismatch(n_columns, VT->n_rows));
@@ -2055,11 +2055,11 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
 
   if (grid->mpi_process_is_active)
     {
-      char        jobu   = left_singluar_vectors ? 'V' : 'N';
-      char        jobvt  = right_singluar_vectors ? 'V' : 'N';
+      char        jobu   = left_singular_vectors ? 'V' : 'N';
+      char        jobvt  = right_singular_vectors ? 'V' : 'N';
       NumberType *A_loc  = this->values.data();
-      NumberType *U_loc  = left_singluar_vectors ? U->values.data() : nullptr;
-      NumberType *VT_loc = right_singluar_vectors ? VT->values.data() : nullptr;
+      NumberType *U_loc  = left_singular_vectors ? U->values.data() : nullptr;
+      NumberType *VT_loc = right_singular_vectors ? VT->values.data() : nullptr;
       int         info   = 0;
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is

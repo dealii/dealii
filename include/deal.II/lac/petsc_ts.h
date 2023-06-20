@@ -80,7 +80,7 @@ namespace PETScWrappers
      * Adaptive time stepping is disabled by default.
      * Negative values indicate using PETSc's default.
      *
-     * @note All parameters values specified here can be overriden by
+     * @note All parameters values specified here can be overridden by
      * command line choices.
      *
      * @ingroup PETScWrappers

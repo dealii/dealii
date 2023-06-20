@@ -6771,7 +6771,7 @@ namespace GridTools
       std::stable_sort(recv_components.begin(),
                        recv_components.end(),
                        [&](const auto &a, const auto &b) {
-                         // intersecton index
+                         // intersection index
                          if (std::get<1>(a) != std::get<1>(b))
                            return std::get<1>(a) < std::get<1>(b);
 

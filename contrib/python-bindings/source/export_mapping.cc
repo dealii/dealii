@@ -37,7 +37,7 @@ namespace python
     " face with the given face number face_no. Ideally the point is     \n"
     " near the face face_no, but any point in the cell can technically  \n"
     " be projected. The returned point is of dimension dim with         \n"
-    " dim-1 coodinate value explicitly set to zero.                     \n";
+    " dim-1 coordinate value explicitly set to zero.                    \n";
 
 
   void

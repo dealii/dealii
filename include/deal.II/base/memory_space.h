@@ -38,7 +38,7 @@ namespace MemorySpace
   /**
    * Structure describing the default memory space. If Kokkos was configured
    * with a GPU backend, the default memory space is the one corresponding to
-   * that backend. Otherwise, the default memory space is the the same as the
+   * that backend. Otherwise, the default memory space is the same as the
    * Host memory space.
    */
   struct Default

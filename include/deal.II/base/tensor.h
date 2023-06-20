@@ -579,7 +579,6 @@ public:
    *
    * This constructor obviously requires that the @p ElementType type is
    * either equal to @p Number, or is convertible to @p Number.
-   * Number.
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */

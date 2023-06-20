@@ -221,7 +221,7 @@ namespace LinearAlgebra
      *
      * @note By default, the GPU @ref GlossDevice "device" id is chosen in a round-robin fashion
      * according to the local MPI rank id. To choose a different @ref GlossDevice "device", Kokkos
-     * has to be initialized explicitly providing the respective devide id
+     * has to be initialized explicitly providing the respective device id
      * explicitly.
      *
      * <h4>MPI-3 shared-memory support</h4>

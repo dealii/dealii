@@ -212,7 +212,7 @@ class MultipleParameterLoop;
  *     }
  *   @endcode
  * The advantage of using json-files is that this format is natively supported
- * by Python, simplifying the running of paramter studies tremendously.
+ * by Python, simplifying the running of parameter studies tremendously.
  *
  * <h3>Including other input files</h3>
  *

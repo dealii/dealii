@@ -126,7 +126,7 @@ file(GLOB _source_files
 foreach (_source ${_source_files})
   file(READ "${_source}" contents)
   string(REGEX MATCH "Copyright .C. +([0-9]+ - )?([0-9]+)" _copyright "${contents}")
-  if (NOT _copright STREQUAL "")
+  if (NOT "${_copyright}" STREQUAL "")
     string(REGEX MATCH "[0-9]+\$" _year "${_copyright}")
 
     if (NOT _year STREQUAL ""   AND   _year GREATER _last_year)

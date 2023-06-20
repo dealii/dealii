@@ -1,9 +1,9 @@
-Fixed: The function ParamerHandler::add_parameter() used to
+Fixed: The function ParameterHandler::add_parameter() used to
 call the internal action. Within that step, the action
 converts the default value to a string and back afterwards.
 This can lead to round-off errors so that the default
 values might change in the case of floating-point numbers.
-The action is not called any more during ParamerHandler::add_parameter(),
+The action is not called any more during ParameterHandler::add_parameter(),
 fixing the problem.
 <br>
 (Peter Munch, Magdalena Schreter, 2022/12/11)

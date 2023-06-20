@@ -190,14 +190,14 @@ namespace internal
     inline std::vector<Point<2>>
     generate_simplex_evaluation_points(const unsigned int n_subdivisions)
     {
-      std::vector<Point<2>> evalution_points;
+      std::vector<Point<2>> evaluation_points;
 
       generate_simplex_evaluation_points_recursively(
         {{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}},
         n_subdivisions,
-        evalution_points);
+        evaluation_points);
 
-      return evalution_points;
+      return evaluation_points;
     }
 
 

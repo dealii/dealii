@@ -334,7 +334,7 @@ namespace MatrixFreeTools
       matrix_free;
 
     /**
-     * Index of the valid FE. Currently, ony a single one is supported.
+     * Index of the valid FE. Currently, only a single one is supported.
      */
     unsigned int fe_index_valid;
   };

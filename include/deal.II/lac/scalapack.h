@@ -641,7 +641,7 @@ public:
    * vectors. The residual sum of squares for each column is given by the sum of
    * squares of elements $M$ to $N-1$ in that column.
    *
-   * If(!tranpose) then $\mathbf{B} \in \mathbb{R}^{M \times N_{\rm RHS}}$,
+   * If(!transpose) then $\mathbf{B} \in \mathbb{R}^{M \times N_{\rm RHS}}$,
    * otherwise $\mathbf{B} \in \mathbb{R}^{N \times N_{\rm RHS}}$.
    * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have an identical block
    * cyclic distribution for rows and columns.

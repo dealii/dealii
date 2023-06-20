@@ -922,7 +922,7 @@ namespace internal
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     double
-    substract_and_norm(
+    subtract_and_norm(
       const unsigned int dim,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
         &                   orthogonal_vectors,
@@ -944,7 +944,7 @@ namespace internal
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     double
-    substract_and_norm(
+    subtract_and_norm(
       const unsigned int dim,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
         &                   orthogonal_vectors,
@@ -1183,7 +1183,7 @@ namespace internal
                      classical_gram_schmidt)
             {
               Tvmult_add(dim, vv, orthogonal_vectors, h);
-              norm_vv = substract_and_norm(dim, orthogonal_vectors, h, vv);
+              norm_vv = subtract_and_norm(dim, orthogonal_vectors, h, vv);
             }
           else
             {

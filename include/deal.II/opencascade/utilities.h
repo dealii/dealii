@@ -114,7 +114,7 @@ namespace OpenCASCADE
    * Read IGES files and translate their content into openCascade topological
    * entities. The option scale_factor is used to compensate for different
    * units being used in the IGES files and in the target application. The
-   * standard unit for IGES files is millimiters. The return object is a
+   * standard unit for IGES files is millimeters. The return object is a
    * TopoDS_Shape which contains all objects from the file.
    */
   TopoDS_Shape
@@ -165,7 +165,7 @@ namespace OpenCASCADE
    * Read STEP files and translate their content into openCascade topological
    * entities. The option scale_factor is used to compensate for different
    * units being used in the STEP files and in the target application. The
-   * standard unit for STEP files is millimiters. The return object is a
+   * standard unit for STEP files is millimeters. The return object is a
    * TopoDS_Shape which contains all objects from the file.
    */
   TopoDS_Shape

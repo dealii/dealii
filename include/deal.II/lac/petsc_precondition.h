@@ -96,7 +96,7 @@ namespace PETScWrappers
     Tvmult(VectorBase &dst, const VectorBase &src) const;
 
     /**
-     * Explictly call setup. This is usually not needed since PETSc will
+     * Explicitly call setup. This is usually not needed since PETSc will
      * automatically call the setup function when needed.
      */
     void

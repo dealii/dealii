@@ -81,7 +81,7 @@ namespace CUDAWrappers
    * write to vectors in parallel without having to explicitly synchronize
    * access to these vectors and matrices. This class does not implement any
    * shape values, all it does is to cache the respective data. To implement
-   * finite element operations, use the class CUDAWrappers::FEEvalutation.
+   * finite element operations, use the class CUDAWrappers::FEEvaluation.
    *
    * This class traverse the cells in a different order than the usual
    * Triangulation class in deal.II.

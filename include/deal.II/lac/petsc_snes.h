@@ -66,7 +66,7 @@ namespace PETScWrappers
      * @param maximum_non_linear_iterations Maximum number of iterations allowed.
      * @param max_n_function_evaluations Maximum number of function evaluations allowed.
      *
-     * @note All parameters values specified here can be overriden by
+     * @note All parameters values specified here can be overridden by
      * command line choices.
      *
      * @ingroup PETScWrappers

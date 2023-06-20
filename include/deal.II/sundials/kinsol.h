@@ -644,7 +644,7 @@ namespace SUNDIALS
      * solution) makes no sense because the norm will either be dominated by the
      * velocity components or the pressure components. The scaling vector this
      * function returns is intended to provide each component of the solution
-     * with a scaling factor that is generally chosen as as the inverse of a
+     * with a scaling factor that is generally chosen as the inverse of a
      * "typical velocity" or "typical pressure" so that upon multiplication of a
      * vector component by the corresponding scaling vector component, one
      * obtains a number that is of order of magnitude of one (i.e., a reasonably

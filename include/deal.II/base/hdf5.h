@@ -399,7 +399,7 @@ namespace HDF5
 
   protected:
     /**
-     * Name of the HDF5Oject. In the case of File, @p name corresponds to the
+     * Name of the HDF5Object. In the case of File, @p name corresponds to the
      * file name. In the case of Group and DataSet @p name corresponds to the
      * name of the object in the HDF5 file.
      */

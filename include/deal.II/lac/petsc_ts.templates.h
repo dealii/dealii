@@ -795,7 +795,7 @@ namespace PETScWrappers
         // case is to use FD and thus assemble a dense operator by finite
         // differencing the residual callbacks. Here instead we decide to
         // use a full matrix-free approach by default. This choice can always
-        // be overriden from command line.
+        // be overridden from command line.
         if (!explicit_jacobian && !implicit_jacobian)
           {
             set_use_matrix_free(ts, false, true);
@@ -805,7 +805,7 @@ namespace PETScWrappers
     // In case solve_with_jacobian is provided, create a shell
     // preconditioner wrapping the user call. The default internal Krylov
     // solver only applies the preconditioner. This choice
-    // can be overriden by command line and users can use any other
+    // can be overridden by command line and users can use any other
     // Krylov method if their solve is not accurate enough.
     // Using solve_with_jacobian as a preconditioner allow users
     // to provide approximate solvers and possibly iterate on a matrix-free

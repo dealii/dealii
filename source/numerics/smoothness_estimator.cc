@@ -77,7 +77,7 @@ namespace SmoothnessEstimator
        * FESeries::process_coefficients() which requires a predicate to be
        * specified. The predicate should operate on TableIndices and return a
        * pair of <code>bool</code> and <code>unsigned int</code>. The latter is
-       * the value of the map from TableIndicies to unsigned int.  It is used to
+       * the value of the map from TableIndices to unsigned int.  It is used to
        * define subsets of coefficients from which we search for the one with
        * highest absolute value, i.e. $l^\infty$-norm. The <code>bool</code>
        * parameter defines which indices should be used in processing. In the
@@ -342,7 +342,7 @@ namespace SmoothnessEstimator
        * which requires a predicate to be specified. The predicate should
        * operate on TableIndices and return a pair of <code>bool</code> and
        * <code>unsigned int</code>. The latter is the value of the map from
-       * TableIndicies to unsigned int.  It is used to define subsets of
+       * TableIndices to unsigned int.  It is used to define subsets of
        * coefficients from which we search for the one with highest absolute
        * value, i.e. $l^\infty$-norm. The <code>bool</code> parameter defines
        * which indices should be used in processing. In the current case we are

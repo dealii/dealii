@@ -451,7 +451,7 @@ namespace Utilities
      *
      * This class models these two steps by taking two constructor
      * arguments that correspond to these two operations. It ensures
-     * that that upon destruction of the current object, both the
+     * that upon destruction of the current object, both the
      * wait and clean-up functions are called. Because the clean-up
      * function can only be called once, objects of the current
      * class can not be copied, but they can be moved.
@@ -1029,7 +1029,7 @@ namespace Utilities
      * @note This function performs a single reduction sweep.
      *
      * @pre Size of the input ArrayView has to be the same on all processes
-     *   and the input and output ArrayVew have to have the same size.
+     *   and the input and output ArrayView have to have the same size.
      */
     void
     min_max_avg(const ArrayView<const double> &my_values,

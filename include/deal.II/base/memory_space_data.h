@@ -76,7 +76,7 @@ namespace MemorySpace
      * @p values when using shared memory and the memory space is
      * MemorySpace::Host. Otherwise it is not set.
      */
-    // This a shared pointer pointer so that MemorySpaceData can be copied and
+    // This a shared pointer so that MemorySpaceData can be copied and
     // MemorySpaceData::values can be used in Kokkos::parallel_for. This
     // pointer owns the data when using shared memory with MPI. In this case,
     // the Kokkos::View @p values is non-owning. When shared memory with MPI is
