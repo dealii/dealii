@@ -1974,9 +1974,22 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
                                                         info);
 
   Assert(info >= 0, ExcInternalError());
-  // TODO:[GK] What if the QR method fails?
-  if (info != 0)
-    std::cerr << "LAPACK error in geev" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in geev: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else
+    {
+      AssertThrow(
+        info == 0,
+        ExcMessage(
+          "Lapack error in geev: the QR algorithm failed to compute "
+          "all the eigenvalues, and no eigenvectors have been computed."));
+    }
 
   state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
@@ -2178,8 +2191,28 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
 
   // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
-  if (info != 0)
-    std::cerr << "LAPACK error in syevx" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in syevx: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else if ((info > 0) && (info <= nn))
+    {
+      AssertThrow(info == 0,
+                  ExcMessage(
+                    "Lapack error in syevx: " + std::to_string(info) +
+                    " eigenvectors failed to converge."
+                    " (You may need to scale the abs_accuracy according"
+                    " to your matrix norm.)"));
+    }
+  else
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in syevx: unknown error."));
+    }
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.reinit(nn, n_eigenpairs, true);
@@ -2303,8 +2336,40 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
-  if (info != 0)
-    std::cerr << "LAPACK error in sygvx" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygvx: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else if ((info > 0) && (info <= nn))
+    {
+      AssertThrow(
+        info == 0,
+        ExcMessage(
+          "Lapack error in sygvx: ssyevx/dsyevx failed to converge, and " +
+          std::to_string(info) +
+          " eigenvectors failed to converge."
+          " (You may need to scale the abs_accuracy"
+          " according to the norms of matrices A and B.)"));
+    }
+  else if ((info > nn) && (info <= 2 * nn))
+    {
+      AssertThrow(info == 0,
+                  ExcMessage(
+                    "Lapack error in sygvx: the leading minor of order " +
+                    std::to_string(info - nn) +
+                    " of matrix B is not positive-definite."
+                    " The factorization of B could not be completed and"
+                    " no eigenvalues or eigenvectors were computed."));
+    }
+  else
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygvx: unknown error."));
+    }
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.resize(n_eigenpairs);
@@ -2401,8 +2466,41 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   // Negative return value implies a wrong argument. This should be internal.
 
   Assert(info >= 0, ExcInternalError());
-  if (info != 0)
-    std::cerr << "LAPACK error in sygv" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygv: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else if ((info > 0) && (info <= nn))
+    {
+      AssertThrow(
+        info == 0,
+        ExcMessage(
+          "Lapack error in sygv: ssyev/dsyev failed to converge, and " +
+          std::to_string(info) +
+          " off-diagonal elements of an intermediate "
+          " tridiagonal did not converge to zero."
+          " (You may need to scale the abs_accuracy"
+          " according to the norms of matrices A and B.)"));
+    }
+  else if ((info > nn) && (info <= 2 * nn))
+    {
+      AssertThrow(info == 0,
+                  ExcMessage(
+                    "Lapack error in sygv: the leading minor of order " +
+                    std::to_string(info - nn) +
+                    " of matrix B is not positive-definite."
+                    " The factorization of B could not be completed and"
+                    " no eigenvalues or eigenvectors were computed."));
+    }
+  else
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygv: unknown error."));
+    }
 
   for (size_type i = 0; i < eigenvectors.size(); ++i)
     {
