@@ -543,7 +543,7 @@ FESeries::process_coefficients(
   std::vector<double>       norm_values;
 
   // first, parse all table elements into a map of predicate values and
-  // coefficients. We could have stored (predicate values ->TableIndicies) map,
+  // coefficients. We could have stored (predicate values ->TableIndices) map,
   // but its processing would have been much harder later on.
   std::map<unsigned int, std::vector<CoefficientType>> pred_to_values;
   internal::FESeriesImplementation::fill_map(coefficients,

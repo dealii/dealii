@@ -276,7 +276,7 @@ def process(arguments):
     # Blocks (some) threads until all the threads finished their tasks.
     # Works similar to MPI_Barrier().
     # In other words, threads wait until all the tasks in task_queue
-    # have finshed.
+    # have finished.
     #
     task_queue.join()
 

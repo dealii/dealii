@@ -793,7 +793,7 @@ public:
    * values of A. V is a NxN orthonal matrix containing the right singular
    * vectors corresponding the singular values of A.
    *
-   * Note that the variable #svd_vt contains the tranpose of V and can be
+   * Note that the variable #svd_vt contains the transpose of V and can be
    * accessed by get_svd_vt(), while U is accessed with get_svd_u().
    */
   void

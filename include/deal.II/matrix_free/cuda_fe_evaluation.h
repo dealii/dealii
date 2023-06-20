@@ -121,7 +121,7 @@ namespace CUDAWrappers
      * the function DoFAccessor::get_interpolated_dof_values when no
      * constraints are present, but it also includes constraints from hanging
      * nodes, so once can see it as a similar function to
-     * AffineConstraints::read_dof_valuess as well.
+     * AffineConstraints::read_dof_values() as well.
      */
     DEAL_II_HOST_DEVICE void
     read_dof_values(const Number *src);

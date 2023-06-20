@@ -106,7 +106,7 @@ class ParameterHandler;
  * By calling the method add_parameters() passing a ParameterHandler object,
  * the following options will be defined in the given ParameterHandler object
  * (in the current level of the ParameterHandler object, i.e., whatever level
- * you have entered with the ParamterHandler::enter_subsection() method),
+ * you have entered with the ParameterHandler::enter_subsection() method),
  * and can be modified at run time through a parameter file:
  * @code
  * set Enable computation of the errors = true

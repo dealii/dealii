@@ -3768,10 +3768,10 @@ namespace internal
       std::vector<Point<dim>> points;
       points.resize(local_support_point_indices.size());
 
-      const auto locally_onwed_support_point =
+      const auto locally_owned_support_point =
         dof_handler_support_points->locally_owned_dofs();
       std::vector<unsigned int> indices_state(
-        locally_onwed_support_point.n_elements(),
+        locally_owned_support_point.n_elements(),
         numbers::invalid_unsigned_int);
 
       AssertIndexRange(local_support_point_indices.size(),
@@ -3798,10 +3798,10 @@ namespace internal
           cell->get_dof_indices(dof_indices);
 
           for (const unsigned int q : fe_values.quadrature_point_indices())
-            if (locally_onwed_support_point.is_element(dof_indices[q]))
+            if (locally_owned_support_point.is_element(dof_indices[q]))
               {
                 const auto index =
-                  locally_onwed_support_point.index_within_set(dof_indices[q]);
+                  locally_owned_support_point.index_within_set(dof_indices[q]);
 
                 if (indices_state[index] != numbers::invalid_unsigned_int)
                   {

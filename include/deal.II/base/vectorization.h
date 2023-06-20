@@ -4138,7 +4138,7 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
   const unsigned int n_chunks = n_entries / 4;
 
   // To avoid warnings about uninitialized variables, need to initialize one
-  // variable to a pre-exisiting value in out, which will never get used in
+  // variable to a pre-existing value in out, which will never get used in
   // the end. Keep the initialization outside the loop because of a bug in
   // gcc-9.1 which generates a "vmovapd" instruction instead of "vmovupd" in
   // case t3 is initialized to zero (inside/outside of loop), see

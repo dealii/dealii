@@ -909,7 +909,7 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 // This function has two parts in the integration loop: applying the negative
 // of matrix $A$ to $u_0$ by submitting the negative of the gradient, and adding
 // the right-hand side contribution by submitting the value $f$. We must be sure
-// to use `read_dof_values_plain()` for evaluating $u_0$ as `read_dof_vaues()`
+// to use `read_dof_values_plain()` for evaluating $u_0$ as `read_dof_values()`
 // would set all Dirichlet values to zero.
 //
 // Finally, the system_rhs vector is of type LA::MPI::Vector, but the

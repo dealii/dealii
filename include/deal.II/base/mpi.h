@@ -1029,7 +1029,7 @@ namespace Utilities
      * @note This function performs a single reduction sweep.
      *
      * @pre Size of the input ArrayView has to be the same on all processes
-     *   and the input and output ArrayVew have to have the same size.
+     *   and the input and output ArrayView have to have the same size.
      */
     void
     min_max_avg(const ArrayView<const double> &my_values,

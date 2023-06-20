@@ -293,7 +293,7 @@ matrix in 2d, and a $27\times 27$ matrix in 3d; for the coarse mesh we
 use on the $L$-shaped domain of the current program, these sizes are
 $21\times 21$ in 2d and $117\times 117$ in 3d. But if the coarse mesh
 consists of hundreds or thousands of cells, this approach will no
-longer work and might start to dominate the overall run-time of each V-cyle.
+longer work and might start to dominate the overall run-time of each V-cycle.
 A common approach is then to solve the coarse mesh problem using an
 algebraic multigrid preconditioner; this would then, however, require
 assembling the coarse matrix (even for the matrix-free version) as

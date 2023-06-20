@@ -296,6 +296,6 @@ it, we recommend reading step-18 for the former and step-40 for the
 latter case first for further background information on the topic, and
 then come back to this tutorial to try out your newly acquired skills.
 
-We go one step further in step-75: Here, we combine hp-adapative and
+We go one step further in step-75: Here, we combine hp-adaptive and
 MatrixFree methods in combination with
 parallel::distributed::Triangulation objects.

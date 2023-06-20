@@ -1568,23 +1568,23 @@ namespace MGTools
       const std::vector<types::global_dof_index> &n_cells_on_levels,
       const MPI_Comm                              comm)
     {
-      std::vector<types::global_dof_index> n_cells_on_leves_max(
+      std::vector<types::global_dof_index> n_cells_on_levels_max(
         n_cells_on_levels.size());
-      std::vector<types::global_dof_index> n_cells_on_leves_sum(
+      std::vector<types::global_dof_index> n_cells_on_levels_sum(
         n_cells_on_levels.size());
 
-      Utilities::MPI::max(n_cells_on_levels, comm, n_cells_on_leves_max);
-      Utilities::MPI::sum(n_cells_on_levels, comm, n_cells_on_leves_sum);
+      Utilities::MPI::max(n_cells_on_levels, comm, n_cells_on_levels_max);
+      Utilities::MPI::sum(n_cells_on_levels, comm, n_cells_on_levels_sum);
 
       const unsigned int n_proc = Utilities::MPI::n_mpi_processes(comm);
 
-      const double ideal_work = std::accumulate(n_cells_on_leves_sum.begin(),
-                                                n_cells_on_leves_sum.end(),
+      const double ideal_work = std::accumulate(n_cells_on_levels_sum.begin(),
+                                                n_cells_on_levels_sum.end(),
                                                 0) /
                                 static_cast<double>(n_proc);
       const double workload_imbalance =
-        std::accumulate(n_cells_on_leves_max.begin(),
-                        n_cells_on_leves_max.end(),
+        std::accumulate(n_cells_on_levels_max.begin(),
+                        n_cells_on_levels_max.end(),
                         0) /
         ideal_work;
 

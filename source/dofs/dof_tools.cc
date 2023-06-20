@@ -506,11 +506,11 @@ namespace DoFTools
 
     // next set up a table for the degrees of freedom on each of the cells
     // whether it is something interesting or not
-    std::vector<unsigned char> local_component_asssociation =
+    std::vector<unsigned char> local_component_association =
       internal::get_local_component_association(fe, component_mask);
     std::vector<bool> local_selected_dofs(fe.n_dofs_per_cell());
     for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-      local_selected_dofs[i] = component_mask[local_component_asssociation[i]];
+      local_selected_dofs[i] = component_mask[local_component_association[i]];
 
     // then loop over all cells and do work
     std::vector<types::global_dof_index> indices(fe.n_dofs_per_cell());
