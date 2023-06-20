@@ -187,8 +187,6 @@ test_3d()
 int
 main(int argc, char **argv)
 {
-  // Initialize Kokkos
-  Kokkos::initialize(argc, argv);
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv);
 
   initlog();
@@ -196,6 +194,4 @@ main(int argc, char **argv)
   // tests
   test_2d();
   test_3d();
-
-  Kokkos::finalize();
 }

@@ -283,9 +283,6 @@ test_points_3d()
 int
 main(int argc, char **argv)
 {
-  // Initialize Kokkos
-  Kokkos::initialize(argc, argv);
-
   initlog();
 
   // Initialize ArborX
@@ -296,6 +293,4 @@ main(int argc, char **argv)
   test_bounding_box_3d();
   test_points_2d();
   test_points_3d();
-
-  Kokkos::finalize();
 }

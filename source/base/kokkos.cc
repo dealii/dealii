@@ -30,7 +30,11 @@ namespace internal
   void
   ensure_kokkos_initialized()
   {
-    if (!Kokkos::is_initialized())
+    if (!Kokkos::is_initialized()
+#if KOKKOS_VERSION >= 30700
+        && !Kokkos::is_finalized()
+#endif
+    )
       {
         // only execute once
         static bool dummy = [] {
