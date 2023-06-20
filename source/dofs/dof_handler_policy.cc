@@ -3529,14 +3529,18 @@ namespace internal
               cell->active_fe_index(),
               DoFAccessorImplementation::Implementation::
                 DoFIndexProcessor<dim, spacedim>(),
-              [&complete](auto &stored_index, auto received_index) {
-                if (*received_index != numbers::invalid_dof_index)
+
+              // Intel ICC 19 and earlier for some reason believe that
+              // numbers::invalid_dof_index is not a valid object
+              // inside the lambda function. Fix this by creating a
+              // local variable initialized by the global one.
+              [&complete, invalid_dof_index = numbers::invalid_dof_index](
+                auto &stored_index, const auto received_index) {
+                if (*received_index != invalid_dof_index)
                   {
-#    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
-                    Assert((stored_index == (numbers::invalid_dof_index)) ||
+                    Assert((stored_index == (invalid_dof_index)) ||
                              (stored_index == *received_index),
                            ExcInternalError());
-#    endif
                     stored_index = *received_index;
                   }
                 else
