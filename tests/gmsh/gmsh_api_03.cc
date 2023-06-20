@@ -44,8 +44,10 @@ test(const Triangulation<dim, spacedim> &tria)
 
 
 int
-main()
+main(int argc, char **argv)
 {
+  // gmsh might be build with mpi support enabled.
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   initlog();
   {
     Triangulation<2> tria;

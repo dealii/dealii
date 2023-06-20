@@ -41,8 +41,10 @@ test(const std::uint8_t kind, const std::string out = "")
 }
 
 int
-main()
+main(int argc, char **argv)
 {
+  // gmsh might be build with mpi support enabled.
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   initlog();
 
   // Generate and print all reference cells
