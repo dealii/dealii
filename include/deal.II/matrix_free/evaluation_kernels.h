@@ -5856,6 +5856,20 @@ namespace internal
     }
   };
 
+  /**
+   * This struct is used to implement
+   * FEEvaluation::fast_evaluation_supported() and
+   * FEFaceEvaluation::fast_evaluation_supported().
+   */
+  struct FastEvaluationSupported
+  {
+    template <int fe_degree, int n_q_points_1d>
+    static bool
+    run()
+    {
+      return fe_degree != -1;
+    }
+  };
 } // end of namespace internal
 
 

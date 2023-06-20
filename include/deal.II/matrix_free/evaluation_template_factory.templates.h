@@ -29,18 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  struct FastEvaluationSupported
-  {
-    template <int fe_degree, int n_q_points_1d>
-    static bool
-    run()
-    {
-      return fe_degree != -1;
-    }
-  };
-
-
-
   template <int dim, typename Number>
   void
   FEEvaluationFactory<dim, Number>::evaluate(
@@ -81,6 +69,10 @@ namespace internal
 
 
 
+  // It is important that this file sits in the same compilation unit as the
+  // evaluate() and integrate() calls of this class, to ensure that all
+  // options choose the same code path when compiling FEFaceEvaluationFactory
+  // outside of deal.II.
   template <int dim, typename Number>
   bool
   FEEvaluationFactory<dim, Number>::fast_evaluation_supported(

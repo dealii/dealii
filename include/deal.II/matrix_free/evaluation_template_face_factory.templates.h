@@ -118,6 +118,21 @@ namespace internal
       fe_eval);
   }
 
+
+
+  // It is important that this file sits in the same compilation unit as the
+  // evaluate() and integrate() calls of this class, to ensure that all
+  // options choose the same code path when compiling FEFaceEvaluationFactory
+  // outside of deal.II.
+  template <int dim, typename Number>
+  bool
+  FEFaceEvaluationFactory<dim, Number>::fast_evaluation_supported(
+    const unsigned int given_degree,
+    const unsigned int n_q_points_1d)
+  {
+    return instantiation_helper_run<1, FastEvaluationSupported>(given_degree,
+                                                                n_q_points_1d);
+  }
 } // end of namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

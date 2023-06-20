@@ -71,6 +71,10 @@ namespace internal
               const EvaluationFlags::EvaluationFlags integration_flag,
               Number *                               values_dofs,
               FEEvaluationData<dim, Number, true> &  fe_eval);
+
+    static bool
+    fast_evaluation_supported(const unsigned int given_degree,
+                              const unsigned int n_q_points_1d);
   };
 
 
