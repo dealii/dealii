@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2021 by the deal.II authors
+ * Copyright (C) 2011 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
