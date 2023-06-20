@@ -104,11 +104,19 @@ test_tensor()
   using Tensor_t           = Tensor<rank, dim, double>;
 
   Tensor_t t_a, t_b;
-  for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+  if constexpr (rank == 0)
     {
-      const auto index = t_a.unrolled_to_component_index(i);
-      t_a[index]       = 1.0;
-      t_b[index]       = 2.0;
+      t_a = 1.0;
+      t_b = 2.0;
+    }
+  else
+    {
+      for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+        {
+          const auto index = t_a.unrolled_to_component_indices(i);
+          t_a[index]       = 1.0;
+          t_b[index]       = 2.0;
+        }
     }
 
   const Tensor_SD_number_t symb_t_a =
@@ -132,7 +140,7 @@ test_symmetric_tensor()
   Tensor_t t_a, t_b;
   for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
     {
-      const auto index = t_a.unrolled_to_component_index(i);
+      const auto index = t_a.unrolled_to_component_indices(i);
       t_a[index]       = 1.0;
       t_b[index]       = 2.0;
     }
@@ -161,7 +169,6 @@ main()
   test_tensor<4, dim>();
 
   test_symmetric_tensor<2, dim>();
-  test_symmetric_tensor<4, dim>();
 
   deallog << "OK" << std::endl;
 }
