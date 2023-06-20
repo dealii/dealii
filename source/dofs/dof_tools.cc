@@ -2293,7 +2293,7 @@ namespace DoFTools
   }
 
 
-  // This functino is deprecated:
+  // This function is deprecated:
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(
@@ -2314,7 +2314,7 @@ namespace DoFTools
   }
 
 
-  // This functino is deprecated:
+  // This function is deprecated:
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED_EARLY void
   map_dofs_to_support_points(

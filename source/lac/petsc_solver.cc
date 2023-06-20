@@ -102,7 +102,7 @@ namespace PETScWrappers
 
         /*
          * by default we set up the preconditioner only once.
-         * this can be overriden by command line.
+         * this can be overridden by command line.
          */
         AssertPETSc(KSPSetReusePreconditioner(ksp, PETSC_TRUE));
       }
@@ -755,7 +755,7 @@ namespace PETScWrappers
 
         /*
          * by default we set up the preconditioner only once.
-         * this can be overriden by command line.
+         * this can be overridden by command line.
          */
         AssertPETSc(KSPSetReusePreconditioner(ksp, PETSC_TRUE));
       }

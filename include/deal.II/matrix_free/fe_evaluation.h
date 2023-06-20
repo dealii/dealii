@@ -1714,7 +1714,7 @@ protected:
  * want to compile all degrees up to eight; recommended setting) or by
  * compiling `evaluation_template_factory.templates.h` and
  * `evaluation_template_face_factory.templates.h` with the
- * `FE_EVAL_FACTORY_DEGREE_MAX` overriden to the desired value. In the second
+ * `FE_EVAL_FACTORY_DEGREE_MAX` overridden to the desired value. In the second
  * option, symbols will be available twice, and it depends on your linker and
  * dynamic library loader whether the user-specified setting takes precedence;
  * use `LD_PRELOAD` to select the desired library. You can check if fast

@@ -3572,7 +3572,7 @@ namespace internal
         dof_handler.get_fe().n_dofs_per_cell() ==
           dof_handler_support_points.get_fe().n_dofs_per_cell(),
         ExcMessage(
-          "For now multple components are not considered and therefore DoFHandlers need the same degree."));
+          "For now multiple components are not considered and therefore DoFHandlers need the same degree."));
 
       const auto degree        = dof_handler.get_fe().degree;
       const auto dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();

@@ -354,7 +354,7 @@ namespace TrilinosWrappers
       {
       public:
         /**
-         * Constructor. The class is intialized by the solution vector and
+         * Constructor. The class is initialized by the solution vector and
          * functions to compute the residual, to setup the jacobian, and
          * to solve the Jacobian.
          */
@@ -956,7 +956,7 @@ namespace TrilinosWrappers
   void
   NOXSolver<VectorType>::clear()
   {
-    // clear interal counters
+    // clear internal counters
     n_residual_evaluations   = 0;
     n_jacobian_applications  = 0;
     n_nonlinear_iterations   = 0;
@@ -987,7 +987,7 @@ namespace TrilinosWrappers
 
         n_residual_evaluations++;
 
-        // evalute residual
+        // evaluate residual
         return internal::NOXWrappers::call_and_possibly_capture_exception(
           residual, pending_exception, x, f);
       },

@@ -288,8 +288,8 @@ namespace TrilinosWrappers
      * $[\nabla_u F(u)]^{-1}$ to
      * @p y, writes the result in @p x and returns the number of
      * linear iterations the linear solver needed.
-     * The parameter @p tolerance species the error reduction if a
-     * interative solver is used. The Jacobian to be used
+     * The parameter @p tolerance species the error reduction if an
+     * iterative solver is used. The Jacobian to be used
      * (i.e., more precisely: the linearization point $u$ above) is
      * the one computed when the `setup_jacobian` function was last called.
      *

@@ -164,7 +164,7 @@ namespace PETScWrappers
       PetscErrorCode ierr;
 
       // Create empty matrices if needed
-      // This is neeeded by the base class
+      // This is needed by the base class
       // not by MATNEST
       std::vector<size_type> row_sizes(m, size_type(-1));
       std::vector<size_type> col_sizes(n, size_type(-1));

@@ -80,7 +80,7 @@ namespace mg
      * is
      * false) the call to the coarse solver on @p level.
      *
-     * The coarse solve will be done with ``defect[leve]`` and returned in
+     * The coarse solve will be done with ``defect[level]`` and returned in
      * ``solution[level]``, which can be inspected by the user using this
      * signal.
      */
