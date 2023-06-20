@@ -85,7 +85,7 @@ public:
    * based on which writes are actually forwarded. Per default the condition
    * of an object is active.
    */
-  ConditionalOStream(std::ostream &stream, const bool active = true);
+  explicit ConditionalOStream(std::ostream &stream, const bool active = true);
 
   /**
    * Depending on the <tt>active</tt> flag set the condition of this stream to

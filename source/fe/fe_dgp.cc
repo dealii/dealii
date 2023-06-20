@@ -40,7 +40,7 @@ FE_DGP<dim, spacedim>::FE_DGP(const unsigned int degree)
       std::vector<ComponentMask>(
         FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
           .n_dofs_per_cell(),
-        std::vector<bool>(1, true)))
+        ComponentMask(std::vector<bool>(1, true))))
 {
   // Reinit the vectors of restriction and prolongation matrices to the right
   // sizes

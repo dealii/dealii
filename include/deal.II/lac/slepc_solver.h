@@ -404,9 +404,10 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverKrylovSchur(SolverControl &       cn,
-                      const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
-                      const AdditionalData &data = AdditionalData());
+    explicit SolverKrylovSchur(
+      SolverControl &       cn,
+      const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
+      const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -442,7 +443,7 @@ namespace SLEPcWrappers
        * Constructor. By default, set the option of delayed
        * reorthogonalization to false, i.e. don't do it.
        */
-      AdditionalData(const bool delayed_reorthogonalization = false);
+      explicit AdditionalData(const bool delayed_reorthogonalization = false);
 
       /**
        * Flag for delayed reorthogonalization.
@@ -455,9 +456,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverArnoldi(SolverControl &       cn,
-                  const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
-                  const AdditionalData &data             = AdditionalData());
+    explicit SolverArnoldi(SolverControl &cn,
+                           const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
+                           const AdditionalData &data      = AdditionalData());
 
   protected:
     /**
@@ -498,7 +499,7 @@ namespace SLEPcWrappers
        * Constructor. By default sets the type of reorthogonalization used
        * during the Lanczos iteration to full.
        */
-      AdditionalData(
+      explicit AdditionalData(
         const EPSLanczosReorthogType r = EPS_LANCZOS_REORTHOG_FULL);
     };
 
@@ -507,9 +508,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverLanczos(SolverControl &       cn,
-                  const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
-                  const AdditionalData &data             = AdditionalData());
+    explicit SolverLanczos(SolverControl &cn,
+                           const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
+                           const AdditionalData &data      = AdditionalData());
 
   protected:
     /**
@@ -547,9 +548,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverPower(SolverControl &       cn,
-                const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
-                const AdditionalData &data             = AdditionalData());
+    explicit SolverPower(SolverControl &cn,
+                         const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
+                         const AdditionalData &data      = AdditionalData());
 
   protected:
     /**
@@ -589,7 +590,7 @@ namespace SLEPcWrappers
       /**
        * Constructor. By default set double_expansion to false.
        */
-      AdditionalData(bool double_expansion = false);
+      explicit AdditionalData(bool double_expansion = false);
     };
 
     /**
@@ -597,9 +598,10 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverGeneralizedDavidson(SolverControl &cn,
-                              const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
-                              const AdditionalData &data = AdditionalData());
+    explicit SolverGeneralizedDavidson(
+      SolverControl &       cn,
+      const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
+      const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -637,9 +639,10 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverJacobiDavidson(SolverControl &cn,
-                         const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
-                         const AdditionalData &data      = AdditionalData());
+    explicit SolverJacobiDavidson(
+      SolverControl &       cn,
+      const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
+      const AdditionalData &data             = AdditionalData());
 
   protected:
     /**
@@ -677,9 +680,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverLAPACK(SolverControl &       cn,
-                 const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
-                 const AdditionalData &data             = AdditionalData());
+    explicit SolverLAPACK(SolverControl &cn,
+                          const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
+                          const AdditionalData &data      = AdditionalData());
 
   protected:
     /**

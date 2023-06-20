@@ -1217,7 +1217,7 @@ namespace MGTools
 
             std::vector<bool> tmp(n_blocks, false);
             tmp[i]          = true;
-            block_select[i] = tmp;
+            block_select[i] = BlockMask(tmp);
 
             tasks += Threads::new_task(
               fun_ptr, l, dof_handler, block_select[i], dofs_in_block[i]);

@@ -76,7 +76,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
                              FiniteElementData<dim>::Hcurl),
       std::vector<bool>(PolynomialsNedelec<dim>::n_polynomials(order), true),
       std::vector<ComponentMask>(PolynomialsNedelec<dim>::n_polynomials(order),
-                                 std::vector<bool>(dim, true)))
+                                 ComponentMask(std::vector<bool>(dim, true))))
 {
 #ifdef DEBUG_NEDELEC
   deallog << get_name() << std::endl;

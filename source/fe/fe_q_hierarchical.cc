@@ -70,7 +70,7 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical(const unsigned int degree)
                  std::vector<ComponentMask>(
                    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
                      .n_dofs_per_cell(),
-                   std::vector<bool>(1, true)))
+                   ComponentMask(std::vector<bool>(1, true))))
   , face_renumber(face_fe_q_hierarchical_to_hierarchic_numbering(degree))
 {
   TensorProductPolynomials<dim> *poly_space_derived_ptr =

@@ -48,7 +48,7 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
                              FiniteElementData<dim>::Hdiv),
       get_ria_vector(deg),
       std::vector<ComponentMask>(PolynomialsRT_Bubbles<dim>::n_polynomials(deg),
-                                 std::vector<bool>(dim, true)))
+                                 ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   Assert(

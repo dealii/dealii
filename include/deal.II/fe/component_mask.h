@@ -98,7 +98,7 @@ public:
    * length of the given vector is zero, then this interpreted as the case
    * where <i>every</i> component is selected.
    */
-  ComponentMask(const std::vector<bool> &component_mask);
+  explicit ComponentMask(const std::vector<bool> &component_mask);
 
   /**
    * Initialize the component mask with a number of elements that are either
@@ -375,7 +375,7 @@ ComponentMask::operator|(const ComponentMask &mask) const
       for (unsigned int i = 0; i < component_mask.size(); ++i)
         new_mask[i] = (component_mask[i] || mask.component_mask[i]);
 
-      return new_mask;
+      return ComponentMask(new_mask);
     }
 }
 
@@ -398,7 +398,7 @@ ComponentMask::operator&(const ComponentMask &mask) const
       for (unsigned int i = 0; i < component_mask.size(); ++i)
         new_mask[i] = (component_mask[i] && mask.component_mask[i]);
 
-      return new_mask;
+      return ComponentMask(new_mask);
     }
 }
 

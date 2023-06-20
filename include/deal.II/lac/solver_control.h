@@ -439,7 +439,7 @@ public:
    * Initialize with a SolverControl object. The result will emulate
    * SolverControl by setting @p reduce to zero.
    */
-  ReductionControl(const SolverControl &c);
+  explicit ReductionControl(const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
@@ -525,7 +525,7 @@ public:
    * Initialize with a SolverControl object. The result will emulate
    * SolverControl by setting the reduction target to zero.
    */
-  IterationNumberControl(const SolverControl &c);
+  explicit IterationNumberControl(const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
@@ -581,7 +581,7 @@ public:
    * Initialize with a SolverControl object. The result will emulate
    * SolverControl by setting @p n_consecutive_iterations to one.
    */
-  ConsecutiveControl(const SolverControl &c);
+  explicit ConsecutiveControl(const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ConsecutiveControl. The result of the

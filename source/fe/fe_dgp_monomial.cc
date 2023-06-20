@@ -142,7 +142,7 @@ FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree)
                  std::vector<ComponentMask>(
                    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
                      .n_dofs_per_cell(),
-                   std::vector<bool>(1, true)))
+                   ComponentMask(std::vector<bool>(1, true))))
 {
   Assert(this->poly_space->n() == this->n_dofs_per_cell(), ExcInternalError());
   Assert(this->poly_space->degree() == this->degree, ExcInternalError());

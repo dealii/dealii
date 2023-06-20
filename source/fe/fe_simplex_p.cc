@@ -284,7 +284,7 @@ FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
       fe_data,
       std::vector<bool>(fe_data.dofs_per_cell),
       std::vector<ComponentMask>(fe_data.dofs_per_cell,
-                                 std::vector<bool>(1, true)))
+                                 ComponentMask(std::vector<bool>(1, true))))
 {
   this->unit_support_points      = unit_support_points;
   this->unit_face_support_points = unit_face_support_points;

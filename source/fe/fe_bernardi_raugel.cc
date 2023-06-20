@@ -51,7 +51,7 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
       std::vector<bool>(PolynomialsBernardiRaugel<dim>::n_polynomials(p), true),
       std::vector<ComponentMask>(PolynomialsBernardiRaugel<dim>::n_polynomials(
                                    p),
-                                 std::vector<bool>(dim, true)))
+                                 ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim == 2 || dim == 3, ExcImpossibleInDim(dim));
   Assert(p == 1, ExcMessage("Only BR1 elements are available"));
