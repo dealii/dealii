@@ -415,28 +415,32 @@ namespace TrilinosWrappers
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
+      template <bool OtherConstness>
       bool
-      operator==(const Iterator<Constness> &) const;
+      operator==(const Iterator<OtherConstness> &) const;
 
       /**
        * Inverse of <tt>==</tt>.
        */
+      template <bool OtherConstness>
       bool
-      operator!=(const Iterator<Constness> &) const;
+      operator!=(const Iterator<OtherConstness> &) const;
 
       /**
        * Comparison operator. Result is true if either the first row number is
        * smaller or if the row numbers are equal and the first index is
        * smaller.
        */
+      template <bool OtherConstness>
       bool
-      operator<(const Iterator<Constness> &) const;
+      operator<(const Iterator<OtherConstness> &) const;
 
       /**
        * Comparison operator. The opposite of the previous operator
        */
+      template <bool OtherConstness>
       bool
-      operator>(const Iterator<Constness> &) const;
+      operator>(const Iterator<OtherConstness> &) const;
 
       /**
        * Exception
@@ -2706,8 +2710,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator==(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator==(const Iterator<OtherConstness> &other) const
     {
       return (accessor.a_row == other.accessor.a_row &&
               accessor.a_index == other.accessor.a_index);
@@ -2716,8 +2721,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator!=(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator!=(const Iterator<OtherConstness> &other) const
     {
       return !(*this == other);
     }
@@ -2725,8 +2731,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator<(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator<(const Iterator<OtherConstness> &other) const
     {
       return (accessor.row() < other.accessor.row() ||
               (accessor.row() == other.accessor.row() &&
@@ -2735,8 +2742,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator>(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator>(const Iterator<OtherConstness> &other) const
     {
       return (other < *this);
     }
