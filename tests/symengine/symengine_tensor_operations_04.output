@@ -47,12 +47,4 @@ DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
 DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0
 DEAL::OK
 DEAL::
-DEAL::SymmetricTensor: Rank 4, dim 2
-DEAL:Substitution: Individual::Symbolic a+b: a_0000 + b_0000 a_0001 + b_0001 a_0001 + b_0001 a_0011 + b_0011 a_0100 + b_0100 a_0101 + b_0101 a_0101 + b_0101 a_0111 + b_0111 a_0100 + b_0100 a_0101 + b_0101 a_0101 + b_0101 a_0111 + b_0111 a_1100 + b_1100 a_1101 + b_1101 a_1101 + b_1101 a_1111 + b_1111
-DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b_0000 1.0 + b_0001 1.0 + b_0001 1.0 + b_0011 1.0 + b_0100 1.0 + b_0101 1.0 + b_0101 1.0 + b_0111 1.0 + b_0100 1.0 + b_0101 1.0 + b_0101 1.0 + b_0111 1.0 + b_1100 1.0 + b_1101 1.0 + b_1101 1.0 + b_1111
-DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
-DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
-DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0
-DEAL::OK
-DEAL::
 DEAL::OK
