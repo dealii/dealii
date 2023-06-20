@@ -115,6 +115,9 @@ test()
   try
     {
       tria.execute_coarsening_and_refinement();
+      deallog << "Error: we did not throw an exception when we should have"
+              << std::endl;
+      std::abort();
     }
   catch (const ExceptionBase &e)
     {
