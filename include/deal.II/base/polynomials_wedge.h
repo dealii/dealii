@@ -30,7 +30,7 @@ namespace internal
 {
   /**
    * Decompose the shape-function index of a linear wedge into an index
-   * to access the right shape function within the triangle and and within
+   * to access the right shape function within the triangle and within
    * the line.
    */
   static const constexpr dealii::ndarray<unsigned int, 6, 2> wedge_table_1{
@@ -38,7 +38,7 @@ namespace internal
 
   /**
    * Decompose the shape-function index of a quadratic wedge into an index
-   * to access the right shape function within the triangle and and within
+   * to access the right shape function within the triangle and within
    * the line.
    */
   static const constexpr dealii::ndarray<unsigned int, 18, 2> wedge_table_2{

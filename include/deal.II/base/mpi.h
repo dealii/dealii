@@ -451,7 +451,7 @@ namespace Utilities
      *
      * This class models these two steps by taking two constructor
      * arguments that correspond to these two operations. It ensures
-     * that that upon destruction of the current object, both the
+     * that upon destruction of the current object, both the
      * wait and clean-up functions are called. Because the clean-up
      * function can only be called once, objects of the current
      * class can not be copied, but they can be moved.

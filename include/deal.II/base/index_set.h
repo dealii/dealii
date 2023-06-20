@@ -195,7 +195,7 @@ public:
    * @pre The condition <code>begin@<=end</code> needs to be satisfied. They
    * also obviously have to point into the same container.
    *
-   * @note The operations of this function are substantially more efficient if
+   * @note The operations of this function are substantially more efficient
    *   if the indices pointed to by the range of iterators are already sorted.
    *   As a consequence, it is often worth sorting the range of indices
    *   before calling this function.

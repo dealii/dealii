@@ -23,7 +23,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A namespace with repartitioning policies. These classes return vectors of
+ * A namespace with repartitioning policies. These classes return vectors
  * of the new owners of the active locally owned and ghost cells of a
  * Triangulation object. The returned vectors can be used, e.g., in
  * TriangulationDescription::Utilities::create_description_from_triangulation()
