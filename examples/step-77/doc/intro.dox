@@ -8,6 +8,10 @@ Foundation grants OAC-1835673, DMS-1821210, and EAR-1925595;
 and by the Computational Infrastructure in
 Geodynamics initiative (CIG), through the National Science Foundation under
 Award No. EAR-1550901 and The University of California-Davis.
+
+Stefano Zampini (King Abdullah University of Science and Technology)
+contributed the results obtained with the PETSc variant of this program
+discussed in the <a href="#Results">results section</a> below.
 </i>
 <br>
 
@@ -166,6 +170,9 @@ functionality, and we better use it.
   then it is not too difficult to switch this program to use either
   of the former two packages instead: Basically everything that we
   say and do below will also be true and work for these other packages!
+  (We will also come back to this point in the
+  <a href="#Results">results section</a>
+  below.)
 
 
 <h3> How deal.II interfaces with KINSOL </h3>

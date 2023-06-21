@@ -180,6 +180,8 @@ The key takeaway messages of this program are the following:
 <a name="extensions"></a>
 <h3> Possibilities for extensions </h3>
 
+<h4> Better linear solvers </h4>
+
 For all but the small problems we consider here, a sparse direct solver
 requires too much time and memory -- we need an iterative solver like
 we use in many other programs. The trade-off between constructing an
@@ -203,3 +205,454 @@ tolerance that needs to be reached. We ignore it in the program above
 because the direct solver we use does not need a tolerance and instead
 solves the linear system exactly (up to round-off, of course), but iterative
 solvers could make use of this kind of information -- and, in fact, should.
+Indeed, the infrastructure is already there: The `solve()` function of this
+program is declared as
+@code
+  template <int dim>
+  void MinimalSurfaceProblem<dim>::solve(const Vector<double> &rhs,
+                                         Vector<double> &      solution,
+                                         const double /*tolerance*/)
+@endcode
+i.e., the `tolerance` parameter already exists, but is unused.
+
+
+<h4> Replacing SUNDIALS' KINSOL by PETSc's SNES </h4>
+
+As mentioned in the introduction, SUNDIALS' KINSOL package is not the
+only player in town. Rather, very similar interfaces exist to the SNES
+package that is part of PETSc, and the NOX package that is part of
+Trilinos, via the PETScWrappers::NonlinearSolver and
+TrilinosWrappers::NOXSolver classes.
+
+It is not very difficult to change the program to use either of these
+two alternatives. Rather than show exactly what needs to be done,
+let us point out that a version of this program that uses SNES instead
+of KINSOL is available as part of the test suite, in the file
+`tests/petsc/step-77-snes.cc`. Setting up the solver for
+PETScWrappers::NonlinearSolver turns out to be even simpler than
+for the SUNDIALS::KINSOL class we use here because we don't even
+need the `reinit` lambda function -- SNES only needs us to set up
+the remaining three functions `residual`, `setup_jacobian`, and
+`solve_with_jacobian`. The majority of changes necessary to convert
+the program to use SNES are related to the fact that SNES can only
+deal with PETSc vectors and matrices, and these need to be set up
+slightly differently. On the upside, the test suite program mentioned
+above already works in parallel.
+
+SNES also allows playing with a number of parameters about the
+solver, and that enables some interesting comparisons between
+methods. When you run the test program (or a slightly modified
+version that outputs information to the screen instead of a file),
+you get output that looks comparable to something like this:
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+1 norm=0.212073
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+2 norm=0.0189603
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+3 norm=0.000314854
+
+[...]
+@endcode
+
+By default, PETSc uses a Newton solver with cubic backtracking,
+resampling the Jacobian matrix at each Newton step.  That is, we
+compute and factorize the matrix once per Newton step, and then sample
+the residual to check for a successul line-search.
+
+The attentive reader should have noticed that in this case we are
+computing one more extra residual per Newton step.  This is because
+the deal.II code is set up to use a Jacobian-free approach, and the
+extra residual computation pops up when computing a matrix-vector
+product to test the validity of the Newton solution.
+
+PETSc can be configured in many interesting ways via the command line.
+We can visualize the details of the solver by using the command line
+argument **-snes_view**, which produces the excerpt below at the end
+of each solve call:
+@code
+Mesh refinement step 0
+[...]
+SNES Object: 1 MPI process
+  type: newtonls
+  maximum iterations=50, maximum function evaluations=10000
+  tolerances: relative=1e-08, absolute=0.001, solution=1e-08
+  total number of linear solver iterations=3
+  total number of function evaluations=7
+  norm schedule ALWAYS
+  Jacobian is applied matrix-free with differencing
+  Jacobian is applied matrix-free with differencing, no explicit Jacobian
+  SNESLineSearch Object: 1 MPI process
+    type: bt
+      interpolation: cubic
+      alpha=1.000000e-04
+    maxstep=1.000000e+08, minlambda=1.000000e-12
+    tolerances: relative=1.000000e-08, absolute=1.000000e-15, lambda=1.000000e-08
+    maximum iterations=40
+  KSP Object: 1 MPI process
+    type: preonly
+    maximum iterations=10000, initial guess is zero
+    tolerances:  relative=1e-05, absolute=1e-50, divergence=10000.
+    left preconditioning
+    using NONE norm type for convergence test
+  PC Object: 1 MPI process
+    type: shell
+      deal.II user solve
+    linear system matrix followed by preconditioner matrix:
+    Mat Object: 1 MPI process
+      type: mffd
+      rows=89, cols=89
+        Matrix-free approximation:
+          err=1.49012e-08 (relative error in function evaluation)
+          Using wp compute h routine
+              Does not compute normU
+    Mat Object: 1 MPI process
+      type: seqaij
+      rows=89, cols=89
+      total: nonzeros=745, allocated nonzeros=745
+      total number of mallocs used during MatSetValues calls=0
+        not using I-node routines
+[...]
+@endcode
+From the above details, we see that we are using the "newtonls" solver
+type ("Newton line search"), with "bt" ("backtracting") line search.
+
+From the output of **-snes_view** we can also get information about
+the linear solver details; specifically, when using the
+`solve_with_jacobian` interface, the deal.II interface internally uses
+a custom solver configuration within a "shell" preconditioner, that
+wraps the action of `solve_with_jacobian`.
+
+We can also see the details of the type of matrices used within the
+solve: "mffd" (matrix-free finite-differencing) for the action of the
+linearized operator and "seqaij" for the assembled Jacobian we have
+used to construct the preconditioner.
+
+Diagnostics for the line search procedure can be turned on using the
+command line **-snes_linesearch_monitor**, producing the excerpt
+below:
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+      Line search: Using full step: fnorm 8.679748230595e-01 gnorm 2.120728179320e-01
+1 norm=0.212073
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+      Line search: Using full step: fnorm 2.120728179320e-01 gnorm 1.896033864659e-02
+2 norm=0.0189603
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+      Line search: Using full step: fnorm 1.896033864659e-02 gnorm 3.148542199408e-04
+3 norm=0.000314854
+
+[...]
+@endcode
+
+Within the run, the Jacobian matrix is assembled (and factored) 29 times:
+@code
+./step-77-snes | grep "Computing Jacobian" | wc -l
+29
+@endcode
+
+KINSOL internally decided when it was necessary to update the Jacobian
+matrix (which is when it would call `setup_jacobian`). SNES can do
+something similar: We can compute the explicit sparse Jacobian matrix
+only once per refinement step (and reuse the initial factorization) by
+using the command line **-snes_lag_jacobian -2**, producing:
+@code
+./step-77-snes -snes_lag_jacobian -2 | grep "Computing Jacobian" | wc -l
+6
+@endcode
+In other words, this dramatically reduces the number of times we have to
+build the Jacobian matrix, though at a cost to the number of
+nonlinear steps we have to take.
+
+The lagging period can also be decided automatically. For example, if
+we want to recompute the Jacobian at every other step:
+@code
+./step-77-snes -snes_lag_jacobian 2 | grep "Computing Jacobian" | wc -l
+25
+@endcode
+Note, however, that we didn't exactly halve the number of Jacobian
+computations. In this case the solution process will require many more
+nonlinear iterations since the accuracy of the linear system solve is
+not enough.
+
+If we switch to using the preconditioned conjugate gradient method as
+a linear solve, still using our initial factorization as
+preconditioner, we get:
+@code
+./step-77-snes -snes_lag_jacobian 2 -ksp_type cg | grep "Computing Jacobian" | wc -l
+17
+@endcode
+Note that in this case we use an approximate preconditioner (the LU
+factorization of the initial approximation) but we use a matrix-free
+operator for the action of our Jacobian matrix, thus solving for the
+correct linear system.
+
+We can switch to a quasi-Newton method by using the command
+line **-snes_type qn -snes_qn_scale_type jacobian**, and we can see that
+our Jacobian is sampled and factored only when needed, at the cost of
+an increase of the number of steps:
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  Computing residual vector
+  Computing residual vector
+1 norm=0.166391
+  Computing residual vector
+  Computing residual vector
+2 norm=0.0507703
+  Computing residual vector
+  Computing residual vector
+3 norm=0.0160007
+  Computing residual vector
+  Computing residual vector
+  Computing residual vector
+4 norm=0.00172425
+  Computing residual vector
+  Computing residual vector
+  Computing residual vector
+5 norm=0.000460486
+[...]
+@endcode
+
+<a href="https://www.mcs.anl.gov/papers/P2010-0112.pdf">Nonlinear preconditioning</a>
+can also be used. For example, we can run a right-preconditioned nonlinear
+GMRES, using one Newton step as a preconditioner, with the command:
+@code
+./step-77-snes -snes_type ngmres -npc_snes_type newtonls -snes_monitor -npc_snes_monitor | grep SNES
+  0 SNES Function norm 8.679748230595e-01
+    0 SNES Function norm 8.679748230595e-01
+    1 SNES Function norm 2.120738413585e-01
+  1 SNES Function norm 1.284613424341e-01
+    0 SNES Function norm 1.284613424341e-01
+    1 SNES Function norm 6.539358995036e-03
+  2 SNES Function norm 5.148828618635e-03
+    0 SNES Function norm 5.148828618635e-03
+    1 SNES Function norm 6.048613313899e-06
+  3 SNES Function norm 3.199913594705e-06
+  0 SNES Function norm 2.464793634583e-01
+    0 SNES Function norm 2.464793634583e-01
+    1 SNES Function norm 3.591625291931e-02
+  1 SNES Function norm 3.235827289342e-02
+    0 SNES Function norm 3.235827289342e-02
+    1 SNES Function norm 1.249214136060e-03
+  2 SNES Function norm 5.302288687547e-04
+    0 SNES Function norm 5.302288687547e-04
+    1 SNES Function norm 1.490247730530e-07
+  3 SNES Function norm 1.436531309822e-07
+  0 SNES Function norm 5.044203686086e-01
+    0 SNES Function norm 5.044203686086e-01
+    1 SNES Function norm 1.716855756535e-01
+  1 SNES Function norm 7.770484434662e-02
+    0 SNES Function norm 7.770484434662e-02
+    1 SNES Function norm 2.462422395554e-02
+  2 SNES Function norm 1.438187947066e-02
+    0 SNES Function norm 1.438187947066e-02
+    1 SNES Function norm 9.214168343848e-04
+  3 SNES Function norm 2.268378169625e-04
+    0 SNES Function norm 2.268378169625e-04
+    1 SNES Function norm 3.463704776158e-07
+  4 SNES Function norm 9.964533647277e-08
+  0 SNES Function norm 1.942213246154e-01
+    0 SNES Function norm 1.942213246154e-01
+    1 SNES Function norm 1.125558372384e-01
+  1 SNES Function norm 1.309880643103e-01
+    0 SNES Function norm 1.309880643103e-01
+    1 SNES Function norm 2.595634741967e-02
+  2 SNES Function norm 1.149616419685e-02
+    0 SNES Function norm 1.149616419685e-02
+    1 SNES Function norm 7.204904831783e-04
+  3 SNES Function norm 6.743539224973e-04
+    0 SNES Function norm 6.743539224973e-04
+    1 SNES Function norm 1.521290969181e-05
+  4 SNES Function norm 8.121151857453e-06
+    0 SNES Function norm 8.121151857453e-06
+    1 SNES Function norm 1.460470903719e-09
+  5 SNES Function norm 9.982794797188e-10
+  0 SNES Function norm 1.225979459424e-01
+    0 SNES Function norm 1.225979459424e-01
+    1 SNES Function norm 4.946412992249e-02
+  1 SNES Function norm 2.466574163571e-02
+    0 SNES Function norm 2.466574163571e-02
+    1 SNES Function norm 8.537739703503e-03
+  2 SNES Function norm 5.935412895618e-03
+    0 SNES Function norm 5.935412895618e-03
+    1 SNES Function norm 3.699307476482e-04
+  3 SNES Function norm 2.188768476656e-04
+    0 SNES Function norm 2.188768476656e-04
+    1 SNES Function norm 9.478344390128e-07
+  4 SNES Function norm 4.559224590570e-07
+    0 SNES Function norm 4.559224590570e-07
+    1 SNES Function norm 1.317127376721e-11
+  5 SNES Function norm 1.311046524394e-11
+  0 SNES Function norm 1.011637873732e-01
+    0 SNES Function norm 1.011637873732e-01
+    1 SNES Function norm 1.072720108836e-02
+  1 SNES Function norm 8.985302820531e-03
+    0 SNES Function norm 8.985302820531e-03
+    1 SNES Function norm 5.807781788861e-04
+  2 SNES Function norm 5.594756759727e-04
+    0 SNES Function norm 5.594756759727e-04
+    1 SNES Function norm 1.834638371641e-05
+  3 SNES Function norm 1.408280767367e-05
+    0 SNES Function norm 1.408280767367e-05
+    1 SNES Function norm 5.763656314185e-08
+  4 SNES Function norm 1.702747382189e-08
+    0 SNES Function norm 1.702747382189e-08
+    1 SNES Function norm 1.452722802538e-12
+  5 SNES Function norm 1.444478767837e-12
+@endcode
+
+
+As also discussed for the KINSOL use above, optimal preconditioners
+should be used instead of the LU factorization used here by
+default. This is already possible within this tutorial by playing with
+the command line options.  For example, algebraic multigrid can be
+used by simply specifying **-pc_type gamg**.  When using iterative
+linear solvers, the "Eisenstat-Walker trick" @cite eiwa96 can be also
+requested at command line via **-snes_ksp_ew**.  Using these options,
+we can see that the number of nonlinear iterations used by the solver
+increases as the mesh is refined, and that the number of linear
+iterations increases as the Newton solver is entering the second-order
+ball of convergence:
+@code
+./step-77-snes -pc_type gamg -ksp_type cg -ksp_converged_reason -snes_converged_reason -snes_ksp_ew | grep CONVERGED
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 4
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 6
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 4
+  Linear solve converged due to CONVERGED_RTOL iterations 7
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 12
+  Linear solve converged due to CONVERGED_RTOL iterations 1
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 4
+  Linear solve converged due to CONVERGED_RTOL iterations 7
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 5
+  Linear solve converged due to CONVERGED_RTOL iterations 2
+  Linear solve converged due to CONVERGED_RTOL iterations 3
+  Linear solve converged due to CONVERGED_RTOL iterations 7
+  Linear solve converged due to CONVERGED_RTOL iterations 6
+  Linear solve converged due to CONVERGED_RTOL iterations 7
+  Linear solve converged due to CONVERGED_RTOL iterations 12
+Nonlinear solve converged due to CONVERGED_FNORM_ABS iterations 6
+@endcode
+
+Finally we describe how to get some diagnostic on the correctness of
+the computed Jacobian.  Deriving the correct linearization is
+sometimes difficult: It took a page or two in the introduction to
+derive the exact bilinear form for the Jacobian matrix, and it would
+be quite nice compute it automatically from the residual of which it
+is the derivative.  (This is what step-72 does!) But if one is set on
+doing things by hand, it would at least be nice if we had a way to
+check the correctness of the derivation. SNES allows us to do this: we
+can use the options **-snes_test_jacobian -snes_test_jacobian_view**:
+@code
+Mesh refinement step 0
+  Target_tolerance: 0.001
+
+  Computing residual vector
+0 norm=0.867975
+  Computing Jacobian matrix
+  ---------- Testing Jacobian -------------
+  Testing hand-coded Jacobian, if (for double precision runs) ||J - Jfd||_F/||J||_F is
+    O(1.e-8), the hand-coded Jacobian is probably correct.
+[...]
+  ||J - Jfd||_F/||J||_F = 0.0196815, ||J - Jfd||_F = 0.503436
+[...]
+  Hand-coded minus finite-difference Jacobian with tolerance 1e-05 ----------
+Mat Object: 1 MPI process
+  type: seqaij
+row 0: (0, 0.125859)
+row 1: (1, 0.0437112)
+row 2:
+row 3:
+row 4: (4, 0.902232)
+row 5:
+row 6:
+row 7:
+row 8:
+row 9: (9, 0.537306)
+row 10:
+row 11: (11, 1.38157)
+row 12:
+[...]
+@endcode
+showing that the only errors we commit in assembling the Jacobian are
+on the boundary dofs.  As discussed in the tutorial, those errors are
+harmless.
+
+The key take-away messages of this modification of the tutorial program are
+therefore basically the same of what we already found using KINSOL:
+
+- The solution is the same as the one we computed in step-15, i.e., the
+  interfaces to PETSc SNES package really did what they were supposed
+  to do. This should not come as a surprise, but the important point is that
+  we don't have to spend the time implementing the complex algorithms that
+  underlie advanced nonlinear solvers ourselves.
+
+- SNES offers a wide variety of solvers and line search techniques,
+  not only Newton.  It also allows us to control Jacobian setups;
+  however, differently from KINSOL, this is not automatically decided
+  within the library by looking at the residual vector but it needs to
+  be specified by the user.
+
+
+
+
+<h4> Replacing SUNDIALS' KINSOL by Trilinos' NOX package </h4>
+
+Besides KINSOL and SNES, the third option you have is to use the NOX
+package. As before, rather than showing in detail how that needs to
+happen, let us simply point out that the test suite program
+`tests/trilinos/step-77-with-nox.cc` does this. The modifications
+necessary to use NOX instead of KINSOL are quite minimal; in
+particular, NOX (unlike SNES) is happy to work with deal.II's own
+vector and matrix classes.
