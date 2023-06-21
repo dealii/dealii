@@ -546,7 +546,7 @@ namespace Step77
               // system.
               nonlinear_solver.solve_with_jacobian = [&](const VectorType &rhs,
                                                          VectorType &dst) {
-                this->solve(rhs, dst);
+                solve(rhs, dst);
 
                 return 0;
               };
