@@ -1326,9 +1326,7 @@ AffineConstraints<number>::resolve_indices(
 
   // keep only the unique elements
   std::sort(indices.begin(), indices.end());
-  std::vector<types::global_dof_index>::iterator it;
-  it = std::unique(indices.begin(), indices.end());
-  indices.resize(it - indices.begin());
+  indices.erase(std::unique(indices.begin(), indices.end()), indices.end());
 }
 
 

@@ -26,8 +26,8 @@ namespace
   get_unique_component_names(const std::vector<std::string> &component_names)
   {
     auto elements = component_names;
-    auto last     = std::unique(elements.begin(), elements.end());
-    elements.resize(last - elements.begin());
+    elements.erase(std::unique(elements.begin(), elements.end()),
+                   elements.end());
     return elements;
   }
 

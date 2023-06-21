@@ -641,10 +641,9 @@ namespace SparsityTools
         std::sort(next_round_dofs.begin(), next_round_dofs.end());
 
         // delete multiple entries
-        std::vector<DynamicSparsityPattern::size_type>::iterator end_sorted;
-        end_sorted =
-          std::unique(next_round_dofs.begin(), next_round_dofs.end());
-        next_round_dofs.erase(end_sorted, next_round_dofs.end());
+        next_round_dofs.erase(std::unique(next_round_dofs.begin(),
+                                          next_round_dofs.end()),
+                              next_round_dofs.end());
 
         // eliminate dofs which are already numbered
         for (int s = next_round_dofs.size() - 1; s >= 0; --s)
