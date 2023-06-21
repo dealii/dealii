@@ -245,7 +245,7 @@ private:
    * |           |
    * |  0  1  2  |
    * |___________|
-   *@endverbatim
+   * @endverbatim
    *
    * We have for a local <code>face_dof_index=i+n*j</code> with index
    * <code>i</code> in x-direction and index <code>j</code> in y-direction
@@ -261,7 +261,7 @@ private:
    * orientation. The flip axis is the diagonal from the lower left to the upper
    * right corner of the face. With these flags the configuration above becomes:
    *
-   *@verbatim
+   * @verbatim
    *  ___________
    * |           |
    * |  2  5  8  |

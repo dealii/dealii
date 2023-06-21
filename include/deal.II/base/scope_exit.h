@@ -84,7 +84,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  *    internal::copy(initial_guess_and_solution, solution);
  *    // Free the vectors which are no longer used.
- *#  ifdef DEAL_II_WITH_MPI
+ * #ifdef DEAL_II_WITH_MPI
  *    if (is_serial_vector<VectorType>::value == false)
  *      {
  *        N_VDestroy_Parallel(solution);
@@ -92,7 +92,7 @@ DEAL_II_NAMESPACE_OPEN
  *        N_VDestroy_Parallel(f_scale);
  *      }
  *    else
- *#  endif
+ * #endif
  *      {
  *        N_VDestroy_Serial(solution);
  *        N_VDestroy_Serial(u_scale);
