@@ -365,7 +365,7 @@ namespace PETScWrappers
       Vec petsc_nest_vector;
 
       /**
-       * Utility to setup the VECNEST object
+       * Utility to set up the VECNEST object
        */
       void
       setup_nest_vec();

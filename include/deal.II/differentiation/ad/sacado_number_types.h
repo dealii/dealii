@@ -337,7 +337,7 @@ namespace Differentiation
           // For Sacado::Rad::ADvar numbers, we have to initialize the
           // ADNumber with an already fully-configured value. This means
           // that if this nests another ADNumber then the nested number
-          // must already be setup and ready for use.
+          // must already be set up and ready for use.
 
           // Initialize potential nested directional derivatives
           derivative_type derivative_initializer;

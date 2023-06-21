@@ -52,7 +52,7 @@ namespace Utilities
      * A shared pointer to this class is provided to ScaLAPACKMatrix matrices to
      * perform block-cyclic distribution.
      *
-     * Note that this class allows to setup a process grid which has fewer
+     * Note that this class allows to set up a process grid which has fewer
      * MPI cores than the total number of cores in the communicator.
      *
      * Currently the only place where one would use a ProcessGrid object is

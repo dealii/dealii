@@ -314,7 +314,7 @@ namespace Utilities
       // find how much the individual processes that want import from me
       std::map<unsigned int, IndexSet> import_data = process.get_requesters();
 
-      // count import requests and setup the compressed indices
+      // count import requests and set up the compressed indices
       n_import_indices_data = 0;
       import_targets_data   = {};
       import_targets_data.reserve(import_data.size());
