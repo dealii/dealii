@@ -1432,10 +1432,8 @@ namespace MGTools
          ++level)
       {
         std::sort(dofs_by_level[level].begin(), dofs_by_level[level].end());
-        boundary_indices[level].add_indices(
-          dofs_by_level[level].begin(),
-          std::unique(dofs_by_level[level].begin(),
-                      dofs_by_level[level].end()));
+        boundary_indices[level].add_indices(dofs_by_level[level].begin(),
+                                            dofs_by_level[level].end());
       }
   }
 
@@ -1521,8 +1519,7 @@ namespace MGTools
         interface_dofs[l].clear();
         std::sort(tmp_interface_dofs[l].begin(), tmp_interface_dofs[l].end());
         interface_dofs[l].add_indices(tmp_interface_dofs[l].begin(),
-                                      std::unique(tmp_interface_dofs[l].begin(),
-                                                  tmp_interface_dofs[l].end()));
+                                      tmp_interface_dofs[l].end());
         interface_dofs[l].compress();
       }
   }

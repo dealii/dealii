@@ -407,8 +407,7 @@ namespace internal
       std::sort(ghosted_level_dofs.begin(), ghosted_level_dofs.end());
       IndexSet ghosted_dofs(locally_owned.size());
       ghosted_dofs.add_indices(ghosted_level_dofs.begin(),
-                               std::unique(ghosted_level_dofs.begin(),
-                                           ghosted_level_dofs.end()));
+                               ghosted_level_dofs.end());
       ghosted_dofs.compress();
 
       // Add possible ghosts from the previous content in the vector

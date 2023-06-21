@@ -930,9 +930,6 @@ namespace internal
                   part.local_to_global(plain_dof_indices[i]));
           }
         std::sort(ghost_indices.begin(), ghost_indices.end());
-        ghost_indices.erase(std::unique(ghost_indices.begin(),
-                                        ghost_indices.end()),
-                            ghost_indices.end());
         IndexSet compressed_set(part.size());
         compressed_set.add_indices(ghost_indices.begin(), ghost_indices.end());
         compressed_set.subtract_set(part.locally_owned_range());
@@ -1084,9 +1081,6 @@ namespace internal
                                          part.get_mpi_communicator()) != 0;
 
               std::sort(ghost_indices.begin(), ghost_indices.end());
-              ghost_indices.erase(std::unique(ghost_indices.begin(),
-                                              ghost_indices.end()),
-                                  ghost_indices.end());
               IndexSet compressed_set(part.size());
               compressed_set.add_indices(ghost_indices.begin(),
                                          ghost_indices.end());
@@ -1161,9 +1155,6 @@ namespace internal
                   }
               });
               std::sort(ghost_indices.begin(), ghost_indices.end());
-              ghost_indices.erase(std::unique(ghost_indices.begin(),
-                                              ghost_indices.end()),
-                                  ghost_indices.end());
               IndexSet compressed_set(part.size());
               compressed_set.add_indices(ghost_indices.begin(),
                                          ghost_indices.end());
