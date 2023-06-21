@@ -575,7 +575,7 @@ public:
    * Obviously, the ArrayView object must represent a stretch of
    * data of size `dim`<sup>`rank`</sup>. The sequentially ordered elements
    * of the argument `initializer` are interpreted as described by
-   * unrolled_to_component_index().
+   * unrolled_to_component_indices().
    *
    * This constructor obviously requires that the @p ElementType type is
    * either equal to @p Number, or is convertible to @p Number.
