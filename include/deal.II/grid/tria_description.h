@@ -522,7 +522,7 @@ namespace TriangulationDescription
      * @return Description to be used to set up a Triangulation.
      *
      * @note If construct_multigrid_hierarchy is set in the settings, the source
-     *   triangulation has to be setup with limit_level_difference_at_vertices.
+     *   triangulation has to be set up with limit_level_difference_at_vertices.
      */
     template <int dim, int spacedim = dim>
     Description<dim, spacedim>

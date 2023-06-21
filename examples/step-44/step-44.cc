@@ -1037,7 +1037,7 @@ namespace Step44
     // The Finite Element System is composed of dim continuous displacement
     // DOFs, and discontinuous pressure and dilatation DOFs. In an attempt to
     // satisfy the Babuska-Brezzi or LBB stability conditions (see Hughes
-    // (2000)), we setup a $Q_n \times DGP_{n-1} \times DGP_{n-1}$
+    // (2000)), we set up a $Q_n \times DGP_{n-1} \times DGP_{n-1}$
     // system. $Q_2 \times DGP_1 \times DGP_1$ elements satisfy this
     // condition, while $Q_1 \times DGP_0 \times DGP_0$ elements do
     // not. However, it has been shown that the latter demonstrate good
@@ -1237,7 +1237,7 @@ namespace Step44
   // matrix. Recall that we wish to solve for a displacement-based formulation.
   // We do the condensation at the element level as the $\widetilde{p}$ and
   // $\widetilde{J}$ fields are element-wise discontinuous.  As these operations
-  // are matrix-based, we need to setup a number of matrices to store the local
+  // are matrix-based, we need to set up a number of matrices to store the local
   // contributions from a number of the tangent matrix sub-blocks.  We place
   // these in the PerTaskData struct.
   //
@@ -1551,7 +1551,7 @@ namespace Step44
                                         triangulation.end(),
                                         n_q_points);
 
-    // Next we setup the initial quadrature point data.
+    // Next we set up the initial quadrature point data.
     // Note that when the quadrature point data is retrieved,
     // it is returned as a vector of smart pointers.
     for (const auto &cell : triangulation.active_cell_iterators())

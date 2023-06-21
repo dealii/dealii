@@ -338,7 +338,7 @@ namespace PETScWrappers
       Mat petsc_nest_matrix;
 
       /**
-       * Utility to setup the MATNEST object
+       * Utility to set up the MATNEST object.
        */
       void
       setup_nest_mat();

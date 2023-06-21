@@ -229,7 +229,7 @@ namespace parallel
           "You have called the method parallel::fullydistributed::Triangulation::create_triangulation() \n"
           "that takes 3 arguments. If you have not called this function directly, \n"
           "it might have been called via a function from the GridGenerator or GridIn \n"
-          "namespace. To be able to setup a fully-distributed Triangulation with these \n"
+          "namespace. To be able to set up a fully-distributed Triangulation with these \n"
           "utility functions nevertheless, please follow the following three steps:\n"
           "  1) call the utility function for a (serial) Triangulation, \n"
           "     a parallel::shared::Triangulation, or a parallel::distributed::Triangulation object,\n"

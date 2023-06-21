@@ -639,8 +639,8 @@ namespace Step60
       std::make_unique<GridTools::Cache<spacedim, spacedim>>(*space_grid);
 
     // The same is done with the embedded grid. Since the embedded grid is
-    // deformed, we first need to setup the deformation mapping. We do so in the
-    // following few lines:
+    // deformed, we first need to set up the deformation mapping. We do so in
+    // the following few lines:
     embedded_grid = std::make_unique<Triangulation<dim, spacedim>>();
     GridGenerator::hyper_cube(*embedded_grid);
     embedded_grid->refine_global(parameters.initial_embedded_refinement);

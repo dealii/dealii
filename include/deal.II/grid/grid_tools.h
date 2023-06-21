@@ -1299,7 +1299,7 @@ namespace GridTools
      * the fields needed by
      * GridTools::internal::distributed_compute_point_locations() are filled.
      * If the input argument is set to true additional data structures are
-     * set up to be able to setup the communication pattern within
+     * set up to be able to set up the communication pattern within
      * Utilities::MPI::RemotePointEvaluation::reinit().
      */
     template <int dim, int spacedim>
@@ -1370,7 +1370,7 @@ namespace GridTools
        * The parameter @p consistent_numbering_of_sender_and_receiver can be used to ensure
        * points on sender and receiver side are numbered consistently.
        * This parameter is optional if DistributedComputePointLocationsInternal
-       * is used to setup RemotePointEvaluation, but might be helpful for
+       * is used to set up RemotePointEvaluation, but might be helpful for
        * debugging or other usage of DistributedComputePointLocationsInternal.
        * Note that setting this parameter true requires an additional
        * communication step during the setup phase.
