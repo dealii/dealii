@@ -218,15 +218,13 @@ namespace internal
       Utilities::MPI::this_mpi_process(mpi_communicator);
 
     // helper function
-    const auto sort_constraints = [&]() {
-      std::sort(locally_relevant_constraints.begin(),
-                locally_relevant_constraints.end());
+    const auto sort_and_make_unique =
+      [](std::vector<ConstraintType> &constraints) {
+        std::sort(constraints.begin(), constraints.end());
 
-      locally_relevant_constraints.erase(
-        std::unique(locally_relevant_constraints.begin(),
-                    locally_relevant_constraints.end()),
-        locally_relevant_constraints.end());
-    };
+        constraints.erase(std::unique(constraints.begin(), constraints.end()),
+                          constraints.end());
+      };
 
     // 0) collect constrained indices of the current object
     IndexSet constrained_indices(locally_owned_dofs.size());
@@ -352,7 +350,7 @@ namespace internal
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 
-      sort_constraints();
+      sort_and_make_unique(locally_relevant_constraints);
     }
 
     // step 3: communicate constraints so that each process know how the
@@ -472,7 +470,7 @@ namespace internal
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 
-      sort_constraints();
+      sort_and_make_unique(locally_relevant_constraints);
     }
 
 #endif
