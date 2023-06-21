@@ -1,0 +1,6 @@
+Fixed: Originally, the LAPACK in /source/lac/lapack_full_matrix.cc directly
+printed errors to the console. This is fixed by using the AssertThrow mechanism
+to explicitly display various error messages based on the error values that are 
+consistent with the LAPACK manual.
+<br>
+(Tao Jin, 2023/06/20)
