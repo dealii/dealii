@@ -105,7 +105,7 @@ namespace Utilities
       buffers.clear();
       requests.clear();
 
-      // setup communication pattern
+      // set up communication pattern
       std::vector<unsigned int> owning_ranks_of_ghosts(
         indexset_want.n_elements());
 
@@ -124,7 +124,7 @@ namespace Utilities
         consensus_algorithm;
       consensus_algorithm.run(process, communicator);
 
-      // setup map of processes from where this rank will receive values
+      // set up map of processes from where this rank will receive values
       {
         std::map<unsigned int, std::vector<types::global_dof_index>> recv_map;
 
@@ -215,7 +215,7 @@ namespace Utilities
       index_set_want.add_indices(indices_want_clean.begin(),
                                  indices_want_clean.end());
 
-      // step 2) setup internal data structures with indexset
+      // step 2) set up internal data structures with indexset
       this->reinit(index_set_has, index_set_want, communicator);
 
       // step 3) fix inner data structures so that it is sorted as

@@ -227,8 +227,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   for (unsigned int support_point = 0; support_point < n_support_points;
        support_point++)
     {
-      // setup valid data in the empty
-      // vectors
+      // set up valid data in the empty vectors
       unsigned int component =
         dof_handler->get_fe().system_to_component_index(support_point).first;
       current_points[component]   = fe_values.quadrature_point(support_point);
@@ -373,8 +372,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
   for (unsigned int support_point = 0; support_point < n_support_points;
        support_point++)
     {
-      // setup valid data in the empty
-      // vectors
+      // set up valid data in the empty vectors
       unsigned int component =
         dof_handler->get_fe().system_to_component_index(support_point).first;
       temp_points[component]   = fe_values.quadrature_point(support_point);

@@ -225,7 +225,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the CG solver from the CG factory which
+     * set the parameters and set up the CG solver from the CG factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the CG solver.
@@ -240,7 +240,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the CG solver from the CG factory which
+     * set the parameters and set up the CG solver from the CG factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the CG solver.
@@ -281,7 +281,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the Bicgstab solver from the Bicgstab
+     * set the parameters and set up the Bicgstab solver from the Bicgstab
      * factory which solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the Bicgstab solver.
@@ -296,7 +296,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the Bicgstab solver from the Bicgstab
+     * set the parameters and set up the Bicgstab solver from the Bicgstab
      * factory which solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the Bicgstab solver.
@@ -339,7 +339,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the CGS solver from the CGS factory which
+     * set the parameters and set up the CGS solver from the CGS factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the CGS solver.
@@ -354,7 +354,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the CGS solver from the CGS factory which
+     * set the parameters and set up the CGS solver from the CGS factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the CGS solver.
@@ -406,7 +406,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the FCG solver from the FCG factory which
+     * set the parameters and set up the FCG solver from the FCG factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the FCG solver.
@@ -421,7 +421,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the FCG solver from the FCG factory which
+     * set the parameters and set up the FCG solver from the FCG factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the FCG solver.
@@ -472,7 +472,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the GMRES solver from the GMRES factory
+     * set the parameters and set up the GMRES solver from the GMRES factory
      * which solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the GMRES solver.
@@ -487,7 +487,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the GMRES solver from the GMRES factory
+     * set the parameters and set up the GMRES solver from the GMRES factory
      * which solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the GMRES solver.
@@ -531,7 +531,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the IR solver from the IR factory which
+     * set the parameters and set up the IR solver from the IR factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the IR solver.
@@ -546,7 +546,7 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @param[in,out] solver_control The solver control object is then used to
-     * set the parameters and setup the IR solver from the IR factory which
+     * set the parameters and set up the IR solver from the IR factory which
      * solves the linear system.
      *
      * @param[in] exec_type The execution paradigm for the IR solver.

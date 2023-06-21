@@ -355,7 +355,7 @@ namespace TrilinosWrappers
       public:
         /**
          * Constructor. The class is initialized by the solution vector and
-         * functions to compute the residual, to setup the jacobian, and
+         * functions to compute the residual, to set up the jacobian, and
          * to solve the Jacobian.
          */
         Group(
@@ -768,7 +768,7 @@ namespace TrilinosWrappers
         std::function<int(const VectorType &x, VectorType &f)> residual;
 
         /**
-         * A helper function to setup Jacobian.
+         * A helper function to set up Jacobian.
          */
         std::function<int(const VectorType &x)> setup_jacobian;
 

@@ -329,7 +329,7 @@ namespace RepartitioningPolicyTools
                 mpi_communicator);
     AssertThrowMPI(ierr);
 
-    // setup partition
+    // set up partition
     LinearAlgebra::distributed::Vector<double> partition(partitioner);
 
     for (std::uint64_t i = 0, weight = process_local_weight_offset;

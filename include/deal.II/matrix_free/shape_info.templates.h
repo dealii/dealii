@@ -582,7 +582,7 @@ namespace internal
 
           univariate_shape_data.nodal_at_cell_boundaries = true;
 
-          // TODO: setup face_to_cell_index_nodal, face_to_cell_index_hermite,
+          // TODO: set up face_to_cell_index_nodal, face_to_cell_index_hermite,
           //  face_orientations
 
           return;
