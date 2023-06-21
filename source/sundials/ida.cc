@@ -278,9 +278,8 @@ namespace SUNDIALS
       {
         VectorType diff_comp_vector(solution);
         diff_comp_vector = 0.0;
-        auto dc          = differential_components();
-        for (auto i = dc.begin(); i != dc.end(); ++i)
-          diff_comp_vector[*i] = 1.0;
+        for (const auto &component : differential_components())
+          diff_comp_vector[component] = 1.0;
         diff_comp_vector.compress(VectorOperation::insert);
 
         const auto diff_id = internal::make_nvector_view(diff_comp_vector

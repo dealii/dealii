@@ -103,8 +103,8 @@ namespace Differentiation
         std::vector<std::pair<SD::Expression, SD::Expression>> symb_val_vec;
         symb_val_vec.reserve(symbol_value_vector.size());
         for (const auto &entry : symbol_value_vector)
-          symb_val_vec.push_back(std::make_pair(SD::Expression(entry.first),
-                                                SD::Expression(entry.second)));
+          symb_val_vec.emplace_back(SD::Expression(entry.first),
+                                    SD::Expression(entry.second));
         return symb_val_vec;
       }
 

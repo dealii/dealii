@@ -664,12 +664,12 @@ namespace Differentiation
 
         // ... followed by any intermediate evaluations due to the application
         // of CSE. These are fed directly back into the substitution map...
-        for (unsigned i = 0; i < intermediate_symbols_exprs.size(); ++i)
+        for (const auto &expression : intermediate_symbols_exprs)
           {
             const SymEngine::RCP<const SymEngine::Basic> &cse_symbol =
-              intermediate_symbols_exprs[i].first;
+              expression.first;
             const SymEngine::RCP<const SymEngine::Basic> &cse_expr =
-              intermediate_symbols_exprs[i].second;
+              expression.second;
             Assert(substitution_value_map.find(cse_symbol) ==
                      substitution_value_map.end(),
                    ExcMessage(
