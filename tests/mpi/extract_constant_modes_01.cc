@@ -64,8 +64,8 @@ test()
   if (myid == 0)
     for (unsigned int c = 0; c < fe.n_components(); ++c)
       {
-        std::vector<bool> mask(fe.n_components(), false);
-        mask[c] = true;
+        ComponentMask mask(fe.n_components(), false);
+        mask.set(c, true);
 
         std::vector<std::vector<bool>> constant_modes;
         DoFTools::extract_constant_modes(dofh, mask, constant_modes);
@@ -83,8 +83,8 @@ test()
   if (myid == 0)
     for (unsigned int c = 0; c < fe.n_components(); ++c)
       {
-        std::vector<bool> mask(fe.n_components(), false);
-        mask[c] = true;
+        ComponentMask mask(fe.n_components(), false);
+        mask.set(c, true);
 
         std::vector<std::vector<bool>> constant_modes;
         DoFTools::extract_constant_modes(dofh, mask, constant_modes);

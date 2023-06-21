@@ -94,9 +94,9 @@ test()
 
   AffineConstraints<double> cm(relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, cm);
-  std::vector<bool> velocity_mask(dim + 1, true);
+  ComponentMask velocity_mask(dim + 1, true);
 
-  velocity_mask[dim] = false;
+  velocity_mask.set(dim, false);
 
   VectorTools::interpolate_boundary_values(
     dofh, 0, Functions::ZeroFunction<dim>(dim + 1), cm, velocity_mask);

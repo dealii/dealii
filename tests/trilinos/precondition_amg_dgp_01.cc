@@ -199,7 +199,7 @@ Step4<dim>::solve()
   TrilinosWrappers::PreconditionAMG                 preconditioner;
   TrilinosWrappers::PreconditionAMG::AdditionalData data;
   DoFTools::extract_constant_modes(dof_handler,
-                                   std::vector<bool>(1, true),
+                                   ComponentMask(1, true),
                                    data.constant_modes);
   data.smoother_sweeps = 2;
   {
