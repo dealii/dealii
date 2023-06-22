@@ -3179,6 +3179,13 @@ namespace Step44
   // Here we present how the results are written to file to be viewed
   // using ParaView or VisIt. The method is similar to that shown in previous
   // tutorials so will not be discussed in detail.
+  //
+  // @note As of 2023, Visit 3.3.3 can still not deal with higher-order cells.
+  //   Rather, it simply reports that there is no data to show. To view the
+  //   results of this program with Visit, you will want to comment out the
+  //   line that sets `output_flags.write_higher_order_cells = true;`. On the
+  //   other hand, Paraview is able to understand VTU files with higher order
+  //   cells just fine.
   template <int dim>
   void Solid<dim>::output_results() const
   {
