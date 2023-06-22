@@ -3844,7 +3844,11 @@ AffineConstraints<number>::make_sorted_row_list(
       for (size_type q = 0; q < position.entries.size(); ++q)
         {
           const size_type new_index = position.entries[q].first;
-          if (active_dofs[active_dofs.size() - i] < new_index)
+          // in case all dofs are constrained, we might insert at
+          // active_dofs.begin(), but we should never insert before that
+          AssertIndexRange(i - 1, active_dofs.size() + 1);
+          if (i > active_dofs.size() ||
+              active_dofs[active_dofs.size() - i] < new_index)
             active_dofs.insert(active_dofs.end() - i + 1, new_index);
 
           // make binary search to find where to put the new index in order to
