@@ -2258,6 +2258,29 @@ namespace Step33
           cell->set_coarsen_flag();
       }
 
+    // The next step addresses a problem mentioned in a remark in the
+    // introduction: The SolutionTransfer class we want to use later on tests
+    // the assumption that the solution function is continuous at hanging
+    // nodes. This is not actually the case in this program because we chose
+    // (perhaps unwisely) to enforce hanging node constraints in a weak way,
+    // as one would for example do with discontinuous elements. But the elements
+    // we use here are continuous (namely, multiple copies of FE_Q), and so
+    // the assertion would fail and the program abort. To avoid the issue
+    // (without having to rewrite the whole program), we simply ensure that the
+    // solution *does* satisfy the hanging node constraints, but creating
+    // an AffineConstraint object that contains the hanging node constraints and
+    // applying the constraints to the two solution vectors we want the
+    // SolutionTransfer class to transfer to the next mesh:
+    {
+      AffineConstraints<double> hanging_node_constraints;
+      DoFTools::make_hanging_node_constraints(dof_handler,
+                                              hanging_node_constraints);
+      hanging_node_constraints.close();
+
+      hanging_node_constraints.distribute(old_solution);
+      hanging_node_constraints.distribute(predictor);
+    }
+
     // Then we need to transfer the various solution vectors from the old to
     // the new grid while we do the refinement. The SolutionTransfer class is
     // our friend here; it has a fairly extensive documentation, including
