@@ -91,7 +91,7 @@ data into <tt>output.dat</tt>, which can be used to plot graphs with
 script <tt>plot_errors.gpl</tt> via
 
 @code
-perl postprocess.pl deallog &> output.dat
+./step-39 | perl postprocess.pl >output.dat
 gnuplot plot_errors.gpl
 @endcode
 

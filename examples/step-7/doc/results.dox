@@ -15,7 +15,7 @@ here:
 
 Secondly, the program writes tables not only to disk, but also to the
 screen while running. The output looks like the following (recall that
-columns labeled as "<code>H1</code>" actually show the $H^1$ <i>semi-</i>norm
+columns labeled as "H1" actually show the $H^1$ <i>semi-</i>norm
 of the error, not the full $H^1$ norm):
 
 
