@@ -62,9 +62,17 @@ function(populate_target_properties _target _build)
     ${CMAKE_BINARY_DIR}/include
     ${CMAKE_SOURCE_DIR}/include
     )
-  target_include_directories(${_target} SYSTEM PRIVATE
-    ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-    )
+
+  #
+  # Do not add bundled include directories to bundled_ targets. First of
+  # all this is unnecessary, secondly, this severly trips up ICC-19 that
+  # cannot handle the additional -isystem include properly...
+  #
+  if(NOT "${_target}" MATCHES "^bundled_")
+    target_include_directories(${_target} SYSTEM PRIVATE
+      ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+      )
+  endif()
 
   # Interface includes:
 
