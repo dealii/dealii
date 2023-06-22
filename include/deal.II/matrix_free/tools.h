@@ -378,13 +378,13 @@ namespace MatrixFreeTools
       unsigned int c_num = 0;
       for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
         {
-          auto &face = *cell->face(i);
-          if (face.at_boundary() && !cell->has_periodic_neighbor(i))
+          const auto face = cell->face(i);
+          if (face->at_boundary() && !cell->has_periodic_neighbor(i))
             c_num +=
               factors[i] * (1 + std::distance(bids.begin(),
                                               std::find(bids.begin(),
                                                         bids.end(),
-                                                        face.boundary_id())));
+                                                        face->boundary_id())));
         }
       return c_num;
     };
