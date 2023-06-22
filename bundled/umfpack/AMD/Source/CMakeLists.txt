@@ -30,6 +30,7 @@ set(src_amd
   amd_valid.cc
   )
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Include)
 define_object_library(bundled_amd_int OBJECT ${src_amd})
 deal_ii_add_definitions(bundled_amd_int "DINT")
 
