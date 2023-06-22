@@ -476,6 +476,13 @@ namespace Step65
   // curved faces for <i>boundary</i> cells by default, so we need to ensure
   // that also inner cells are printed in a curved representation via the
   // mapping.
+  //
+  // @note As of 2023, Visit 3.3.3 can still not deal with higher-order cells.
+  //   Rather, it simply reports that there is no data to show. To view the
+  //   results of this program with Visit, you will want to comment out the
+  //   line that sets `flags.write_higher_order_cells = true;`. On the other
+  //   hand, Paraview is able to understand VTU files with higher order cells
+  //   just fine.
   template <int dim>
   void PoissonProblem<dim>::postprocess(const Mapping<dim> &mapping)
   {
