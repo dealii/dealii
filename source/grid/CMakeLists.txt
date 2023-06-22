@@ -21,11 +21,12 @@
 # due to a longstanding bug in gcc. Thus, simply set
 # -Wno-misleading-indentation on the command line for the
 # grid_generator_cgal.cc compilation unit.
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89549
 #
 if(DEAL_II_WITH_CGAL)
   enable_if_supported(_flag "-Wno-misleading-indentation")
-  set_property(SOURCE "grid_generator_cgal.cc"
-    APPEND_STRING PROPERTY COMPILE_FLAGS " ${_flag}"
+  set_property(SOURCE "grid_generator_cgal.cc" "grid_tools.cc"
+    APPEND PROPERTY COMPILE_OPTIONS "${_flag}"
     )
 endif()
 
