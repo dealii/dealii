@@ -23,7 +23,13 @@
 set(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 macro(feature_cuda_find_external var)
-  if(NOT Kokkos_ENABLE_CUDA)
+  if(DEAL_II_FEATURE_KOKKOS_BUNDLED_CONFIGURED)
+    set(CUDA_ADDITIONAL_ERROR_STRING
+      ${CUDA_ADDITIONAL_ERROR_STRING}
+      "deal.II's bundled version of Kokkos only supports the Serial backend and therefore cannot be used with Cuda."
+      )
+    set(${var} FALSE)
+  elseif(NOT Kokkos_ENABLE_CUDA)
     set(CUDA_ADDITIONAL_ERROR_STRING
       ${CUDA_ADDITIONAL_ERROR_STRING}
       "deal.II can only be compiled with Cuda support if Kokkos was built with Cuda support!"
@@ -113,7 +119,7 @@ macro(feature_cuda_error_message)
   message(FATAL_ERROR "\n"
     "Could not find any suitable cuda library!\n"
     ${CUDA_ADDITIONAL_ERROR_STRING}
-    "\nPlease ensure that a cuda library is installed on your computer\n"
+    "\nPlease ensure that a cuda library is installed on your computer and deal.II is configured to use an external Kokkos installation.\n"
     )
 endmacro()
 
