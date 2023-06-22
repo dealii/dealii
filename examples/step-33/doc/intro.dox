@@ -304,13 +304,33 @@ the continuous and DG methodologies. It also simplifies the generation
 of the Jacobian because we do not have to track constrained degrees of
 freedom through the automatic differentiation used to compute it.
 
-@note Whereas this program was written in 2008, we were unaware of any
+@note When this program was written in 2008, we were unaware of any
 publication that would actually have used this approach. However, a
 more recent paper by A. Dedner, R. Kl&ouml;fkorn, and M. Kr&auml;nkel
 ("Continuous Finite-Elements on Non-Conforming Grids Using
 Discontinuous Galerkin Stabilization", Proceedings of Finite Volumes
 for Complex Applications VII - Methods and Theoretical Aspects,
 Springer, 2014) comes close.
+
+@note In hindsight, dealing with hanging nodes in this way is perhaps
+  not the best choice. deal.II contains many places that assume that
+  an element that has degrees of freedom on vertices, edges, and faces
+  (like the FE_Q element used here) represents finite element functions
+  on a triangulation that have certain continuity properties. Calling
+  DoFTools::make_hanging_node_constraints() and putting the corresponding
+  output into an AffineConstraints object allows one to enforce
+  these assumptions when one calls AffineConstraints::distribute()
+  at the end of the function that solves linear systems -- this call
+  can be found in all other tutorial programs that use meshes with
+  hanging nodes, and ensures that the resulting function's value at
+  hanging nodes is correct with regard to the values of the nodes on
+  the adjacent parent cell. On the other hand, this program does not do
+  this, and this runs afoul of an assertion that was later added to the
+  library and that tested that the function is indeed continuous.
+  To address the resulting failure due to the assertion not being
+  satisfied, we *do* after all enforce continuity at hanging nodes
+  just before we transfer the solution from one mesh to another,
+  in the `ConservationLaw::refine_grid()` function.
 
 Further, we enforce a maximum number of refinement levels to keep refinement under check.  It is the
 author's experience that for adaptivity for a time dependent problem, refinement can easily lead the simulation to
