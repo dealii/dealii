@@ -1484,7 +1484,7 @@ namespace Differentiation
       /**
        * Move constructor.
        */
-      BatchOptimizer(BatchOptimizer &&) = default;
+      BatchOptimizer(BatchOptimizer &&) noexcept = default;
 
       /**
        * Destructor.

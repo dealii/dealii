@@ -236,13 +236,11 @@ namespace OpenCASCADE
       TopoDS_Shape        out_shape;
       Tensor<1, spacedim> average_normal;
 #  ifdef DEBUG
-      for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+      for (const auto &point : surrounding_points)
         {
-          Assert(closest_point(sh, surrounding_points[i], tolerance)
-                     .distance(surrounding_points[i]) <
-                   std::max(tolerance * surrounding_points[i].norm(),
-                            tolerance),
-                 ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
+          Assert(closest_point(sh, point, tolerance).distance(point) <
+                   std::max(tolerance * point.norm(), tolerance),
+                 ExcPointNotOnManifold<spacedim>(point));
         }
 #  endif
 
@@ -250,11 +248,13 @@ namespace OpenCASCADE
         {
           case 2:
             {
-              for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+              for (const auto &point : surrounding_points)
                 {
                   std::tuple<Point<3>, Tensor<1, 3>, double, double>
-                    p_and_diff_forms = closest_point_and_differential_forms(
-                      sh, surrounding_points[i], tolerance);
+                    p_and_diff_forms =
+                      closest_point_and_differential_forms(sh,
+                                                           point,
+                                                           tolerance);
                   average_normal += std::get<1>(p_and_diff_forms);
                 }
 

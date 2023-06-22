@@ -211,8 +211,8 @@ namespace Step36
     IndexSet eigenfunction_index_set = dof_handler.locally_owned_dofs();
     eigenfunctions.resize(
       parameters.get_integer("Number of eigenvalues/eigenfunctions"));
-    for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
-      eigenfunctions[i].reinit(eigenfunction_index_set, MPI_COMM_WORLD);
+    for (auto &eigenfunction : eigenfunctions)
+      eigenfunction.reinit(eigenfunction_index_set, MPI_COMM_WORLD);
 
     eigenvalues.resize(eigenfunctions.size());
   }
@@ -384,8 +384,8 @@ namespace Step36
     // does not necessarily have to be attained at a node, and so
     // $\max_{\mathbf x}\phi_i(\mathbf x)\ge\max_j (\Phi_i)_j$ (although the
     // equality is usually nearly true).
-    for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
-      eigenfunctions[i] /= eigenfunctions[i].linfty_norm();
+    for (auto &eigenfunction : eigenfunctions)
+      eigenfunction /= eigenfunction.linfty_norm();
 
     // Finally return the number of iterations it took to converge:
     return solver_control.last_step();
