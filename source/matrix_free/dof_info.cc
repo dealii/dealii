@@ -588,7 +588,7 @@ namespace internal
               IndexStorageVariants::full;
           else
             {
-              bool indices_are_contiguous = true;
+              bool indices_are_contiguous = (ndofs > 0);
               for (unsigned int j = 0; j < n_comp; ++j)
                 {
                   const unsigned int  cell_no = i * vectorization_length + j;
@@ -630,14 +630,18 @@ namespace internal
                   indices_are_interleaved_and_contiguous)
                 {
                   for (unsigned int j = 0; j < n_comp; ++j)
-                    dof_indices_contiguous
-                      [dof_access_cell][i * vectorization_length + j] =
-                        this->dof_indices.size() == 0 ?
-                          0 :
-                          this->dof_indices
-                            [row_starts[(i * vectorization_length + j) *
-                                        n_components]
-                               .first];
+                    {
+                      const unsigned int start_index =
+                        row_starts[(i * vectorization_length + j) *
+                                   n_components]
+                          .first;
+                      AssertIndexRange(start_index, dof_indices.size());
+                      dof_indices_contiguous[dof_access_cell]
+                                            [i * vectorization_length + j] =
+                                              this->dof_indices.size() == 0 ?
+                                                0 :
+                                                this->dof_indices[start_index];
+                    }
                 }
 
               if (indices_are_interleaved_and_contiguous)
@@ -657,7 +661,7 @@ namespace internal
                     dof_indices_interleave_strides[2][i * vectorization_length +
                                                       j] = 1;
                 }
-              else
+              else if (ndofs > 0)
                 {
                   int                 indices_are_interleaved_and_mixed = 2;
                   const unsigned int *dof_indices =
@@ -750,6 +754,9 @@ namespace internal
                         }
                     }
                 }
+              else // ndofs == 0
+                index_storage_variants[dof_access_cell][i] =
+                  IndexStorageVariants::full;
             }
           index_kinds[static_cast<unsigned int>(
             index_storage_variants[dof_access_cell][i])]++;
