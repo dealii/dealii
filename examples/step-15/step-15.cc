@@ -164,7 +164,7 @@ namespace Step15
 
   // @sect4{MinimalSurfaceProblem::setup_system}
 
-  // As always in the setup-system function, we setup the variables of the
+  // As always in the setup-system function, we set up the variables of the
   // finite element method. There are same differences to step-6, because
   // there we start solving the PDE from scratch in every refinement cycle
   // whereas here we need to take the solution from the previous mesh onto the

@@ -1461,7 +1461,7 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
 // @sect4{LaplaceProblem::run()}
 
 // As in most tutorials, this function calls the various functions defined
-// above to setup, assemble, solve, and output the results.
+// above to set up, assemble, solve, and output the results.
 template <int dim, int degree>
 void LaplaceProblem<dim, degree>::run()
 {

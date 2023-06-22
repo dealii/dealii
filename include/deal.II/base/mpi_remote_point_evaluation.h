@@ -100,7 +100,7 @@ namespace Utilities
        * GridTools::internal::DistributedComputePointLocationsInternal.
        *
        * This function is called internally by the reinit() function above.
-       * Having it as a separate function makes it possible to setup the class
+       * Having it as a separate function makes it possible to set up the class
        * if it is known in which cells corresponding reference points are
        * located (e.g. if intersections of cells are known).
        */

@@ -320,7 +320,7 @@ namespace Step46
 
   // @sect4{<code>FluidStructureProblem::setup_dofs</code>}
 
-  // The next step is to setup the data structures for the linear system. To
+  // The next step is to set up the data structures for the linear system. To
   // this end, we first have to set the active FE indices with the function
   // immediately above, then distribute degrees of freedom, and then determine
   // constraints on the linear system. The latter includes hanging node

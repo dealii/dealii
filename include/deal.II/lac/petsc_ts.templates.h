@@ -751,7 +751,7 @@ namespace PETScWrappers
                                    ts_ijacobian_with_setup,
                                    this));
 
-        // Tell PETSc to setup a MFFD operator for the linear system matrix
+        // Tell PETSc to set up a MFFD operator for the linear system matrix
         if (!A)
           set_use_matrix_free(ts, true, false);
 

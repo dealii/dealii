@@ -548,7 +548,7 @@ namespace Euler_DG
   }
 
 
-  // Modified reinit() function to setup the internal data structures in
+  // Modified reinit() function to set up the internal data structures in
   // MatrixFree in a way that it is usable by the cell-centric loops and
   // the MPI-3.0 shared-memory capabilities are used:
   template <int dim, int degree, int n_points_1d>
