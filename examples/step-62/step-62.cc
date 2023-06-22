@@ -1386,7 +1386,9 @@ int main(int argc, char *argv[])
 
       // Each of the simulations (displacement and calibration) is stored in a
       // separate HDF5 group:
-      for (const std::string &group_name : {"displacement", "calibration"})
+      const std::array<std::string, 2> group_names{
+        {"displacement", "calibration"}};
+      for (const std::string &group_name : group_names)
         {
           // For each of these two group names, we now create the group and put
           // attributes into these groups.
