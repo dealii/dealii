@@ -23,6 +23,8 @@ set(src_boost_iostreams
 enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-c11-extensions)
 enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-deprecated-copy)
 enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-uninitialized)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-deprecated-builtins)
+enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-deprecated-declarations)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
 define_object_library(bundled_boost_iostreams OBJECT ${src_boost_iostreams})
