@@ -20,7 +20,7 @@
 # guarding the include by DEAL_II_DISABLE_EXTRA_DIAGNOSTICS is not enough
 # due to a longstanding bug in gcc. Thus, simply set
 # -Wno-misleading-indentation on the command line for the
-# grid_generator_cgal.cc compilation unit.
+# grid_generator_cgal.cc and grid_tools.cc compilation units.
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89549
 #
 if(DEAL_II_WITH_CGAL)
