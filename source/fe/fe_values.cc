@@ -3116,7 +3116,7 @@ namespace internal
   template <int spacedim, typename Number, typename Number2>
   void
   do_function_laplacians(
-    const Number2 *                              dof_values_ptr,
+    const ArrayView<Number2> &                   dof_values,
     const dealii::Table<2, Tensor<2, spacedim>> &shape_hessians,
     std::vector<Number> &                        laplacians)
   {
@@ -3133,7 +3133,7 @@ namespace internal
     // the trace of the Hessian.
     for (unsigned int shape_func = 0; shape_func < dofs_per_cell; ++shape_func)
       {
-        const Number2 value = dof_values_ptr[shape_func];
+        const Number2 value = dof_values[shape_func];
         // For auto-differentiable numbers, the fact that a DoF value is zero
         // does not imply that its derivatives are zero as well. So we
         // can't filter by value for these number types.
@@ -3153,7 +3153,7 @@ namespace internal
   template <int dim, int spacedim, typename VectorType, typename Number>
   void
   do_function_laplacians(
-    const Number *                               dof_values_ptr,
+    const ArrayView<Number> &                    dof_values,
     const dealii::Table<2, Tensor<2, spacedim>> &shape_hessians,
     const FiniteElement<dim, spacedim> &         fe,
     const std::vector<unsigned int> &            shape_function_to_row_table,
@@ -3200,7 +3200,7 @@ namespace internal
       for (unsigned int shape_func = 0; shape_func < dofs_per_cell;
            ++shape_func)
         {
-          const Number &value = dof_values_ptr[shape_func + mc * dofs_per_cell];
+          const Number &value = dof_values[shape_func + mc * dofs_per_cell];
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
@@ -3648,7 +3648,8 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   // get function values of dofs on this cell
   Vector<Number> dof_values(dofs_per_cell);
   present_cell.get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_laplacians(dof_values.begin(),
+  internal::do_function_laplacians(make_array_view(dof_values.begin(),
+                                                   dof_values.end()),
                                    this->finite_element_output.shape_hessians,
                                    laplacians);
 }
@@ -3672,7 +3673,8 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
-  internal::do_function_laplacians(dof_values.data(),
+  internal::do_function_laplacians(make_array_view(dof_values.begin(),
+                                                   dof_values.end()),
                                    this->finite_element_output.shape_hessians,
                                    laplacians);
 }
@@ -3696,7 +3698,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   Vector<Number> dof_values(dofs_per_cell);
   present_cell.get_interpolated_dof_values(fe_function, dof_values);
   internal::do_function_laplacians(
-    dof_values.begin(),
+    make_array_view(dof_values.begin(), dof_values.end()),
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -3725,7 +3727,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   for (unsigned int i = 0; i < indices.size(); ++i)
     dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
   internal::do_function_laplacians(
-    dof_values.data(),
+    make_array_view(dof_values.begin(), dof_values.end()),
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -3755,7 +3757,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   for (unsigned int i = 0; i < indices.size(); ++i)
     dof_values[i] = internal::get_vector_element(fe_function, indices[i]);
   internal::do_function_laplacians(
-    dof_values.data(),
+    make_array_view(dof_values.begin(), dof_values.end()),
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
