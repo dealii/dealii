@@ -24,9 +24,7 @@ enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-implicit-fallthrough)
 enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-cast-function-type)
 enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-float-conversion)
 
-include_directories(
-  include/
-)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
 define_object_library(bundled_muparser OBJECT
   src/muParserBase.cpp
