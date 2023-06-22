@@ -3294,12 +3294,10 @@ namespace Step32
       // remainder of the function further down below is then concerned with
       // setting up the data structures again after mesh refinement and
       // restoring the solution vectors on the new mesh.
-      std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature(2);
-      x_temperature[0] = &temperature_solution;
-      x_temperature[1] = &old_temperature_solution;
-      std::vector<const TrilinosWrappers::MPI::BlockVector *> x_stokes(2);
-      x_stokes[0] = &stokes_solution;
-      x_stokes[1] = &old_stokes_solution;
+      const std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature = {
+        &temperature_solution, &old_temperature_solution};
+      const std::vector<const TrilinosWrappers::MPI::BlockVector *> x_stokes = {
+        &stokes_solution, &old_stokes_solution};
 
       triangulation.prepare_coarsening_and_refinement();
 
@@ -3319,9 +3317,8 @@ namespace Step32
         TrilinosWrappers::MPI::Vector distributed_temp1(temperature_rhs);
         TrilinosWrappers::MPI::Vector distributed_temp2(temperature_rhs);
 
-        std::vector<TrilinosWrappers::MPI::Vector *> tmp(2);
-        tmp[0] = &(distributed_temp1);
-        tmp[1] = &(distributed_temp2);
+        std::vector<TrilinosWrappers::MPI::Vector *> tmp = {&distributed_temp1,
+                                                            &distributed_temp2};
         temperature_trans.interpolate(tmp);
 
         // enforce constraints to make the interpolated solution conforming on
@@ -3329,17 +3326,16 @@ namespace Step32
         temperature_constraints.distribute(distributed_temp1);
         temperature_constraints.distribute(distributed_temp2);
 
-        temperature_solution     = distributed_temp1;
-        old_temperature_solution = distributed_temp2;
+        temperature_solution     = std::move(distributed_temp1);
+        old_temperature_solution = std::move(distributed_temp2);
       }
 
       {
         TrilinosWrappers::MPI::BlockVector distributed_stokes(stokes_rhs);
         TrilinosWrappers::MPI::BlockVector old_distributed_stokes(stokes_rhs);
 
-        std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp(2);
-        stokes_tmp[0] = &(distributed_stokes);
-        stokes_tmp[1] = &(old_distributed_stokes);
+        std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp = {
+          &distributed_stokes, &old_distributed_stokes};
 
         stokes_trans.interpolate(stokes_tmp);
 
@@ -3348,8 +3344,8 @@ namespace Step32
         stokes_constraints.distribute(distributed_stokes);
         stokes_constraints.distribute(old_distributed_stokes);
 
-        stokes_solution     = distributed_stokes;
-        old_stokes_solution = old_distributed_stokes;
+        stokes_solution     = std::move(distributed_stokes);
+        old_stokes_solution = std::move(old_distributed_stokes);
       }
     }
   }
