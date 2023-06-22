@@ -69,4 +69,12 @@ enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-missing-field-initializers)
 enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-suggest-override)
 enable_if_supported(DEAL_II_WARNING_FLAGS -Wno-unused-but-set-parameter)
 
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/containers/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/core/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/simd/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/tpls/desul/include
+  )
+
 define_object_library(bundled_kokkos OBJECT ${src_kokkos})
