@@ -1161,12 +1161,21 @@ namespace TrilinosWrappers
                         ExcNOXNoConvergence());
           }
       }
-    // See if NOX returned by triggering an exception. In a sign of generally
-    // poor software design, NOX throws an exception that is not of a class
-    // derived from std::exception, but just a char*. That's a nuisance -- you
-    // just have to know :-(
+    // See if NOX returned by triggering an exception.
+#if DEAL_II_TRILINOS_VERSION_GTE(4, 2, 0)
+    // Starting with Trilinos version 4.2.0 NOX started to throw a
+    // std::runtime_error instead of a plain char*.
+    catch (const std::runtime_error &exc)
+      {
+        const char *s = exc.what();
+#else
+    // In a sign of generally poor software design, NOX prior to Trilinos
+    // version 4.2.0 throws an exception that is not of a class derived
+    // from std::exception, but just a char*. That's a nuisance -- you just
+    // have to know :-(
     catch (const char *s)
       {
+#endif
         // Like above, see if NOX aborted because there was an exception
         // in a user callback. In that case, collate the errors if we can
         // (namely, if the user exception was derived from std::exception),
