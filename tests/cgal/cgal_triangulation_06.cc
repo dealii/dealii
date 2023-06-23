@@ -45,6 +45,16 @@ using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr>;
 int
 main()
 {
+  // This test might trigger spurious floating point exception despite
+  // functioning properly. Simply disable floating point exceptions again
+  // (after they had been enabled int tests.h)
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  {
+    const int current_fe_except = fegetexcept();
+    fedisableexcept(current_fe_except);
+  }
+#endif
+
   initlog();
   // Build a deal.II triangulation
   CGAL::Surface_mesh<CGALPoint> cgal_surface_mesh;
