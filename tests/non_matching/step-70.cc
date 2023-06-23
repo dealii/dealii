@@ -1922,35 +1922,13 @@ main(int argc, char *argv[])
   try
     {
       std::string prm_file;
-      if (argc > 1)
-        prm_file = argv[1];
-      else
-        prm_file = SOURCE_DIR "/step-70.in.prm";
+      prm_file = SOURCE_DIR "/step-70.in.prm";
 
-      if (prm_file.find("23") != std::string::npos)
-        {
-          StokesImmersedProblemParameters<2, 3> par;
-          ParameterAcceptor::initialize(prm_file);
+      StokesImmersedProblemParameters<2> par;
+      ParameterAcceptor::initialize(prm_file);
 
-          StokesImmersedProblem<2, 3> problem(par);
-          problem.run();
-        }
-      else if (prm_file.find('3') != std::string::npos)
-        {
-          StokesImmersedProblemParameters<3> par;
-          ParameterAcceptor::initialize(prm_file);
-
-          StokesImmersedProblem<3> problem(par);
-          problem.run();
-        }
-      else
-        {
-          StokesImmersedProblemParameters<2> par;
-          ParameterAcceptor::initialize(prm_file);
-
-          StokesImmersedProblem<2> problem(par);
-          problem.run();
-        }
+      StokesImmersedProblem<2> problem(par);
+      problem.run();
     }
   catch (std::exception &exc)
     {
