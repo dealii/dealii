@@ -104,7 +104,7 @@ namespace Differentiation
         {expression_otherwise.get_RCP(), SE::boolTrue});
 
       // Initialize
-      expression = SE::piecewise(piecewise_function);
+      expression = SE::piecewise(std::move(piecewise_function));
     }
 
 
