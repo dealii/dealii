@@ -656,3 +656,15 @@ happen, let us simply point out that the test suite program
 necessary to use NOX instead of KINSOL are quite minimal; in
 particular, NOX (unlike SNES) is happy to work with deal.II's own
 vector and matrix classes.
+
+
+<h4> Replacing SUNDIALS' KINSOL by a generic nonlinear solver </h4>
+
+Having to choose which of these three frameworks (KINSOL, SNES, or NOX)
+to use at compile time is cumbersome when wanting to compare things. It
+would be nicer if one could decide the package to use at run time, assuming that one
+has a copy of deal.II installed that is compiled against all three of these
+dependencies. It turns out that this is possible, using the class
+NonlinearSolverSelector that presents a common interface to all three of
+these solvers, along with the ability to choose which one to use based
+on run-time parameters.
