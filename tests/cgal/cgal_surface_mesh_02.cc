@@ -47,6 +47,16 @@ using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr,
 void
 test()
 {
+  // This test might trigger spurious floating point exception despite
+  // functioning properly. Simply disable floating point exceptions again
+  // (after they had been enabled int tests.h)
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  {
+    const int current_fe_except = fegetexcept();
+    fedisableexcept(current_fe_except);
+  }
+#endif
+
   const std::vector<std::string> fnames{SOURCE_DIR "/input_grids/cube.off",
                                         SOURCE_DIR
                                         "/input_grids/tetrahedron.off"};
