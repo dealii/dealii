@@ -406,10 +406,11 @@ namespace MPI_nonlinear_solver_selector_test
 #endif
     preconditioner.initialize(jacobian_matrix, data);
 
-    solver.solve(jacobian_matrix, solution, rhs, preconditioner);
-
-    deallog << "   Solved in " << solver_control.last_step() << " iterations."
-            << std::endl;
+    check_solver_within_range(
+      solver.solve(jacobian_matrix, solution, rhs, preconditioner),
+      solver_control.last_step(),
+      0,
+      10);
 
     zero_constraints.distribute(solution);
   }
