@@ -516,9 +516,15 @@ namespace internal
         // determine range of dofs in global data structure
         const auto range =
           process_object_range(dof_handler, obj_level, obj_index, fe_index, dd);
+        if (range.second == 0)
+          return;
+
+        std::vector<types::global_dof_index> &object_dof_indices =
+          dof_handler
+            .object_dof_indices[structdim < dim ? 0 : obj_level][structdim];
+        AssertIndexRange(range.first, object_dof_indices.size());
         types::global_dof_index *DEAL_II_RESTRICT stored_indices =
-          &dof_handler.object_dof_indices[structdim < dim ? 0 : obj_level]
-                                         [structdim][range.first];
+          object_dof_indices.data() + range.first;
 
         // process dofs
         for (unsigned int i = 0; i < range.second; ++i, ++dof_indices_ptr)
