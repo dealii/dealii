@@ -457,8 +457,8 @@ namespace Step57
                 local_rhs(i) +=
                   (-viscosity * scalar_product(grad_phi_u[i],
                                                present_velocity_gradients[q]) -
-                   phi_u[i] * (present_velocity_values[q] *
-                               present_velocity_gradients[q]) +
+                   phi_u[i] * (present_velocity_gradients[q] *
+                               present_velocity_values[q]) +
                    div_phi_u[i] * present_pressure_values[q] +
                    phi_p[i] * present_velocity_divergence -
                    gamma * div_phi_u[i] * present_velocity_divergence) *
