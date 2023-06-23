@@ -15,7 +15,8 @@
  */
 
 
-// step-77 for the test suite - verifies KINSOL.
+// A modification of step-77 for the test suite, using NOX instead of
+// the KINSOL solver used in step-77.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/mpi.h>
