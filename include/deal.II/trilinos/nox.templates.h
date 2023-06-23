@@ -1170,7 +1170,7 @@ namespace TrilinosWrappers
         const char *s = exc.what();
 #    else
     // In a sign of generally poor software design, NOX prior to Trilinos
-    // version 4.2.0 throws an exception that is not of a class derived
+    // version 14.2.0 throws an exception that is not of a class derived
     // from std::exception, but just a char*. That's a nuisance -- you just
     // have to know :-(
     catch (const char *s)
