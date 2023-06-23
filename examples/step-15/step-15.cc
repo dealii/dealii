@@ -683,7 +683,7 @@ namespace Step15
         ++refinement_cycle;
         std::cout << std::endl;
       }
-    while (last_residual_norm > 1e-3);
+    while (last_residual_norm > 1e-2);
   }
 } // namespace Step15
 

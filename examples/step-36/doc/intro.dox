@@ -18,9 +18,8 @@ course equally applicable to the other applications above.
 
 Eigenspectrum problems have the general form
 @f{align*}
-	L \Psi &= \varepsilon \Psi \qquad &&\text{in}\ \Omega\quad,
-	\\
-	\Psi &= 0 &&\text{on}\ \partial\Omega\quad,
+    L \Psi &= \varepsilon \Psi \qquad &&\text{in}\ \Omega, \\
+    \Psi   &= 0 &&\text{on}\ \partial\Omega,
 @f}
 where the Dirichlet boundary condition on $\Psi=\Psi(\mathbf x)$ could also be
 replaced by Neumann or Robin conditions; $L$ is an operator that generally
