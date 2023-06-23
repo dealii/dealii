@@ -1148,6 +1148,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
   {
     tmp = 0.0;
     tmp.add(nloc, local_indices.data(), resid.data());
+    tmp.compress(VectorOperation::add);
     solver_control.check(iparam[2], tmp.l2_norm());
   }
 }
