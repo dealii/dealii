@@ -781,9 +781,16 @@ namespace Utilities
         // argv has argc+1 elements and the last one is a nullptr. For appending
         // one element we thus create a new argv by copying the first argc
         // elements, append the new option, and then a nullptr.
+        //
+        // We do get in trouble, though, if a user program is called with
+        // '--help' as a command line argument. This '--help' gets passed on to
+        // Kokkos, which promptly responds with a lengthy message that the user
+        // likely did not intend. As a consequence, filter out this specific
+        // flag.
         std::vector<char *> argv_new;
         for (int i = 0; i < argc; ++i)
-          argv_new.push_back(argv[i]);
+          if (strcmp(argv[i], "--help") != 0)
+            argv_new.push_back(argv[i]);
 
         std::stringstream threads_flag;
 #if KOKKOS_VERSION >= 30700
