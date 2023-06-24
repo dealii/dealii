@@ -79,7 +79,7 @@ main(int argc, char **argv)
       AssertThrow(ts == static_cast<TS>(myode), ExcInternalError());
       myode.solve(v, A);
     }
-  catch (StandardExceptions::ExcFunctionNotProvided)
+  catch (StandardExceptions::ExcFunctionNotProvided &)
     {
       deallog << "catching expected exception" << std::endl;
     }
