@@ -788,9 +788,9 @@ namespace Utilities
         // likely did not intend. As a consequence, filter out this specific
         // flag.
         std::vector<char *> argv_new;
-        for (int i = 0; i < argc; ++i)
-          if (strcmp(argv[i], "--help") != 0)
-            argv_new.push_back(argv[i]);
+        for (const auto arg : make_array_view(&argv[0], &argv[0] + argc))
+          if (strcmp(arg, "--help") != 0)
+            argv_new.push_back(arg);
 
         std::stringstream threads_flag;
 #if KOKKOS_VERSION >= 30700
