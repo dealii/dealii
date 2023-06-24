@@ -568,20 +568,22 @@ namespace PETScWrappers
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
           "Failure in ts_ijacobian_with_setup from dealii::PETScWrappers::TimeStepper");
-
       petsc_increment_state_counter(P);
 
       // Handle older versions of PETSc for which we cannot pass a MATSHELL
       // matrix to DMSetMatType. This has been fixed from 3.13 on.
       // What we need to do for older version of PETSc is instead to have
       // a zero matrix with all diagonal entries present.
+      // We use PETSC_MACHINE_EPSILON because some versions of PETSc skip
+      // MatShift if we pass 0.0
       if (user->need_dummy_assemble)
         {
           PetscCall(MatZeroEntries(P));
           PetscCall(MatAssemblyBegin(P, MAT_FINAL_ASSEMBLY));
           PetscCall(MatAssemblyEnd(P, MAT_FINAL_ASSEMBLY));
-          PetscCall(MatShift(P, 0.0));
+          PetscCall(MatShift(P, PETSC_MACHINE_EPSILON));
         }
+      user->need_dummy_assemble = false;
 
       // Handle the Jacobian-free case
       // This call allow to resample the linearization point
@@ -668,18 +670,7 @@ namespace PETScWrappers
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
           "Failure in ts_rhsjacobian from dealii::PETScWrappers::TimeStepper");
-
       petsc_increment_state_counter(P);
-
-      // Handle older versions of PETSc for which we cannot pass a MATSHELL
-      // matrix to DMSetMatType
-      if (user->need_dummy_assemble)
-        {
-          PetscCall(MatZeroEntries(P));
-          PetscCall(MatAssemblyBegin(P, MAT_FINAL_ASSEMBLY));
-          PetscCall(MatAssemblyEnd(P, MAT_FINAL_ASSEMBLY));
-          PetscCall(MatShift(P, 0.0));
-        }
 
       // Handle the Jacobian-free case
       // This call allow to resample the linearization point
