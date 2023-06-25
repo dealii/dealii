@@ -97,10 +97,12 @@ pipeline
                   set -x
                   export TEST_TIME_LIMIT=1200
                   export NP=`grep -c ^processor /proc/cpuinfo`
+                  export ASAN_OPTIONS="detect_leaks=0"
                   mkdir -p /home/dealii/build
                   cd /home/dealii/build
                   cmake -G "Ninja" \
-                    -D DEAL_II_CXX_FLAGS='-Werror' \
+                    -D DEAL_II_CXX_FLAGS='-Werror -fsanitize=address' \
+                    -D DEAL_II_LINKER_FLAGS='-fsanitize=address' \
                     -D DEAL_II_CXX_FLAGS_DEBUG='-Og' \
                     -D DEAL_II_EARLY_DEPRECATIONS=ON \
                     -D CMAKE_BUILD_TYPE=Debug \
