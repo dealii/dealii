@@ -714,6 +714,7 @@ namespace OpenCASCADE
     [[maybe_unused]] unsigned int counter = 0;
 #  else
     unsigned int     counter = 0;
+    (void)counter;
 #  endif
     unsigned int face_counter = 0;
 
