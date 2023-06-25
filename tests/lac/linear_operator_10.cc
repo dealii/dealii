@@ -50,6 +50,16 @@ test_preconditioner(const MATRIX &         A,
                     const VECTOR &         b,
                     const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
 {
+  // This test might trigger spurious floating point exceptions in Trilinos
+  // despite functioning properly. Simply disable floating point exceptions
+  // again (after they had been enabled int tests.h).
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  {
+    const int current_fe_except = fegetexcept();
+    fedisableexcept(current_fe_except);
+  }
+#endif
+
   const auto lo_A = linear_operator<VECTOR>(A);
   // Note: The above should be equivalent to the following:
   //
