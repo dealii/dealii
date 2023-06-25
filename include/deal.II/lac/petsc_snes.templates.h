@@ -447,6 +447,7 @@ namespace PETScWrappers
           PetscCall(MatAssemblyBegin(P, MAT_FINAL_ASSEMBLY));
           PetscCall(MatAssemblyEnd(P, MAT_FINAL_ASSEMBLY));
         }
+      user->need_dummy_assemble = false;
 
       // Handle the Jacobian-free case
       // This call allows to resample the linearization point
@@ -531,6 +532,7 @@ namespace PETScWrappers
     if (energy)
       AssertPETSc(SNESSetObjective(snes, snes_objective, this));
 
+    this->need_dummy_assemble = false;
     if (setup_jacobian)
       {
         AssertPETSc(SNESSetJacobian(snes,
@@ -543,7 +545,6 @@ namespace PETScWrappers
 
 
         // Do not waste memory by creating a dummy AIJ matrix inside PETSc.
-        this->need_dummy_assemble = false;
         if (!P)
           {
 #  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)

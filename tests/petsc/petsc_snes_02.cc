@@ -77,7 +77,7 @@ main(int argc, char **argv)
       AssertThrow(snes == static_cast<SNES>(mysolver), ExcInternalError());
       mysolver.solve(v, A);
     }
-  catch (StandardExceptions::ExcFunctionNotProvided)
+  catch (StandardExceptions::ExcFunctionNotProvided &)
     {
       deallog << "catching expected exception" << std::endl;
     }

@@ -66,6 +66,14 @@ main(int argc, char **argv)
       last_residual_eval = X(0);
     };
 
+    // This test triggers false positives in FPE trapping for some versions of
+    // PETSc
+#if DEAL_II_PETSC_VERSION_LT(3, 19, 2) && defined(DEBUG) && \
+  defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+    PetscErrorCode ierr = PetscFPTrapPush(PETSC_FP_TRAP_OFF);
+    (void)ierr;
+#endif
+
     for (int setjac = 0; setjac < 2; setjac++)
       {
         if (setjac)

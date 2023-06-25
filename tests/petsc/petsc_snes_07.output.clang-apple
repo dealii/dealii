@@ -1,0 +1,101 @@
+
+DEAL::Running testcase 0
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the Jacobian at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Evaluating the Jacobian at x=-0.557408
+DEAL::Throwing a recoverable exception from jacobian.
+DEAL::Caught exception.
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_snes.templates.h> in function
+    unsigned int dealii::PETScWrappers::NonlinearSolver<dealii::PETScWrappers::MPI::Vector, dealii::PETScWrappers::MPI::SparseMatrix, dealii::PETScWrappers::MPI::SparseMatrix>::solve(VectorType &) [VectorType = dealii::PETScWrappers::MPI::Vector, PMatrixType = dealii::PETScWrappers::MPI::SparseMatrix, AMatrixType = dealii::PETScWrappers::MPI::SparseMatrix]
+The violated condition was: 
+    reason > 0
+Additional information: 
+    SNES solver did not converge after 1 iterations with reason
+    DIVERGED_JACOBIAN_DOMAIN
+--------------------------------------------------------
+
+DEAL::Running testcase 1
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Setup Jacobian at x=1.00000
+DEAL::Solve Jacobian
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Setup Jacobian at x=-0.557408
+DEAL::Throwing a recoverable exception from setup_jacobian.
+DEAL::Caught exception.
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_snes.templates.h> in function
+    unsigned int dealii::PETScWrappers::NonlinearSolver<dealii::PETScWrappers::MPI::Vector, dealii::PETScWrappers::MPI::SparseMatrix, dealii::PETScWrappers::MPI::SparseMatrix>::solve(VectorType &) [VectorType = dealii::PETScWrappers::MPI::Vector, PMatrixType = dealii::PETScWrappers::MPI::SparseMatrix, AMatrixType = dealii::PETScWrappers::MPI::SparseMatrix]
+The violated condition was: 
+    reason > 0
+Additional information: 
+    SNES solver did not converge after 1 iterations with reason
+    DIVERGED_JACOBIAN_DOMAIN
+--------------------------------------------------------
+
+DEAL::Running testcase 2
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Setup Jacobian at x=1.00000
+DEAL::Solve Jacobian
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Setup Jacobian at x=-0.557408
+DEAL::Solve Jacobian
+DEAL::Throwing a recoverable exception from solve_with_jacobian.
+DEAL::Caught exception.
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_snes.templates.h> in function
+    unsigned int dealii::PETScWrappers::NonlinearSolver<dealii::PETScWrappers::MPI::Vector, dealii::PETScWrappers::MPI::SparseMatrix, dealii::PETScWrappers::MPI::SparseMatrix>::solve(VectorType &) [VectorType = dealii::PETScWrappers::MPI::Vector, PMatrixType = dealii::PETScWrappers::MPI::SparseMatrix, AMatrixType = dealii::PETScWrappers::MPI::SparseMatrix]
+The violated condition was: 
+    reason > 0
+Additional information: 
+    SNES solver did not converge after 1 iterations with reason
+    DIVERGED_LINEAR_SOLVE
+--------------------------------------------------------
+
+DEAL::Running testcase 0
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the Jacobian at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Evaluating the Jacobian at x=-0.557408
+DEAL::Throwing a unrecoverable exception from jacobian.
+DEAL::Caught exception.
+DEAL::Unrecoverable error in jacobian
+DEAL::Running testcase 1
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Setup Jacobian at x=1.00000
+DEAL::Solve Jacobian
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Setup Jacobian at x=-0.557408
+DEAL::Throwing a unrecoverable exception from setup_jacobian.
+DEAL::Caught exception.
+DEAL::Unrecoverable error in setup_jacobian
+DEAL::Running testcase 2
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Setup Jacobian at x=1.00000
+DEAL::Solve Jacobian
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Setup Jacobian at x=-0.557408
+DEAL::Solve Jacobian
+DEAL::Throwing a unrecoverable exception from solve_with_jacobian.
+DEAL::Caught exception.
+DEAL::
+--------------------------------------------------------
+An error occurred in file <petsc_snes.templates.h> in function
+    unsigned int dealii::PETScWrappers::NonlinearSolver<dealii::PETScWrappers::MPI::Vector, dealii::PETScWrappers::MPI::SparseMatrix, dealii::PETScWrappers::MPI::SparseMatrix>::solve(VectorType &) [VectorType = dealii::PETScWrappers::MPI::Vector, PMatrixType = dealii::PETScWrappers::MPI::SparseMatrix, AMatrixType = dealii::PETScWrappers::MPI::SparseMatrix]
+The violated condition was: 
+    ierr == 0
+Additional information: 
+    deal.II encountered an error while calling a PETSc function.
+    The description of the error provided by PETSc is "Error in external
+    library".
+    The numerical value of the original error code is 76.
+--------------------------------------------------------
+

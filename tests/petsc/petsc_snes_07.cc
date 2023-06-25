@@ -153,6 +153,14 @@ run_test(int testcase, bool recoverable)
   x(0) = starting_x;
   x.compress(VectorOperation::insert);
 
+  // This test triggers false positives in FPE trapping for some versions of
+  // PETSc
+#if DEAL_II_PETSC_VERSION_LT(3, 19, 2) && defined(DEBUG) && \
+  defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  PetscErrorCode ierr = PetscFPTrapPush(PETSC_FP_TRAP_OFF);
+  (void)ierr;
+#endif
+
   deallog << "Running testcase " << testcase << std::endl;
   try
     {

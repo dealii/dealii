@@ -220,6 +220,14 @@ main(int argc, char **argv)
   deallog << "# Testing Parameters" << std::endl;
   prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortText);
 
+  // This test triggers false positives in FPE trapping for some versions of
+  // PETSc
+#if DEAL_II_PETSC_VERSION_LT(3, 19, 2) && defined(DEBUG) && \
+  defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  PetscErrorCode ierr = PetscFPTrapPush(PETSC_FP_TRAP_OFF);
+  (void)ierr;
+#endif
+
   for (int seterri = 0; seterri < 2; seterri++)
     {
       bool seterr = seterri ? true : false;
