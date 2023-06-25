@@ -118,14 +118,11 @@ foreach(_category ${_categories})
 
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category})
 
+  set(_redirect > /dev/null)
   if(DEAL_II_MSVC)
-    set(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir})
-  else()
-    # Do not pass the generator with -G so that we use make instead of ninja
-    # for the test projects. This is because calling ninja several times in
-    # parallel for the same project will break the configuration.
-    set(_command ${CMAKE_COMMAND} ${_options} ${_category_dir} > /dev/null)
+    set (_redirect)
   endif()
+  set(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir} ${_redirect})
 
   add_custom_target(setup_tests_${_category}
     COMMAND ${_command}
