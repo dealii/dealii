@@ -110,6 +110,10 @@
 # A small helper macro that is used below:
 #
 
+if(POLICY CMP0112)
+  cmake_policy(SET CMP0112 NEW)
+endif()
+
 macro(item_matches _var _regex)
   set(${_var})
   foreach (_item ${ARGN})
@@ -333,7 +337,8 @@ function(deal_ii_add_test _category _test_name _comparison_file)
 
       set(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
       set(_target_short ${_test_name}.${_build_lowercase}) # short target name
-      set(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
+      # FIXME: do not add implicit target dependencies
+      set(_run_args "$<TARGET_FILE_DIR:${_target}>/$<TARGET_FILE_NAME:${_target}>")
 
       #
       # If the variable ${category_test_RUNARGS_PREFIX) is nonempty prepend
@@ -361,7 +366,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         endif()
         set(_target_short ${_target})
         set(_run_args
-          "$<TARGET_FILE:${_target}>"
+          "$<TARGET_FILE_DIR:${_target}>/$<TARGET_FILE_NAME:${_target}>"
           "${_source_file}"
           )
       endif()
@@ -510,6 +515,15 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # Add a top level target to run and compare the test:
       #
 
+      if(_shared_target)
+        #
+        # FIXME: test what happens if we unlink dependencies
+        #
+        set(_target_dependency)
+      else()
+        set(_target_dependency ${_target})
+      endif()
+
       add_custom_command(OUTPUT ${_test_directory}/output
         COMMAND ${BASH} ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           run "${_test_full}" TEST_N_THREADS=${_n_threads} ${_run_args}
@@ -519,7 +533,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
-          ${_target}
+          ${_target_dependency}
           ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
         VERBATIM
         )
