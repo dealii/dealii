@@ -239,6 +239,11 @@ namespace Threads
         value = std::move(v);
       }
 
+      /**
+       *  Set the value from the given `std::future` object. If the future
+       * object holds an exception, the set will not happen and this function
+       * instead throws the exception stored in the future object.
+       */
       inline void
       set_from(std::future<RT> &v)
       {
@@ -291,6 +296,11 @@ namespace Threads
         value = &v;
       }
 
+      /**
+       *  Set the value from the given `std::future` object. If the future
+       * object holds an exception, the set will not happen and this function
+       * instead throws the exception stored in the future object.
+       */
       inline void
       set_from(std::future<RT &> &v)
       {
@@ -327,6 +337,12 @@ namespace Threads
       {}
 
 
+      /**
+       * This function does nothing, because the `std::future` object
+       * does not actually hold a return value. However, if the future
+       * object holds an exception, the set will not happen and this function
+       * instead throws the exception stored in the future object.
+       */
       inline void
       set_from(std::future<void> &)
       {}
@@ -1397,9 +1413,26 @@ namespace Threads
             // to future.wait() in the set_from() function. Avoid the
             // issue by just explicitly calling future.wait() here.)
             future.wait();
-            returned_object.set_from(future);
 
-            // Now we can safely set the flag and return.
+            // Acquire the returned object. If the task ended in an
+            // exception, `set_from` will call `std::future::get`, which
+            // will throw an exception. This leaves `returned_object` in
+            // an undefined state, but moreover we would bypass setting
+            // `task_has_finished=true` below. So catch the exception
+            // for just long enough that we can set that flag, and then
+            // re-throw it:
+            try
+              {
+                returned_object.set_from(future);
+              }
+            catch (...)
+              {
+                task_has_finished = true;
+                throw;
+              }
+
+            // If we got here, the task has ended without an exception and
+            // we can safely set the flag and return.
             task_has_finished = true;
           }
       }
