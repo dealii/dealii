@@ -151,7 +151,7 @@ private:
                   make_vectorized_array(random_value<Number>(1.0e-2, 1.0e-1));
                 // make diagonal dominant because inverse is needed
                 if (d1 == d2)
-                  dyadic_coefficients[q][d1][d2] *= 1.0e2;
+                  dyadic_coefficients[q][d1][d2] += 5.0;
               }
           }
         inverse_dyadic_coefficients[q] = invert(dyadic_coefficients[q]);
@@ -220,12 +220,6 @@ test()
     tria.refine_global(1);
   tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
-  tria.execute_coarsening_and_refinement();
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  for (; cell != endc; ++cell)
-    if (cell->center().norm() < 1e-8)
-      cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
   const unsigned int degree = fe_degree;
