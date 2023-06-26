@@ -125,7 +125,7 @@ main()
       test(-0.1, 0.1);
       test(9.1, -6.1);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

@@ -165,7 +165,7 @@ namespace Step31
         {
           cg.solve(*matrix, dst, src, preconditioner);
         }
-      catch (std::exception &e)
+      catch (const std::exception &e)
         {
           Assert(false, ExcMessage(e.what()));
         }
@@ -1098,7 +1098,7 @@ main(int argc, char *argv[])
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

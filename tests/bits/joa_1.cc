@@ -1186,7 +1186,7 @@ main()
   // exiting the program with an
   // error code (this is what the
   // <code>return 1;</code> does):
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

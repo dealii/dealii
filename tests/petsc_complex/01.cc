@@ -71,7 +71,7 @@ main(int argc, char **argv)
         test(m);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

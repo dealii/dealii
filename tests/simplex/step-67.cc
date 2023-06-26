@@ -2527,7 +2527,7 @@ main(int argc, char **argv)
       EulerProblem<dimension> euler_problem;
       euler_problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

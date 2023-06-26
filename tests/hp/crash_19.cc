@@ -123,7 +123,7 @@ main()
       test<2>();
       test<3>();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

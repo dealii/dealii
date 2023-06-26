@@ -82,7 +82,7 @@ main()
     {
       test();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

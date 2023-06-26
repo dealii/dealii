@@ -201,7 +201,7 @@ main(int argc, char *argv[])
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       test<2>();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

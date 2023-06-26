@@ -369,7 +369,7 @@ main()
       Step6<2> laplace_problem_2d;
       laplace_problem_2d.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

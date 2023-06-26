@@ -309,7 +309,7 @@ main(int argc, char **argv)
           FE_Q<dim>(3), FE_Q<dim>(2), QGauss<dim>(2), QGauss<dim - 1>(2), true);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

@@ -373,7 +373,7 @@ main(int argc, char *argv[])
       //  test_3D.write_grid();
       test_3D.check_periodicity();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

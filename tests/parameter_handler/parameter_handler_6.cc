@@ -53,7 +53,7 @@ main()
       // then write
       prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

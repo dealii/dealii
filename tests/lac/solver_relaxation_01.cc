@@ -117,7 +117,7 @@ main()
           r2 = check_solve(relax, A, u, f, prec_ssor2);
           deallog << "SSOR1.2 diff " << std::fabs(r1 - r2) / r1 << std::endl;
         }
-      catch (std::exception &e)
+      catch (const std::exception &e)
         {
           std::cerr << "Exception: " << e.what() << std::endl;
         }

@@ -418,7 +418,7 @@ main()
       LaplaceBeltramiProblem<3> laplace_beltrami;
       laplace_beltrami.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

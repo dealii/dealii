@@ -41,7 +41,7 @@ check()
     {
       prm.leave_subsection();
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       deallog << "Exception " << e.what() << std::endl;
     }
@@ -68,7 +68,7 @@ check()
       prm.leave_subsection();
       deallog << "error, why could we leave a subsection?" << std::endl;
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       deallog << "Exception " << e.what() << std::endl;
     }

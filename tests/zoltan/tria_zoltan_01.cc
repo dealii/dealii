@@ -54,7 +54,7 @@ main(int argc, char *argv[])
       test<2>(MPI_COMM_WORLD);
       test<3>(MPI_COMM_WORLD);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

@@ -414,7 +414,7 @@ main(int argc, char **argv)
              true);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

@@ -435,7 +435,7 @@ main()
       ElasticProblem<2> elastic_problem_2d;
       elastic_problem_2d.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

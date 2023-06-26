@@ -78,7 +78,7 @@ main(int argc, char **argv)
         test(trilinos_vector);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

@@ -169,7 +169,7 @@ run_test(int testcase, bool recoverable)
       deallog << "Found the solution x=" << x(0) << " after " << nit
               << " iterations." << std::endl;
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << "Caught exception." << std::endl;
       deallog << exc.what() << std::endl;

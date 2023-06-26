@@ -217,7 +217,7 @@ test_getting_types()
     {
       prm.get_integer({"foo", "bar"}, "baz");
     }
-  catch (StandardExceptions::ExcMessage &e)
+  catch (const StandardExceptions::ExcMessage &e)
     {
       log_exception(e);
     }
@@ -226,7 +226,7 @@ test_getting_types()
     {
       prm.get_integer({"foo", "bar"}, "yox");
     }
-  catch (StandardExceptions::ExcMessage &e)
+  catch (const StandardExceptions::ExcMessage &e)
     {
       log_exception(e);
     }
@@ -235,7 +235,7 @@ test_getting_types()
     {
       prm.get_double({"foo", "bar"}, "yox");
     }
-  catch (StandardExceptions::ExcMessage &e)
+  catch (const StandardExceptions::ExcMessage &e)
     {
       log_exception(e);
     }
@@ -244,7 +244,7 @@ test_getting_types()
     {
       prm.get_bool({"foo", "bar"}, "jik");
     }
-  catch (StandardExceptions::ExcMessage &e)
+  catch (const StandardExceptions::ExcMessage &e)
     {
       log_exception(e);
     }
@@ -253,7 +253,7 @@ test_getting_types()
     {
       prm.get_bool({"foo", "bar"}, "spam");
     }
-  catch (StandardExceptions::ExcMessage &e)
+  catch (const StandardExceptions::ExcMessage &e)
     {
       log_exception(e);
     }
@@ -308,7 +308,7 @@ main()
       test_getting_types();
       test_weird_strings();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

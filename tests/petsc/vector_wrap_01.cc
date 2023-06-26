@@ -65,7 +65,7 @@ main(int argc, char **argv)
 
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

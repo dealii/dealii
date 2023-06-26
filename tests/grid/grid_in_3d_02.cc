@@ -49,7 +49,7 @@ test(const char *filename)
     {
       gi.read_ucd(in);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << "  caught exception:" << std::endl << exc.what() << std::endl;
       return;

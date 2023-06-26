@@ -70,7 +70,7 @@ main()
       test(1);
       test(3);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

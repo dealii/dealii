@@ -119,7 +119,7 @@ main()
     {
       comsol_grid<3>(SOURCE_DIR "/grids/comsol/mesh_1.mphtxt");
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

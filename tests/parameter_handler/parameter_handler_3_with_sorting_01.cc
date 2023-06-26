@@ -46,7 +46,7 @@ main()
                            ParameterHandler::Text |
                              ParameterHandler::KeepDeclarationOrder);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

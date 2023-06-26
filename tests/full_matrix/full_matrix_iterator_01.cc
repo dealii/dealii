@@ -68,7 +68,7 @@ main()
       test<FullMatrix<double>::const_iterator>();
       deallog << "OK" << std::endl;
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

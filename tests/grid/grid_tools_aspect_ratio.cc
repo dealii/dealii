@@ -203,7 +203,7 @@ main(int argc, char **argv)
         deallog << "aspect ratio max    = " << ar << std::endl << std::endl;
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl
