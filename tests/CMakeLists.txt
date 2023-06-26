@@ -118,9 +118,9 @@ foreach(_category ${_categories})
 
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category})
 
-  set(_redirect > /dev/null)
+  set(_redirect ">" "/dev/null")
   if(DEAL_II_MSVC)
-    set (_redirect)
+    set (_redirect "")
   endif()
   set(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir} ${_redirect})
 

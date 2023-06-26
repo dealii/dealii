@@ -111,6 +111,7 @@
 #
 
 if(POLICY CMP0112)
+  # Target file component generator expressions do not add target dependencies.
   cmake_policy(SET CMP0112 NEW)
 endif()
 
