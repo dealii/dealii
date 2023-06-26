@@ -28,7 +28,7 @@ set_if_empty(ARBORX_DIR "$ENV{ARBORX_DIR}")
 
 # silence a warning when including FindKOKKOS.cmake
 set(CMAKE_CXX_EXTENSIONS OFF)
-find_package(ArborX QUIET
+find_package(ArborX 1.3 QUIET
   HINTS ${ARBORX_DIR} ${ArborX_DIR} $ENV{ArborX_DIR}
   )
 
