@@ -1,4 +1,0 @@
-Fixed: step-77 contained a bug where the residual was not
-zeroed out before assembly.
-<br>
-(Sebastian Proell, 2023/05/14)

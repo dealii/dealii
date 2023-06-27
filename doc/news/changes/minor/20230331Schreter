@@ -1,4 +1,0 @@
-New: Added Functions::SignedDistance::Rectangle() and BoundingBox::signed_distance()
-to compute the signed distance function of a rectangle.
-<br>
-(Magdalena Schreter, Peter Munch, 2023/03/31)

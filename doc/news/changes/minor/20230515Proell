@@ -1,4 +1,0 @@
-Changed: The KINSOL wrapper used to copy vectors to/from deal.II format
-to/from a native SUNDIALS format. These copies are no longer made.
-<br>
-(Sebastian Proell, 2023/05/15)

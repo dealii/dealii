@@ -283,7 +283,7 @@ inconvenience this causes.
   </li>
 
   <li> Changed: The functionparser library bundled with deal.II got replaced
-  by the <a href="http://muparser.beltoforion.de/">muparser</a> library.
+  by the <a href="https://muparser.beltoforion.de/">muparser</a> library.
   <br>
   (Timo Heister, 2014/02/10)
   </li>
@@ -307,7 +307,7 @@ inconvenience this causes.
   </li>
 
   <li> New: deal.II now links with the
-  <a href="http://www.boost.org/doc/libs/1_55_0/libs/iostreams/doc/index.html">BOOST
+  <a href="https://www.boost.org/doc/libs/1_55_0/libs/iostreams/doc/index.html">BOOST
   Iostreams</a> library (at least if the libz and libbz2 libraries
   can be found that are necessary for BOOST Iostreams).
   Among many other things, this allows to easily
@@ -575,7 +575,7 @@ inconvenience this causes.
   </li>
 
   <li> New: To better support applications that want to use C++11's
-  <a href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-based
+  <a href="https://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-based
   for loops</a>, there are now functions Triangulation::cell_iterators(),
   Triangulation::all_cell_iterators() and similarly in classes DoFHandler
   and hp::DoFHandler

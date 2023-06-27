@@ -1,4 +1,0 @@
-New: The new class ScopeExit is useful in ensuring that cleanup code
-is always run, regardless of how a function is left.
-<br>
-(Wolfgang Bangerth, 2023/05/05)

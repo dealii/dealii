@@ -1,7 +1,0 @@
-Fixed: In FEInterfaceValues::reinit(), if `q_index` is not explicitly
-given but none of the two adjacent elements dominates the other, one
-used to get a rather obscure error. The error now produced points at
-the actual problem, and a much expanded discussion of what is going
-wrong is provided in the documentation of the function.
-<br>
-(Simon Sticko, Wolfgang Bangerth, 2023/04/13)

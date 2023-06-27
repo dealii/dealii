@@ -1,4 +1,0 @@
-Changed: The get_mpi_communicator() methods no longer return references to MPI_Comm.
-They all now return the MPI_Comm by value.
-<br>
-(Stefano Zampini, 2023/04/12)

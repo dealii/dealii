@@ -1,6 +1,0 @@
-New: LAPACKFullMatrix now provides two new functions,
-LAPACKFullMatrix::get_right_eigenvectors() and
-LAPACKFullMatrix::get_left_eigenvectors(), to return eigenvectors after calls
-to LAPACKFullMatrix::compute_eigenvalues().
-<br>
-(Martin Kronbichler, 2023/03/09)

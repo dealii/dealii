@@ -1,9 +1,0 @@
-Fixed: Mesh files in COMSOL's `.mphtxt` format are often created on
-Windows and then read using deal.II on Unix. Windows uses a different
-line ending style than Linux, and this led to error messages that were
-impossible to understand because the different line ending style is
-not visible in most editors. This is now fixed: The
-GridIn::read_comsol_mphtxt() function also accepts Windows line
-endings.
-<br>
-(Wolfgang Bangerth, 2023/04/20)

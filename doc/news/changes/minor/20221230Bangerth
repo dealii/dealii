@@ -1,5 +1,0 @@
-New: Writing graphical output in VTU format now uses a workflow that
-uses multiple threads where possible, substantially increasing the
-speed with which functions such as DataOut::write_vtu() work.
-<br>
-(Wolfgang Bangerth, 2022/12/30)

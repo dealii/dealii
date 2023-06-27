@@ -1,4 +1,0 @@
-Removed: The deprecated LinearAlgebra::CUDAWrappers::atomicAdd_wrapper
-has been removed.
-<br>
-(Daniel Arndt, 2022/06/22)

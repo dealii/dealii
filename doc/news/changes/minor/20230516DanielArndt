@@ -1,3 +1,0 @@
-Fixed: Patterns::pattern_factory now parses lists of lists correctly.
-<br>
-(Daniel Arndt, 2023/05/16)

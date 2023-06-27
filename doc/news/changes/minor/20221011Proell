@@ -1,5 +1,0 @@
-New: A new overload for MatrixFree::loop allows
-to specify a pre- and post-operation, similar
-to MatrixFree::cell_loop.
-<br>
-(Sebastian Proell, 2022/10/11)

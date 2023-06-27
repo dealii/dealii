@@ -1,5 +1,0 @@
-Fixed: When outputting hexahedral meshes in AVS Explorer's UCD file format,
-cells were written with an inverted vertex order. While they were shown
-correctly, these cells had negative volume. This has now been fixed.
-<br>
-(Nils Margenberg, 2023/01/22)

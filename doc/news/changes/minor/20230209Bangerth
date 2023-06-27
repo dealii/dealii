@@ -1,5 +1,0 @@
-New: The function ReferenceCell::face_vertex_location() allows
-translating between the vertices of faces of cells and the coordinate
-system of the cell itself.
-<br>
-(Wolfgang Bangerth, 2023/02/09)

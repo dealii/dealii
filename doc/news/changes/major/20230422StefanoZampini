@@ -1,4 +1,0 @@
-New: Add wrappers to the non-linear solver SNES (PETScWrappers::NonLinearSolver ) and
-the ode integrator TS (PETScWrappers::TimeStepper) from the PETSc library.
-<br>
-(Stefano Zampini, 2023/04/22)

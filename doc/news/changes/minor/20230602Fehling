@@ -1,6 +1,0 @@
-New: All parallel BlockVector classes now have a reinit function that takes
-collections of Utilities::MPI::Partitioner objects as an argument. This
-affects TrilinosWrappers::MPI::BlockVector, PETScWrappers::MPI::BlockVector,
-and LinearAlgebra::distributed::BlockVector. The interface is compatible.
-<br>
-(Marc Fehling, 2023/06/02)

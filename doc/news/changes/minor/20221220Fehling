@@ -1,4 +1,0 @@
-New: LinearAlgebra::distributed::BlockVector::reinit now accepts
-a vector of Utilities::MPI::Partitioner objects.
-<br>
-(Marc Fehling, 2022/12/20)

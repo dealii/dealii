@@ -1,4 +1,0 @@
-New: Expose PETScWrappers::MPI::BlockVector as a PETSc VecNest vector, and make sure the mpi communicator is always
-queried from the internal vec object.
-<br>
-(Stefano Zampini, 2022/12/21)

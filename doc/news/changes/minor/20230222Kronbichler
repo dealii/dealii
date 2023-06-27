@@ -1,6 +1,0 @@
-Fixed: When used with the linear-polynomial MappingQCache(1),
-FEValues::reinit() could previously trigger CellSimilarity in case the
-underlying mesh was affine, but the deformed state described via MappingQCache
-was not. This is now fixed.
-<br>
-(Martin Kronbichler, 2023/02/22)

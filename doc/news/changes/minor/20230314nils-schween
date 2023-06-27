@@ -1,5 +1,0 @@
-Fixed: There was no instance of GridTools::collect_periodic_faces() with
-MeshType = parallel::shared::Triangulation<1,1>. But the function works with the
-template parameter as well. Thus, it should be instantiated.
-<br>
-(Nils Schween, 2023/03/14)

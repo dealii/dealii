@@ -1,7 +1,0 @@
-Removed: The deal.IIFeatureConfig.cmake configuration file has been
-removed. This file used to contain a record of all
-<code>FEATURE_[suffix]</code> variables for a given external library. Said
-information is now exported via interface targets in CMake.
-<br>
-(Matthias Maier, 2022/11/30)
-

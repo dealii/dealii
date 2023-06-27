@@ -1,3 +1,0 @@
-Fixed: ParameterAcceptor::clear() had issues with 'use after free'.
-<br>
-(Luca Heltai, 2023/04/20)

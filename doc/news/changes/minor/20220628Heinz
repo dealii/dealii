@@ -1,3 +1,0 @@
-Fixed: The function find_active_cell_around_point() now skips cells without any marked vertices.
-<br>
-(Johannes Heinz, 2022/06/28)

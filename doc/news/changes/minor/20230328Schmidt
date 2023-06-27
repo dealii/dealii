@@ -1,3 +1,0 @@
-Changed: The default `compression_level` for vtu output is changed from `best_compression` to `best_speed`.
-<br>
-(Christoph Schmidt, 2023/03/28)
