@@ -94,6 +94,14 @@ case $STAGE in
     export OMPI_MCA_rmaps_base_oversubscribe=1
     export OMPI_MCA_hwloc_base_binding_policy=none
 
+    #
+    # Kokkos parameters:
+    #  - Disable Kokkos runtime warnings so that we can oversubscribe
+    #    threads without Kokkos complaining. This should also help with
+    #    some spurious warnings that we get in tests depending on who
+    #    initialized openmp first, kokkos or another external dependency.
+    export KOKKOS_DISABLE_WARNINGS=1
+
     rm -f failing_output
     rm -f output
     rm -f stdout
