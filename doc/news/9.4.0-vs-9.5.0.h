@@ -63,8 +63,8 @@ inconvenience this causes.
  <li>
   Deprecated: All vector classes had member functions called `import()`
   to copy elements from a source into the current vector. Unfortunately,
-  `import` is a 
-  [keyword (of sorts) in C++20](https://en.cppreference.com/w/cpp/keyword/import). 
+  `import` is a
+  [keyword (of sorts) in C++20](https://en.cppreference.com/w/cpp/keyword/import).
   While not strictly necessary because we do not use the name in a
   context where it would be recognized as a keyword, it is useful to
   avoid the name nonetheless, if only to avoid confusing readers and
@@ -677,7 +677,7 @@ inconvenience this causes.
 
  <li>
   Fixed: Fix GridTools::find_all_active_cells_around_point() to return the correct cells
-  if the requested point is located on a cell edge adjacent to neighbor cells at different 
+  if the requested point is located on a cell edge adjacent to neighbor cells at different
   refinement levels.
   <br>
   (Peter Munch, Magdalena Schreter, 2023/02/07)
@@ -791,7 +791,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Small fixes to communicator handling in PETSc classes. Move from 
+  Fixed: Small fixes to communicator handling in PETSc classes. Move from
   GetArray to GetArrayRead (threadsafe version).
   <br>
   (Stefano Zampini, 2022/12/20)
@@ -818,7 +818,7 @@ inconvenience this causes.
 
  <li>
   Fixed: PETSc has no concept of ownership, but only shared ownership. Vec and Mat objects are
-  reference counted, and automatically cleaned when no longer used. We do not need to keep track 
+  reference counted, and automatically cleaned when no longer used. We do not need to keep track
   of ownership manually.
   <br>
   (Stefano Zampini, 2022/12/13)
@@ -833,7 +833,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: SolverGMRES and SolverFGMRES now also support classical 
+  New: SolverGMRES and SolverFGMRES now also support classical
   Gram-Schmidt orthonormalization
   alongside to the existing modified Gram-Schmidt algorithm. This
   algorithm allows to reduce the cost of vector operations in terms of
@@ -906,7 +906,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: Added capability in the particle handler to generate ghost particles 
+  Improved: Added capability in the particle handler to generate ghost particles
   in ghost cells close to periodic boundary conditions.
   <br>
   (Bruno Blais, Audrey Collard-Daigneault, 2022-11-18)
@@ -973,9 +973,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: On very coarse meshes, with very particular manifolds, e.g., polar manifolds, 
+  Fixed: On very coarse meshes, with very particular manifolds, e.g., polar manifolds,
   cylindrical manifolds, Manifold<3, 3>::normal_vector may return a zero vector.
-  This is fixed now. 
+  This is fixed now.
   <br>
   (Timo Heister, Luca Heltai, Jiaqi Zhang, 2022/09/20)
  </li>
@@ -983,7 +983,7 @@ inconvenience this causes.
  <li>
   New: The new function CGALWrappers::compute_intersection_of_cells computes
   the intersection between two (affine) cells starting from the location of the
-  vertices. The intersection is described by a vector of arrays, where each array 
+  vertices. The intersection is described by a vector of arrays, where each array
   identifies a simplex of the sub-tassellation of the intersection.
   <br>
   (Marco Feder, Johannes Heinz, 2022/09/20)
@@ -992,14 +992,14 @@ inconvenience this causes.
  <li>
   Fixed: The function GridTools::internal::distributed_compute_point_locations()
   now projects reference points outside of a cell (but within a tolerance) onto
-  the unit cell. This enables the use of FE_Q_iso_Q1 in 
+  the unit cell. This enables the use of FE_Q_iso_Q1 in
   Utilities::MPI::RemotePointEvaluation.
   <br>
   (Peter Munch, Magdalena Schreter, 2022/09/12)
  </li>
 
  <li>
-  Improved: The functions VectorTools::point_values()/::point_gradients() and 
+  Improved: The functions VectorTools::point_values()/::point_gradients() and
   the class Utilities::MPI::RemotePointEvaluation now allow to specify the first
   component to be selected. The feature is used in the class DataOutResample
   to output multi-component solutions.
@@ -1044,7 +1044,7 @@ inconvenience this causes.
 
  <li>
   New: The new class MatrixFreeTools::ElementActivationAndDeactivationMatrixFree
-  is a wrapper around MatrixFree designed to deal with 
+  is a wrapper around MatrixFree designed to deal with
   DoFHandler objects involving cells without degrees of freedom, i.e.,
   cells using FENothing as element type. The class helps to implement the
   "element birth and death technique".
@@ -1085,7 +1085,7 @@ inconvenience this causes.
 
  <li>
   Added the missing explicit instantiations of DoFTools::distribute_cell_to_dof_vector
-  for problems with non-zero codim (dim != spacedim) 
+  for problems with non-zero codim (dim != spacedim)
   <br>
   (Ahmad Shahba, 2022/07/06)
  </li>
