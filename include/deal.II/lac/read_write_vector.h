@@ -459,14 +459,12 @@ namespace LinearAlgebra
      * @deprecated Use import_elements() instead.
      */
     template <typename Dummy = Number>
-    DEAL_II_DEPRECATED
-      std::enable_if_t<std::is_same<Dummy, Number>::value &&
-                       dealii::is_tpetra_type<Number>::value>
-      import(
-        const TpetraWrappers::Vector<Number> &V,
-        VectorOperation::values               operation,
-        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          &communication_pattern = {})
+    DEAL_II_DEPRECATED std::enable_if_t<std::is_same<Dummy, Number>::value &&
+                                        dealii::is_tpetra_type<Number>::value>
+                       import(const TpetraWrappers::Vector<Number> &V,
+                              VectorOperation::values               operation,
+                              const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+                                &communication_pattern = {})
     {
       import_elements(V, operation, communication_pattern);
     }
