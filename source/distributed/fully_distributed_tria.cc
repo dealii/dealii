@@ -749,8 +749,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::update_number_cache()
     {
       dealii::parallel::TriangulationBase<dim, spacedim>::update_number_cache();
 
