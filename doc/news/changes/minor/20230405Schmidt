@@ -1,6 +1,0 @@
-Fixed: In grid_out.cc VtkFlags with default settings were passed to the
-write_vtu method instead of the available vtu_flags. Thus, a
-compression_level that has been set was simply ignored. This has been
-fixed in #14983 by passing the available vtu_flags to the method.
-<br>
-(Christoph Schmidt, 2023/04/05)

@@ -1,4 +1,0 @@
-New: Implement `VectorTools::add_constant` that adds a constant
-to a given component of a finite element solution.
-<br>
-(Timo Heister, 2023/02/17)

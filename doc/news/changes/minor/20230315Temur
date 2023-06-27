@@ -1,7 +1,0 @@
-New: Added functionality to the matrix-free CellwiseInverseMassMatrix
-operator for coupling (dyadic) coefficients. `fill_inverse_JxW_values`
-and `CellwiseInverseMassMatrixImplFlexible` have been extended.
-Internal interfaces for the coefficients now use ArrayView instead
-of AlignedVector.
-<br>
-(Bugrahan Temur, 2023/03/15)

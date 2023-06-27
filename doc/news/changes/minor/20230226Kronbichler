@@ -1,7 +1,0 @@
-Fixed: SolverCG used with matrices and preconditioners that support
-interleaving of the vector updates with the matrix-vector product (e.g. with
-certain matrix-free operators) sometimes performed the final update to the
-result vector `x` with a wrong coefficient. This could affect the returned
-solution for coarse tolerances far away from convergence. This is now fixed.
-<br>
-(Martin Kronbichler, 2023/02/26)

@@ -1,8 +1,0 @@
-Updated: deal.II no longer exports the -fPIC/-fpic compiler flags for
-compiling relocatable, position independent code. This should have minimal
-impact on user projects because CMake is handling the -fPIC/-fpic
-automatically. But for some less common scenarios in user projects (e.g.,
-object targets) it might be necessary to set the POSITION_INDEPENDENT_CODE
-target property in CMake.
-<br>
-(Matthias Maier, 2023/03/29)

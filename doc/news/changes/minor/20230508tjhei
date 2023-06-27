@@ -1,5 +1,0 @@
-Changed: MPI communicators (of type `MPI_Comm`) are now treated as
-trivially copyable POD types throughout the library. This means that
-we store and pass them by value instead of by reference.
-<br>
-(Timo Heister, 2023/05/08)

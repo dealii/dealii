@@ -1,7 +1,0 @@
-Fixed: The DerivativeForm class had a constructor that took an array
-of elements via the type
-`Tensor<order, spacedim, Tensor<1, dim,Number>>`.
-This should have been
-`Tensor<1, spacedim, Tensor<order, dim, Number>>`, and it is now fixed.
-<br>
-(Robin Goermer, Wolfgang Bangerth, 2023/02/01)

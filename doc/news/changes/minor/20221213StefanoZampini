@@ -1,5 +1,0 @@
-Fixed: PETSc has no concept of ownership, but only shared ownership. Vec and Mat objects are
-reference counted, and automatically cleaned when no longer used. We do not need to keep track 
-of ownership manually.
-<br>
-(Stefano Zampini, 2022/12/13)

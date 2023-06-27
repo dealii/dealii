@@ -1,4 +1,0 @@
-New: There is now a new function Threads::TaskGroup::return_values() that waits
-for all tasks in a task group and returns a vector of their returned objects.
-<br>
-(Wolfgang Bangerth, 2022/11/29)

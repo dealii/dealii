@@ -1,4 +1,0 @@
-Removed: The CUDAWrappers::MatrixFee::AdditionalData::ParallelizationScheme
-parameter has been removed.
-<br>
-(Bruno Turcksin, 2023/03/30)

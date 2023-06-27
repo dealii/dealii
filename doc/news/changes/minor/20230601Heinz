@@ -1,3 +1,0 @@
-Improved: Make it possible to fill JxW in NonMatching::MappingInfo from quadratures which contain JxW as weights.
-<br>
-(Johannes Heinz, 2023/06/01)

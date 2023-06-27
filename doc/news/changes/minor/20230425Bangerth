@@ -1,6 +1,0 @@
-New: FEInterfaceValues::reinit() sometimes had trouble automatically
-determining which quadrature or mapping object to use in the hp
-context. There are now two more rules that help determine which
-objects to use, as described in detail in the documentation.
-<br>
-(Wolfgang Bangerth, 2023/04/25)

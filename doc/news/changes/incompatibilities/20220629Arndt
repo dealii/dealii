@@ -1,4 +1,0 @@
-Removed: The deprecated QTrapez, ParticleHandler::locally_relevant_ids(),
-and Arkode::reinit_vector have been removed.
-<br>
-(Daniel Arndt, 2022/06/29)

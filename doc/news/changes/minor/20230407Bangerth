@@ -1,7 +1,0 @@
-Deprecated: The DoFTools::map_dofs_to_support_points() function family
-had functions that returned what they computed via a non-const
-reference argument `support_points` of type `std::map`. These
-overloads are now deprecated and replaced by functions that return the
-map via a regular `return` value.
-<br>
-(Wolfgang Bangerth, 2023/04/07)
