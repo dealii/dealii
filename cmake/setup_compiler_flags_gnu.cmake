@@ -198,6 +198,23 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
 
   #
+  # We have to ensure that we emit floating-point instructions in debug
+  # mode that preserve the occurence of floating-point exceptions and don't
+  # introduce new ones. gcc plays nicely in this regard by enabling
+  # `-ftrapping-math` per default, at least for the level of optimization
+  # we have in debug mode. clang however is more aggressive and assumes
+  # that it can optimize code disregarding precise floating-point exception
+  # semantics.
+  #
+  # We thus set `-ffp-exceptions-behavior=strict` in debug mode to ensure
+  # that our testsuite doesn't run into false positive floating-point
+  # exceptions. See
+  #
+  # https://github.com/dealii/dealii/issues/15496
+  #
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-ffp-exception-behavior=strict")
+
+  #
   # In recent versions, gcc often eliminates too much debug information
   # using '-Og' to be useful.
   #
