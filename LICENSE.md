@@ -3,9 +3,8 @@ deal.II Copyright and License
 
 This directory contains the deal.II library.
 
-The deal.II library is copyrighted by the deal.II authors. This term
-refers to the people listed in the file `AUTHORS` and in the
-[authors list](https://www.dealii.org/authors.html) on the webpage.
+The deal.II library is copyrighted by the deal.II authors. This term refers
+to the people listed in the file AUTHORS.md.
 
 The deal.II library is free software; you can use it, redistribute it,
 and/or modify it under the terms of the <b>GNU Lesser General Public
@@ -74,8 +73,7 @@ Contact
 -------
 
 For further questions regarding licensing and commercial use please contact the
-[deal.II principal developers, or project
-administrators](https://www.dealii.org/authors.html) directly.
+[deal.II principal developers](https://www.dealii.org/authors.html) directly.
 
 
 Full text of the [Developer Certificate of Origin version 1.1](https://developercertificate.org/)
@@ -122,8 +120,7 @@ By making a contribution to this project, I certify that:
 
 
 Full license text of the [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html)
--------------------------------------------------------------------------------------------------------------------
-----
+------------------------------------------------------------------------------------------------------------------------------------
 ```
                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
