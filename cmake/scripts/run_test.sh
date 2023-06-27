@@ -83,8 +83,16 @@ case $STAGE in
     export OMP_THREAD_LIMIT="2"
     export OMP_PROC_BIND="false"
 
-    # Allow oversubscription for MPI (needed for Openmpi@3.0)
+    #
+    # OpenMPI parameters:
+    #  - Allow to oversubsribe the system, meaning that we can issue tests
+    #    with more mpi ranks than available cores.
+    #  - Ensure that we do not bind mpi tests to specific
+    #    cores/processors/sockets. Otherwise we run the risk that multiple
+    #    mpi tests (for example with two ranks) are all pinned to the same
+    #    processor core, bringing everything to a grinding halt.
     export OMPI_MCA_rmaps_base_oversubscribe=1
+    export OMPI_MCA_hwloc_base_binding_policy=none
 
     rm -f failing_output
     rm -f output
