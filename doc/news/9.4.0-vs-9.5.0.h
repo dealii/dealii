@@ -108,12 +108,12 @@ inconvenience this causes.
  </li>
 
  <li>
-  Updated: deal.II no longer exports the -fPIC/-fpic compiler flags for
-  compiling relocatable, position independent code. This should have minimal
-  impact on user projects because CMake is handling the -fPIC/-fpic
-  automatically. But for some less common scenarios in user projects (e.g.,
-  object targets) it might be necessary to set the POSITION_INDEPENDENT_CODE
-  target property in CMake.
+  Updated: deal.II no longer exports the <code>-fPIC/-fpic</code> compiler
+  flags for compiling relocatable, position independent code. This should
+  have minimal impact on user projects because CMake is handling the
+  <code>-fPIC/-fpic</code> automatically. But for some less common
+  scenarios in user projects (e.g., object targets) it might be necessary
+  to set the POSITION_INDEPENDENT_CODE target property in CMake.
   <br>
   (Matthias Maier, 2023/03/29)
  </li>
@@ -367,7 +367,7 @@ inconvenience this causes.
   The interfaces in SUNDIALS::KINSOL and SUNDIALS::ARKode have been
   changed correspondingly.
   <br>
-  (Wolfgang Bangerth, 2023/05/08)
+  (Wolfgang Bangerth, 2021/05/08)
  </li>
 
  <li>
@@ -414,10 +414,11 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Originally, the LAPACK in /source/lac/lapack_full_matrix.cc directly
-  printed errors to the console. This is fixed by using the AssertThrow mechanism
-  to explicitly display various error messages based on the error values that are 
-  consistent with the LAPACK manual.
+  Fixed: Originally, the LAPACK wrappers in
+  source/lac/lapack_full_matrix.cc directly printed errors to the console.
+  This is fixed by using the AssertThrow mechanism to explicitly display
+  various error messages based on the error values that are consistent with
+  the LAPACK manual.
   <br>
   (Tao Jin, 2023/06/20)
  </li>
@@ -790,7 +791,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Small fixes to commnicator handling in PETSc classes. Move from 
+  Fixed: Small fixes to communicator handling in PETSc classes. Move from 
   GetArray to GetArrayRead (threadsafe version).
   <br>
   (Stefano Zampini, 2022/12/20)
