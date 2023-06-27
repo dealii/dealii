@@ -270,7 +270,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverRichardson(SolverControl &       cn,
                      const MPI_Comm        mpi_communicator,
                      const AdditionalData &data = AdditionalData());
@@ -322,7 +322,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverChebychev(SolverControl &       cn,
                     const MPI_Comm        mpi_communicator,
                     const AdditionalData &data = AdditionalData());
@@ -372,7 +372,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverCG(SolverControl &       cn,
              const MPI_Comm        mpi_communicator,
              const AdditionalData &data = AdditionalData());
@@ -423,7 +423,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverBiCG(SolverControl &       cn,
                const MPI_Comm        mpi_communicator,
                const AdditionalData &data = AdditionalData());
@@ -491,7 +491,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverGMRES(SolverControl &       cn,
                 const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
@@ -543,7 +543,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverBicgstab(SolverControl &       cn,
                    const MPI_Comm        mpi_communicator,
                    const AdditionalData &data = AdditionalData());
@@ -594,7 +594,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverCGS(SolverControl &       cn,
               const MPI_Comm        mpi_communicator,
               const AdditionalData &data = AdditionalData());
@@ -645,7 +645,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverTFQMR(SolverControl &       cn,
                 const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
@@ -701,7 +701,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverTCQMR(SolverControl &       cn,
                 const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
@@ -751,7 +751,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverCR(SolverControl &       cn,
              const MPI_Comm        mpi_communicator,
              const AdditionalData &data = AdditionalData());
@@ -803,7 +803,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverLSQR(SolverControl &       cn,
                const MPI_Comm        mpi_communicator,
                const AdditionalData &data = AdditionalData());
@@ -859,7 +859,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SolverPreOnly(SolverControl &       cn,
                   const MPI_Comm        mpi_communicator,
                   const AdditionalData &data = AdditionalData());
@@ -922,7 +922,7 @@ namespace PETScWrappers
      *
      * @deprecated
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     SparseDirectMUMPS(SolverControl &       cn,
                       const MPI_Comm        mpi_communicator,
                       const AdditionalData &data = AdditionalData());

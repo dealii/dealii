@@ -640,7 +640,7 @@ public:
    * @deprecated Use get_combined_orientation() instead.
    */
   template <typename T, std::size_t N>
-  DEAL_II_DEPRECATED_EARLY unsigned char
+  DEAL_II_DEPRECATED unsigned char
   compute_orientation(const std::array<T, N> &vertices_0,
                       const std::array<T, N> &vertices_1) const;
 
@@ -689,7 +689,7 @@ public:
    * @deprecated Use permute_by_combined_orientation() instead.
    */
   template <typename T, std::size_t N>
-  DEAL_II_DEPRECATED_EARLY std::array<T, N>
+  DEAL_II_DEPRECATED std::array<T, N>
   permute_according_orientation(const std::array<T, N> &vertices,
                                 const unsigned int      orientation) const;
 

@@ -731,7 +731,7 @@ namespace TrilinosWrappers
       /**
        * @deprecated Use import_elements() instead.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       void
       import(const LinearAlgebra::ReadWriteVector<double> &rwv,
              const VectorOperation::values                 operation)
