@@ -131,6 +131,12 @@ inconvenience this causes.
  </li>
 
  <li>
+   Updated: The minimum version for Trilinos has been bumped to 12.14.1 if Trilinos bundles Kokkkos.
+   <br>
+   (Daniel Arndt, 2022/12/30)
+ </li>
+
+ <li>
   Fixed: The function ParameterHandler::add_parameter() used to
   call the internal action. Within that step, the action
   converts the default value to a string and back afterwards.
