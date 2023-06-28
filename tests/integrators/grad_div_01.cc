@@ -58,7 +58,7 @@ test_cell(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_gradients(u, indices, ugrad, true);
+        fev.get_function_gradients(u, indices, make_array_view(ugrad), true);
         cell_residual<dim>(w, fev, ugrad);
         M.vmult(v, u);
         w.add(-1., v);
@@ -100,8 +100,8 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u, indices, uval, true);
-        fev.get_function_gradients(u, indices, ugrad, true);
+        fev.get_function_values(u, indices, make_array_view(uval), true);
+        fev.get_function_gradients(u, indices, make_array_view(ugrad), true);
         nitsche_residual<dim>(w, fev, uval, ugrad, null_val, 17);
         M.vmult(v, u);
         w.add(-1., v);
@@ -168,8 +168,11 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
         u1(i1) = 1.;
         w1     = 0.;
         w2     = 0.;
-        fev1.get_function_values(u1, indices1, u1val, true);
-        fev1.get_function_gradients(u1, indices1, u1grad, true);
+        fev1.get_function_values(u1, indices1, make_array_view(u1val), true);
+        fev1.get_function_gradients(u1,
+                                    indices1,
+                                    make_array_view(u1grad),
+                                    true);
         ip_residual<dim>(
           w1, w2, fev1, fev2, u1val, u1grad, nullval, nullgrad, 17);
         M11.vmult(v1, u1);
@@ -180,8 +183,11 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
 
         w1 = 0.;
         w2 = 0.;
-        fev2.get_function_values(u1, indices2, u1val, true);
-        fev2.get_function_gradients(u1, indices2, u1grad, true);
+        fev2.get_function_values(u1, indices2, make_array_view(u1val), true);
+        fev2.get_function_gradients(u1,
+                                    indices2,
+                                    make_array_view(u1grad),
+                                    true);
         ip_residual<dim>(
           w1, w2, fev1, fev2, nullval, nullgrad, u1val, u1grad, 17);
         M12.vmult(v1, u1);

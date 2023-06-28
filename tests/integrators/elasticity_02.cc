@@ -62,8 +62,8 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u, indices, uval, true);
-        fev.get_function_gradients(u, indices, ugrad, true);
+        fev.get_function_values(u, indices, make_array_view(uval), true);
+        fev.get_function_gradients(u, indices, make_array_view(ugrad), true);
         nitsche_tangential_residual<dim>(w, fev, uval, ugrad, null_val, 17);
         M.vmult(v, u);
         w.add(-1., v);

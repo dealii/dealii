@@ -66,7 +66,7 @@ test_cell(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
       u    = 0.;
       u(i) = 1.;
       w    = 0.;
-      fev.get_function_gradients(u, indices, ugrad, true);
+      fev.get_function_gradients(u, indices, make_array_view(ugrad), true);
       cell_residual<dim>(w, fes, ugrad);
       Md.vmult(v, u);
       w.add(-1., v);
@@ -123,7 +123,7 @@ test_boundary(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
       u    = 0.;
       u(i) = 1.;
       w    = 0.;
-      fev.get_function_values(u, indices, uval, true);
+      fev.get_function_values(u, indices, make_array_view(uval), true);
       u_dot_n_residual(w, fev, fes, uval);
       M.vmult(v, u);
       w.add(-1., v);
