@@ -3479,6 +3479,7 @@ template <int dim, int spacedim>
 inline TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
 CellAccessor<dim, spacedim>::face(const unsigned int i) const
 {
+  AssertIndexRange(i, this->n_faces());
   return dealii::internal::CellAccessorImplementation::get_face(*this, i);
 }
 
