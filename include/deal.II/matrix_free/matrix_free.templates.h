@@ -1083,7 +1083,8 @@ namespace internal
         connectivity_direct.add_entries(cell,
                                         new_indices.begin(),
                                         std::unique(new_indices.begin(),
-                                                    new_indices.end()));
+                                                    new_indices.end()),
+                                        true);
       }
   }
 
@@ -1115,7 +1116,8 @@ namespace internal
         connectivity.add_entries(block,
                                  new_indices.begin(),
                                  std::unique(new_indices.begin(),
-                                             new_indices.end()));
+                                             new_indices.end()),
+                                 true);
       }
   }
 
