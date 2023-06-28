@@ -197,8 +197,15 @@ public:
    *
    * @note The operations of this function are substantially more efficient
    *   if the indices pointed to by the range of iterators are already sorted.
-   *   As a consequence, it is often worth sorting the range of indices
-   *   before calling this function.
+   *   As a consequence, it is often highly beneficial to sort the range of
+   *   indices pointed to by the iterator range given by the arguments
+   *   before calling this function. Note also that the function deals
+   *   efficiently with sorted indices that contain duplicates (e.g., if
+   *   the iterator range points to the list `(1,1,1,2,2,4,6,8,8,8)`).
+   *   In other words, it is very useful to call `std::sort()` on the
+   *   range of indices you are about to add, but it is not necessary
+   *   to call the usual combination of `std::unique` and `std::erase`
+   *   to reduce the list of indices to only a set of unique elements.
    */
   template <typename ForwardIterator>
   void
@@ -1746,12 +1753,26 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
       // at once.
       const size_type begin_index = *p;
       size_type       end_index   = begin_index + 1;
-      ForwardIterator q           = p;
+
+      // Start looking at the position after 'p', and keep iterating while
+      // 'q' points to a duplicate of 'p':
+      ForwardIterator q = p;
       ++q;
+      while ((q != end) && (*q == *p))
+        ++q;
+
+      // Now we know that 'q' is either past the end, or points to a value
+      // other than 'p'. If it points to 'end_index', we are still good with
+      // a contiguous range; then increment the end index of that range, and
+      // move to the next iterator that is not a duplicate of what
+      // we were just looking at:
       while ((q != end) && (static_cast<size_type>(*q) == end_index))
         {
-          ++end_index;
           ++q;
+          while ((q != end) && (static_cast<size_type>(*q) == end_index))
+            ++q;
+
+          ++end_index;
         }
 
       // Add this range:
@@ -1763,7 +1784,7 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
       // least one pair of ranges that are not sorted, and consequently the
       // whole collection of ranges is not sorted.
       p = q;
-      if (p != end && static_cast<size_type>(*p) < end_index)
+      if ((p != end) && (static_cast<size_type>(*p) < end_index))
         ranges_are_sorted = false;
     }
 
