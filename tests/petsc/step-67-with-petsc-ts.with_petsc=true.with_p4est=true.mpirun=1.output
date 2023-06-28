@@ -1,0 +1,26 @@
+
+Running with 1 MPI processes
+Number of degrees of freedom: 9216 ( = 4 [vars] x 64 [cells] x 36 [dofs/cell/var] )
+Time step size: 0.0275808, minimal h: 1.25000, initial transport scaling: 0.411150
+
+Monitor is at t=0.0693617 with ||y||=158.219
+Monitor is at t=0.116085 with ||y||=158.220
+Monitor is at t=0.170333 with ||y||=158.221
+Monitor is at t=0.223603 with ||y||=158.221
+Monitor is at t=0.259770 with ||y||=158.221
+Monitor is at t=0.332301 with ||y||=158.220
+Monitor is at t=0.373992 with ||y||=158.219
+Monitor is at t=0.417647 with ||y||=158.218
+Monitor is at t=0.462060 with ||y||=158.217
+Monitor is at t=0.503602 with ||y||=158.216
+Monitor is at t=0.578443 with ||y||=158.214
+Monitor is at t=0.618551 with ||y||=158.214
+Monitor is at t=0.660433 with ||y||=158.214
+Monitor is at t=0.703591 with ||y||=158.214
+Monitor is at t=0.787191 with ||y||=158.215
+Monitor is at t=0.825503 with ||y||=158.216
+Monitor is at t=0.864442 with ||y||=158.217
+Monitor is at t=0.905591 with ||y||=158.217
+Monitor is at t=0.989302 with ||y||=158.219
+Monitor is at t=1.03147 with ||y||=158.219
+
