@@ -149,9 +149,12 @@ namespace Utilities
     unsigned int
     n_mpi_processes(const MPI_Comm mpi_communicator)
     {
-      int       n_jobs = 1;
-      const int ierr   = MPI_Comm_size(mpi_communicator, &n_jobs);
-      AssertThrowMPI(ierr);
+      int n_jobs = 1;
+      if (job_supports_mpi())
+        {
+          const int ierr = MPI_Comm_size(mpi_communicator, &n_jobs);
+          AssertThrowMPI(ierr);
+        }
 
       return n_jobs;
     }
@@ -160,9 +163,12 @@ namespace Utilities
     unsigned int
     this_mpi_process(const MPI_Comm mpi_communicator)
     {
-      int       rank = 0;
-      const int ierr = MPI_Comm_rank(mpi_communicator, &rank);
-      AssertThrowMPI(ierr);
+      int rank = 0;
+      if (job_supports_mpi())
+        {
+          const int ierr = MPI_Comm_rank(mpi_communicator, &rank);
+          AssertThrowMPI(ierr);
+        }
 
       return rank;
     }
@@ -541,8 +547,7 @@ namespace Utilities
     {
       // If MPI was not started, we have a serial computation and cannot run
       // the other MPI commands
-      if (job_supports_mpi() == false ||
-          Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
+      if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
         {
           for (unsigned int i = 0; i < my_values.size(); ++i)
             {
@@ -1184,21 +1189,24 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
 
-      // TODO: For now, we implement this mutex with a blocking barrier
-      // in the lock and unlock. It needs to be tested, if we can move
-      // to a nonblocking barrier (code disabled below).
+      if (job_supports_mpi())
+        {
+          // TODO: For now, we implement this mutex with a blocking barrier in
+          // the lock and unlock. It needs to be tested, if we can move to a
+          // nonblocking barrier (code disabled below).
 
-      const int ierr = MPI_Barrier(comm);
-      AssertThrowMPI(ierr);
+          const int ierr = MPI_Barrier(comm);
+          AssertThrowMPI(ierr);
 
 #  if 0
-      // wait for non-blocking barrier to finish. This is a noop the
-      // first time we lock().
-      const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+          // wait for non-blocking barrier to finish. This is a noop the
+          // first time we lock().
+          const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
 #  else
-      // nothing to do as blocking barrier already completed
+          // nothing to do as blocking barrier already completed
 #  endif
+        }
 #endif
 
       locked = true;
@@ -1222,16 +1230,19 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
 
-      // TODO: For now, we implement this mutex with a blocking barrier
-      // in the lock and unlock. It needs to be tested, if we can move
-      // to a nonblocking barrier (code disabled below):
+      if (job_supports_mpi())
+        {
+          // TODO: For now, we implement this mutex with a blocking barrier
+          // in the lock and unlock. It needs to be tested, if we can move
+          // to a nonblocking barrier (code disabled below):
 #  if 0
       const int ierr = MPI_Ibarrier(comm, &request);
       AssertThrowMPI(ierr);
 #  else
-      const int ierr = MPI_Barrier(comm);
-      AssertThrowMPI(ierr);
+          const int ierr = MPI_Barrier(comm);
+          AssertThrowMPI(ierr);
 #  endif
+        }
 #endif
 
       locked = false;

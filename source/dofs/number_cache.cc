@@ -91,9 +91,7 @@ namespace internal
       else if (n_locally_owned_dofs_per_processor.empty() == false)
         {
           AssertDimension(n_locally_owned_dofs_per_processor.size(),
-                          (Utilities::MPI::job_supports_mpi() ?
-                             Utilities::MPI::n_mpi_processes(mpi_communicator) :
-                             1));
+                          Utilities::MPI::n_mpi_processes(mpi_communicator));
           return n_locally_owned_dofs_per_processor;
         }
       else
@@ -115,9 +113,7 @@ namespace internal
       else if (locally_owned_dofs_per_processor.empty() == false)
         {
           AssertDimension(locally_owned_dofs_per_processor.size(),
-                          (Utilities::MPI::job_supports_mpi() ?
-                             Utilities::MPI::n_mpi_processes(mpi_communicator) :
-                             1));
+                          Utilities::MPI::n_mpi_processes(mpi_communicator));
           return locally_owned_dofs_per_processor;
         }
       else

@@ -406,7 +406,7 @@ namespace Utilities
            const unsigned int                            root_process)
     {
 #ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
+      if (n_mpi_processes(comm) > 1)
         {
           // 1) perform custom reduction
           T result = vec;
@@ -488,7 +488,7 @@ namespace Utilities
                const MPI_Comm                                comm,
                const std::function<T(const T &, const T &)> &combiner)
     {
-      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
+      if (n_mpi_processes(comm) > 1)
         {
           // 1) perform reduction
           const auto result = Utilities::MPI::reduce<T>(vec, comm, combiner);

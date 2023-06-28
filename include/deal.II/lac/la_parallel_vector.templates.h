@@ -1341,34 +1341,36 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_MPI
 
 #  ifdef DEBUG
-      if (Utilities::MPI::job_supports_mpi())
+      Assert(Utilities::MPI::job_supports_mpi() ||
+               (update_ghost_values_requests.empty() &&
+                compress_requests.empty()),
+             ExcInternalError());
+
+      // make sure that there are not outstanding requests from updating
+      // ghost values or compress
+      int flag = 1;
+      if (update_ghost_values_requests.size() > 0)
         {
-          // make sure that there are not outstanding requests from updating
-          // ghost values or compress
-          int flag = 1;
-          if (update_ghost_values_requests.size() > 0)
-            {
-              const int ierr = MPI_Testall(update_ghost_values_requests.size(),
-                                           update_ghost_values_requests.data(),
-                                           &flag,
-                                           MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-              Assert(flag == 1,
-                     ExcMessage(
-                       "MPI found unfinished update_ghost_values() requests "
-                       "when calling swap, which is not allowed."));
-            }
-          if (compress_requests.size() > 0)
-            {
-              const int ierr = MPI_Testall(compress_requests.size(),
-                                           compress_requests.data(),
-                                           &flag,
-                                           MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-              Assert(flag == 1,
-                     ExcMessage("MPI found unfinished compress() requests "
-                                "when calling swap, which is not allowed."));
-            }
+          const int ierr = MPI_Testall(update_ghost_values_requests.size(),
+                                       update_ghost_values_requests.data(),
+                                       &flag,
+                                       MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+          Assert(flag == 1,
+                 ExcMessage(
+                   "MPI found unfinished update_ghost_values() requests "
+                   "when calling swap, which is not allowed."));
+        }
+      if (compress_requests.size() > 0)
+        {
+          const int ierr = MPI_Testall(compress_requests.size(),
+                                       compress_requests.data(),
+                                       &flag,
+                                       MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+          Assert(flag == 1,
+                 ExcMessage("MPI found unfinished compress() requests "
+                            "when calling swap, which is not allowed."));
         }
 #  endif
 

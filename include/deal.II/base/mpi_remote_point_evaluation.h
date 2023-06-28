@@ -476,10 +476,13 @@ namespace Utilities
         }
 
       // make sure all messages have been sent
-      const int ierr = MPI_Waitall(send_requests.size(),
-                                   send_requests.data(),
-                                   MPI_STATUSES_IGNORE);
-      AssertThrowMPI(ierr);
+      if (!send_requests.empty())
+        {
+          const int ierr = MPI_Waitall(send_requests.size(),
+                                       send_requests.data(),
+                                       MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+        }
 #endif
     }
 
@@ -644,10 +647,13 @@ namespace Utilities
             buffer_eval[send_permutation_inv[i]] = recv_buffer_unpacked[c];
         }
 
-      const int ierr = MPI_Waitall(send_requests.size(),
-                                   send_requests.data(),
-                                   MPI_STATUSES_IGNORE);
-      AssertThrowMPI(ierr);
+      if (!send_requests.empty())
+        {
+          const int ierr = MPI_Waitall(send_requests.size(),
+                                       send_requests.data(),
+                                       MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
+        }
 
       // evaluate function at points
       evaluation_function(buffer_eval, cell_data);

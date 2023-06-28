@@ -441,24 +441,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       task_info.allow_ghosted_vectors_in_loops =
         additional_data.allow_ghosted_vectors_in_loops;
 
-      // set variables that are independent of FE
-      if (Utilities::MPI::job_supports_mpi() == true)
-        {
-          task_info.communicator = dof_handler[0]->get_communicator();
-          task_info.my_pid =
-            Utilities::MPI::this_mpi_process(task_info.communicator);
-          task_info.n_procs =
-            Utilities::MPI::n_mpi_processes(task_info.communicator);
-
-          task_info.communicator_sm = additional_data.communicator_sm;
-        }
-      else
-        {
-          task_info.communicator    = MPI_COMM_SELF;
-          task_info.communicator_sm = MPI_COMM_SELF;
-          task_info.my_pid          = 0;
-          task_info.n_procs         = 1;
-        }
+      task_info.communicator    = dof_handler[0]->get_communicator();
+      task_info.communicator_sm = additional_data.communicator_sm;
+      task_info.my_pid =
+        Utilities::MPI::this_mpi_process(task_info.communicator);
+      task_info.n_procs =
+        Utilities::MPI::n_mpi_processes(task_info.communicator);
 
 #ifdef DEBUG
       for (const auto &constraint : constraints)

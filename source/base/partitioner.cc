@@ -150,16 +150,8 @@ namespace Utilities
     void
     Partitioner::set_owned_indices(const IndexSet &locally_owned_indices)
     {
-      if (Utilities::MPI::job_supports_mpi() == true)
-        {
-          my_pid  = Utilities::MPI::this_mpi_process(communicator);
-          n_procs = Utilities::MPI::n_mpi_processes(communicator);
-        }
-      else
-        {
-          my_pid  = 0;
-          n_procs = 1;
-        }
+      my_pid  = Utilities::MPI::this_mpi_process(communicator);
+      n_procs = Utilities::MPI::n_mpi_processes(communicator);
 
       // set the local range
       Assert(locally_owned_indices.is_contiguous() == true,

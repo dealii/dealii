@@ -725,11 +725,7 @@ namespace LinearAlgebra
     {
       Assert(this->n_blocks() > 0, ExcEmptyObject());
 
-      // use int instead of bool. in order to make global reduction operations
-      // work also when MPI_Init was not called, only call MPI_Allreduce
-      // commands when there is more than one processor (note that reinit()
-      // functions handle this case correctly through the job_supports_mpi()
-      // query). this is the same in all the functions below
+      // use int instead of bool
       int local_result = -1;
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         local_result =
