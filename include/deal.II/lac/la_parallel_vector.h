@@ -711,7 +711,7 @@ namespace LinearAlgebra
        * @deprecated Use import_elements() instead.
        */
       template <typename MemorySpace2>
-      DEAL_II_DEPRECATED_EARLY void
+      DEAL_II_DEPRECATED void
       import(const Vector<Number, MemorySpace2> &src,
              VectorOperation::values             operation)
       {
@@ -778,7 +778,7 @@ namespace LinearAlgebra
       /**
        * @deprecated Use import_elements() instead.
        */
-      DEAL_II_DEPRECATED_EARLY virtual void
+      DEAL_II_DEPRECATED virtual void
       import(const LinearAlgebra::ReadWriteVector<Number> &V,
              VectorOperation::values                       operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>

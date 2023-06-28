@@ -342,7 +342,7 @@ constexpr bool has_begin_and_end =
  * @deprecated Use `std_cxx20::identity_type` instead.
  */
 template <typename T>
-using identity DEAL_II_DEPRECATED_EARLY = std_cxx20::type_identity<T>;
+using identity DEAL_II_DEPRECATED = std_cxx20::type_identity<T>;
 
 
 /**

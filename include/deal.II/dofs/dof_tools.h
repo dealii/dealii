@@ -2127,7 +2127,7 @@ namespace DoFTools
    * vector.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   get_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
                         std::vector<unsigned int> &      active_fe_indices);
 
@@ -2304,7 +2304,7 @@ namespace DoFTools
    * @deprecated Use the function that returns the `std::map` instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2317,7 +2317,7 @@ namespace DoFTools
    * @deprecated Use the function that returns the `std::map` instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &        mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,

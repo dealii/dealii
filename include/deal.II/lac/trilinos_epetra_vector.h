@@ -136,7 +136,7 @@ namespace LinearAlgebra
       /**
        * @deprecated Use import_elements() instead.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       import(const ReadWriteVector<double> &V,
              VectorOperation::values        operation,

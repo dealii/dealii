@@ -307,7 +307,7 @@ namespace LinearAlgebra
     /**
      * @deprecated Use import_elements() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     import(const dealii::Vector<Number> &V,
            VectorOperation::values       operation,
@@ -336,7 +336,7 @@ namespace LinearAlgebra
     /**
      * @deprecated Use import_elements() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     import(const LinearAlgebra::Vector<Number> &V,
            VectorOperation::values              operation,
@@ -366,7 +366,7 @@ namespace LinearAlgebra
      * @deprecated Use import_elements() instead.
      */
     template <typename MemorySpace>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     import(const distributed::Vector<Number, MemorySpace> &V,
            VectorOperation::values                         operation,
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -395,7 +395,7 @@ namespace LinearAlgebra
     /**
      * @deprecated Use import_elements() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     import(const PETScWrappers::MPI::Vector &V,
            VectorOperation::values           operation,
@@ -427,7 +427,7 @@ namespace LinearAlgebra
     /**
      * @deprecated Use import_elements() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     import(const TrilinosWrappers::MPI::Vector &V,
            VectorOperation::values              operation,
@@ -459,14 +459,12 @@ namespace LinearAlgebra
      * @deprecated Use import_elements() instead.
      */
     template <typename Dummy = Number>
-    DEAL_II_DEPRECATED_EARLY
-      std::enable_if_t<std::is_same<Dummy, Number>::value &&
-                       dealii::is_tpetra_type<Number>::value>
-      import(
-        const TpetraWrappers::Vector<Number> &V,
-        VectorOperation::values               operation,
-        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          &communication_pattern = {})
+    DEAL_II_DEPRECATED std::enable_if_t<std::is_same<Dummy, Number>::value &&
+                                        dealii::is_tpetra_type<Number>::value>
+                       import(const TpetraWrappers::Vector<Number> &V,
+                              VectorOperation::values               operation,
+                              const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+                                &communication_pattern = {})
     {
       import_elements(V, operation, communication_pattern);
     }
@@ -490,7 +488,7 @@ namespace LinearAlgebra
     /**
      * @deprecated Use import_elements() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     import(const EpetraWrappers::Vector &V,
            VectorOperation::values       operation,
@@ -519,7 +517,7 @@ namespace LinearAlgebra
     /**
      * @deprecated Use import_elements() instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     import(const CUDAWrappers::Vector<Number> &V,
            VectorOperation::values             operation,
