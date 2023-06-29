@@ -23,7 +23,7 @@
  * quadratures.
  */
 
-#include <deal.II/base/function_level_set.h>
+#include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -85,7 +85,7 @@ test_plane_cuts_through_center()
   for (int plane_direction = 0; plane_direction < dim; ++plane_direction)
     {
       const Tensor<1, dim> normal = Point<dim>::unit_vector(plane_direction);
-      const Functions::LevelSet::Plane<dim> levelset(center, normal);
+      const Functions::SignedDistance::Plane<dim> levelset(center, normal);
 
       // Test all faces that are intersected by the plane.
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -118,10 +118,10 @@ test_1D()
 {
   deallog << "test_1D" << std::endl;
 
-  const int                             dim = 1;
-  Point<dim>                            center(.5);
-  const Tensor<1, dim>                  normal = Point<dim>::unit_vector(0);
-  const Functions::LevelSet::Plane<dim> levelset(center, normal);
+  const int            dim = 1;
+  Point<dim>           center(.5);
+  const Tensor<1, dim> normal = Point<dim>::unit_vector(0);
+  const Functions::SignedDistance::Plane<dim> levelset(center, normal);
 
   for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
     {
