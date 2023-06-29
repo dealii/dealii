@@ -101,7 +101,7 @@ do_test(const unsigned int fe_degree)
 
       // Set random seed for reproducibility
       Testing::srand(42);
-      for (unsigned int i = 0; i < in.local_size(); ++i)
+      for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
         {
           const double entry  = Testing::rand() / (double)RAND_MAX;
           in.local_element(i) = entry;

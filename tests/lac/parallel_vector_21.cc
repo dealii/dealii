@@ -51,7 +51,7 @@ test()
 
   // set locally owned range of v2 manually
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> v2_view(
-    v2.get_values(), v2.local_size());
+    v2.get_values(), v2.locally_owned_size());
   Kokkos::deep_copy(v2_view, 1.);
 
   // add entries to ghost values

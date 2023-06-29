@@ -101,7 +101,7 @@ print(const Mapping<dim> &                              mapping,
   data_out.write_vtu_with_pvtu_record(
     "./", "example-3", counter, MPI_COMM_WORLD, 1, 1);
 
-  result.zero_out_ghosts();
+  result.zero_out_ghost_values();
 }
 
 void
@@ -192,7 +192,7 @@ test()
   Utilities::MPI::RemotePointEvaluation<dim> evaluation_cache;
   const auto evaluation_point_results = VectorTools::point_values<1>(
     mapping_1, dof_handler_1, vector_1, evaluation_points, evaluation_cache);
-  vector_1.zero_out_ghosts();
+  vector_1.zero_out_ghost_values();
 
   LinearAlgebra::distributed::Vector<double> vector_2(
     create_partitioner(dof_handler_2));

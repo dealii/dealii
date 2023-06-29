@@ -75,7 +75,7 @@ main(int argc, char *argv[])
   LinearAlgebra::distributed::Vector<double> solution(
     dof_handler.locally_owned_dofs(), locally_relevant_dofs, MPI_COMM_WORLD);
   const double old_value = 1.;
-  for (unsigned int i = 0; i < solution.local_size(); ++i)
+  for (unsigned int i = 0; i < solution.locally_owned_size(); ++i)
     solution.local_element(i) = old_value;
 
   {

@@ -78,13 +78,13 @@ main(int argc, char **argv)
 
   deallog << "main partitioner: size="
           << matrix_free.get_dof_info().vector_partitioner->size()
-          << " local_size="
-          << matrix_free.get_dof_info().vector_partitioner->local_size()
+          << " locally_owned_size="
+          << matrix_free.get_dof_info().vector_partitioner->locally_owned_size()
           << " n_ghosts="
           << matrix_free.get_dof_info().vector_partitioner->n_ghost_indices()
           << std::endl;
   for (auto &p : matrix_free.get_dof_info().vector_exchanger_face_variants)
     deallog << "partitioner: size=" << p->size()
-            << " local_size=" << p->locally_owned_size()
+            << " locally_owned_size=" << p->locally_owned_size()
             << " n_ghosts=" << p->n_ghost_indices() << std::endl;
 }

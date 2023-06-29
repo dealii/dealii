@@ -56,7 +56,8 @@ test()
   LinearAlgebra::distributed::Vector<double> v(local_owned,
                                                local_relevant,
                                                MPI_COMM_WORLD);
-  AssertDimension(static_cast<unsigned int>(actual_local_size), v.local_size());
+  AssertDimension(static_cast<unsigned int>(actual_local_size),
+                  v.locally_owned_size());
   LinearAlgebra::distributed::Vector<double> w(v), x(v), y(v);
 
   // set local elements

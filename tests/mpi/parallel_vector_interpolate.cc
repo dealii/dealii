@@ -65,12 +65,12 @@ test()
 
   // set first vector to 1
   VectorTools::interpolate(dof1, Functions::ConstantFunction<dim>(1.), v1);
-  for (unsigned int i = 0; i < v1.local_size(); ++i)
+  for (unsigned int i = 0; i < v1.locally_owned_size(); ++i)
     Assert(v1.local_element(i) == 1., ExcInternalError());
 
   v1.update_ghost_values();
   FETools::interpolate(dof1, v1, dof2, v2);
-  for (unsigned int i = 0; i < v2.local_size(); ++i)
+  for (unsigned int i = 0; i < v2.locally_owned_size(); ++i)
     Assert(v2.local_element(i) == 1., ExcInternalError());
 
   v2.update_ghost_values();

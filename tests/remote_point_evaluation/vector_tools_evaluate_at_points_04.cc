@@ -100,7 +100,7 @@ print(const Mapping<dim> &                              mapping,
   data_out.write_vtu_with_pvtu_record(
     "./", "example-1", counter, MPI_COMM_WORLD, 1, 1);
 
-  result.zero_out_ghosts();
+  result.zero_out_ghost_values();
 }
 
 template <int dim>
@@ -158,7 +158,7 @@ test()
   const auto evaluation_point_gradient_results =
     VectorTools::point_gradients<1>(
       mapping_1, dof_handler_1, vector_1, evaluation_points, evaluation_cache);
-  vector_1.zero_out_ghosts();
+  vector_1.zero_out_ghost_values();
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     for (unsigned int i = 0; i <= n_intervals; ++i)

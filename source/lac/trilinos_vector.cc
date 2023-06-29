@@ -56,7 +56,7 @@ namespace TrilinosWrappers
       Assert(local_index >= 0,
              MPI::Vector::ExcAccessToNonLocalElement(
                index,
-               vector.local_size(),
+               vector.vector->Map().NumMyElements(),
                vector.vector->Map().MinMyGID(),
                vector.vector->Map().MaxMyGID()));
 
@@ -290,14 +290,15 @@ namespace TrilinosWrappers
       // vector. need to manually create an Epetra_Map.
       size_type n_elements = 0, added_elements = 0, block_offset = 0;
       for (size_type block = 0; block < v.n_blocks(); ++block)
-        n_elements += v.block(block).local_size();
+        n_elements += v.block(block).vector->Map().NumMyElements();
       std::vector<TrilinosWrappers::types::int_type> global_ids(n_elements, -1);
       for (size_type block = 0; block < v.n_blocks(); ++block)
         {
           TrilinosWrappers::types::int_type *glob_elements =
             TrilinosWrappers::my_global_elements(
               v.block(block).trilinos_partitioner());
-          for (size_type i = 0; i < v.block(block).local_size(); ++i)
+          size_type vector_size = v.block(block).vector->Map().NumMyElements();
+          for (size_type i = 0; i < vector_size; ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
           owned_elements.add_indices(v.block(block).owned_elements,
                                      block_offset);
@@ -317,7 +318,7 @@ namespace TrilinosWrappers
       for (size_type block = 0; block < v.n_blocks(); ++block)
         {
           v.block(block).trilinos_vector().ExtractCopy(entries, 0);
-          entries += v.block(block).local_size();
+          entries += v.block(block).vector->Map().NumMyElements();
         }
 
       if (import_data == true)
@@ -680,7 +681,7 @@ namespace TrilinosWrappers
         {
           Assert(false,
                  ExcAccessToNonLocalElement(index,
-                                            local_size(),
+                                            vector->Map().NumMyElements(),
                                             vector->Map().MinMyGID(),
                                             vector->Map().MaxMyGID()));
         }
@@ -731,11 +732,11 @@ namespace TrilinosWrappers
     Vector::operator==(const Vector &v) const
     {
       Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
-      if (local_size() != v.local_size())
+      if (vector->Map().NumMyElements() != v.vector->Map().NumMyElements())
         return false;
 
-      size_type i;
-      for (i = 0; i < local_size(); ++i)
+      size_type vector_size = vector->Map().NumMyElements();
+      for (size_type i = 0; i < vector_size; ++i)
         if ((*(v.vector))[0][i] != (*vector)[0][i])
           return false;
 
@@ -760,8 +761,9 @@ namespace TrilinosWrappers
       // get a representation of the vector and
       // loop over all the elements
       TrilinosScalar *      start_ptr = (*vector)[0];
-      const TrilinosScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
-      unsigned int          flag = 0;
+      const TrilinosScalar *ptr       = start_ptr,
+                           *eptr = start_ptr + vector->Map().NumMyElements();
+      unsigned int flag          = 0;
       while (ptr != eptr)
         {
           if (*ptr != 0)
@@ -789,8 +791,9 @@ namespace TrilinosWrappers
       // get a representation of the vector and
       // loop over all the elements
       TrilinosScalar *      start_ptr = (*vector)[0];
-      const TrilinosScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
-      unsigned int          flag = 0;
+      const TrilinosScalar *ptr       = start_ptr,
+                           *eptr = start_ptr + vector->Map().NumMyElements();
+      unsigned int flag          = 0;
       while (ptr != eptr)
         {
           if (*ptr < 0.0)
@@ -826,14 +829,16 @@ namespace TrilinosWrappers
       else
         out.setf(std::ios::fixed, std::ios::floatfield);
 
-      if (size() != local_size())
+      size_type vector_size = vector->Map().NumMyElements();
+      if (size() != vector_size)
         {
           auto global_id = [&](const size_type index) {
             return gid(vector->Map(), index);
           };
-          out << "size:" << size() << " local_size:" << local_size() << " :"
+          out << "size:" << size()
+              << " locally_owned_size:" << vector->Map().NumMyElements() << " :"
               << std::endl;
-          for (size_type i = 0; i < local_size(); ++i)
+          for (size_type i = 0; i < vector_size; ++i)
             out << "[" << global_id(i) << "]: " << (*(vector))[0][i]
                 << std::endl;
         }
@@ -880,7 +885,7 @@ namespace TrilinosWrappers
       // one index and the value per local
       // entry.
       return sizeof(*this) +
-             this->local_size() *
+             this->vector->Map().NumMyElements() *
                (sizeof(double) + sizeof(TrilinosWrappers::types::int_type));
     }
 

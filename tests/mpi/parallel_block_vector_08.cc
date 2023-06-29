@@ -128,7 +128,7 @@ test(const unsigned int n_blocks = 5)
       left.block(b)  = 0.;
       left2.block(b) = 0.;
       right.block(b) = 0.;
-      for (unsigned int i = 0; i < right.block(b).local_size(); ++i)
+      for (unsigned int i = 0; i < right.block(b).locally_owned_size(); ++i)
         {
           const unsigned int glob_index = owned_set.nth_index_in_set(i);
           if (constraints.is_constrained(glob_index))

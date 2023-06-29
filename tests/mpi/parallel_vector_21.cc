@@ -50,7 +50,7 @@ test()
   v2.reinit(v, true);
 
   // set locally owned range of v2 manually
-  for (unsigned int i = 0; i < v2.local_size(); ++i)
+  for (unsigned int i = 0; i < v2.locally_owned_size(); ++i)
     v2.local_element(i) = 1.;
 
   // add entries to ghost values

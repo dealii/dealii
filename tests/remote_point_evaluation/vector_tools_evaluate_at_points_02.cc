@@ -108,7 +108,7 @@ print(const Mapping<dim> &                              mapping,
   data_out.write_vtu_with_pvtu_record(
     "./", "example-2", counter, MPI_COMM_WORLD, 1, 1);
 
-  result.zero_out_ghosts();
+  result.zero_out_ghost_values();
 }
 
 template <int dim>
@@ -186,7 +186,7 @@ public:
                                      solution_other,
                                      evaluation_points,
                                      evaluation_cache);
-      solution_other.zero_out_ghosts();
+      solution_other.zero_out_ghost_values();
       for (unsigned int i = 0; i < evaluation_points.size(); ++i)
         {
           if (global_ids[i] == numbers::invalid_size_type)

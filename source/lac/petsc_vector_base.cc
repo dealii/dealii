@@ -448,18 +448,6 @@ namespace PETScWrappers
 
 
 
-  VectorBase::size_type
-  VectorBase::local_size() const
-  {
-    PetscInt             sz;
-    const PetscErrorCode ierr = VecGetLocalSize(vector, &sz);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    return sz;
-  }
-
-
-
   std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range() const
   {
@@ -749,33 +737,6 @@ namespace PETScWrappers
 
 
 
-  VectorBase::real_type
-  VectorBase::min() const
-  {
-    PetscInt  p;
-    real_type d;
-
-    const PetscErrorCode ierr = VecMin(vector, &p, &d);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    return d;
-  }
-
-
-  VectorBase::real_type
-  VectorBase::max() const
-  {
-    PetscInt  p;
-    real_type d;
-
-    const PetscErrorCode ierr = VecMax(vector, &p, &d);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    return d;
-  }
-
-
-
   bool
   VectorBase::all_zero() const
   {
@@ -827,38 +788,6 @@ namespace PETScWrappers
                         "whether it is non-negative.")) return true;
     }
   } // namespace internal
-
-
-
-  bool
-  VectorBase::is_non_negative() const
-  {
-    // get a representation of the vector and
-    // loop over all the elements
-    const PetscScalar *start_ptr;
-    PetscErrorCode     ierr = VecGetArrayRead(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    const PetscScalar *ptr  = start_ptr,
-                      *eptr = start_ptr + locally_owned_size();
-    bool flag               = true;
-    while (ptr != eptr)
-      {
-        if (!internal::is_non_negative(*ptr))
-          {
-            flag = false;
-            break;
-          }
-        ++ptr;
-      }
-
-    // restore the representation of the
-    // vector
-    ierr = VecRestoreArrayRead(vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    return flag;
-  }
 
 
 

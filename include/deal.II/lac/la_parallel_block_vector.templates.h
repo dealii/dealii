@@ -472,15 +472,6 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    BlockVector<Number>::zero_out_ghosts() const
-    {
-      this->zero_out_ghost_values();
-    }
-
-
-
-    template <typename Number>
-    void
     BlockVector<Number>::zero_out_ghost_values() const
     {
       for (unsigned int block = 0; block < this->n_blocks(); ++block)

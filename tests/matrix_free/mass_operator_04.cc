@@ -100,7 +100,7 @@ test()
   LinearAlgebra::distributed::Vector<number> in, out, ref;
   mf_data_0->initialize_dof_vector(in);
 
-  for (unsigned int i = 0; i < in.local_size(); ++i)
+  for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
     in.local_element(i) = random_value<double>();
 
   mf_c0.initialize_dof_vector(out);

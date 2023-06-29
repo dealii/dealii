@@ -763,23 +763,6 @@ namespace TrilinosWrappers
       size() const;
 
       /**
-       * Return the local dimension of the vector, i.e. the number of elements
-       * stored on the present MPI process. For sequential vectors, this number
-       * is the same as size(), but for parallel vectors it may be smaller.
-       *
-       * To figure out which elements exactly are stored locally, use
-       * local_range().
-       *
-       * If the vector contains ghost elements, they are included in this
-       * number.
-       *
-       * @deprecated This function is deprecated.
-       */
-      DEAL_II_DEPRECATED
-      size_type
-      local_size() const;
-
-      /**
        * Return the local size of the vector, i.e., the number of indices
        * owned locally.
        */
@@ -792,9 +775,10 @@ namespace TrilinosWrappers
        * stored, the second the index of the one past the last one that is
        * stored locally. If this is a sequential vector, then the result will be
        * the pair <code>(0,N)</code>, otherwise it will be a pair
-       * <code>(i,i+n)</code>, where <code>n=local_size()</code> and
-       * <code>i</code> is the first element of the vector stored on this
-       * processor, corresponding to the half open interval $[i,i+n)$
+       * <code>(i,i+n)</code>, where <code>n</code> is the number of elements
+       * stored on this processor and and <code>i</code> is the first element of
+       * the vector stored on this processor, corresponding to the half open
+       * interval $[i,i+n)$
        *
        * @note The description above is true most of the time, but not always.
        * In particular, Trilinos vectors need not store contiguous ranges of
@@ -1052,8 +1036,6 @@ namespace TrilinosWrappers
        * corresponds to the one given by the global indices in case the vector
        * is constructed from an IndexSet or other methods in deal.II (note that
        * an Epetra_Map can contain elements in arbitrary orders, though).
-       *
-       * It holds that end() - begin() == local_size().
        */
       iterator
       begin();
@@ -1771,14 +1753,6 @@ namespace TrilinosWrappers
 #    else
       return vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64();
 #    endif
-    }
-
-
-
-    inline Vector::size_type
-    Vector::local_size() const
-    {
-      return vector->Map().NumMyElements();
     }
 
 

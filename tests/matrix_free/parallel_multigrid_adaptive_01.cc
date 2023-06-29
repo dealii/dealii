@@ -226,7 +226,7 @@ public:
           .local_element(edge_constrained_indices[i]) =
           edge_constrained_values[i].first;
       }
-    for (; c < dst.local_size(); ++c)
+    for (; c < dst.locally_owned_size(); ++c)
       dst.local_element(c) = 0.;
   }
 
@@ -255,7 +255,7 @@ public:
           src_cpy.local_element(c) = 0.;
         ++c;
       }
-    for (; c < src_cpy.local_size(); ++c)
+    for (; c < src_cpy.locally_owned_size(); ++c)
       src_cpy.local_element(c) = 0.;
 
     data.cell_loop(&LaplaceOperator::local_apply, this, dst, src_cpy);
@@ -347,7 +347,8 @@ private:
       }
 
 
-    for (unsigned int i = 0; i < inverse_diagonal_entries.local_size(); ++i)
+    for (unsigned int i = 0; i < inverse_diagonal_entries.locally_owned_size();
+         ++i)
       if (std::abs(inverse_diagonal_entries.local_element(i)) > 1e-10)
         inverse_diagonal_entries.local_element(i) =
           1. / inverse_diagonal_entries.local_element(i);
@@ -533,7 +534,7 @@ do_test(const DoFHandler<dim> &dof)
   fine_matrix.initialize_dof_vector(sol);
 
   // set constant rhs vector
-  for (unsigned int i = 0; i < in.local_size(); ++i)
+  for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
     if (!hanging_node_constraints.is_constrained(
           in.get_partitioner()->local_to_global(i)))
       in.local_element(i) = 1.;

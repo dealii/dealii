@@ -232,9 +232,9 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    AssertDimension(x.local_size(),
+    AssertDimension(x.locally_owned_size(),
                     A.trilinos_matrix().DomainMap().NumMyElements());
-    AssertDimension(b.local_size(),
+    AssertDimension(b.locally_owned_size(),
                     A.trilinos_matrix().RangeMap().NumMyElements());
 
     Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
@@ -258,8 +258,10 @@ namespace TrilinosWrappers
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                     const PreconditionBase &preconditioner)
   {
-    AssertDimension(x.local_size(), A.OperatorDomainMap().NumMyElements());
-    AssertDimension(b.local_size(), A.OperatorRangeMap().NumMyElements());
+    AssertDimension(x.locally_owned_size(),
+                    A.OperatorDomainMap().NumMyElements());
+    AssertDimension(b.locally_owned_size(),
+                    A.OperatorRangeMap().NumMyElements());
 
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
     Epetra_Vector ep_b(View,
@@ -858,9 +860,9 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &      x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    AssertDimension(x.local_size(),
+    AssertDimension(x.locally_owned_size(),
                     A.trilinos_matrix().DomainMap().NumMyElements());
-    AssertDimension(b.local_size(),
+    AssertDimension(b.locally_owned_size(),
                     A.trilinos_matrix().RangeMap().NumMyElements());
     Epetra_Vector ep_x(View, A.trilinos_matrix().DomainMap(), x.begin());
     Epetra_Vector ep_b(View,
