@@ -665,28 +665,28 @@ namespace StokesTests
                 (
                   // - nu {\nabla u}n . [v] (consistency)
                   -nu *
-                    (fe_fv[velocities].average_gradient(j, point) *
+                    (fe_fv[velocities].average_of_gradients(j, point) *
                      normals[point]) *
-                    fe_fv[velocities].jump(i, point)
+                    fe_fv[velocities].jump_in_values(i, point)
 
                   // - nu [u] . {\nabla v}n  (symmetry) // NIPG: use +
-                  - nu * fe_fv[velocities].jump(j, point) *
-                      (fe_fv[velocities].average_gradient(i, point) *
+                  - nu * fe_fv[velocities].jump_in_values(j, point) *
+                      (fe_fv[velocities].average_of_gradients(i, point) *
                        normals[point])
 
                   // nu sigma [u].[v] (penalty)
                   + nu * penalty *
-                      scalar_product(fe_fv[velocities].jump(j, point),
-                                     fe_fv[velocities].jump(i, point))
+                      scalar_product(fe_fv[velocities].jump_in_values(j, point),
+                                     fe_fv[velocities].jump_in_values(i, point))
 
                   // {p} ([v].n)
-                  + fe_fv[pressure].average(j, point) *
-                      scalar_product(fe_fv[velocities].jump(i, point),
+                  + fe_fv[pressure].average_of_values(j, point) *
+                      scalar_product(fe_fv[velocities].jump_in_values(i, point),
                                      normals[point])
 
                   // {q} ([u].n)
-                  + fe_fv[pressure].average(i, point) *
-                      scalar_product(fe_fv[velocities].jump(j, point),
+                  + fe_fv[pressure].average_of_values(i, point) *
+                      scalar_product(fe_fv[velocities].jump_in_values(j, point),
                                      normals[point])) *
                 JxW[point];
         }
