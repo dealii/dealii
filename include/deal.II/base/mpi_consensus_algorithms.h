@@ -237,42 +237,13 @@ namespace Utilities
         /**
          * Default constructor.
          */
-        Interface();
-
-        /**
-         * Constructor. @p process is an object that provides information
-         * about what processes the current process wants to communicate with,
-         * and the data to be sent/received. @p comm is the communicator on
-         * which this communication is to happen.
-         *
-         * @deprecated This constructor stores the Process object and the
-         *   communicator so that one can later call the run() function
-         *   without arguments. This approach is deprecated. Instead, use
-         *   the default constructor of this class along with the run()
-         *   function that takes an argument.
-         */
-        DEAL_II_DEPRECATED
-        Interface(Process<RequestType, AnswerType> &process,
-                  const MPI_Comm                    comm);
+        Interface() = default;
 
         /**
          * Destructor. Made `virtual` to ensure that one can work with
          * derived classes.
          */
         virtual ~Interface() = default;
-
-        /**
-         * Run the consensus algorithm and return a vector of process ranks
-         * that have requested answers from the current process.
-         *
-         * @deprecated This function is deprecated. It can be called
-         *   if the Process object and communicator to be used have previously
-         *   been provided to the non-default constructor. Use the run()
-         *   functions taking arguments instead.
-         */
-        DEAL_II_DEPRECATED
-        std::vector<unsigned int>
-        run();
 
         /**
          * Run the consensus algorithm and return a vector of process ranks
@@ -317,26 +288,6 @@ namespace Utilities
           const std::function<void(const unsigned int, const AnswerType &)>
             &            process_answer,
           const MPI_Comm comm) = 0;
-
-      private:
-        /**
-         * Reference to the process provided by the user.
-         *
-         * This member variable is only used in the deprecated constructor
-         * and the run() function without argument. It is a `nullptr`
-         * otherwise
-         */
-        DEAL_II_DEPRECATED
-        Process<RequestType, AnswerType> *process;
-
-        /**
-         * MPI communicator.
-         *
-         * This member variable is only used in the deprecated constructor
-         * and the run() function without argument.
-         */
-        DEAL_II_DEPRECATED
-        MPI_Comm comm;
       };
 
 
@@ -361,21 +312,6 @@ namespace Utilities
          * Default constructor.
          */
         NBX() = default;
-
-        /**
-         * Constructor.
-         *
-         * @param process Process to be run during consensus algorithm.
-         * @param comm MPI Communicator
-         *
-         * @deprecated This constructor stores the Process object and the
-         *   communicator so that one can later call the run() function
-         *   without arguments. This approach is deprecated. Instead, use
-         *   the default constructor of this class along with the run()
-         *   function that takes an argument.
-         */
-        DEAL_II_DEPRECATED
-        NBX(Process<RequestType, AnswerType> &process, const MPI_Comm comm);
 
         /**
          * Destructor.
@@ -627,22 +563,6 @@ namespace Utilities
          */
         PEX() = default;
 
-
-        /**
-         * Constructor.
-         *
-         * @param process Process to be run during consensus algorithm.
-         * @param comm MPI Communicator
-         *
-         * @deprecated This constructor stores the Process object and the
-         *   communicator so that one can later call the run() function
-         *   without arguments. This approach is deprecated. Instead, use
-         *   the default constructor of this class along with the run()
-         *   function that takes an argument.
-         */
-        DEAL_II_DEPRECATED
-        PEX(Process<RequestType, AnswerType> &process, const MPI_Comm comm);
-
         /**
          * Destructor.
          */
@@ -863,21 +783,6 @@ namespace Utilities
          */
         Serial() = default;
 
-        /**
-         * Constructor.
-         *
-         * @param process Process to be run during consensus algorithm.
-         * @param comm MPI Communicator (ignored)
-         *
-         * @deprecated This constructor stores the Process object and the
-         *   communicator so that one can later call the run() function
-         *   without arguments. This approach is deprecated. Instead, use
-         *   the default constructor of this class along with the run()
-         *   function that takes an argument.
-         */
-        DEAL_II_DEPRECATED
-        Serial(Process<RequestType, AnswerType> &process, const MPI_Comm comm);
-
         // Import the declarations from the base class.
         using Interface<RequestType, AnswerType>::run;
 
@@ -1000,22 +905,6 @@ namespace Utilities
          * Default constructor.
          */
         Selector() = default;
-
-        /**
-         * Constructor.
-         *
-         * @param process Process to be run during consensus algorithm.
-         * @param comm MPI Communicator.
-         *
-         * @deprecated This constructor stores the Process object and the
-         *   communicator so that one can later call the run() function
-         *   without arguments. This approach is deprecated. Instead, use
-         *   the default constructor of this class along with the run()
-         *   function that takes an argument.
-         */
-        DEAL_II_DEPRECATED
-        Selector(Process<RequestType, AnswerType> &process,
-                 const MPI_Comm                    comm);
 
         /**
          * Destructor.
@@ -1148,77 +1037,6 @@ namespace Utilities
           &            process_request,
         const MPI_Comm comm);
 
-
-      /**
-       * This class implements Utilities::MPI::ConsensusAlgorithms::Process,
-       * using user-provided function wrappers.
-       * The advantage of this class is that users do not have to write their
-       * own implementation but can register lambda functions directly.
-       */
-      template <typename RequestType, typename AnswerType>
-      class DEAL_II_DEPRECATED AnonymousProcess
-        : public Process<RequestType, AnswerType>
-      {
-      public:
-        /**
-         * Register functions that should be called for implementing the
-         * interface of Process.
-         *
-         * @param function_compute_targets called during `compute_targets`.
-         * @param function_create_request called during `create_request`.
-         * @param function_answer_request called during `answer_request`.
-         * @param function_read_answer called during `read_answer`.
-         */
-        AnonymousProcess(
-          const std::function<std::vector<unsigned int>()>
-            &function_compute_targets,
-          const std::function<void(const unsigned int, RequestType &)>
-            &                                      function_create_request = {},
-          const std::function<void(const unsigned int,
-                                   const RequestType &,
-                                   AnswerType &)> &function_answer_request = {},
-          const std::function<void(const unsigned int, const AnswerType &)>
-            &function_read_answer = {});
-
-        /**
-         * @copydoc Process::compute_targets()
-         */
-        std::vector<unsigned int>
-        compute_targets() override;
-
-        /**
-         * @copydoc Process::create_request()
-         */
-        void
-        create_request(const unsigned int other_rank,
-                       RequestType &      send_buffer) override;
-
-        /**
-         * @copydoc Process::answer_request()
-         */
-        void
-        answer_request(const unsigned int other_rank,
-                       const RequestType &buffer_recv,
-                       AnswerType &       request_buffer) override;
-
-        /**
-         * @copydoc Process::read_answer()
-         */
-        void
-        read_answer(const unsigned int other_rank,
-                    const AnswerType & recv_buffer) override;
-
-      private:
-        const std::function<std::vector<unsigned int>()>
-          function_compute_targets;
-        const std::function<void(const int, RequestType &)>
-          function_create_request;
-        const std::function<
-          void(const unsigned int, const RequestType &, AnswerType &)>
-          function_answer_request;
-        const std::function<void(const int, const AnswerType &)>
-          function_read_answer;
-      };
 
 
 #ifndef DOXYGEN
@@ -1434,71 +1252,6 @@ namespace Utilities
           comm);
       }
 
-
-
-      template <typename RequestType, typename AnswerType>
-      AnonymousProcess<RequestType, AnswerType>::AnonymousProcess(
-        const std::function<std::vector<unsigned int>()>
-          &function_compute_targets,
-        const std::function<void(const unsigned int, RequestType &)>
-          &                                      function_create_request,
-        const std::function<void(const unsigned int,
-                                 const RequestType &,
-                                 AnswerType &)> &function_answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
-          &function_read_answer)
-        : function_compute_targets(function_compute_targets)
-        , function_create_request(function_create_request)
-        , function_answer_request(function_answer_request)
-        , function_read_answer(function_read_answer)
-      {}
-
-
-
-      template <typename RequestType, typename AnswerType>
-      std::vector<unsigned int>
-      AnonymousProcess<RequestType, AnswerType>::compute_targets()
-      {
-        return function_compute_targets();
-      }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      void
-      AnonymousProcess<RequestType, AnswerType>::create_request(
-        const unsigned int other_rank,
-        RequestType &      send_buffer)
-      {
-        if (function_create_request)
-          function_create_request(other_rank, send_buffer);
-      }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      void
-      AnonymousProcess<RequestType, AnswerType>::answer_request(
-        const unsigned int other_rank,
-        const RequestType &buffer_recv,
-        AnswerType &       request_buffer)
-      {
-        if (function_answer_request)
-          function_answer_request(other_rank, buffer_recv, request_buffer);
-      }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      void
-      AnonymousProcess<RequestType, AnswerType>::read_answer(
-        const unsigned int other_rank,
-        const AnswerType & recv_buffer)
-      {
-        if (function_read_answer)
-          function_read_answer(other_rank, recv_buffer);
-      }
-
 #endif
 
 
@@ -1662,38 +1415,6 @@ namespace Utilities
 
 
       template <typename RequestType, typename AnswerType>
-      Interface<RequestType, AnswerType>::Interface(
-        Process<RequestType, AnswerType> &process,
-        const MPI_Comm                    comm)
-        : process(&process)
-        , comm(comm)
-      {}
-
-
-
-      template <typename RequestType, typename AnswerType>
-      Interface<RequestType, AnswerType>::Interface()
-        : process(nullptr)
-        , comm(MPI_COMM_NULL)
-      {}
-
-
-
-      template <typename RequestType, typename AnswerType>
-      std::vector<unsigned int>
-      Interface<RequestType, AnswerType>::run()
-      {
-        Assert(process != nullptr,
-               ExcMessage("This function can only be called if the "
-                          "deprecated non-default constructor of this class "
-                          "has previously been called to set the Process "
-                          "object and a communicator."));
-        return run(*process, comm);
-      }
-
-
-
-      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       Interface<RequestType, AnswerType>::run(
         Process<RequestType, AnswerType> &process,
@@ -1721,15 +1442,6 @@ namespace Utilities
           },
           comm);
       }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      NBX<RequestType, AnswerType>::NBX(
-        Process<RequestType, AnswerType> &process,
-        const MPI_Comm                    comm)
-        : Interface<RequestType, AnswerType>(process, comm)
-      {}
 
 
 
@@ -2105,15 +1817,6 @@ namespace Utilities
 
 
       template <typename RequestType, typename AnswerType>
-      PEX<RequestType, AnswerType>::PEX(
-        Process<RequestType, AnswerType> &process,
-        const MPI_Comm                    comm)
-        : Interface<RequestType, AnswerType>(process, comm)
-      {}
-
-
-
-      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       PEX<RequestType, AnswerType>::run(
         const std::vector<unsigned int> &                     targets,
@@ -2385,15 +2088,6 @@ namespace Utilities
 
 
       template <typename RequestType, typename AnswerType>
-      Serial<RequestType, AnswerType>::Serial(
-        Process<RequestType, AnswerType> &process,
-        const MPI_Comm                    comm)
-        : Interface<RequestType, AnswerType>(process, comm)
-      {}
-
-
-
-      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       Serial<RequestType, AnswerType>::run(
         const std::vector<unsigned int> &                     targets,
@@ -2434,15 +2128,6 @@ namespace Utilities
 
         return targets; // nothing to do
       }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      Selector<RequestType, AnswerType>::Selector(
-        Process<RequestType, AnswerType> &process,
-        const MPI_Comm                    comm)
-        : Interface<RequestType, AnswerType>(process, comm)
-      {}
 
 
 

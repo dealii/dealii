@@ -63,8 +63,8 @@ test()
     Utilities::MPI::ConsensusAlgorithms::Selector<
       std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
       std::vector<unsigned int>>
-      consensus_algorithm(process, comm);
-    consensus_algorithm.run();
+      consensus_algorithm;
+    consensus_algorithm.run(process, comm);
 
     deallog << "owning_ranks_of_ghosts:" << std::endl;
     for (auto i : owning_ranks_of_ghosts)
