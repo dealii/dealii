@@ -2287,11 +2287,7 @@ namespace Step33
     // examples, so we won't comment much on the following code. The last
     // three lines simply re-set the sizes of some other vectors to the now
     // correct size:
-    std::vector<Vector<double>> transfer_in;
-    std::vector<Vector<double>> transfer_out;
-
-    transfer_in.push_back(old_solution);
-    transfer_in.push_back(predictor);
+    const std::vector<Vector<double>> transfer_in = {old_solution, predictor};
 
     triangulation.prepare_coarsening_and_refinement();
 
@@ -2303,26 +2299,17 @@ namespace Step33
     dof_handler.clear();
     dof_handler.distribute_dofs(fe);
 
-    {
-      Vector<double> new_old_solution(1);
-      Vector<double> new_predictor(1);
-
-      transfer_out.push_back(new_old_solution);
-      transfer_out.push_back(new_predictor);
-      transfer_out[0].reinit(dof_handler.n_dofs());
-      transfer_out[1].reinit(dof_handler.n_dofs());
-    }
-
+    std::vector<Vector<double>> transfer_out = {
+      Vector<double>(dof_handler.n_dofs()),
+      Vector<double>(dof_handler.n_dofs())};
     soltrans.interpolate(transfer_in, transfer_out);
 
-    old_solution.reinit(transfer_out[0].size());
-    old_solution = transfer_out[0];
-
-    predictor.reinit(transfer_out[1].size());
-    predictor = transfer_out[1];
+    old_solution = std::move(transfer_out[0]);
+    predictor    = std::move(transfer_out[1]);
 
     current_solution.reinit(dof_handler.n_dofs());
     current_solution = old_solution;
+
     right_hand_side.reinit(dof_handler.n_dofs());
   }
 
