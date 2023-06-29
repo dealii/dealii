@@ -58,5 +58,5 @@ string(REGEX REPLACE ".*<Site>(.*)</Site>" "\\1" CTEST_SITE "${CTEST_SITE}")
 
 message("-- CTEST_SITE:             ${CTEST_SITE}")
 
-ctest_start(Experimental TRACK ${_track} APPEND)
+ctest_start(TRACK ${_track} APPEND)
 ctest_submit()
