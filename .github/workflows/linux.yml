@@ -105,7 +105,7 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make -j2 setup_tests_simplex setup_tests_vtk
+        make -j2 setup_tests_simplex
         ctest --output-on-failure -j2
     - name: failed test log
       if: ${{ failure() }}
