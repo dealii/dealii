@@ -40,14 +40,23 @@ set(CTEST_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 message("-- CTEST_BINARY_DIRECTORY: ${CTEST_BINARY_DIRECTORY}")
 
 file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag)
+list(GET _tag 0 _subdirectory)
 list(GET _tag 1 _track)
 
 if("${_track}" STREQUAL "")
-  message(FATAL_ERROR "
-No test results found. Bailing out.
-"
-    )
+  message(FATAL_ERROR "\nNo test results found. Bailing out.\n")
 endif()
+
+set(_file "${CTEST_BINARY_DIRECTORY}/Testing/${_subdirectory}/Update.xml")
+
+if(NOT EXISTS "${_file}")
+  message(FATAL_ERROR "\nNo test results found. Bailing out.\n")
+endif()
+
+file(STRINGS "${_file}" CTEST_SITE REGEX "<Site>")
+string(REGEX REPLACE ".*<Site>(.*)</Site>" "\\1" CTEST_SITE "${CTEST_SITE}")
+
+message("-- CTEST_SITE:             ${CTEST_SITE}")
 
 ctest_start(Experimental TRACK ${_track} APPEND)
 ctest_submit()
