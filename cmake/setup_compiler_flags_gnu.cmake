@@ -212,7 +212,19 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
   #
   # https://github.com/dealii/dealii/issues/15496
   #
-  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-ffp-exception-behavior=strict")
+  # ... except this doesn't presently work with AppleClang versions before 16.0.
+  # They support this flag but it is not compatible with C++14: see
+  #
+  # https://github.com/dealii/dealii/issues/15531
+  #
+  # This flag works with standard Clang 13.0 or newer.
+  #
+  if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "13.0")
+      OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "16.0"))
+    enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-ffp-exception-behavior=strict")
+  endif()
 
   #
   # In recent versions, gcc often eliminates too much debug information
