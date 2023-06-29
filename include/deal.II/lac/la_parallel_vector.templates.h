@@ -1348,9 +1348,9 @@ namespace LinearAlgebra
 
       // make sure that there are not outstanding requests from updating
       // ghost values or compress
-      int flag = 1;
       if (update_ghost_values_requests.size() > 0)
         {
+          int       flag = 1;
           const int ierr = MPI_Testall(update_ghost_values_requests.size(),
                                        update_ghost_values_requests.data(),
                                        &flag,
@@ -1363,6 +1363,7 @@ namespace LinearAlgebra
         }
       if (compress_requests.size() > 0)
         {
+          int       flag = 1;
           const int ierr = MPI_Testall(compress_requests.size(),
                                        compress_requests.data(),
                                        &flag,

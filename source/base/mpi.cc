@@ -149,28 +149,30 @@ namespace Utilities
     unsigned int
     n_mpi_processes(const MPI_Comm mpi_communicator)
     {
-      int n_jobs = 1;
       if (job_supports_mpi())
         {
-          const int ierr = MPI_Comm_size(mpi_communicator, &n_jobs);
+          int       n_jobs = 1;
+          const int ierr   = MPI_Comm_size(mpi_communicator, &n_jobs);
           AssertThrowMPI(ierr);
+          return n_jobs;
         }
-
-      return n_jobs;
+      else
+        return 1;
     }
 
 
     unsigned int
     this_mpi_process(const MPI_Comm mpi_communicator)
     {
-      int rank = 0;
       if (job_supports_mpi())
         {
+          int       rank = 0;
           const int ierr = MPI_Comm_rank(mpi_communicator, &rank);
           AssertThrowMPI(ierr);
+          return rank;
         }
-
-      return rank;
+      else
+        return 0;
     }
 
 
