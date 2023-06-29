@@ -461,7 +461,7 @@ namespace MPI_nonlinear_solver_selector_test
     nonlinear_solver.solve_with_jacobian = [&](const LA::MPI::Vector &rhs,
                                                LA::MPI::Vector &      dst,
                                                const double tolerance) {
-      this->solve(rhs, dst, tolerance);
+      solve(rhs, dst, tolerance);
     };
 
     nonlinear_solver.solve(current_solution);

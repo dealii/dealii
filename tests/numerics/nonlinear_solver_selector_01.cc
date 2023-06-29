@@ -378,7 +378,7 @@ namespace nonlinear_solver_selector_test
       nonlinear_solver.solve_with_jacobian = [&](const Vector<double> &rhs,
                                                  Vector<double> &      dst,
                                                  const double tolerance) {
-        this->solve(rhs, dst, tolerance);
+        solve(rhs, dst, tolerance);
       };
 
       nonlinear_solver.solve(current_solution);
