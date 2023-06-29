@@ -45,11 +45,10 @@ struct X
 void
 test()
 {
-  X                    x;
-  Threads::Thread<int> t;
-  t = Threads::new_thread(&X::f, x);
+  X    x;
+  auto future = std::async(&X::f, x);
 
-  AssertThrow(t.return_value() == 42, ExcInternalError());
+  AssertThrow(future.get() == 42, ExcInternalError());
 }
 
 

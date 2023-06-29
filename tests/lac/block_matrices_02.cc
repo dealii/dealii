@@ -78,13 +78,14 @@ test()
 
   BlockSparseMatrix<double> bsm(bsp);
 
-  Threads::ThreadGroup<> tg;
+  std::vector<std::thread> tg;
   for (unsigned int i = 0; i < 100; ++i)
     {
-      tg += Threads::new_thread(&do_set, true, bsm);
-      tg += Threads::new_thread(&do_set, false, bsm);
+      tg.emplace_back(&do_set, true, std::ref(bsm));
+      tg.emplace_back(&do_set, false, std::ref(bsm));
     }
-  tg.join_all();
+  for (auto &thread : tg)
+    thread.join();
 
   bsm.print_formatted(deallog.get_file_stream());
 }

@@ -42,8 +42,8 @@ main()
   initlog();
 
   {
-    Threads::Thread<> t1 = Threads::new_thread(test, 1);
-    Threads::Thread<> t2 = Threads::new_thread(test, 2);
+    std::thread t1(test, 1);
+    std::thread t2(test, 2);
 
     t1.join();
     t2.join();

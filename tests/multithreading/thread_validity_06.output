@@ -1,5 +1,0 @@
-
-DEAL::void execute_ref(const X&) 0
-DEAL::OK
-DEAL::void execute_value(X) OK
-DEAL::OK

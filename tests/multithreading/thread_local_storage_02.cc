@@ -82,9 +82,9 @@ test()
   // thread ids, which means that we will
   // create 5 individual thread specific
   // storage locations
-  Threads::ThreadGroup<> tg;
+  std::vector<std::thread> tg;
   for (unsigned int i = 10; i < 15; ++i)
-    tg += Threads::new_thread(execute, i);
+    tg.emplace_back(execute, i);
 
   // spin lock until all threads have created
   // their objects
@@ -109,7 +109,8 @@ test()
   deallog << "Done." << std::endl;
 
   // now make sure the threads all finish
-  tg.join_all();
+  for (auto &thread : tg)
+    thread.join();
 
   // at this point, the seventh object will
   // be destroyed, which is the exemplar

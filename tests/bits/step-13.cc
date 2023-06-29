@@ -356,15 +356,15 @@ namespace LaplaceSolver
                                                    dof_handler.end(),
                                                    n_threads);
 
-    Threads::Mutex         mutex;
-    Threads::ThreadGroup<> threads;
+    Threads::Mutex           mutex;
+    std::vector<std::thread> threads;
     for (unsigned int thread = 0; thread < n_threads; ++thread)
-      threads += Threads::new_thread(&Solver<dim>::assemble_matrix,
-                                     *this,
-                                     linear_system,
-                                     thread_ranges[thread].first,
-                                     thread_ranges[thread].second,
-                                     mutex);
+      threads.emplace_back(&Solver<dim>::assemble_matrix,
+                           std::ref(*this),
+                           std::ref(linear_system),
+                           std::ref(thread_ranges[thread].first),
+                           std::ref(thread_ranges[thread].second),
+                           std::ref(mutex));
 
     assemble_rhs(linear_system.rhs);
     linear_system.hanging_node_constraints.condense(linear_system.rhs);
@@ -375,8 +375,9 @@ namespace LaplaceSolver
                                              *boundary_values,
                                              boundary_value_map);
 
+    for (auto &thread : threads)
+      thread.join();
 
-    threads.join_all();
     linear_system.hanging_node_constraints.condense(linear_system.matrix);
 
     MatrixTools::apply_boundary_values(boundary_value_map,
@@ -441,8 +442,10 @@ namespace LaplaceSolver
     void (*mhnc_p)(const DoFHandler<dim> &, AffineConstraints<double> &) =
       &DoFTools::make_hanging_node_constraints;
 
-    Threads::Thread<> mhnc_thread =
-      Threads::new_thread(mhnc_p, dof_handler, hanging_node_constraints);
+    std::thread mhnc_thread(
+      &DoFTools::make_hanging_node_constraints<dim, dim, double>,
+      std::ref(dof_handler),
+      std::ref(hanging_node_constraints));
 
     sparsity_pattern.reinit(dof_handler.n_dofs(),
                             dof_handler.n_dofs(),
