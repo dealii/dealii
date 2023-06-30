@@ -1704,6 +1704,17 @@ public:
     {
       ar &index &entries &inhomogeneity;
     }
+
+    /**
+     * Swap function.
+     */
+    friend void
+    swap(ConstraintLine &l1, ConstraintLine &l2)
+    {
+      std::swap(l1.index, l2.index);
+      std::swap(l1.entries, l2.entries);
+      std::swap(l1.inhomogeneity, l2.inhomogeneity);
+    }
   };
 
   /**
