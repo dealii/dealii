@@ -1,0 +1,103 @@
+
+DEAL:0:2d/2d::Before serialization particle id 0 is in cell 2.0
+DEAL:0:2d/2d::Before serialization particle id 3 is in cell 2.1
+DEAL:0:2d/2d::Before serialization particle id 1 is in cell 2.2
+DEAL:0:2d/2d::Before serialization particle id 4 is in cell 2.3
+DEAL:0:2d/2d::Before serialization particle id 6 is in cell 2.5
+DEAL:0:2d/2d::Before serialization particle id 7 is in cell 2.7
+DEAL:0:2d/2d::Before serialization particle id 2 is in cell 2.10
+DEAL:0:2d/2d::Before serialization particle id 5 is in cell 2.11
+DEAL:0:2d/2d::Before serialization particle id 8 is in cell 2.15
+DEAL:0:2d/2d::0 0 9 1 9
+
+DEAL:0:2d/2d::After serialization particle id 0 is in cell 2.0
+DEAL:0:2d/2d::After serialization particle id 3 is in cell 2.1
+DEAL:0:2d/2d::After serialization particle id 1 is in cell 2.2
+DEAL:0:2d/2d::After serialization particle id 4 is in cell 2.3
+DEAL:0:2d/2d::After serialization particle id 6 is in cell 2.5
+DEAL:0:2d/2d::After serialization particle id 7 is in cell 2.7
+DEAL:0:2d/2d::After serialization particle id 2 is in cell 2.10
+DEAL:0:2d/2d::After serialization particle id 5 is in cell 2.11
+DEAL:0:2d/2d::After serialization particle id 8 is in cell 2.15
+DEAL:0:2d/2d::OK
+DEAL:0:2d/2d::
+DEAL:0:2d/3d::Before serialization particle id 0 is in cell 2.0
+DEAL:0:2d/3d::Before serialization particle id 3 is in cell 2.1
+DEAL:0:2d/3d::Before serialization particle id 1 is in cell 2.2
+DEAL:0:2d/3d::Before serialization particle id 4 is in cell 2.3
+DEAL:0:2d/3d::Before serialization particle id 6 is in cell 2.5
+DEAL:0:2d/3d::Before serialization particle id 7 is in cell 2.7
+DEAL:0:2d/3d::Before serialization particle id 2 is in cell 2.10
+DEAL:0:2d/3d::Before serialization particle id 5 is in cell 2.11
+DEAL:0:2d/3d::Before serialization particle id 8 is in cell 2.15
+DEAL:0:2d/3d::0 0 9 1 9
+
+DEAL:0:2d/3d::After serialization particle id 0 is in cell 2.0
+DEAL:0:2d/3d::After serialization particle id 3 is in cell 2.1
+DEAL:0:2d/3d::After serialization particle id 1 is in cell 2.2
+DEAL:0:2d/3d::After serialization particle id 4 is in cell 2.3
+DEAL:0:2d/3d::After serialization particle id 6 is in cell 2.5
+DEAL:0:2d/3d::After serialization particle id 7 is in cell 2.7
+DEAL:0:2d/3d::After serialization particle id 2 is in cell 2.10
+DEAL:0:2d/3d::After serialization particle id 5 is in cell 2.11
+DEAL:0:2d/3d::After serialization particle id 8 is in cell 2.15
+DEAL:0:2d/3d::OK
+DEAL:0:2d/3d::
+DEAL:0:3d/3d::Before serialization particle id 0 is in cell 2.0
+DEAL:0:3d/3d::Before serialization particle id 1 is in cell 2.0
+DEAL:0:3d/3d::Before serialization particle id 2 is in cell 2.0
+DEAL:0:3d/3d::Before serialization particle id 9 is in cell 2.1
+DEAL:0:3d/3d::Before serialization particle id 10 is in cell 2.1
+DEAL:0:3d/3d::Before serialization particle id 11 is in cell 2.1
+DEAL:0:3d/3d::Before serialization particle id 3 is in cell 2.6
+DEAL:0:3d/3d::Before serialization particle id 4 is in cell 2.6
+DEAL:0:3d/3d::Before serialization particle id 5 is in cell 2.6
+DEAL:0:3d/3d::Before serialization particle id 12 is in cell 2.7
+DEAL:0:3d/3d::Before serialization particle id 13 is in cell 2.7
+DEAL:0:3d/3d::Before serialization particle id 14 is in cell 2.7
+DEAL:0:3d/3d::Before serialization particle id 18 is in cell 2.9
+DEAL:0:3d/3d::Before serialization particle id 19 is in cell 2.9
+DEAL:0:3d/3d::Before serialization particle id 20 is in cell 2.9
+DEAL:0:3d/3d::Before serialization particle id 21 is in cell 2.15
+DEAL:0:3d/3d::Before serialization particle id 22 is in cell 2.15
+DEAL:0:3d/3d::Before serialization particle id 23 is in cell 2.15
+DEAL:0:3d/3d::Before serialization particle id 6 is in cell 2.54
+DEAL:0:3d/3d::Before serialization particle id 7 is in cell 2.54
+DEAL:0:3d/3d::Before serialization particle id 8 is in cell 2.54
+DEAL:0:3d/3d::Before serialization particle id 15 is in cell 2.55
+DEAL:0:3d/3d::Before serialization particle id 16 is in cell 2.55
+DEAL:0:3d/3d::Before serialization particle id 17 is in cell 2.55
+DEAL:0:3d/3d::Before serialization particle id 24 is in cell 2.63
+DEAL:0:3d/3d::Before serialization particle id 25 is in cell 2.63
+DEAL:0:3d/3d::Before serialization particle id 26 is in cell 2.63
+DEAL:0:3d/3d::0 0 27 3 27
+
+DEAL:0:3d/3d::After serialization particle id 0 is in cell 2.0
+DEAL:0:3d/3d::After serialization particle id 1 is in cell 2.0
+DEAL:0:3d/3d::After serialization particle id 2 is in cell 2.0
+DEAL:0:3d/3d::After serialization particle id 9 is in cell 2.1
+DEAL:0:3d/3d::After serialization particle id 10 is in cell 2.1
+DEAL:0:3d/3d::After serialization particle id 11 is in cell 2.1
+DEAL:0:3d/3d::After serialization particle id 3 is in cell 2.6
+DEAL:0:3d/3d::After serialization particle id 4 is in cell 2.6
+DEAL:0:3d/3d::After serialization particle id 5 is in cell 2.6
+DEAL:0:3d/3d::After serialization particle id 12 is in cell 2.7
+DEAL:0:3d/3d::After serialization particle id 13 is in cell 2.7
+DEAL:0:3d/3d::After serialization particle id 14 is in cell 2.7
+DEAL:0:3d/3d::After serialization particle id 18 is in cell 2.9
+DEAL:0:3d/3d::After serialization particle id 19 is in cell 2.9
+DEAL:0:3d/3d::After serialization particle id 20 is in cell 2.9
+DEAL:0:3d/3d::After serialization particle id 21 is in cell 2.15
+DEAL:0:3d/3d::After serialization particle id 22 is in cell 2.15
+DEAL:0:3d/3d::After serialization particle id 23 is in cell 2.15
+DEAL:0:3d/3d::After serialization particle id 6 is in cell 2.54
+DEAL:0:3d/3d::After serialization particle id 7 is in cell 2.54
+DEAL:0:3d/3d::After serialization particle id 8 is in cell 2.54
+DEAL:0:3d/3d::After serialization particle id 15 is in cell 2.55
+DEAL:0:3d/3d::After serialization particle id 16 is in cell 2.55
+DEAL:0:3d/3d::After serialization particle id 17 is in cell 2.55
+DEAL:0:3d/3d::After serialization particle id 24 is in cell 2.63
+DEAL:0:3d/3d::After serialization particle id 25 is in cell 2.63
+DEAL:0:3d/3d::After serialization particle id 26 is in cell 2.63
+DEAL:0:3d/3d::OK
+DEAL:0:3d/3d::
