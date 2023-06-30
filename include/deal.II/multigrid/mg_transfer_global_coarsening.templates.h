@@ -540,13 +540,6 @@ namespace internal
            const IndexSet &is_src_locally_owned,
            const bool      check_if_elements_in_is_dst_remote_exist = false)
     {
-#ifndef DEAL_II_WITH_MPI
-      Assert(false, ExcNeedsMPI());
-      (void)is_dst_locally_owned;
-      (void)is_dst_remote_input;
-      (void)is_src_locally_owned;
-      (void)check_if_elements_in_is_dst_remote_exist;
-#else
       IndexSet is_dst_remote = is_dst_remote_input;
 
       if (check_if_elements_in_is_dst_remote_exist)
@@ -606,18 +599,33 @@ namespace internal
       this->is_dst_remote        = is_dst_remote;
       this->is_src_locally_owned = is_src_locally_owned;
 
+      this->is_extended_locally_owned =
+        mg_level_fine == numbers::invalid_unsigned_int ?
+          dof_handler_fine.locally_owned_dofs() :
+          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
+
       const auto targets_with_indexset = process.get_requesters();
+      std::vector<types::global_dof_index> ghost_indices;
+
+#ifndef DEAL_II_WITH_MPI
+      Assert(targets_with_indexset.empty(), ExcInternalError());
+#else
 
       std::map<unsigned int, std::vector<types::global_dof_index>>
                                indices_to_be_sent;
       std::vector<MPI_Request> requests;
       requests.reserve(targets_with_indexset.size());
+      const unsigned int my_rank =
+        Utilities::MPI::this_mpi_process(communicator);
 
       {
         std::vector<types::global_dof_index> indices;
 
         for (const auto &i : targets_with_indexset)
           {
+            if (i.first == my_rank)
+              continue;
+
             indices_to_be_sent[i.first] = {};
             std::vector<types::global_dof_index> &buffer =
               indices_to_be_sent[i.first];
@@ -640,7 +648,7 @@ namespace internal
                 buffer.insert(buffer.end(), indices.begin(), indices.end());
               }
 
-            requests.resize(requests.size() + 1);
+            requests.emplace_back();
 
             const auto ierr_1 = MPI_Isend(
               buffer.data(),
@@ -653,13 +661,6 @@ namespace internal
             AssertThrowMPI(ierr_1);
           }
       }
-
-      this->is_extended_locally_owned =
-        mg_level_fine == numbers::invalid_unsigned_int ?
-          dof_handler_fine.locally_owned_dofs() :
-          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
-
-      std::vector<types::global_dof_index> ghost_indices;
 
       // process local cells
       {
@@ -690,22 +691,16 @@ namespace internal
       {
         std::map<unsigned int, std::vector<types::global_dof_index>>
           rank_to_ids;
-
-        std::set<unsigned int> ranks;
-
-        for (auto i : is_dst_remote_owners)
-          ranks.insert(i);
-
-        for (auto i : ranks)
-          rank_to_ids[i] = {};
-
         for (unsigned int i = 0; i < is_dst_remote_owners.size(); ++i)
           rank_to_ids[is_dst_remote_owners[i]].push_back(
             is_dst_remote.nth_index_in_set(i));
 
-
-        for (unsigned int i = 0; i < ranks.size(); ++i)
+        for (const auto &pair : rank_to_ids)
           {
+            // above we skip messages sent to myself, so also skip MPI_Probe
+            if (pair.first == my_rank)
+              continue;
+
             MPI_Status status;
             const int  ierr_1 = MPI_Probe(
               MPI_ANY_SOURCE,
@@ -767,10 +762,15 @@ namespace internal
               }
           }
 
-        const int ierr_1 =
-          MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr_1);
+        if (!requests.empty())
+          {
+            const int ierr_1 = MPI_Waitall(requests.size(),
+                                           requests.data(),
+                                           MPI_STATUSES_IGNORE);
+            AssertThrowMPI(ierr_1);
+          }
       }
+#endif
 
       std::sort(ghost_indices.begin(), ghost_indices.end());
       ghost_indices.erase(std::unique(ghost_indices.begin(),
@@ -784,8 +784,6 @@ namespace internal
       this->is_extended_ghosts.add_indices(ghost_indices.begin(),
                                            ghost_indices.end());
       this->is_extended_ghosts.subtract_set(this->is_extended_locally_owned);
-
-#endif
     }
 
     FineDoFHandlerViewCell
@@ -867,7 +865,7 @@ namespace internal
 
       const bool is_cell_locally_owned =
         this->is_dst_locally_owned.is_element(id);
-      const bool is_cell_remotly_owned = this->is_dst_remote.is_element(id);
+      const bool is_cell_remotely_owned = this->is_dst_remote.is_element(id);
 
       return FineDoFHandlerViewCell(
         [cell]() {
@@ -876,7 +874,7 @@ namespace internal
 
           return false;
         },
-        [cell, is_cell_locally_owned, is_cell_remotly_owned, c, id, this](
+        [cell, is_cell_locally_owned, is_cell_remotely_owned, c, id, this](
           auto &dof_indices) {
           if (is_cell_locally_owned)
             {
@@ -892,7 +890,7 @@ namespace internal
               else
                 cell_fine->get_mg_dof_indices(dof_indices);
             }
-          else if (is_cell_remotly_owned)
+          else if (is_cell_remotely_owned)
             {
               dof_indices = map.at(id).second;
             }

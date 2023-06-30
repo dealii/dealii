@@ -488,8 +488,7 @@ AffineConstraints<number>::make_consistent_in_parallel(
   const IndexSet &locally_relevant_dofs,
   const MPI_Comm  mpi_communicator)
 {
-  if (Utilities::MPI::job_supports_mpi() == false ||
-      Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
+  if (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
     return; // nothing to do, since serial
 
   Assert(sorted == false, ExcMatrixIsClosed());
