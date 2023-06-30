@@ -44,6 +44,7 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
 #include <deal.II/matrix_free/type_traits.h>
+#include <deal.II/matrix_free/vector_data_exchange.h>
 
 #include <cstdlib>
 #include <limits>

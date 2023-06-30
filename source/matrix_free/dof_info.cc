@@ -22,6 +22,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 #include <deal.II/matrix_free/dof_info.templates.h>
+#include <deal.II/matrix_free/vector_data_exchange.h>
 
 #include <iostream>
 

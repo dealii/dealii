@@ -25,7 +25,6 @@
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/vector_data_exchange.h>
 
 #include <array>
 #include <memory>
@@ -48,6 +47,11 @@ namespace internal
 
     template <typename Number>
     struct ConstraintValues;
+
+    namespace VectorDataExchange
+    {
+      class Base;
+    }
   } // namespace MatrixFreeFunctions
 } // namespace internal
 
