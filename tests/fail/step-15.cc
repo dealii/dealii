@@ -595,7 +595,7 @@ main()
           minimization_problem_1d.run();
         }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

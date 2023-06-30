@@ -86,7 +86,7 @@ main()
                         false,
                         "codim_1-jagged_surface");
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

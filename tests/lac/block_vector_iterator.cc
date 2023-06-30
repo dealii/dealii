@@ -333,7 +333,7 @@ main()
     {
       test();
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       deallog << std::endl
               << std::endl

@@ -54,7 +54,7 @@ check_solve(SolverType &         solver,
     {
       solver.solve(A, u, f, P);
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       deallog << e.what() << std::endl;
       abort();

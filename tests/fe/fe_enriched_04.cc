@@ -207,7 +207,7 @@ main(int argc, char **argv)
       plot_shape_function<3>();
 #endif
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

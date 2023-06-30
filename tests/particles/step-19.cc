@@ -1124,7 +1124,7 @@ main()
       Step19::CathodeRaySimulator<2> cathode_ray_simulator_2d;
       cathode_ray_simulator_2d.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

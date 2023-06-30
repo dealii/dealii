@@ -362,7 +362,7 @@ main(int argc, char **argv)
           FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(1), 1, FE_Q<dim>(1), 1));
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

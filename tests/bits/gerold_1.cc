@@ -112,7 +112,7 @@ main()
       LaplaceProblem<3> laplace_problem_3d;
       laplace_problem_3d.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

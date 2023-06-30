@@ -38,7 +38,7 @@ main(int argc, char **argv)
                        "/prm/parameters-step-44-with_linesearch.prm");
       solid.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

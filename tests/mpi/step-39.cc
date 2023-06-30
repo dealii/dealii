@@ -795,7 +795,7 @@ main(int argc, char *argv[])
       InteriorPenaltyProblem<2> test1(fe1);
       test1.run(6);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

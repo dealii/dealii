@@ -86,7 +86,7 @@ main(int argc, char **argv)
         test(v, w, x);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

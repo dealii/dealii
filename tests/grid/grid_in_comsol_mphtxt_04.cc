@@ -371,7 +371,7 @@ main()
     {
       comsol_grid<2, 2>();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

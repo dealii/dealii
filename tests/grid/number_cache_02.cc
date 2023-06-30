@@ -91,7 +91,7 @@ test(const char *filename)
       deallog << dcv.distorted_cells.size() << " cells are distorted."
               << std::endl;
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << "  caught exception:" << std::endl << exc.what() << std::endl;
       return;

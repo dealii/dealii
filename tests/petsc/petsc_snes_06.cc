@@ -102,7 +102,7 @@ main(int argc, char **argv)
             deallog << "Found the solution x=" << x(0) << " after " << nit
                     << " iterations." << std::endl;
           }
-        catch (std::exception &exc)
+        catch (const std::exception &exc)
           {
             deallog << exc.what() << std::endl;
           }

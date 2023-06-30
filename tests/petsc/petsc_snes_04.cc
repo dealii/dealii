@@ -55,7 +55,7 @@ main(int argc, char **argv)
       {
         auto nit = solver.solve(x);
       }
-    catch (std::exception &exc)
+    catch (const std::exception &exc)
       {
         deallog << exc.what() << std::endl;
       }

@@ -46,7 +46,7 @@ main()
       Vector<double> v(100);
       test(v);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

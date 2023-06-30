@@ -448,7 +448,7 @@ main(int argc, char **argv)
       WaveEquation<2> wave_equation_solver;
       wave_equation_solver.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

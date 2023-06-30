@@ -56,7 +56,7 @@ check_solve(const MatrixType &                         A,
     {
       solver.solve(A, u, f, prec_no);
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       deallog << e.what() << std::endl;
     }

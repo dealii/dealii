@@ -62,7 +62,7 @@ main(int, char **)
           }
         } // ++fe_degree
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

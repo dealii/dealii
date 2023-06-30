@@ -47,7 +47,7 @@ main()
       prm.parse_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
       prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

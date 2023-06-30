@@ -2125,7 +2125,7 @@ main()
       Framework<dim>::run(descriptor);
     }
 
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

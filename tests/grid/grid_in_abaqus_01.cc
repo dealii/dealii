@@ -85,7 +85,7 @@ main()
       deallog << "3d_test_abaqus.inp" << std::endl;
       abaqus_grid<3>(SOURCE_DIR "/grids/abaqus/3d/3d_test_abaqus.inp");
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

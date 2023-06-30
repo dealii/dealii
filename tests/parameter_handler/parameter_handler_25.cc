@@ -47,7 +47,7 @@ success()
       prm.set("Precision", "float");
       prm.leave_subsection();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }
@@ -57,7 +57,7 @@ success()
     {
       prm.assert_that_entries_have_been_set();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }
@@ -91,7 +91,7 @@ fail()
       // dim is not set!
       prm.leave_subsection();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }
@@ -101,7 +101,7 @@ fail()
     {
       prm.assert_that_entries_have_been_set();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }
@@ -119,7 +119,7 @@ main()
       success();
       fail();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }

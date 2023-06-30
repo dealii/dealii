@@ -57,7 +57,7 @@ main(int argc, char **argv)
       deallog.get_file_stream() << "ok" << std::endl << std::endl;
     }
 
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

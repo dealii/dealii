@@ -41,7 +41,7 @@ test(const bool is_singular)
     {
       A.compute_lu_factorization();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << "matrix is singular" << std::endl;
       // Some implementations of LAPACK do not detect that the vector we pass

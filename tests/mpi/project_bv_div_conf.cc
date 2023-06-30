@@ -251,7 +251,7 @@ main(int argc, char *argv[])
       ResFlowProblem<dim> resflow(press_order);
       resflow.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

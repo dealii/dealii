@@ -1467,7 +1467,7 @@ main(int argc, char *argv[])
         deallog.pop();
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

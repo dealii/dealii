@@ -283,7 +283,7 @@ main()
       ImposeBC<2>().run();
       ImposeBC<3>().run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

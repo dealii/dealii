@@ -343,7 +343,7 @@ main(int argc, char **argv)
       problem.run();
     }
 
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

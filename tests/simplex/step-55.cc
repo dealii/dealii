@@ -162,7 +162,7 @@ namespace Step55
         {
           cg.solve(*matrix, dst, src, preconditioner);
         }
-      catch (std::exception &e)
+      catch (const std::exception &e)
         {
           Assert(false, ExcMessage(e.what()));
         }
@@ -910,7 +910,7 @@ main(int argc, char *argv[])
       StokesProblem<2> problem(2);
       problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

@@ -230,7 +230,7 @@ main()
     {
       LaplaceProblem<2>(1).run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

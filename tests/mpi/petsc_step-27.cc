@@ -483,7 +483,7 @@ main(int argc, char *argv[])
       LaplaceProblem<2> laplace_problem;
       laplace_problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

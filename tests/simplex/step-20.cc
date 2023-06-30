@@ -518,7 +518,7 @@ main()
       MixedLaplaceProblem<2> mixed_laplace_problem(fe_degree);
       mixed_laplace_problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

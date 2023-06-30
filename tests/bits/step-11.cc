@@ -231,7 +231,7 @@ main()
            ++mapping_degree)
         LaplaceProblem<2>(mapping_degree).run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

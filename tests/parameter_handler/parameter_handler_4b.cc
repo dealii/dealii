@@ -37,7 +37,7 @@ main()
       prm.leave_subsection();
       prm.print_parameters(deallog.get_file_stream(), ParameterHandler::LaTeX);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

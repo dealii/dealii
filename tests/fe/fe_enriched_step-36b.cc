@@ -919,7 +919,7 @@ main(int argc, char **argv)
         step36.run();
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

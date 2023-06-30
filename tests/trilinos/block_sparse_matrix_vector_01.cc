@@ -104,7 +104,7 @@ main(int argc, char **argv)
     {
       test(50, 47);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

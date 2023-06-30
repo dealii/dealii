@@ -121,7 +121,7 @@ main(int argc, char **argv)
       test<LinearAlgebraTrilinos::MPI::Vector>();
       test<LinearAlgebra::distributed::Vector<double>>();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

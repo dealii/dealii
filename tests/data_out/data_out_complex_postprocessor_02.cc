@@ -155,7 +155,7 @@ main()
       check<2>();
       check<3>();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

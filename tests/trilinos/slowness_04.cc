@@ -128,7 +128,7 @@ main(int argc, char **argv)
         test();
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

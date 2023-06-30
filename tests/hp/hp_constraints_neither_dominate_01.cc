@@ -233,7 +233,7 @@ main(int argc, char **argv)
       test2cells<3>(
         2, 1); // Q(2) x FE_Nothing vs Q(1) x Q(1) => common Q(1) x FE_Nothing
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl
