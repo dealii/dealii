@@ -84,10 +84,10 @@ test(const unsigned int degree)
 {
 #ifdef SIMPLEX
   FE_SimplexP<dim>   fe(degree);
-  QGaussSimplex<dim> quadrature(degree + 2);
+  QGaussSimplex<dim> quadrature(degree + 1);
 #else
   FE_Q<dim>   fe(degree);
-  QGauss<dim> quadrature(degree + 2);
+  QGauss<dim> quadrature(degree + 1);
 #endif
   deallog << "FE = " << fe.get_name() << std::endl;
 
@@ -199,7 +199,9 @@ main()
 
   test<2>(1);
   test<2>(2);
+  test<3>(3);
 
   test<3>(1);
   test<3>(2);
+  test<3>(3);
 }

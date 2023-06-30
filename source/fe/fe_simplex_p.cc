@@ -28,6 +28,31 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
+  // TODO: replace this and the equivalent inlined function in
+  // FE_SimplexP_Bubbles with QProjector
+  template <int dim>
+  Point<dim>
+  face_midpoint(const unsigned int face_no)
+  {
+    const auto reference_cell = ReferenceCells::get_simplex<dim>();
+    const auto face_reference_cell =
+      reference_cell.face_reference_cell(face_no);
+
+    Point<dim> midpoint;
+    for (const auto face_vertex_no : face_reference_cell.vertex_indices())
+      {
+        const auto vertex_no = reference_cell.face_to_cell_vertices(
+          face_no,
+          face_vertex_no,
+          ReferenceCell::default_combined_face_orientation());
+
+        midpoint += reference_cell.template vertex<dim>(vertex_no);
+      }
+
+    midpoint /= reference_cell.face_reference_cell(0).n_vertices();
+    return midpoint;
+  }
+
   /**
    * Helper function to set up the dpo vector of FE_SimplexP for a given @p dim and
    * @p degree.
@@ -44,6 +69,8 @@ namespace
                 return {1, 0};
               case 2:
                 return {1, 1};
+              case 3:
+                return {1, 2};
               default:
                 Assert(false, ExcNotImplemented());
             }
@@ -54,6 +81,8 @@ namespace
                 return {1, 0, 0};
               case 2:
                 return {1, 1, 0};
+              case 3:
+                return {1, 2, 1};
               default:
                 Assert(false, ExcNotImplemented());
             }
@@ -64,6 +93,8 @@ namespace
                 return {1, 0, 0, 0};
               case 2:
                 return {1, 1, 0, 0};
+              case 3:
+                return {1, 2, 1, 0};
               default:
                 Assert(false, ExcNotImplemented());
             }
@@ -83,15 +114,11 @@ namespace
   std::vector<Point<dim>>
   unit_support_points_fe_p(const unsigned int degree)
   {
+    Assert(dim != 0, ExcInternalError());
+    Assert(degree <= 3, ExcNotImplemented());
     std::vector<Point<dim>> unit_points;
-    // If we do dim - 1 we can get here in dim = 0:
-    if (dim == 0)
-      {
-        unit_points.emplace_back();
-        return unit_points;
-      }
+    const auto              reference_cell = ReferenceCells::get_simplex<dim>();
 
-    const auto reference_cell = ReferenceCells::get_simplex<dim>();
     // Piecewise constants are a special case: use a support point at the
     // centroid and only the centroid
     if (degree == 0)
@@ -100,20 +127,44 @@ namespace
         return unit_points;
       }
 
-    Assert(degree <= 2, ExcNotImplemented());
-    for (const auto &vertex_no : reference_cell.vertex_indices())
-      unit_points.emplace_back(reference_cell.template vertex<dim>(vertex_no));
+    // otherwise write everything as linear combinations of vertices
+    const auto dpo = get_dpo_vector_fe_p(dim, degree);
+    Assert(dpo.size() == dim + 1, ExcInternalError());
+    Assert(dpo[0] == 1, ExcNotImplemented());
+    // vertices:
+    for (unsigned int d : reference_cell.vertex_indices())
+      unit_points.push_back(reference_cell.template vertex<dim>(d));
+    // lines:
+    for (unsigned int l : reference_cell.line_indices())
+      {
+        const Point<dim> p0 =
+          unit_points[reference_cell.line_to_cell_vertices(l, 0)];
+        const Point<dim> p1 =
+          unit_points[reference_cell.line_to_cell_vertices(l, 1)];
+        for (unsigned int p = 0; p < dpo[1]; ++p)
+          unit_points.push_back((double(dpo[1] - p) / (dpo[1] + 1)) * p0 +
+                                (double(p + 1) / (dpo[1] + 1)) * p1);
+      }
+    // quads:
+    if (dim > 1 && dpo[2] > 0)
+      {
+        Assert(dpo[2] == 1, ExcNotImplemented());
+        if (dim == 2)
+          unit_points.push_back(reference_cell.template barycenter<dim>());
+        if (dim == 3)
+          for (unsigned int f : reference_cell.face_indices())
+            unit_points.push_back(face_midpoint<dim>(f));
+      }
 
-    if (degree == 2)
-      for (const auto &line_no : reference_cell.line_indices())
-        {
-          const auto v0 = reference_cell.template vertex<dim>(
-            reference_cell.line_to_cell_vertices(line_no, 0));
-          const auto v1 = reference_cell.template vertex<dim>(
-            reference_cell.line_to_cell_vertices(line_no, 1));
-          unit_points.emplace_back((v0 + v1) / 2.0);
-        }
+    return unit_points;
+  }
 
+  template <>
+  std::vector<Point<0>>
+  unit_support_points_fe_p(const unsigned int /*degree*/)
+  {
+    std::vector<Point<0>> unit_points;
+    unit_points.emplace_back();
     return unit_points;
   }
 
@@ -167,8 +218,6 @@ namespace
   constraints_fe_p<2>(const unsigned int degree)
   {
     const unsigned int dim = 2;
-
-    Assert(degree <= 2, ExcNotImplemented());
 
     // the following implements the 2d case
     // (the 3d case is not implemented yet)
@@ -575,7 +624,14 @@ FE_SimplexP<dim, spacedim>::FE_SimplexP(const unsigned int degree)
       unit_support_points_fe_p<dim>(degree),
       unit_face_support_points_fe_p<dim>(degree, FiniteElementData<dim>::H1),
       constraints_fe_p<dim>(degree))
-{}
+{
+  if (degree > 2)
+    for (unsigned int i = 0; i < this->n_dofs_per_line(); ++i)
+      this->adjust_line_dof_index_for_line_orientation_table[i] =
+        this->n_dofs_per_line() - 1 - i - i;
+  // We do not support multiple DoFs per quad yet
+  Assert(degree <= 3, ExcNotImplemented());
+}
 
 
 
