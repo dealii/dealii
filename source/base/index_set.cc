@@ -388,8 +388,15 @@ IndexSet::pop_front()
 void
 IndexSet::add_range_lower_bound(const Range &new_range)
 {
-  ranges.insert(Utilities::lower_bound(ranges.begin(), ranges.end(), new_range),
-                new_range);
+  // if the inserted range is already within the range we find by lower_bound,
+  // there is no need to do anything; we do not try to be clever here and
+  // leave all other work to compress().
+  const auto insert_position =
+    Utilities::lower_bound(ranges.begin(), ranges.end(), new_range);
+  if (insert_position == ranges.end() ||
+      insert_position->begin > new_range.begin ||
+      insert_position->end < new_range.end)
+    ranges.insert(insert_position, new_range);
 }
 
 
