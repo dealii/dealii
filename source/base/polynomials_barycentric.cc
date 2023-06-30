@@ -92,6 +92,57 @@ BarycentricPolynomials<dim>::get_fe_p_basis(const unsigned int degree)
             }
           break;
         }
+      case 3:
+        {
+          // vertices, then lines, then quads:
+          for (unsigned int v : reference_cell.vertex_indices())
+            polys.push_back(
+              0.5 * BarycentricPolynomial<dim, double>::monomial(v) *
+              (3 * BarycentricPolynomial<dim, double>::monomial(v) - 1) *
+              (3 * BarycentricPolynomial<dim, double>::monomial(v) - 2));
+          for (unsigned int l : reference_cell.line_indices())
+            {
+              const auto v0 = reference_cell.line_to_cell_vertices(l, 0);
+              const auto v1 = reference_cell.line_to_cell_vertices(l, 1);
+              polys.push_back(
+                4.5 * BarycentricPolynomial<dim, double>::monomial(v0) *
+                (3 * BarycentricPolynomial<dim, double>::monomial(v0) - 1) *
+                BarycentricPolynomial<dim, double>::monomial(v1));
+              polys.push_back(
+                4.5 * BarycentricPolynomial<dim, double>::monomial(v0) *
+                (3 * BarycentricPolynomial<dim, double>::monomial(v1) - 1) *
+                BarycentricPolynomial<dim, double>::monomial(v1));
+            }
+
+          if (dim == 2)
+            {
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(2));
+            }
+          else if (dim == 3)
+            {
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(2));
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(3));
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(0) *
+                              BarycentricPolynomial<dim, double>::monomial(2) *
+                              BarycentricPolynomial<dim, double>::monomial(3));
+              polys.push_back(27 *
+                              BarycentricPolynomial<dim, double>::monomial(1) *
+                              BarycentricPolynomial<dim, double>::monomial(2) *
+                              BarycentricPolynomial<dim, double>::monomial(3));
+            }
+
+          break;
+        }
       default:
         Assert(false, ExcNotImplemented());
     }
