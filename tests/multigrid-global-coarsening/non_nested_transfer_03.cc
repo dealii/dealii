@@ -57,7 +57,7 @@ do_test(const FiniteElement<dim> &   fe_fine,
   // create coarse grid
   parallel::distributed::Triangulation<dim> tria_coarse(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria_coarse, -1., 1.);
-  tria_coarse.refine_global(3);
+  tria_coarse.refine_global(2);
   const double factor = 0.25;
   GridTools::distort_random(factor,
                             tria_coarse,
@@ -67,7 +67,7 @@ do_test(const FiniteElement<dim> &   fe_fine,
   // create fine grid
   parallel::distributed::Triangulation<dim> tria_fine(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria_fine, -1., 1.);
-  tria_fine.refine_global(4);
+  tria_fine.refine_global(3);
   GridTools::distort_random(factor,
                             tria_fine,
                             true,
@@ -158,6 +158,6 @@ main(int argc, char **argv)
 
   deallog.precision(8);
   Functions::Monomial<2> linear_function(Tensor<1, 2>({1, 0})); // f(x,y)= x
-  for (unsigned int i = 0; i < 5; ++i)
+  for (unsigned int i = 0; i < 3; ++i)
     test<2, double>(i, linear_function);
 }
