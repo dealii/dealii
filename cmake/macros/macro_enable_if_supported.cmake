@@ -22,7 +22,14 @@
 #
 
 macro(enable_if_supported _variable _flag)
+  # First check if we can use -Werror
+  CHECK_CXX_COMPILER_FLAG("-Werror" DEAL_II_HAVE_FLAG_werror)
+
   string(STRIP "${_flag}" _flag_stripped)
+
+  if(DEAL_II_HAVE_FLAG_werror)
+    set(CMAKE_REQUIRED_FLAGS "-Werror")
+  endif()
 
   #
   # Gcc does not emit a warning if testing -Wno-... flags which leads to
@@ -47,5 +54,7 @@ macro(enable_if_supported _variable _flag)
       string(STRIP "${${_variable}}" ${_variable})
     endif()
   endif()
+
+  unset(CMAKE_REQUIRED_FLAGS)
 endmacro()
 
