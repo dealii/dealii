@@ -84,12 +84,13 @@ test(const unsigned int degree)
 {
 #ifdef SIMPLEX
   FE_SimplexP<dim>   fe(degree);
-  QGaussSimplex<dim> quadrature(degree + 2);
+  QGaussSimplex<dim> quadrature(degree + 1);
 #else
   FE_Q<dim>   fe(degree);
-  QGauss<dim> quadrature(degree + 2);
+  QGauss<dim> quadrature(degree + 1);
 #endif
   deallog << "FE = " << fe.get_name() << std::endl;
+  deallog << std::setprecision(4);
 
   double previous_error = 1.0;
 
@@ -116,65 +117,52 @@ test(const unsigned int degree)
         reference_cell.template get_default_linear_mapping<dim>();
       dummy.close();
 
-      const bool l2_projection = false;
+      SparsityPattern sparsity_pattern;
+      {
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+        DoFTools::make_sparsity_pattern(dof_handler, dsp);
+        sparsity_pattern.copy_from(dsp);
+      }
 
-      if (l2_projection)
-        {
-          VectorTools::project(
-            mapping, dof_handler, dummy, quadrature, function, solution);
-        }
-      else
-        {
-          SparsityPattern sparsity_pattern;
-          {
-            DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                                       dof_handler.n_dofs());
-            DoFTools::make_sparsity_pattern(dof_handler, dsp);
-            sparsity_pattern.copy_from(dsp);
-          }
+      SparseMatrix<double> h1_matrix(sparsity_pattern);
+      SparseMatrix<double> laplace_matrix(sparsity_pattern);
 
-          SparseMatrix<double> h1_matrix(sparsity_pattern);
-          SparseMatrix<double> laplace_matrix(sparsity_pattern);
+      MatrixCreator::create_mass_matrix(mapping,
+                                        dof_handler,
+                                        quadrature,
+                                        h1_matrix);
+      MatrixCreator::create_laplace_matrix(mapping,
+                                           dof_handler,
+                                           quadrature,
+                                           laplace_matrix);
 
-          MatrixCreator::create_mass_matrix(mapping,
-                                            dof_handler,
-                                            quadrature,
-                                            h1_matrix);
-          MatrixCreator::create_laplace_matrix(mapping,
-                                               dof_handler,
-                                               quadrature,
-                                               laplace_matrix);
+      h1_matrix.add(0.0, laplace_matrix);
 
-          h1_matrix.add(0.0, laplace_matrix);
+      Vector<double> rhs(solution.size());
+      VectorTools::create_right_hand_side(
+        mapping, dof_handler, quadrature, ForcingH1<dim>(), rhs);
 
-          Vector<double> rhs(solution.size());
-          VectorTools::create_right_hand_side(
-            mapping, dof_handler, quadrature, ForcingH1<dim>(), rhs);
+      SolverControl solver_control(1000, 1e-12 * rhs.l2_norm(), false, false);
+      SolverCG<Vector<double>> cg(solver_control);
 
-          SolverControl            solver_control(1000,
-                                       1e-12 * rhs.l2_norm(),
-                                       false,
-                                       false);
-          SolverCG<Vector<double>> cg(solver_control);
-
-          cg.solve(h1_matrix, solution, rhs, PreconditionIdentity());
-        }
+      cg.solve(h1_matrix, solution, rhs, PreconditionIdentity());
 
       VectorTools::integrate_difference(mapping,
                                         dof_handler,
                                         solution,
                                         function,
                                         cell_errors,
-                                        Quadrature<dim>(
-                                          fe.get_unit_support_points()),
-                                        VectorTools::Linfty_norm);
+                                        quadrature,
+                                        VectorTools::L2_norm);
+      const double L2_error =
+        VectorTools::compute_global_error(tria,
+                                          cell_errors,
+                                          VectorTools::L2_norm);
 
-      const double max_error =
-        *std::max_element(cell_errors.begin(), cell_errors.end());
-      deallog << "max error = " << max_error << std::endl;
-      if (max_error != 0.0)
-        deallog << "ratio = " << previous_error / max_error << std::endl;
-      previous_error = max_error;
+      deallog << "L2 error = " << L2_error << std::endl;
+      if (L2_error != 0.0)
+        deallog << "ratio = " << previous_error / L2_error << std::endl;
+      previous_error = L2_error;
 
 #if 0
       if (dim == 2)
@@ -199,7 +187,9 @@ main()
 
   test<2>(1);
   test<2>(2);
+  test<2>(3);
 
   test<3>(1);
   test<3>(2);
+  test<3>(3);
 }

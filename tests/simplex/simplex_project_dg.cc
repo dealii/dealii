@@ -20,18 +20,29 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/matrix_creator.h>
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
 #include <deal.II/numerics/vector_tools_project.h>
+#include <deal.II/numerics/vector_tools_rhs.h>
 
 #include "../tests.h"
 
@@ -41,6 +52,7 @@ test(const unsigned int degree)
 {
   FE_SimplexDGP<dim> fe(degree);
   deallog << "FE = " << fe.get_name() << std::endl;
+  deallog << std::setprecision(4);
   QGaussSimplex<dim> quadrature(degree + 1);
 
   double previous_error = 1.0;
@@ -63,24 +75,44 @@ test(const unsigned int degree)
       const auto                    &mapping =
         reference_cell.template get_default_linear_mapping<dim>();
       dummy.close();
-      VectorTools::project(
-        mapping, dof_handler, dummy, quadrature, function, solution);
+
+      SparsityPattern sparsity_pattern;
+      {
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+        DoFTools::make_sparsity_pattern(dof_handler, dsp);
+        sparsity_pattern.copy_from(dsp);
+      }
+
+      SparseMatrix<double> mass_matrix(sparsity_pattern);
+      MatrixCreator::create_mass_matrix(mapping,
+                                        dof_handler,
+                                        quadrature,
+                                        mass_matrix);
+      Vector<double> rhs(solution.size());
+      VectorTools::create_right_hand_side(
+        mapping, dof_handler, quadrature, function, rhs);
+
+      SolverControl solver_control(1000, 1e-12 * rhs.l2_norm(), false, false);
+      SolverCG<Vector<double>> cg(solver_control);
+
+      cg.solve(mass_matrix, solution, rhs, PreconditionIdentity());
 
       VectorTools::integrate_difference(mapping,
                                         dof_handler,
                                         solution,
                                         function,
                                         cell_errors,
-                                        Quadrature<dim>(
-                                          fe.get_unit_support_points()),
-                                        VectorTools::Linfty_norm);
+                                        quadrature,
+                                        VectorTools::L2_norm);
+      const double L2_error =
+        VectorTools::compute_global_error(tria,
+                                          cell_errors,
+                                          VectorTools::L2_norm);
 
-      const double max_error =
-        *std::max_element(cell_errors.begin(), cell_errors.end());
-      deallog << "max error = " << max_error << std::endl;
-      if (max_error != 0.0)
-        deallog << "ratio = " << previous_error / max_error << std::endl;
-      previous_error = max_error;
+      deallog << "L2 error = " << L2_error << std::endl;
+      if (L2_error != 0.0)
+        deallog << "ratio = " << previous_error / L2_error << std::endl;
+      previous_error = L2_error;
 
 #if 0
       if (dim == 2)
@@ -105,7 +137,9 @@ main()
 
   test<2>(1);
   test<2>(2);
+  test<2>(3);
 
   test<3>(1);
   test<3>(2);
+  test<3>(3);
 }
