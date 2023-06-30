@@ -773,9 +773,6 @@ namespace internal
 #endif
 
       std::sort(ghost_indices.begin(), ghost_indices.end());
-      ghost_indices.erase(std::unique(ghost_indices.begin(),
-                                      ghost_indices.end()),
-                          ghost_indices.end());
 
       this->is_extended_ghosts =
         IndexSet(mg_level_fine == numbers::invalid_unsigned_int ?
@@ -1076,12 +1073,6 @@ namespace internal
 
       std::sort(locally_relevant_dofs_temp.begin(),
                 locally_relevant_dofs_temp.end());
-
-      locally_relevant_dofs_temp.erase(
-        std::unique(locally_relevant_dofs_temp.begin(),
-                    locally_relevant_dofs_temp.end()),
-        locally_relevant_dofs_temp.end());
-
       locally_relevant_dofs.add_indices(locally_relevant_dofs_temp.begin(),
                                         locally_relevant_dofs_temp.end());
 

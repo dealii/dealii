@@ -2612,10 +2612,6 @@ AffineConstraints<number>::distribute(VectorType &vec) const
             if (!vec_owned_elements.is_element(entry.first))
               additional_elements.emplace_back(entry.first);
       std::sort(additional_elements.begin(), additional_elements.end());
-      additional_elements.erase(std::unique(additional_elements.begin(),
-                                            additional_elements.end()),
-                                additional_elements.end());
-
       needed_elements.add_indices(additional_elements.begin(),
                                   additional_elements.end());
 

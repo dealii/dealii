@@ -1159,11 +1159,9 @@ namespace DoFTools
               dofs_on_ghosts.push_back(dof_index);
         }
 
-    // sort, compress out duplicates, fill into index set
+    // sort and put into an index set
     std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
-    dof_set.add_indices(dofs_on_ghosts.begin(),
-                        std::unique(dofs_on_ghosts.begin(),
-                                    dofs_on_ghosts.end()));
+    dof_set.add_indices(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
     dof_set.compress();
 
     return dof_set;
@@ -1217,12 +1215,9 @@ namespace DoFTools
             dofs_on_ghosts.push_back(dof_index);
       }
 
-    // sort, compress out duplicates, fill into index set
+    // sort and fill into an index set
     std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
-    dof_set.add_indices(dofs_on_ghosts.begin(),
-                        std::unique(dofs_on_ghosts.begin(),
-                                    dofs_on_ghosts.end()));
-
+    dof_set.add_indices(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
     dof_set.compress();
 
     return dof_set;
@@ -1690,13 +1685,8 @@ namespace DoFTools
                                    local_dof_indices.begin(),
                                    local_dof_indices.end());
         }
-    // sort indices and remove duplicates
+    // sort indices and put into an index set:
     std::sort(subdomain_indices.begin(), subdomain_indices.end());
-    subdomain_indices.erase(std::unique(subdomain_indices.begin(),
-                                        subdomain_indices.end()),
-                            subdomain_indices.end());
-
-    // insert into IndexSet
     index_set.add_indices(subdomain_indices.begin(), subdomain_indices.end());
     index_set.compress();
 

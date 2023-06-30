@@ -499,10 +499,6 @@ namespace SparseMatrixTools
                                   i.end());
 
     std::sort(ghost_indices_vector.begin(), ghost_indices_vector.end());
-    ghost_indices_vector.erase(std::unique(ghost_indices_vector.begin(),
-                                           ghost_indices_vector.end()),
-                               ghost_indices_vector.end());
-
 
     IndexSet locally_active_dofs(std::get<1>(prefix_sum));
     locally_active_dofs.add_indices(ghost_indices_vector.begin(),
