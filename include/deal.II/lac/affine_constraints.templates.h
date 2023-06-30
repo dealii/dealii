@@ -63,26 +63,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-bool
-AffineConstraints<number>::ConstraintLine::operator<(
-  const ConstraintLine &a) const
-{
-  return index < a.index;
-}
-
-
-
-template <typename number>
-bool
-AffineConstraints<number>::ConstraintLine::operator==(
-  const ConstraintLine &a) const
-{
-  return index == a.index;
-}
-
-
-
-template <typename number>
 std::size_t
 AffineConstraints<number>::ConstraintLine::memory_consumption() const
 {
@@ -218,13 +198,25 @@ namespace internal
       Utilities::MPI::this_mpi_process(mpi_communicator);
 
     // helper function
-    const auto sort_and_make_unique =
-      [](std::vector<ConstraintType> &constraints) {
-        std::sort(constraints.begin(), constraints.end());
+    const auto sort_and_make_unique = [](std::vector<ConstraintType>
+                                           &constraints) {
+      std::sort(
+        constraints.begin(),
+        constraints.end(),
+        [](const typename dealii::AffineConstraints<number>::ConstraintLine &l1,
+           const typename dealii::AffineConstraints<number>::ConstraintLine
+             &l2) { return l1.index < l2.index; });
 
-        constraints.erase(std::unique(constraints.begin(), constraints.end()),
-                          constraints.end());
-      };
+      constraints.erase(
+        std::unique(
+          constraints.begin(),
+          constraints.end(),
+          [](const typename dealii::AffineConstraints<number>::ConstraintLine
+               &l1,
+             const typename dealii::AffineConstraints<number>::ConstraintLine
+               &l2) { return l1.index == l2.index; }),
+        constraints.end());
+    };
 
     // 0) collect constrained indices of the current object
     IndexSet constrained_indices(locally_owned_dofs.size());
@@ -639,7 +631,11 @@ AffineConstraints<number>::close()
     return;
 
   // sort the lines
-  std::sort(lines.begin(), lines.end());
+  std::sort(lines.begin(),
+            lines.end(),
+            [](const ConstraintLine &l1, const ConstraintLine &l2) {
+              return l1.index < l2.index;
+            });
 
   // update list of pointers and give the vector a sharp size since we
   // won't modify the size any more after this point.
