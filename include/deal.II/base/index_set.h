@@ -1686,16 +1686,7 @@ IndexSet::compress() const
 inline void
 IndexSet::add_index(const size_type index)
 {
-  AssertIndexRange(index, index_space_size);
-
-  const Range new_range(index, index + 1);
-  if (ranges.size() == 0 || index > ranges.back().end)
-    ranges.push_back(new_range);
-  else if (index == ranges.back().end)
-    ranges.back().end++;
-  else
-    add_range_lower_bound(new_range);
-  is_compressed = false;
+  add_range(index, index + 1);
 }
 
 
@@ -1712,16 +1703,14 @@ IndexSet::add_range(const size_type begin, const size_type end)
 
   if (begin != end)
     {
-      const Range new_range(begin, end);
-
       // the new index might be larger than the last index present in the
       // ranges. Then we can skip the binary search
       if (ranges.size() == 0 || begin > ranges.back().end)
-        ranges.push_back(new_range);
+        ranges.emplace_back(begin, end);
       else if (begin == ranges.back().end)
         ranges.back().end = end;
       else
-        add_range_lower_bound(new_range);
+        add_range_lower_bound(Range(begin, end));
 
       is_compressed = false;
     }
