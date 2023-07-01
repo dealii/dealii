@@ -187,13 +187,10 @@
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
-// The following two are defined for backwards compatibility with older deal.II versions:
+// The following three are defined for backwards compatibility with older deal.II versions:
 #define DEAL_II_WITH_CXX11
 #define DEAL_II_WITH_CXX14
-
-#ifdef DEAL_II_HAVE_CXX17
-#  define DEAL_II_WITH_CXX17
-#endif
+#define DEAL_II_WITH_CXX17
 
 
 /***********************************************************************
