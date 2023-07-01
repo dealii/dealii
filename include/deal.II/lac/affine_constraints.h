@@ -1651,9 +1651,10 @@ public:
     /**
      * Default constructor.
      */
-    ConstraintLine(const size_type &index         = numbers::invalid_dof_index,
-                   const Entries &  entries       = {},
-                   const number &   inhomogeneity = 0.0);
+    ConstraintLine(const size_type &index = numbers::invalid_dof_index,
+                   const typename AffineConstraints<
+                     number>::ConstraintLine::Entries &entries       = {},
+                   const number &                      inhomogeneity = 0.0);
 
     /**
      * Copy constructor.
