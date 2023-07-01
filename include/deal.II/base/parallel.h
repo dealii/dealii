@@ -520,7 +520,9 @@ namespace parallel
    * This function works a lot like the apply_to_subranges() function, but it
    * allows to accumulate numerical results computed on each subrange into one
    * number. The type of this number is given by the `ResultType` template
-   * argument that needs to be explicitly specified.
+   * argument that needs to be explicitly specified, and results are added
+   * up (i.e., the reduction of results from subranges happens by adding up
+   * these results).
    *
    * An example of use of this function is to compute the value of the
    * expression $x^T A x$ for a square matrix $A$ and a vector $x$. The sum
@@ -532,12 +534,12 @@ namespace parallel
    *     return
    *      std::sqrt
    *       (parallel::accumulate_from_subranges<double>
-   *        (0, A.n_rows(),
-   *         [&](const unsigned int begin_row,
+   *        ([&](const unsigned int begin_row,
    *             const unsigned int end_row)
    *         {
-   *           mat_vec_on_subranges(begin_row, end_row, A, x, y);
+   *           mat_norm_sqr_on_subranges(begin_row, end_row, A, x);
    *         },
+   *         0, A.n_rows(),
    *         50);
    *   }
    *
