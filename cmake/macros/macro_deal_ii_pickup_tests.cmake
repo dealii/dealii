@@ -86,6 +86,12 @@ endmacro()
 
 macro(deal_ii_pickup_tests)
   #
+  # Initialize two counters to zero:
+  #
+  set(_number_of_tests 0)
+  set(_number_of_test_dependencies 0)
+
+  #
   # Find bash and perl interpreter:
   #
 
@@ -343,4 +349,6 @@ Comparison operator \"=\" expected for boolean match.\n"
     deal_ii_add_test(${_category} ${_test} ${_comparison})
 
   endforeach()
+
+  message(STATUS "Test category \"${_category}\": ${_number_of_tests} tests (and ${_number_of_test_dependencies} test dependencies)")
 endmacro()
