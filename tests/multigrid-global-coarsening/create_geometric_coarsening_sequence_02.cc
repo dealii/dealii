@@ -19,9 +19,8 @@
  * on globally refined cell.
  */
 
-#include <deal.II/distributed/tria.h>
-
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
 
@@ -33,11 +32,9 @@ template <int dim>
 void
 test()
 {
-  parallel::distributed::Triangulation<dim> tria(
-    MPI_COMM_WORLD,
-    typename Triangulation<dim>::MeshSmoothing(
-      Triangulation<dim>::smoothing_on_refinement |
-      Triangulation<dim>::smoothing_on_coarsening));
+  Triangulation<dim> tria(typename Triangulation<dim>::MeshSmoothing(
+    Triangulation<dim>::smoothing_on_refinement |
+    Triangulation<dim>::smoothing_on_coarsening));
 
   GridGenerator::hyper_cube(tria, -1.0, +1.0);
   tria.refine_global(1);
@@ -51,8 +48,7 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  MPILogInitAll                    all;
+  initlog();
 
   test<2>();
 }
