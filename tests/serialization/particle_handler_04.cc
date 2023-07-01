@@ -29,63 +29,9 @@
 
 template <int dim, int spacedim>
 void
-create_regular_particle_distribution(
-  Particles::ParticleHandler<dim, spacedim> &particle_handler,
-  const parallel::fullydistributed::Triangulation<dim, spacedim> &tr,
-  const unsigned int particles_per_direction = 3)
-{
-  for (unsigned int i = 0; i < particles_per_direction; ++i)
-    for (unsigned int j = 0; j < particles_per_direction; ++j)
-      {
-        Point<spacedim> position;
-        Point<dim>      reference_position;
-        unsigned int    id = i * particles_per_direction + j;
-
-        position[0] = static_cast<double>(i) /
-                      static_cast<double>(particles_per_direction - 1);
-        position[1] = static_cast<double>(j) /
-                      static_cast<double>(particles_per_direction - 1);
-
-        if (dim > 2)
-          for (unsigned int k = 0; k < particles_per_direction; ++k)
-            {
-              position[2] = static_cast<double>(j) /
-                            static_cast<double>(particles_per_direction - 1);
-              id = i * particles_per_direction * particles_per_direction +
-                   j * particles_per_direction + k;
-              Particles::Particle<dim, spacedim> particle(position,
-                                                          reference_position,
-                                                          id);
-
-              typename parallel::fullydistributed::
-                Triangulation<dim, spacedim>::active_cell_iterator cell =
-                  GridTools::find_active_cell_around_point(
-                    tr, particle.get_location());
-
-              particle_handler.insert_particle(particle, cell);
-            }
-        else
-          {
-            Particles::Particle<dim, spacedim> particle(position,
-                                                        reference_position,
-                                                        id);
-
-            typename parallel::fullydistributed::Triangulation<dim, spacedim>::
-              active_cell_iterator cell =
-                GridTools::find_active_cell_around_point(
-                  tr, particle.get_location());
-
-            particle_handler.insert_particle(particle, cell);
-          }
-      }
-}
-
-
-
-template <int dim, int spacedim>
-void
 test()
 {
+  // Generate fulllydistributed triangulation from serial triangulation
   Triangulation<dim, spacedim> basetria;
   GridGenerator::hyper_cube(basetria);
   basetria.refine_global(2);
@@ -99,33 +45,29 @@ test()
 
   MappingQ<dim, spacedim> mapping(1);
 
+  // Create ParticleHandler and insert two particles
   Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
-       std::vector<Point<spacedim>> position(2);
-        std::vector<Point<dim>>      reference_position(2);
+  std::vector<Point<spacedim>>              position(2);
+  std::vector<Point<dim>>                   reference_position(2);
 
-        for (unsigned int i = 0; i < dim; ++i)
-          {
-            position[0](i) = 0.125;
-            position[1](i) = 0.525;
-          }
+  for (unsigned int i = 0; i < dim; ++i)
+    {
+      position[0](i) = 0.125;
+      position[1](i) = 0.525;
+    }
 
-        Particles::Particle<dim, spacedim> particle1(position[0],
-                                                     reference_position[0],
-                                                     0);
-        Particles::Particle<dim, spacedim> particle2(position[1],
-                                                     reference_position[1],
-                                                     1);
+  Particles::Particle<dim, spacedim> particle1(position[0],
+                                               reference_position[0],
+                                               0);
+  Particles::Particle<dim, spacedim> particle2(position[1],
+                                               reference_position[1],
+                                               1);
 
-        typename Triangulation<dim, spacedim>::active_cell_iterator cell1(&tr,
-                                                                          2,
-                                                                          0);
-        typename Triangulation<dim, spacedim>::active_cell_iterator cell2(&tr,
-                                                                          2,
-                                                                          0);
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell1(&tr, 2, 0);
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell2(&tr, 2, 0);
   particle_handler.insert_particle(particle1, cell1);
   particle_handler.insert_particle(particle2, cell2);
 
-  //create_regular_particle_distribution(particle_handler, tr);
   particle_handler.sort_particles_into_subdomains_and_cells();
 
   for (auto particle = particle_handler.begin();
@@ -137,8 +79,8 @@ test()
 
   particle_handler.prepare_for_serialization();
 
-  // save data to archive
-  std::ofstream oss("data.particles");
+  // save additional particle data to archive
+  std::ostringstream oss;
   {
     boost::archive::text_oarchive oa(oss, boost::archive::no_header);
 
@@ -148,13 +90,11 @@ test()
     // archive and stream closed when
     // destructors are called
   }
-  oss.close();
-  //deallog << oss.str() << std::endl;
+  deallog << oss.str() << std::endl;
 
   // Now remove all information in tr and particle_handler,
   // this is like creating new objects after a restart
   tr.clear();
-  //GridGenerator::hyper_cube(tr);
 
   particle_handler.clear();
   particle_handler.initialize(tr, mapping);
@@ -166,12 +106,12 @@ test()
     deallog << "In between particle id " << particle->get_id() << " is in cell "
             << particle->get_surrounding_cell(tr) << std::endl;
 
-  // verify correctness of the serialization. Note that the deserialization of
-  // the particle handler has to happen before the triangulation (otherwise it
+  // verify correctness of the serialization. Note that the boost
+  // archive of the ParticleHandler has to be read before the triangulation (otherwise it
   // does not know if something was stored in the user data of the
   // triangulation).
   {
-    std::ifstream            iss("data.particles");
+    std::istringstream                 iss(oss.str());
     boost::archive::text_iarchive ia(iss, boost::archive::no_header);
 
     ia >> particle_handler;
@@ -179,7 +119,8 @@ test()
     particle_handler.deserialize();
   }
 
-  deallog << "After deserialization global number of particles is: " << particle_handler.n_global_particles() << std::endl;
+  deallog << "After deserialization global number of particles is: "
+          << particle_handler.n_global_particles() << std::endl;
   for (auto particle = particle_handler.begin();
        particle != particle_handler.end();
        ++particle)

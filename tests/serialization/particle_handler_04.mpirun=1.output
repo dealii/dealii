@@ -1,6 +1,8 @@
 
 DEAL:0:2d/2d::Before serialization particle id 0 is in cell 2.0
 DEAL:0:2d/2d::Before serialization particle id 1 is in cell 2.12
+DEAL:0:2d/2d::0 0 2 1 2
+
 DEAL:0:2d/2d::After deserialization global number of particles is: 2
 DEAL:0:2d/2d::After serialization particle id 0 is in cell 2.0
 DEAL:0:2d/2d::After serialization particle id 1 is in cell 2.12
@@ -8,6 +10,8 @@ DEAL:0:2d/2d::OK
 DEAL:0:2d/2d::
 DEAL:0:2d/3d::Before serialization particle id 0 is in cell 2.0
 DEAL:0:2d/3d::Before serialization particle id 1 is in cell 2.12
+DEAL:0:2d/3d::0 0 2 1 2
+
 DEAL:0:2d/3d::After deserialization global number of particles is: 2
 DEAL:0:2d/3d::After serialization particle id 0 is in cell 2.0
 DEAL:0:2d/3d::After serialization particle id 1 is in cell 2.12
@@ -15,6 +19,8 @@ DEAL:0:2d/3d::OK
 DEAL:0:2d/3d::
 DEAL:0:3d/3d::Before serialization particle id 0 is in cell 2.0
 DEAL:0:3d/3d::Before serialization particle id 1 is in cell 2.56
+DEAL:0:3d/3d::0 0 2 1 2
+
 DEAL:0:3d/3d::After deserialization global number of particles is: 2
 DEAL:0:3d/3d::After serialization particle id 0 is in cell 2.0
 DEAL:0:3d/3d::After serialization particle id 1 is in cell 2.56
