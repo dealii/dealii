@@ -22,7 +22,6 @@
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx17/optional.h>
 
 #include <deal.II/boost_adaptors/bounding_box.h>
 
@@ -51,6 +50,8 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include <optional>
 
 #ifdef DEAL_II_WITH_ZLIB
 #  include <boost/iostreams/device/back_inserter.hpp>
@@ -3398,12 +3399,12 @@ namespace GridTools
    * every ghost cell as it was given by @p pack on the owning processor.
    * Whether you do or do not receive information to @p unpack on a given
    * ghost cell depends on whether the @p pack function decided that
-   * something needs to be sent. It does so using the std_cxx17::optional
-   * mechanism: if the std_cxx17::optional return object of the @p pack
+   * something needs to be sent. It does so using the std::optional
+   * mechanism: if the std::optional return object of the @p pack
    * function is empty, then this implies that no data has to be sent for
    * the locally owned cell it was called on. In that case, @p unpack will
    * also not be called on the ghost cell that corresponds to it on the
-   * receiving side. On the other hand, if the std_cxx17::optional object is
+   * receiving side. On the other hand, if the std::optional object is
    * not empty, then the data stored within it will be sent to the received
    * and the @p unpack function called with it.
    *
@@ -3421,11 +3422,11 @@ namespace GridTools
    *   that is a ghost cell somewhere else. As mentioned above, the function
    *   may return a regular data object of type @p DataType to indicate
    *   that data should be sent, or an empty
-   *   <code>std_cxx17::optional@<DataType@></code> to indicate that nothing has
+   *   <code>std::optional@<DataType@></code> to indicate that nothing has
    *   to be sent for this cell.
    * @param unpack The function that will be called for each ghost cell
    *   for which data was sent, i.e., for which the @p pack function
-   *   on the sending side returned a non-empty std_cxx17::optional object.
+   *   on the sending side returned a non-empty std::optional object.
    *   The @p unpack function is then called with the data sent by the
    *   processor that owns that cell.
    * @param cell_filter Only cells are communicated where this filter function returns
@@ -3462,7 +3463,7 @@ namespace GridTools
    * @endcode
    *
    * You will notice that the @p pack lambda function returns an `unsigned int`,
-   * not a `std_cxx17::optional<unsigned int>`. The former converts
+   * not a `std::optional<unsigned int>`. The former converts
    * automatically to the latter, implying that data will always be transported
    * to the other processor.
    *
@@ -3480,7 +3481,7 @@ namespace GridTools
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   void exchange_cell_data_to_ghosts(
     const MeshType &                                     mesh,
-    const std::function<std_cxx17::optional<DataType>(
+    const std::function<std::optional<DataType>(
       const typename MeshType::active_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::active_cell_iterator &,
                              const DataType &)> &        unpack,
@@ -3504,7 +3505,7 @@ namespace GridTools
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   void exchange_cell_data_to_level_ghosts(
     const MeshType &                                    mesh,
-    const std::function<std_cxx17::optional<DataType>(
+    const std::function<std::optional<DataType>(
       const typename MeshType::level_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)> &       unpack,
@@ -4613,8 +4614,8 @@ namespace GridTools
     DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
     inline void exchange_cell_data(
       const MeshType &mesh,
-      const std::function<
-        std_cxx17::optional<DataType>(const MeshCellIteratorType &)> &pack,
+      const std::function<std::optional<DataType>(const MeshCellIteratorType &)>
+        &pack,
       const std::function<void(const MeshCellIteratorType &, const DataType &)>
         &                                                         unpack,
       const std::function<bool(const MeshCellIteratorType &)> &   cell_filter,
@@ -4760,7 +4761,7 @@ namespace GridTools
                                            cell->index(),
                                            &mesh);
 
-              const std_cxx17::optional<DataType> data = pack(mesh_it);
+              const std::optional<DataType> data = pack(mesh_it);
               if (data)
                 {
                   data_to_send.emplace_back(*data);
@@ -4903,7 +4904,7 @@ namespace GridTools
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   inline void exchange_cell_data_to_ghosts(
     const MeshType &                                     mesh,
-    const std::function<std_cxx17::optional<DataType>(
+    const std::function<std::optional<DataType>(
       const typename MeshType::active_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::active_cell_iterator &,
                              const DataType &)> &        unpack,
@@ -4939,7 +4940,7 @@ namespace GridTools
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   inline void exchange_cell_data_to_level_ghosts(
     const MeshType &                                    mesh,
-    const std::function<std_cxx17::optional<DataType>(
+    const std::function<std::optional<DataType>(
       const typename MeshType::level_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)> &       unpack,

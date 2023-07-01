@@ -22,7 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/std_cxx17/tuple.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <atomic>
@@ -31,6 +30,7 @@
 #include <list>
 #include <memory>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -839,7 +839,7 @@ namespace Threads
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
     return new_thread(
-      [dummy, fun_ptr]() -> RT { return std_cxx17::apply(fun_ptr, dummy); });
+      [dummy, fun_ptr]() -> RT { return std::apply(fun_ptr, dummy); });
     DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
   }
 
@@ -1633,7 +1633,7 @@ namespace Threads
   {
     auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
     return new_task(
-      [dummy, fun_ptr]() -> RT { return std_cxx17::apply(fun_ptr, dummy); });
+      [dummy, fun_ptr]() -> RT { return std::apply(fun_ptr, dummy); });
   }
 
 

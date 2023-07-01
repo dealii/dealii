@@ -17,7 +17,7 @@
 // test GridTools::exchange_cell_data_to_ghosts
 //
 // this test works just like the _01 test, but it skips those cells
-// where we have an odd 'counter' value via the std_cxx17::optional
+// where we have an odd 'counter' value via the std::optional
 // framework
 
 #include <deal.II/base/logstream.h>
@@ -80,7 +80,7 @@ test()
   GridTools::
     exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
       tria,
-      [&](const cell_iterator &cell) -> std_cxx17::optional<DT> {
+      [&](const cell_iterator &cell) -> std::optional<DT> {
         const auto         counter = map[cell->id()];
         std::ostringstream oss;
         if (counter % 2 == 0)
@@ -95,7 +95,7 @@ test()
           {
             oss << "skipping " << cell->id() << ' ' << counter;
             input[cell->id()] = oss.str();
-            return std_cxx17::optional<DT>();
+            return std::optional<DT>();
           }
       },
       [&](const cell_iterator &cell, const DT &data) {

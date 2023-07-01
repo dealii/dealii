@@ -19,7 +19,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/patterns.h>
-#include <deal.II/base/std_cxx17/tuple.h>
 
 #include <tuple>
 #include <utility>
@@ -253,7 +252,7 @@ namespace Utilities
   ReturnType
   MutableBind<ReturnType, FunctionArgs...>::operator()() const
   {
-    return std_cxx17::apply(function, arguments);
+    return std::apply(function, arguments);
   }
 
 

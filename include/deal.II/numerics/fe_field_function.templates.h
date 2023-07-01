@@ -81,7 +81,7 @@ namespace Functions
     if (cell == dh->end())
       cell = dh->begin_active();
 
-    std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
+    std::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
         const std::pair<
@@ -143,7 +143,7 @@ namespace Functions
     if (cell == dh->end())
       cell = dh->begin_active();
 
-    std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
+    std::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
         const std::pair<
@@ -219,7 +219,7 @@ namespace Functions
     if (cell == dh->end())
       cell = dh->begin_active();
 
-    std_cxx17::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
+    std::optional<Point<dim>> qp = get_reference_coordinates(cell, p);
     if (!qp)
       {
         const std::pair<
@@ -548,7 +548,7 @@ namespace Functions
 
 
   template <int dim, typename VectorType, int spacedim>
-  std_cxx17::optional<Point<dim>>
+  std::optional<Point<dim>>
   FEFieldFunction<dim, VectorType, spacedim>::get_reference_coordinates(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const Point<dim> &                                              point) const
@@ -559,14 +559,14 @@ namespace Functions
         if (GeometryInfo<dim>::is_inside_unit_cell(qp))
           return qp;
         else
-          return std_cxx17::optional<Point<dim>>();
+          return std::optional<Point<dim>>();
       }
     catch (const typename Mapping<dim>::ExcTransformationFailed &)
       {
         // transformation failed, so
         // assume the point is
         // outside
-        return std_cxx17::optional<Point<dim>>();
+        return std::optional<Point<dim>>();
       }
   }
 

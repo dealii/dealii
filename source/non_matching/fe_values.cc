@@ -237,7 +237,7 @@ namespace NonMatching
 
 
   template <int dim>
-  const std_cxx17::optional<dealii::FEValues<dim>> &
+  const std::optional<dealii::FEValues<dim>> &
   FEValues<dim>::get_inside_fe_values() const
   {
     if (current_cell_location == LocationToLevelSet::inside)
@@ -249,7 +249,7 @@ namespace NonMatching
 
 
   template <int dim>
-  const std_cxx17::optional<dealii::FEValues<dim>> &
+  const std::optional<dealii::FEValues<dim>> &
   FEValues<dim>::get_outside_fe_values() const
   {
     if (current_cell_location == LocationToLevelSet::outside)
@@ -261,7 +261,7 @@ namespace NonMatching
 
 
   template <int dim>
-  const std_cxx17::optional<FEImmersedSurfaceValues<dim>> &
+  const std::optional<FEImmersedSurfaceValues<dim>> &
   FEValues<dim>::get_surface_fe_values() const
   {
     return fe_values_surface;
@@ -457,7 +457,7 @@ namespace NonMatching
 
 
   template <int dim>
-  const std_cxx17::optional<dealii::FEInterfaceValues<dim>> &
+  const std::optional<dealii::FEInterfaceValues<dim>> &
   FEInterfaceValues<dim>::get_inside_fe_values() const
   {
     if (current_face_location == LocationToLevelSet::inside)
@@ -469,7 +469,7 @@ namespace NonMatching
 
 
   template <int dim>
-  const std_cxx17::optional<dealii::FEInterfaceValues<dim>> &
+  const std::optional<dealii::FEInterfaceValues<dim>> &
   FEInterfaceValues<dim>::get_outside_fe_values() const
   {
     if (current_face_location == LocationToLevelSet::outside)

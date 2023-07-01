@@ -51,7 +51,7 @@ test_ignores_definite_functions()
   bounds[0].value = pair_with_equal_entries(-1);
   bounds[1].value = pair_with_equal_entries(1);
 
-  const std_cxx17::optional<HeightDirectionData> data =
+  const std::optional<HeightDirectionData> data =
     find_best_height_direction(bounds);
 
   if (!data)
@@ -87,7 +87,7 @@ test_find_best_height_direction()
   bounds[0].gradient[1] = pair_with_equal_entries(6);
   bounds[1].gradient[1] = pair_with_equal_entries(5);
 
-  const std_cxx17::optional<HeightDirectionData> data =
+  const std::optional<HeightDirectionData> data =
     find_best_height_direction(bounds);
 
   deallog << "height direction = " << data->direction << std::endl;

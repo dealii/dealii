@@ -19,7 +19,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx17/optional.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/distributed/tria.h>
@@ -33,6 +32,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <map>
+#include <optional>
 #include <type_traits>
 #include <vector>
 
@@ -170,9 +170,9 @@ public:
   get_data(const CellIteratorType &cell) const;
 
   /**
-   * Returns a std_cxx17::optional indicating whether @p cell contains an
+   * Returns a std::optional indicating whether @p cell contains an
    * associated data or not. If data is available, dereferencing the
-   * std_cxx17::optional reveals a vector of pointers to the underlying data
+   * std::optional reveals a vector of pointers to the underlying data
    * at the quadrature points.
    * A possible additional typename @p T is the class to which the base class
    * DataType could be cast. Since @p DataType is stored as shared pointers,
@@ -186,13 +186,13 @@ public:
    * initialize() the cell data.
    */
   template <typename T = DataType>
-  std_cxx17::optional<std::vector<std::shared_ptr<T>>>
+  std::optional<std::vector<std::shared_ptr<T>>>
   try_get_data(const CellIteratorType &cell);
 
   /**
-   * Returns a std_cxx17::optional indicating whether @p cell contains an
+   * Returns a std::optional indicating whether @p cell contains an
    * associated data or not. If data is available, dereferencing the
-   * std_cxx17::optional reveals a vector of constant pointers to the
+   * std::optional reveals a vector of constant pointers to the
    * underlying data at the quadrature points.
    * A possible additional typename @p T is the class to which the base class
    * DataType could be cast. Since @p DataType is stored as shared pointers,
@@ -206,7 +206,7 @@ public:
    * initialize() the cell data.
    */
   template <typename T = DataType>
-  std_cxx17::optional<std::vector<std::shared_ptr<const T>>>
+  std::optional<std::vector<std::shared_ptr<const T>>>
   try_get_data(const CellIteratorType &cell) const;
 
 private:
@@ -746,7 +746,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-inline std_cxx17::optional<std::vector<std::shared_ptr<T>>>
+inline std::optional<std::vector<std::shared_ptr<T>>>
 CellDataStorage<CellIteratorType, DataType>::try_get_data(
   const CellIteratorType &cell)
 {
@@ -777,7 +777,7 @@ CellDataStorage<CellIteratorType, DataType>::try_get_data(
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-inline std_cxx17::optional<std::vector<std::shared_ptr<const T>>>
+inline std::optional<std::vector<std::shared_ptr<const T>>>
 CellDataStorage<CellIteratorType, DataType>::try_get_data(
   const CellIteratorType &cell) const
 {

@@ -22,7 +22,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_restriction.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx17/optional.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -33,6 +32,7 @@
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
 
 #include <functional>
+#include <optional>
 
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
@@ -1149,10 +1149,10 @@ namespace NonMatching
         void
         split_box_and_recurse(
           const std::vector<std::reference_wrapper<const Function<dim>>>
-            &                                             level_sets,
-          const BoundingBox<dim> &                        box,
-          const std_cxx17::optional<HeightDirectionData> &direction_data,
-          const unsigned int                              n_box_splits);
+            &                                       level_sets,
+          const BoundingBox<dim> &                  box,
+          const std::optional<HeightDirectionData> &direction_data,
+          const unsigned int                        n_box_splits);
 
         /**
          * Uses the midpoint-method to create a quadrature over the box.
@@ -1367,7 +1367,7 @@ namespace NonMatching
        * std::optional is non-set.
        */
       template <int dim>
-      std_cxx17::optional<HeightDirectionData>
+      std::optional<HeightDirectionData>
       find_best_height_direction(
         const std::vector<FunctionBounds<dim>> &all_function_bounds);
 
