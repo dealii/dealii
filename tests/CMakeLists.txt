@@ -107,11 +107,26 @@ endforeach()
 # Custom targets for the testsuite:
 #
 
-# Setup tests:
-add_custom_target(setup_tests)
+#
+# Clear the test summary files that records how many tests have been configured.
+#
+set(_summary_files_prefix "${CMAKE_CURRENT_BINARY_DIR}/test_summary")
 
-# Remove all tests:
-add_custom_target(prune_tests)
+# Set up all tests and print a summary:
+add_custom_target(setup_tests
+  COMMAND ${CMAKE_COMMAND}
+    -D_summary_files_prefix="${_summary_files_prefix}"
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/scripts/print_summary_files.cmake
+  COMMENT "Setting up tests and printing test summary"
+  )
+
+# Remove all tests and also remove all test summary files:
+add_custom_target(prune_tests
+  COMMAND ${CMAKE_COMMAND}
+    -D_summary_files_prefix="${_summary_files_prefix}"
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/scripts/remove_summary_files.cmake
+  COMMENT "Cleaning tests and removing test summary files"
+  )
 
 foreach(_category ${_categories})
   set(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
@@ -124,7 +139,8 @@ foreach(_category ${_categories})
     # Do not pass the generator with -G so that we use make instead of ninja
     # for the test projects. This is because calling ninja several times in
     # parallel for the same project will break the configuration.
-    set(_command ${CMAKE_COMMAND} ${_options} ${_category_dir} > /dev/null)
+
+    set(_command ${CMAKE_COMMAND} ${_options} ${_category_dir} > "${_summary_files_prefix}_${_category}")
   endif()
 
   add_custom_target(setup_tests_${_category}
