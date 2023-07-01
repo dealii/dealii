@@ -601,11 +601,11 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(const VectorType &in,
   Assert(out.size() == dof_handler->n_dofs(),
          ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
 
-  std::vector<VectorType> all_in(1);
-  all_in[0] = in;
-  std::vector<VectorType> all_out(1);
-  all_out[0] = out;
+  std::vector<VectorType> all_in  = {in};
+  std::vector<VectorType> all_out = {out};
+
   interpolate(all_in, all_out);
+
   out = all_out[0];
 }
 
