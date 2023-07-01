@@ -456,9 +456,6 @@ namespace parallel
     void Triangulation<dim, spacedim>::save(const std::string &filename) const
     {
 #ifdef DEAL_II_WITH_MPI
-      // AssertThrow(this->cell_attached_data.pack_callbacks_variable.size() ==
-      // 0,
-      //            ExcNotImplemented());
 
       Assert(
         this->cell_attached_data.n_attached_deserialize == 0,
