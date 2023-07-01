@@ -1654,7 +1654,7 @@ public:
     ConstraintLine(const size_type &index = numbers::invalid_dof_index,
                    const typename AffineConstraints<
                      number>::ConstraintLine::Entries &entries       = {},
-                   const number &                      inhomogeneity = 0.0);
+                   const number                        inhomogeneity = 0.0);
 
     /**
      * Copy constructor.
@@ -2532,7 +2532,7 @@ template <typename number>
 inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
   const size_type &                                                  index,
   const typename AffineConstraints<number>::ConstraintLine::Entries &entries,
-  const number &inhomogeneity)
+  const number inhomogeneity)
   : index(index)
   , entries(entries)
   , inhomogeneity(inhomogeneity)
