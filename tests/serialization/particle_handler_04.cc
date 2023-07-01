@@ -107,11 +107,11 @@ test()
             << particle->get_surrounding_cell(tr) << std::endl;
 
   // verify correctness of the serialization. Note that the boost
-  // archive of the ParticleHandler has to be read before the triangulation (otherwise it
-  // does not know if something was stored in the user data of the
+  // archive of the ParticleHandler has to be read before the triangulation
+  // (otherwise it does not know if something was stored in the user data of the
   // triangulation).
   {
-    std::istringstream                 iss(oss.str());
+    std::istringstream            iss(oss.str());
     boost::archive::text_iarchive ia(iss, boost::archive::no_header);
 
     ia >> particle_handler;
