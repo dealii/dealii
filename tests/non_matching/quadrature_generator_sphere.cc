@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/function_level_set.h>
+#include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -48,7 +48,7 @@ calculate_volume_and_surface_area()
 
 
   // Description of the immersed domain.
-  const Functions::LevelSet::Sphere<dim> level_set;
+  const Functions::SignedDistance::Sphere<dim> level_set;
 
   // Create a quadrature generator.
   const hp::QCollection<1>              q_collection1D(QGauss<1>(2));

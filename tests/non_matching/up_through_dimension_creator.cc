@@ -18,7 +18,7 @@
  * in NonMatching::internal::QuadratureGeneratorImplementation.
  */
 
-#include <deal.II/base/function_level_set.h>
+#include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/hp/q_collection.h>
@@ -96,8 +96,8 @@ test_cut_through_center()
 
   Point<dim>     point_through_plane = .5 * Point<dim>::unit_vector(dim - 1);
   Tensor<1, dim> plane_normal        = Point<dim>::unit_vector(dim - 1);
-  const Functions::LevelSet::Plane<dim> level_set(point_through_plane,
-                                                  plane_normal);
+  const Functions::SignedDistance::Plane<dim> level_set(point_through_plane,
+                                                        plane_normal);
 
   create_and_print_partitioning(level_set);
 }
@@ -121,7 +121,8 @@ test_missed_roots_on_bottom_face()
   const Tensor<1, dim> plane_normal = Point<dim>::unit_vector(dim - 1);
   Point<dim>           point_in_plane;
   point_in_plane[dim - 1] = -.1;
-  const Functions::LevelSet::Plane<dim> level_set(point_in_plane, plane_normal);
+  const Functions::SignedDistance::Plane<dim> level_set(point_in_plane,
+                                                        plane_normal);
 
   create_and_print_partitioning(level_set);
 }
@@ -141,7 +142,8 @@ test_missed_roots_on_top_face()
   const Tensor<1, dim> plane_normal = Point<dim>::unit_vector(dim - 1);
   Point<dim>           point_in_plane;
   point_in_plane[dim - 1] = 1.1;
-  const Functions::LevelSet::Plane<dim> level_set(point_in_plane, plane_normal);
+  const Functions::SignedDistance::Plane<dim> level_set(point_in_plane,
+                                                        plane_normal);
 
   create_and_print_partitioning(level_set);
 }

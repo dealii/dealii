@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/function_level_set.h>
+#include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -114,7 +114,7 @@ Test<dim>::setup_discrete_level_set()
 {
   Point<dim> point_on_zero_contour;
   point_on_zero_contour[0] = 1.5;
-  const Functions::LevelSet::Plane<dim> analytical_levelset(
+  const Functions::SignedDistance::Plane<dim> analytical_levelset(
     point_on_zero_contour, Point<dim>::unit_vector(0));
 
   level_set.reinit(dof_handler.n_dofs());

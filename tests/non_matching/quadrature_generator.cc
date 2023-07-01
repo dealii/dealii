@@ -23,7 +23,7 @@
  */
 
 #include <deal.II/base/function.h>
-#include <deal.II/base/function_level_set.h>
+#include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -98,7 +98,7 @@ test_vertical_cuts_through_center()
     {
       deallog << "direction=" << direction << std::endl;
       const Tensor<1, dim> normal = Point<dim>::unit_vector(direction);
-      const Functions::LevelSet::Plane<dim> level_set(center, normal);
+      const Functions::SignedDistance::Plane<dim> level_set(center, normal);
       create_and_print_quadratures(level_set);
     }
 }
@@ -152,7 +152,7 @@ test_simplex_cut()
   Point<dim> point_in_plane;
   point_in_plane[0] = edge_length;
 
-  const Functions::LevelSet::Plane<dim> level_set(point_in_plane, normal);
+  const Functions::SignedDistance::Plane<dim> level_set(point_in_plane, normal);
 
   create_and_print_quadratures(level_set);
 }
@@ -176,7 +176,7 @@ test_epsilon_cut_at_bottom_corner()
       normal[i] = 1;
       center(i) += epsilon;
     }
-  const Functions::LevelSet::Plane<dim> level_set(center, normal);
+  const Functions::SignedDistance::Plane<dim> level_set(center, normal);
 
   create_and_print_quadratures(level_set);
 }
@@ -204,7 +204,7 @@ test_sphere_cutting_corner_exactly()
   const double radius = 4;
   Point<dim>   center;
   center[dim - 1] = radius;
-  const Functions::LevelSet::Sphere<dim> level_set(center, radius);
+  const Functions::SignedDistance::Sphere<dim> level_set(center, radius);
 
   typename QuadratureGenerator<dim>::AdditionalData data;
   data.split_in_half  = false;

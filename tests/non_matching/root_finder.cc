@@ -18,8 +18,8 @@
  */
 
 #include <deal.II/base/bounding_box.h>
-#include <deal.II/base/function_level_set.h>
 #include <deal.II/base/function_lib.h>
+#include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
@@ -66,7 +66,7 @@ test_roots_sorted_not_duplicated()
 {
   deallog << "test_roots_sorted_not_duplicated" << std::endl;
 
-  std::vector<Functions::LevelSet::Plane<1>> linear_functions;
+  std::vector<Functions::SignedDistance::Plane<1>> linear_functions;
 
   const std::vector<double> roots = {.75, .25, .25};
   for (unsigned int i = 0; i < roots.size(); ++i)
@@ -74,7 +74,8 @@ test_roots_sorted_not_duplicated()
       Tensor<1, 1> normal;
       normal[0] = 1;
       const Point<1> point(roots.at(i));
-      linear_functions.push_back(Functions::LevelSet::Plane<1>(point, normal));
+      linear_functions.push_back(
+        Functions::SignedDistance::Plane<1>(point, normal));
     }
 
   const std::vector<std::reference_wrapper<const Function<1>>> functions(

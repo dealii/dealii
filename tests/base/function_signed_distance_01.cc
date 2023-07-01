@@ -20,7 +20,7 @@
  * what the function values should be.
  */
 
-#include <deal.II/base/function_level_set.h>
+#include <deal.II/base/function_signed_distance.h>
 
 #include "../tests.h"
 
