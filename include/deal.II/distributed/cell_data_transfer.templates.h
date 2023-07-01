@@ -110,8 +110,7 @@ namespace parallel
       handle = tria->register_data_attach(
         [this](const typename parallel::distributed::
                  Triangulation<dim, spacedim>::cell_iterator &cell,
-               const typename parallel::distributed::
-                 Triangulation<dim, spacedim>::CellStatus status) {
+               const CellStatus                               status) {
           return this->pack_callback(cell, status);
         },
         /*returns_variable_size_data=*/transfer_variable_size_data);
@@ -185,8 +184,7 @@ namespace parallel
         [this, &all_out](
           const typename parallel::distributed::Triangulation<dim, spacedim>::
             cell_iterator &cell,
-          const typename parallel::distributed::Triangulation<dim, spacedim>::
-            CellStatus status,
+          const CellStatus status,
           const boost::iterator_range<std::vector<char>::const_iterator>
             &data_range) {
           this->unpack_callback(cell, status, data_range, all_out);
@@ -247,9 +245,7 @@ namespace parallel
     CellDataTransfer<dim, spacedim, VectorType>::pack_callback(
       const typename parallel::distributed::Triangulation<dim, spacedim>::
         cell_iterator &cell,
-      const typename parallel::distributed::Triangulation<dim,
-                                                          spacedim>::CellStatus
-        status)
+      const CellStatus status)
     {
       std::vector<value_type> cell_data(input_vectors.size());
 
@@ -260,17 +256,14 @@ namespace parallel
         {
           switch (status)
             {
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_PERSIST:
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_REFINE:
+              case CELL_PERSIST:
+              case CELL_REFINE:
                 // Cell either persists, or will be refined, and its children do
                 // not exist yet in the latter case.
                 *it_output = (**it_input)[cell->active_cell_index()];
                 break;
 
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_COARSEN:
+              case CELL_COARSEN:
                 {
                   // Cell is parent whose children will get coarsened to.
                   // Decide data to store on parent by provided strategy.
@@ -314,9 +307,7 @@ namespace parallel
     CellDataTransfer<dim, spacedim, VectorType>::unpack_callback(
       const typename parallel::distributed::Triangulation<dim, spacedim>::
         cell_iterator &cell,
-      const typename parallel::distributed::Triangulation<dim,
-                                                          spacedim>::CellStatus
-        status,
+      const CellStatus status,
       const boost::iterator_range<std::vector<char>::const_iterator>
         &                        data_range,
       std::vector<VectorType *> &all_out)
@@ -344,17 +335,14 @@ namespace parallel
       for (; it_input != cell_data.cend(); ++it_input, ++it_output)
         switch (status)
           {
-            case parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CELL_PERSIST:
-            case parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CELL_COARSEN:
+            case CELL_PERSIST:
+            case CELL_COARSEN:
               // Cell either persists, or has been coarsened.
               // Thus, cell has no (longer) children.
               (**it_output)[cell->active_cell_index()] = *it_input;
               break;
 
-            case parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CELL_REFINE:
+            case CELL_REFINE:
               {
                 // Cell has been refined, and is now parent of its children.
                 // Thus, distribute parent's data on its children.

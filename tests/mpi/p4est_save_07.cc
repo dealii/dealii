@@ -41,9 +41,8 @@ template <int dim>
 std::vector<char>
 pack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
-    &cell,
-  const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-    status)
+    &              cell,
+  const CellStatus status)
 {
   static unsigned int       some_number = 1;
   std::vector<unsigned int> some_vector(some_number);
@@ -63,9 +62,7 @@ pack_function(
           << std::accumulate(some_vector.begin(), some_vector.end(), 0)
           << std::endl;
 
-  Assert((status ==
-          parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST),
-         ExcInternalError());
+  Assert((status == CELL_PERSIST), ExcInternalError());
 
   ++some_number;
   return buffer;
@@ -77,9 +74,8 @@ template <int dim>
 void
 unpack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
-    &cell,
-  const typename parallel::distributed::Triangulation<dim, dim>::CellStatus
-                                                                  status,
+    &                                                             cell,
+  const CellStatus                                                status,
   const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
 {
   const unsigned int data_in_bytes =
@@ -104,9 +100,7 @@ unpack_function(
           << std::accumulate(intdatavector.begin(), intdatavector.end(), 0)
           << std::endl;
 
-  Assert((status ==
-          parallel::distributed::Triangulation<dim, dim>::CELL_PERSIST),
-         ExcInternalError());
+  Assert((status == CELL_PERSIST), ExcInternalError());
 }
 
 

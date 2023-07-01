@@ -39,7 +39,7 @@ template <int dim>
 unsigned int
 cell_weight(
   const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-  const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+  const CellStatus status)
 {
   const unsigned int cell_weight =
     (cell->center()[0] < 0.5 || cell->center()[1] < 0.5 ? 1 : 4);
@@ -80,9 +80,7 @@ test()
   std::vector<unsigned int> integrated_weights(numproc, 0);
   for (const auto &cell :
        tr.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
-    integrated_weights[myid] +=
-      cell_weight<dim>(cell,
-                       parallel::distributed::Triangulation<dim>::CELL_PERSIST);
+    integrated_weights[myid] += cell_weight<dim>(cell, CELL_PERSIST);
 
   Utilities::MPI::sum(integrated_weights, MPI_COMM_WORLD, integrated_weights);
   if (myid == 0)

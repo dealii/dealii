@@ -27,6 +27,8 @@
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/cell_status.h>
+#include <deal.II/grid/data_transfer.h>
 #include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
@@ -2033,34 +2035,6 @@ public:
 
 
   /**
-   * Used to inform functions in derived classes how the cell with the given
-   * cell_iterator is going to change. Note that this may me different than
-   * the refine_flag() and coarsen_flag() in the cell_iterator in parallel
-   * calculations because of refinement constraints that this machine does not
-   * see.
-   */
-  enum CellStatus
-  {
-    /**
-     * The cell will not be refined or coarsened and might or might not move
-     * to a different processor.
-     */
-    CELL_PERSIST,
-    /**
-     * The cell will be or was refined.
-     */
-    CELL_REFINE,
-    /**
-     * The children of this cell will be or were coarsened into this cell.
-     */
-    CELL_COARSEN,
-    /**
-     * Invalid status. Will not occur for the user.
-     */
-    CELL_INVALID
-  };
-
-  /**
    * A structure used to accumulate the results of the `weight` signal slot
    * functions below. It takes an iterator range and returns the sum of
    * values.
@@ -3484,6 +3458,239 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif
 
+  /**
+   * @name Serialization facilities.
+   * @{
+   */
+public:
+  /**
+   * Register a function that can be used to attach data of fixed size
+   * to cells. This is useful for two purposes: (i) Upon refinement and
+   * coarsening of a triangulation (@a e.g. in
+   * parallel::distributed::Triangulation::execute_coarsening_and_refinement()),
+   * one needs to be able to store one or more data vectors per cell that
+   * characterizes the solution values on the cell so that this data can
+   * then be transferred to the new owning processor of the cell (or
+   * its parent/children) when the mesh is re-partitioned; (ii) when
+   * serializing a computation to a file, it is necessary to attach
+   * data to cells so that it can be saved (@a e.g. in
+   * parallel::distributed::Triangulation::save()) along with the cell's
+   * other information and, if necessary, later be reloaded from disk
+   * with a different subdivision of cells among the processors.
+   *
+   * The way this function works is that it allows any number of interest
+   * parties to register their intent to attach data to cells. One example
+   * of classes that do this is parallel::distributed::SolutionTransfer
+   * where each parallel::distributed::SolutionTransfer object that works
+   * on the current Triangulation object then needs to register its intent.
+   * Each of these parties registers a callback function (the first
+   * argument here, @p pack_callback) that will be called whenever the
+   * triangulation's execute_coarsening_and_refinement() or save()
+   * functions are called.
+   *
+   * The current function then returns an integer handle that corresponds
+   * to the number of data set that the callback provided here will attach.
+   * While this number could be given a precise meaning, this is
+   * not important: You will never actually have to do anything with
+   * this number except return it to the notify_ready_to_unpack() function.
+   * In other words, each interested party (i.e., the caller of the current
+   * function) needs to store their respective returned handle for later use
+   * when unpacking data in the callback provided to
+   * notify_ready_to_unpack().
+   *
+   * Whenever @p pack_callback is then called by
+   * execute_coarsening_and_refinement() or load() on a given cell, it
+   * receives a number of arguments. In particular, the first
+   * argument passed to the callback indicates the cell for which
+   * it is supposed to attach data. This is always an active cell.
+   *
+   * The second, CellStatus, argument provided to the callback function
+   * will tell you if the given cell will be coarsened, refined, or will
+   * persist as is. (This status may be different than the refinement
+   * or coarsening flags set on that cell, to accommodate things such as
+   * the "one hanging node per edge" rule.). These flags need to be
+   * read in context with the p4est quadrant they belong to, as their
+   * relations are gathered in local_cell_relations.
+   *
+   * Specifically, the values for this argument mean the following:
+   *
+   * - `CELL_PERSIST`: The cell won't be refined/coarsened, but might be
+   * moved to a different processor. If this is the case, the callback
+   * will want to pack up the data on this cell into an array and store
+   * it at the provided address for later unpacking wherever this cell
+   * may land.
+   * - `CELL_REFINE`: This cell will be refined into 4 or 8 cells (in 2d
+   * and 3d, respectively). However, because these children don't exist
+   * yet, you cannot access them at the time when the callback is
+   * called. Thus, in local_cell_relations, the corresponding
+   * p4est quadrants of the children cells are linked to the deal.II
+   * cell which is going to be refined. To be specific, only the very
+   * first child is marked with `CELL_REFINE`, whereas the others will be
+   * marked with `CELL_INVALID`, which indicates that these cells will be
+   * ignored by default during the packing or unpacking process. This
+   * ensures that data is only transferred once onto or from the parent
+   * cell. If the callback is called with `CELL_REFINE`, the callback
+   * will want to pack up the data on this cell into an array and store
+   * it at the provided address for later unpacking in a way so that
+   * it can then be transferred to the children of the cell that will
+   * then be available. In other words, if the data the callback
+   * will want to pack up corresponds to a finite element field, then
+   * the prolongation from parent to (new) children will have to happen
+   * during unpacking.
+   * - `CELL_COARSEN`: The children of this cell will be coarsened into the
+   * given cell. These children still exist, so if this is the value
+   * given to the callback as second argument, the callback will want
+   * to transfer data from the children to the current parent cell and
+   * pack it up so that it can later be unpacked again on a cell that
+   * then no longer has any children (and may also be located on a
+   * different processor). In other words, if the data the callback
+   * will want to pack up corresponds to a finite element field, then
+   * it will need to do the restriction from children to parent at
+   * this point.
+   * - `CELL_INVALID`: See `CELL_REFINE`.
+   *
+   * @note If this function is used for serialization of data
+   *   using save() and load(), then the cell status argument with which
+   *   the callback is called will always be `CELL_PERSIST`.
+   *
+   * The callback function is expected to return a memory chunk of the
+   * format `std::vector<char>`, representing the packed data on a
+   * certain cell.
+   *
+   * The second parameter @p returns_variable_size_data indicates whether
+   * the returned size of the memory region from the callback function
+   * varies by cell (<tt>=true</tt>) or stays constant on each one
+   * throughout the whole domain (<tt>=false</tt>).
+   *
+   * @note The purpose of this function is to register intent to
+   *   attach data for a single, subsequent call to
+   *   execute_coarsening_and_refinement() and notify_ready_to_unpack(),
+   *   save(), load(). Consequently, notify_ready_to_unpack(), save(),
+   *   and load() all forget the registered callbacks once these
+   *   callbacks have been called, and you will have to re-register
+   *   them with a triangulation if you want them to be active for
+   *   another call to these functions.
+   */
+  unsigned int
+  register_data_attach(
+    const std::function<std::vector<char>(const cell_iterator &,
+                                          const CellStatus)> &pack_callback,
+    const bool returns_variable_size_data);
+
+  /**
+   * This function is the opposite of register_data_attach(). It is called
+   * <i>after</i> the execute_coarsening_and_refinement() or save()/load()
+   * functions are done when classes and functions that have previously
+   * attached data to a triangulation for either transfer to other
+   * processors, across mesh refinement, or serialization of data to
+   * a file are ready to receive that data back. The important part about
+   * this process is that the triangulation cannot do this right away from
+   * the end of execute_coarsening_and_refinement() or load() via a
+   * previously attached callback function (as the register_data_attach()
+   * function does) because the classes that eventually want the data
+   * back may need to do some setup between the point in time where the
+   * mesh has been recreated and when the data can actually be received.
+   * An example is the parallel::distributed::SolutionTransfer class
+   * that can really only receive the data once not only the mesh is
+   * completely available again on the current processor, but only
+   * after a DoFHandler has been reinitialized and distributed
+   * degrees of freedom. In other words, there is typically a significant
+   * amount of set up that needs to happen in user space before the classes
+   * that can receive data attached to cell are ready to actually do so.
+   * When they are, they use the current function to tell the triangulation
+   * object that now is the time when they are ready by calling the
+   * current function.
+   *
+   * The supplied callback function is then called for each newly locally
+   * owned cell. The first argument to the callback is an iterator that
+   * designates the cell; the second argument indicates the status of the
+   * cell in question; and the third argument localizes a memory area by
+   * two iterators that contains the data that was previously saved from
+   * the callback provided to register_data_attach().
+   *
+   * The CellStatus will indicate if the cell was refined, coarsened, or
+   * persisted unchanged. The @p cell_iterator argument to the callback
+   * will then either be an active,
+   * locally owned cell (if the cell was not refined), or the immediate
+   * parent if it was refined during execute_coarsening_and_refinement().
+   * Therefore, contrary to during register_data_attach(), you can now
+   * access the children if the status is `CELL_REFINE` but no longer for
+   * callbacks with status `CELL_COARSEN`.
+   *
+   * The first argument to this function, `handle`, corresponds to
+   * the return value of register_data_attach(). (The precise
+   * meaning of what the numeric value of this handle is supposed
+   * to represent is neither important, nor should you try to use
+   * it for anything other than transmit information between a
+   * call to register_data_attach() to the corresponding call to
+   * notify_ready_to_unpack().)
+   */
+  void
+  notify_ready_to_unpack(
+    const unsigned int handle,
+    const std::function<
+      void(const cell_iterator &,
+           const CellStatus,
+           const boost::iterator_range<std::vector<char>::const_iterator> &)>
+      &unpack_callback);
+
+  CellAttachedData<dim, spacedim> cell_attached_data;
+
+protected:
+  /**
+   * Save additional cell-attached data into the given file. The first
+   * arguments are used to determine the offsets where to write buffers to.
+   *
+   * Called by @ref save.
+   */
+  void
+  save_attached_data(const unsigned int global_first_cell,
+                     const unsigned int global_num_cells,
+                     const std::string &filename) const;
+
+  /**
+   * Load additional cell-attached data from the given file, if any was saved.
+   * The first arguments are used to determine the offsets where to read
+   * buffers from.
+   *
+   * Called by @ref load.
+   */
+  void
+  load_attached_data(const unsigned int global_first_cell,
+                     const unsigned int global_num_cells,
+                     const unsigned int local_num_cells,
+                     const std::string &filename,
+                     const unsigned int n_attached_deserialize_fixed,
+                     const unsigned int n_attached_deserialize_variable);
+
+  /**
+   * A function to record the CellStatus of currently active cells that
+   * are locally owned. This information is mandatory to transfer data
+   * between meshes during adaptation or serialization, e.g., using
+   * parallel::distributed::SolutionTransfer.
+   *
+   * Relations will be stored in the private member local_cell_relations. For
+   * an extensive description of CellStatus, see the documentation for the
+   * member function register_data_attach().
+   */
+  virtual void
+  update_cell_relations()
+  {}
+
+  /**
+   * Vector of pairs, each containing a deal.II cell iterator and its
+   * respective CellStatus. To update its contents, use the
+   * update_cell_relations() member function.
+   */
+  std::vector<typename DataTransfer<dim, spacedim>::cell_relation_t>
+    local_cell_relations;
+
+  std::unique_ptr<DataTransfer<dim, spacedim>> data_transfer;
+  /**
+   * @}
+   */
+
+public:
   /**
    * @name Exceptions
    * @{

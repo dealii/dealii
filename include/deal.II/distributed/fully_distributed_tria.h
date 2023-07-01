@@ -120,9 +120,6 @@ namespace parallel
       using active_cell_iterator =
         typename dealii::Triangulation<dim, spacedim>::active_cell_iterator;
 
-      using CellStatus =
-        typename dealii::Triangulation<dim, spacedim>::CellStatus;
-
       /**
        * Constructor.
        *

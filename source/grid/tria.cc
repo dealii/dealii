@@ -11081,6 +11081,10 @@ Triangulation<dim, spacedim>::Triangulation(
   signals.post_refinement.connect(signals.any_change);
   signals.clear.connect(signals.any_change);
   signals.mesh_movement.connect(signals.any_change);
+
+  cell_attached_data = {0, 0, {}, {}};
+  data_transfer =
+    std::make_unique<DataTransfer<dim, spacedim>>(get_communicator());
 }
 
 
@@ -11184,6 +11188,9 @@ void Triangulation<dim, spacedim>::clear()
   periodic_face_pairs_level_0.clear();
   periodic_face_map.clear();
   reference_cells.clear();
+
+  cell_attached_data = {0, 0, {}, {}};
+  data_transfer->clear();
 }
 
 
@@ -14814,6 +14821,148 @@ bool Triangulation<dim, spacedim>::is_mixed_mesh() const
           (reference_cells[0].is_simplex() == false));
 }
 
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::register_data_attach(
+  const std::function<std::vector<char>(const cell_iterator &,
+                                        const CellStatus)> &pack_callback,
+  const bool returns_variable_size_data)
+{
+  unsigned int handle = numbers::invalid_unsigned_int;
+
+  // Add new callback function to the corresponding register.
+  // Encode handles according to returns_variable_size_data.
+  if (returns_variable_size_data)
+    {
+      handle = 2 * this->cell_attached_data.pack_callbacks_variable.size();
+      this->cell_attached_data.pack_callbacks_variable.push_back(pack_callback);
+    }
+  else
+    {
+      handle = 2 * this->cell_attached_data.pack_callbacks_fixed.size() + 1;
+      this->cell_attached_data.pack_callbacks_fixed.push_back(pack_callback);
+    }
+
+  // Increase overall counter.
+  ++this->cell_attached_data.n_attached_data_sets;
+
+  return handle;
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::notify_ready_to_unpack(
+  const unsigned int handle,
+  const std::function<
+    void(const cell_iterator &,
+         const CellStatus,
+         const boost::iterator_range<std::vector<char>::const_iterator> &)>
+    &unpack_callback)
+{
+  // perform unpacking
+  this->data_transfer->unpack_data(this->local_cell_relations,
+                                   handle,
+                                   unpack_callback);
+
+  // decrease counters
+  --this->cell_attached_data.n_attached_data_sets;
+  if (this->cell_attached_data.n_attached_deserialize > 0)
+    --this->cell_attached_data.n_attached_deserialize;
+
+  // important: only remove data if we are not in the deserialization
+  // process. There, each SolutionTransfer registers and unpacks before
+  // the next one does this, so n_attached_data_sets is only 1 here.  This
+  // would destroy the saved data before the second SolutionTransfer can
+  // get it. This created a bug that is documented in
+  // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
+
+  if (this->cell_attached_data.n_attached_data_sets == 0 &&
+      this->cell_attached_data.n_attached_deserialize == 0)
+    {
+      // everybody got their data, time for cleanup!
+      this->cell_attached_data.pack_callbacks_fixed.clear();
+      this->cell_attached_data.pack_callbacks_variable.clear();
+      this->data_transfer->clear();
+
+      // reset all cell_status entries after coarsening/refinement
+      for (auto &cell_rel : this->local_cell_relations)
+        cell_rel.second = CELL_PERSIST;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_attached_data(
+  const unsigned int global_first_cell,
+  const unsigned int global_num_cells,
+  const std::string &filename) const
+{
+  // cast away constness
+  auto tria = const_cast<Triangulation<dim, spacedim> *>(this);
+
+  if (this->cell_attached_data.n_attached_data_sets > 0)
+    {
+      // pack attached data first
+      tria->data_transfer->pack_data(
+        tria->local_cell_relations,
+        tria->cell_attached_data.pack_callbacks_fixed,
+        tria->cell_attached_data.pack_callbacks_variable);
+
+      // then store buffers in file
+      tria->data_transfer->save(global_first_cell, global_num_cells, filename);
+
+      // and release the memory afterwards
+      tria->data_transfer->clear();
+    }
+
+  // clear all of the callback data, as explained in the documentation of
+  // register_data_attach()
+  {
+    tria->cell_attached_data.n_attached_data_sets = 0;
+    tria->cell_attached_data.pack_callbacks_fixed.clear();
+    tria->cell_attached_data.pack_callbacks_variable.clear();
+  }
+}
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_attached_data(
+  const unsigned int global_first_cell,
+  const unsigned int global_num_cells,
+  const unsigned int local_num_cells,
+  const std::string &filename,
+  const unsigned int n_attached_deserialize_fixed,
+  const unsigned int n_attached_deserialize_variable)
+{
+  // load saved data, if any was stored
+  if (this->cell_attached_data.n_attached_deserialize > 0)
+    {
+      this->data_transfer->load(global_first_cell,
+                                global_num_cells,
+                                local_num_cells,
+                                filename,
+                                n_attached_deserialize_fixed,
+                                n_attached_deserialize_variable);
+
+      this->data_transfer->unpack_cell_status(this->local_cell_relations);
+
+      // the CellStatus of all stored cells should always be CELL_PERSIST.
+      for (const auto &cell_rel : this->local_cell_relations)
+        {
+          (void)cell_rel;
+          Assert((cell_rel.second == // cell_status
+                  CELL_PERSIST),
+                 ExcInternalError());
+        }
+    }
+}
 
 
 template <int dim, int spacedim>

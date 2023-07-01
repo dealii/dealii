@@ -72,23 +72,21 @@ test()
 
   // register weighting function that returns the number of particles per cell
   triangulation.signals.weight.connect(
-    [&particle_handler](
-      const typename parallel::distributed::Triangulation<dim>::cell_iterator
-        &cell,
-      const typename parallel::distributed::Triangulation<dim>::CellStatus
-        status) -> unsigned int {
+    [&particle_handler](const typename parallel::distributed::Triangulation<
+                          dim>::cell_iterator &cell,
+                        const CellStatus       status) -> unsigned int {
       unsigned int n_particles_in_cell = 0;
       switch (status)
         {
-          case parallel::distributed::Triangulation<dim>::CELL_PERSIST:
-          case parallel::distributed::Triangulation<dim>::CELL_REFINE:
+          case CELL_PERSIST:
+          case CELL_REFINE:
             n_particles_in_cell = particle_handler.n_particles_in_cell(cell);
             break;
 
-          case parallel::distributed::Triangulation<dim>::CELL_INVALID:
+          case CELL_INVALID:
             break;
 
-          case parallel::distributed::Triangulation<dim>::CELL_COARSEN:
+          case CELL_COARSEN:
             for (const auto &child : cell->child_iterators())
               n_particles_in_cell +=
                 particle_handler.n_particles_in_cell(child);

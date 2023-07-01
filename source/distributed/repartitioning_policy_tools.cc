@@ -262,8 +262,7 @@ namespace RepartitioningPolicyTools
   CellWeightPolicy<dim, spacedim>::CellWeightPolicy(
     const std::function<
       unsigned int(const typename Triangulation<dim, spacedim>::cell_iterator &,
-                   const typename Triangulation<dim, spacedim>::CellStatus)>
-      &weighting_function)
+                   const CellStatus)> &weighting_function)
     : weighting_function(weighting_function)
   {}
 
@@ -297,8 +296,7 @@ namespace RepartitioningPolicyTools
     for (const auto &cell :
          tria->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
       weights[partitioner->global_to_local(cell->global_active_cell_index())] =
-        weighting_function(
-          cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
+        weighting_function(cell, CELL_PERSIST);
 
     // determine weight of all the cells locally owned by this process
     std::uint64_t process_local_weight = 0;

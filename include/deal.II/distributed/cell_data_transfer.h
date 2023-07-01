@@ -290,8 +290,7 @@ namespace parallel
       std::vector<char>
       pack_callback(const typename parallel::distributed::
                       Triangulation<dim, spacedim>::cell_iterator &cell,
-                    const typename parallel::distributed::
-                      Triangulation<dim, spacedim>::CellStatus status);
+                    const CellStatus                               status);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -302,8 +301,7 @@ namespace parallel
       unpack_callback(
         const typename parallel::distributed::Triangulation<dim, spacedim>::
           cell_iterator &cell,
-        const typename parallel::distributed::Triangulation<dim, spacedim>::
-          CellStatus status,
+        const CellStatus status,
         const boost::iterator_range<std::vector<char>::const_iterator>
           &                        data_range,
         std::vector<VectorType *> &all_out);

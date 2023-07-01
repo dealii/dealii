@@ -1522,7 +1522,7 @@ namespace
   template <int dim, int spacedim>
   using cell_relation_t = typename std::pair<
     typename dealii::Triangulation<dim, spacedim>::cell_iterator,
-    typename dealii::Triangulation<dim, spacedim>::CellStatus>;
+    CellStatus>;
 
   /**
    * Adds a pair of a @p dealii_cell and its @p status
@@ -1540,7 +1540,7 @@ namespace
     const typename dealii::internal::p4est::types<dim>::tree &  tree,
     const unsigned int                                          idx,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename Triangulation<dim, spacedim>::CellStatus     status)
+    const CellStatus                                            status)
   {
     const unsigned int local_quadrant_index = tree.quadrants_offset + idx;
 
@@ -1620,11 +1620,7 @@ namespace
         // this active cell didn't change
         // save pair into corresponding position
         add_single_cell_relation<dim, spacedim>(
-          cell_rel,
-          tree,
-          idx,
-          dealii_cell,
-          Triangulation<dim, spacedim>::CELL_PERSIST);
+          cell_rel, tree, idx, dealii_cell, CELL_PERSIST);
       }
     else if (p4est_has_children) // based on the conditions above, we know that
                                  // dealii_cell has no children
@@ -1656,8 +1652,8 @@ namespace
         // mark first child with CELL_REFINE and the remaining children with
         // CELL_INVALID, but associate them all with the parent cell unpack
         // algorithm will be called only on CELL_REFINE flagged quadrant
-        int                                               child_idx;
-        typename Triangulation<dim, spacedim>::CellStatus cell_status;
+        int        child_idx;
+        CellStatus cell_status;
         for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
              ++i)
           {
@@ -1666,8 +1662,7 @@ namespace
               &p4est_child[i],
               dealii::internal::p4est::functions<dim>::quadrant_compare);
 
-            cell_status = (i == 0) ? Triangulation<dim, spacedim>::CELL_REFINE :
-                                     Triangulation<dim, spacedim>::CELL_INVALID;
+            cell_status = (i == 0) ? CELL_REFINE : CELL_INVALID;
 
             add_single_cell_relation<dim, spacedim>(
               cell_rel, tree, child_idx, dealii_cell, cell_status);
@@ -1679,11 +1674,7 @@ namespace
         // its children got coarsened into this cell in p4est,
         // but the dealii_cell still has its children
         add_single_cell_relation<dim, spacedim>(
-          cell_rel,
-          tree,
-          idx,
-          dealii_cell,
-          Triangulation<dim, spacedim>::CELL_COARSEN);
+          cell_rel, tree, idx, dealii_cell, CELL_COARSEN);
       }
   }
 } // namespace
@@ -1877,13 +1868,13 @@ namespace parallel
       const typename dealii::internal::p4est::types<dim>::gloidx
         *previous_global_first_quadrant)
     {
-      Assert(this->data_transfer.sizes_fixed_cumulative.size() > 0,
+      Assert(this->data_transfer->sizes_fixed_cumulative.size() > 0,
              ExcMessage("No data has been packed!"));
 
       // Resize memory according to the data that we will receive.
-      this->data_transfer.dest_data_fixed.resize(
+      this->data_transfer->dest_data_fixed.resize(
         parallel_forest->local_num_quadrants *
-        this->data_transfer.sizes_fixed_cumulative.back());
+        this->data_transfer->sizes_fixed_cumulative.back());
 
       // Execute non-blocking fixed size transfer.
       typename dealii::internal::p4est::types<dim>::transfer_context
@@ -1894,14 +1885,14 @@ namespace parallel
           previous_global_first_quadrant,
           parallel_forest->mpicomm,
           0,
-          this->data_transfer.dest_data_fixed.data(),
-          this->data_transfer.src_data_fixed.data(),
-          this->data_transfer.sizes_fixed_cumulative.back());
+          this->data_transfer->dest_data_fixed.data(),
+          this->data_transfer->src_data_fixed.data(),
+          this->data_transfer->sizes_fixed_cumulative.back());
 
-      if (this->data_transfer.variable_size_data_stored)
+      if (this->data_transfer->variable_size_data_stored)
         {
           // Resize memory according to the data that we will receive.
-          this->data_transfer.dest_sizes_variable.resize(
+          this->data_transfer->dest_sizes_variable.resize(
             parallel_forest->local_num_quadrants);
 
           // Execute fixed size transfer of data sizes for variable size
@@ -1911,23 +1902,23 @@ namespace parallel
             previous_global_first_quadrant,
             parallel_forest->mpicomm,
             1,
-            this->data_transfer.dest_sizes_variable.data(),
-            this->data_transfer.src_sizes_variable.data(),
+            this->data_transfer->dest_sizes_variable.data(),
+            this->data_transfer->src_sizes_variable.data(),
             sizeof(unsigned int));
         }
 
       dealii::internal::p4est::functions<dim>::transfer_fixed_end(tf_context);
 
       // Release memory of previously packed data.
-      this->data_transfer.src_data_fixed.clear();
-      this->data_transfer.src_data_fixed.shrink_to_fit();
+      this->data_transfer->src_data_fixed.clear();
+      this->data_transfer->src_data_fixed.shrink_to_fit();
 
-      if (this->data_transfer.variable_size_data_stored)
+      if (this->data_transfer->variable_size_data_stored)
         {
           // Resize memory according to the data that we will receive.
-          this->data_transfer.dest_data_variable.resize(
-            std::accumulate(this->data_transfer.dest_sizes_variable.begin(),
-                            this->data_transfer.dest_sizes_variable.end(),
+          this->data_transfer->dest_data_variable.resize(
+            std::accumulate(this->data_transfer->dest_sizes_variable.begin(),
+                            this->data_transfer->dest_sizes_variable.end(),
                             std::vector<int>::size_type(0)));
 
 #  if DEAL_II_P4EST_VERSION_GTE(2, 0, 65, 0)
@@ -1937,10 +1928,10 @@ namespace parallel
           // at all, which is mandatory if one of our processes does not own
           // any quadrant. This bypasses the assertion from being triggered.
           //   - see: https://github.com/cburstedde/p4est/issues/48
-          if (this->data_transfer.src_sizes_variable.size() == 0)
-            this->data_transfer.src_sizes_variable.resize(1);
-          if (this->data_transfer.dest_sizes_variable.size() == 0)
-            this->data_transfer.dest_sizes_variable.resize(1);
+          if (this->data_transfer->src_sizes_variable.size() == 0)
+            this->data_transfer->src_sizes_variable.resize(1);
+          if (this->data_transfer->dest_sizes_variable.size() == 0)
+            this->data_transfer->dest_sizes_variable.resize(1);
 #  endif
 
           // Execute variable size transfer.
@@ -1949,16 +1940,16 @@ namespace parallel
             previous_global_first_quadrant,
             parallel_forest->mpicomm,
             1,
-            this->data_transfer.dest_data_variable.data(),
-            this->data_transfer.dest_sizes_variable.data(),
-            this->data_transfer.src_data_variable.data(),
-            this->data_transfer.src_sizes_variable.data());
+            this->data_transfer->dest_data_variable.data(),
+            this->data_transfer->dest_sizes_variable.data(),
+            this->data_transfer->src_data_variable.data(),
+            this->data_transfer->src_sizes_variable.data());
 
           // Release memory of previously packed data.
-          this->data_transfer.src_sizes_variable.clear();
-          this->data_transfer.src_sizes_variable.shrink_to_fit();
-          this->data_transfer.src_data_variable.clear();
-          this->data_transfer.src_data_variable.shrink_to_fit();
+          this->data_transfer->src_sizes_variable.clear();
+          this->data_transfer->src_sizes_variable.shrink_to_fit();
+          this->data_transfer->src_data_variable.clear();
+          this->data_transfer->src_data_variable.shrink_to_fit();
         }
     }
 
@@ -2035,10 +2026,9 @@ namespace parallel
       for (const auto &cell_rel : this->local_cell_relations)
         {
           (void)cell_rel;
-          Assert(
-            (cell_rel.second == // cell_status
-             parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST),
-            ExcInternalError());
+          Assert((cell_rel.second == // cell_status
+                  CELL_PERSIST),
+                 ExcInternalError());
         }
 
       // Save cell attached data.
@@ -3395,7 +3385,7 @@ namespace parallel
       // pack data before triangulation gets updated
       if (this->cell_attached_data.n_attached_data_sets > 0)
         {
-          this->data_transfer.pack_data(
+          this->data_transfer->pack_data(
             this->local_cell_relations,
             this->cell_attached_data.pack_callbacks_fixed,
             this->cell_attached_data.pack_callbacks_variable);
@@ -3428,7 +3418,7 @@ namespace parallel
                                  previous_global_first_quadrant.data());
 
           // also update the CellStatus information on the new mesh
-          this->data_transfer.unpack_cell_status(this->local_cell_relations);
+          this->data_transfer->unpack_cell_status(this->local_cell_relations);
         }
 
 #  ifdef DEBUG
@@ -3568,7 +3558,7 @@ namespace parallel
       // pack data before triangulation gets updated
       if (this->cell_attached_data.n_attached_data_sets > 0)
         {
-          this->data_transfer.pack_data(
+          this->data_transfer->pack_data(
             this->local_cell_relations,
             this->cell_attached_data.pack_callbacks_fixed,
             this->cell_attached_data.pack_callbacks_variable);
@@ -4244,19 +4234,19 @@ namespace parallel
 
               switch (status)
                 {
-                  case dealii::Triangulation<dim, spacedim>::CELL_PERSIST:
+                  case CELL_PERSIST:
                     // cell remains unchanged
                     cell->clear_refine_flag();
                     cell->clear_coarsen_flag();
                     break;
 
-                  case dealii::Triangulation<dim, spacedim>::CELL_REFINE:
+                  case CELL_REFINE:
                     // cell will be refined
                     cell->clear_coarsen_flag();
                     cell->set_refine_flag();
                     break;
 
-                  case dealii::Triangulation<dim, spacedim>::CELL_COARSEN:
+                  case CELL_COARSEN:
                     // children of this cell will be coarsened
                     for (const auto &child : cell->child_iterators())
                       {
@@ -4265,7 +4255,7 @@ namespace parallel
                       }
                     break;
 
-                  case dealii::Triangulation<dim, spacedim>::CELL_INVALID:
+                  case CELL_INVALID:
                     // do nothing as cell does not exist yet
                     break;
 

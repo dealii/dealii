@@ -2195,10 +2195,9 @@ namespace Particles
         "creation and do not refine afterwards, or use a distributed triangulation."));
 
     const auto callback_function =
-      [this](
-        const typename Triangulation<dim, spacedim>::cell_iterator
-          &                                                     cell_iterator,
-        const typename Triangulation<dim, spacedim>::CellStatus cell_status) {
+      [this](const typename Triangulation<dim, spacedim>::cell_iterator
+               &              cell_iterator,
+             const CellStatus cell_status) {
         return this->pack_callback(cell_iterator, cell_status);
       };
 
@@ -2271,12 +2270,11 @@ namespace Particles
     if (handle != numbers::invalid_unsigned_int)
       {
         const auto callback_function =
-          [this](
-            const typename Triangulation<dim, spacedim>::cell_iterator
-              &cell_iterator,
-            const typename Triangulation<dim, spacedim>::CellStatus cell_status,
-            const boost::iterator_range<std::vector<char>::const_iterator>
-              &range_iterator) {
+          [this](const typename Triangulation<dim, spacedim>::cell_iterator
+                   &              cell_iterator,
+                 const CellStatus cell_status,
+                 const boost::iterator_range<std::vector<char>::const_iterator>
+                   &range_iterator) {
             this->unpack_callback(cell_iterator, cell_status, range_iterator);
           };
 
@@ -2295,14 +2293,14 @@ namespace Particles
   std::vector<char>
   ParticleHandler<dim, spacedim>::pack_callback(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const typename Triangulation<dim, spacedim>::CellStatus     status) const
+    const CellStatus                                            status) const
   {
     std::vector<particle_iterator> stored_particles_on_cell;
 
     switch (status)
       {
-        case parallel::TriangulationBase<dim, spacedim>::CELL_PERSIST:
-        case parallel::TriangulationBase<dim, spacedim>::CELL_REFINE:
+        case CELL_PERSIST:
+        case CELL_REFINE:
           // If the cell persist or is refined store all particles of the
           // current cell.
           {
@@ -2317,7 +2315,7 @@ namespace Particles
           }
           break;
 
-        case parallel::TriangulationBase<dim, spacedim>::CELL_COARSEN:
+        case CELL_COARSEN:
           // If this cell is the parent of children that will be coarsened,
           // collect the particles of all children.
           {
@@ -2351,16 +2349,14 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::unpack_callback(
     const typename Triangulation<dim, spacedim>::cell_iterator &    cell,
-    const typename Triangulation<dim, spacedim>::CellStatus         status,
+    const CellStatus                                                status,
     const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
   {
     if (data_range.begin() == data_range.end())
       return;
 
     const auto cell_to_store_particles =
-      (status != parallel::TriangulationBase<dim, spacedim>::CELL_REFINE) ?
-        cell :
-        cell->child(0);
+      (status != CELL_REFINE) ? cell : cell->child(0);
 
     // deserialize particles and insert into local storage
     if (data_range.begin() != data_range.end())
@@ -2384,13 +2380,13 @@ namespace Particles
     // now update particle storage location and properties if necessary
     switch (status)
       {
-        case parallel::TriangulationBase<dim, spacedim>::CELL_PERSIST:
+        case CELL_PERSIST:
           {
             // all particles are correctly inserted
           }
           break;
 
-        case parallel::TriangulationBase<dim, spacedim>::CELL_COARSEN:
+        case CELL_COARSEN:
           {
             // all particles are in correct cell, but their reference location
             // has changed
@@ -2404,7 +2400,7 @@ namespace Particles
           }
           break;
 
-        case parallel::TriangulationBase<dim, spacedim>::CELL_REFINE:
+        case CELL_REFINE:
           {
             // we need to find the correct child to store the particles and
             // their reference location has changed

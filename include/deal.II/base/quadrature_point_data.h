@@ -500,9 +500,8 @@ namespace parallel
       std::vector<char>
       pack_function(
         const typename parallel::distributed::Triangulation<dim>::cell_iterator
-          &cell,
-        const typename parallel::distributed::Triangulation<dim>::CellStatus
-          status);
+          &              cell,
+        const CellStatus status);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -512,9 +511,8 @@ namespace parallel
       void
       unpack_function(
         const typename parallel::distributed::Triangulation<dim>::cell_iterator
-          &cell,
-        const typename parallel::distributed::Triangulation<dim>::CellStatus
-          status,
+          &              cell,
+        const CellStatus status,
         const boost::iterator_range<std::vector<char>::const_iterator>
           &data_range);
 
@@ -935,11 +933,11 @@ namespace parallel
       data_storage  = &data_storage_;
 
       handle = triangulation->register_data_attach(
-        [this](
-          const typename parallel::distributed::Triangulation<
-            dim>::cell_iterator &cell,
-          const typename parallel::distributed::Triangulation<dim>::CellStatus
-            status) { return this->pack_function(cell, status); },
+        [this](const typename parallel::distributed::Triangulation<
+                 dim>::cell_iterator &cell,
+               const CellStatus       status) {
+          return this->pack_function(cell, status);
+        },
         /*returns_variable_size_data=*/true);
     }
 
@@ -951,13 +949,13 @@ namespace parallel
     {
       triangulation->notify_ready_to_unpack(
         handle,
-        [this](
-          const typename parallel::distributed::Triangulation<
-            dim>::cell_iterator &cell,
-          const typename parallel::distributed::Triangulation<dim>::CellStatus
-            status,
-          const boost::iterator_range<std::vector<char>::const_iterator>
-            &data_range) { this->unpack_function(cell, status, data_range); });
+        [this](const typename parallel::distributed::Triangulation<
+                 dim>::cell_iterator &cell,
+               const CellStatus       status,
+               const boost::iterator_range<std::vector<char>::const_iterator>
+                 &data_range) {
+          this->unpack_function(cell, status, data_range);
+        });
 
       // invalidate the pointers
       data_storage  = nullptr;
@@ -971,8 +969,7 @@ namespace parallel
     ContinuousQuadratureDataTransfer<dim, DataType>::pack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
         &cell,
-      const typename parallel::distributed::Triangulation<
-        dim>::CellStatus /*status*/)
+      const CellStatus /*status*/)
     {
       pack_cell_data(cell, data_storage, matrix_quadrature);
 
@@ -991,15 +988,12 @@ namespace parallel
     inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::unpack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
-        &cell,
-      const typename parallel::distributed::Triangulation<dim>::CellStatus
-        status,
+        &              cell,
+      const CellStatus status,
       const boost::iterator_range<std::vector<char>::const_iterator>
         &data_range)
     {
-      Assert((status !=
-              parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN),
-             ExcNotImplemented());
+      Assert((status != CELL_COARSEN), ExcNotImplemented());
       (void)status;
 
       matrix_dofs =
