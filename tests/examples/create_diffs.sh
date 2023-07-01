@@ -12,10 +12,10 @@ for file in $diff_files; do
 
   # Check if the corresponding .cc file exists
   if [[ -f "$src" ]]; then
-      echo "creating $file from $src and $filename.cc"
-    diff "$src" "$filename.cc" > $file
+    echo "creating $file from $src and $filename.cc"
+    diff "$src" "$filename.cc" > "$file"
   else
-      echo "No matching .cc file found for $diff_file"
-      exit -1
+    echo "No matching .cc file found for $file"
+    exit 1
   fi
 done
