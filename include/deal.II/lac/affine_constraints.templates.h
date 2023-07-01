@@ -901,20 +901,28 @@ AffineConstraints<number>::close()
         }
     } // end of loop over all constraint lines
 
-#ifdef DEBUG
   // if in debug mode: check that no dof is constrained to another dof that
   // is also constrained. exclude dofs from this check whose constraint
   // lines are not stored on the local processor
-  for (const ConstraintLine &line : lines)
-    for (const std::pair<size_type, number> &entry : line.entries)
-      if ((local_lines.size() == 0) || (local_lines.is_element(entry.first)))
-        {
-          // make sure that entry->first is not the index of a line itself
-          const bool is_circle = is_constrained(entry.first);
-          Assert(is_circle == false,
-                 ExcDoFConstrainedToConstrainedDoF(line.index, entry.first));
-        }
-#endif
+  Assert(std::none_of(lines.begin(),
+                      lines.end(),
+                      [this](const ConstraintLine &line) {
+                        for (const std::pair<size_type, number> &entry :
+                             line.entries)
+                          if ((local_lines.size() == 0) ||
+                              (local_lines.is_element(entry.first)))
+                            {
+                              // make sure that entry->first is not the index of
+                              // a line itself
+                              const bool is_circle =
+                                is_constrained(entry.first);
+                              if (is_circle)
+                                return true;
+                            }
+                        return false;
+                      }),
+         ExcMessage("The constraints represented by this object have a cycle. "
+                    "This is not allowed."));
 
   sorted = true;
 }
