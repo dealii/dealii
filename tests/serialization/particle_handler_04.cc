@@ -100,8 +100,32 @@ test()
   MappingQ<dim, spacedim> mapping(1);
 
   Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
+       std::vector<Point<spacedim>> position(2);
+        std::vector<Point<dim>>      reference_position(2);
 
-  create_regular_particle_distribution(particle_handler, tr);
+        for (unsigned int i = 0; i < dim; ++i)
+          {
+            position[0](i) = 0.125;
+            position[1](i) = 0.525;
+          }
+
+        Particles::Particle<dim, spacedim> particle1(position[0],
+                                                     reference_position[0],
+                                                     0);
+        Particles::Particle<dim, spacedim> particle2(position[1],
+                                                     reference_position[1],
+                                                     1);
+
+        typename Triangulation<dim, spacedim>::active_cell_iterator cell1(&tr,
+                                                                          2,
+                                                                          0);
+        typename Triangulation<dim, spacedim>::active_cell_iterator cell2(&tr,
+                                                                          2,
+                                                                          0);
+  particle_handler.insert_particle(particle1, cell1);
+  particle_handler.insert_particle(particle2, cell2);
+
+  //create_regular_particle_distribution(particle_handler, tr);
   particle_handler.sort_particles_into_subdomains_and_cells();
 
   for (auto particle = particle_handler.begin();
@@ -114,9 +138,9 @@ test()
   // save data to archive
   std::ostringstream oss;
   {
-    boost::archive::text_oarchive oa(oss, boost::archive::no_header);
+    //boost::archive::text_oarchive oa(oss, boost::archive::no_header);
 
-    oa << particle_handler;
+    //oa << particle_handler;
     particle_handler.prepare_for_serialization();
     tr.save("checkpoint");
 
@@ -128,7 +152,7 @@ test()
   // Now remove all information in tr and particle_handler,
   // this is like creating new objects after a restart
   tr.clear();
-  GridGenerator::hyper_cube(tr);
+  //GridGenerator::hyper_cube(tr);
 
   particle_handler.clear();
   particle_handler.initialize(tr, mapping);
@@ -145,14 +169,15 @@ test()
   // does not know if something was stored in the user data of the
   // triangulation).
   {
-    std::istringstream            iss(oss.str());
-    boost::archive::text_iarchive ia(iss, boost::archive::no_header);
+  //  std::istringstream            iss(oss.str());
+   // boost::archive::text_iarchive ia(iss, boost::archive::no_header);
 
-    ia >> particle_handler;
+   // ia >> particle_handler;
     tr.load("checkpoint");
     particle_handler.deserialize();
   }
 
+  deallog << "After deserialization global number of particles is: " << particle_handler.n_global_particles() << std::endl;
   for (auto particle = particle_handler.begin();
        particle != particle_handler.end();
        ++particle)

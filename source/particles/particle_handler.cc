@@ -2194,7 +2194,6 @@ namespace Particles
         "by the ParticleHandler class. Either insert particles after mesh "
         "creation and do not refine afterwards, or use a distributed triangulation."));
 
-#ifdef DEAL_II_WITH_P4EST
     const auto callback_function =
       [this](
         const typename Triangulation<dim, spacedim>::cell_iterator
@@ -2205,7 +2204,7 @@ namespace Particles
 
     handle = distributed_triangulation->register_data_attach(
       callback_function, /*returns_variable_size_data=*/true);
-#endif
+
   }
 
 
