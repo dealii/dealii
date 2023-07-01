@@ -20,8 +20,10 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/parallel.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_local_storage.h>
+#include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparse_matrix.h>
@@ -657,18 +659,26 @@ AffineConstraints<number>::close()
       Assert(i == calculate_line_index(lines[lines_cache[i]].index),
              ExcInternalError());
 
-  // first, strip zero entries, as we have to do that only once
-  for (ConstraintLine &line : lines)
-    // first remove zero entries. that would mean that in the linear
-    // constraint for a node, x_i = ax_1 + bx_2 + ..., another node times 0
-    // appears. obviously, 0*something can be omitted
-    line.entries.erase(std::remove_if(line.entries.begin(),
-                                      line.entries.end(),
-                                      [](
-                                        const std::pair<size_type, number> &p) {
-                                        return p.second == number(0.);
-                                      }),
-                       line.entries.end());
+  // The second part is that we need to work on the individual lines.
+  // Let us start by stripping zero entries. That would mean that in the linear
+  // constraint for a node, x_i = ax_1 + bx_2 + ..., another node times 0
+  // appears. obviously, 0*something can be omitted.
+  //
+  // This can be done in parallel:
+  parallel::internal::parallel_for(
+    lines.begin(),
+    lines.end(),
+    [](const auto &range) {
+      for (ConstraintLine &line : range)
+        line.entries.erase(
+          std::remove_if(line.entries.begin(),
+                         line.entries.end(),
+                         [](const std::pair<size_type, number> &p) {
+                           return p.second == number(0.);
+                         }),
+          line.entries.end());
+    },
+    /* grainsize = */ 100);
 
 
 
@@ -812,94 +822,104 @@ AffineConstraints<number>::close()
 #endif
     }
 
-  // finally sort the entries and re-scale them if necessary. in this step,
+  // Finally sort the entries and re-scale them if necessary. in this step,
   // we also throw out duplicates as mentioned above. moreover, as some
   // entries might have had zero weights, we replace them by a vector with
   // sharp sizes.
-  for (ConstraintLine &line : lines)
-    {
-      std::sort(line.entries.begin(),
-                line.entries.end(),
-                [](const std::pair<unsigned int, number> &a,
-                   const std::pair<unsigned int, number> &b) -> bool {
-                  // Let's use lexicogrpahic ordering with std::abs for number
-                  // type (it might be complex valued).
-                  return (a.first < b.first) ||
-                         (a.first == b.first &&
-                          std::abs(a.second) < std::abs(b.second));
-                });
-
-      // loop over the now sorted list and see whether any of the entries
-      // references the same dofs more than once in order to find how many
-      // non-duplicate entries we have. This lets us allocate the correct
-      // amount of memory for the constraint entries.
-      size_type duplicates = 0;
-      for (size_type i = 1; i < line.entries.size(); ++i)
-        if (line.entries[i].first == line.entries[i - 1].first)
-          duplicates++;
-
-      if (duplicates > 0 || line.entries.size() < line.entries.capacity())
+  //
+  // This is again an operation that works on each line separately. It can be
+  // run in parallel:
+  parallel::internal::parallel_for(
+    lines.begin(),
+    lines.end(),
+    [](const auto &range) {
+      for (ConstraintLine &line : range)
         {
-          typename ConstraintLine::Entries new_entries;
+          std::sort(line.entries.begin(),
+                    line.entries.end(),
+                    [](const std::pair<unsigned int, number> &a,
+                       const std::pair<unsigned int, number> &b) -> bool {
+                      // Let's use lexicographic ordering with std::abs for
+                      // number type (it might be complex valued).
+                      return (a.first < b.first) ||
+                             (a.first == b.first &&
+                              std::abs(a.second) < std::abs(b.second));
+                    });
 
-          // if we have no duplicates, copy verbatim the entries. this way,
-          // the final size is of the vector is correct.
-          if (duplicates == 0)
-            new_entries = line.entries;
-          else
+          // loop over the now sorted list and see whether any of the entries
+          // references the same dofs more than once in order to find how many
+          // non-duplicate entries we have. This lets us allocate the correct
+          // amount of memory for the constraint entries.
+          size_type duplicates = 0;
+          for (size_type i = 1; i < line.entries.size(); ++i)
+            if (line.entries[i].first == line.entries[i - 1].first)
+              ++duplicates;
+
+          if (duplicates > 0 || (line.entries.size() < line.entries.capacity()))
             {
-              // otherwise, we need to go through the list and resolve the
-              // duplicates
-              new_entries.reserve(line.entries.size() - duplicates);
-              new_entries.push_back(line.entries[0]);
-              for (size_type j = 1; j < line.entries.size(); ++j)
-                if (line.entries[j].first == line.entries[j - 1].first)
-                  {
-                    Assert(new_entries.back().first == line.entries[j].first,
-                           ExcInternalError());
-                    new_entries.back().second += line.entries[j].second;
-                  }
-                else
-                  new_entries.push_back(line.entries[j]);
+              typename ConstraintLine::Entries new_entries;
 
-              Assert(new_entries.size() == line.entries.size() - duplicates,
-                     ExcInternalError());
-
-              // make sure there are really no duplicates left and that the
-              // list is still sorted
-              for (size_type j = 1; j < new_entries.size(); ++j)
+              // if we have no duplicates, copy verbatim the entries. this way,
+              // the final size is of the vector is correct.
+              if (duplicates == 0)
+                new_entries = line.entries;
+              else
                 {
-                  Assert(new_entries[j].first != new_entries[j - 1].first,
+                  // otherwise, we need to go through the list and resolve the
+                  // duplicates
+                  new_entries.reserve(line.entries.size() - duplicates);
+                  new_entries.push_back(line.entries[0]);
+                  for (size_type j = 1; j < line.entries.size(); ++j)
+                    if (line.entries[j].first == line.entries[j - 1].first)
+                      {
+                        Assert(new_entries.back().first ==
+                                 line.entries[j].first,
+                               ExcInternalError());
+                        new_entries.back().second += line.entries[j].second;
+                      }
+                    else
+                      new_entries.push_back(line.entries[j]);
+
+                  Assert(new_entries.size() == line.entries.size() - duplicates,
                          ExcInternalError());
-                  Assert(new_entries[j].first > new_entries[j - 1].first,
-                         ExcInternalError());
+
+                  // make sure there are really no duplicates left and that the
+                  // list is still sorted
+                  for (size_type j = 1; j < new_entries.size(); ++j)
+                    {
+                      Assert(new_entries[j].first != new_entries[j - 1].first,
+                             ExcInternalError());
+                      Assert(new_entries[j].first > new_entries[j - 1].first,
+                             ExcInternalError());
+                    }
                 }
+
+              // replace old list of constraints for this dof by the new one
+              line.entries.swap(new_entries);
             }
 
-          // replace old list of constraints for this dof by the new one
-          line.entries.swap(new_entries);
+          // Finally do the following check: if the sum of weights for the
+          // constraints is close to one, but not exactly one, then rescale all
+          // the weights so that they sum up to 1. this adds a little numerical
+          // stability and avoids all sorts of problems where the actual value
+          // is close to, but not quite what we expected
+          //
+          // the case where the weights don't quite sum up happens when we
+          // compute the interpolation weights "on the fly", i.e. not from
+          // precomputed tables. in this case, the interpolation weights are
+          // also subject to round-off
+          number sum = 0.;
+          for (const std::pair<size_type, number> &entry : line.entries)
+            sum += entry.second;
+          if (std::abs(sum - number(1.)) < 1.e-13)
+            {
+              for (std::pair<size_type, number> &entry : line.entries)
+                entry.second /= sum;
+              line.inhomogeneity /= sum;
+            }
         }
-
-      // Finally do the following check: if the sum of weights for the
-      // constraints is close to one, but not exactly one, then rescale all
-      // the weights so that they sum up to 1. this adds a little numerical
-      // stability and avoids all sorts of problems where the actual value
-      // is close to, but not quite what we expected
-      //
-      // the case where the weights don't quite sum up happens when we
-      // compute the interpolation weights "on the fly", i.e. not from
-      // precomputed tables. in this case, the interpolation weights are
-      // also subject to round-off
-      number sum = 0.;
-      for (const std::pair<size_type, number> &entry : line.entries)
-        sum += entry.second;
-      if (std::abs(sum - number(1.)) < 1.e-13)
-        {
-          for (std::pair<size_type, number> &entry : line.entries)
-            entry.second /= sum;
-          line.inhomogeneity /= sum;
-        }
-    } // end of loop over all constraint lines
+    },
+    /* grainsize = */ 100);
 
   // if in debug mode: check that no dof is constrained to another dof that
   // is also constrained. exclude dofs from this check whose constraint
