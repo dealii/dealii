@@ -2093,8 +2093,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
     outside[d] = internal::invalid_pull_back_coordinate;
 
   // project the user-given input to unit cell
-  Point<dim> chart_point =
-    GeometryInfo<dim>::project_to_unit_cell(initial_guess);
+  Point<dim> chart_point = cell->reference_cell().closest_point(initial_guess);
 
   // run quasi-Newton iteration with a combination of finite differences for
   // the exact Jacobian and "Broyden's good method". As opposed to the various

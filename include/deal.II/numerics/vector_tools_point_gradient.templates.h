@@ -113,7 +113,7 @@ namespace VectorTools
            ExcInternalError());
 
     const Quadrature<dim> quadrature(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+      cell_point.first->reference_cell().closest_point(cell_point.second));
 
     FEValues<dim> fe_values(mapping, fe, quadrature, update_gradients);
     fe_values.reinit(cell_point.first);
@@ -159,7 +159,7 @@ namespace VectorTools
            ExcInternalError());
 
     const Quadrature<dim> quadrature(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+      cell_point.first->reference_cell().closest_point(cell_point.second));
     hp::FEValues<dim, spacedim> hp_fe_values(mapping,
                                              fe,
                                              hp::QCollection<dim>(quadrature),

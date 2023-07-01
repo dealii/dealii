@@ -112,7 +112,7 @@ namespace VectorTools
            ExcInternalError());
 
     const Quadrature<dim> quadrature(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+      cell_point.first->reference_cell().closest_point(cell_point.second));
 
     FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
     fe_values.reinit(cell_point.first);
@@ -155,7 +155,7 @@ namespace VectorTools
            ExcInternalError());
 
     const Quadrature<dim> quadrature(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+      cell_point.first->reference_cell().closest_point(cell_point.second));
     hp::FEValues<dim, spacedim> hp_fe_values(mapping,
                                              fe,
                                              hp::QCollection<dim>(quadrature),
@@ -260,7 +260,7 @@ namespace VectorTools
            ExcInternalError());
 
     const Quadrature<dim> quadrature(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+      cell_point.first->reference_cell().closest_point(cell_point.second));
     FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
     fe_values.reinit(cell_point.first);
 
@@ -300,12 +300,12 @@ namespace VectorTools
     AssertThrow(cell_point.first.state() == IteratorState::valid,
                 ExcPointNotAvailableHere());
 
-    Quadrature<dim> q(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+    const Quadrature<dim> quadrature(
+      cell_point.first->reference_cell().closest_point(cell_point.second));
 
     FEValues<dim, spacedim> fe_values(mapping,
                                       dof_handler.get_fe(),
-                                      q,
+                                      quadrature,
                                       UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
@@ -364,12 +364,12 @@ namespace VectorTools
     AssertThrow(cell_point.first.state() == IteratorState::valid,
                 ExcPointNotAvailableHere());
 
-    Quadrature<dim> q(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+    const Quadrature<dim> quadrature(
+      cell_point.first->reference_cell().closest_point(cell_point.second));
 
     FEValues<dim> fe_values(mapping[cell_point.first->active_fe_index()],
                             cell_point.first->get_fe(),
-                            q,
+                            quadrature,
                             UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
@@ -409,13 +409,13 @@ namespace VectorTools
     AssertThrow(cell_point.first.state() == IteratorState::valid,
                 ExcPointNotAvailableHere());
 
-    const Quadrature<dim> q(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+    const Quadrature<dim> quadrature(
+      cell_point.first->reference_cell().closest_point(cell_point.second));
 
     const FEValuesExtractors::Vector vec(0);
     FEValues<dim, spacedim>          fe_values(mapping,
                                       dof_handler.get_fe(),
-                                      q,
+                                      quadrature,
                                       UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
@@ -480,13 +480,13 @@ namespace VectorTools
     AssertThrow(cell_point.first.state() == IteratorState::valid,
                 ExcPointNotAvailableHere());
 
-    Quadrature<dim> q(
-      GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+    const Quadrature<dim> quadrature(
+      cell_point.first->reference_cell().closest_point(cell_point.second));
 
     const FEValuesExtractors::Vector vec(0);
     FEValues<dim> fe_values(mapping[cell_point.first->active_fe_index()],
                             cell_point.first->get_fe(),
-                            q,
+                            quadrature,
                             UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 

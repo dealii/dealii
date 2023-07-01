@@ -1637,7 +1637,7 @@ namespace GridTools
    * local position might be located slightly outside an actual unit cell,
    * due to numerical roundoff. Therefore, the point returned by this function
    * should be projected onto the unit cell, using
-   * GeometryInfo::project_to_unit_cell().  This is not automatically performed
+   * ReferenceCell::closest_point(). This is not automatically performed
    * by the algorithm. The returned cell can be a locally-owned cell or a
    * ghost cell (but not an artificial cell). The returned cell might be a
    * ghost cell even if the given point is a vertex of a locally owned cell.
